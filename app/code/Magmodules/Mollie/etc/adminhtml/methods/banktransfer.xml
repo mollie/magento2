@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+	<group id="mollie_methods_banktransfer" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+		<label>Banktransfer</label>
+		<field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+			<label>Enabled</label>
+			<source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/mollie_methods_banktransfer/active</config_path>
+        </field>
+		<field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+			<label>Title</label>
+            <config_path>payment/mollie_methods_banktransfer/title</config_path>
+			<depends>
+				<field id="active">1</field>
+			</depends>
+        </field>        
+		<field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1" showInWebsite="1" showInStore="0">
+			<label>Payment from Applicable Countries</label>
+			<source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+            <config_path>payment/mollie_methods_banktransfer/allowspecific</config_path>
+			<depends>
+				<field id="active">1</field>
+			</depends>
+        </field>
+		<field id="specificcountry" translate="label" type="multiselect" sortOrder="97" showInDefault="1" showInWebsite="1" showInStore="0">
+			<label>Payment from Specific Countries</label>
+			<source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+			<can_be_empty>1</can_be_empty>
+            <config_path>payment/mollie_methods_banktransfer/specificcountry</config_path>
+			<depends>
+				<field id="active">1</field>
+			</depends>
+		</field>
+		<field id="min_order_total" translate="label" type="text" sortOrder="98" showInDefault="1" showInWebsite="1" showInStore="0">
+			<label>Minimum Order Total</label>
+            <config_path>payment/mollie_methods_banktransfer/min_order_total</config_path>
+			<depends>
+				<field id="active">1</field>
+			</depends>
+        </field>
+		<field id="max_order_total" translate="label" type="text" sortOrder="99" showInDefault="1" showInWebsite="1" showInStore="0">
+			<label>Maximum Order Total</label>
+            <config_path>payment/mollie_methods_banktransfer/max_order_total</config_path>
+			<depends>
+				<field id="active">1</field>
+			</depends>
+        </field>
+		<field id="sort_order" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="0">
+			<label>Sort Order</label>
+			<frontend_class>validate-number</frontend_class>
+            <config_path>payment/mollie_methods_banktransfer/sort_order</config_path>
+			<depends>
+				<field id="active">1</field>
+			</depends>
+        </field>        
+	</group>
+</include>

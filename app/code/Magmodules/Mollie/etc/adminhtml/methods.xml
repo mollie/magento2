@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <include path="Magmodules_Mollie::methods/bancontact.xml" />
+    <include path="Magmodules_Mollie::methods/banktransfer.xml" />
+    <include path="Magmodules_Mollie::methods/belfius.xml" />
+    <include path="Magmodules_Mollie::methods/bitcoin.xml" />
+    <include path="Magmodules_Mollie::methods/creditcard.xml" />
+    <include path="Magmodules_Mollie::methods/ideal.xml" />
+    <include path="Magmodules_Mollie::methods/kbc.xml" />
+    <include path="Magmodules_Mollie::methods/paypal.xml" />
+    <include path="Magmodules_Mollie::methods/paysafecard.xml" />
+    <include path="Magmodules_Mollie::methods/sofort.xml" />
+</include>

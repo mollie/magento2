@@ -1,0 +1,46 @@
+.mm-heading-mollie {
+   color: #666;
+   text-align: left;
+   border: 1px solid rgba(229, 229, 229, 0.27);
+   border-left: 2px solid #ea4c00;
+   font-size: 14px;
+   margin: 20px 0 0;
+   padding: 5px 5px 5px 10px;
+   background: #f8f8f8;
+}
+
+.mm-comment-mollie {
+   padding: 10px 0px;
+   font-size: 12px;
+}
+
+.mollie-success {
+   display: block;
+   line-height: 30px;
+}
+
+.mollie-success:before {
+   font-family: 'Admin Icons';
+   font-size: 12px;
+   font-style: normal;
+   font-weight: 400;
+   padding: 10px;
+   color: #79a22e;
+   content: '\e62d';
+}
+
+.mollie-error {
+   display: block;
+   background-color: white;
+   line-height: 30px;
+}
+
+.mollie-error:before {
+   color: #eb5202;
+   content: '\e623';
+   font-family: 'Admin Icons';
+   font-size: 12px;
+   font-style: normal;
+   font-weight: 400;
+   padding: 10px;
+}

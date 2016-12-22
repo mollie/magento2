@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<payment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/payment.xsd">
+    <methods>
+        <method name="mollie_methods_bancontact">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_banktransfer">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_belfius">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_bitcoin">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_creditcard">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_ideal">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_kbc">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_paypal">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_paysafecard">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_sofort">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+    </methods>
+</payment>
