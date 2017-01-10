@@ -4,7 +4,6 @@
         <section id="payment">
 			<group id="mollie" translate="label" type="text" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="1">
 				<label>Mollie</label>
-	            <resource>Magmodules_Mollie::config</resource>
                 <group id="mollie_general" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>General</label>
 					<field id="version" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
@@ -20,7 +19,7 @@
 						<label>API Details</label>
 						<frontend_model>Magmodules\Mollie\Block\Adminhtml\Magmodules\Heading</frontend_model>
 						<comment><![CDATA[You can find your Api Keys in your <a href="https://www.mollie.nl/beheer/account/profielen/" title="Mollie Profiles">Mollie Profile</a>.<br>]]></comment>
-					</field>                    
+					</field>
                     <field id="type" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Modus</label>
                         <source_model>Magmodules\Mollie\Model\Adminhtml\Source\ApiKey</source_model>
@@ -38,7 +37,7 @@
 						<label>Settings</label>
 						<frontend_model>Magmodules\Mollie\Block\Adminhtml\Magmodules\Heading</frontend_model>
 						<comment><![CDATA[Configure the general Mollie Payment Payment status and Payment Icons.]]></comment>
-					</field>                       
+					</field>
                     <field id="payment_images" translate="label" type="select" sortOrder="21" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Show Icons</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -67,27 +66,27 @@
 						<label>Debug</label>
 						<frontend_model>Magmodules\Mollie\Block\Adminhtml\Magmodules\Heading</frontend_model>
 						<comment><![CDATA[Especially for Developers you can enable the Debug mode.]]></comment>
-					</field>                        
+					</field>
                     <field id="debug" translate="label" type="select" sortOrder="81" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>Debug requests</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/mollie_general/debug</config_path>
                         <comment>When activated the debug file will be located in: var/mollie.log</comment>
-                    </field>                    
+                    </field>
 					<field id="heading_compatibility" translate="label comment" type="text" sortOrder="90" showInDefault="1" showInWebsite="0" showInStore="0">
 						<label>Compatibility</label>
 						<frontend_model>Magmodules\Mollie\Block\Adminhtml\Magmodules\Heading</frontend_model>
 						<comment>Check the Mollie extension technical requirements by running the self test. In case of a warning or error please contact your Developer or Hosting Company.</comment>
-					</field>                      
+					</field>
 					<field id="compatibility_checker" translate="label" type="button" sortOrder="91" showInDefault="1" showInWebsite="0" showInStore="0">
 						<frontend_model>Magmodules\Mollie\Block\Adminhtml\System\Config\Form\Compatibility\Checker</frontend_model>
 					</field>
 					<field id="compatibility_result" translate="label" type="text" sortOrder="92" showInDefault="1" showInWebsite="0" showInStore="0">
 						<frontend_model>Magmodules\Mollie\Block\Adminhtml\System\Config\Form\Compatibility\Result</frontend_model>
-					</field>                                      
+					</field>
                 </group>
 				<include path="Magmodules_Mollie::methods.xml"/>
 			</group>
-		</section>	
+		</section>
 	</system>
 </config>
