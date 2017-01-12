@@ -112,6 +112,12 @@ class General extends AbstractHelper
     {
         $method = $order->getPayment()->getMethodInstance()->getCode();
         $methodCode = str_replace('mollie_methods_', '', $method);
+
+        // Mollie API uses mistercash instead of bancontact
+        if ($methodCode == 'bancontact') {
+            $methodCode = 'mistercash';
+        }
+
         return $methodCode;
     }
 
