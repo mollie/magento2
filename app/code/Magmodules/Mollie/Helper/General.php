@@ -16,7 +16,7 @@ class General extends AbstractHelper
 {
 
     const MODULE_CODE = 'Magmodules_Mollie';
-    const XML_PATH_MODULE_ACTIVE = 'payment/mollie_general/active';
+    const XML_PATH_MODULE_ACTIVE = 'payment/mollie_general/enabled';
     const XML_PATH_API_MODUS = 'payment/mollie_general/type';
     const XML_PATH_LIVE_APIKEY = 'payment/mollie_general/apikey_live';
     const XML_PATH_TEST_APIKEY = 'payment/mollie_general/apikey_test';

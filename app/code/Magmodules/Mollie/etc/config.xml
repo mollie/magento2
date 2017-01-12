@@ -3,12 +3,15 @@
     <default>
         <payment>
             <mollie_general>
+                <active>0</active>
+                <enabled>0</enabled>
                 <type>test</type>
                 <payment_images>1</payment_images>
                 <order_status_pending>pending_payment</order_status_pending>
                 <order_status_processing>processing</order_status_processing>
                 <invoice_notify>1</invoice_notify>
                 <debug>1</debug>
+                <model>Magmodules\Mollie\Model\Methods\General</model>
             </mollie_general>
             <mollie_methods_bancontact>
                 <active>0</active>
