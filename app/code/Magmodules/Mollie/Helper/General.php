@@ -28,10 +28,10 @@ class General extends AbstractHelper
     /**
      * General constructor
      *
-     * @param Context $context
+     * @param Context               $context
      * @param StoreManagerInterface $storeManager
-     * @param ModuleListInterface $moduleList
-     * @param MollieLogger $logger
+     * @param ModuleListInterface   $moduleList
+     * @param MollieLogger          $logger
      */
     public function __construct(
         Context $context,
@@ -50,6 +50,7 @@ class General extends AbstractHelper
      * Availabiliy check, on Active & API Key
      *
      * @param $storeId
+     *
      * @return bool
      */
     public function isAvailable($storeId)
@@ -64,19 +65,33 @@ class General extends AbstractHelper
             $this->addTolog('error', 'Invalid Mollie API key.');
             return false;
         }
-        
+
         return true;
+    }
+
+    /**
+     * Get admin value by path and storeId
+     *
+     * @param     $path
+     * @param int $storeId
+     *
+     * @return mixed
+     */
+    public function getStoreConfig($path, $storeId = 0)
+    {
+        return $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     /**
      * Returns API key
      *
      * @param $storeId
+     *
      * @return bool|mixed
      */
     public function getApiKey($storeId)
     {
-        $modus = $this->getStoreConfig(self::XML_PATH_API_MODUS, $storeId);
+        $modus = $this->getModus($storeId);
         if ($modus == 'test') {
             return $this->getStoreConfig(self::XML_PATH_TEST_APIKEY, $storeId);
         } else {
@@ -87,9 +102,38 @@ class General extends AbstractHelper
     }
 
     /**
+     * @param $storeId
+     *
+     * @return mixed
+     */
+    public function getModus($storeId)
+    {
+        return $this->getStoreConfig(self::XML_PATH_API_MODUS, $storeId);
+    }
+
+    /**
+     * Write to log
+     *
+     * @param $type
+     * @param $data
+     */
+    public function addTolog($type, $data)
+    {
+        $debug = $this->getStoreConfig(self::XML_PATH_DEBUG);
+        if ($debug) {
+            if ($type == 'error') {
+                $this->logger->addErrorLog($type, $data);
+            } else {
+                $this->logger->addInfoLog($type, $data);
+            }
+        }
+    }
+
+    /**
      * Currecny check
      *
      * @param $currency
+     *
      * @return bool
      */
     public function isCurrencyAllowed($currency)
@@ -98,7 +142,7 @@ class General extends AbstractHelper
         if (!in_array($currency, $allowed)) {
             return false;
         }
-        
+
         return true;
     }
 
@@ -106,6 +150,7 @@ class General extends AbstractHelper
      * Method code for API
      *
      * @param $order
+     *
      * @return mixed
      */
     public function getMethodCode($order)
@@ -125,6 +170,7 @@ class General extends AbstractHelper
      * Redirect Url Builder /w OrderId & UTM No Override
      *
      * @param $orderId
+     *
      * @return string
      */
     public function getRedirectUrl($orderId)
@@ -147,6 +193,7 @@ class General extends AbstractHelper
      * Selected processing status
      *
      * @param int $storeId
+     *
      * @return mixed
      */
     public function getStatusProcessing($storeId = 0)
@@ -158,6 +205,7 @@ class General extends AbstractHelper
      * Selected pending (payment) status
      *
      * @param int $storeId
+     *
      * @return mixed
      */
     public function getStatusPending($storeId = 0)
@@ -169,6 +217,7 @@ class General extends AbstractHelper
      * Send invoice
      *
      * @param int $storeId
+     *
      * @return mixed
      */
     public function sendInvoice($storeId = 0)
@@ -177,33 +226,39 @@ class General extends AbstractHelper
     }
 
     /**
-     * Get admin value by path and storeId
+     * @param $storeId
      *
-     * @param $path
-     * @param int $storeId
-     * @return mixed
+     * @return array
      */
-    public function getStoreConfig($path, $storeId = 0)
+    public function getAllActiveMethods($storeId)
     {
-        return $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
-    }
+        $activeMethods = [];
+        $methodCodes = [
+            'mollie_methods_bancontact',
+            'mollie_methods_banktransfer',
+            'mollie_methods_belfius',
+            'mollie_methods_bitcoin',
+            'mollie_methods_creditcard',
+            'mollie_methods_ideal',
+            'mollie_methods_kbc',
+            'mollie_methods_paypal',
+            'mollie_methods_paysafecard',
+            'mollie_methods_sofort'
+        ];
 
-    /**
-     * Write to log
-     *
-     * @param $type
-     * @param $data
-     */
-    public function addTolog($type, $data)
-    {
-        $debug = $this->getStoreConfig(self::XML_PATH_DEBUG);
-        if ($debug) {
-            if ($type == 'error') {
-                $this->logger->addErrorLog($type, $data);
-            } else {
-                $this->logger->addInfoLog($type, $data);
+        foreach ($methodCodes as $methodCode) {
+            $path = 'payment/' . $methodCode . '/active';
+            $active = $this->getStoreConfig($path, $storeId);
+            if ($active) {
+                $id = str_replace('mollie_methods_', '', $methodCode);
+                if ($id == 'bancontact') {
+                    $id = 'mistercash';
+                }
+                $activeMethods[$methodCode] = $id;
             }
         }
+
+        return $activeMethods;
     }
 
     /**

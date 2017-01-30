@@ -107,16 +107,36 @@ class MollieConfigProvider implements ConfigProviderInterface
     public function getMethodImage($code)
     {
         $images = [];
-        $images['mollie_methods_bancontact'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/bancontact.png");
-        $images['mollie_methods_banktransfer'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/banktransfer.png");
-        $images['mollie_methods_belfius'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/belfius.png");
-        $images['mollie_methods_bitcoin'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/bitcoin.png");
-        $images['mollie_methods_creditcard'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/creditcard.png");
-        $images['mollie_methods_ideal'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/ideal.png");
-        $images['mollie_methods_kbc'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/kbc.png");
-        $images['mollie_methods_paypal'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/paypal.png");
-        $images['mollie_methods_paysafecard'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/paysafecard.png");
-        $images['mollie_methods_sofort'] = $this->assetRepository->getUrl("Magmodules_Mollie::images/sofort.png");
+
+        $images['mollie_methods_bancontact'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/bancontact.png");
+
+        $images['mollie_methods_banktransfer'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/banktransfer.png");
+
+        $images['mollie_methods_belfius'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/belfius.png");
+
+        $images['mollie_methods_bitcoin'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/bitcoin.png");
+
+        $images['mollie_methods_creditcard'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/creditcard.png");
+
+        $images['mollie_methods_ideal'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/ideal.png");
+
+        $images['mollie_methods_kbc'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/kbc.png");
+
+        $images['mollie_methods_paypal'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/paypal.png");
+
+        $images['mollie_methods_paysafecard'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/paysafecard.png");
+
+        $images['mollie_methods_sofort'] =
+            $this->assetRepository->getUrl("Magmodules_Mollie::images/sofort.png");
         
         if ($this->getStoreConfig(self::XML_PATH_IMAGES)) {
             if (isset($images[$code])) {

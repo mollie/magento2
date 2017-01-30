@@ -37,25 +37,26 @@ class Mollie extends AbstractMethod
 
     /**
      * Mollie constructor.
-     * @param Context $context
-     * @param Registry $registry
+     *
+     * @param Context                    $context
+     * @param Registry                   $registry
      * @param ExtensionAttributesFactory $extensionFactory
-     * @param AttributeValueFactory $customAttributeFactory
-     * @param Data $paymentData
-     * @param ScopeConfigInterface $scopeConfig
-     * @param Logger $logger
-     * @param MollieApi $mollieApi
-     * @param MollieHelper $mollieHelper
-     * @param CheckoutSession $checkoutSession
-     * @param StoreManagerInterface $storeManager
-     * @param Order $order
-     * @param OrderSender $orderSender
-     * @param InvoiceSender $invoiceSender
-     * @param OrderRepository $orderRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param AbstractResource|null $resource
-     * @param AbstractDb|null $resourceCollection
-     * @param array $data
+     * @param AttributeValueFactory      $customAttributeFactory
+     * @param Data                       $paymentData
+     * @param ScopeConfigInterface       $scopeConfig
+     * @param Logger                     $logger
+     * @param MollieApi                  $mollieApi
+     * @param MollieHelper               $mollieHelper
+     * @param CheckoutSession            $checkoutSession
+     * @param StoreManagerInterface      $storeManager
+     * @param Order                      $order
+     * @param OrderSender                $orderSender
+     * @param InvoiceSender              $invoiceSender
+     * @param OrderRepository            $orderRepository
+     * @param SearchCriteriaBuilder      $searchCriteriaBuilder
+     * @param AbstractResource|null      $resource
+     * @param AbstractDb|null            $resourceCollection
+     * @param array                      $data
      */
     public function __construct(
         Context $context,
@@ -107,6 +108,7 @@ class Mollie extends AbstractMethod
      * Extra checks for method availability
      *
      * @param \Magento\Quote\Api\Data\CartInterface|null $quote
+     *
      * @return bool
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
@@ -131,6 +133,7 @@ class Mollie extends AbstractMethod
      * Start transaction
      *
      * @param Order $order
+     *
      * @return bool
      */
     public function startTransaction(Order $order, $issuer = '')
@@ -147,13 +150,13 @@ class Mollie extends AbstractMethod
         $shippingAddress = $order->getShippingAddress();
 
         $paymentData = [
-            'amount' => $order->getBaseGrandTotal(),
+            'amount'      => $order->getBaseGrandTotal(),
             'description' => $order->getIncrementId(),
             'redirectUrl' => $this->mollieHelper->getRedirectUrl($orderId),
-            'webhookUrl' => $this->mollieHelper->getWebhookUrl(),
-            'method' => $this->mollieHelper->getMethodCode($order),
-            'issuer' => $issuer,
-            'metadata' => [
+            'webhookUrl'  => $this->mollieHelper->getWebhookUrl(),
+            'method'      => $this->mollieHelper->getMethodCode($order),
+            'issuer'      => $issuer,
+            'metadata'    => [
                 'order_id' => $orderId,
                 'store_id' => $order->getStoreId()
             ]
@@ -162,9 +165,9 @@ class Mollie extends AbstractMethod
         if ($billingAddress) {
             $billingData = [
                 'billingAddress' => $billingAddress->getStreetLine(1),
-                'billingCity' => $billingAddress->getCity(),
-                'billingRegion' => $billingAddress->getRegion(),
-                'billingPostal' => $billingAddress->getPostcode(),
+                'billingCity'    => $billingAddress->getCity(),
+                'billingRegion'  => $billingAddress->getRegion(),
+                'billingPostal'  => $billingAddress->getPostcode(),
                 'billingCountry' => $billingAddress->getCountryId()
             ];
             $paymentData = array_merge($paymentData, $billingData);
@@ -173,9 +176,9 @@ class Mollie extends AbstractMethod
         if ($shippingAddress) {
             $shippingData = [
                 'shippingAddress' => $shippingAddress->getStreetLine(1),
-                'shippingCity' => $shippingAddress->getCity(),
-                'shippingRegion' => $shippingAddress->getRegion(),
-                'shippingPostal' => $shippingAddress->getPostcode(),
+                'shippingCity'    => $shippingAddress->getCity(),
+                'shippingRegion'  => $shippingAddress->getRegion(),
+                'shippingPostal'  => $shippingAddress->getPostcode(),
                 'shippingCountry' => $shippingAddress->getCountryId()
             ];
             $paymentData = array_merge($paymentData, $shippingData);
@@ -199,8 +202,9 @@ class Mollie extends AbstractMethod
     /**
      * Process Transaction (webhook / success)
      *
-     * @param $orderId
+     * @param        $orderId
      * @param string $type
+     *
      * @return array
      */
     public function processTransaction($orderId, $type = 'webhook')
@@ -288,6 +292,7 @@ class Mollie extends AbstractMethod
      * Cancel order
      *
      * @param $order
+     *
      * @return bool
      */
     protected function cancelOrder($order)
@@ -307,7 +312,8 @@ class Mollie extends AbstractMethod
      * Refund Transaction
      *
      * @param \Magento\Payment\Model\InfoInterface $payment
-     * @param float $amount
+     * @param float                                $amount
+     *
      * @return $this|array
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
@@ -347,6 +353,7 @@ class Mollie extends AbstractMethod
      * Get order by TransactionId
      *
      * @param $transactionId
+     *
      * @return mixed
      */
     public function getOrderIdByTransactionId($transactionId)
@@ -391,5 +398,22 @@ class Mollie extends AbstractMethod
         }
 
         return $issuers;
+    }
+
+    /**
+     * @param $storeId
+     *
+     * @return bool
+     */
+    public function getPaymentMethods($storeId)
+    {
+        $apiKey = $this->mollieHelper->getApiKey($storeId);
+
+        if (empty($apiKey)) {
+            return false;
+        }
+
+        $this->mollieApi->setApiKey($apiKey);
+        return $this->mollieApi->methods->all();
     }
 }
