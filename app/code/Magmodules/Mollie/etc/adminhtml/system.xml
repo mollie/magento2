@@ -71,7 +71,7 @@
                         <label>Debug requests</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/mollie_general/debug</config_path>
-                        <comment>When activated the debug file will be located in: var/mollie.log</comment>
+                        <comment>When activated the debug file will be located in: var/log/mollie.log</comment>
                     </field>
 					<field id="heading_compatibility" translate="label comment" type="text" sortOrder="90" showInDefault="1" showInWebsite="0" showInStore="0">
 						<label>Compatibility</label>
