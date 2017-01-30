@@ -18,7 +18,7 @@
 					<field id="heading_api" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
 						<label>API Details</label>
 						<frontend_model>Magmodules\Mollie\Block\Adminhtml\Magmodules\Heading</frontend_model>
-						<comment><![CDATA[You can find your Api Keys in your <a href="https://www.mollie.nl/beheer/account/profielen/" title="Mollie Profiles">Mollie Profile</a>.<br>]]></comment>
+						<comment><![CDATA[You can find your Api Keys in your <a href="https://www.mollie.com/dashboard/" title="Mollie Profiles">Mollie Profile</a>.<br>]]></comment>
 					</field>
                     <field id="type" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Modus</label>
