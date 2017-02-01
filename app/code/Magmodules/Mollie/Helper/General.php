@@ -226,6 +226,8 @@ class General extends AbstractHelper
     }
 
     /**
+     * Returns array of active methods with maximum order value
+     *
      * @param $storeId
      *
      * @return array
@@ -247,14 +249,18 @@ class General extends AbstractHelper
         ];
 
         foreach ($methodCodes as $methodCode) {
-            $path = 'payment/' . $methodCode . '/active';
-            $active = $this->getStoreConfig($path, $storeId);
+
+            $activePath = 'payment/' . $methodCode . '/active';
+            $active = $this->getStoreConfig($activePath, $storeId);
+
             if ($active) {
-                $id = str_replace('mollie_methods_', '', $methodCode);
-                if ($id == 'bancontact') {
-                    $id = 'mistercash';
+                $maxPath = 'payment/' . $methodCode . '/max_order_total';
+                $max = $this->getStoreConfig($maxPath, $storeId);
+                $code = str_replace('mollie_methods_', '', $methodCode);
+                if ($code == 'bancontact') {
+                    $code = 'mistercash';
                 }
-                $activeMethods[$methodCode] = $id;
+                $activeMethods[$methodCode] = ['code' => $code, 'max' => $max];
             }
         }
 

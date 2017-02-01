@@ -8,25 +8,31 @@ namespace Magmodules\Mollie\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
+use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magmodules\Mollie\Model\Mollie as MollieModel;
 use Magmodules\Mollie\Helper\General as MollieHelper;
 
 class ConfigObserver implements ObserverInterface
 {
 
+    protected $messageManager;
     protected $mollieModel;
     protected $mollieHelper;
 
     /**
      * ConfigObserver constructor.
      *
-     * @param MollieModel  $mollieModel
-     * @param MollieHelper $mollieHelper
+     * @param ManagerInterface $messageManager
+     * @param MollieModel      $mollieModel
+     * @param MollieHelper     $mollieHelper
      */
     public function __construct(
+        ManagerInterface $messageManager,
         MollieModel $mollieModel,
         MollieHelper $mollieHelper
     ) {
+        $this->messageManager = $messageManager;
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
     }
@@ -49,6 +55,8 @@ class ConfigObserver implements ObserverInterface
     }
 
     /**
+     * Validate Magento config values against Mollie API
+     *
      * @param $storeId
      * @param $modus
      *
@@ -63,9 +71,8 @@ class ConfigObserver implements ObserverInterface
         try {
             $apiMethods = $this->mollieModel->getPaymentMethods($storeId, $modus);
         } catch (\Exception $e) {
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('Mollie: %1', $e->getMessage())
-            );
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+            throw new LocalizedException(__('Mollie: %1', $e->getMessage()));
         }
 
         if (empty($apiMethods)) {
@@ -76,21 +83,31 @@ class ConfigObserver implements ObserverInterface
 
         $methods = [];
         foreach ($apiMethods as $apiMethod) {
-            $methods[] = $apiMethod->id;
+            $methods[$apiMethod->id] = [
+                'max' => $apiMethod->amount->maximum
+            ];
         }
 
         $errors = [];
         foreach ($activeMethods as $k => $v) {
-            if (!in_array($v, $methods)) {
-                $errors[] = ucfirst($v);
+            $code = $v['code'];
+            if (!isset($methods[$code])) {
+                $errors[] = __('%1: method not enabled in Mollie Dashboard', ucfirst($code));
+                continue;
+            }
+            if ($v['max'] > $methods[$code]['max']) {
+                $errors[] = __(
+                    '%1: maximum is set higher than set in Mollie dashboard: %2, please correct.',
+                    ucfirst($code),
+                    '€ ' . number_format($methods[$code]['max'], 2, ',', '.')
+                );
             }
         }
 
         if (!empty($errors)) {
-            $errorMethods = implode(', ', $errors);
-            throw new \Magento\Framework\Exception\LocalizedException(
-                __('%1 methods not enabled in Mollie Dashboard', $errorMethods)
-            );
+            $errorMethods = implode('<br/>', $errors);
+            $this->messageManager->addError($errorMethods);
         }
+
     }
 }
