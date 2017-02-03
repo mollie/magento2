@@ -9,3 +9,6 @@
     'Magmodules_Mollie',
     __DIR__
 );
+
+// Require Mollie API
+$vendorDir = require (__DIR__ . '/Api/Autoloader.php');

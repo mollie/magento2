@@ -67,7 +67,7 @@ class Success extends Action
 
         if (isset($status['success'])) {
             $this->checkoutSession->start();
-            $this->_redirect('checkout/onepage/success');
+            $this->_redirect('checkout/onepage/success?utm_nooverride=1');
         } else {
             $this->checkoutSession->restoreQuote();
             $this->messageManager->addNoticeMessage(__('Something went wrong.'));
