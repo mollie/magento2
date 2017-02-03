@@ -175,7 +175,7 @@ class General extends AbstractHelper
      */
     public function getRedirectUrl($orderId)
     {
-        $urlParams = '?order_id=' . int($orderId) . '&utm_nooverride=1';
+        $urlParams = '?order_id=' . intval($orderId) . '&utm_nooverride=1';
         return $this->urlBuilder->getUrl('mollie/checkout/success/') . $urlParams;
     }
 
