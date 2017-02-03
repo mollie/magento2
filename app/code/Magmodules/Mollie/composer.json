@@ -7,8 +7,7 @@
         "magento/module-checkout": ">=100.1.0",
         "magento/module-payment": ">=100.1.0",
         "magento/framework": ">=100.1.0",
-        "magento/magento-composer-installer": "*",
-        "mollie/mollie-api-php": "1.9.*"
+        "magento/magento-composer-installer": "*"
     },
     "type": "magento2-module",
     "version": "0.9.0",
