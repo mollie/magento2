@@ -341,7 +341,7 @@ class Mollie extends AbstractMethod
 
         try {
             $payment = $this->mollieApi->payments->get($transactionId);
-            $this->mollieApi->payments->refund($payment, $payment->amount);
+            $this->mollieApi->payments->refund($payment, $amount);
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
         }

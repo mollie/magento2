@@ -108,6 +108,5 @@ class ConfigObserver implements ObserverInterface
             $errorMethods = implode('<br/>', $errors);
             $this->messageManager->addError($errorMethods);
         }
-
     }
 }

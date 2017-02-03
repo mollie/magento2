@@ -11,4 +11,4 @@
 );
 
 // Require Mollie API
-$vendorDir = require (__DIR__ . '/Api/Autoloader.php');
+$vendorDir = require __DIR__ . '/Api/Autoloader.php';

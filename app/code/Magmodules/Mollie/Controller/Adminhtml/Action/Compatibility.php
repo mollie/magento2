@@ -56,7 +56,8 @@ class Compatibility extends Action
         }
 
         if (!$this->compatibilityChecker->satisfiesJsonExtension()) {
-            $msg = 'Error: PHP extension JSON is not enabled. Please make sure to enable \'json\' in your PHP configuration.';
+            $msg = 'Error: PHP extension JSON is not enabled. ';
+            $msg .= 'Please make sure to enable \'json\' in your PHP configuration.';
             $results[] = '<span class="mollie-error">' . $msg . '</span>';
         } else {
             $msg = 'Success: JSON is enabled.';
@@ -64,7 +65,8 @@ class Compatibility extends Action
         }
 
         if (!$this->compatibilityChecker->satisfiesCurlExtension()) {
-            $msg = 'Error: PHP extension cURL is not enabled. Please make sure to enable \'curl\' in your PHP configuration.';
+            $msg = 'Error: PHP extension cURL is not enabled. ';
+            $msg .= 'Please make sure to enable \'curl\' in your PHP configuration.';
             $results[] = '<span class="mollie-error">' . $msg . '</span>';
         } else {
             $msg = 'Success: cURL is enabled.';
@@ -73,8 +75,9 @@ class Compatibility extends Action
 
         if (!$this->compatibilityChecker->satisfiesCurlFunctions()) {
             $reqCurlFunctions = implode(', ', $class::$REQUIRED_CURL_FUNCTIONS);
-            $msg = 'Error: This client requires the following cURL functions to be available: ' . $reqCurlFunctions . '.<br/>';
-            $$msg .= 'Please check that none of these functions are disabled in your PHP configuration.';
+            $msg = 'Error: This client requires the following cURL functions to ';
+            $msg .= 'be available: ' . $reqCurlFunctions . '.<br/>';
+            $msg .= 'Please check that none of these functions are disabled in your PHP configuration.';
             $results[] = '<span class="mollie-error">' . $msg . '</span>';
         } else {
             $msg = 'Success: cURL functions are enabled.';

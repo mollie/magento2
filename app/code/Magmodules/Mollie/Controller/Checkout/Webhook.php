@@ -12,23 +12,25 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
+use Magento\Framework\Controller\ResultFactory;
 
 class Webhook extends Action
 {
     
     protected $checkoutSession;
-    protected $logger;
+    protected $resultFactory;
     protected $paymentHelper;
     protected $mollieModel;
     protected $mollieHelper;
 
     /**
      * Webhook constructor.
-     * @param Context $context
-     * @param Session $checkoutSession
+     *
+     * @param Context       $context
+     * @param Session       $checkoutSession
      * @param PaymentHelper $paymentHelper
-     * @param MollieModel $mollieModel
-     * @param MollieHelper $mollieHelper
+     * @param MollieModel   $mollieModel
+     * @param MollieHelper  $mollieHelper
      */
     public function __construct(
         Context $context,
@@ -39,6 +41,7 @@ class Webhook extends Action
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->paymentHelper = $paymentHelper;
+        $this->resultFactory = $context->getResultFactory();
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
         parent::__construct($context);
@@ -52,7 +55,10 @@ class Webhook extends Action
         $params = $this->getRequest()->getParams();
 
         if (!empty($params['testByMollie'])) {
-            die('OK');
+            $result = $this->resultFactory->create(ResultFactory::TYPE_RAW);
+            $result->setHeader('content-type', 'text/plain');
+            $result->setContents('OK', true);
+            return;
         }
 
         if (!empty($params['id'])) {
