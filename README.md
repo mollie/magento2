@@ -7,7 +7,7 @@ Beta version Mollie for Magento 2, not for production environments.
 Download the extension as a ZIP file from this repository or install our module with [Composer](https://getcomposer.org/) using the following command:
 
 ```
-composer require mollie/Magento2
+composer require mollie/magento2
 ```
 
 If you're installing the extension manually, unzip the archive and upload the contents of the /src directory to `/app/code/Mollie/Payment`. 
