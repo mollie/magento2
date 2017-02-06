@@ -11,7 +11,6 @@
     "mollie/mollie-api-php": "1.9.*"
   },
   "type": "magento2-module",
-  "version": "0.9.5",
   "license": [
     "OSL-3.0",
     "AFL-3.0"
