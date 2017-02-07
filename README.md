@@ -1,30 +1,43 @@
-# Mollie Magento 2 - BETA
+# Mollie Magento® 2 - BETA
 
-Beta version Mollie for Magento 2, not for production environments. 
+As this is a Beta of the Mollie extension for Magento® 2, don't use this in production environments. 
 
-## Getting Started
+## Installation
 
-Download the extension as a ZIP file from this repository or install our module with [Composer](https://getcomposer.org/) using the following command:
+### Magento® Marketplace
 
-```
-composer require mollie/magento2
-```
+This extension will be available on the Magento® Marketplace once it is out of beta. 
 
-If you're installing the extension manually, unzip the archive and upload the contents of the /src directory to `/app/code/Mollie/Payment`. 
+### Manually
 
-After uploading, run the following commands:
+1. Go to Magento® 2 root folder
 
-```
-bin/magento module:enable Mollie_Payment
-bin/magento setup:upgrade
-bin/magento setup:di:compile
-```
+2. Enter following commands to install module:
 
+   ```
+   composer require mollie/magento2
+   ```
+
+   Wait while dependencies are updated.
+
+3. Enter following commands to enable module:
+
+   ```
+   php bin/magento module:enable Mollie_Payment
+   php bin/magento setup:upgrade
+   php bin/magento cache:clean
+   ```
+
+4. Enable and configure the Mollie extension in Magento® Admin under *Stores* >
+   *Configuration* > *Sales* > *Payment Methods* > *Mollie*.
+   
 ## Requirements
 
-This extension requires the [Mollie API client for PHP](https://github.com/mollie/mollie-api-php) 
+This extension requires the [Mollie API client for PHP.](https://github.com/mollie/mollie-api-php)
 
-Run the following command in your Magento 2 store root:
+When using composer this will be installed automaticly.
+
+To install manually, enter the following command in your Magento® 2 root folder:
 ```
 composer require mollie/mollie-api-php
 ```

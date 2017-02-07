@@ -1,5 +1,5 @@
 {
-  "name": "mollie/magento2",
+  "name": "mollie/Magento2",
   "description": "Mollie Payment Module for Magento 2",
   "require": {
     "php": "~5.5.0|~5.6.0|~7.0.0",
@@ -17,10 +17,10 @@
   ],
   "autoload": {
     "files": [
-      "src/registration.php"
+      "registration.php"
     ],
     "psr-4": {
-      "Mollie\\Payment\\": "src"
+      "Mollie\\Payment\\": ""
     }
   }
 }
