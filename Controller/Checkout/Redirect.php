@@ -52,7 +52,7 @@ class Redirect extends Action
             if ($methodInstance instanceof \Mollie\Payment\Model\Mollie) {
                 $issuer = $this->getRequest()->getParam('issuer');
                 $redirectUrl = $methodInstance->startTransaction($order, $issuer);
-                $this->_redirect($redirectUrl);
+                $this->getResponse()->setRedirect($redirectUrl);
             } else {
                 $msg = __('Paymentmethod not found.');
                 $this->messageManager->addError($msg);
