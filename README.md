@@ -1,12 +1,12 @@
-# Mollie Magento® 2 - BETA
+# Mollie Magento® 2
 
-As this is a Beta of the Mollie extension for Magento® 2, don't use this in production environments. 
+As this is the Mollie extension for Magento® 2. This extention has not been battle tested yet, although we've received many successful reports of clients that are running this extention without any problems.
 
 ## Installation
 
 ### Magento® Marketplace
 
-This extension will be available on the Magento® Marketplace once it is out of beta. 
+This extension will also be available on the Magento® Marketplace when approved. 
 
 ### Manually
 
