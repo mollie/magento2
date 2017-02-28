@@ -66,7 +66,7 @@ class Success extends Action
             $this->_redirect('checkout/cart');
         }
 
-        if (isset($status['success'])) {
+        if (!empty($status['success'])) {
             $this->checkoutSession->start();
             $this->_redirect('checkout/onepage/success?utm_nooverride=1');
         } else {
