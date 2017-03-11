@@ -296,11 +296,11 @@ class Mollie extends AbstractMethod
                 }
 
                 $msg = ['success' => true, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
-                $this->mollieHelper->addTolog('sucess', $msg);
+                $this->mollieHelper->addTolog('success', $msg);
             }
         } elseif ($paymentData->isRefunded() == true) {
             $msg = ['success' => true, 'status' => 'refunded', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('sucess', $msg);
+            $this->mollieHelper->addTolog('success', $msg);
         } elseif ($paymentData->isOpen() == true) {
             if ($paymentData->method == 'banktransfer' && !$order->getEmailSent()) {
                 $this->orderSender->send($order);
@@ -310,14 +310,14 @@ class Mollie extends AbstractMethod
                 $order->addStatusToHistory($status, $message, true)->save();
             }
             $msg = ['success' => true, 'status' => 'open', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('sucess', $msg);
+            $this->mollieHelper->addTolog('success', $msg);
         } elseif ($paymentData->isPending() == true) {
             $msg = ['success' => true, 'status' => 'pending', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('sucess', $msg);
+            $this->mollieHelper->addTolog('success', $msg);
         } elseif (!$paymentData->isOpen()) {
             $this->cancelOrder($order);
             $msg = ['success' => false, 'status' => 'cancel', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('sucess', $msg);
+            $this->mollieHelper->addTolog('success', $msg);
         }
 
         return $msg;
