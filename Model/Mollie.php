@@ -302,6 +302,13 @@ class Mollie extends AbstractMethod
             $msg = ['success' => true, 'status' => 'refunded', 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('sucess', $msg);
         } elseif ($paymentData->isOpen() == true) {
+            if ($paymentData->method == 'banktransfer' && !$order->getEmailSent()) {
+                $this->orderSender->send($order);
+                $message = __('New order email sent');
+                $status = $this->mollieHelper->getStatusPending($storeId);
+                $order->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
+                $order->addStatusToHistory($status, $message, true)->save();
+            }
             $msg = ['success' => true, 'status' => 'open', 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('sucess', $msg);
         } elseif ($paymentData->isPending() == true) {
