@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2016 Magmodules.eu. All rights reserved.
+ * Copyright © 2017 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -11,6 +11,7 @@ use Magento\Framework\App\Helper\Context;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Config\Model\ResourceModel\Config;
+use Magento\Framework\App\ProductMetadataInterface;
 use Mollie\Payment\Logger\MollieLogger;
 
 class General extends AbstractHelper
@@ -22,29 +23,40 @@ class General extends AbstractHelper
     const XML_PATH_LIVE_APIKEY = 'payment/mollie_general/apikey_live';
     const XML_PATH_TEST_APIKEY = 'payment/mollie_general/apikey_test';
     const XML_PATH_DEBUG = 'payment/mollie_general/debug';
+    const XML_PATH_LOADING_SCREEN = 'payment/mollie_general/loading_screen';
     const XML_PATH_STATUS_PROCESSING = 'payment/mollie_general/order_status_processing';
     const XML_PATH_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const XML_PATH_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
 
+    protected $metadata;
+    protected $storeManager;
+    protected $resourceConfig;
+    protected $moduleList;
+    protected $logger;
+
     /**
-     * General constructor
+     * General constructor.
      *
-     * @param Context               $context
-     * @param StoreManagerInterface $storeManager
-     * @param ModuleListInterface   $moduleList
-     * @param MollieLogger          $logger
+     * @param Context                  $context
+     * @param StoreManagerInterface    $storeManager
+     * @param Config                   $resourceConfig
+     * @param ModuleListInterface      $moduleList
+     * @param ProductMetadataInterface $metadata
+     * @param MollieLogger             $logger
      */
     public function __construct(
         Context $context,
         StoreManagerInterface $storeManager,
         Config $resourceConfig,
         ModuleListInterface $moduleList,
+        ProductMetadataInterface $metadata,
         MollieLogger $logger
     ) {
         $this->storeManager = $storeManager;
         $this->resourceConfig = $resourceConfig;
         $this->urlBuilder = $context->getUrlBuilder();
         $this->moduleList = $moduleList;
+        $this->metadata = $metadata;
         $this->logger = $logger;
         parent::__construct($context);
     }
@@ -104,8 +116,6 @@ class General extends AbstractHelper
         } else {
             return $this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId);
         }
-
-        return false;
     }
 
     /**
@@ -118,6 +128,16 @@ class General extends AbstractHelper
         return $this->getStoreConfig(self::XML_PATH_API_MODUS, $storeId);
     }
 
+    /**
+     * @param $storeId
+     *
+     * @return mixed
+     */
+    public function useLoadingScreen($storeId)
+    {
+        return $this->getStoreConfig(self::XML_PATH_LOADING_SCREEN, $storeId);
+    }
+    
     /**
      * Write to log
      *
@@ -146,7 +166,7 @@ class General extends AbstractHelper
     }
 
     /**
-     * Currecny check
+     * Currency check
      *
      * @param $currency
      *
@@ -292,6 +312,16 @@ class General extends AbstractHelper
         $moduleInfo = $this->moduleList->getOne(self::MODULE_CODE);
 
         return $moduleInfo['setup_version'];
+    }
+
+    /**
+     * Returns current version of Magento
+     *
+     * @return string
+     */
+    public function getMagentoVersion()
+    {
+        return $this->metadata->getVersion();
     }
 
     /**

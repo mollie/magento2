@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2016 Magmodules.eu. All rights reserved.
+ * Copyright © 2017 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -11,12 +11,13 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
+use Magento\Framework\View\Result\PageFactory;
 
 class Redirect extends Action
 {
 
     protected $checkoutSession;
-    protected $logger;
+    protected $resultPageFactory;
     protected $paymentHelper;
     protected $mollieHelper;
 
@@ -25,16 +26,19 @@ class Redirect extends Action
      *
      * @param Context       $context
      * @param Session       $checkoutSession
+     * @param PageFactory   $resultPageFactory
      * @param PaymentHelper $paymentHelper
      * @param MollieHelper  $mollieHelper
      */
     public function __construct(
         Context $context,
         Session $checkoutSession,
+        PageFactory $resultPageFactory,
         PaymentHelper $paymentHelper,
         MollieHelper $mollieHelper
     ) {
         $this->checkoutSession = $checkoutSession;
+        $this->resultPageFactory = $resultPageFactory;
         $this->paymentHelper = $paymentHelper;
         $this->mollieHelper = $mollieHelper;
         parent::__construct($context);
@@ -50,9 +54,18 @@ class Redirect extends Action
             $method = $order->getPayment()->getMethod();
             $methodInstance = $this->paymentHelper->getMethodInstance($method);
             if ($methodInstance instanceof \Mollie\Payment\Model\Mollie) {
+                $storeId = $order->getStoreId();
                 $issuer = $this->getRequest()->getParam('issuer');
                 $redirectUrl = $methodInstance->startTransaction($order, $issuer);
-                $this->getResponse()->setRedirect($redirectUrl);
+                $this->mollieHelper->addTolog('request', $redirectUrl);
+                if ($this->mollieHelper->useLoadingScreen($storeId)) {
+                    $resultPage = $this->resultPageFactory->create();
+                    $resultPage->getLayout()->initMessages();
+                    $resultPage->getLayout()->getBlock('mollie_loading')->setMollieRedirect($redirectUrl);
+                    return $resultPage;
+                } else {
+                    $this->getResponse()->setRedirect($redirectUrl);
+                }
             } else {
                 $msg = __('Paymentmethod not found.');
                 $this->messageManager->addError($msg);

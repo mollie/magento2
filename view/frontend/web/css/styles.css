@@ -1,0 +1,24 @@
+.mollie-loading .redirect-block {
+    padding: 10%;
+    text-align: center;
+}
+
+.mollie-loading .loader {
+    border: 16px solid #e3f0fa;
+    border-top: 16px solid #31a8f0;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
