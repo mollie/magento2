@@ -10,6 +10,7 @@
                 <order_status_pending>pending_payment</order_status_pending>
                 <order_status_processing>processing</order_status_processing>
                 <invoice_notify>1</invoice_notify>
+                <loading_screen>0</loading_screen>
                 <debug>1</debug>
                 <model>Mollie\Payment\Model\Methods\General</model>
             </mollie_general>
@@ -18,60 +19,80 @@
                 <model>Mollie\Payment\Model\Methods\Bancontact</model>
                 <title>Bancontact</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_bancontact>
             <mollie_methods_banktransfer>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Banktransfer</model>
                 <title>Banktransfer</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_banktransfer>
             <mollie_methods_belfius>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Belfius</model>
                 <title>Belfius</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_belfius>
             <mollie_methods_bitcoin>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Bitcoin</model>
                 <title>Bitcoin</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_bitcoin>
             <mollie_methods_creditcard>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Creditcard</model>
                 <title>Credit Cards</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_creditcard>
             <mollie_methods_ideal>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Ideal</model>
                 <title>iDeal</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_ideal>
             <mollie_methods_kbc>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Kbc</model>
                 <title>KBC</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_kbc>
             <mollie_methods_paypal>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Paypal</model>
                 <title>Paypal</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_paypal>
             <mollie_methods_paysafecard>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Paysafecard</model>
                 <title>Paysafecard</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_paysafecard>
             <mollie_methods_sofort>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Sofort</model>
                 <title>Sofort</title>
                 <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
             </mollie_methods_sofort>
         </payment>
     </default>
