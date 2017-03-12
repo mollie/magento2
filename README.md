@@ -28,7 +28,13 @@ This extension will also be available on the Magento® Marketplace when approved
    php bin/magento cache:clean
    ```
 
-4. Enable and configure the Mollie extension in Magento® Admin under *Stores* >
+4. If Magento® is running in production mode, deploy static content: 
+
+   ```
+   php bin/magento setup:static-content:deploy
+   ```
+
+5. Enable and configure the Mollie extension in Magento® Admin under *Stores* >
    *Configuration* > *Sales* > *Payment Methods* > *Mollie*.
 
 ## Requirements
