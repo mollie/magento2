@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2016 Magmodules.eu. All rights reserved.
+ * Copyright © 2017 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -29,10 +29,22 @@ use Mollie\Payment\Helper\General as MollieHelper;
 class Mollie extends AbstractMethod
 {
 
+    protected $_isInitializeNeeded = true;
     protected $_isGateway = true;
     protected $_isOffline = false;
     protected $_canRefund = true;
+
     protected $issuers = [];
+    protected $objectManager;
+    protected $mollieHelper;
+    protected $checkoutSession;
+    protected $storeManager;
+    protected $order;
+    protected $scopeConfig;
+    protected $orderSender;
+    protected $invoiceSender;
+    protected $orderRepository;
+    protected $searchCriteriaBuilder;
 
     /**
      * Mollie constructor.
@@ -124,6 +136,23 @@ class Mollie extends AbstractMethod
         }
 
         return parent::isAvailable($quote);
+    }
+
+    /**
+     * @param string $paymentAction
+     * @param object $stateObject
+     */
+    public function initialize($paymentAction, $stateObject)
+    {
+        $payment = $this->getInfoInstance();
+        $order = $payment->getOrder();
+        $order->setCanSendNewEmailFlag(false);
+        $order->setIsNotified(false);
+
+        $status = $this->mollieHelper->getStatusPending($order->getId());
+        $stateObject->setState(\Magento\Sales\Model\Order::STATE_NEW);
+        $stateObject->setStatus($status);
+        $stateObject->setIsNotified(false);
     }
 
     /**
@@ -257,7 +286,7 @@ class Mollie extends AbstractMethod
 
                 if ($invoice && !$order->getEmailSent()) {
                     $this->orderSender->send($order);
-                    $message = __('New order email sent', $paymentUrl);
+                    $message = __('New order email sent');
                     $order->addStatusToHistory($status, $message, true)->save();
                 }
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
@@ -267,21 +296,28 @@ class Mollie extends AbstractMethod
                 }
 
                 $msg = ['success' => true, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
-                $this->mollieHelper->addTolog('sucess', $msg);
+                $this->mollieHelper->addTolog('success', $msg);
             }
         } elseif ($paymentData->isRefunded() == true) {
             $msg = ['success' => true, 'status' => 'refunded', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('sucess', $msg);
+            $this->mollieHelper->addTolog('success', $msg);
         } elseif ($paymentData->isOpen() == true) {
+            if ($paymentData->method == 'banktransfer' && !$order->getEmailSent()) {
+                $this->orderSender->send($order);
+                $message = __('New order email sent');
+                $status = $this->mollieHelper->getStatusPendingBanktransfer($storeId);
+                $order->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
+                $order->addStatusToHistory($status, $message, true)->save();
+            }
             $msg = ['success' => true, 'status' => 'open', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('sucess', $msg);
+            $this->mollieHelper->addTolog('success', $msg);
         } elseif ($paymentData->isPending() == true) {
             $msg = ['success' => true, 'status' => 'pending', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('sucess', $msg);
+            $this->mollieHelper->addTolog('success', $msg);
         } elseif (!$paymentData->isOpen()) {
             $this->cancelOrder($order);
             $msg = ['success' => false, 'status' => 'cancel', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('sucess', $msg);
+            $this->mollieHelper->addTolog('success', $msg);
         }
 
         return $msg;
@@ -308,8 +344,6 @@ class Mollie extends AbstractMethod
     }
 
     /**
-     * Refund Transaction
-     *
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @param float                                $amount
      *
@@ -426,6 +460,8 @@ class Mollie extends AbstractMethod
     {
         $mollieApi = $this->objectManager->create('Mollie_API_Client');
         $mollieApi->setApiKey($apiKey);
+        $mollieApi->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
+        $mollieApi->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
         return $mollieApi;
     }
 }

@@ -8,7 +8,7 @@ define(
         'Magento_Customer/js/model/customer',
         'Magento_Checkout/js/checkout-data',
         'Magento_Checkout/js/model/payment/additional-validators',
-        'mage/url',
+        'mage/url'
     ],
     function (
         ko,

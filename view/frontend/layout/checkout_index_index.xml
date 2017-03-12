@@ -5,7 +5,6 @@
             <arguments>
                 <argument name="jsLayout" xsi:type="array">
                     <item name="components" xsi:type="array">
-
                         <item name="checkout" xsi:type="array">
                             <item name="children" xsi:type="array">
                                 <item name="steps" xsi:type="array">
@@ -16,9 +15,8 @@
                                                 <item name="payment" xsi:type="array">
                                                     <item name="children" xsi:type="array">
                                                         <item name="renders" xsi:type="array">
-                                                            <!-- merge payment method renders here -->
                                                             <item name="children" xsi:type="array">
-                                                                <item name="magmodules_mollie" xsi:type="array">
+                                                                <item name="mollie_payment" xsi:type="array">
                                                                     <item name="component" xsi:type="string">Mollie_Payment/js/view/payment/method-renderer</item>
                                                                     <item name="methods" xsi:type="array">
                                                                         <item name="mollie_methods_bancontact" xsi:type="array">
