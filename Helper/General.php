@@ -26,6 +26,7 @@ class General extends AbstractHelper
     const XML_PATH_LOADING_SCREEN = 'payment/mollie_general/loading_screen';
     const XML_PATH_STATUS_PROCESSING = 'payment/mollie_general/order_status_processing';
     const XML_PATH_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
+    const XML_PATH_STATUS_PENDING_BANKTRANSFER = 'payment/mollie_methods_banktransfer/order_status_pending';
     const XML_PATH_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
 
     protected $metadata;
@@ -247,6 +248,18 @@ class General extends AbstractHelper
     public function getStatusPending($storeId = 0)
     {
         return $this->getStoreConfig(self::XML_PATH_STATUS_PENDING, $storeId);
+    }
+
+    /**
+     * Selected pending (payment) status for banktransfer
+     *
+     * @param int $storeId
+     *
+     * @return mixed
+     */
+    public function getStatusPendingBanktransfer($storeId = 0)
+    {
+        return $this->getStoreConfig(self::XML_PATH_STATUS_PENDING_BANKTRANSFER, $storeId);
     }
 
     /**

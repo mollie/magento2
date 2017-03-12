@@ -305,7 +305,7 @@ class Mollie extends AbstractMethod
             if ($paymentData->method == 'banktransfer' && !$order->getEmailSent()) {
                 $this->orderSender->send($order);
                 $message = __('New order email sent');
-                $status = $this->mollieHelper->getStatusPending($storeId);
+                $status = $this->mollieHelper->getStatusPendingBanktransfer($storeId);
                 $order->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
                 $order->addStatusToHistory($status, $message, true)->save();
             }

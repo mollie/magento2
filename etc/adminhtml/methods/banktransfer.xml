@@ -18,6 +18,13 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="order_status_pending" translate="label comment" type="select" sortOrder="3"
+               showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Status Pending</label>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\Pending</source_model>
+            <config_path>payment/mollie_methods_banktransfer/order_status_pending</config_path>
+            <comment><![CDATA[<b>Note:</b> By default the status "Pending Payment" is not visible for customers on the frontend, we advise you to create a new visible status for this, otherwise the orders will not show up on the frontend.]]></comment>
+        </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
                showInWebsite="1" showInStore="0">
             <label>Payment from Applicable Countries</label>

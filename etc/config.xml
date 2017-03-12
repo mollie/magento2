@@ -26,6 +26,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Banktransfer</model>
                 <title>Banktransfer</title>
+                <order_status_pending>pending_payment</order_status_pending>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions></instructions>
