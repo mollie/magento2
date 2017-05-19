@@ -1,6 +1,6 @@
 # Mollie Magento® 2
 
-As this is the Mollie extension for Magento® 2. This extension has not been battle tested yet, although we've received many successful reports of clients that are running this extention without any problems.
+This is the official Mollie extension for Magento® 2.
 
 ## Installation
 
