@@ -1,0 +1,48 @@
+<?php
+/**
+ * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @see \Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker
+ * @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker $block
+ */
+?>
+<script>
+    require([
+        'jquery',
+        'prototype'
+    ], function (jQuery) {
+        var resultSpan = jQuery('#result');
+        jQuery('#compatibility_button').click(function () {
+            var params = {};
+            new Ajax.Request('<?php echo $block->getAjaxUrl() ?>', {
+                parameters: params,
+                loaderArea: false,
+                asynchronous: true,
+                onCreate: function () {
+                    resultSpan.find('.compatibility_connecting').show();
+                    resultSpan.find('#comaptibility_result').hide();
+                },
+                onSuccess: function (response) {
+                    console.log(response);
+                    resultSpan.find('.compatibility_connecting').hide();
+                    var resultText = '';
+                    if (response.status > 200) {
+                        resultText = response.statusText;
+                    } else {
+                        var json = response.responseJSON;
+                        if (typeof json.msg != 'undefined') {
+                            resultText = json.msg;
+                        }
+                    }
+                    resultSpan.find('#comaptibility_result').show();
+                    jQuery('#comaptibility_result').html(resultText);
+                }
+            });
+        });
+
+    });
+</script>
+<?php echo $block->getButtonHtml() ?> 

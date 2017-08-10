@@ -53,6 +53,14 @@
                         <label>Live API Key</label>
                         <config_path>payment/mollie_general/apikey_live</config_path>
                     </field>
+                    <field id="credentials_checker" translate="label" type="button" sortOrder="14" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
+                        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker</frontend_model>
+                    </field>
+                    <field id="credentials_result" translate="label" type="text" sortOrder="15" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
+                        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Result</frontend_model>
+                    </field>
                     <field id="heading_settings" translate="label comment" type="text" sortOrder="20" showInDefault="1"
                            showInWebsite="1" showInStore="1">
                         <label>Settings</label>
@@ -108,17 +116,17 @@
                         <comment>When activated the debug file will be located in: var/log/mollie.log</comment>
                     </field>
                     <field id="heading_compatibility" translate="label comment" type="text" sortOrder="90"
-                           showInDefault="1" showInWebsite="0" showInStore="0">
+                           showInDefault="1" showInWebsite="0" showInStore="1">
                         <label>Compatibility</label>
                         <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
                         <comment>Check the Mollie extension technical requirements by running the self test. In case of a warning or error please contact your Developer or Hosting Company.</comment>
                     </field>
                     <field id="compatibility_checker" translate="label" type="button" sortOrder="91" showInDefault="1"
-                           showInWebsite="0" showInStore="0">
+                           showInWebsite="0" showInStore="1">
                         <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker</frontend_model>
                     </field>
                     <field id="compatibility_result" translate="label" type="text" sortOrder="92" showInDefault="1"
-                           showInWebsite="0" showInStore="0">
+                           showInWebsite="0" showInStore="1">
                         <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Result</frontend_model>
                     </field>
                 </group>

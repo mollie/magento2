@@ -4,20 +4,20 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility;
+namespace Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey;
 
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
-class Result extends Field
+class Checker extends Field
 {
 
     protected $request;
-    protected $_template = 'Mollie_Payment::system/config/fieldset/result_compatibility.phtml';
+    protected $_template = 'Mollie_Payment::system/config/button/apikey.phtml';
 
     /**
-     * Result constructor.
+     * Checker constructor.
      *
      * @param Context $context
      * @param array   $data
@@ -33,7 +33,7 @@ class Result extends Field
     /**
      * @param AbstractElement $element
      *
-     * @return bool
+     * @return string
      */
     public function render(AbstractElement $element)
     {
@@ -45,10 +45,29 @@ class Result extends Field
     /**
      * @param AbstractElement $element
      *
-     * @return bool
+     * @return string
      */
-    protected function _getElementHtml(AbstractElement $element)
+    public function _getElementHtml(AbstractElement $element)
     {
         return $this->_toHtml();
+    }
+
+    /**
+     * @return string
+     */
+    public function getAjaxUrl()
+    {
+        return $this->getUrl('mollie/action/apikey');
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getButtonHtml()
+    {
+        $buttonData = ['id' => 'apikey_button', 'label' => __('Test Apikey')];
+        $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')->setData($buttonData);
+
+        return $button->toHtml();
     }
 }

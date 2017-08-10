@@ -32,8 +32,11 @@ class General extends AbstractHelper
     protected $metadata;
     protected $storeManager;
     protected $resourceConfig;
+    protected $urlBuilder;
     protected $moduleList;
     protected $logger;
+    protected $apiCheck;
+    protected $apiKey;
 
     /**
      * General constructor.
@@ -81,8 +84,7 @@ class General extends AbstractHelper
         }
 
         $apiKey = $this->getApiKey($storeId);
-        if (!preg_match('/^(live|test)_\w+$/', $apiKey)) {
-            $this->addTolog('error', 'Invalid Mollie API key.');
+        if (empty($apiKey)) {
             return false;
         }
 
@@ -103,20 +105,65 @@ class General extends AbstractHelper
     }
 
     /**
+     * Check is class extists, used for Mollie API check
+     *
+     * @param $class
+     *
+     * @return bool
+     */
+    public function checkIfClassExists($class)
+    {
+        if (!empty($this->apiCheck)) {
+            return true;
+        }
+
+        if (class_exists($class)) {
+            $this->apiCheck = true;
+        }
+
+        return $this->apiCheck;
+    }
+
+    /**
      * Returns API key
      *
      * @param $storeId
      *
      * @return bool|mixed
      */
-    public function getApiKey($storeId)
+    public function getApiKey($storeId = null)
     {
-        $modus = $this->getModus($storeId);
-        if ($modus == 'test') {
-            return $this->getStoreConfig(self::XML_PATH_TEST_APIKEY, $storeId);
-        } else {
-            return $this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId);
+        if (!empty($this->apiKey)) {
+            return $this->apiKey;
         }
+
+        if (empty($storeId)) {
+            $storeId = $this->storeManager->getStore()->getId();
+        }
+
+        $modus = $this->getModus($storeId);
+
+        if ($modus == 'test') {
+            $apiKey = trim($this->getStoreConfig(self::XML_PATH_TEST_APIKEY, $storeId));
+            if (empty($apiKey)) {
+                $this->addTolog('error', 'Mollie API key not set (test modus)');
+            }
+            if (!preg_match('/^test_\w+$/', $apiKey)) {
+                $this->addTolog('error', 'Mollie set to test modus, but API key does not start with "test_"');
+            }
+            $this->apiKey = $apiKey;
+        } else {
+            $apiKey = trim($this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId));
+            if (empty($apiKey)) {
+                $this->addTolog('error', 'Mollie API key not set (live modus)');
+            }
+            if (!preg_match('/^live_\w+$/', $apiKey)) {
+                $this->addTolog('error', 'Mollie set to live modus, but API key does not start with "live_"');
+            }
+            $this->apiKey = $apiKey;
+        }
+
+        return $this->apiKey;
     }
 
     /**
@@ -129,16 +176,6 @@ class General extends AbstractHelper
         return $this->getStoreConfig(self::XML_PATH_API_MODUS, $storeId);
     }
 
-    /**
-     * @param $storeId
-     *
-     * @return mixed
-     */
-    public function useLoadingScreen($storeId)
-    {
-        return $this->getStoreConfig(self::XML_PATH_LOADING_SCREEN, $storeId);
-    }
-    
     /**
      * Write to log
      *
@@ -155,6 +192,16 @@ class General extends AbstractHelper
                 $this->logger->addInfoLog($type, $data);
             }
         }
+    }
+
+    /**
+     * @param $storeId
+     *
+     * @return mixed
+     */
+    public function useLoadingScreen($storeId)
+    {
+        return $this->getStoreConfig(self::XML_PATH_LOADING_SCREEN, $storeId);
     }
 
     /**
@@ -181,6 +228,16 @@ class General extends AbstractHelper
         }
 
         return true;
+    }
+
+    /**
+     * @param null $storeId
+     *
+     * @return mixed
+     */
+    public function getStoreCurrencyCode($storeId = null)
+    {
+        return $this->storeManager->getStore($storeId)->getCurrentCurrency()->getCode();
     }
 
     /**
@@ -294,7 +351,8 @@ class General extends AbstractHelper
             'mollie_methods_kbc',
             'mollie_methods_paypal',
             'mollie_methods_paysafecard',
-            'mollie_methods_sofort'
+            'mollie_methods_sofort',
+            'mollie_methods_giftcard'
         ];
 
         foreach ($methodCodes as $methodCode) {
@@ -338,26 +396,13 @@ class General extends AbstractHelper
     }
 
     /**
-     * Check is class extists, used for Mollie API check
-     *
-     * @param $class
-     *
-     * @return bool
-     */
-    public function checkIfClassExists($class)
-    {
-        return class_exists($class);
-    }
-
-    /**
      * @return string
      */
     public function getPhpApiErrorMessage()
     {
-        $url = '<a href="https://github.com/mollie/Magento2" target="_blank">GitHub</a>';
-        $error = 'Mollie API client for PHP is not installed, for more information 
-            about this issue see our ' . $url . ' page.';
-
-        return $error;
+        return __(
+            'Mollie API client for PHP is not installed, for more information about this issue see our %1 page.',
+            '<a href="https://github.com/mollie/Magento2" target="_blank">GitHub</a>'
+        );
     }
 }

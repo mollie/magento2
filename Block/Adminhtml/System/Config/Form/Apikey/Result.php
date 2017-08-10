@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility;
+namespace Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey;
 
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
@@ -14,7 +14,7 @@ class Result extends Field
 {
 
     protected $request;
-    protected $_template = 'Mollie_Payment::system/config/fieldset/result_compatibility.phtml';
+    protected $_template = 'Mollie_Payment::system/config/fieldset/result_apikey.phtml';
 
     /**
      * Result constructor.

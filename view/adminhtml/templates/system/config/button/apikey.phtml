@@ -5,8 +5,8 @@
  */
 
 /**
- * @see \Mollie\Payment\Block\Adminhtml\System\Config\Form\CompatibilityChecker
- * @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\CompatibilityChecker $block
+ * @see \Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker
+ * @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker $block
  */
 ?>
 <script>
@@ -15,19 +15,22 @@
         'prototype'
     ], function (jQuery) {
         var resultSpan = jQuery('#result');
-        jQuery('#compatibility_button').click(function () {
-            var params = {};
+        jQuery('#apikey_button').click(function () {
+            var params = {
+            	"test_key": jQuery('#payment_us_mollie_mollie_general_apikey_test').val(),            	
+            	"live_key": jQuery('#payment_us_mollie_mollie_general_apikey_live').val()
+            	};
             new Ajax.Request('<?php echo $block->getAjaxUrl() ?>', {
                 parameters: params,
                 loaderArea: false,
                 asynchronous: true,
                 onCreate: function () {
-                    resultSpan.find('.connecting').show();
-                    resultSpan.find('#comaptibility_result').hide();
+                    resultSpan.find('.apikey_connecting').show();
+                    resultSpan.find('#apikey_result').hide();
                 },
                 onSuccess: function (response) {
                     console.log(response);
-                    resultSpan.find('.connecting').hide();
+                    resultSpan.find('.apikey_connecting').hide();
                     var resultText = '';
                     if (response.status > 200) {
                         resultText = response.statusText;
@@ -37,12 +40,11 @@
                             resultText = json.msg;
                         }
                     }
-                    resultSpan.find('#comaptibility_result').show();
-                    jQuery('#comaptibility_result').html(resultText);
+                    resultSpan.find('#apikey_result').show();
+                    jQuery('#apikey_result').html(resultText);
                 }
             });
         });
-
     });
 </script>
-<?php echo $block->getButtonHtml() ?> 
+<?php echo $block->getButtonHtml() ?>

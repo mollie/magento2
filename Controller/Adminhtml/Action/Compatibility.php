@@ -17,24 +17,24 @@ class Compatibility extends Action
     protected $request;
     protected $resultJsonFactory;
     protected $objectManager;
-    protected $compatibilityCheckerHelper;
+    protected $mollieHelper;
 
     /**
      * Compatibility constructor.
      *
      * @param Context                $context
      * @param JsonFactory            $resultJsonFactory
-     * @param MollieHelper           $compatibilityCheckerHelper
+     * @param MollieHelper           $mollieHelper
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        MollieHelper $compatibilityCheckerHelper
+        MollieHelper $mollieHelper
     ) {
         $this->request = $context->getRequest();
         $this->objectManager = $context->getObjectManager();
         $this->resultJsonFactory = $resultJsonFactory;
-        $this->mollieHelper = $compatibilityCheckerHelper;
+        $this->mollieHelper = $mollieHelper;
         parent::__construct($context);
     }
 
@@ -96,6 +96,13 @@ class Compatibility extends Action
         } else {
             $msg = 'Success: cURL functions are enabled.';
             $results[] = '<span class="mollie-success">' . $msg . '</span>';
+        }
+
+        $storeId = (int)$this->request->getParam('store', 0);
+        $currency = $this->mollieHelper->getStoreCurrencyCode($storeId);
+        if ($currency != 'EUR') {
+            $msg = __('%1 is not supported as Currency. Mollie only supports Euro.', $currency);
+            $results[] = '<span class="mollie-error">' . $msg . '</span>';
         }
 
         $result = $this->resultJsonFactory->create();

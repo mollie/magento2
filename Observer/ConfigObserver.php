@@ -60,7 +60,7 @@ class ConfigObserver implements ObserverInterface
      * @param $storeId
      * @param $modus
      *
-     * @return bool|void
+     * @return mixed
      */
     public function validatePaymentMethods($storeId, $modus)
     {
@@ -78,7 +78,7 @@ class ConfigObserver implements ObserverInterface
         }
 
         try {
-            $apiMethods = $this->mollieModel->getPaymentMethods($storeId, $modus);
+            $apiMethods = $this->mollieModel->getPaymentMethods($storeId);
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->messageManager->addError($e->getMessage());

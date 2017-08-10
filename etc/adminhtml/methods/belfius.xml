@@ -5,7 +5,7 @@
            showInStore="1">
         <label>Belfius</label>
         <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
-               showInStore="0">
+               showInStore="1">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_belfius/active</config_path>
@@ -19,7 +19,7 @@
             </depends>
         </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
-               showInWebsite="1" showInStore="0">
+               showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
             <config_path>payment/mollie_methods_belfius/allowspecific</config_path>
@@ -28,7 +28,7 @@
             </depends>
         </field>
         <field id="specificcountry" translate="label" type="multiselect" sortOrder="97" showInDefault="1"
-               showInWebsite="1" showInStore="0">
+               showInWebsite="1" showInStore="1">
             <label>Payment from Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
             <can_be_empty>1</can_be_empty>
@@ -38,7 +38,7 @@
             </depends>
         </field>
         <field id="min_order_total" translate="label" type="text" sortOrder="98" showInDefault="1" showInWebsite="1"
-               showInStore="0">
+               showInStore="1">
             <label>Minimum Order Total</label>
             <config_path>payment/mollie_methods_belfius/min_order_total</config_path>
             <depends>
@@ -46,7 +46,7 @@
             </depends>
         </field>
         <field id="max_order_total" translate="label" type="text" sortOrder="99" showInDefault="1" showInWebsite="1"
-               showInStore="0">
+               showInStore="1">
             <label>Maximum Order Total</label>
             <config_path>payment/mollie_methods_belfius/max_order_total</config_path>
             <depends>
@@ -54,7 +54,7 @@
             </depends>
         </field>
         <field id="sort_order" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
-               showInStore="0">
+               showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>
             <config_path>payment/mollie_methods_belfius/sort_order</config_path>
