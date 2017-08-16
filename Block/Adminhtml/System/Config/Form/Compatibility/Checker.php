@@ -14,7 +14,7 @@ class Checker extends Field
 {
 
     protected $request;
-    protected $_template = 'Mollie_Payment::system/config/button/button.phtml';
+    protected $_template = 'Mollie_Payment::system/config/button/compatibility.phtml';
 
     /**
      * Checker constructor.
@@ -57,7 +57,8 @@ class Checker extends Field
      */
     public function getAjaxUrl()
     {
-        return $this->getUrl('mollie/action/compatibility');
+        $storeId = (int)$this->request->getParam('store', 0);
+        return $this->getUrl('mollie/action/compatibility/store/' . $storeId);
     }
 
     /**
@@ -65,8 +66,8 @@ class Checker extends Field
      */
     public function getButtonHtml()
     {
-        $button_data = ['id' => 'compatibility_button', 'label' => __('Self Test')];
-        $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')->setData($button_data);
+        $buttonData = ['id' => 'compatibility_button', 'label' => __('Self Test')];
+        $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')->setData($buttonData);
 
         return $button->toHtml();
     }

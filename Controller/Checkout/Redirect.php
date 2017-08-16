@@ -55,8 +55,7 @@ class Redirect extends Action
             $methodInstance = $this->paymentHelper->getMethodInstance($method);
             if ($methodInstance instanceof \Mollie\Payment\Model\Mollie) {
                 $storeId = $order->getStoreId();
-                $issuer = $this->getRequest()->getParam('issuer');
-                $redirectUrl = $methodInstance->startTransaction($order, $issuer);
+                $redirectUrl = $methodInstance->startTransaction($order);
                 $this->mollieHelper->addTolog('request', $redirectUrl);
                 if ($this->mollieHelper->useLoadingScreen($storeId)) {
                     $resultPage = $this->resultPageFactory->create();

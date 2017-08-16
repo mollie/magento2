@@ -31,5 +31,8 @@
         <method name="mollie_methods_sofort">
             <allow_multiple_address>1</allow_multiple_address>
         </method>
+        <method name="mollie_methods_giftcard">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
     </methods>
 </payment>

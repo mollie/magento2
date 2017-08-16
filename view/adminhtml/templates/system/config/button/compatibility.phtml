@@ -5,8 +5,8 @@
  */
 
 /**
- * @see \Mollie\Payment\Block\Adminhtml\System\Config\Form\CompatibilityChecker
- * @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\CompatibilityChecker $block
+ * @see \Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker
+ * @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker $block
  */
 ?>
 <script>
@@ -22,12 +22,12 @@
                 loaderArea: false,
                 asynchronous: true,
                 onCreate: function () {
-                    resultSpan.find('.connecting').show();
+                    resultSpan.find('.compatibility_connecting').show();
                     resultSpan.find('#comaptibility_result').hide();
                 },
                 onSuccess: function (response) {
                     console.log(response);
-                    resultSpan.find('.connecting').hide();
+                    resultSpan.find('.compatibility_connecting').hide();
                     var resultText = '';
                     if (response.status > 200) {
                         resultText = response.statusText;

@@ -16,4 +16,5 @@
     <include path="Mollie_Payment::methods/paypal.xml"/>
     <include path="Mollie_Payment::methods/paysafecard.xml"/>
     <include path="Mollie_Payment::methods/sofort.xml"/>
+    <include path="Mollie_Payment::methods/giftcard.xml"/>
 </include>

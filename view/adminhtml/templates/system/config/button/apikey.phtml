@@ -1,0 +1,50 @@
+<?php
+/**
+ * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @see \Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker
+ * @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker $block
+ */
+?>
+<script>
+    require([
+        'jquery',
+        'prototype'
+    ], function (jQuery) {
+        var resultSpan = jQuery('#result');
+        jQuery('#apikey_button').click(function () {
+            var params = {
+                "test_key": jQuery("input[name='groups[mollie][groups][mollie_general][fields][apikey_test][value]']").val(),
+                "live_key": jQuery("input[name='groups[mollie][groups][mollie_general][fields][apikey_live][value]']").val()
+            	};
+            new Ajax.Request('<?php echo $block->getAjaxUrl() ?>', {
+                parameters: params,
+                loaderArea: false,
+                asynchronous: true,
+                onCreate: function () {
+                    resultSpan.find('.apikey_connecting').show();
+                    resultSpan.find('#apikey_result').hide();
+                },
+                onSuccess: function (response) {
+                    console.log(response);
+                    resultSpan.find('.apikey_connecting').hide();
+                    var resultText = '';
+                    if (response.status > 200) {
+                        resultText = response.statusText;
+                    } else {
+                        var json = response.responseJSON;
+                        if (typeof json.msg != 'undefined') {
+                            resultText = json.msg;
+                        }
+                    }
+                    resultSpan.find('#apikey_result').show();
+                    jQuery('#apikey_result').html(resultText);
+                }
+            });
+        });
+    });
+</script>
+<?php echo $block->getButtonHtml() ?>

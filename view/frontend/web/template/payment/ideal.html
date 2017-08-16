@@ -6,9 +6,9 @@
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label data-bind="attr: {'for': getCode()}" class="label">
             <!-- ko if: getMethodImage() -->
-		    <img data-bind="attr: {src: getMethodImage()}" class="payment-icon"/>
+            <img data-bind="attr: {src: getMethodImage()}" class="payment-icon"/>
             <!--/ko-->
-        	<span data-bind="text: getTitle()"></span>
+            <span data-bind="text: getTitle()"></span>
         </label>
 
     </div>
@@ -17,6 +17,14 @@
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
 
+        <!-- ko if: getIssuers() -->
+        <div class="field-select-billing">
+			<strong><span data-bind="i18n: 'Select Bank'"></span></strong>
+            <select data-bind="options: getIssuers(), optionsText: 'name', optionsValue: 'id', value: selectedIssuer"></select>
+        </div>
+        <br/>
+        <!--/ko-->
+        
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
