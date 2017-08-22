@@ -134,7 +134,12 @@ class MollieConfigProvider implements ConfigProviderInterface
         try {
             $apiMethods = $mollieApi->methods->all();
             foreach ($apiMethods->data as $method) {
-                $methods['mollie_methods_' . $method->id] = [
+                if ($method->id == 'mistercash') {
+                    $methodId = 'mollie_methods_bancontact';
+                } else {
+                    $methodId = 'mollie_methods_' . $method->id;
+                }
+                $methods[$methodId] = [
                     'min'   => $method->amount->minimum,
                     'max'   => $method->amount->maximum,
                     'image' => $method->image->normal
