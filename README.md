@@ -6,7 +6,7 @@ This is the official Mollie extension for Magento® 2.
 
 ### Magento® Marketplace
 
-This extension will also be available on the Magento® Marketplace when approved.
+This extension is also available on the [Magento Marketplace](https://marketplace.magento.com/mollie-magento2.html)
 
 ### Manually
 
@@ -39,9 +39,11 @@ This extension will also be available on the Magento® Marketplace when approved
 
 ## Requirements
 
-This extension requires the [Mollie API client for PHP.](https://github.com/mollie/mollie-api-php)
+1) For Magento® 2.1.x and Magento® 2.2.x
 
-When using composer this will be installed automatically.
+2) This extension requires the [Mollie API client for PHP.](https://github.com/mollie/mollie-api-php)
+
+When using composer of installation through the Magento® Marketplace this will be installed automatically.
 
 To install manually, enter the following command in your Magento® 2 root folder:
 ```
