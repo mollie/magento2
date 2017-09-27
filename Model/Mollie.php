@@ -309,8 +309,13 @@ class Mollie extends AbstractMethod
                 $order->save();
 
                 $invoice = $payment->getCreatedInvoice();
-                $status = $this->mollieHelper->getStatusProcessing($storeId);
                 $sendInvoice = $this->mollieHelper->sendInvoice($storeId);
+
+                if ($order->getIsVirtual()) {
+                    $status = $order->getStatus();
+                } else {
+                    $status = $this->mollieHelper->getStatusProcessing($storeId);
+                }
 
                 if ($invoice && !$order->getEmailSent()) {
                     $this->orderSender->send($order);
