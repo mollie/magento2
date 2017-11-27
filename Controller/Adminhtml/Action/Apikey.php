@@ -14,9 +14,21 @@ use Mollie\Payment\Helper\General as MollieHelper;
 class Apikey extends Action
 {
 
+    /**
+     * @var \Magento\Framework\App\RequestInterface
+     */
     protected $request;
+    /**
+     * @var JsonFactory
+     */
     protected $resultJsonFactory;
+    /**
+     * @var \Magento\Framework\ObjectManagerInterface
+     */
     protected $objectManager;
+    /**
+     * @var MollieHelper
+     */
     protected $mollieHelper;
 
     /**
@@ -39,7 +51,7 @@ class Apikey extends Action
     }
 
     /**
-     * @return $this
+     * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {
@@ -58,33 +70,60 @@ class Apikey extends Action
         $results = [];
 
         if (empty($testKey)) {
-            $results[] = '<span class="mollie-error">' . __('Test Key: Empty value') . '</span>';
+            $results[] = '<span class="mollie-error">' . __('Test API-key: Empty value') . '</span>';
         } else {
             if (!preg_match('/^test_\w+$/', $testKey)) {
-                $results[] = '<span class="mollie-error">' . __('Test Key: Should start with "test_"') . '</span>';
+                $results[] = '<span class="mollie-error">' . __('Test API-key: Should start with "test_"') . '</span>';
             } else {
                 try {
+                    $availableMethods = [];
                     $mollieApi = $this->loadApi($testKey);
-                    $mollieApi->issuers->all();
-                    $results[] = '<span class="mollie-success">' . __('Test Key: Success!') . '</span>';
+                    $methods = $mollieApi->methods->all();
+
+                    foreach ($methods as $apiMethod) {
+                        $availableMethods[] = ucfirst($apiMethod->id);
+                    }
+
+                    if (empty($availableMethods)) {
+                        $msg = __('Enabled Methods: None, Please enable the payment methods in your Mollie dashboard.');
+                        $methodsMsg = '<span class="enabled-methods-error">' . $msg . '</span>';
+                    } else {
+                        $msg = __('Enabled Methods') . ': ' . implode(', ', $availableMethods);
+                        $methodsMsg = '<span class="enabled-methods">' . $msg . '</span>';
+                    }
+
+                    $results[] = '<span class="mollie-success">' . __('Test API-key: Success!') . $methodsMsg . '</span>';
                 } catch (\Exception $e) {
-                    $results[] = '<span class="mollie-error">' . __('Test Key: %1', $e->getMessage()) . '</span>';
+                    $results[] = '<span class="mollie-error">' . __('Test API-key: %1', $e->getMessage()) . '</span>';
                 }
             }
         }
 
         if (empty($liveKey)) {
-            $results[] = '<span class="mollie-error">' . __('Live Key: Empty value') . '</span>';
+            $results[] = '<span class="mollie-error">' . __('Live API-key: Empty value') . '</span>';
         } else {
             if (!preg_match('/^live_\w+$/', $liveKey)) {
-                $results[] = '<span class="mollie-error">' . __('Live Key: Should start with "live_"') . '</span>';
+                $results[] = '<span class="mollie-error">' . __('Live API-key: Should start with "live_"') . '</span>';
             } else {
                 try {
+                    $availableMethods = [];
                     $mollieApi = $this->loadApi($liveKey);
-                    $mollieApi->issuers->all();
-                    $results[] = '<span class="mollie-success">' . __('Live Key: Success!') . '</span>';
+                    $methods = $mollieApi->methods->all();
+                    foreach ($methods as $apiMethod) {
+                        $availableMethods[] = ucfirst($apiMethod->id);
+                    }
+
+                    if (empty($availableMethods)) {
+                        $msg = __('Enabled Methods: None, Please enable the payment methods in your Mollie dashboard.');
+                        $methodsMsg = '<span class="enabled-methods-error">' . $msg . '</span>';
+                    } else {
+                        $msg = __('Enabled Methods') . ': ' . implode(', ', $availableMethods);
+                        $methodsMsg = '<span class="enabled-methods">' . $msg . '</span>';
+                    }
+
+                    $results[] = '<span class="mollie-success">' . __('Live API-key: Success!') . $methodsMsg . '</span>';
                 } catch (\Exception $e) {
-                    $results[] = '<span class="mollie-error">' . __('Live Key: %1', $e->getMessage()) . '</span>';
+                    $results[] = '<span class="mollie-error">' . __('Live API-key: %1', $e->getMessage()) . '</span>';
                 }
             }
         }

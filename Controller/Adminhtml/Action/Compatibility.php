@@ -14,9 +14,21 @@ use Mollie\Payment\Helper\General as MollieHelper;
 class Compatibility extends Action
 {
 
+    /**
+     * @var \Magento\Framework\App\RequestInterface
+     */
     protected $request;
+    /**
+     * @var JsonFactory
+     */
     protected $resultJsonFactory;
+    /**
+     * @var \Magento\Framework\ObjectManagerInterface
+     */
     protected $objectManager;
+    /**
+     * @var MollieHelper
+     */
     protected $mollieHelper;
 
     /**
@@ -44,7 +56,7 @@ class Compatibility extends Action
      * - Check if Mollie php API is installed
      * - Check for minimum system requirements of API
      *
-     * @return $this
+     * @return \Magento\Framework\Controller\Result\Json
      */
     public function execute()
     {

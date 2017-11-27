@@ -2,10 +2,12 @@
     padding: 10px 0px;
     font-size: 12px;
 }
+
 .mollie-success {
     display: block;
     line-height: 30px;
 }
+
 .mollie-success:before {
     font-family: 'Admin Icons';
     font-size: 12px;
@@ -15,11 +17,44 @@
     color: #79A22E;
     content: '\e62d';
 }
+
+.mollie-success .enabled-methods-error {
+    display: block;
+    line-height: 30px;
+}
+
+.mollie-success .enabled-methods-error:before {
+    font-family: 'Admin Icons';
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    padding: 10px;
+    color: #EB5103;
+    content: '\e610';
+}
+
+.mollie-success .enabled-methods {
+    display: block;
+    line-height: 30px;
+    margin-top: 15px;
+}
+
+.mollie-success .enabled-methods:before {
+    font-family: 'Admin Icons';
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 400;
+    padding: 11px;
+    color: #78A230;
+    content: '\e610';
+}
+
 .mollie-error {
     display: block;
     background-color: white;
     line-height: 30px;
 }
+
 .mollie-error:before {
     color: #EB5202;
     content: '\e623';
@@ -29,48 +64,57 @@
     font-weight: 400;
     padding: 10px;
 }
+
 .mm-heading-mollie {
     color: #666;
     text-align: left;
     border: 1px solid rgba(229, 229, 229, 0.27);
-    border-left: 2px solid #ea4c00;
+    border-left: 2px solid #EA4C00;
     font-size: 14px;
     margin: 20px 0 0;
     padding: 5px 5px 5px 10px;
-    background: #f8f8f8;
+    background: #F8F8F8;
 }
+
 .mm-block-mollie {
-    background: #f8f8f8 no-repeat 8px;
-    border: 1px solid #e5e5e5;
-    border-left: 2px solid #ea4c00;
+    background: #F8F8F8 no-repeat 8px;
+    border: 1px solid #E5E5E5;
+    border-left: 2px solid #EA4C00;
     font-size: 12px;
     color: #303030;
     margin-bottom: 0;
     padding: 1.5rem 1.5rem 1.5rem 1.5rem;
     background-size: 55px;
 }
+
 .mm-block-mollie table {
-    width: 520px!important;
+    width: 520px !important;
 }
+
 .mm-block-mollie strong {
     font-weight: 600;
     color: #514943;
 }
+
 .mm-block-mollie p {
     font-size: 12px;
     padding: 0 0 0.3em;
 }
+
 .mm-block-mollie tr a {
-    color: #6d6761;
+    color: #6D6761;
     margin-top: 3px;
     display: block;
 }
+
 .mm-block-mollie tr td {
-    padding: 5px 0px 0 0!important;
+    padding: 5px 0px 0 0 !important;
 }
+
 .mm-block-mollie .accordion .form-inline .config td {
     padding: 0.8rem 1.5rem 0 0;
 }
+
 .mm-block-mollie .helpbutton {
     padding: 10px 15px;
     width: 100px;
@@ -78,39 +122,46 @@
     float: right;
     background: url(../images/icons.png) no-repeat scroll 0px -175px #F8F8F8;
 }
+
 .mm-block-mollie .icon1 {
     background: url(../images/icons.png) no-repeat scroll -20px -14px;
     width: 45px;
     height: 25px;
     float: left;
 }
+
 .mm-block-mollie .icon2 {
     background: url(../images/icons.png) no-repeat scroll -30px -70px;
     width: 36px;
     height: 25px;
     float: left;
 }
+
 .mm-block-mollie .icon3 {
     background: url(../images/icons.png) no-repeat scroll -20px -129px;
     width: 47px;
     height: 25px;
     float: left;
 }
+
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .mm-block-mollie .icon1 {
         background: url(../images/icons@x2.png) no-repeat scroll 0px -7px;
         background-size: 55px;
     }
+
     .mm-block-mollie .icon2 {
         background: url(../images/icons@x2.png) no-repeat scroll -4px -32px;
         background-size: 45px;
     }
+
     .mm-block-mollie .icon3 {
         background: url(../images/icons@x2.png) no-repeat scroll 0px -75px;
         background-size: 52px;
     }
+
     .mm-block-mollie .helpbutton {
-        background: url(../images/icons@x2.png) no-repeat scroll 0px -260px #f8f8f8;
+        background: url(../images/icons@x2.png) no-repeat scroll 0px -260px #F8F8F8;
         background-size: 130px;
     }
 }
