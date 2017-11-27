@@ -156,7 +156,7 @@ class Mollie extends AbstractMethod
         $order = $payment->getOrder();
         $order->setCanSendNewEmailFlag(false);
 
-        $status = $this->mollieHelper->getStatusPending($order->getId());
+        $status = $this->mollieHelper->getStatusPending($order->getStoreId());
         $stateObject->setState(\Magento\Sales\Model\Order::STATE_NEW);
         $stateObject->setStatus($status);
         $stateObject->setIsNotified(false);
