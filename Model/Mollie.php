@@ -58,6 +58,7 @@ class Mollie extends AbstractMethod
      * @param Data                       $paymentData
      * @param ScopeConfigInterface       $scopeConfig
      * @param Logger                     $logger
+     * @param ObjectManagerInterface     $objectManager
      * @param MollieHelper               $mollieHelper
      * @param CheckoutSession            $checkoutSession
      * @param StoreManagerInterface      $storeManager
@@ -143,15 +144,19 @@ class Mollie extends AbstractMethod
     /**
      * @param string $paymentAction
      * @param object $stateObject
+     *
+     * @return $this
      */
     public function initialize($paymentAction, $stateObject)
     {
+        /** @var \Magento\Sales\Model\Order\Payment $payment */
         $payment = $this->getInfoInstance();
+
+        /** @var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
         $order->setCanSendNewEmailFlag(false);
-        $order->setIsNotified(false);
 
-        $status = $this->mollieHelper->getStatusPending($order->getId());
+        $status = $this->mollieHelper->getStatusPending($order->getStoreId());
         $stateObject->setState(\Magento\Sales\Model\Order::STATE_NEW);
         $stateObject->setStatus($status);
         $stateObject->setIsNotified(false);
@@ -181,8 +186,7 @@ class Mollie extends AbstractMethod
         $transactionId = $order->getMollieTransactionId();
         if (!empty($transactionId)) {
             $paymentData = $mollieApi->payments->get($transactionId);
-            $paymentUrl = $paymentData->links->paymentUrl;
-            if (!empty($paymentUrl)) {
+            if (!empty($paymentData->links->paymentUrl)) {
                 return $this->mollieHelper->getRedirectUrl($orderId);
             }
         }

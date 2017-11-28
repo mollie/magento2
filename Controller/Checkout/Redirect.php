@@ -51,6 +51,13 @@ class Redirect extends Action
     {
         try {
             $order = $this->checkoutSession->getLastRealOrder();
+
+            if (!$order) {
+                $msg = __('Order not found.');
+                $this->mollieHelper->addTolog('error', $msg);
+                $this->_redirect('checkout/cart');
+            }
+
             $method = $order->getPayment()->getMethod();
             $methodInstance = $this->paymentHelper->getMethodInstance($method);
             if ($methodInstance instanceof \Mollie\Payment\Model\Mollie) {
