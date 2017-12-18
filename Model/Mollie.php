@@ -145,7 +145,8 @@ class Mollie extends AbstractMethod
      * @param string $paymentAction
      * @param object $stateObject
      *
-     * @return $this
+     * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function initialize($paymentAction, $stateObject)
     {
@@ -166,6 +167,7 @@ class Mollie extends AbstractMethod
      * @param \Magento\Sales\Model\Order $order
      *
      * @return bool
+     * @throws \Exception
      */
     public function startTransaction(Order $order)
     {
@@ -204,7 +206,8 @@ class Mollie extends AbstractMethod
             'metadata'    => [
                 'order_id' => $orderId,
                 'store_id' => $order->getStoreId()
-            ]
+            ],
+            'locale'      => $this->mollieHelper->getLocaleCode()
         ];
 
         if ($billingAddress) {
@@ -265,6 +268,7 @@ class Mollie extends AbstractMethod
      * @param string $type
      *
      * @return array
+     * @throws \Exception
      */
     public function processTransaction($orderId, $type = 'webhook')
     {
@@ -303,6 +307,9 @@ class Mollie extends AbstractMethod
 
         if (($paymentData->isPaid() == true) && ($paymentData->isRefunded() == false)) {
             $amount = $paymentData->amount;
+            if (abs($paymentData->amount - $order->getBaseGrandTotal()) < 0.01) {
+                $amount = $order->getBaseGrandTotal();
+            }
             $payment = $order->getPayment();
 
             if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
@@ -366,6 +373,8 @@ class Mollie extends AbstractMethod
      * @param \Magento\Sales\Model\Order $order
      *
      * @return bool
+     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function cancelOrder($order)
     {
@@ -384,6 +393,7 @@ class Mollie extends AbstractMethod
      * @param \Magento\Framework\DataObject $data
      *
      * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function assignData(DataObject $data)
     {

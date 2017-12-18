@@ -3,9 +3,15 @@
     text-align: center;
 }
 
+.mollie-payment-icon {
+    width: 25px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
 .mollie-loading .loader {
-    border: 16px solid #e3f0fa;
-    border-top: 16px solid #31a8f0;
+    border: 16px solid #E3F0FA;
+    border-top: 16px solid #31A8F0;
     border-radius: 50%;
     width: 50px;
     height: 50px;

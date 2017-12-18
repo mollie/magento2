@@ -12,6 +12,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Locale\Resolver;
 use Mollie\Payment\Logger\MollieLogger;
 
 class General extends AbstractHelper
@@ -28,6 +29,8 @@ class General extends AbstractHelper
     const XML_PATH_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const XML_PATH_STATUS_PENDING_BANKTRANSFER = 'payment/mollie_methods_banktransfer/order_status_pending';
     const XML_PATH_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
+    const XML_PATH_LOCALE = 'payment/mollie_general/locale';
+    const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
 
     protected $metadata;
     protected $storeManager;
@@ -39,6 +42,11 @@ class General extends AbstractHelper
     protected $apiKey;
 
     /**
+     * @var Resolver
+     */
+    private $resolver;
+
+    /**
      * General constructor.
      *
      * @param Context                  $context
@@ -46,6 +54,7 @@ class General extends AbstractHelper
      * @param Config                   $resourceConfig
      * @param ModuleListInterface      $moduleList
      * @param ProductMetadataInterface $metadata
+     * @param Resolver                 $resolver
      * @param MollieLogger             $logger
      */
     public function __construct(
@@ -54,6 +63,7 @@ class General extends AbstractHelper
         Config $resourceConfig,
         ModuleListInterface $moduleList,
         ProductMetadataInterface $metadata,
+        Resolver $resolver,
         MollieLogger $logger
     ) {
         $this->storeManager = $storeManager;
@@ -61,6 +71,7 @@ class General extends AbstractHelper
         $this->urlBuilder = $context->getUrlBuilder();
         $this->moduleList = $moduleList;
         $this->metadata = $metadata;
+        $this->resolver = $resolver;
         $this->logger = $logger;
         parent::__construct($context);
     }
@@ -204,6 +215,21 @@ class General extends AbstractHelper
         return $this->getStoreConfig(self::XML_PATH_LOADING_SCREEN, $storeId);
     }
 
+
+    /**
+     * @param $storeId
+     *
+     * @return mixed
+     */
+    public function useImage($storeId = null)
+    {
+        if ($storeId == null) {
+            $storeId = $this->storeManager->getStore()->getId();
+        }
+
+        return $this->getStoreConfig(self::XML_PATH_IMAGES, $storeId);
+    }
+
     /**
      * Disable extension function.
      * Used when Mollie API is not installed
@@ -329,6 +355,39 @@ class General extends AbstractHelper
     public function sendInvoice($storeId = 0)
     {
         return (int)$this->getStoreConfig(self::XML_PATH_INVOICE_NOTIFY, $storeId);
+    }
+
+    /**
+     * @return string
+     */
+    public function getLocaleCode()
+    {
+        $locale = $this->getStoreConfig(self::XML_PATH_LOCALE);
+
+        if (!$locale) {
+            return '';
+        }
+
+        if ($locale == 'store') {
+            $localeCode = $this->resolver->getLocale();
+            if (in_array($localeCode, $this->getSupportedLocal())) {
+                return $localeCode;
+            } else {
+                return '';
+            }
+        }
+
+        return $locale;
+    }
+
+    /**
+     * List of supported local codes Mollie.
+     *
+     * @return array
+     */
+    public function getSupportedLocal()
+    {
+        return ['en_US', 'de_AT', 'de_CH', 'de_DE', 'es_ES', 'fr_BE', 'fr_FR', 'nl_BE', 'nl_NL'];
     }
 
     /**
