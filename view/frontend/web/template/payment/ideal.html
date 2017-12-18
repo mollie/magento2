@@ -6,7 +6,7 @@
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label data-bind="attr: {'for': getCode()}" class="label">
             <!-- ko if: getMethodImage() -->
-            <img data-bind="attr: {src: getMethodImage()}" class="payment-icon"/>
+            <img data-bind="attr: {src: getMethodImage()}" class="mollie-payment-icon"/>
             <!--/ko-->
             <span data-bind="text: getTitle()"></span>
         </label>
