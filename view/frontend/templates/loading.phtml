@@ -1,11 +1,30 @@
-<div class="mollie-loading">
-	<div class="redirect-block">
-		<h1>Redirecting to Mollie</h1>
-		<div class="loader"></div>
-	</div>
+<?php
+/**
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php $redirectUrl = $this->getRedirectUrl(); ?>
+<div class="mollie-loading" id="mollie-loading">
+    <div class="redirect-block">
+        <h1><?php echo __('Redirecting to Mollie'); ?></h1>
+        <div class="loader"></div>
+    </div>
+</div>
+<div class="mollie-buttons" id="mollie-buttons" style="display:none">
+    <div class="redirect-block">
+        <a class="button" href="<?php echo $this->getBackUrl(); ?>">
+            <?php echo __('Back to Checkout'); ?>
+        </a>
+        <a class="button" href="<?php echo $redirectUrl; ?>">
+            <?php echo __('Proceed Payment'); ?>
+        </a>
+    </div>
 </div>
 <script>
-	window.setTimeout(function() {
-		window.location.href = '<?php echo $this->getRedirectUrl(); ?>';
-	}, 1000); 
+    window.setTimeout(function() {
+        document.getElementById("mollie-loading").style.display = "none";
+        document.getElementById("mollie-buttons").style.display = "block";
+        window.location.href = '<?php echo $redirectUrl; ?>';
+    }, 1000);
 </script>

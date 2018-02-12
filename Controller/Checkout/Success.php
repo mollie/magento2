@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -13,12 +13,29 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
 
+/**
+ * Class Success
+ *
+ * @package Mollie\Payment\Controller\Checkout
+ */
 class Success extends Action
 {
 
+    /**
+     * @var Session
+     */
     protected $checkoutSession;
+    /**
+     * @var PaymentHelper
+     */
     protected $paymentHelper;
+    /**
+     * @var MollieModel
+     */
     protected $mollieModel;
+    /**
+     * @var MollieHelper
+     */
     protected $mollieHelper;
 
     /**
@@ -60,17 +77,28 @@ class Success extends Action
         try {
             $status = $this->mollieModel->processTransaction($params['order_id'], 'success');
         } catch (\Exception $e) {
-            $this->mollieHelper->addTolog('error', $e);
+            $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->messageManager->addExceptionMessage($e, __('There was an error checking the transaction status.'));
             $this->_redirect('checkout/cart');
         }
 
         if (!empty($status['success'])) {
-            $this->checkoutSession->start();
-            $this->_redirect('checkout/onepage/success?utm_nooverride=1');
+            try {
+                $this->checkoutSession->start();
+                $this->_redirect('checkout/onepage/success?utm_nooverride=1');
+            } catch (\Exception $e) {
+                $this->mollieHelper->addTolog('error', $e->getMessage());
+                $this->messageManager->addNoticeMessage(__('Something went wrong.'));
+                $this->_redirect('checkout/cart');
+            }
         } else {
             $this->checkoutSession->restoreQuote();
-            $this->messageManager->addNoticeMessage(__('Something went wrong.'));
+            if (isset($status['status']) && $status['status'] == 'cancel') {
+                $this->messageManager->addNoticeMessage(__('Payment cancelled, please try again.'));
+            } else {
+                $this->messageManager->addNoticeMessage(__('Something went wrong.'));
+            }
+
             $this->_redirect('checkout/cart');
         }
     }

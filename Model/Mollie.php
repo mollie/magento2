@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -27,26 +27,83 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\DataObject;
 use Mollie\Payment\Helper\General as MollieHelper;
 
+/**
+ * Class Mollie
+ *
+ * @package Mollie\Payment\Model
+ */
 class Mollie extends AbstractMethod
 {
 
+    /**
+     * Enable Initialize
+     *
+     * @var bool
+     */
     protected $_isInitializeNeeded = true;
+    /**
+     * Enable Gateway
+     *
+     * @var bool
+     */
     protected $_isGateway = true;
-    protected $_isOffline = false;
+    /**
+     * Enable Refund
+     *
+     * @var bool
+     */
     protected $_canRefund = true;
+    /**
+     * Enable Partial Refund
+     *
+     * @var bool
+     */
     protected $_canRefundInvoicePartial = true;
 
-    protected $issuers = [];
-    protected $objectManager;
-    protected $mollieHelper;
-    protected $checkoutSession;
-    protected $storeManager;
-    protected $order;
-    protected $scopeConfig;
-    protected $orderSender;
-    protected $invoiceSender;
-    protected $orderRepository;
-    protected $searchCriteriaBuilder;
+    /**
+     * @var array
+     */
+    private $issuers = [];
+    /**
+     * @var ObjectManagerInterface
+     */
+    private $objectManager;
+    /**
+     * @var MollieHelper
+     */
+    private $mollieHelper;
+    /**
+     * @var CheckoutSession
+     */
+    private $checkoutSession;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+    /**
+     * @var Order
+     */
+    private $order;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+    /**
+     * @var OrderSender
+     */
+    private $orderSender;
+    /**
+     * @var InvoiceSender
+     */
+    private $invoiceSender;
+    /**
+     * @var OrderRepository
+     */
+    private $orderRepository;
+    /**
+     * @var SearchCriteriaBuilder
+     */
+    private $searchCriteriaBuilder;
 
     /**
      * Mollie constructor.
@@ -191,6 +248,8 @@ class Mollie extends AbstractMethod
             if (!empty($paymentData->links->paymentUrl)) {
                 return $this->mollieHelper->getRedirectUrl($orderId);
             }
+
+            return $this->mollieHelper->getCheckoutUrl();
         }
 
         $billingAddress = $order->getBillingAddress();
@@ -358,8 +417,10 @@ class Mollie extends AbstractMethod
         } elseif ($paymentData->isPending() == true) {
             $msg = ['success' => true, 'status' => 'pending', 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);
-        } elseif (!$paymentData->isOpen() && $type == 'webhook') {
-            $this->cancelOrder($order);
+        } elseif (!$paymentData->isOpen()) {
+            if ($type == 'webhook') {
+                $this->cancelOrder($order);
+            }
             $msg = ['success' => false, 'status' => 'cancel', 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);
         }

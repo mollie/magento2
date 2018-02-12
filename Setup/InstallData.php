@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -8,43 +8,18 @@ namespace Mollie\Payment\Setup;
 
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
-use Magento\Eav\Setup\EavSetup;
-use Magento\Eav\Setup\EavSetupFactory;
 use Magento\Framework\Setup\InstallDataInterface;
-use Magento\Catalog\Setup\CategorySetupFactory;
-use Magento\Quote\Setup\QuoteSetupFactory;
 use Magento\Sales\Setup\SalesSetupFactory;
 
 class InstallData implements InstallDataInterface
 {
 
     /**
-     * EAV setup factory
-     *
-     * @var EavSetupFactory
-     */
-    private $eavSetupFactory;
-
-    /**
-     * Category setup factory
-     *
-     * @var CategorySetupFactory
-     */
-    protected $categorySetupFactory;
-
-    /**
-     * Quote setup factory
-     *
-     * @var QuoteSetupFactory
-     */
-    protected $quoteSetupFactory;
-
-    /**
      * Sales setup factory
      *
      * @var SalesSetupFactory
      */
-    protected $salesSetupFactory;
+    private $salesSetupFactory;
 
     /**
      * InstallData constructor.
@@ -63,7 +38,6 @@ class InstallData implements InstallDataInterface
      */
     public function install(ModuleDataSetupInterface $setup, ModuleContextInterface $context)
     {
-
         /** @var \Magento\Sales\Setup\SalesSetup $salesSetup */
         $salesSetup = $this->salesSetupFactory->create(['setup' => $setup]);
 

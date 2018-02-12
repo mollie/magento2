@@ -9,11 +9,11 @@ namespace Mollie\Payment\Model\Methods;
 use Mollie\Payment\Model\Mollie;
 
 /**
- * Class Belfius
+ * Class Inghomepay
  *
  * @package Mollie\Payment\Model\Methods
  */
-class Belfius extends Mollie
+class Inghomepay extends Mollie
 {
 
     /**
@@ -21,6 +21,6 @@ class Belfius extends Mollie
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_belfius';
+    protected $_code = 'mollie_methods_inghomepay';
 
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -13,12 +13,29 @@ use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Result\PageFactory;
 
+/**
+ * Class Redirect
+ *
+ * @package Mollie\Payment\Controller\Checkout
+ */
 class Redirect extends Action
 {
 
+    /**
+     * @var Session
+     */
     protected $checkoutSession;
+    /**
+     * @var PageFactory
+     */
     protected $resultPageFactory;
+    /**
+     * @var PaymentHelper
+     */
     protected $paymentHelper;
+    /**
+     * @var MollieHelper
+     */
     protected $mollieHelper;
 
     /**
