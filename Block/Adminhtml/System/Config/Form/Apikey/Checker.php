@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -10,11 +10,22 @@ use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
+/**
+ * Class Checker
+ *
+ * @package Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey
+ */
 class Checker extends Field
 {
 
-    protected $request;
+    /**
+     * @var string
+     */
     protected $_template = 'Mollie_Payment::system/config/button/apikey.phtml';
+    /**
+     * @var \Magento\Framework\App\RequestInterface
+     */
+    private $request;
 
     /**
      * Checker constructor.
@@ -65,9 +76,12 @@ class Checker extends Field
      */
     public function getButtonHtml()
     {
-        $buttonData = ['id' => 'apikey_button', 'label' => __('Test Apikey')];
-        $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')->setData($buttonData);
-
-        return $button->toHtml();
+        try {
+            $buttonData = ['id' => 'apikey_button', 'label' => __('Test Apikey')];
+            $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')->setData($buttonData);
+            return $button->toHtml();
+        } catch (\Exception $e) {
+            return '';
+        }
     }
 }

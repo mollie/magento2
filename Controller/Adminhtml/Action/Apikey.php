@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -11,25 +11,30 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Mollie\Payment\Helper\General as MollieHelper;
 
+/**
+ * Class Apikey
+ *
+ * @package Mollie\Payment\Controller\Adminhtml\Action
+ */
 class Apikey extends Action
 {
 
     /**
      * @var \Magento\Framework\App\RequestInterface
      */
-    protected $request;
+    private $request;
     /**
      * @var JsonFactory
      */
-    protected $resultJsonFactory;
+    private $resultJsonFactory;
     /**
      * @var \Magento\Framework\ObjectManagerInterface
      */
-    protected $objectManager;
+    private $objectManager;
     /**
      * @var MollieHelper
      */
-    protected $mollieHelper;
+    private $mollieHelper;
 
     /**
      * ApiKey constructor.

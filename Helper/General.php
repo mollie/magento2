@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -15,6 +15,11 @@ use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Locale\Resolver;
 use Mollie\Payment\Logger\MollieLogger;
 
+/**
+ * Class General
+ *
+ * @package Mollie\Payment\Helper
+ */
 class General extends AbstractHelper
 {
 
@@ -32,15 +37,38 @@ class General extends AbstractHelper
     const XML_PATH_LOCALE = 'payment/mollie_general/locale';
     const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
 
-    protected $metadata;
-    protected $storeManager;
-    protected $resourceConfig;
-    protected $urlBuilder;
-    protected $moduleList;
-    protected $logger;
-    protected $apiCheck;
-    protected $apiKey;
-
+    /**
+     * @var ProductMetadataInterface
+     */
+    private $metadata;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+    /**
+     * @var Config
+     */
+    private $resourceConfig;
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    private $urlBuilder;
+    /**
+     * @var ModuleListInterface
+     */
+    private $moduleList;
+    /**
+     * @var MollieLogger
+     */
+    private $logger;
+    /**
+     * @var
+     */
+    private $apiCheck;
+    /**
+     * @var
+     */
+    private $apiKey;
     /**
      * @var Resolver
      */
@@ -215,7 +243,6 @@ class General extends AbstractHelper
         return $this->getStoreConfig(self::XML_PATH_LOADING_SCREEN, $storeId);
     }
 
-
     /**
      * @param $storeId
      *
@@ -307,6 +334,26 @@ class General extends AbstractHelper
     public function getWebhookUrl()
     {
         return $this->urlBuilder->getUrl('mollie/checkout/webhook/');
+    }
+
+    /**
+     * Checkout Url Builder
+     *
+     * @return string
+     */
+    public function getCheckoutUrl()
+    {
+        return $this->urlBuilder->getUrl('checkout/cart');
+    }
+
+    /**
+     * Restart Url Builder
+     *
+     * @return string
+     */
+    public function getRestartUrl()
+    {
+        return $this->urlBuilder->getUrl('mollie/checkout/restart/');
     }
 
     /**
@@ -411,6 +458,7 @@ class General extends AbstractHelper
             'mollie_methods_paypal',
             'mollie_methods_paysafecard',
             'mollie_methods_sofort',
+            'mollie_methods_inghomepay',
             'mollie_methods_giftcard'
         ];
 

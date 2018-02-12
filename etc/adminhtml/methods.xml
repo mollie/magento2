@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 -->
@@ -16,5 +16,6 @@
     <include path="Mollie_Payment::methods/paypal.xml"/>
     <include path="Mollie_Payment::methods/paysafecard.xml"/>
     <include path="Mollie_Payment::methods/sofort.xml"/>
+    <include path="Mollie_Payment::methods/inghomepay.xml"/>
     <include path="Mollie_Payment::methods/giftcard.xml"/>
 </include>

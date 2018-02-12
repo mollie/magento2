@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -8,13 +8,21 @@ namespace Mollie\Payment\Block\Adminhtml\Render;
 
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
-use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Mollie\Payment\Helper\General as MollieHelper;
 
+/**
+ * Class Version
+ *
+ * @package Mollie\Payment\Block\Adminhtml\Render
+ */
 class Version extends Field
 {
 
-    protected $mollieHelper;
+    /**
+     * @var MollieHelper
+     */
+    private $mollieHelper;
 
     /**
      * Version constructor.

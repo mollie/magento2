@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -9,16 +9,29 @@ namespace Mollie\Payment\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Framework\Exception\LocalizedException;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
 
+/**
+ * Class ConfigObserver
+ *
+ * @package Mollie\Payment\Observer
+ */
 class ConfigObserver implements ObserverInterface
 {
 
-    protected $messageManager;
-    protected $mollieModel;
-    protected $mollieHelper;
+    /**
+     * @var ManagerInterface
+     */
+    private $messageManager;
+    /**
+     * @var MollieModel
+     */
+    private $mollieModel;
+    /**
+     * @var MollieHelper
+     */
+    private $mollieHelper;
 
     /**
      * ConfigObserver constructor.

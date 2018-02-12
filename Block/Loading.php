@@ -1,32 +1,49 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
 namespace Mollie\Payment\Block;
- 
+
 use Magento\Checkout\Model\Session;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\View\Element\Template;
+use Mollie\Payment\Helper\General as MollieHelper;
 
+/**
+ * Class Loading
+ *
+ * @package Mollie\Payment\Block
+ */
 class Loading extends Template
 {
-    protected $checkoutSession;
+
+    /**
+     * @var Session
+     */
+    private $checkoutSession;
+    /**
+     * @var MollieHelper
+     */
+    private $mollieHelper;
 
     /**
      * Loading constructor.
      *
-     * @param Context $context
-     * @param Session $checkoutSession
-     * @param array   $data
+     * @param Context      $context
+     * @param Session      $checkoutSession
+     * @param MollieHelper $mollieHelper
+     * @param array        $data
      */
     public function __construct(
         Context $context,
         Session $checkoutSession,
+        MollieHelper $mollieHelper,
         array $data = []
     ) {
         $this->checkoutSession = $checkoutSession;
+        $this->mollieHelper = $mollieHelper;
         parent::__construct($context, $data);
     }
 
@@ -54,4 +71,13 @@ class Loading extends Template
             return $this->getMollieRedirect();
         }
     }
+
+    /**
+     * @return string
+     */
+    public function getBackUrl()
+    {
+        return $this->mollieHelper->getRestartUrl();
+    }
+
 }

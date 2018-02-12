@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -14,13 +14,33 @@ use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Controller\ResultFactory;
 
+/**
+ * Class Webhook
+ *
+ * @package Mollie\Payment\Controller\Checkout
+ */
 class Webhook extends Action
 {
 
+    /**
+     * @var Session
+     */
     protected $checkoutSession;
+    /**
+     * @var ResultFactory
+     */
     protected $resultFactory;
+    /**
+     * @var PaymentHelper
+     */
     protected $paymentHelper;
+    /**
+     * @var MollieModel
+     */
     protected $mollieModel;
+    /**
+     * @var MollieHelper
+     */
     protected $mollieHelper;
 
     /**

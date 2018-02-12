@@ -24,6 +24,7 @@ define(
             {type: 'mollie_methods_paypal', component: defaultComponent},
             {type: 'mollie_methods_paysafecard', component: defaultComponent},
             {type: 'mollie_methods_sofort', component: defaultComponent},
+            {type: 'mollie_methods_inghomepay', component: defaultComponent},
             {type: 'mollie_methods_giftcard', component: giftcardComponent}
         ];
         $.each(methods, function (k, method) {

@@ -95,6 +95,14 @@
                 <allowspecific>0</allowspecific>
                 <instructions></instructions>
             </mollie_methods_sofort>
+            <mollie_methods_inghomepay>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\Inghomepay</model>
+                <title>ING Homepay</title>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions></instructions>
+            </mollie_methods_inghomepay>
             <mollie_methods_giftcard>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Giftcard</model>

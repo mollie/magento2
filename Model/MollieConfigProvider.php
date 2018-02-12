@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2017 Magmodules.eu. All rights reserved.
+ * Copyright © 2018 Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -14,10 +14,18 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 
+/**
+ * Class MollieConfigProvider
+ *
+ * @package Mollie\Payment\Model
+ */
 class MollieConfigProvider implements ConfigProviderInterface
 {
 
-    protected $methodCodes = [
+    /**
+     * @var array
+     */
+    private $methodCodes = [
         'mollie_methods_bancontact',
         'mollie_methods_banktransfer',
         'mollie_methods_belfius',
@@ -28,17 +36,37 @@ class MollieConfigProvider implements ConfigProviderInterface
         'mollie_methods_paypal',
         'mollie_methods_paysafecard',
         'mollie_methods_sofort',
+        'mollie_methods_inghomepay',
         'mollie_methods_giftcard'
     ];
-
-    protected $methods = [];
-    protected $escaper;
-    protected $assetRepository;
-    protected $scopeConfig;
-    protected $storeManager;
-    protected $mollieModel;
-    protected $mollieHelper;
-    protected $paymentHelper;
+    /**
+     * @var array
+     */
+    private $methods = [];
+    /**
+     * @var Escaper
+     */
+    private $escaper;
+    /**
+     * @var AssetRepository
+     */
+    private $assetRepository;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+    /**
+     * @var Mollie
+     */
+    private $mollieModel;
+    /**
+     * @var MollieHelper
+     */
+    private $mollieHelper;
+    /**
+     * @var PaymentHelper
+     */
+    private $paymentHelper;
 
     /**
      * MollieConfigProvider constructor.

@@ -1,3 +1,61 @@
+.mollie-buttons {
+    margin-top: 10%;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 1s;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.mollie-buttons .button {
+    display: inline-block;
+    margin: 20px;
+    max-width: 100%;
+    padding: 0 16px;
+    border: 0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .19);
+    border-radius: 6px;
+    background-color: #0095FF;
+    color: #FFF;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 4.4rem;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-transition: background .15s;
+    transition: background .15s;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mollie-buttons {
+    opacity: 0;
+    -webkit-transition: opacity 2s ease-in;
+    -moz-transition: opacity 2s ease-in;
+    -ms-transition: opacity 2s ease-in;
+    -o-transition: opacity 2s ease-in;
+    transition: opacity 2s ease-in;
+}
+
+.mollie-buttons .button:hover {
+    background-color: #0077CB;
+}
+
 .mollie-loading .redirect-block {
     padding: 10%;
     text-align: center;
