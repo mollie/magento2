@@ -254,13 +254,14 @@ class Mollie extends AbstractMethod
 
         $billingAddress = $order->getBillingAddress();
         $shippingAddress = $order->getShippingAddress();
+        $method = $this->mollieHelper->getMethodCode($order);
 
         $paymentData = [
             'amount'      => $order->getBaseGrandTotal(),
             'description' => $order->getIncrementId(),
             'redirectUrl' => $this->mollieHelper->getRedirectUrl($orderId),
             'webhookUrl'  => $this->mollieHelper->getWebhookUrl(),
-            'method'      => $this->mollieHelper->getMethodCode($order),
+            'method'      => $method,
             'issuer'      => $issuer,
             'metadata'    => [
                 'order_id' => $orderId,
@@ -268,6 +269,14 @@ class Mollie extends AbstractMethod
             ],
             'locale'      => $this->mollieHelper->getLocaleCode()
         ];
+
+        if ($method == 'banktransfer') {
+            $banktransferData = [
+                'billingEmail' => $order->getCustomerEmail(),
+                'dueDate'      => $this->mollieHelper->getBanktransferDueDate($storeId)
+            ];
+            $paymentData = array_merge($paymentData, $banktransferData);
+        }
 
         if ($billingAddress) {
             $billingData = [

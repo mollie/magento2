@@ -1,51 +1,63 @@
-# Mollie Magento® 2
+![Mollie](https://www.mollie.nl/files/Mollie-Logo-Style-Small.png)
 
-This is the official Mollie extension for Magento® 2.
+# Official Magento 2.x plugin for [Mollie Payments](https://www.mollie.com/). #
 
-## Installation
+**Magento 1.x** users check out our [Mollie Magento 1 plugin](https://github.com/mollie/Magento).
 
-### Magento® Marketplace
+***
 
-This extension is also available on the [Magento Marketplace](https://marketplace.magento.com/mollie-magento2.html)
+## Installation & Update the Mollie Payments plugin ##
 
-### Manually
+[1. Installation through Magento Marketplace](https://github.com/mollie/magento2/wiki/Installation-using-Marketplace)
 
-1. Go to Magento® 2 root folder
+[2. Installation by Composer](https://github.com/mollie/magento2/wiki/Installation-using-Composer)
 
-2. Enter following commands to install module:
+[3. Update by Composer](https://github.com/mollie/magento2/wiki/Update-through-Composer)
 
-   ```
-   composer require mollie/magento2
-   ```
+[- Configuration](https://github.com/mollie/magento2/wiki/Configure-the-extension)
 
-   Wait while dependencies are updated.
+[- Troubleshooting](https://github.com/mollie/magento2/wiki/Troubleshooting)
 
-3. Enter following commands to enable module:
 
-   ```
-   php bin/magento module:enable Mollie_Payment
-   php bin/magento setup:upgrade
-   php bin/magento cache:clean
-   ```
+## About Mollie Payments ##
+With Mollie, you can accept payments and donations online and expand your customer base internationally with support for all major payment methods through a single integration. No need to spend weeks on paperwork or security compliance procedures. No more lost conversions because you don’t support a shopper’s favourite payment method or because they don’t feel safe. We made our products and API expansive, intuitive, and safe for merchants, customers and developers alike. 
 
-4. If Magento® is running in production mode, deploy static content: 
+Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie you only pay for successful transactions. More about this pricing model can be found [here](https://www.mollie.com/en/pricing/). You can create an account [here](https://www.mollie.com/dashboard/signup). The Mollie Magento 2 plugin quickly integrates all major payment methods ready-made into your Magento webshop.
+   
 
-   ```
-   php bin/magento setup:static-content:deploy
-   ```
+## Supported Mollie Payment Methods ##
+- iDEAL
 
-5. Enable and configure the Mollie extension in Magento® Admin under *Stores* >
-   *Configuration* > *Sales* > *Payment Methods* > *Mollie*.
+- Creditcard
 
-## Requirements
+- CartaSi & Cartes Bancaires
 
-1) For Magento® 2.1.x and Magento® 2.2.x
+- Bancontact
 
-2) This extension requires the [Mollie API client for PHP.](https://github.com/mollie/mollie-api-php)
+- Belfius Pay Button
 
-When using composer of installation through the Magento® Marketplace this will be installed automatically.
+- ING HomePay
 
-To install manually, enter the following command in your Magento® 2 root folder:
-```
-composer require mollie/mollie-api-php
-```
+- KBC/CBC-Betaalknop
+
+- SOFORT Banking
+
+- BankTransfer
+
+- PayPal
+
+- Bitcoin
+
+- Paysafecard
+
+- SEPA bank transfer
+
+- Giftcards 
+
+## Configuration, FAQ and Troubleshooting  ##
+If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension in Magento 2.x, please see our [WIKI Page](https://github.com/mollie/magento2/wiki) or sent an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
+
+
+## License ##
+[BSD (Berkeley Software Distribution) License](http://www.opensource.org/licenses/bsd-license.php).
+Copyright (c) 2011-2018, Mollie B.V.

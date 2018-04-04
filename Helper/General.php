@@ -33,6 +33,7 @@ class General extends AbstractHelper
     const XML_PATH_STATUS_PROCESSING = 'payment/mollie_general/order_status_processing';
     const XML_PATH_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const XML_PATH_STATUS_PENDING_BANKTRANSFER = 'payment/mollie_methods_banktransfer/order_status_pending';
+    const XML_PATH_BANKTRANSFER_DUE_DAYS = 'payment/mollie_methods_banktransfer/due_days';
     const XML_PATH_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const XML_PATH_LOCALE = 'payment/mollie_general/locale';
     const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
@@ -425,6 +426,21 @@ class General extends AbstractHelper
         }
 
         return $locale;
+    }
+
+    /**
+     * @param int $storeId
+     *
+     * @return false|string
+     */
+    public function getBanktransferDueDate($storeId = 0)
+    {
+        $dueDays = $this->getStoreConfig(self::XML_PATH_BANKTRANSFER_DUE_DAYS, $storeId);
+        if ($dueDays > 0) {
+            $dueDate = new \DateTime();
+            $dueDate->modify('+' . $dueDays . ' day');
+            return $dueDate->format('Y-m-d');
+        }
     }
 
     /**
