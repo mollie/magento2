@@ -28,6 +28,16 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="due_days" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Due Days</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/mollie_methods_banktransfer/due_days</config_path>
+            <comment><![CDATA[The number of days after which the payment should expire. Please note: Minimum is 1 and the maximum is 100.]]></comment>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
