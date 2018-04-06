@@ -12,5 +12,5 @@ cache:
     - $HOME/.composer/cache
 
 script:
-- composer validate --strict
+- composer validate
 - find . -name '*.php' | xargs -n 1 -P4 php -l
