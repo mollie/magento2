@@ -1,0 +1,16 @@
+language: php
+
+php:
+- 5.6
+- 7.0
+- 7.1
+
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+script:
+- composer validate --strict
+- find . -name '*.php' | xargs -n 1 -P4 php -l
