@@ -91,13 +91,13 @@ class Redirect extends Action
                 }
             } else {
                 $msg = __('Paymentmethod not found.');
-                $this->messageManager->addError($msg);
+                $this->messageManager->addErrorMessage($msg);
                 $this->mollieHelper->addTolog('error', $msg);
                 $this->checkoutSession->restoreQuote();
                 $this->_redirect('checkout/cart');
             }
         } catch (\Exception $e) {
-            $this->messageManager->addException($e, __($e->getMessage()));
+            $this->messageManager->addExceptionMessage($e, __($e->getMessage()));
             $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->checkoutSession->restoreQuote();
             $this->_redirect('checkout/cart');

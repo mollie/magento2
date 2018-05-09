@@ -8,6 +8,7 @@ namespace Mollie\Payment\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Quote\Model\Quote;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Config\Model\ResourceModel\Config;
@@ -24,6 +25,8 @@ class General extends AbstractHelper
 {
 
     const MODULE_CODE = 'Mollie_Payment';
+    const SUPPORTED_LOCAL = ['en_US', 'de_AT', 'de_CH', 'de_DE', 'es_ES', 'fr_BE', 'fr_FR', 'nl_BE', 'nl_NL'];
+
     const XML_PATH_MODULE_ACTIVE = 'payment/mollie_general/enabled';
     const XML_PATH_API_MODUS = 'payment/mollie_general/type';
     const XML_PATH_LIVE_APIKEY = 'payment/mollie_general/apikey_live';
@@ -37,6 +40,7 @@ class General extends AbstractHelper
     const XML_PATH_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const XML_PATH_LOCALE = 'payment/mollie_general/locale';
     const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
+    const XML_PATH_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
 
     /**
      * @var ProductMetadataInterface
@@ -119,10 +123,6 @@ class General extends AbstractHelper
             return false;
         }
 
-        if (!$this->checkIfClassExists('Mollie_API_Client')) {
-            return false;
-        }
-
         $apiKey = $this->getApiKey($storeId);
         if (empty($apiKey)) {
             return false;
@@ -142,26 +142,6 @@ class General extends AbstractHelper
     public function getStoreConfig($path, $storeId = 0)
     {
         return $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
-    }
-
-    /**
-     * Check is class extists, used for Mollie API check
-     *
-     * @param $class
-     *
-     * @return bool
-     */
-    public function checkIfClassExists($class)
-    {
-        if (!empty($this->apiCheck)) {
-            return true;
-        }
-
-        if (class_exists($class)) {
-            $this->apiCheck = true;
-        }
-
-        return $this->apiCheck;
     }
 
     /**
@@ -268,36 +248,9 @@ class General extends AbstractHelper
     }
 
     /**
-     * Currency check
-     *
-     * @param $currency
-     *
-     * @return bool
-     */
-    public function isCurrencyAllowed($currency)
-    {
-        $allowed = ['EUR'];
-        if (!in_array($currency, $allowed)) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * @param null $storeId
-     *
-     * @return mixed
-     */
-    public function getStoreCurrencyCode($storeId = null)
-    {
-        return $this->storeManager->getStore($storeId)->getCurrentCurrency()->getCode();
-    }
-
-    /**
      * Method code for API
      *
-     * @param $order
+     * @param \Magento\Sales\Model\Order $order
      *
      * @return mixed
      */
@@ -305,12 +258,6 @@ class General extends AbstractHelper
     {
         $method = $order->getPayment()->getMethodInstance()->getCode();
         $methodCode = str_replace('mollie_methods_', '', $method);
-
-        // Mollie API uses mistercash instead of bancontact
-        if ($methodCode == 'bancontact') {
-            $methodCode = 'mistercash';
-        }
-
         return $methodCode;
     }
 
@@ -406,22 +353,88 @@ class General extends AbstractHelper
     }
 
     /**
-     * @return string
+     * Order Currency and Value array for payment request
+     *
+     * @param \Magento\Sales\Model\Order $order
+     *
+     * @return array
      */
-    public function getLocaleCode()
+    public function getOrderAmountByOrder($order)
     {
-        $locale = $this->getStoreConfig(self::XML_PATH_LOCALE);
+        $baseCurrency = $this->useBaseCurrency($order->getStoreId());
+
+        if ($baseCurrency) {
+            $orderAmount = [
+                "currency" => $order->getBaseCurrencyCode(),
+                "value"    => number_format($order->getBaseGrandTotal(), 2)
+            ];
+        } else {
+            $orderAmount = [
+                "currency" => $order->getOrderCurrencyCode(),
+                "value"    => number_format($order->getGrandTotal(), 2)
+            ];
+        }
+
+        return $orderAmount;
+    }
+
+    /**
+     * Order Currency and Value array for payment request
+     *
+     * @param \Magento|Quote $quote
+     *
+     * @return array
+     */
+    public function getOrderAmountByQuote($quote)
+    {
+        $baseCurrency = $this->useBaseCurrency($quote->getStoreId());
+
+        if ($baseCurrency) {
+            $orderAmount = [
+                "currency" => $quote->getBaseCurrencyCode(),
+                "value"    => number_format($quote->getBaseGrandTotal(), 2)
+            ];
+        } else {
+            $orderAmount = [
+                "currency" => $quote->getQuoteCurrencyCode(),
+                "value"    => number_format($quote->getGrandTotal(), 2)
+            ];
+        }
+
+        return $orderAmount;
+    }
+
+    /**
+     * @param int $storeId
+     *
+     * @return int
+     */
+    public function useBaseCurrency($storeId = 0)
+    {
+        return (int)$this->getStoreConfig(self::XML_PATH_USE_BASE_CURRENCY, $storeId);
+    }
+
+    /**
+     * Determine Locale
+     *
+     * @param $storeId
+     *
+     * @return mixed|null|string
+     */
+    public function getLocaleCode($storeId)
+    {
+        $locale = $this->getStoreConfig(self::XML_PATH_LOCALE, $storeId);
 
         if (!$locale) {
-            return '';
+            return null;
         }
 
         if ($locale == 'store') {
             $localeCode = $this->resolver->getLocale();
-            if (in_array($localeCode, $this->getSupportedLocal())) {
+            if (in_array($localeCode, self::SUPPORTED_LOCAL)) {
                 return $localeCode;
             } else {
-                return '';
+                return null;
             }
         }
 
@@ -429,6 +442,8 @@ class General extends AbstractHelper
     }
 
     /**
+     * Returns void end date for Banktransfer payments
+     *
      * @param int $storeId
      *
      * @return false|string
@@ -441,16 +456,6 @@ class General extends AbstractHelper
             $dueDate->modify('+' . $dueDays . ' day');
             return $dueDate->format('Y-m-d');
         }
-    }
-
-    /**
-     * List of supported local codes Mollie.
-     *
-     * @return array
-     */
-    public function getSupportedLocal()
-    {
-        return ['en_US', 'de_AT', 'de_CH', 'de_DE', 'es_ES', 'fr_BE', 'fr_FR', 'nl_BE', 'nl_NL'];
     }
 
     /**
@@ -486,9 +491,6 @@ class General extends AbstractHelper
                 $maxPath = 'payment/' . $methodCode . '/max_order_total';
                 $max = $this->getStoreConfig($maxPath, $storeId);
                 $code = str_replace('mollie_methods_', '', $methodCode);
-                if ($code == 'bancontact') {
-                    $code = 'mistercash';
-                }
                 $activeMethods[$methodCode] = ['code' => $code, 'max' => $max];
             }
         }
@@ -525,7 +527,7 @@ class General extends AbstractHelper
     {
         return __(
             'Mollie API client for PHP is not installed, for more information about this issue see our %1 page.',
-            '<a href="https://github.com/mollie/Magento2" target="_blank">GitHub</a>'
+            '<a href="https://github.com/mollie/Magento2/wiki/Troubleshooting" target="_blank">GitHub</a>'
         );
     }
 }

@@ -10,6 +10,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Helper\Tests as TestsHelper;
 
 /**
  * Class Apikey
@@ -28,29 +29,31 @@ class Apikey extends Action
      */
     private $resultJsonFactory;
     /**
-     * @var \Magento\Framework\ObjectManagerInterface
+     * @var TestsHelper
      */
-    private $objectManager;
+    private $testsHelper;
     /**
      * @var MollieHelper
      */
     private $mollieHelper;
 
     /**
-     * ApiKey constructor.
+     * Apikey constructor.
      *
-     * @param Context      $context
-     * @param JsonFactory  $resultJsonFactory
-     * @param MollieHelper $mollieHelper
+     * @param Context       $context
+     * @param JsonFactory   $resultJsonFactory
+     * @param TestsHelper $testsHelper
+     * @param MollieHelper  $mollieHelper
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
+        TestsHelper $testsHelper,
         MollieHelper $mollieHelper
     ) {
         $this->request = $context->getRequest();
-        $this->objectManager = $context->getObjectManager();
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->testsHelper = $testsHelper;
         $this->mollieHelper = $mollieHelper;
         parent::__construct($context);
     }
@@ -60,97 +63,16 @@ class Apikey extends Action
      */
     public function execute()
     {
-
-        if (!$this->mollieHelper->checkIfClassExists('Mollie_API_Client')) {
-            $msg = $this->mollieHelper->getPhpApiErrorMessage();
-            $return = '<span class="mollie-error">' . $msg . '</span>';
-            $result = $this->resultJsonFactory->create();
-
-            return $result->setData(['success' => true, 'msg' => $return]);
-        }
-
-        $testKey = $this->request->getParam('test_key');
-        $liveKey = $this->request->getParam('live_key');
-
-        $results = [];
-
-        if (empty($testKey)) {
-            $results[] = '<span class="mollie-error">' . __('Test API-key: Empty value') . '</span>';
+        if (!class_exists('Mollie\Api\MollieApiClient', false)) {
+            $results = ['<span class="mollie-error">' . $this->mollieHelper->getPhpApiErrorMessage() . '</span>'];
         } else {
-            if (!preg_match('/^test_\w+$/', $testKey)) {
-                $results[] = '<span class="mollie-error">' . __('Test API-key: Should start with "test_"') . '</span>';
-            } else {
-                try {
-                    $availableMethods = [];
-                    $mollieApi = $this->loadApi($testKey);
-                    $methods = $mollieApi->methods->all();
-
-                    foreach ($methods as $apiMethod) {
-                        $availableMethods[] = ucfirst($apiMethod->id);
-                    }
-
-                    if (empty($availableMethods)) {
-                        $msg = __('Enabled Methods: None, Please enable the payment methods in your Mollie dashboard.');
-                        $methodsMsg = '<span class="enabled-methods-error">' . $msg . '</span>';
-                    } else {
-                        $msg = __('Enabled Methods') . ': ' . implode(', ', $availableMethods);
-                        $methodsMsg = '<span class="enabled-methods">' . $msg . '</span>';
-                    }
-
-                    $results[] = '<span class="mollie-success">' . __('Test API-key: Success!') . $methodsMsg . '</span>';
-                } catch (\Exception $e) {
-                    $results[] = '<span class="mollie-error">' . __('Test API-key: %1', $e->getMessage()) . '</span>';
-                }
-            }
-        }
-
-        if (empty($liveKey)) {
-            $results[] = '<span class="mollie-error">' . __('Live API-key: Empty value') . '</span>';
-        } else {
-            if (!preg_match('/^live_\w+$/', $liveKey)) {
-                $results[] = '<span class="mollie-error">' . __('Live API-key: Should start with "live_"') . '</span>';
-            } else {
-                try {
-                    $availableMethods = [];
-                    $mollieApi = $this->loadApi($liveKey);
-                    $methods = $mollieApi->methods->all();
-                    foreach ($methods as $apiMethod) {
-                        $availableMethods[] = ucfirst($apiMethod->id);
-                    }
-
-                    if (empty($availableMethods)) {
-                        $msg = __('Enabled Methods: None, Please enable the payment methods in your Mollie dashboard.');
-                        $methodsMsg = '<span class="enabled-methods-error">' . $msg . '</span>';
-                    } else {
-                        $msg = __('Enabled Methods') . ': ' . implode(', ', $availableMethods);
-                        $methodsMsg = '<span class="enabled-methods">' . $msg . '</span>';
-                    }
-
-                    $results[] = '<span class="mollie-success">' . __('Live API-key: Success!') . $methodsMsg . '</span>';
-                } catch (\Exception $e) {
-                    $results[] = '<span class="mollie-error">' . __('Live API-key: %1', $e->getMessage()) . '</span>';
-                }
-            }
+            $testKey = $this->request->getParam('test_key');
+            $liveKey = $this->request->getParam('live_key');
+            $results = $this->testsHelper->getMethods($testKey, $liveKey);
         }
 
         $result = $this->resultJsonFactory->create();
-
         return $result->setData(['success' => true, 'msg' => implode('<br/>', $results)]);
-    }
-
-    /**
-     * @param $apiKey
-     *
-     * @return mixed
-     */
-    protected function loadApi($apiKey)
-    {
-        $mollieApi = $this->objectManager->create('Mollie_API_Client');
-        $mollieApi->setApiKey($apiKey);
-        $mollieApi->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
-        $mollieApi->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
-
-        return $mollieApi;
     }
 
     /**
