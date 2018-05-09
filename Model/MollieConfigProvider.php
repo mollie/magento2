@@ -9,6 +9,7 @@ namespace Mollie\Payment\Model;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Checkout\Model\ConfigProviderInterface;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Escaper;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
@@ -67,6 +68,10 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var PaymentHelper
      */
     private $paymentHelper;
+    /**
+     * @var CheckoutSession
+     */
+    private $checkoutSession;
 
     /**
      * MollieConfigProvider constructor.
@@ -74,6 +79,7 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @param Mollie               $mollieModel
      * @param MollieHelper         $mollieHelper
      * @param PaymentHelper        $paymentHelper
+     * @param CheckoutSession      $checkoutSession
      * @param AssetRepository      $assetRepository
      * @param ScopeConfigInterface $scopeConfig
      * @param Escaper              $escaper
@@ -82,6 +88,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         MollieModel $mollieModel,
         MollieHelper $mollieHelper,
         PaymentHelper $paymentHelper,
+        CheckoutSession $checkoutSession,
         AssetRepository $assetRepository,
         ScopeConfigInterface $scopeConfig,
         Escaper $escaper
@@ -89,6 +96,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
         $this->paymentHelper = $paymentHelper;
+        $this->checkoutSession = $checkoutSession;
         $this->escaper = $escaper;
         $this->assetRepository = $assetRepository;
         $this->scopeConfig = $scopeConfig;
@@ -132,22 +140,21 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
 
         foreach ($this->methodCodes as $code) {
+
             if ($this->methods[$code]->isAvailable()) {
                 if (!empty($activeMethods[$code])) {
                     $config['payment']['isActive'][$code] = true;
                     $config['payment']['instructions'][$code] = $this->getInstructions($code);
-                    $config['payment']['min'][$code] = (isset($activeMethods[$code]['min']) ? $activeMethods[$code]['min'] : '');
-                    $config['payment']['max'][$code] = (isset($activeMethods[$code]['max']) ? $activeMethods[$code]['max'] : '');
                     if ($useImage && isset($activeMethods[$code]['image'])) {
                         $config['payment']['image'][$code] = $activeMethods[$code]['image'];
                     } else {
                         $config['payment']['image'][$code] = '';
                     }
                     if ($code == 'mollie_methods_ideal') {
-                        $config['payment']['issuers'][$code] = $this->getIdealIssuers($mollieApi);
+                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers($mollieApi, $code);
                     }
                     if ($code == 'mollie_methods_giftcard') {
-                        $config['payment']['issuers'][$code] = $this->getGiftcardIssuers($mollieApi);
+                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers($mollieApi, $code);
                         if (empty($config['payment']['issuers'][$code])) {
                             $config['payment']['isActive'][$code] = false;
                         }
@@ -170,27 +177,25 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     public function getActiveMethods($mollieApi)
     {
-        $methods = [];
+        $methodData = [];
 
         try {
-            $apiMethods = $mollieApi->methods->all();
-            foreach ($apiMethods->data as $method) {
-                if ($method->id == 'mistercash') {
-                    $methodId = 'mollie_methods_bancontact';
-                } else {
-                    $methodId = 'mollie_methods_' . $method->id;
-                }
-                $methods[$methodId] = [
-                    'min'   => $method->amount->minimum,
-                    'max'   => $method->amount->maximum,
-                    'image' => $method->image->normal
+            $quote = $this->checkoutSession->getQuote();
+            $amount = $this->mollieHelper->getOrderAmountByQuote($quote);
+            $params = ["amount[value]" => $amount['value'], "amount[currency]" => $amount['currency']];
+            $apiMethods = $mollieApi->methods->all($params);
+
+            foreach ($apiMethods as $method) {
+                $methodId = 'mollie_methods_' . $method->id;
+                $methodData[$methodId] = [
+                    'image' => $method->image->size2x
                 ];
             }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', 'Function: getActiveMethods: ' . $e->getMessage());
         }
 
-        return $methods;
+        return $methodData;
     }
 
     /**
@@ -203,36 +208,6 @@ class MollieConfigProvider implements ConfigProviderInterface
     protected function getInstructions($code)
     {
         return nl2br($this->escaper->escapeHtml($this->methods[$code]->getInstructions()));
-    }
-
-    /**
-     * Get list of iDeal Issuers
-     *
-     * @param $mollieApi
-     *
-     * @return array|bool
-     */
-    public function getIdealIssuers($mollieApi)
-    {
-        if ($issuers = $this->mollieModel->getIdealIssuers($mollieApi)) {
-            return $issuers;
-        }
-        return [];
-    }
-
-    /**
-     * Get list of Giftcard Issuers
-     *
-     * @param $mollieApi
-     *
-     * @return array|bool
-     */
-    public function getGiftcardIssuers($mollieApi)
-    {
-        if ($issuers = $this->mollieModel->getGiftcardIssuers($mollieApi)) {
-            return $issuers;
-        }
-        return [];
     }
 
 }

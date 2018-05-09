@@ -14,7 +14,7 @@
         'jquery',
         'prototype'
     ], function (jQuery) {
-        var resultSpan = jQuery('#result');
+        var resultSpan = jQuery('#result_compatibility');
         jQuery('#compatibility_button').click(function () {
             var params = {};
             new Ajax.Request('<?php echo $block->getAjaxUrl() ?>', {
@@ -22,12 +22,12 @@
                 loaderArea: false,
                 asynchronous: true,
                 onCreate: function () {
-                    resultSpan.find('.compatibility_connecting').show();
-                    resultSpan.find('#comaptibility_result').hide();
+                    resultSpan.find('.connecting').show();
+                    resultSpan.find('.result').hide();
                 },
                 onSuccess: function (response) {
                     console.log(response);
-                    resultSpan.find('.compatibility_connecting').hide();
+                    resultSpan.find('.connecting').hide();
                     var resultText = '';
                     if (response.status > 200) {
                         resultText = response.statusText;
@@ -37,8 +37,8 @@
                             resultText = json.msg;
                         }
                     }
-                    resultSpan.find('#comaptibility_result').show();
-                    jQuery('#comaptibility_result').html(resultText);
+                    resultSpan.find('.result').show();
+                    resultSpan.find('.result').html(resultText);
                 }
             });
         });

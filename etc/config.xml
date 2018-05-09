@@ -13,6 +13,7 @@
                 <loading_screen>0</loading_screen>
                 <debug>1</debug>
                 <model>Mollie\Payment\Model\Methods\General</model>
+                <currency>1</currency>
             </mollie_general>
             <mollie_methods_bancontact>
                 <active>0</active>
@@ -20,7 +21,7 @@
                 <title>Bancontact</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_bancontact>
             <mollie_methods_banktransfer>
                 <active>0</active>
@@ -30,7 +31,7 @@
                 <due_days>14</due_days>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_banktransfer>
             <mollie_methods_belfius>
                 <active>0</active>
@@ -38,7 +39,7 @@
                 <title>Belfius</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_belfius>
             <mollie_methods_bitcoin>
                 <active>0</active>
@@ -46,7 +47,7 @@
                 <title>Bitcoin</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_bitcoin>
             <mollie_methods_creditcard>
                 <active>0</active>
@@ -54,7 +55,7 @@
                 <title>Credit Cards</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_creditcard>
             <mollie_methods_ideal>
                 <active>0</active>
@@ -62,7 +63,7 @@
                 <title>iDeal</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_ideal>
             <mollie_methods_kbc>
                 <active>0</active>
@@ -70,7 +71,7 @@
                 <title>KBC</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_kbc>
             <mollie_methods_paypal>
                 <active>0</active>
@@ -78,7 +79,7 @@
                 <title>Paypal</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_paypal>
             <mollie_methods_paysafecard>
                 <active>0</active>
@@ -86,7 +87,7 @@
                 <title>Paysafecard</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_paysafecard>
             <mollie_methods_sofort>
                 <active>0</active>
@@ -94,7 +95,7 @@
                 <title>Sofort</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_sofort>
             <mollie_methods_inghomepay>
                 <active>0</active>
@@ -102,7 +103,7 @@
                 <title>ING Homepay</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_inghomepay>
             <mollie_methods_giftcard>
                 <active>0</active>
@@ -110,7 +111,7 @@
                 <title>Giftcard</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions></instructions>
+                <instructions/>
             </mollie_methods_giftcard>
         </payment>
     </default>

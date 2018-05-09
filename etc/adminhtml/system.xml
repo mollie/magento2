@@ -109,6 +109,13 @@
                         <config_path>payment/mollie_general/locale</config_path>
                         <comment><![CDATA[Let Mollie automatically detect the language or force the language from the store view.]]></comment>
                     </field>
+                    <field id="currency" translate="label" type="select" sortOrder="27" showInDefault="1"
+                           showInWebsite="1" showInStore="1">
+                        <label>Use Base Currency</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/mollie_general/currency</config_path>
+                        <comment>Force use of base currency for the payment request. Is set to no the selected currency of the storeview will be used for request.</comment>
+                    </field>
                     <field id="heading_debug" translate="label comment" type="text" sortOrder="80" showInDefault="1"
                            showInWebsite="0" showInStore="0">
                         <label>Debug</label>

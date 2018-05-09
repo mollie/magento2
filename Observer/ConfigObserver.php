@@ -78,11 +78,11 @@ class ConfigObserver implements ObserverInterface
     public function validatePaymentMethods($storeId, $modus)
     {
 
-        if (!$this->mollieHelper->checkIfClassExists('Mollie_API_Client')) {
+        if (!class_exists('Mollie\Api\CompatibilityChecker', false)) {
             $error = $this->mollieHelper->getPhpApiErrorMessage();
             $this->mollieHelper->disableExtension();
             $this->mollieHelper->addTolog('error', $error);
-            $this->messageManager->addError($error);
+            $this->messageManager->addErrorMessage($error);
             return false;
         }
 
@@ -94,7 +94,7 @@ class ConfigObserver implements ObserverInterface
             $apiMethods = $this->mollieModel->getPaymentMethods($storeId);
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            $this->messageManager->addError($e->getMessage());
+            $this->messageManager->addErrorMessage($e->getMessage());
             return false;
         }
 
@@ -106,9 +106,7 @@ class ConfigObserver implements ObserverInterface
 
         $methods = [];
         foreach ($apiMethods as $apiMethod) {
-            $methods[$apiMethod->id] = [
-                'max' => $apiMethod->amount->maximum
-            ];
+            $methods[$apiMethod->id] = $apiMethod;
         }
 
         $errors = [];
@@ -118,18 +116,11 @@ class ConfigObserver implements ObserverInterface
                 $errors[] = __('%1: method not enabled in Mollie Dashboard', ucfirst($code));
                 continue;
             }
-            if ($v['max'] > $methods[$code]['max']) {
-                $errors[] = __(
-                    '%1: maximum is set higher than set in Mollie dashboard: %2, please correct.',
-                    ucfirst($code),
-                    '€ ' . number_format($methods[$code]['max'], 2, ',', '.')
-                );
-            }
         }
 
         if (!empty($errors)) {
-            $errorMethods = implode('<br/>', $errors);
-            $this->messageManager->addError($errorMethods);
+            $errorMethods = implode(', ', $errors);
+            $this->messageManager->addErrorMessage($errorMethods);
         }
     }
 }
