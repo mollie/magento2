@@ -8,8 +8,8 @@ namespace Mollie\Payment\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\ObjectManagerInterface;
 use Mollie\Payment\Model\Mollie as MollieModel;
-use Mollie\Api\CompatibilityChecker;
 
 /**
  * Class Tests
@@ -18,30 +18,29 @@ use Mollie\Api\CompatibilityChecker;
  */
 class Tests extends AbstractHelper
 {
-
+    /**
+     * @var ObjectManagerInterface
+     */
+    private $objectManager;
     /**
      * @var MollieModel
      */
     private $mollieModel;
-    /**
-     * @var CompatibilityChecker
-     */
-    private $compatibilityChecker;
 
     /**
      * Tests constructor.
      *
-     * @param Context              $context
-     * @param MollieModel          $mollieModel
-     * @param CompatibilityChecker $compatibilityChecker
+     * @param Context                $context
+     * @param ObjectManagerInterface $objectManager
+     * @param MollieModel            $mollieModel
      */
     public function __construct(
         Context $context,
-        MollieModel $mollieModel,
-        CompatibilityChecker $compatibilityChecker
+        ObjectManagerInterface $objectManager,
+        MollieModel $mollieModel
     ) {
+        $this->objectManager = $objectManager;
         $this->mollieModel = $mollieModel;
-        $this->compatibilityChecker = $compatibilityChecker;
         parent::__construct($context);
     }
 
@@ -122,7 +121,7 @@ class Tests extends AbstractHelper
      */
     public function compatibilityChecker()
     {
-        $compatibilityChecker = $this->compatibilityChecker;
+        $compatibilityChecker = $this->objectManager->create('Mollie\Api\CompatibilityChecker');
 
         if (!$compatibilityChecker->satisfiesPhpVersion()) {
             $minPhpVersion = $compatibilityChecker::MIN_PHP_VERSION;

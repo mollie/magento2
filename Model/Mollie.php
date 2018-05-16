@@ -26,7 +26,6 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\DataObject;
 use Mollie\Payment\Helper\General as MollieHelper;
-use Mollie\Api\MollieApiClient as MollieApiClient;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
@@ -75,10 +74,6 @@ class Mollie extends AbstractMethod
      */
     private $mollieHelper;
     /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-    /**
      * @var CheckoutSession
      */
     private $checkoutSession;
@@ -123,7 +118,6 @@ class Mollie extends AbstractMethod
      * @param Logger                     $logger
      * @param ObjectManagerInterface     $objectManager
      * @param MollieHelper               $mollieHelper
-     * @param MollieApiClient            $mollieApiClient
      * @param CheckoutSession            $checkoutSession
      * @param StoreManagerInterface      $storeManager
      * @param Order                      $order
@@ -145,7 +139,6 @@ class Mollie extends AbstractMethod
         Logger $logger,
         ObjectManagerInterface $objectManager,
         MollieHelper $mollieHelper,
-        MollieApiClient $mollieApiClient,
         CheckoutSession $checkoutSession,
         StoreManagerInterface $storeManager,
         Order $order,
@@ -171,7 +164,6 @@ class Mollie extends AbstractMethod
         );
         $this->objectManager = $objectManager;
         $this->mollieHelper = $mollieHelper;
-        $this->mollieApiClient = $mollieApiClient;
         $this->checkoutSession = $checkoutSession;
         $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
@@ -230,6 +222,7 @@ class Mollie extends AbstractMethod
      *
      * @return bool
      * @throws \Exception
+     * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function startTransaction(Order $order)
     {
@@ -318,16 +311,19 @@ class Mollie extends AbstractMethod
     /**
      * @param $apiKey
      *
-     * @return MollieApiClient
+     * @return \Mollie\Api\MollieApiClient
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws LocalizedException
      */
     public function loadMollieApi($apiKey)
     {
-        $mollieApiClient = new MollieApiClient();
-        $mollieApiClient->setApiKey($apiKey);
-        $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
-        $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
-        return $mollieApiClient;
+        if (class_exists('Mollie\Api\MollieApiClient')) {
+            /** @var \Mollie\Payment\Model\Api $mollieApi */
+            $mollieApi = $this->objectManager->create('Mollie\Payment\Model\Api');
+            return $mollieApi->load($apiKey);
+        } else {
+            throw new LocalizedException(__('Class Mollie\Api\MollieApiClient does not exist'));
+        }
     }
 
     /**
@@ -528,7 +524,6 @@ class Mollie extends AbstractMethod
      *
      * @return $this|array
      * @throws LocalizedException
-     * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
     {
@@ -552,9 +547,8 @@ class Mollie extends AbstractMethod
             return $msg;
         }
 
-        $mollieApi = $this->loadMollieApi($apiKey);
-
         try {
+            $mollieApi = $this->loadMollieApi($apiKey);
             $payment = $mollieApi->payments->get($transactionId);
             $payment->refund([
                 "amount" => [
@@ -624,10 +618,14 @@ class Mollie extends AbstractMethod
     }
 
     /**
+     * Get list payment methods by Store ID.
+     * Used in Observer/ConfigObserver to validate payment methods.
+     *
      * @param $storeId
      *
      * @return bool|\Mollie\Api\Resources\MethodCollection
      * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws LocalizedException
      */
     public function getPaymentMethods($storeId)
     {
@@ -642,19 +640,4 @@ class Mollie extends AbstractMethod
         return $mollieApi->methods->all();
     }
 
-    /**
-     * @param $apiKey
-     *
-     * @return MollieApiClient
-     * @throws \Mollie\Api\Exceptions\ApiException
-     */
-    protected function loadApi($apiKey)
-    {
-        $mollieApiClient = new MollieApiClient();
-        $mollieApiClient->setApiKey($apiKey);
-        $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
-        $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
-
-        return $mollieApiClient;
-    }
 }

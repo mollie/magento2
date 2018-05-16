@@ -68,14 +68,17 @@ class Compatibility extends Action
      */
     public function execute()
     {
-        if (!class_exists('Mollie\Api\CompatibilityChecker', false)) {
-            $results = ['<span class="mollie-error">' . $this->mollieHelper->getPhpApiErrorMessage() . '</span>'];
-        } else {
-            $results = $this->testsHelper->compatibilityChecker();
+        $result = $this->resultJsonFactory->create();
+
+        if (!class_exists('Mollie\Api\CompatibilityChecker')) {
+            $apiErrorMsg = ['<span class="mollie-error">' . $this->mollieHelper->getPhpApiErrorMessage() . '</span>'];
+            $result->setData(['success' => false, 'msg' => $apiErrorMsg]);
+            return $result;
         }
 
-        $result = $this->resultJsonFactory->create();
-        return $result->setData(['success' => true, 'msg' => implode('<br/>', $results)]);
+        $compatibilityResult = $this->testsHelper->compatibilityChecker();
+        $result->setData(['success' => true, 'msg' => implode('<br/>', $compatibilityResult)]);
+        return $result;
     }
 
     /**

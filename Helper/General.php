@@ -521,13 +521,22 @@ class General extends AbstractHelper
     }
 
     /**
-     * @return string
+     * @param bool $addLink
+     *
+     * @return \Magento\Framework\Phrase
      */
-    public function getPhpApiErrorMessage()
+    public function getPhpApiErrorMessage($addLink = true)
     {
-        return __(
-            'Mollie API client for PHP is not installed, for more information about this issue see our %1 page.',
-            '<a href="https://github.com/mollie/Magento2/wiki/Troubleshooting" target="_blank">GitHub</a>'
-        );
+        if ($addLink) {
+            return __(
+                'Mollie API client for PHP is not installed, for more information about this issue see our %1 page.',
+                '<a href="https://github.com/mollie/Magento2/wiki/Troubleshooting" target="_blank">GitHub</a>'
+            );
+        } else {
+            return __(
+                'Mollie API client for PHP is not installed, for more information about this issue see: %1',
+                'https://github.com/mollie/Magento2/wiki/Troubleshooting'
+            );
+        }
     }
 }
