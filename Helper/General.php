@@ -26,6 +26,7 @@ class General extends AbstractHelper
 
     const MODULE_CODE = 'Mollie_Payment';
     const SUPPORTED_LOCAL = ['en_US', 'de_AT', 'de_CH', 'de_DE', 'es_ES', 'fr_BE', 'fr_FR', 'nl_BE', 'nl_NL'];
+    const CURRENCIES_WITHOUT_DECIMAL = ['JPY'];
 
     const XML_PATH_MODULE_ACTIVE = 'payment/mollie_general/enabled';
     const XML_PATH_API_MODUS = 'payment/mollie_general/type';
@@ -366,38 +367,12 @@ class General extends AbstractHelper
         if ($baseCurrency) {
             $orderAmount = [
                 "currency" => $order->getBaseCurrencyCode(),
-                "value"    => number_format($order->getBaseGrandTotal(), 2)
+                "value"    => $this->formatCurrencyValue($order->getBaseGrandTotal(), $order->getBaseCurrencyCode())
             ];
         } else {
             $orderAmount = [
                 "currency" => $order->getOrderCurrencyCode(),
-                "value"    => number_format($order->getGrandTotal(), 2)
-            ];
-        }
-
-        return $orderAmount;
-    }
-
-    /**
-     * Order Currency and Value array for payment request
-     *
-     * @param \Magento|Quote $quote
-     *
-     * @return array
-     */
-    public function getOrderAmountByQuote($quote)
-    {
-        $baseCurrency = $this->useBaseCurrency($quote->getStoreId());
-
-        if ($baseCurrency) {
-            $orderAmount = [
-                "currency" => $quote->getBaseCurrencyCode(),
-                "value"    => number_format($quote->getBaseGrandTotal(), 2)
-            ];
-        } else {
-            $orderAmount = [
-                "currency" => $quote->getQuoteCurrencyCode(),
-                "value"    => number_format($quote->getGrandTotal(), 2)
+                "value"    => $this->formatCurrencyValue($order->getGrandTotal(), $order->getOrderCurrencyCode())
             ];
         }
 
@@ -412,6 +387,48 @@ class General extends AbstractHelper
     public function useBaseCurrency($storeId = 0)
     {
         return (int)$this->getStoreConfig(self::XML_PATH_USE_BASE_CURRENCY, $storeId);
+    }
+
+    /**
+     * @param $value
+     * @param $currency
+     *
+     * @return string
+     */
+    public function formatCurrencyValue($value, $currency)
+    {
+        $decimalPrecision = 2;
+        if (in_array($currency, self::CURRENCIES_WITHOUT_DECIMAL)) {
+            $decimalPrecision = 0;
+        }
+
+        return number_format($value, $decimalPrecision, '.', '');
+    }
+
+    /**
+     * Order Currency and Value array for payment request
+     *
+     * @param \Magento\Quote\Model\Quote $quote
+     *
+     * @return array
+     */
+    public function getOrderAmountByQuote($quote)
+    {
+        $baseCurrency = $this->useBaseCurrency($quote->getStoreId());
+
+        if ($baseCurrency) {
+            $orderAmount = [
+                "currency" => $quote->getBaseCurrencyCode(),
+                "value"    => $this->formatCurrencyValue($quote->getBaseGrandTotal(), $quote->getBaseCurrencyCode())
+            ];
+        } else {
+            $orderAmount = [
+                "currency" => $quote->getQuoteCurrencyCode(),
+                "value"    => $this->formatCurrencyValue($quote->getGrandTotal(), $quote->getQuoteCurrencyCode())
+            ];
+        }
+
+        return $orderAmount;
     }
 
     /**
