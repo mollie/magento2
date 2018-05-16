@@ -554,7 +554,7 @@ class Mollie extends AbstractMethod
             $payment->refund([
                 "amount" => [
                     "currency" => $order->getOrderCurrencyCode(),
-                    "value"    => number_format($amount, 2)
+                    "value"    => number_format($amount, 2, '.', '')
                 ]
             ]);
         } catch (\Exception $e) {
