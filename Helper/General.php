@@ -366,12 +366,12 @@ class General extends AbstractHelper
         if ($baseCurrency) {
             $orderAmount = [
                 "currency" => $order->getBaseCurrencyCode(),
-                "value"    => number_format($order->getBaseGrandTotal(), 2)
+                "value"    => number_format($order->getBaseGrandTotal(), 2, '.', '')
             ];
         } else {
             $orderAmount = [
                 "currency" => $order->getOrderCurrencyCode(),
-                "value"    => number_format($order->getGrandTotal(), 2)
+                "value"    => number_format($order->getGrandTotal(), 2, '.', '')
             ];
         }
 
@@ -392,12 +392,12 @@ class General extends AbstractHelper
         if ($baseCurrency) {
             $orderAmount = [
                 "currency" => $quote->getBaseCurrencyCode(),
-                "value"    => number_format($quote->getBaseGrandTotal(), 2)
+                "value"    => number_format($quote->getBaseGrandTotal(), 2, '.', '')
             ];
         } else {
             $orderAmount = [
                 "currency" => $quote->getQuoteCurrencyCode(),
-                "value"    => number_format($quote->getGrandTotal(), 2)
+                "value"    => number_format($quote->getGrandTotal(), 2, '.', '')
             ];
         }
 
