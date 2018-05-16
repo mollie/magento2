@@ -40,10 +40,10 @@ class Apikey extends Action
     /**
      * Apikey constructor.
      *
-     * @param Context       $context
-     * @param JsonFactory   $resultJsonFactory
-     * @param TestsHelper $testsHelper
-     * @param MollieHelper  $mollieHelper
+     * @param Context      $context
+     * @param JsonFactory  $resultJsonFactory
+     * @param TestsHelper  $testsHelper
+     * @param MollieHelper $mollieHelper
      */
     public function __construct(
         Context $context,
@@ -63,15 +63,18 @@ class Apikey extends Action
      */
     public function execute()
     {
-        if (!class_exists('Mollie\Api\MollieApiClient', false)) {
-            $results = ['<span class="mollie-error">' . $this->mollieHelper->getPhpApiErrorMessage() . '</span>'];
-        } else {
-            $testKey = $this->request->getParam('test_key');
-            $liveKey = $this->request->getParam('live_key');
-            $results = $this->testsHelper->getMethods($testKey, $liveKey);
+        $result = $this->resultJsonFactory->create();
+
+        if (!class_exists('Mollie\Api\MollieApiClient')) {
+            $apiErrorMsg = ['<span class="mollie-error">' . $this->mollieHelper->getPhpApiErrorMessage() . '</span>'];
+            $result->setData(['success' => false, 'msg' => $apiErrorMsg]);
+            return $result;
         }
 
-        $result = $this->resultJsonFactory->create();
+        $testKey = $this->request->getParam('test_key');
+        $liveKey = $this->request->getParam('live_key');
+        $results = $this->testsHelper->getMethods($testKey, $liveKey);
+
         return $result->setData(['success' => true, 'msg' => implode('<br/>', $results)]);
     }
 
