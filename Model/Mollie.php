@@ -293,6 +293,7 @@ class Mollie extends AbstractMethod
             ];
         }
 
+        $paymentData = $this->mollieHelper->validatePaymentData($paymentData);
         $this->mollieHelper->addTolog('request', $paymentData);
 
         $payment = $mollieApi->payments->create($paymentData);

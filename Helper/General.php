@@ -539,4 +539,29 @@ class General extends AbstractHelper
             );
         }
     }
+
+    /**
+     * @param array $paymentData
+     *
+     * @return mixed
+     */
+    public function validatePaymentData($paymentData)
+    {
+        if (isset($paymentData['billingAddress'])) {
+            foreach ($paymentData['billingAddress'] as $k => $v) {
+                if ((empty($v)) && ($k != 'region')) {
+                    unset($paymentData['billingAddress']);
+                }
+            }
+        }
+        if (isset($paymentData['shippingAddress'])) {
+            foreach ($paymentData['shippingAddress'] as $k => $v) {
+                if ((empty($v)) && ($k != 'region')) {
+                    unset($paymentData['shippingAddress']);
+                }
+            }
+        }
+
+        return $paymentData;
+    }
 }
