@@ -459,20 +459,11 @@ class Mollie extends AbstractMethod
             return $msg;
         }
 
-        if ($status == 'canceled') {
+        if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
             if ($type == 'webhook') {
                 $this->cancelOrder($order, $status);
             }
-            $msg = ['success' => false, 'status' => 'cancel', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        if ($status == 'failed') {
-            if ($type == 'webhook') {
-                $this->cancelOrder($order, $status);
-            }
-            $msg = ['success' => false, 'status' => 'failed', 'order_id' => $orderId, 'type' => $type];
+            $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);
             return $msg;
         }
@@ -490,10 +481,13 @@ class Mollie extends AbstractMethod
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function cancelOrder($order, $status)
+    protected function cancelOrder($order, $status = null)
     {
         if ($order->getId() && $order->getState() != Order::STATE_CANCELED) {
-            $comment = __("The order was %1", $status);
+            $comment = __('The order was canceled');
+            if ($status !== null) {
+                $comment = __('The order was canceled, reason: payment %1', $status);
+            }
             $this->mollieHelper->addTolog('info', $order->getIncrementId() . ' ' . $comment);
             $order->registerCancellation($comment)->save();
 
