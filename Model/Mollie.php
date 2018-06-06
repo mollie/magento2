@@ -393,11 +393,15 @@ class Mollie extends AbstractMethod
                     $payment->setIsTransactionClosed(true);
                     $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
 
-                    if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
-                        $message = __('Mollie: Captured %1, Settlement Amount %2',
-                            $paymentData->amount->currency . ' ' . $paymentData->amount->value,
-                            $paymentData->settlementAmount->currency . ' ' . $paymentData->settlementAmount->value);
-                        $order->addStatusToHistory($order->getState(), $message, false)->save();
+                    if ($paymentData->settlementAmount !== null) {
+                        if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
+                            $message = __(
+                                'Mollie: Captured %1, Settlement Amount %2',
+                                $paymentData->amount->currency . ' ' . $paymentData->amount->value,
+                                $paymentData->settlementAmount->currency . ' ' . $paymentData->settlementAmount->value
+                            );
+                            $order->addStatusHistoryComment($message);
+                        }
                     }
                 }
 
