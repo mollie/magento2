@@ -15,11 +15,19 @@ use Mollie\Payment\Model\Mollie;
  */
 class Creditcard extends Mollie
 {
+
     /**
      * Payment method code
      *
      * @var string
      */
     protected $_code = 'mollie_methods_creditcard';
+
+    /**
+     * Info instructions block path
+     *
+     * @var string
+     */
+    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
 
 }

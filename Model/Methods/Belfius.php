@@ -23,4 +23,11 @@ class Belfius extends Mollie
      */
     protected $_code = 'mollie_methods_belfius';
 
+    /**
+     * Info instructions block path
+     *
+     * @var string
+     */
+    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
+
 }

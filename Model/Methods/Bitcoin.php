@@ -22,4 +22,11 @@ class Bitcoin extends Mollie
      */
     protected $_code = 'mollie_methods_bitcoin';
 
+    /**
+     * Info instructions block path
+     *
+     * @var string
+     */
+    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
+
 }

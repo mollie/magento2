@@ -385,6 +385,10 @@ class Mollie extends AbstractMethod
             }
 
             $payment = $order->getPayment();
+            if ($paymentData->details !== null) {
+                $payment->setAdditionalInformation('details', json_encode($paymentData->details));
+            }
+
             if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
 
                 if (abs($amount - $orderAmount['value']) < 0.01) {
@@ -392,34 +396,40 @@ class Mollie extends AbstractMethod
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
                     $payment->setIsTransactionClosed(true);
                     $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
+                    $this->orderRepository->save($order);
 
-                    if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
-                        $message = __('Mollie: Captured %1, Settlement Amount %2',
-                            $paymentData->amount->currency . ' ' . $paymentData->amount->value,
-                            $paymentData->settlementAmount->currency . ' ' . $paymentData->settlementAmount->value);
-                        $order->addStatusToHistory($order->getState(), $message, false)->save();
+                    if ($paymentData->settlementAmount !== null) {
+                        if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
+                            $message = __(
+                                'Mollie: Captured %1, Settlement Amount %2',
+                                $paymentData->amount->currency . ' ' . $paymentData->amount->value,
+                                $paymentData->settlementAmount->currency . ' ' . $paymentData->settlementAmount->value
+                            );
+                            $order->addStatusHistoryComment($message)->save();
+                        }
                     }
                 }
 
                 $invoice = $payment->getCreatedInvoice();
                 $sendInvoice = $this->mollieHelper->sendInvoice($storeId);
 
-                if ($order->getIsVirtual()) {
-                    $status = $order->getStatus();
-                } else {
-                    $status = $this->mollieHelper->getStatusProcessing($storeId);
-                }
-
                 if (!$order->getEmailSent()) {
                     $this->orderSender->send($order);
                     $message = __('New order email sent');
-                    $order->addStatusToHistory($status, $message, true)->save();
+                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true)->save();
                 }
 
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
                     $this->invoiceSender->send($invoice);
                     $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $order->addStatusToHistory($status, $message, true)->save();
+                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true)->save();
+                }
+
+                if (!$order->getIsVirtual()) {
+                    $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
+                    if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
+                        $order->setStatus($defaultStatusProcessing)->save();
+                    }
                 }
             }
 
@@ -453,20 +463,11 @@ class Mollie extends AbstractMethod
             return $msg;
         }
 
-        if ($status == 'canceled') {
+        if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
             if ($type == 'webhook') {
                 $this->cancelOrder($order, $status);
             }
-            $msg = ['success' => false, 'status' => 'cancel', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        if ($status == 'failed') {
-            if ($type == 'webhook') {
-                $this->cancelOrder($order, $status);
-            }
-            $msg = ['success' => false, 'status' => 'failed', 'order_id' => $orderId, 'type' => $type];
+            $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);
             return $msg;
         }
@@ -484,10 +485,13 @@ class Mollie extends AbstractMethod
      * @throws \Exception
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    protected function cancelOrder($order, $status)
+    protected function cancelOrder($order, $status = null)
     {
         if ($order->getId() && $order->getState() != Order::STATE_CANCELED) {
-            $comment = __("The order was %1", $status);
+            $comment = __('The order was canceled');
+            if ($status !== null) {
+                $comment = __('The order was canceled, reason: payment %1', $status);
+            }
             $this->mollieHelper->addTolog('info', $order->getIncrementId() . ' ' . $comment);
             $order->registerCancellation($comment)->save();
 

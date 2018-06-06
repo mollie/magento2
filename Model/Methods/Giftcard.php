@@ -24,6 +24,13 @@ class Giftcard extends Mollie
     protected $_code = 'mollie_methods_giftcard';
 
     /**
+     * Info instructions block path
+     *
+     * @var string
+     */
+    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
+
+    /**
      * Disable refund for Giftcard
      *
      * @var bool

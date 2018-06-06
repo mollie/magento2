@@ -23,4 +23,11 @@ class Paypal extends Mollie
      */
     protected $_code = 'mollie_methods_paypal';
 
+    /**
+     * Info instructions block path
+     *
+     * @var string
+     */
+    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
+
 }

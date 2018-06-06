@@ -141,7 +141,7 @@ class MollieConfigProvider implements ConfigProviderInterface
 
         foreach ($this->methodCodes as $code) {
 
-            if ($this->methods[$code]->isAvailable()) {
+            if (!empty($this->methods[$code]) && $this->methods[$code]->isAvailable()) {
                 if (!empty($activeMethods[$code])) {
                     $config['payment']['isActive'][$code] = true;
                     $config['payment']['instructions'][$code] = $this->getInstructions($code);

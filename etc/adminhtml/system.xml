@@ -91,7 +91,7 @@
                     <field id="order_status_processing" translate="label comment" type="select" sortOrder="24"
                            showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Status Processing</label>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                        <source_model>Mollie\Payment\Model\Adminhtml\Source\Processing</source_model>
                         <config_path>payment/mollie_general/order_status_processing</config_path>
                         <comment><![CDATA[Set the order status for Completed Payments]]></comment>
                     </field>
@@ -115,6 +115,13 @@
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/mollie_general/currency</config_path>
                         <comment>Force use of base currency for the payment request. Is set to no the selected currency of the storeview will be used for request.</comment>
+                    </field>
+                    <field id="transaction_details" translate="label" type="select" sortOrder="28" showInDefault="1"
+                           showInWebsite="0" showInStore="0">
+                        <label>Show Transaction Details</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>payment/mollie_general/transaction_details</config_path>
+                        <comment>Display Transaction Details like e.g. IBAN, BIC, Paypal Reference, Card Holder etc.</comment>
                     </field>
                     <field id="heading_debug" translate="label comment" type="text" sortOrder="80" showInDefault="1"
                            showInWebsite="0" showInStore="0">
