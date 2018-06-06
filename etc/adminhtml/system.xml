@@ -91,7 +91,7 @@
                     <field id="order_status_processing" translate="label comment" type="select" sortOrder="24"
                            showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Status Processing</label>
-                        <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
+                        <source_model>Mollie\Payment\Model\Adminhtml\Source\Processing</source_model>
                         <config_path>payment/mollie_general/order_status_processing</config_path>
                         <comment><![CDATA[Set the order status for Completed Payments]]></comment>
                     </field>

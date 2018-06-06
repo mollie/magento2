@@ -392,6 +392,7 @@ class Mollie extends AbstractMethod
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
                     $payment->setIsTransactionClosed(true);
                     $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
+                    $this->orderRepository->save($order);
 
                     if ($paymentData->settlementAmount !== null) {
                         if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
@@ -400,7 +401,7 @@ class Mollie extends AbstractMethod
                                 $paymentData->amount->currency . ' ' . $paymentData->amount->value,
                                 $paymentData->settlementAmount->currency . ' ' . $paymentData->settlementAmount->value
                             );
-                            $order->addStatusHistoryComment($message);
+                            $order->addStatusHistoryComment($message)->save();
                         }
                     }
                 }
@@ -408,22 +409,23 @@ class Mollie extends AbstractMethod
                 $invoice = $payment->getCreatedInvoice();
                 $sendInvoice = $this->mollieHelper->sendInvoice($storeId);
 
-                if ($order->getIsVirtual()) {
-                    $status = $order->getStatus();
-                } else {
-                    $status = $this->mollieHelper->getStatusProcessing($storeId);
-                }
-
                 if (!$order->getEmailSent()) {
                     $this->orderSender->send($order);
                     $message = __('New order email sent');
-                    $order->addStatusToHistory($status, $message, true)->save();
+                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true)->save();
                 }
 
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
                     $this->invoiceSender->send($invoice);
                     $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $order->addStatusToHistory($status, $message, true)->save();
+                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true)->save();
+                }
+
+                if (!$order->getIsVirtual()) {
+                    $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
+                    if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
+                        $order->setStatus($defaultStatusProcessing)->save();
+                    }
                 }
             }
 
