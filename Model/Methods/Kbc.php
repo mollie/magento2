@@ -23,4 +23,11 @@ class Kbc extends Mollie
      */
     protected $_code = 'mollie_methods_kbc';
 
+    /**
+     * Info instructions block path
+     *
+     * @var string
+     */
+    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
+
 }

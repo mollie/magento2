@@ -23,4 +23,11 @@ class Banktransfer extends Mollie
      */
     protected $_code = 'mollie_methods_banktransfer';
 
+    /**
+     * Info instructions block path
+     *
+     * @var string
+     */
+    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
+
 }

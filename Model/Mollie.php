@@ -385,6 +385,10 @@ class Mollie extends AbstractMethod
             }
 
             $payment = $order->getPayment();
+            if ($paymentData->details !== null) {
+                $payment->setAdditionalInformation('details', json_encode($paymentData->details));
+            }
+
             if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
 
                 if (abs($amount - $orderAmount['value']) < 0.01) {

@@ -42,6 +42,7 @@ class General extends AbstractHelper
     const XML_PATH_LOCALE = 'payment/mollie_general/locale';
     const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
     const XML_PATH_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
+    const XML_PATH_SHOW_TRANSACTION_DETAILS = 'payment/mollie_general/transaction_details';
 
     /**
      * @var ProductMetadataInterface
@@ -237,6 +238,14 @@ class General extends AbstractHelper
         }
 
         return $this->getStoreConfig(self::XML_PATH_IMAGES, $storeId);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function showTransactionDetails()
+    {
+        return $this->getStoreConfig(self::XML_PATH_SHOW_TRANSACTION_DETAILS);
     }
 
     /**

@@ -23,4 +23,11 @@ class Bancontact extends Mollie
      */
     protected $_code = 'mollie_methods_bancontact';
 
+    /**
+     * Info instructions block path
+     *
+     * @var string
+     */
+    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
+
 }
