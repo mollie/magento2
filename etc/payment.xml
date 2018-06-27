@@ -34,6 +34,12 @@
         <method name="mollie_methods_inghomepay">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="mollie_methods_giropay">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
+        <method name="mollie_methods_eps">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="mollie_methods_giftcard">
             <allow_multiple_address>0</allow_multiple_address>
         </method>

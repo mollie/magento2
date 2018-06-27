@@ -105,6 +105,22 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_inghomepay>
+            <mollie_methods_giropay>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\Giropay</model>
+                <title>Giropay</title>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_giropay>
+            <mollie_methods_eps>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\Eps</model>
+                <title>EPS</title>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_eps>
             <mollie_methods_giftcard>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Giftcard</model>

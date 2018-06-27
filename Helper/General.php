@@ -506,6 +506,8 @@ class General extends AbstractHelper
             'mollie_methods_paysafecard',
             'mollie_methods_sofort',
             'mollie_methods_inghomepay',
+            'mollie_methods_giropay',
+            'mollie_methods_eps',
             'mollie_methods_giftcard'
         ];
 
