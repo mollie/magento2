@@ -391,6 +391,10 @@ class Mollie extends AbstractMethod
 
             if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
 
+                if ($order->isCanceled()) {
+                    $order = $this->uncancelOrder($order);
+                }
+
                 if (abs($amount - $orderAmount['value']) < 0.01) {
                     $payment->setTransactionId($transactionId);
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
@@ -499,6 +503,28 @@ class Mollie extends AbstractMethod
         }
 
         return false;
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     *
+     * @return \Magento\Sales\Model\Order
+     */
+    public function uncancelOrder($order)
+    {
+        try {
+            $status = $this->mollieHelper->getStatusPending($order->getStoreId());
+            $message = __('Order uncanceled by webhook.');
+            $order->setState(Order::STATE_NEW);
+            $order->addStatusToHistory($status, $message, true)->save();
+            foreach ($order->getAllItems() as $item) {
+                $item->setQtyCanceled(0)->save();
+            }
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+
+        return $order;
     }
 
     /**
