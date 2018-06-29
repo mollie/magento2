@@ -11,7 +11,7 @@ define(
             {
                 defaults: {
                     template: 'Mollie_Payment/payment/ideal',
-                    selectedIssuer: ko.observable()
+                    selectedIssuer: null
                 },
                 getIssuers: function () {
                     return checkoutConfig.issuers[this.item.method];
