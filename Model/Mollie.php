@@ -623,15 +623,16 @@ class Mollie extends AbstractMethod
      *
      * @param $mollieApi
      * @param $method
+     * @param $issuerListType
      *
-     * @return array|bool
+     * @return array
      */
-    public function getIssuers($mollieApi, $method)
+    public function getIssuers($mollieApi, $method, $issuerListType)
     {
         $issuers = [];
 
-        if (empty($mollieApi)) {
-            return false;
+        if (empty($mollieApi) || $issuerListType == 'none') {
+            return $issuers;
         }
 
         $methodCode = str_replace('mollie_methods_', '', $method);
@@ -643,6 +644,14 @@ class Mollie extends AbstractMethod
             }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+
+        if ($issuers && $issuerListType == 'dropdown') {
+            array_unshift($issuers, array(
+                'resource' => 'issuer',
+                'id'       => '',
+                'name'     => __('-- Please Select --')
+            ));
         }
 
         return $issuers;

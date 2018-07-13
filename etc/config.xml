@@ -61,6 +61,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Ideal</model>
                 <title>iDeal</title>
+                <issuer_list_type>dropdown</issuer_list_type>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -125,6 +126,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Giftcard</model>
                 <title>Giftcard</title>
+                <issuer_list_type>dropdown</issuer_list_type>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>

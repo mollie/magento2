@@ -19,17 +19,31 @@ define(
                 getIssuers: function () {
                     return checkoutConfig.issuers[this.item.method];
                 },
+                getIssuerListType: function () {
+                    return checkoutConfig.issuersListType[this.item.method];
+                },
+                getSelectedIssuer: function () {
+                    if (this.getIssuerListType() === 'radio') {
+                        return $('input[name=issuer]:checked', this.getForm()).val();
+                    }
+                    if (this.getIssuerListType() === 'dropdown') {
+                        return this.selectedIssuer;
+                    }
+                },
                 getData: function () {
                     return {
                         'method': this.item.method,
                         'additional_data': {
-                            "selected_issuer": $('input[name=issuer]:checked', this.getForm()).val()
+                            "selected_issuer": this.getSelectedIssuer()
                         }
                     };
                 },
                 validate: function () {
                     var $form = this.getForm();
-                    return $form.validation() && $form.validation('isValid');
+                    if (this.getIssuerListType() === 'radio') {
+                        return $form.validation() && $form.validation('isValid');
+                    }
+                    return $form.validation();
                 }
             }
         );

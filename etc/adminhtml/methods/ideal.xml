@@ -18,6 +18,16 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="issuer_list_type" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Issuer List Style</label>
+            <config_path>payment/mollie_methods_ideal/issuer_list_type</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\IssuerListType</source_model>
+			<comment><![CDATA[Select the way you want to show the issuer list in the checkout.]]></comment>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
