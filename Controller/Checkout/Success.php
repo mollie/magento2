@@ -72,6 +72,7 @@ class Success extends Action
             $this->mollieHelper->addTolog('error', __('Invalid return, missing order id.'));
             $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));
             $this->_redirect('checkout/cart');
+            return;
         }
 
         try {
@@ -80,6 +81,7 @@ class Success extends Action
             $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->messageManager->addExceptionMessage($e, __('There was an error checking the transaction status.'));
             $this->_redirect('checkout/cart');
+            return;
         }
 
         if (!empty($status['success'])) {
