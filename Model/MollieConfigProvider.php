@@ -153,10 +153,14 @@ class MollieConfigProvider implements ConfigProviderInterface
                         $config['payment']['image'][$code] = '';
                     }
                     if ($code == 'mollie_methods_ideal') {
-                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers($mollieApi, $code);
+                        $issuerListType = $this->mollieHelper->getIssuerListType($code);
+                        $config['payment']['issuersListType'][$code] = $issuerListType;
+                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers($mollieApi, $code, $issuerListType);
                     }
                     if ($code == 'mollie_methods_giftcard') {
-                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers($mollieApi, $code);
+                        $issuerListType = $this->mollieHelper->getIssuerListType($code);
+                        $config['payment']['issuersListType'][$code] = $issuerListType;
+                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers($mollieApi, $code, $issuerListType);
                         if (empty($config['payment']['issuers'][$code])) {
                             $config['payment']['isActive'][$code] = false;
                         }

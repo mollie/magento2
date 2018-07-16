@@ -61,6 +61,26 @@
     text-align: center;
 }
 
+.checkout-payment-method #mollie_methods_ideal-form .label {
+    height: 35px;
+    display: inline-block;
+}
+
+.checkout-payment-method #mollie_methods_ideal-form .payment-icon {
+    width: 35px;
+    max-height: 30px;
+}
+
+.checkout-payment-method #mollie_methods_giftcard-form .label {
+    height: 40px;
+    display: inline-block;
+}
+
+.checkout-payment-method #mollie_methods_giftcard-form .payment-icon {
+    width: 35px;
+    max-height: 30px;
+}
+
 .mollie-payment-icon {
     width: 25px;
     margin-right: 5px;

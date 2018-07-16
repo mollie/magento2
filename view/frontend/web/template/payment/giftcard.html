@@ -18,34 +18,29 @@
         <!--/ko-->
 
         <!-- ko if: getIssuers() -->
+        <!-- ko if: getIssuerListType() == 'dropdown' -->
+        <div class="field-select-billing">
+            <strong><span data-bind="i18n: 'Select Bank'"></span></strong>
+            <select data-bind="options: getIssuers(), optionsText: 'name', optionsValue: 'id', value: selectedIssuer"></select>
+        </div>
+        <br/>
+        <!--/ko-->
+        <!-- ko if: getIssuerListType() == 'radio' -->
         <div class="payment-method-title field choice">
             <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
                 <strong><span data-bind="i18n: 'Select Giftcard'"></span></strong>
                 <div data-bind="foreach: {data: getIssuers(), as :'issuer' }" class="field choice">
                     <input type="radio" name="issuer" data-bind="attr: {value: issuer.id}" class="radio" data-validate="{'validate-one-required-by-name':true}">
                     <label data-bind="attr: {'for': issuer.id}" class="label">
-                        <img data-bind="attr: {src: issuer.image.normal}" class="payment-icon"/>
+                        <img data-bind="attr: {src: issuer.image.size2x}" class="payment-icon"/>
                         <span data-bind="text: issuer.name"></span>
                     </label>
                     <br/>
                 </div>
             </form>
         </div>
-        <script>
-            require(["jquery","mage/mage"], function($)
-            {
-                var dataForm = $('#giftcard');
-                dataForm.mage('validation', {
-                    errorPlacement: function(error, element) {
-                        if (element.hasClass('radio')) {
-                            error.appendTo('.field.choice');
-                        }
-                    }
-                });
-
-            });
-        </script>
         <br/>
+        <!--/ko-->
         <!--/ko-->
 
         <div class="payment-method-billing-address">

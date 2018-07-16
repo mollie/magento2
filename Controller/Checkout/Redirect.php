@@ -73,6 +73,13 @@ class Redirect extends Action
                 $msg = __('Order not found.');
                 $this->mollieHelper->addTolog('error', $msg);
                 $this->_redirect('checkout/cart');
+                return;
+            }
+
+            $payment = $order->getPayment();
+            if (!isset($payment)) {
+                $this->_redirect('checkout/cart');
+                return;
             }
 
             $method = $order->getPayment()->getMethod();
