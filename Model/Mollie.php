@@ -300,7 +300,7 @@ class Mollie extends AbstractMethod
         $paymentUrl = $payment->getCheckoutUrl();
         $transactionId = $payment->id;
 
-        $message = __('Customer redirected to Mollie, url: %1', $paymentUrl);
+        $message = htmlspecialchars(__('Customer redirected to Mollie, url: %1', $paymentUrl));
         $status = $this->mollieHelper->getStatusPending($storeId);
         $order->addStatusToHistory($status, $message, false);
         $order->setMollieTransactionId($transactionId);
