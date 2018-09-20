@@ -309,7 +309,8 @@ class General extends AbstractHelper
      */
     public function getWebhookUrl()
     {
-        return $this->urlBuilder->getUrl('mollie/checkout/webhook/');
+        $urlParams = '?isAjax=1';
+        return $this->urlBuilder->getUrl('mollie/checkout/webhook/') . $urlParams;
     }
 
     /**
