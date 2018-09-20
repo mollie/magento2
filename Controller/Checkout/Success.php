@@ -95,7 +95,7 @@ class Success extends Action
             }
         } else {
             $this->checkoutSession->restoreQuote();
-            if (isset($status['status']) && $status['status'] == 'cancel') {
+            if (isset($status['status']) && $status['status'] == 'canceled') {
                 $this->messageManager->addNoticeMessage(__('Payment cancelled, please try again.'));
             } else {
                 $this->messageManager->addNoticeMessage(__('Something went wrong.'));
