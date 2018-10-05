@@ -400,6 +400,7 @@ class Mollie extends AbstractMethod
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
                     $payment->setIsTransactionClosed(true);
                     $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
+                    $order->setState(Order::STATE_PROCESSING);
                     $this->orderRepository->save($order);
 
                     if ($paymentData->settlementAmount !== null) {
