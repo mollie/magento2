@@ -1,8 +1,9 @@
-![Mollie](https://www.mollie.nl/files/Mollie-Logo-Style-Small.png)
+<p align="center">
+  <img src="https://info.mollie.com/hubfs/github/magento-2/logo.png" width="128" height="128"/>
+</p>
+<h1 align="center">Mollie for Magento 2.x</h1>
 
-# Official Magento 2.x plugin for [Mollie Payments](https://www.mollie.com/). #
-
-**Magento 1.x** users check out our [Mollie Magento 1 plugin](https://github.com/mollie/Magento).
+> **Magento 1.x** users check out our [Mollie Magento 1 plugin](https://github.com/mollie/Magento).
 
 ***
 
