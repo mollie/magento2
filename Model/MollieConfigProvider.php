@@ -40,6 +40,8 @@ class MollieConfigProvider implements ConfigProviderInterface
         'mollie_methods_inghomepay',
         'mollie_methods_giropay',
         'mollie_methods_eps',
+        'mollie_methods_klarnapaylater',
+        'mollie_methods_klarnasliceit',
         'mollie_methods_giftcard'
     ];
     /**
@@ -142,7 +144,6 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
 
         foreach ($this->methodCodes as $code) {
-
             if (!empty($this->methods[$code]) && $this->methods[$code]->isAvailable()) {
                 if (!empty($activeMethods[$code])) {
                     $config['payment']['isActive'][$code] = true;
@@ -155,12 +156,20 @@ class MollieConfigProvider implements ConfigProviderInterface
                     if ($code == 'mollie_methods_ideal') {
                         $issuerListType = $this->mollieHelper->getIssuerListType($code);
                         $config['payment']['issuersListType'][$code] = $issuerListType;
-                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers($mollieApi, $code, $issuerListType);
+                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
+                            $mollieApi,
+                            $code,
+                            $issuerListType
+                        );
                     }
                     if ($code == 'mollie_methods_giftcard') {
                         $issuerListType = $this->mollieHelper->getIssuerListType($code);
                         $config['payment']['issuersListType'][$code] = $issuerListType;
-                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers($mollieApi, $code, $issuerListType);
+                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
+                            $mollieApi,
+                            $code,
+                            $issuerListType
+                        );
                         if (empty($config['payment']['issuers'][$code])) {
                             $config['payment']['isActive'][$code] = false;
                         }
@@ -177,7 +186,7 @@ class MollieConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * @param $mollieApi
+     * @param \Mollie\Api\MollieApiClient $mollieApi
      *
      * @return array
      */
@@ -188,7 +197,10 @@ class MollieConfigProvider implements ConfigProviderInterface
         try {
             $quote = $this->checkoutSession->getQuote();
             $amount = $this->mollieHelper->getOrderAmountByQuote($quote);
-            $params = ["amount[value]" => $amount['value'], "amount[currency]" => $amount['currency']];
+            $params = ["amount[value]"    => $amount['value'],
+                       "amount[currency]" => $amount['currency'],
+                       "resource"         => "orders"
+            ];
             $apiMethods = $mollieApi->methods->all($params);
 
             foreach ($apiMethods as $method) {
@@ -215,5 +227,4 @@ class MollieConfigProvider implements ConfigProviderInterface
     {
         return nl2br($this->escaper->escapeHtml($this->methods[$code]->getInstructions()));
     }
-
 }

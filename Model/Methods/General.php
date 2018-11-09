@@ -22,5 +22,4 @@ class General extends Mollie
      * @var string
      */
     protected $_code = 'mollie_methods_general';
-
 }

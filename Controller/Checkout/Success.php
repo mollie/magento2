@@ -66,9 +66,7 @@ class Success extends Action
      */
     public function execute()
     {
-        $params = $this->getRequest()->getParams();
-
-        if (!isset($params['order_id'])) {
+        if (!$orderId = $this->getRequest()->getParam('order_id')) {
             $this->mollieHelper->addTolog('error', __('Invalid return, missing order id.'));
             $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));
             $this->_redirect('checkout/cart');
@@ -76,7 +74,8 @@ class Success extends Action
         }
 
         try {
-            $status = $this->mollieModel->processTransaction($params['order_id'], 'success');
+            $paymentToken = $this->getRequest()->getParam('payment_token', null);
+            $status = $this->mollieModel->processTransaction($orderId, 'success', $paymentToken);
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->messageManager->addExceptionMessage($e, __('There was an error checking the transaction status.'));
@@ -95,8 +94,8 @@ class Success extends Action
             }
         } else {
             $this->checkoutSession->restoreQuote();
-            if (isset($status['status']) && $status['status'] == 'canceled') {
-                $this->messageManager->addNoticeMessage(__('Payment cancelled, please try again.'));
+            if (isset($status['status']) && ($status['status'] == 'canceled')) {
+                $this->messageManager->addNoticeMessage(__('Payment canceled, please try again.'));
             } else {
                 $this->messageManager->addNoticeMessage(__('Something went wrong.'));
             }

@@ -29,5 +29,4 @@ class Eps extends Mollie
      * @var string
      */
     protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
-
 }

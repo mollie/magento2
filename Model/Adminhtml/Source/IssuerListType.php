@@ -9,9 +9,9 @@ namespace Mollie\Payment\Model\Adminhtml\Source;
 use Magento\Framework\Option\ArrayInterface;
 
 /**
- * Class Locale
+ * Class IssuerListType
  *
- * @package Mollie\Payment\Model\Adminhtml\IssuerListType
+ * @package Mollie\Payment\Model\Adminhtml\Source
  */
 class IssuerListType implements ArrayInterface
 {

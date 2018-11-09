@@ -9,6 +9,7 @@ namespace Mollie\Payment\Model;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\DataObject;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
@@ -17,15 +18,13 @@ use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Payment\Model\Method\Logger;
 use Magento\Sales\Model\Order;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\ObjectManagerInterface;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender;
-use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\DataObject;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\Client\Orders as OrdersApi;
+use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Magento\Framework\Exception\LocalizedException;
 
 /**
@@ -60,15 +59,16 @@ class Mollie extends AbstractMethod
      * @var bool
      */
     protected $_canRefundInvoicePartial = true;
-
+    /**
+     * Availability option
+     *
+     * @var bool
+     */
+    protected $_canUseInternal = false;
     /**
      * @var array
      */
     private $issuers = [];
-    /**
-     * @var ObjectManagerInterface
-     */
-    private $objectManager;
     /**
      * @var MollieHelper
      */
@@ -78,33 +78,29 @@ class Mollie extends AbstractMethod
      */
     private $checkoutSession;
     /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-    /**
-     * @var Order
-     */
-    private $order;
-    /**
      * @var ScopeConfigInterface
      */
     private $scopeConfig;
-    /**
-     * @var OrderSender
-     */
-    private $orderSender;
-    /**
-     * @var InvoiceSender
-     */
-    private $invoiceSender;
     /**
      * @var OrderRepository
      */
     private $orderRepository;
     /**
+     * @var OrderFactory
+     */
+    private $orderFactory;
+    /**
      * @var SearchCriteriaBuilder
      */
     private $searchCriteriaBuilder;
+    /**
+     * @var OrdersApi
+     */
+    private $ordersApi;
+    /**
+     * @var PaymentsApi
+     */
+    private $paymentsApi;
 
     /**
      * Mollie constructor.
@@ -116,14 +112,12 @@ class Mollie extends AbstractMethod
      * @param Data                       $paymentData
      * @param ScopeConfigInterface       $scopeConfig
      * @param Logger                     $logger
-     * @param ObjectManagerInterface     $objectManager
+     * @param OrderRepository            $orderRepository
+     * @param OrderFactory               $orderFactory
+     * @param OrdersApi                  $ordersApi
+     * @param PaymentsApi                $paymentsApi
      * @param MollieHelper               $mollieHelper
      * @param CheckoutSession            $checkoutSession
-     * @param StoreManagerInterface      $storeManager
-     * @param Order                      $order
-     * @param OrderSender                $orderSender
-     * @param InvoiceSender              $invoiceSender
-     * @param OrderRepository            $orderRepository
      * @param SearchCriteriaBuilder      $searchCriteriaBuilder
      * @param AbstractResource|null      $resource
      * @param AbstractDb|null            $resourceCollection
@@ -137,14 +131,12 @@ class Mollie extends AbstractMethod
         Data $paymentData,
         ScopeConfigInterface $scopeConfig,
         Logger $logger,
-        ObjectManagerInterface $objectManager,
+        OrderRepository $orderRepository,
+        OrderFactory $orderFactory,
+        OrdersApi $ordersApi,
+        PaymentsApi $paymentsApi,
         MollieHelper $mollieHelper,
         CheckoutSession $checkoutSession,
-        StoreManagerInterface $storeManager,
-        Order $order,
-        OrderSender $orderSender,
-        InvoiceSender $invoiceSender,
-        OrderRepository $orderRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
@@ -162,15 +154,13 @@ class Mollie extends AbstractMethod
             $resourceCollection,
             $data
         );
-        $this->objectManager = $objectManager;
+        $this->paymentsApi = $paymentsApi;
+        $this->ordersApi = $ordersApi;
         $this->mollieHelper = $mollieHelper;
         $this->checkoutSession = $checkoutSession;
-        $this->storeManager = $storeManager;
         $this->scopeConfig = $scopeConfig;
-        $this->order = $order;
-        $this->orderSender = $orderSender;
-        $this->invoiceSender = $invoiceSender;
         $this->orderRepository = $orderRepository;
+        $this->orderFactory = $orderFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }
 
@@ -183,7 +173,6 @@ class Mollie extends AbstractMethod
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
-
         if ($quote == null) {
             $quote = $this->checkoutSession->getQuote();
         }
@@ -218,95 +207,27 @@ class Mollie extends AbstractMethod
     }
 
     /**
-     * @param \Magento\Sales\Model\Order $order
+     * @param Order $order
      *
-     * @return bool
-     * @throws \Exception
+     * @return bool|void
+     * @throws LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
      */
     public function startTransaction(Order $order)
     {
-        $issuer = null;
         $storeId = $order->getStoreId();
-        $orderId = $order->getId();
-        $additionalData = $order->getPayment()->getAdditionalInformation();
-
-        if (isset($additionalData['selected_issuer'])) {
-            $issuer = $additionalData['selected_issuer'];
-        }
-
         if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
             return false;
         }
 
         $mollieApi = $this->loadMollieApi($apiKey);
-        $transactionId = $order->getMollieTransactionId();
-        if (!empty($transactionId)) {
-            $paymentData = $mollieApi->payments->get($transactionId);
-            if (!empty($paymentData->getCheckoutUrl)) {
-                return $this->mollieHelper->getRedirectUrl($orderId);
-            }
+        $method = $this->mollieHelper->getApiMethod($order);
 
-            return $this->mollieHelper->getCheckoutUrl();
+        if ($method == 'order') {
+            return $this->ordersApi->startTransaction($order, $mollieApi);
+        } else {
+            return $this->paymentsApi->startTransaction($order, $mollieApi);
         }
-
-        $billingAddress = $order->getBillingAddress();
-        $shippingAddress = $order->getShippingAddress();
-        $method = $this->mollieHelper->getMethodCode($order);
-
-        $paymentData = [
-            'amount'      => $this->mollieHelper->getOrderAmountByOrder($order),
-            'description' => $order->getIncrementId(),
-            'redirectUrl' => $this->mollieHelper->getRedirectUrl($orderId),
-            'webhookUrl'  => $this->mollieHelper->getWebhookUrl(),
-            'method'      => $method,
-            'issuer'      => $issuer,
-            'metadata'    => [
-                'order_id' => $orderId,
-                'store_id' => $order->getStoreId()
-            ],
-            'locale'      => $this->mollieHelper->getLocaleCode($storeId)
-        ];
-
-        if ($method == 'banktransfer') {
-            $paymentData['billingEmail'] = $order->getCustomerEmail();
-            $paymentData['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
-        }
-
-        if ($billingAddress) {
-            $paymentData['billingAddress'] = [
-                'streetAndNumber' => $billingAddress->getStreetLine(1),
-                'postalCode'      => $billingAddress->getPostcode(),
-                'city'            => $billingAddress->getCity(),
-                'region'          => $billingAddress->getRegion(),
-                'country'         => $billingAddress->getCountryId()
-            ];
-        }
-
-        if ($shippingAddress) {
-            $paymentData['shippingAddress'] = [
-                'streetAndNumber' => $shippingAddress->getStreetLine(1),
-                'postalCode'      => $shippingAddress->getPostcode(),
-                'city'            => $shippingAddress->getCity(),
-                'region'          => $shippingAddress->getRegion(),
-                'country'         => $shippingAddress->getCountryId()
-            ];
-        }
-
-        $paymentData = $this->mollieHelper->validatePaymentData($paymentData);
-        $this->mollieHelper->addTolog('request', $paymentData);
-
-        $payment = $mollieApi->payments->create($paymentData);
-        $paymentUrl = $payment->getCheckoutUrl();
-        $transactionId = $payment->id;
-
-        $message = __('Customer redirected to Mollie, url: %1', $paymentUrl);
-        $status = $this->mollieHelper->getStatusPending($storeId);
-        $order->addStatusToHistory($status, $message, false);
-        $order->setMollieTransactionId($transactionId);
-        $order->save();
-
-        return $paymentUrl;
     }
 
     /**
@@ -319,213 +240,57 @@ class Mollie extends AbstractMethod
     public function loadMollieApi($apiKey)
     {
         if (class_exists('Mollie\Api\MollieApiClient')) {
-            /** @var \Mollie\Payment\Model\Api $mollieApi */
-            $mollieApi = $this->objectManager->create('Mollie\Payment\Model\Api');
-            return $mollieApi->load($apiKey);
+            $mollieApiClient = new \Mollie\Api\MollieApiClient();
+            $mollieApiClient->setApiKey($apiKey);
+            $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
+            $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
+            return $mollieApiClient;
         } else {
             throw new LocalizedException(__('Class Mollie\Api\MollieApiClient does not exist'));
         }
     }
 
     /**
-     * Process Transaction (webhook / success)
-     *
      * @param        $orderId
      * @param string $type
+     * @param null   $paymentToken
      *
      * @return array
-     * @throws \Exception
+     * @throws LocalizedException
+     * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function processTransaction($orderId, $type = 'webhook')
+    public function processTransaction($orderId, $type = 'webhook', $paymentToken = null)
     {
-        $order = $this->order->load($orderId);
+        /** @var \Magento\Sales\Model\Order $order */
+        $order = $this->orderRepository->get($orderId);
         if (empty($order)) {
             $msg = ['error' => true, 'msg' => __('Order not found')];
             $this->mollieHelper->addTolog('error', $msg);
-
             return $msg;
         }
-
-        $storeId = $order->getStoreId();
 
         $transactionId = $order->getMollieTransactionId();
         if (empty($transactionId)) {
             $msg = ['error' => true, 'msg' => __('Transaction ID not found')];
             $this->mollieHelper->addTolog('error', $msg);
-
             return $msg;
         }
 
-        $apiKey = $this->mollieHelper->getApiKey($storeId);
-        if (empty($apiKey)) {
-            $msg = ['error' => true, 'msg' => __('Api key not found')];
+        $storeId = $order->getStoreId();
+        if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
+            $msg = ['error' => true, 'msg' => __('API Key not found')];
             $this->mollieHelper->addTolog('error', $msg);
-
             return $msg;
         }
 
         $mollieApi = $this->loadMollieApi($apiKey);
+        $method = $this->mollieHelper->getApiMethod($order);
 
-        $paymentData = $mollieApi->payments->get($transactionId);
-        $this->mollieHelper->addTolog($type, $paymentData);
-
-        $status = $paymentData->status;
-        $refunded = isset($paymentData->_links->refunds) ? true : false;
-
-        if ($status == 'paid' && !$refunded) {
-
-            $amount = $paymentData->amount->value;
-            $currency = $paymentData->amount->currency;
-            $orderAmount = $this->mollieHelper->getOrderAmountByOrder($order);
-
-            if ($currency != $orderAmount['currency']) {
-                $msg = ['success' => false, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
-                $this->mollieHelper->addTolog('error', __('Currency does not match.'));
-                return $msg;
-            }
-
-            $payment = $order->getPayment();
-            if ($paymentData->details !== null) {
-                $payment->setAdditionalInformation('details', json_encode($paymentData->details));
-            }
-
-            if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
-
-                if ($order->isCanceled()) {
-                    $order = $this->uncancelOrder($order);
-                }
-
-                if (abs($amount - $orderAmount['value']) < 0.01) {
-                    $payment->setTransactionId($transactionId);
-                    $payment->setCurrencyCode($order->getBaseCurrencyCode());
-                    $payment->setIsTransactionClosed(true);
-                    $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
-                    $order->setState(Order::STATE_PROCESSING);
-                    $this->orderRepository->save($order);
-
-                    if ($paymentData->settlementAmount !== null) {
-                        if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
-                            $message = __(
-                                'Mollie: Captured %1, Settlement Amount %2',
-                                $paymentData->amount->currency . ' ' . $paymentData->amount->value,
-                                $paymentData->settlementAmount->currency . ' ' . $paymentData->settlementAmount->value
-                            );
-                            $order->addStatusHistoryComment($message)->save();
-                        }
-                    }
-                }
-
-                $invoice = $payment->getCreatedInvoice();
-                $sendInvoice = $this->mollieHelper->sendInvoice($storeId);
-
-                if (!$order->getEmailSent()) {
-                    $this->orderSender->send($order);
-                    $message = __('New order email sent');
-                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true)->save();
-                }
-
-                if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
-                    $this->invoiceSender->send($invoice);
-                    $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true)->save();
-                }
-
-                if (!$order->getIsVirtual()) {
-                    $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
-                    if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
-                        $order->setStatus($defaultStatusProcessing)->save();
-                    }
-                }
-            }
-
-            $msg = ['success' => true, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
+        if ($method == 'order') {
+            return $this->ordersApi->processTransaction($order, $mollieApi, $type, $paymentToken);
+        } else {
+            return $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
         }
-
-        if ($refunded) {
-            $msg = ['success' => true, 'status' => 'refunded', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        if ($status == 'open') {
-            if ($paymentData->method == 'banktransfer' && !$order->getEmailSent()) {
-                $this->orderSender->send($order);
-                $message = __('New order email sent');
-                $status = $this->mollieHelper->getStatusPendingBanktransfer($storeId);
-                $order->setState(Order::STATE_PENDING_PAYMENT);
-                $order->addStatusToHistory($status, $message, true)->save();
-            }
-            $msg = ['success' => true, 'status' => 'open', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        if ($status == 'pending') {
-            $msg = ['success' => true, 'status' => 'pending', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
-            if ($type == 'webhook') {
-                $this->cancelOrder($order, $status);
-            }
-            $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
-        $this->mollieHelper->addTolog('success', $msg);
-        return $msg;
-    }
-
-    /**
-     * @param \Magento\Sales\Model\Order $order
-     * @param                            $status
-     *
-     * @return bool
-     * @throws \Exception
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    protected function cancelOrder($order, $status = null)
-    {
-        if ($order->getId() && $order->getState() != Order::STATE_CANCELED) {
-            $comment = __('The order was canceled');
-            if ($status !== null) {
-                $comment = __('The order was canceled, reason: payment %1', $status);
-            }
-            $this->mollieHelper->addTolog('info', $order->getIncrementId() . ' ' . $comment);
-            $order->registerCancellation($comment)->save();
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \Magento\Sales\Model\Order $order
-     *
-     * @return \Magento\Sales\Model\Order
-     */
-    public function uncancelOrder($order)
-    {
-        try {
-            $status = $this->mollieHelper->getStatusPending($order->getStoreId());
-            $message = __('Order uncanceled by webhook.');
-            $order->setState(Order::STATE_NEW);
-            $order->addStatusToHistory($status, $message, true)->save();
-            foreach ($order->getAllItems() as $item) {
-                $item->setQtyCanceled(0)->save();
-            }
-        } catch (\Exception $e) {
-            $this->mollieHelper->addTolog('error', $e->getMessage());
-        }
-
-        return $order;
     }
 
     /**
@@ -551,10 +316,58 @@ class Mollie extends AbstractMethod
     }
 
     /**
+     * @param Order\Shipment $shipment
+     * @param Order          $order
+     *
+     * @return OrdersApi
+     * @throws LocalizedException
+     */
+    public function createShipment(Order\Shipment $shipment, Order $order)
+    {
+        return $this->ordersApi->createShipment($shipment, $order);
+    }
+
+    /**
+     * @param Order\Shipment       $shipment
+     * @param Order\Shipment\Track $track
+     * @param Order                $order
+     *
+     * @return OrdersApi
+     * @throws LocalizedException
+     */
+    public function updateShipmentTrack(Order\Shipment $shipment, Order\Shipment\Track $track, Order $order)
+    {
+        return $this->ordersApi->updateShipmentTrack($shipment, $track, $order);
+    }
+
+    /**
+     * @param Order $order
+     *
+     * @return OrdersApi
+     * @throws LocalizedException
+     */
+    public function cancelOrder(Order $order)
+    {
+        return $this->ordersApi->cancelOrder($order);
+    }
+
+    /**
+     * @param Order\Creditmemo $creditmemo
+     * @param Order            $order
+     *
+     * @return $this
+     * @throws LocalizedException
+     */
+    public function createOrderRefund(Order\Creditmemo $creditmemo, Order $order)
+    {
+        $this->ordersApi->createOrderRefund($creditmemo, $order);
+    }
+
+    /**
      * @param \Magento\Payment\Model\InfoInterface $payment
      * @param float                                $amount
      *
-     * @return $this|array
+     * @return $this
      * @throws LocalizedException
      */
     public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
@@ -567,30 +380,34 @@ class Mollie extends AbstractMethod
         if (empty($transactionId)) {
             $msg = ['error' => true, 'msg' => __('Transaction ID not found')];
             $this->mollieHelper->addTolog('error', $msg);
-
-            return $msg;
+            return $this;
         }
 
         $apiKey = $this->mollieHelper->getApiKey($storeId);
         if (empty($apiKey)) {
             $msg = ['error' => true, 'msg' => __('Api key not found')];
             $this->mollieHelper->addTolog('error', $msg);
+            return $this;
+        }
 
-            return $msg;
+        /**
+         * Order Api does not use amount to refund, but refunds per itemLine
+         * See SalesOrderCreditmemoAfter Observer for logic.
+         */
+        $checkoutType = $this->mollieHelper->getCheckoutType($order);
+        if ($checkoutType == 'order') {
+            return $this;
         }
 
         try {
             $mollieApi = $this->loadMollieApi($apiKey);
-            $payment = $mollieApi->payments->get($transactionId);
-            $payment->refund([
-                "amount" => [
-                    "currency" => $order->getOrderCurrencyCode(),
-                    "value"    => $this->mollieHelper->formatCurrencyValue($amount, $order->getOrderCurrencyCode())
-                ]
-            ]);
+            $mollieOrder = $mollieApi->orders->get($transactionId);
+            $mollieOrder->refundAll(['Testing Refund Order xx']);
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            throw new LocalizedException(__('Error: not possible to create an online refund: %1', $e->getMessage()));
+            throw new LocalizedException(
+                __('Mollie: %1', $e->getMessage())
+            );
         }
 
         return $this;
@@ -605,16 +422,15 @@ class Mollie extends AbstractMethod
      */
     public function getOrderIdByTransactionId($transactionId)
     {
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter('mollie_transaction_id', $transactionId, 'eq')->create();
-        $orderList = $this->orderRepository->getList($searchCriteria);
-        $orderId = $orderList->getFirstItem()->getId();
+        $orderId = $this->orderFactory->create()
+            ->addFieldToFilter('mollie_transaction_id', $transactionId)
+            ->getFirstItem()
+            ->getId();
 
         if ($orderId) {
             return $orderId;
         } else {
             $this->mollieHelper->addTolog('error', __('No order found for transaction id %1', $transactionId));
-
             return false;
         }
     }
@@ -648,11 +464,11 @@ class Mollie extends AbstractMethod
         }
 
         if ($issuers && $issuerListType == 'dropdown') {
-            array_unshift($issuers, array(
+            array_unshift($issuers, [
                 'resource' => 'issuer',
                 'id'       => '',
                 'name'     => __('-- Please Select --')
-            ));
+            ]);
         }
 
         return $issuers;
@@ -678,7 +494,6 @@ class Mollie extends AbstractMethod
 
         $mollieApi = $this->loadMollieApi($apiKey);
 
-        return $mollieApi->methods->all();
+        return $mollieApi->methods->all(["resource" => "orders"]);
     }
-
 }

@@ -122,6 +122,34 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_eps>
+            <mollie_methods_klarnapaylater>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\Klarnapaylater</model>
+                <title>Klarna Pay Later</title>
+                <method>order</method>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_klarnapaylater>
+            <mollie_methods_klarnasliceit>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\Klarnasliceit</model>
+                <title>Klarna Slice It</title>
+                <method>order</method>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_klarnasliceit>
+            <mollie_methods_paymentlink>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\Paymentlink</model>
+                <title>Mollie: Payment Link</title>
+                <method>order</method>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <message><![CDATA[Click <a href="%link%">here</a> to pay for your purchase.]]></message>
+                <instructions/>
+            </mollie_methods_paymentlink>
             <mollie_methods_giftcard>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Giftcard</model>

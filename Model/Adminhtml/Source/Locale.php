@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Framework\Option\ArrayInterface;
+use Mollie\Payment\Helper\General as MollieHelper;
 
 /**
  * Class Locale
@@ -37,40 +38,11 @@ class Locale implements ArrayInterface
                 [
                     'value' => 'store',
                     'label' => __('Store Locale')
-                ],
-                [
-                    'value' => 'en_US',
-                    'label' => __('en_US')
-                ],
-                [
-                    'value' => 'de_AT',
-                    'label' => __('de_AT')
-                ],
-                [
-                    'value' => 'de_CH',
-                    'label' => __('de_CH')
-                ],
-                [
-                    'value' => 'de_DE',
-                    'label' => __('de_DE')
-                ],
-                [
-                    'value' => 'es_ES',
-                    'label' => __('es_ES')
-                ],
-                [
-                    'value' => 'fr_BE',
-                    'label' => __('fr_BE')
-                ],
-                [
-                    'value' => 'nl_BE',
-                    'label' => __('nl_BE')
-                ],
-                [
-                    'value' => 'nl_NL',
-                    'label' => __('nl_NL')
-                ],
+                ]
             ];
+            foreach (MollieHelper::SUPPORTED_LOCAL as $local) {
+                $this->options[] = ['value' => $local, 'label' => __($local)];
+            }
         }
         return $this->options;
     }

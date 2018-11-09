@@ -79,5 +79,4 @@ class Loading extends Template
     {
         return $this->mollieHelper->getRestartUrl();
     }
-
 }

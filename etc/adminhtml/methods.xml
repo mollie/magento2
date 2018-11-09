@@ -19,5 +19,8 @@
     <include path="Mollie_Payment::methods/inghomepay.xml"/>
     <include path="Mollie_Payment::methods/giropay.xml"/>
     <include path="Mollie_Payment::methods/eps.xml"/>
+    <include path="Mollie_Payment::methods/klarnapaylater.xml"/>
+    <include path="Mollie_Payment::methods/klarnasliceit.xml"/>
+    <include path="Mollie_Payment::methods/paymentlink.xml"/>
     <include path="Mollie_Payment::methods/giftcard.xml"/>
 </include>

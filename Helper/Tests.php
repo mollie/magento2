@@ -18,6 +18,7 @@ use Mollie\Payment\Model\Mollie as MollieModel;
  */
 class Tests extends AbstractHelper
 {
+
     /**
      * @var ObjectManagerInterface
      */
@@ -63,7 +64,7 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieModel->loadMollieApi($testKey);
-                    $methods = $mollieApi->methods->all();
+                    $methods = $mollieApi->methods->all(["resource" => "orders"]);
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
@@ -93,7 +94,7 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieModel->loadMollieApi($liveKey);
-                    $methods = $mollieApi->methods->all();
+                    $methods = $mollieApi->methods->all(["resource" => "orders"]);
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
                     }
@@ -121,24 +122,28 @@ class Tests extends AbstractHelper
      */
     public function compatibilityChecker()
     {
-        $compatibilityChecker = $this->objectManager->create('Mollie\Api\CompatibilityChecker');
+        if (class_exists('Mollie\Api\CompatibilityChecker')) {
+            $compatibilityChecker = new \Mollie\Api\CompatibilityChecker();
+            if (!$compatibilityChecker->satisfiesPhpVersion()) {
+                $minPhpVersion = $compatibilityChecker::MIN_PHP_VERSION;
+                $msg = __('Error: The client requires PHP version >= %1, you have %2.', $minPhpVersion, PHP_VERSION);
+                $results[] = '<span class="mollie-error">' . $msg . '</span>';
+            } else {
+                $msg = __('Success: PHP version: %1.', PHP_VERSION);
+                $results[] = '<span class="mollie-success">' . $msg . '</span>';
+            }
 
-        if (!$compatibilityChecker->satisfiesPhpVersion()) {
-            $minPhpVersion = $compatibilityChecker::MIN_PHP_VERSION;
-            $msg = __('Error: The client requires PHP version >= %1, you have %2.', $minPhpVersion, PHP_VERSION);
-            $results[] = '<span class="mollie-error">' . $msg . '</span>';
+            if (!$compatibilityChecker->satisfiesJsonExtension()) {
+                $msg = __('Error: PHP extension JSON is not enabled.') . '<br/>';
+                $msg .= __('Please make sure to enable "json" in your PHP configuration.');
+                $results[] = '<span class="mollie-error">' . $msg . '</span>';
+            } else {
+                $msg = __('Success: JSON is enabled.');
+                $results[] = '<span class="mollie-success">' . $msg . '</span>';
+            }
         } else {
-            $msg = __('Success: PHP version: %1.', PHP_VERSION);
-            $results[] = '<span class="mollie-success">' . $msg . '</span>';
-        }
-
-        if (!$compatibilityChecker->satisfiesJsonExtension()) {
-            $msg = __('Error: PHP extension JSON is not enabled.') . '<br/>';
-            $msg .= __('Please make sure to enable "json" in your PHP configuration.');
+            $msg = __('Error: Mollie CompatibilityChecker not found.') . '<br/>';
             $results[] = '<span class="mollie-error">' . $msg . '</span>';
-        } else {
-            $msg = __('Success: JSON is enabled.');
-            $results[] = '<span class="mollie-success">' . $msg . '</span>';
         }
 
         return $results;
