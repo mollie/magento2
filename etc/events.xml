@@ -3,4 +3,16 @@
     <event name="admin_system_config_changed_section_payment">
         <observer name="custom_admin_system_config_changed_section_payment" instance="Mollie\Payment\Observer\ConfigObserver"/>
     </event>
+    <event name="order_cancel_after">
+        <observer name="mollie_cancel_order" instance="Mollie\Payment\Observer\OrderCancelAfter"/>
+    </event>
+    <event name="sales_order_shipment_save_before">
+        <observer name="mollie_create_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentSaveBefore"/>
+    </event>
+    <event name="sales_order_shipment_track_save_after">
+        <observer name="mollie_create_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentTrackSaveAfter"/>
+    </event>
+    <event name="sales_order_creditmemo_save_after">
+        <observer name="mollie_create_online_refund" instance="Mollie\Payment\Observer\SalesOrderCreditmemoSaveAfter"/>
+    </event>
 </config>

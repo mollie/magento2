@@ -17,7 +17,7 @@
         var resultSpan = jQuery('#result_compatibility');
         jQuery('#compatibility_button').click(function () {
             var params = {};
-            new Ajax.Request('<?php echo $block->getAjaxUrl() ?>', {
+            new Ajax.Request('<?= $block->getAjaxUrl() ?>', {
                 parameters: params,
                 loaderArea: false,
                 asynchronous: true,
@@ -45,4 +45,4 @@
 
     });
 </script>
-<?php echo $block->getButtonHtml() ?> 
+<?= $block->getButtonHtml() ?>

@@ -3,7 +3,7 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="magmodules_mollie_config_provider" xsi:type="object">Mollie\Payment\Model\MollieConfigProvider</item>
+                <item name="mollie_payment_config_provider" xsi:type="object">Mollie\Payment\Model\MollieConfigProvider</item>
             </argument>
         </arguments>
     </type>

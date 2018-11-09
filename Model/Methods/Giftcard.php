@@ -43,5 +43,4 @@ class Giftcard extends Mollie
      * @var bool
      */
     protected $_canRefundInvoicePartial = false;
-
 }

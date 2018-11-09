@@ -18,6 +18,18 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="method" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Method</label>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\Method</source_model>
+            <config_path>payment/mollie_methods_inghomepay/method</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+            <comment><![CDATA[<strong>Payment API</strong><br>Use the Payment API Platform for the transactions.<br><br>
+            <strong>Order API</strong><br>Use the new Order API Platform and get additional insights in the orders.
+            Read <a href="https://docs.mollie.com/orders/why-use-orders" target="_blank" >more.</a>]]></comment>
+        </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>

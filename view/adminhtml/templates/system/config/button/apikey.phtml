@@ -20,7 +20,7 @@
                 "test_key": jQuery("input[name='groups[mollie][groups][mollie_general][fields][apikey_test][value]']").val(),
                 "live_key": jQuery("input[name='groups[mollie][groups][mollie_general][fields][apikey_live][value]']").val()
             	};
-            new Ajax.Request('<?php echo $block->getAjaxUrl() ?>', {
+            new Ajax.Request('<?= $block->getAjaxUrl() ?>', {
                 parameters: params,
                 loaderArea: false,
                 asynchronous: true,
@@ -47,4 +47,4 @@
         });
     });
 </script>
-<?php echo $block->getButtonHtml() ?>
+<?= $block->getButtonHtml() ?>

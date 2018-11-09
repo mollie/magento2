@@ -144,6 +144,24 @@
     float: left;
 }
 
+a.mollie-tooltip span {
+    display: none;
+    padding: 2px 3px;
+    margin-left: 30px;
+    width: auto;
+    margin-top: 5px;
+}
+
+a.mollie-tooltip:hover span {
+    display: block;
+    position: absolute;
+    background: #f8f8f8;
+    border: 1px solid #CCCCCC;
+    color: #6C6C6C;
+    margin-right: 0px;
+    padding: 10px;
+}
+
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .mm-block-mollie .icon1 {
         background: url(../images/icons@x2.png) no-repeat scroll 0px -7px;

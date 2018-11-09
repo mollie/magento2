@@ -9,7 +9,7 @@ namespace Mollie\Payment\Model\Adminhtml\Source;
 use Magento\Sales\Model\Config\Source\Order\Status;
 
 /**
- * Class Pending
+ * Class Processing
  *
  * @package Mollie\Payment\Model\Adminhtml\Source
  */

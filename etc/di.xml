@@ -13,4 +13,18 @@
             </argument>
         </arguments>
     </type>
+
+    <!-- Set sensitive information -->
+    <type name="Magento\Config\Model\Config\TypePool">
+        <arguments>
+            <argument name="sensitive" xsi:type="array">
+                <item name="payment/mollie_general/apikey_test" xsi:type="string">1</item>
+                <item name="payment/mollie_general/apikey_live" xsi:type="string">1</item>
+            </argument>
+            <argument name="environment" xsi:type="array">
+                <item name="payment/mollie_general/apikey_test" xsi:type="string">1</item>
+                <item name="payment/mollie_general/apikey_live" xsi:type="string">1</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

@@ -9,6 +9,7 @@ namespace Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Mollie\Payment\Helper\General as MollieHelper;
 
 /**
  * Class Checker
@@ -26,18 +27,25 @@ class Checker extends Field
      * @var \Magento\Framework\App\RequestInterface
      */
     private $request;
+    /**
+     * @var MollieHelper
+     */
+    private $mollieHelper;
 
     /**
      * Checker constructor.
      *
-     * @param Context $context
-     * @param array   $data
+     * @param Context      $context
+     * @param MollieHelper $mollieHelper
+     * @param array        $data
      */
     public function __construct(
         Context $context,
+        MollieHelper $mollieHelper,
         array $data = []
     ) {
         $this->request = $context->getRequest();
+        $this->mollieHelper = $mollieHelper;
         parent::__construct($context, $data);
     }
 
@@ -81,7 +89,7 @@ class Checker extends Field
             $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')->setData($buttonData);
             return $button->toHtml();
         } catch (\Exception $e) {
-            return '';
+            $this->mollieHelper->addTolog('error', $e->getMessage());
         }
     }
 }

@@ -53,6 +53,8 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 
 - SEPA bank transfer
 
+- Klarna
+
 - Giftcards 
 
 ## Configuration, FAQ and Troubleshooting  ##

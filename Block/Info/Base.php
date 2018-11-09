@@ -8,69 +8,122 @@ namespace Mollie\Payment\Block\Info;
 
 use Magento\Payment\Block\Info;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Framework\Stdlib\DateTime;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\Methods\Klarnapaylater;
+use Mollie\Payment\Model\Methods\Klarnasliceit;
 
 class Base extends Info
 {
 
     /**
+     * @var string
+     */
+    protected $_template = 'Mollie_Payment::info/mollie_base.phtml';
+    /**
      * @var MollieHelper
      */
     private $mollieHelper;
+    /**
+     * @var TimezoneInterface
+     */
+    private $timezone;
 
     /**
-     * Info constructor.
+     * Base constructor.
      *
-     * @param MollieHelper $mollieHelper
-     * @param Context      $context
-     * @param array        $data
+     * @param Context           $context
+     * @param MollieHelper      $mollieHelper
+     * @param TimezoneInterface $timezone
      */
     public function __construct(
-        MollieHelper $mollieHelper,
         Context $context,
-        $data = []
+        MollieHelper $mollieHelper,
+        TimezoneInterface $timezone
     ) {
-        parent::__construct($context, $data);
+        parent::__construct($context);
         $this->mollieHelper = $mollieHelper;
+        $this->timezone = $timezone;
     }
 
     /**
-     * @param null $transport
-     *
-     * @return $this|\Magento\Framework\DataObject
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return string
      */
-    protected function _prepareSpecificInformation($transport = null)
+    public function getCheckoutType()
     {
-        if ($this->_paymentSpecificInformation !== null) {
-            return $this->_paymentSpecificInformation;
+        try {
+            $checkoutType = $this->getInfo()->getAdditionalInformation('checkout_type');
+            return $checkoutType;
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
         }
-
-        $transport = parent::_prepareSpecificInformation($transport);
-
-        if ($this->_appState->getAreaCode() !== \Magento\Backend\App\Area\FrontNameResolver::AREA_CODE) {
-            return $transport;
-        }
-
-        $showTransactionDetails = $this->mollieHelper->showTransactionDetails();
-        if (!$showTransactionDetails) {
-            return $transport;
-        }
-
-        $transactionDetails = json_decode($this->getInfo()->getAdditionalInformation('details'), true);
-        if (!$transactionDetails) {
-            return $transport;
-        }
-
-        $data = [];
-        foreach ($transactionDetails as $k => $v) {
-            if ($v !== null && !is_array($v)) {
-                $label = ucwords(trim(preg_replace('/(?=[A-Z])/', " $1", $k)));
-                $data[(string)__($label)] = $v;
-            }
-        }
-
-        return $transport->setData(array_merge($data, $transport->getData()));
     }
 
+    /**
+     * @return string
+     */
+    public function getExpiresAt()
+    {
+        try {
+            if ($expiresAt = $this->getInfo()->getAdditionalInformation('expires_at')) {
+                return $this->timezone->date($expiresAt)->format(DateTime::DATETIME_PHP_FORMAT);
+            }
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentLink()
+    {
+        if ($checkoutUrl = $this->getCheckoutUrl()) {
+            return $this->mollieHelper->getPaymentLinkMessage($checkoutUrl);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getCheckoutUrl()
+    {
+        try {
+            $checkoutUrl = $this->getInfo()->getAdditionalInformation('checkout_url');
+            return $checkoutUrl;
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getPaymentStatus()
+    {
+        try {
+            $paymentStatus = $this->getInfo()->getAdditionalInformation('payment_status');
+            return $paymentStatus;
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function isKlarnaMethod()
+    {
+        try {
+            $code = $this->getInfo()->getMethod();
+            if ($code == Klarnapaylater::METHOD_CODE || $code == Klarnasliceit::METHOD_CODE) {
+                return true;
+            }
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+
+        return false;
+    }
 }

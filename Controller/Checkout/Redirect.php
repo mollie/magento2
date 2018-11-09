@@ -87,7 +87,6 @@ class Redirect extends Action
             if ($methodInstance instanceof \Mollie\Payment\Model\Mollie) {
                 $storeId = $order->getStoreId();
                 $redirectUrl = $methodInstance->startTransaction($order);
-                $this->mollieHelper->addTolog('request', $redirectUrl);
                 if ($this->mollieHelper->useLoadingScreen($storeId)) {
                     $resultPage = $this->resultPageFactory->create();
                     $resultPage->getLayout()->initMessages();
@@ -97,7 +96,7 @@ class Redirect extends Action
                     $this->getResponse()->setRedirect($redirectUrl);
                 }
             } else {
-                $msg = __('Paymentmethod not found.');
+                $msg = __('Payment Method not found');
                 $this->messageManager->addErrorMessage($msg);
                 $this->mollieHelper->addTolog('error', $msg);
                 $this->checkoutSession->restoreQuote();
