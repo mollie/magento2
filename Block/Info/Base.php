@@ -9,7 +9,6 @@ namespace Mollie\Payment\Block\Info;
 use Magento\Payment\Block\Info;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Stdlib\DateTime;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Klarnapaylater;
 use Mollie\Payment\Model\Methods\Klarnasliceit;
@@ -26,25 +25,23 @@ class Base extends Info
      */
     private $mollieHelper;
     /**
-     * @var TimezoneInterface
+     * @var DateTime\TimezoneInterface
      */
     private $timezone;
 
     /**
      * Base constructor.
      *
-     * @param Context           $context
-     * @param MollieHelper      $mollieHelper
-     * @param TimezoneInterface $timezone
+     * @param Context      $context
+     * @param MollieHelper $mollieHelper
      */
     public function __construct(
         Context $context,
-        MollieHelper $mollieHelper,
-        TimezoneInterface $timezone
+        MollieHelper $mollieHelper
     ) {
         parent::__construct($context);
         $this->mollieHelper = $mollieHelper;
-        $this->timezone = $timezone;
+        $this->timezone = $context->getLocaleDate();
     }
 
     /**
