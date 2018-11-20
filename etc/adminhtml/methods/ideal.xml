@@ -40,6 +40,12 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="add_qr" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Add QR-Code option in Issuer List</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/mollie_methods_ideal/add_qr</config_path>
+        </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
