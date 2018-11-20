@@ -401,13 +401,16 @@ class Mollie extends AbstractMethod
 
         try {
             $mollieApi = $this->loadMollieApi($apiKey);
-            $mollieOrder = $mollieApi->orders->get($transactionId);
-            $mollieOrder->refundAll(['Testing Refund Order xx']);
+            $payment = $mollieApi->payments->get($transactionId);
+            $payment->refund([
+                "amount" => [
+                    "currency" => $order->getOrderCurrencyCode(),
+                    "value"    => $this->mollieHelper->formatCurrencyValue($amount, $order->getOrderCurrencyCode())
+                ]
+            ]);
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            throw new LocalizedException(
-                __('Mollie: %1', $e->getMessage())
-            );
+            throw new LocalizedException(__('Error: not possible to create an online refund: %1', $e->getMessage()));
         }
 
         return $this;
