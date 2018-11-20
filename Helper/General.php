@@ -71,6 +71,7 @@ class General extends AbstractHelper
     const XML_PATH_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
     const XML_PATH_SHOW_TRANSACTION_DETAILS = 'payment/mollie_general/transaction_details';
     const XML_PATH_IDEAL_ISSUER_LIST_TYPE = 'payment/mollie_methods_ideal/issuer_list_type';
+    const XML_PATH_ADD_QR = 'payment/mollie_methods_ideal/add_qr';
     const XML_PATH_GIFTCARD_ISSUER_LIST_TYPE = 'payment/mollie_methods_giftcard/issuer_list_type';
     const XML_PATH_PAYMENTLINK_ADD_MESSAGE = 'payment/mollie_methods_paymentlink/add_message';
     const XML_PATH_PAYMENTLINK_MESSAGE = 'payment/mollie_methods_paymentlink/message';
@@ -317,6 +318,17 @@ class General extends AbstractHelper
         if ($method == 'mollie_methods_giftcard') {
             return $this->getStoreConfig(self::XML_PATH_GIFTCARD_ISSUER_LIST_TYPE);
         }
+    }
+
+    /**
+     * @param null $storeId
+     *
+     * @return mixed
+     */
+    public function addQrOption($storeId = null)
+    {
+        return $this->getStoreConfig(self::XML_PATH_ADD_QR, $storeId);
+
     }
 
     /**

@@ -26,6 +26,7 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\View\Asset\Repository as AssetRepository;
 
 /**
  * Class Mollie
@@ -101,6 +102,10 @@ class Mollie extends AbstractMethod
      * @var PaymentsApi
      */
     private $paymentsApi;
+    /**
+     * @var AssetRepository
+     */
+    private $assetRepository;
 
     /**
      * Mollie constructor.
@@ -119,6 +124,7 @@ class Mollie extends AbstractMethod
      * @param MollieHelper               $mollieHelper
      * @param CheckoutSession            $checkoutSession
      * @param SearchCriteriaBuilder      $searchCriteriaBuilder
+     * @param AssetRepository            $assetRepository
      * @param AbstractResource|null      $resource
      * @param AbstractDb|null            $resourceCollection
      * @param array                      $data
@@ -138,6 +144,7 @@ class Mollie extends AbstractMethod
         MollieHelper $mollieHelper,
         CheckoutSession $checkoutSession,
         SearchCriteriaBuilder $searchCriteriaBuilder,
+        AssetRepository $assetRepository,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -162,6 +169,7 @@ class Mollie extends AbstractMethod
         $this->orderRepository = $orderRepository;
         $this->orderFactory = $orderFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->assetRepository = $assetRepository;
     }
 
     /**
@@ -401,13 +409,16 @@ class Mollie extends AbstractMethod
 
         try {
             $mollieApi = $this->loadMollieApi($apiKey);
-            $mollieOrder = $mollieApi->orders->get($transactionId);
-            $mollieOrder->refundAll(['Testing Refund Order xx']);
+            $payment = $mollieApi->payments->get($transactionId);
+            $payment->refund([
+                "amount" => [
+                    "currency" => $order->getOrderCurrencyCode(),
+                    "value"    => $this->mollieHelper->formatCurrencyValue($amount, $order->getOrderCurrencyCode())
+                ]
+            ]);
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            throw new LocalizedException(
-                __('Mollie: %1', $e->getMessage())
-            );
+            throw new LocalizedException(__('Error: not possible to create an online refund: %1', $e->getMessage()));
         }
 
         return $this;
@@ -469,6 +480,15 @@ class Mollie extends AbstractMethod
                 'id'       => '',
                 'name'     => __('-- Please Select --')
             ]);
+        }
+
+        if ($this->mollieHelper->addQrOption()) {
+            $issuers[] = [
+                'resource' => 'issuer',
+                'id'       => '',
+                'name'     => __('QR Code'),
+                'image'    => ['size2x' => $this->assetRepository->getUrl("Mollie_Payment::images/qr-select.png")]
+            ];
         }
 
         return $issuers;
