@@ -160,15 +160,16 @@ class Orders extends AbstractModel
     public function getAddressLine($address)
     {
         return [
-            'title'           => $address->getPrefix(),
-            'givenName'       => $address->getFirstname(),
-            'familyName'      => $address->getLastname(),
-            'email'           => $address->getEmail(),
-            'streetAndNumber' => rtrim(implode(' ', $address->getStreet()), ' '),
-            'postalCode'      => $address->getPostcode(),
-            'city'            => $address->getCity(),
-            'region'          => $address->getRegion(),
-            'country'         => $address->getCountryId(),
+            'organizationName' => $address->getCompany(),
+            'title'            => $address->getPrefix(),
+            'givenName'        => $address->getFirstname(),
+            'familyName'       => $address->getLastname(),
+            'email'            => $address->getEmail(),
+            'streetAndNumber'  => rtrim(implode(' ', $address->getStreet()), ' '),
+            'postalCode'       => $address->getPostcode(),
+            'city'             => $address->getCity(),
+            'region'           => $address->getRegion(),
+            'country'          => $address->getCountryId(),
         ];
     }
 
