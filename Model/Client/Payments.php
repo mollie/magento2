@@ -94,7 +94,6 @@ class Payments extends AbstractModel
             'amount'          => $this->mollieHelper->getOrderAmountByOrder($order),
             'description'     => $order->getIncrementId(),
             'billingAddress'  => $this->getAddressLine($order->getBillingAddress()),
-            'shippingAddress' => $this->getAddressLine($order->getShippingAddress()),
             'redirectUrl'     => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
             'webhookUrl'      => $this->mollieHelper->getWebhookUrl(),
             'method'          => $method,
@@ -106,6 +105,10 @@ class Payments extends AbstractModel
             ],
             'locale'          => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE)
         ];
+
+        if (!$order->getIsVirtual() && $order->hasData('shipping_address_id')) {
+            $paymentData['shippingAddress'] = $this->getAddressLine($order->getShippingAddress());
+        }
 
         if ($method == 'banktransfer') {
             $paymentData['billingEmail'] = $order->getCustomerEmail();
