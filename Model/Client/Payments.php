@@ -83,7 +83,7 @@ class Payments extends AbstractModel
         $additionalData = $order->getPayment()->getAdditionalInformation();
 
         $transactionId = $order->getMollieTransactionId();
-        if (!empty($transactionId)) {
+        if (!empty($transactionId) && !preg_match('/^ord_\w+$/', $transactionId)) {
             $payment = $mollieApi->payments->get($transactionId);
             return $payment->getCheckoutUrl();
         }
