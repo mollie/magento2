@@ -232,10 +232,22 @@ class Mollie extends AbstractMethod
         $method = $this->mollieHelper->getApiMethod($order);
 
         if ($method == 'order') {
-            return $this->ordersApi->startTransaction($order, $mollieApi);
+            try {
+                $transactionResult = $this->ordersApi->startTransaction($order, $mollieApi);
+            } catch (\Exception $e) {
+                $methodCode = $this->mollieHelper->getMethodCode($order);
+                if ($methodCode != 'klarnapaylater' && $methodCode != 'klarnasliceit') {
+                    $this->mollieHelper->addTolog('error', $e->getMessage());
+                    $transactionResult = $this->paymentsApi->startTransaction($order, $mollieApi);
+                } else {
+                    throw new LocalizedException(__($e->getMessage()));
+                }
+            }
         } else {
-            return $this->paymentsApi->startTransaction($order, $mollieApi);
+            $transactionResult = $this->paymentsApi->startTransaction($order, $mollieApi);
         }
+
+        return $transactionResult;
     }
 
     /**
@@ -294,7 +306,7 @@ class Mollie extends AbstractMethod
         $mollieApi = $this->loadMollieApi($apiKey);
         $method = $this->mollieHelper->getApiMethod($order);
 
-        if ($method == 'order') {
+        if ($method == 'order' && preg_match('/^ord_\w+$/', $transactionId)) {
             return $this->ordersApi->processTransaction($order, $mollieApi, $type, $paymentToken);
         } else {
             return $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);

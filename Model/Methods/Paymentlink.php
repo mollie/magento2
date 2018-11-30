@@ -42,7 +42,13 @@ class Paymentlink extends Mollie
      *
      * @var string
      */
-    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Paymentlink';
+    protected $_infoBlockType = \Mollie\Payment\Block\Info\Paymentlink::class;
+    /**
+     * Info instructions form path
+     *
+     * @var string
+     */
+    protected $_formBlockType = \Mollie\Payment\Block\Form\Paymentlink::class;
 
     /**
      * @param string $paymentAction

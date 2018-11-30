@@ -120,7 +120,6 @@ class Orders extends AbstractModel
             'amount'              => $this->mollieHelper->getOrderAmountByOrder($order),
             'orderNumber'         => $order->getIncrementId(),
             'billingAddress'      => $this->getAddressLine($order->getBillingAddress()),
-            'shippingAddress'     => $this->getAddressLine($order->getShippingAddress()),
             'consumerDateOfBirth' => null,
             'lines'               => $this->orderLines->getOrderLines($order),
             'redirectUrl'         => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
@@ -133,6 +132,10 @@ class Orders extends AbstractModel
                 'payment_token' => $paymentToken
             ],
         ];
+
+        if (!$order->getIsVirtual() && $order->hasData('shipping_address_id')) {
+            $orderData['shippingAddress'] = $this->getAddressLine($order->getShippingAddress());
+        }
 
         if (isset($additionalData['selected_issuer'])) {
             $orderData['payment']['issuer'] = $additionalData['selected_issuer'];
@@ -157,15 +160,16 @@ class Orders extends AbstractModel
     public function getAddressLine($address)
     {
         return [
-            'title'           => $address->getPrefix(),
-            'givenName'       => $address->getFirstname(),
-            'familyName'      => $address->getLastname(),
-            'email'           => $address->getEmail(),
-            'streetAndNumber' => rtrim(implode(' ', $address->getStreet()), ' '),
-            'postalCode'      => $address->getPostcode(),
-            'city'            => $address->getCity(),
-            'region'          => $address->getRegion(),
-            'country'         => $address->getCountryId(),
+            'organizationName' => $address->getCompany(),
+            'title'            => $address->getPrefix(),
+            'givenName'        => $address->getFirstname(),
+            'familyName'       => $address->getLastname(),
+            'email'            => $address->getEmail(),
+            'streetAndNumber'  => rtrim(implode(' ', $address->getStreet()), ' '),
+            'postalCode'       => $address->getPostcode(),
+            'city'             => $address->getCity(),
+            'region'           => $address->getRegion(),
+            'country'          => $address->getCountryId(),
         ];
     }
 
