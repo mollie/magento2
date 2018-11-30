@@ -13,4 +13,5 @@ class Paymentlink extends Base
      * @var string
      */
     protected $_template = 'Mollie_Payment::info/mollie_paymentlink.phtml';
+
 }
