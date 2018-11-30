@@ -123,4 +123,18 @@ class Base extends Info
 
         return false;
     }
+
+    /**
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getPaymentImage()
+    {
+        $code = $this->getInfo()->getMethod();
+        if (strpos($code, 'mollie_methods_') !== false) {
+            $code = str_replace('mollie_methods_', '', $code);
+        }
+
+        return $code . '.png';
+    }
 }

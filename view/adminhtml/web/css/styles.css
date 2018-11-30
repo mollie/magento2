@@ -3,6 +3,14 @@
     font-size: 12px;
 }
 
+.mollie-method img {
+    width: 30px;
+    margin-right: 10px;
+    margin-left: 10px;
+    float: left;
+    margin-top: -5px;
+}
+
 .mollie-success {
     display: block;
     line-height: 30px;
@@ -155,7 +163,7 @@ a.mollie-tooltip span {
 a.mollie-tooltip:hover span {
     display: block;
     position: absolute;
-    background: #f8f8f8;
+    background: #F8F8F8;
     border: 1px solid #CCCCCC;
     color: #6C6C6C;
     margin-right: 0px;

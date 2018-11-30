@@ -12,38 +12,41 @@
 $specificInfo = $block->getSpecificInformation();
 $status = $block->getPaymentStatus();
 ?>
-<?= $block->escapeHtml($block->getMethod()->getTitle()); ?>
-<table class="data-table admin__table-secondary">
-    <tbody>
-        <?php if ($block->getCheckoutType()): ?>
-            <tr>
-                <th><?= __('Checkout Type'); ?></th>
-                <td><?= ucfirst($block->getCheckoutType()); ?></td>
-            </tr>
-        <?php endif; ?>
-        <?php if ($block->getCheckoutUrl() && $status == 'created'): ?>
-            <tr>
-                <th><?= __('Checkout Url'); ?></th>
-                <td><?= $block->getCheckoutUrl(); ?></td>
-            </tr>
-        <?php endif; ?>
-        <?php if ($block->getExpiresAt() && $status == 'created'): ?>
-            <tr>
-                <th><?= __('Valid Until'); ?></th>
-                <td><?= $block->getExpiresAt(); ?></td>
-            </tr>
-        <?php endif; ?>
-        <?php if ($block->getPaymentStatus()): ?>
-            <tr>
-                <th><?= __('Payment Status'); ?></th>
-                <td>
-                    <?= ucfirst($status); ?>
-                    <?php if($block->isKlarnaMethod() && $status == 'authorized'): ?>
-                        <?= __('<a href="#" class="mollie-tooltip">(i)<span>Please ship order to capture Klarna payment</span></a>'); ?>
-                    <?php endif; ?>
-                </td>
-            </tr>
-        <?php endif; ?>
-    </tbody>
-</table>
+<div class="mollie-method">
+    <img src="<?= $block->escapeUrl($this->getViewFileUrl('Mollie_Payment::images/' . $this->getPaymentImage())) ?>"/>
+    <?= $block->escapeHtml($block->getMethod()->getTitle()); ?>
+    <table class="data-table admin__table-secondary">
+        <tbody>
+            <?php if ($block->getCheckoutType()): ?>
+                <tr>
+                    <th><?= __('Checkout Type'); ?></th>
+                    <td><?= ucfirst($block->getCheckoutType()); ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($block->getCheckoutUrl() && $status == 'created'): ?>
+                <tr>
+                    <th><?= __('Checkout Url'); ?></th>
+                    <td><?= $block->getCheckoutUrl(); ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($block->getExpiresAt() && $status == 'created'): ?>
+                <tr>
+                    <th><?= __('Valid Until'); ?></th>
+                    <td><?= $block->getExpiresAt(); ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($block->getPaymentStatus()): ?>
+                <tr>
+                    <th><?= __('Payment Status'); ?></th>
+                    <td>
+                        <?= ucfirst($status); ?>
+                        <?php if ($block->isKlarnaMethod() && $status == 'authorized'): ?>
+                            <?= __('<a href="#" class="mollie-tooltip">(i)<span>Please ship order to capture Klarna payment</span></a>'); ?>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
 <?= $block->getChildHtml() ?>
