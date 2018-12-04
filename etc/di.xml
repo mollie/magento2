@@ -24,6 +24,8 @@
             <argument name="environment" xsi:type="array">
                 <item name="payment/mollie_general/apikey_test" xsi:type="string">1</item>
                 <item name="payment/mollie_general/apikey_live" xsi:type="string">1</item>
+                <item name="payment/mollie_general/type" xsi:type="string">1</item>
+                <item name="payment/mollie_general/debug" xsi:type="string">1</item>
             </argument>
         </arguments>
     </type>

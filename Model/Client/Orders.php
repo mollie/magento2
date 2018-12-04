@@ -648,7 +648,7 @@ class Orders extends AbstractModel
         if ($shippingCostsLine->getId() && $shippingCostsLine->getQtyRefunded() == 0) {
             if ($creditmemo->getShippingAmount() > 0) {
                 $addShippingToRefund = true;
-                if (abs($creditmemo->getShippingAmount() - $shippingCostsLine->getTotalAmount()) > 0.01) {
+                if (abs($creditmemo->getShippingInclTax() - $shippingCostsLine->getTotalAmount()) > 0.01) {
                     $msg = __('Can not create online refund, as shipping costs do not match');
                     $this->mollieHelper->addTolog('error', $msg);
                     throw new LocalizedException($msg);
