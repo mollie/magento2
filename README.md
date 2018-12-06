@@ -58,7 +58,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Giftcards 
 
 ## Configuration, FAQ and Troubleshooting  ##
-If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension in Magento 2.x, please see our [WIKI Page](https://github.com/mollie/magento2/wiki) or sent an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
+If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension in Magento 2.x, please see our [WIKI Page](https://github.com/mollie/magento2/wiki) or send an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
 
 
 ## License ##
