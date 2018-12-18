@@ -12,6 +12,7 @@ define(
         'use strict';
         var defaultComponent = 'Mollie_Payment/js/view/payment/method-renderer/default';
         var idealComponent = 'Mollie_Payment/js/view/payment/method-renderer/ideal';
+        var kbcComponent = 'Mollie_Payment/js/view/payment/method-renderer/kbc';
         var giftcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/giftcard';
         var methods = [
             {type: 'mollie_methods_bancontact', component: defaultComponent},
@@ -20,7 +21,7 @@ define(
             {type: 'mollie_methods_bitcoin', component: defaultComponent},
             {type: 'mollie_methods_creditcard', component: defaultComponent},
             {type: 'mollie_methods_ideal', component: idealComponent},
-            {type: 'mollie_methods_kbc', component: defaultComponent},
+            {type: 'mollie_methods_kbc', component: kbcComponent},
             {type: 'mollie_methods_paypal', component: defaultComponent},
             {type: 'mollie_methods_paysafecard', component: defaultComponent},
             {type: 'mollie_methods_sofort', component: defaultComponent},

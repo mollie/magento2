@@ -133,15 +133,24 @@ class OrderLines extends AbstractModel
         }
 
         if (!$order->getIsVirtual()) {
-            $totalAmount = $forceBaseCurrency ? $order->getBaseShippingInclTax() : $order->getShippingInclTax();
-            $vatRate = $this->getShippingVatRate($order);
+            $baseShipping = $forceBaseCurrency ? $order->getBaseShippingAmount() : $order->getShippingAmount();
+            $rowTotalInclTax = $forceBaseCurrency ? $baseShipping + $order->getBaseShippingTaxAmount() : $baseShipping + $order->getShippingTaxAmount();
+            $discountAmount = $forceBaseCurrency ? $order->getBaseShippingDiscountAmount() : $order->getShippingDiscountAmount();
+
+            /**
+             * The total amount of the line, including VAT and discounts
+             * Should Match: (unitPrice × quantity) - discountAmount
+             * NOTE: TotalAmount can differ from actutal Total Amount due to rouding in tax or exchange rate
+             */
+            $totalAmount = $rowTotalInclTax - $discountAmount;
 
             /**
              * The amount of VAT on the line.
              * Should Match: totalAmount × (vatRate / (100 + vatRate)).
-             * Due to Mollie API requirements, we calculate this instead of using $item->getTaxAmount() to overcome
+             * Due to Mollie API requirements, we calculate this instead of using $order->getBaseShippingTaxAmount() to overcome
              * any rouding issues.
              */
+            $vatRate = $this->getShippingVatRate($order);
             $vatAmount = round($totalAmount * ($vatRate / (100 + $vatRate)), 2);
 
             $orderLines[] = [
@@ -149,9 +158,9 @@ class OrderLines extends AbstractModel
                 'type'           => 'shipping_fee',
                 'name'           => preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription()),
                 'quantity'       => 1,
-                'unitPrice'      => $this->mollieHelper->getAmountArray($currency, $totalAmount),
+                'unitPrice'      => $this->mollieHelper->getAmountArray($currency, $rowTotalInclTax),
                 'totalAmount'    => $this->mollieHelper->getAmountArray($currency, $totalAmount),
-                'discountAmount' => $this->mollieHelper->getAmountArray($currency, '0'),
+                'discountAmount' => $this->mollieHelper->getAmountArray($currency, $discountAmount),
                 'vatRate'        => sprintf("%.2f", $vatRate),
                 'vatAmount'      => $this->mollieHelper->getAmountArray($currency, $vatAmount),
                 'sku'            => $order->getShippingMethod()
