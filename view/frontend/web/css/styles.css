@@ -71,6 +71,16 @@
     max-height: 30px;
 }
 
+.checkout-payment-method #mollie_methods_kbc-form .label {
+    height: 35px;
+    display: inline-block;
+}
+
+.checkout-payment-method #mollie_methods_kbc-form .payment-icon {
+    width: 35px;
+    max-height: 30px;
+}
+
 .checkout-payment-method #mollie_methods_giftcard-form .label {
     height: 40px;
     display: inline-block;

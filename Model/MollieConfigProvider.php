@@ -162,6 +162,15 @@ class MollieConfigProvider implements ConfigProviderInterface
                             $issuerListType
                         );
                     }
+                    if ($code == 'mollie_methods_kbc') {
+                        $issuerListType = $this->mollieHelper->getIssuerListType($code);
+                        $config['payment']['issuersListType'][$code] = $issuerListType;
+                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
+                            $mollieApi,
+                            $code,
+                            $issuerListType
+                        );
+                    }
                     if ($code == 'mollie_methods_giftcard') {
                         $issuerListType = $this->mollieHelper->getIssuerListType($code);
                         $config['payment']['issuersListType'][$code] = $issuerListType;

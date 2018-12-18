@@ -494,7 +494,7 @@ class Mollie extends AbstractMethod
             ]);
         }
 
-        if ($this->mollieHelper->addQrOption()) {
+        if ($this->mollieHelper->addQrOption() && $methodCode == 'ideal') {
             $issuers[] = [
                 'resource' => 'issuer',
                 'id'       => '',

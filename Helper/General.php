@@ -70,12 +70,11 @@ class General extends AbstractHelper
     const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
     const XML_PATH_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
     const XML_PATH_SHOW_TRANSACTION_DETAILS = 'payment/mollie_general/transaction_details';
-    const XML_PATH_IDEAL_ISSUER_LIST_TYPE = 'payment/mollie_methods_ideal/issuer_list_type';
     const XML_PATH_ADD_QR = 'payment/mollie_methods_ideal/add_qr';
-    const XML_PATH_GIFTCARD_ISSUER_LIST_TYPE = 'payment/mollie_methods_giftcard/issuer_list_type';
     const XML_PATH_PAYMENTLINK_ADD_MESSAGE = 'payment/mollie_methods_paymentlink/add_message';
     const XML_PATH_PAYMENTLINK_MESSAGE = 'payment/mollie_methods_paymentlink/message';
     const XML_PATH_API_METHOD = 'payment/%method%/method';
+    const XPATH_ISSUER_LIST_TYPE = 'payment/%method%/issuer_list_type';
 
     /**
      * @var ProductMetadataInterface
@@ -311,13 +310,8 @@ class General extends AbstractHelper
      */
     public function getIssuerListType($method)
     {
-        if ($method == 'mollie_methods_ideal') {
-            return $this->getStoreConfig(self::XML_PATH_IDEAL_ISSUER_LIST_TYPE);
-        }
-
-        if ($method == 'mollie_methods_giftcard') {
-            return $this->getStoreConfig(self::XML_PATH_GIFTCARD_ISSUER_LIST_TYPE);
-        }
+        $methodXpath = str_replace('%method%', $method, self::XPATH_ISSUER_LIST_TYPE);
+        return $this->getStoreConfig($methodXpath);
     }
 
     /**
