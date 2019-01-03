@@ -4,17 +4,42 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
 /**
- * @var \Mollie\Payment\Block\Form\Paymentlink $block
+ * @var \Mollie\Payment\Block\Form\Paymentlink            $block
  * @see \Mollie\Payment\Block\Form\Paymentlink
-
-// @codingStandardsIgnoreFile
-/**
+ *
+ * /**
  * @var \Magento\Payment\Block\Adminhtml\Transparent\Form $block
  */
 $code = $block->escapeHtml($block->getMethodCode());
 ?>
-<fieldset class="admin__fieldset payment-method" id="payment_form_<?php /* @noEscape */ echo $code; ?>" style="display:none">
-    <?= $block->escapeHtml(__('Create a Mollie Payment link and add this to the order email.')); ?>
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?= /* @noEscape */
+$code; ?>" style="display:none">
+    <div class="mollie-admin-method">
+        <?= $block->escapeHtml(__('Create a Mollie Payment link and add this to the order email.')); ?>
+        <div class="field admin__field">
+            <label for="<?= $code ?>_methods" class="label admin__field-label"><span><?= $block->escapeHtml(__('Limit to the following method(s)')) ?></span></label>
+            <div class="control admin__field-control">
+                <select multiple="multiple" size="16" id="<?= $code ?>_methods" name="payment[limited_methods][]" class="admin__control-multiselect">
+                    <option value="bancontact">Bancontact</option>
+                    <option value="banktransfer">Banktransfer</option>
+                    <option value="belfius">Belfius</option>
+                    <option value="bitcoin">Bitcoin</option>
+                    <option value="creditcard">Creditcard</option>
+                    <option value="eps">EPS</option>
+                    <option value="giftcard">Giftcard</option>
+                    <option value="giropay">Giropay</option>
+                    <option value="ideal">iDEAL</option>
+                    <option value="inghomepay">ING Homepay</option>
+                    <option value="kbc">KBC/CBC</option>
+                    <option value="klarnapaylater">Klarna Pay Later</option>
+                    <option value="klarnasliceit">Klarna Slice It</option>
+                    <option value="paypal">Paypal</option>
+                    <option value="paysafecard">Paysafecard</option>
+                    <option value="sofort">Sofort</option>
+                </select>
+            </div>
+        </div>
+        <p><?= $block->escapeHtml(__('If one method is chosen, it will skip the selection screen and the customer is sent directly to the payment method.')); ?></p>
+    </div>
 </fieldset>

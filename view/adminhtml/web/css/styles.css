@@ -170,6 +170,11 @@ a.mollie-tooltip:hover span {
     padding: 10px;
 }
 
+.mollie-admin-method {
+    padding: 10px;
+    margin: 10px 0;
+}
+
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .mm-block-mollie .icon1 {
         background: url(../images/icons@x2.png) no-repeat scroll 0px -7px;

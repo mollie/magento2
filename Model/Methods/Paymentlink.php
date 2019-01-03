@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Model\Methods;
 
 use Mollie\Payment\Model\Mollie;
+use Magento\Framework\DataObject;
 
 /**
  * Class Paymentlink
@@ -68,5 +69,27 @@ class Paymentlink extends Mollie
         $order->save();
 
         $this->startTransaction($order);
+    }
+
+    /**
+     * @param DataObject $data
+     *
+     * @return $this
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function assignData(DataObject $data)
+    {
+        $limitedMethods = null;
+        parent::assignData($data);
+
+        if ($additionalData = $data->getData('additional_data')) {
+            if (isset($additionalData['limited_methods'])) {
+                $limitedMethods = $additionalData['limited_methods'];
+            }
+        }
+
+        $this->getInfoInstance()->setAdditionalInformation('limited_methods', $limitedMethods);
+
+        return $this;
     }
 }

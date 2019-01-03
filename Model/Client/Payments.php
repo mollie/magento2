@@ -91,19 +91,19 @@ class Payments extends AbstractModel
         $paymentToken = $this->mollieHelper->getPaymentToken();
         $method = $this->mollieHelper->getMethodCode($order);
         $paymentData = [
-            'amount'          => $this->mollieHelper->getOrderAmountByOrder($order),
-            'description'     => $order->getIncrementId(),
-            'billingAddress'  => $this->getAddressLine($order->getBillingAddress()),
-            'redirectUrl'     => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
-            'webhookUrl'      => $this->mollieHelper->getWebhookUrl(),
-            'method'          => $method,
-            'issuer'          => isset($additionalData['selected_issuer']) ? $additionalData['selected_issuer'] : null,
-            'metadata'        => [
+            'amount'         => $this->mollieHelper->getOrderAmountByOrder($order),
+            'description'    => $order->getIncrementId(),
+            'billingAddress' => $this->getAddressLine($order->getBillingAddress()),
+            'redirectUrl'    => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
+            'webhookUrl'     => $this->mollieHelper->getWebhookUrl(),
+            'method'         => $method,
+            'issuer'         => isset($additionalData['selected_issuer']) ? $additionalData['selected_issuer'] : null,
+            'metadata'       => [
                 'order_id'      => $orderId,
                 'store_id'      => $order->getStoreId(),
                 'payment_token' => $paymentToken
             ],
-            'locale'          => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE)
+            'locale'         => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE)
         ];
 
         if (!$order->getIsVirtual() && $order->hasData('shipping_address_id')) {
@@ -261,9 +261,11 @@ class Payments extends AbstractModel
             if ($paymentData->method == 'banktransfer' && !$order->getEmailSent()) {
                 $this->orderSender->send($order);
                 $message = __('New order email sent');
-                $status = $this->mollieHelper->getStatusPendingBanktransfer($storeId);
+                if (!$statusPending = $this->mollieHelper->getStatusPendingBanktransfer($storeId)) {
+                    $statusPending = $order->getStatus();
+                }
                 $order->setState(Order::STATE_PENDING_PAYMENT);
-                $order->addStatusToHistory($status, $message, true);
+                $order->addStatusToHistory($statusPending, $message, true);
                 $this->orderRepository->save($order);
             }
             $msg = ['success' => true, 'status' => 'open', 'order_id' => $orderId, 'type' => $type];

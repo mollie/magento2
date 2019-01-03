@@ -315,7 +315,12 @@ class OrderLines extends AbstractModel
      */
     public function getOrderLineByItemId($itemId)
     {
-        return $this->orderLinesFactory->create()->load($itemId, 'item_id');
+        $orderLine = $this->orderLinesCollection->create()
+            ->addFieldToFilter('item_id', ['eq' => $itemId])
+            ->addFieldToFilter('line_id', ['notnull' => true])
+            ->getLastItem();
+
+        return $orderLine;
     }
 
     /**
@@ -374,8 +379,8 @@ class OrderLines extends AbstractModel
             ->addFieldToFilter('type', ['eq' => 'physical'])
             ->addExpressionFieldToSelect(
                 'open',
-                'SUM(qty_paid - qty_shipped - qty_refunded)',
-                ['qty_paid', 'qty_shipped', 'qty_refunded']
+                'SUM(qty_ordered - qty_shipped - qty_refunded)',
+                ['qty_ordered', 'qty_shipped', 'qty_refunded']
             );
         $orderLinesCollection->getSelect()->group('order_id');
 
@@ -401,8 +406,8 @@ class OrderLines extends AbstractModel
             ->addFieldToFilter('type', ['in' => ['physical', 'digital']])
             ->addExpressionFieldToSelect(
                 'open',
-                'SUM(qty_paid - qty_refunded)',
-                ['qty_paid', 'qty_refunded']
+                'SUM(qty_ordered - qty_refunded)',
+                ['qty_ordered', 'qty_refunded']
             );
         $orderLinesCollection->getSelect()->group('order_id');
 

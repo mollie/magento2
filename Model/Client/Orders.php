@@ -8,6 +8,8 @@ namespace Mollie\Payment\Model\Client;
 
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\Registry;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
@@ -61,6 +63,14 @@ class Orders extends AbstractModel
      * @var CheckoutSession
      */
     private $checkoutSession;
+    /**
+     * @var ManagerInterface
+     */
+    private $messageManager;
+    /**
+     * @var Registry
+     */
+    private $registry;
 
     /**
      * Orders constructor.
@@ -72,6 +82,8 @@ class Orders extends AbstractModel
      * @param OrderRepository   $orderRepository
      * @param InvoiceRepository $invoiceRepository
      * @param CheckoutSession   $checkoutSession
+     * @param ManagerInterface  $messageManager
+     * @param Registry          $registry
      * @param MollieHelper      $mollieHelper
      */
     public function __construct(
@@ -82,6 +94,8 @@ class Orders extends AbstractModel
         OrderRepository $orderRepository,
         InvoiceRepository $invoiceRepository,
         CheckoutSession $checkoutSession,
+        ManagerInterface $messageManager,
+        Registry $registry,
         MollieHelper $mollieHelper
     ) {
         $this->orderLines = $orderLines;
@@ -91,6 +105,8 @@ class Orders extends AbstractModel
         $this->orderRepository = $orderRepository;
         $this->invoiceRepository = $invoiceRepository;
         $this->checkoutSession = $checkoutSession;
+        $this->messageManager = $messageManager;
+        $this->registry = $registry;
         $this->mollieHelper = $mollieHelper;
     }
 
@@ -143,6 +159,10 @@ class Orders extends AbstractModel
 
         if ($method == 'banktransfer') {
             $orderData['payment']['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
+        }
+
+        if (isset($additionalData['limited_methods'])) {
+            $orderData['method'] = $additionalData['limited_methods'];
         }
 
         $this->mollieHelper->addTolog('request', $orderData);
@@ -342,9 +362,12 @@ class Orders extends AbstractModel
             if ($mollieOrder->method == 'banktransfer' && !$order->getEmailSent()) {
                 $this->orderSender->send($order);
                 $message = __('New order email sent');
-                $defaultStatusPending = $this->mollieHelper->getStatusPendingBanktransfer($storeId);
+                if (!$statusPending = $this->mollieHelper->getStatusPendingBanktransfer($storeId)) {
+                    $statusPending = $order->getStatus();
+                }
+
                 $order->setState(Order::STATE_PENDING_PAYMENT);
-                $order->addStatusToHistory($defaultStatusPending, $message, true);
+                $order->addStatusToHistory($statusPending, $message, true);
                 $this->orderRepository->save($order);
             }
             $msg = ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
@@ -588,9 +611,6 @@ class Orders extends AbstractModel
             }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            throw new LocalizedException(
-                __('Mollie API: %1', $e->getMessage())
-            );
         }
 
         return $this;
@@ -605,9 +625,21 @@ class Orders extends AbstractModel
      */
     public function createOrderRefund(Order\Creditmemo $creditmemo, Order $order)
     {
-        $refundAll = false;
         $storeId = $order->getStoreId();
         $orderId = $order->getId();
+
+        /**
+         * Skip the creation of an online refund if an offline refund is used + add notice msg.
+         * Registry set at the Mollie\Payment\Model\Mollie::refund and is set once an online refund is used.
+         */
+        if (!$this->registry->registry('online_refund')) {
+            $this->messageManager->addNoticeMessage(__(
+                    'An offline refund has been created, please make sure to also create this 
+                    refund on mollie.com/dashboard or use the online refund option.'
+                )
+            );
+            return $this;
+        }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
         if (!$order->hasShipments() && ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit')) {
@@ -656,27 +688,10 @@ class Orders extends AbstractModel
             }
         }
 
-        /**
-         * If products ordered qty equals refunded qty,
-         * complete order can be shipped incl. shipping & discount itemLines.
-         */
-        if ((int)$order->getTotalQtyOrdered() == (int)$creditmemo->getTotalQty()) {
-            $refundAll = true;
-        }
-
-        /**
-         * If refunded qty equals total paid physical products count,
-         * all remaining lines can be refunded, incl. shipping & discount itemLines.
-         */
-        $openForRefundQty = $this->orderLines->getOpenForRefundQty($orderId);
-        if ((int)$creditmemo->getTotalQty() == (int)$openForRefundQty) {
-            $refundAll = true;
-        }
-
         try {
             $mollieApi = $this->loadMollieApi($apiKey);
             $mollieOrder = $mollieApi->orders->get($transactionId);
-            if ($refundAll) {
+            if ($order->getState() == Order::STATE_CLOSED) {
                 $mollieOrder->refundAll();
             } else {
                 $orderLines = $this->orderLines->getCreditmemoOrderLines($creditmemo, $addShippingToRefund);
