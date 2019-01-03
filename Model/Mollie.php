@@ -321,17 +321,20 @@ class Mollie extends AbstractMethod
      */
     public function assignData(DataObject $data)
     {
+        $issuer = null;
         parent::assignData($data);
 
-        if (is_array($data)) {
-            $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $data['selected_issuer']);
+        if (is_array($data) && isset($data['selected_issuer'])) {
+            $issuer = $data['selected_issuer'];
         } elseif ($data instanceof \Magento\Framework\DataObject) {
             $additionalData = $data->getAdditionalData();
             if (isset($additionalData['selected_issuer'])) {
                 $issuer = $additionalData['selected_issuer'];
-                $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $issuer);
             }
         }
+
+        $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $issuer);
+
         return $this;
     }
 
@@ -396,6 +399,16 @@ class Mollie extends AbstractMethod
         $order = $payment->getOrder();
         $storeId = $order->getStoreId();
 
+        /**
+         * Order Api does not use amount to refund, but refunds per itemLine
+         * See SalesOrderCreditmemoAfter Observer for logic.
+         */
+        $checkoutType = $this->mollieHelper->getCheckoutType($order);
+        if ($checkoutType == 'order') {
+            $this->_registry->register('online_refund', true);
+            return $this;
+        }
+
         $transactionId = $order->getMollieTransactionId();
         if (empty($transactionId)) {
             $msg = ['error' => true, 'msg' => __('Transaction ID not found')];
@@ -407,15 +420,6 @@ class Mollie extends AbstractMethod
         if (empty($apiKey)) {
             $msg = ['error' => true, 'msg' => __('Api key not found')];
             $this->mollieHelper->addTolog('error', $msg);
-            return $this;
-        }
-
-        /**
-         * Order Api does not use amount to refund, but refunds per itemLine
-         * See SalesOrderCreditmemoAfter Observer for logic.
-         */
-        $checkoutType = $this->mollieHelper->getCheckoutType($order);
-        if ($checkoutType == 'order') {
             return $this;
         }
 
