@@ -89,15 +89,17 @@ class Success extends Action
                 $this->_redirect('checkout/onepage/success?utm_nooverride=1');
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
-                $this->messageManager->addNoticeMessage(__('Something went wrong.'));
+                $this->messageManager->addErrorMessage(__('Something went wrong.'));
                 $this->_redirect('checkout/cart');
             }
         } else {
             $this->checkoutSession->restoreQuote();
             if (isset($status['status']) && ($status['status'] == 'canceled')) {
                 $this->messageManager->addNoticeMessage(__('Payment canceled, please try again.'));
+            } elseif (isset($status['status']) && ($status['status'] == 'failed') && isset($status['method'])) {
+                $this->messageManager->addErrorMessage(__('Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.', $status['method']));
             } else {
-                $this->messageManager->addNoticeMessage(__('Something went wrong.'));
+                $this->messageManager->addErrorMessage(__('Something went wrong.'));
             }
 
             $this->_redirect('checkout/cart');

@@ -224,7 +224,7 @@ class OrderLines extends AbstractModel
                 throw new LocalizedException(__('Could not save Order Lines. Error: order line not found'));
             }
 
-            if ($orderLines[$key]->sku != $orderLineRow->getSku()) {
+            if ($orderLines[$key]->sku != trim($orderLineRow->getSku())) {
                 throw new LocalizedException(__('Could not save Order Lines. Error: sku\'s do not match'));
             }
 
