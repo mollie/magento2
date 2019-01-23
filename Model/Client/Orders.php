@@ -250,10 +250,11 @@ class Orders extends AbstractModel
         $lastPayment = isset($mollieOrder->_embedded->payments) ? end($mollieOrder->_embedded->payments) : null;
         $lastPaymentStatus = isset($lastPayment) ? $lastPayment->status : null;
         if ($lastPaymentStatus == 'canceled' || $lastPaymentStatus == 'failed' || $lastPaymentStatus == 'expired') {
+            $method = $order->getPayment()->getMethodInstance()->getTitle();
             $order->getPayment()->setAdditionalInformation('payment_status', $lastPaymentStatus);
             $this->orderRepository->save($order);
             $this->mollieHelper->registerCancellation($order, $status);
-            $msg = ['success' => false, 'status' => $lastPaymentStatus, 'order_id' => $orderId, 'type' => $type];
+            $msg = ['success' => false, 'status' => $lastPaymentStatus, 'order_id' => $orderId, 'type' => $type, 'method' => $method];
             $this->mollieHelper->addTolog('success', $msg);
             return $msg;
         }

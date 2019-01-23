@@ -80,3 +80,4 @@
 "Api Test","Api Test"
 "Language Payment Page","Taal Betaalpagina"
 "Let Mollie automatically detect the language or force the language from the store view.","Laat Mollie de taal automatisch detecteren of forceer een taal voor deze store-view."
+"Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Betaling van het type %1 is geweigerd. Deze beslissing is gebaseerd op de bestelling en de uitkomst van de risicobeoordeling."
