@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "1.4.6",
+  "version": "1.4.7",
   "require": {
     "mollie/mollie-api-php": "^2.1",
     "magento/framework": ">=100.1.0",
