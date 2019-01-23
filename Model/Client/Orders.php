@@ -258,10 +258,11 @@ class Orders extends AbstractModel
             return $msg;
         }
 
+        $refunded = $mollieOrder->amountRefunded !== null ? true : false;
         $order->getPayment()->setAdditionalInformation('payment_status', $status);
         $this->orderRepository->save($order);
 
-        if ($mollieOrder->isPaid() || $mollieOrder->isAuthorized()) {
+        if (($mollieOrder->isPaid() || $mollieOrder->isAuthorized()) && !$refunded) {
             $amount = $mollieOrder->amount->value;
             $currency = $mollieOrder->amount->currency;
             $orderAmount = $this->mollieHelper->getOrderAmountByOrder($order);
@@ -352,8 +353,8 @@ class Orders extends AbstractModel
             return $msg;
         }
 
-        if ($mollieOrder->isRefunded()) {
-            $msg = ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
+        if ($refunded) {
+            $msg = ['success' => true, 'status' => 'refunded', 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);
             return $msg;
         }
