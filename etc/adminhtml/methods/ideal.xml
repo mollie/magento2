@@ -45,6 +45,9 @@
             <label>Add QR-Code option in Issuer List</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_ideal/add_qr</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
         </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
                showInWebsite="1" showInStore="1">
