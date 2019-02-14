@@ -117,19 +117,24 @@ class OrderLines extends AbstractModel
              */
             $vatAmount = round($totalAmount * ($item->getTaxPercent() / (100 + $item->getTaxPercent())), 2);
 
-            $orderLines[] = [
+            $orderLine = [
                 'item_id'        => $item->getId(),
                 'type'           => $item->getProduct()->getTypeId() != 'downloadable' ? 'physical' : 'digital',
                 'name'           => preg_replace("/[^A-Za-z0-9 -]/", "", $item->getName()),
                 'quantity'       => $quantity,
                 'unitPrice'      => $this->mollieHelper->getAmountArray($currency, $unitPrice),
-                'discountAmount' => $this->mollieHelper->getAmountArray($currency, $discountAmount),
                 'totalAmount'    => $this->mollieHelper->getAmountArray($currency, $totalAmount),
                 'vatRate'        => sprintf("%.2f", $item->getTaxPercent()),
                 'vatAmount'      => $this->mollieHelper->getAmountArray($currency, $vatAmount),
                 'sku'            => $item->getProduct()->getSku(),
                 'productUrl'     => $item->getProduct()->getProductUrl()
             ];
+
+            if ($discountAmount) {
+                $orderLine['discountAmount'] = $this->mollieHelper->getAmountArray($currency, $discountAmount);
+            }
+
+            $orderLines[] = $orderLine;
         }
 
         if (!$order->getIsVirtual()) {
@@ -153,18 +158,23 @@ class OrderLines extends AbstractModel
             $vatRate = $this->getShippingVatRate($order);
             $vatAmount = round($totalAmount * ($vatRate / (100 + $vatRate)), 2);
 
-            $orderLines[] = [
+            $orderLine = [
                 'item_id'        => '',
                 'type'           => 'shipping_fee',
                 'name'           => preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription()),
                 'quantity'       => 1,
                 'unitPrice'      => $this->mollieHelper->getAmountArray($currency, $rowTotalInclTax),
                 'totalAmount'    => $this->mollieHelper->getAmountArray($currency, $totalAmount),
-                'discountAmount' => $this->mollieHelper->getAmountArray($currency, $discountAmount),
                 'vatRate'        => sprintf("%.2f", $vatRate),
                 'vatAmount'      => $this->mollieHelper->getAmountArray($currency, $vatAmount),
                 'sku'            => $order->getShippingMethod()
             ];
+
+            if ($discountAmount) {
+                $orderLine['discountAmount'] = $this->mollieHelper->getAmountArray($currency, $discountAmount);
+            }
+
+            $orderLines[] = $orderLine;
         }
 
         $this->saveOrderLines($orderLines, $order);
