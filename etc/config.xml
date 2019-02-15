@@ -160,6 +160,16 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_giftcard>
+            <mollie_methods_przelewy24>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\Przelewy24</model>
+                <title>Przelewy24</title>
+                <payment_description>{ordernumber}</payment_description>
+                <issuer_list_type>dropdown</issuer_list_type>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_przelewy24>
         </payment>
     </default>
 </config>
