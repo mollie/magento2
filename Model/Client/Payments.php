@@ -115,6 +115,10 @@ class Payments extends AbstractModel
             $paymentData['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
         }
 
+        if ($method == 'przelewy24') {
+            $paymentData['billingEmail'] = $order->getCustomerEmail();
+        }
+
         $paymentData = $this->mollieHelper->validatePaymentData($paymentData);
         $this->mollieHelper->addTolog('request', $paymentData);
         $payment = $mollieApi->payments->create($paymentData);

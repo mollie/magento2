@@ -30,7 +30,8 @@ define(
             {type: 'mollie_methods_eps', component: defaultComponent},
             {type: 'mollie_methods_klarnapaylater', component: defaultComponent},
             {type: 'mollie_methods_klarnasliceit', component: defaultComponent},
-            {type: 'mollie_methods_giftcard', component: giftcardComponent}
+            {type: 'mollie_methods_giftcard', component: giftcardComponent},
+            {type: 'mollie_methods_przelewy24', component: defaultComponent}
         ];
         $.each(methods, function (k, method) {
             if (window.checkoutConfig.payment.isActive[method['type']]) {
