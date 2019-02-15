@@ -338,7 +338,7 @@ class OrderLines extends AbstractModel
             $orderItemId = $item->getOrderItemId();
             $lineId = $this->getOrderLineByItemId($orderItemId)->getLineId();
             if ($lineId) {
-                $orderLines[] = ['id' => $lineId, 'quantity' => $item->getQty()];
+                $orderLines[] = ['id' => $lineId, 'quantity' => round($item->getQty())];
             }
         }
 
