@@ -74,6 +74,7 @@ class General extends AbstractHelper
     const XML_PATH_PAYMENTLINK_ADD_MESSAGE = 'payment/mollie_methods_paymentlink/add_message';
     const XML_PATH_PAYMENTLINK_MESSAGE = 'payment/mollie_methods_paymentlink/message';
     const XML_PATH_API_METHOD = 'payment/%method%/method';
+    const XML_PATH_PAYMENT_DESCRIPTION = 'payment/%method%/payment_description';
     const XPATH_ISSUER_LIST_TYPE = 'payment/%method%/issuer_list_type';
 
     /**
@@ -814,5 +815,33 @@ class General extends AbstractHelper
                 $this->couponUsage->updateCustomerCouponTimesUsed($customerId, $this->coupon->getId(), false);
             }
         }
+    }
+
+    /**
+     * @param $method
+     * @param $orderNumber
+     * @param int $storeId
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getPaymentDescription($method, $orderNumber, $storeId = 0)
+    {
+        $xpath = str_replace('%method%', $method, self::XML_PATH_PAYMENT_DESCRIPTION);
+        $description = $this->getStoreConfig($xpath);
+
+        if (!trim($description)) {
+            $description = '{ordernumber}';
+        }
+
+        $replacements = [
+            '{ordernumber}' => $orderNumber,
+            '{storename}' => $this->storeManager->getStore($storeId)->getName(),
+        ];
+
+        return str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $description
+        );
     }
 }
