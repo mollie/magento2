@@ -18,16 +18,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_description" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Description</label>
-            <config_path>payment/mollie_methods_giftcard/payment_description</config_path>
-            <comment><![CDATA[The description to be used for this transaction. These variables are available:<br><br>
-            <strong>{ordernumber}</strong>: The order number for this transaction<br>
-            <strong>{storename}</strong>: The name of the store<br><br>
-            (Note: This only works when the method is set to Payments API)
-            ]]></comment>
-        </field>
-        <field id="method" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1"
+        <field id="method" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Method</label>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\Method</source_model>
@@ -38,6 +29,19 @@
             <comment><![CDATA[<strong>Payment API</strong><br>Use the Payment API Platform for the transactions.<br><br>
             <strong>Order API</strong><br>Use the new Order API Platform and get additional insights in the orders.
             Read <a href="https://docs.mollie.com/orders/why-use-orders" target="_blank" >more.</a>]]></comment>
+        </field>
+        <field id="payment_description" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Description</label>
+            <config_path>payment/mollie_methods_giftcard/payment_description</config_path>
+            <comment><![CDATA[The description to be used for this transaction. These variables are available:<br><br>
+            <strong>{ordernumber}</strong>: The order number for this transaction<br>
+            <strong>{storename}</strong>: The name of the store<br><br>
+            (Note: This only works when the method is set to Payments API)
+            ]]></comment>
+            <depends>
+                <field id="method">payment</field>
+                <field id="active">1</field>
+            </depends>
         </field>
         <field id="issuer_list_type" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1"
                showInStore="1">
