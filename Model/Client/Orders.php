@@ -161,10 +161,6 @@ class Orders extends AbstractModel
             $orderData['payment']['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
         }
 
-        if ($method == 'przelewy24') {
-            $orderData['payment']['billingEmail'] = $order->getCustomerEmail();
-        }
-
         if (isset($additionalData['limited_methods'])) {
             $orderData['method'] = $additionalData['limited_methods'];
         }
