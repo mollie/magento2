@@ -826,7 +826,7 @@ class General extends AbstractHelper
      */
     public function getPaymentDescription($method, $orderNumber, $storeId = 0)
     {
-        $xpath = str_replace('%method%', $method, self::XML_PATH_PAYMENT_DESCRIPTION);
+        $xpath = str_replace('%method%', 'mollie_methods_' . $method, self::XML_PATH_PAYMENT_DESCRIPTION);
         $description = $this->getStoreConfig($xpath);
 
         if (!trim($description)) {
