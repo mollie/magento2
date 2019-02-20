@@ -30,6 +30,19 @@
             <strong>Order API</strong><br>Use the new Order API Platform and get additional insights in the orders.
             Read <a href="https://docs.mollie.com/orders/why-use-orders" target="_blank" >more.</a>]]></comment>
         </field>
+        <field id="payment_description" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Description</label>
+            <config_path>payment/mollie_methods_sofort/payment_description</config_path>
+            <comment><![CDATA[The description to be used for this transaction. These variables are available:<br><br>
+            <strong>{ordernumber}</strong>: The order number for this transaction<br>
+            <strong>{storename}</strong>: The name of the store<br><br>
+            (Note: This only works when the method is set to Payments API)
+            ]]></comment>
+            <depends>
+                <field id="method">payment</field>
+                <field id="active">1</field>
+            </depends>
+        </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>

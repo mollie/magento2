@@ -18,7 +18,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="add_message" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1"
+        <field id="add_message" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Add Link to Payment Details</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -27,7 +27,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="message" translate="label" type="textarea" sortOrder="4" showInDefault="1" showInWebsite="1"
+        <field id="message" translate="label" type="textarea" sortOrder="5" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Message / Link</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>

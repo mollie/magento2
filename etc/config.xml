@@ -19,6 +19,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Bancontact</model>
                 <title>Bancontact</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -27,6 +28,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Banktransfer</model>
                 <title>Banktransfer</title>
+                <payment_description>{ordernumber}</payment_description>
                 <order_status_pending>pending_payment</order_status_pending>
                 <due_days>14</due_days>
                 <payment_action>order</payment_action>
@@ -37,6 +39,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Belfius</model>
                 <title>Belfius</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -45,6 +48,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Bitcoin</model>
                 <title>Bitcoin</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -53,6 +57,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Creditcard</model>
                 <title>Credit Cards</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -61,6 +66,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Ideal</model>
                 <title>iDeal</title>
+                <payment_description>{ordernumber}</payment_description>
                 <issuer_list_type>dropdown</issuer_list_type>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
@@ -70,6 +76,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Kbc</model>
                 <title>KBC/CBC</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <issuer_list_type>none</issuer_list_type>
                 <allowspecific>0</allowspecific>
@@ -79,6 +86,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Paypal</model>
                 <title>Paypal</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -87,6 +95,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Paysafecard</model>
                 <title>Paysafecard</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -95,6 +104,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Sofort</model>
                 <title>Sofort</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -103,6 +113,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Inghomepay</model>
                 <title>ING Homepay</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -111,6 +122,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Giropay</model>
                 <title>Giropay</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -119,6 +131,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Eps</model>
                 <title>EPS</title>
+                <payment_description>{ordernumber}</payment_description>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -127,6 +140,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Klarnapaylater</model>
                 <title>Klarna Pay Later</title>
+                <payment_description>{ordernumber}</payment_description>
                 <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
@@ -136,6 +150,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Klarnasliceit</model>
                 <title>Klarna Slice It</title>
+                <payment_description>{ordernumber}</payment_description>
                 <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
@@ -145,6 +160,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Paymentlink</model>
                 <title>Mollie: Payment Link</title>
+                <payment_description>{ordernumber}</payment_description>
                 <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
@@ -155,6 +171,7 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Giftcard</model>
                 <title>Giftcard</title>
+                <payment_description>{ordernumber}</payment_description>
                 <issuer_list_type>dropdown</issuer_list_type>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
