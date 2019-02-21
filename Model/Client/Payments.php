@@ -92,7 +92,7 @@ class Payments extends AbstractModel
         $method = $this->mollieHelper->getMethodCode($order);
         $paymentData = [
             'amount'         => $this->mollieHelper->getOrderAmountByOrder($order),
-            'description'    => $order->getIncrementId(),
+            'description'    => $this->mollieHelper->getPaymentDescription($method, $order->getIncrementId()),
             'billingAddress' => $this->getAddressLine($order->getBillingAddress()),
             'redirectUrl'    => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
             'webhookUrl'     => $this->mollieHelper->getWebhookUrl(),
@@ -113,6 +113,10 @@ class Payments extends AbstractModel
         if ($method == 'banktransfer') {
             $paymentData['billingEmail'] = $order->getCustomerEmail();
             $paymentData['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
+        }
+
+        if ($method == 'przelewy24') {
+            $paymentData['billingEmail'] = $order->getCustomerEmail();
         }
 
         $paymentData = $this->mollieHelper->validatePaymentData($paymentData);

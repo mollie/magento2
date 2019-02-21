@@ -31,7 +31,7 @@ class Method implements ArrayInterface
         if (!$this->options) {
             $this->options = [
                 [
-                    'value' => '',
+                    'value' => 'payment',
                     'label' => __('Payments API')
                 ],
                 [
