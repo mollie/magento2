@@ -49,6 +49,8 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 
 - Paysafecard
 
+- Przelewy24
+
 - SEPA bank transfer
 
 - Klarna
@@ -61,4 +63,4 @@ If you experience problems with the extension installation, setup or whenever yo
 
 ## License ##
 [BSD (Berkeley Software Distribution) License](http://www.opensource.org/licenses/bsd-license.php).
-Copyright (c) 2011-2018, Mollie B.V.
+Copyright (c) 2011-2019, Mollie B.V.
