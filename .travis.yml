@@ -27,7 +27,5 @@ deploy:
   skip_cleanup: true
   file: Mollie_Payment.zip
   on:
-    branch: feature/meqp-codesniffer
-    condition:  MEQP_CHECK=true
-#  on:
-#    tags: true
+    condition: MEQP_CHECK=true
+    tags: true
