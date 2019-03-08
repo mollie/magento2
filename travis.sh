@@ -1,6 +1,8 @@
 set -e
 set -x
 
+echo "TAG: $TRAVIS_TAG"
+
 if [ "$MEQP_CHECK" = "true" ];
 then
     composer global config http-basic.repo.magento.com $MAGENTO_USERNAME $MAGENTO_PASSWORD
