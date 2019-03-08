@@ -10,16 +10,10 @@ then
 
     echo "vendor"
     ls -al vendor
-    echo "vendor/squizlabs"
-    ls -al vendor/squizlabs
-    echo "vendor/squizlabs/php_codesniffer"
-    ls -al vendor/squizlabs/php_codesniffer
-    echo "vendor/squizlabs/php_codesniffer/scripts"
-    ls -al vendor/squizlabs/php_codesniffer/scripts
-    echo "vendor/squizlabs/php_codesniffer/scripts/phpcs"
-    ls -al vendor/squizlabs/php_codesniffer/scripts/phpcs
+    echo "vendor/bin"
+    ls -al vendor/bin
 
 
-    vendor/squizlabs/php_codesniffer/scripts/phpcs --config-set installed_paths vendor/magento/marketplace-eqp
+    vendor/bin/phpcs --config-set installed_paths vendor/magento/marketplace-eqp
     vendor/squizlabs/php_codesniffer/scripts/phpcs -n --standard="MEQP2" ./;
 fi
