@@ -7,7 +7,7 @@ php:
 - 7.2
 
 env:
-  - $TEST_SUITE=marketplaceeqp
+  - TEST_SUITE=marketplaceeqp
 
 sudo: false
 
