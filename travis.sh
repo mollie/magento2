@@ -15,5 +15,5 @@ then
 
 
     vendor/bin/phpcs --config-set installed_paths vendor/magento/marketplace-eqp
-    vendor/squizlabs/php_codesniffer/scripts/phpcs -n --standard="MEQP2" ./;
+    vendor/bin/phpcs -n --standard="MEQP2" ./;
 fi
