@@ -17,4 +17,4 @@ git archive --format=zip --output=Mollie_Mpm.zip $TRAVIS_COMMIT
 
 git clone https://github.com/magento/marketplace-tools.git
 
-php marketplace-tools/validate_m2_package.php Mollie_Mpm.zip
+php marketplace-tools/validate_m2_package.php -d Mollie_Mpm.zip
