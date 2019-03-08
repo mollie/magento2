@@ -1,17 +1,30 @@
 language: php
 
-php:
-- 5.6
-- 7.0
-- 7.1
-- 7.2
-
-sudo: false
+matrix:
+  include:
+    - php: 5.6
+    - php: 7.0
+    - php: 7.1
+    - php: 7.2
+      env: MEQP_CHECK=true TOOLS_CHECK=true
+    - php: 7.3
 
 cache:
   directories:
-    - $HOME/.composer/cache
+    - "$HOME/.composer"
+    - "$HOME/.cache/composer"
+    - "$HOME/.composer/cache"
 
 script:
-- composer validate
-- find . -name '*.php' | xargs -n 1 -P4 php -l
+  - composer validate
+  - find . -name '*.php' | xargs -n 1 -P4 php -l
+  - sh travis.sh
+
+deploy:
+  provider: releases
+  api_key: "TODO: Add the api key"
+  skip_cleanup: true
+  file: Mollie_Payment.zip
+  on:
+    condition: MEQP_CHECK=true
+    tags: true
