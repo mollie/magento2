@@ -28,5 +28,6 @@ deploy:
   file: Mollie_Payment.zip
   on:
     branch: feature/meqp-codesniffer
+    condition:  MEQP_CHECK=true
 #  on:
 #    tags: true
