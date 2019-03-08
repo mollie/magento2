@@ -13,6 +13,8 @@ sudo: false
 
 cache:
   directories:
+    - $HOME/.composer
+    - $HOME/.cache/composer
     - $HOME/.composer/cache
 
 script:
