@@ -9,15 +9,22 @@ matrix:
       env: MEQP_CHECK=true TOOLS_CHECK=true
     - php: 7.3
 
-sudo: false
-
 cache:
   directories:
-    - $HOME/.composer
-    - $HOME/.cache/composer
-    - $HOME/.composer/cache
+    - "$HOME/.composer"
+    - "$HOME/.cache/composer"
+    - "$HOME/.composer/cache"
 
 script:
   - composer validate
   - find . -name '*.php' | xargs -n 1 -P4 php -l
   - sh travis.sh
+
+deploy:
+  provider: releases
+  api_key:
+    secure: f/UayYB2ywfk+ajYh5xHz/ru072N1LKsfVqDkv2VBQSwoccui1ce2N/GVEP+jxKcNL7NbBKIl4Js8lOO6iBIVJ8A8Q7JzmQfWNaBp0Qv4PHeED9Vkzc/O63YWsrNmmwMRZOabFx8+CMNulolLcf6nVj+rGCREj11keRVvH20b1w6t17GG4ZN6Uska5r7yJvELMJ9tl10T3fiPKpr4fktedI8ruB63VH5LaqtFRtHEoKKQEdbBCtkJeBY+Ieq378FTXoAbXiqKAvEygtDLaQ7XRhb9PMEkwD1w73Mp1ThP7qP4g0l932/xykMQSAkoj2s/tdvW982YitRvchvp2Raa5mPSHKFZjuJlOqT90hSN89DXf21NfZGtMbD77VKv7a4eModRr0TSRUC6z17trQsniHntQD47hLtjZQr/RU+wKyc0lOepQ4YjQH26QI1Ue1XHMEEMiRdPBu56T6QljhmrU/SPheyt73DsrQP1THr8XxRtcgAHgZLXFtrUfS/77/b72SkiQ6aAckamHlqVp+wsHKGx0oYWW0MPZBg8HYcKYX/957PxXwn8ITE+tn0a4XjegJvqvDrtOt/97o6cZdka2HS69RHp0XRqululDhdT82bj03dVuc8YVm2SUAixpD4eWdXwtAPH3sYSfcyKVdtJd03ppcjKHatX2AdVKa4+gk=
+  skip_cleanup: true
+  file: Mollie_Payment.zip
+#  on:
+#    tags: true
