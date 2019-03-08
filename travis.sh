@@ -8,5 +8,5 @@ then
     composer require --prefer-source --no-interaction squizlabs/php_codesniffer magento/marketplace-eqp
 
     vendor/bin/phpcs --config-set installed_paths vendor/magento/marketplace-eqp
-    vendor/bin/phpcs -p -n --standard="MEQP2" ./
+    vendor/bin/phpcs -p --ignore=*/vendor/* -n --standard="MEQP2" ./
 fi
