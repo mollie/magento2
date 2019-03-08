@@ -7,13 +7,6 @@ then
     composer config repositories.repo-name composer https://repo.magento.com
     composer require --prefer-source --no-interaction squizlabs/php_codesniffer magento/marketplace-eqp
 
-
-    echo "vendor"
-    ls -al vendor
-    echo "vendor/bin"
-    ls -al vendor/bin
-
-
     vendor/bin/phpcs --config-set installed_paths vendor/magento/marketplace-eqp
-    vendor/bin/phpcs -n --standard="MEQP2" ./;
+    vendor/bin/phpcs -p -n --standard="MEQP2" ./
 fi
