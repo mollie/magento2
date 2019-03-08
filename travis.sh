@@ -1,4 +1,5 @@
 set -e
+set -x
 
 if [ "$TEST_SUITE" = "marketplaceeqp" ];
 then
