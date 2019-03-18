@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Model;
 
+use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -128,6 +129,7 @@ class Mollie extends AbstractMethod
      * @param AbstractResource|null      $resource
      * @param AbstractDb|null            $resourceCollection
      * @param array                      $data
+     * @param DirectoryHelper|null       $directory
      */
     public function __construct(
         Context $context,
@@ -147,7 +149,8 @@ class Mollie extends AbstractMethod
         AssetRepository $assetRepository,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
+        DirectoryHelper $directory = null
     ) {
         parent::__construct(
             $context,
@@ -159,7 +162,8 @@ class Mollie extends AbstractMethod
             $logger,
             $resource,
             $resourceCollection,
-            $data
+            $data,
+            $directory
         );
         $this->paymentsApi = $paymentsApi;
         $this->ordersApi = $ordersApi;
