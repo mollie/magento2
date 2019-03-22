@@ -40,7 +40,7 @@ deploy:
   provider: releases
   api_key: $GITHUB_API_KEY
   skip_cleanup: true
-  file: Mollie_Payment-$TRAVIS_TAG.zip
+  file: Mollie_Payment-${TRAVIS_TAG:1}.zip
   on:
     condition: TOOLS_CHECK=true
     tags: true

@@ -28,10 +28,18 @@ fi
 
 if [ "$TOOLS_CHECK" = "true" ];
 then
+    FILENAME="Mollie_Payment.zip"
+
+    if [ ! -z "$TRAVIS_TAG" ];
+    then
+        echo $TRAVIS_TAG;
+        FILENAME="Mollie_Payment-${TRAVIS_TAG:1}.zip"
+    fi
+
     # Create the package
-    git archive --format=zip --output=Mollie_Payment-$TRAVIS_TAG.zip $TRAVIS_COMMIT
+    git archive --format=zip --output=$FILENAME $TRAVIS_COMMIT
 
     git clone https://github.com/magento/marketplace-tools.git
 
-    php marketplace-tools/validate_m2_package.php -d Mollie_Payment-$TRAVIS_TAG.zip
+    php marketplace-tools/validate_m2_package.php -d $FILENAME
 fi
