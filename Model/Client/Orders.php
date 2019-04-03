@@ -18,6 +18,7 @@ use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
+use Mollie\Api\Resources\PaymentFactory;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
 
@@ -71,6 +72,10 @@ class Orders extends AbstractModel
      * @var Registry
      */
     private $registry;
+    /**
+     * @var PaymentFactory
+     */
+    private $paymentFactory;
 
     /**
      * Orders constructor.
@@ -96,7 +101,8 @@ class Orders extends AbstractModel
         CheckoutSession $checkoutSession,
         ManagerInterface $messageManager,
         Registry $registry,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        PaymentFactory $paymentFactory
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -108,6 +114,7 @@ class Orders extends AbstractModel
         $this->messageManager = $messageManager;
         $this->registry = $registry;
         $this->mollieHelper = $mollieHelper;
+        $this->paymentFactory = $paymentFactory;
     }
 
     /**
@@ -635,7 +642,8 @@ class Orders extends AbstractModel
          * Registry set at the Mollie\Payment\Model\Mollie::refund and is set once an online refund is used.
          */
         if (!$this->registry->registry('online_refund')) {
-            $this->messageManager->addNoticeMessage(__(
+            $this->messageManager->addNoticeMessage(
+                __(
                     'An offline refund has been created, please make sure to also create this 
                     refund on mollie.com/dashboard or use the online refund option.'
                 )
@@ -663,14 +671,38 @@ class Orders extends AbstractModel
             return $this;
         }
 
+        try {
+            $mollieApi = $this->loadMollieApi($apiKey);
+        } catch (\Exception $exception) {
+            $this->mollieHelper->addTolog('error', $exception->getMessage());
+            throw new LocalizedException(
+                __('Mollie API: %1', $exception->getMessage())
+            );
+        }
+
         /**
          * Check for creditmemo adjusment fee's, positive and negative.
-         * Throw exception if these are set, as this is not supportef by the orders api.
          */
-        if ($creditmemo->getAdjustmentPositive() > 0 || $creditmemo->getAdjustmentNegative() > 0) {
-            $msg = __('Creating an online refund with adjustment fee\'s is not supported by Mollie');
-            $this->mollieHelper->addTolog('error', $msg);
-            throw new LocalizedException($msg);
+        if ($creditmemo->getAdjustment() !== 0.0) {
+            $mollieOrder = $mollieApi->orders->get($order->getMollieTransactionId(), ['embed' => 'payments']);
+            $payments = $mollieOrder->payments();
+
+            try {
+                $payment = $this->paymentFactory->create([$mollieApi]);
+                $payment->id = current($payments)->id;
+
+                $mollieApi->payments->refund($payment, [
+                    'amount' => [
+                        'currency' => $order->getOrderCurrencyCode(),
+                        'value' => money_format('%.2n', $creditmemo->getAdjustment()),
+                    ]
+                ]);
+            } catch (\Exception $exception) {
+                $this->mollieHelper->addTolog('error', $exception->getMessage());
+                throw new LocalizedException(
+                    __('Mollie API: %1', $exception->getMessage())
+                );
+            }
         }
 
         /**
@@ -690,8 +722,11 @@ class Orders extends AbstractModel
             }
         }
 
+        if (!$creditmemo->getAllItems()) {
+            return $this;
+        }
+
         try {
-            $mollieApi = $this->loadMollieApi($apiKey);
             $mollieOrder = $mollieApi->orders->get($transactionId);
             if ($order->getState() == Order::STATE_CLOSED) {
                 $mollieOrder->refundAll();
