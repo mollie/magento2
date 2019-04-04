@@ -694,7 +694,10 @@ class Orders extends AbstractModel
                 $mollieApi->payments->refund($payment, [
                     'amount' => [
                         'currency' => $order->getOrderCurrencyCode(),
-                        'value' => money_format('%.2n', $creditmemo->getAdjustment()),
+                        'value' => $this->mollieHelper->formatCurrencyValue(
+                            $creditmemo->getAdjustment(),
+                            $order->getOrderCurrencyCode()
+                        ),
                     ]
                 ]);
             } catch (\Exception $exception) {
