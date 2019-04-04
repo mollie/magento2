@@ -90,6 +90,7 @@ class Orders extends AbstractModel
      * @param ManagerInterface  $messageManager
      * @param Registry          $registry
      * @param MollieHelper      $mollieHelper
+     * @param PaymentFactory    $paymentFactory
      */
     public function __construct(
         OrderLines $orderLines,
@@ -681,11 +682,11 @@ class Orders extends AbstractModel
         }
 
         /**
-         * Check for creditmemo adjusment fee's, positive and negative.
+         * Check for creditmemo adjustment fee's, positive and negative.
          */
         if ($creditmemo->getAdjustment() !== 0.0) {
             $mollieOrder = $mollieApi->orders->get($order->getMollieTransactionId(), ['embed' => 'payments']);
-            $payments = $mollieOrder->payments();
+            $payments = $mollieOrder->_embedded->payments;
 
             try {
                 $payment = $this->paymentFactory->create([$mollieApi]);
