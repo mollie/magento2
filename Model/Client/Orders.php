@@ -181,7 +181,7 @@ class Orders extends AbstractModel
     {
         return [
             'organizationName' => $address->getCompany(),
-            'title'            => $address->getPrefix(),
+            'title'            => trim($address->getPrefix()),
             'givenName'        => $address->getFirstname(),
             'familyName'       => $address->getLastname(),
             'email'            => $address->getEmail(),
