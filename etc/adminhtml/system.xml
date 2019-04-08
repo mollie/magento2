@@ -140,7 +140,10 @@
                            showInDefault="1" showInWebsite="0" showInStore="1">
                         <label>Compatibility</label>
                         <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-                        <comment>Check the Mollie extension technical requirements by running the self test. In case of a warning or error please contact your Developer or Hosting Company.</comment>
+                        <comment><![CDATA[Run the selftest to check if the Mollie extension meets the technical requirements.
+                        In case of a warning or error please contact your Developer or Hosting Company.
+                        Specific information about the errors and warnings can be found
+                        <a href="https://github.com/mollie/magento2/wiki/compatability" target="_blank">here</a>.]]></comment>
                     </field>
                     <field id="compatibility_checker" translate="label" type="button" sortOrder="91" showInDefault="1"
                            showInWebsite="0" showInStore="1">
