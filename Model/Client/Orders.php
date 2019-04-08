@@ -261,7 +261,7 @@ class Orders extends AbstractModel
             $method = $order->getPayment()->getMethodInstance()->getTitle();
             $order->getPayment()->setAdditionalInformation('payment_status', $lastPaymentStatus);
             $this->orderRepository->save($order);
-            $this->mollieHelper->registerCancellation($order, $status);
+            $this->mollieHelper->registerCancellation($order, $lastPaymentStatus);
             $msg = ['success' => false, 'status' => $lastPaymentStatus, 'order_id' => $orderId, 'type' => $type, 'method' => $method];
             $this->mollieHelper->addTolog('success', $msg);
             return $msg;
