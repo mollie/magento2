@@ -186,6 +186,15 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_przelewy24>
+            <mollie_methods_applepay>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\ApplePay</model>
+                <title>Apple Pay</title>
+                <payment_description>{ordernumber}</payment_description>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_applepay>
         </payment>
     </default>
 </config>

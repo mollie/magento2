@@ -24,4 +24,5 @@
     <include path="Mollie_Payment::methods/paymentlink.xml"/>
     <include path="Mollie_Payment::methods/giftcard.xml"/>
     <include path="Mollie_Payment::methods/przelewy24.xml"/>
+    <include path="Mollie_Payment::methods/applepay.xml"/>
 </include>

@@ -33,6 +33,17 @@ define(
             {type: 'mollie_methods_giftcard', component: giftcardComponent},
             {type: 'mollie_methods_przelewy24', component: defaultComponent}
         ];
+
+        /**
+         * Only add Apple Pay if the current client supports Apple Pay.
+         */
+        if (window.ApplePaySession && window.ApplePaySession.canMakePayments()) {
+            methods.push({
+                type: 'mollie_methods_applepay',
+                component: defaultComponent
+            });
+        }
+
         $.each(methods, function (k, method) {
             if (window.checkoutConfig.payment.isActive[method['type']]) {
                 rendererList.push(method);

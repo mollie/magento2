@@ -44,6 +44,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         'mollie_methods_klarnasliceit',
         'mollie_methods_giftcard',
         'mollie_methods_przelewy24',
+        'mollie_methods_applepay',
     ];
     /**
      * @var array
@@ -207,9 +208,11 @@ class MollieConfigProvider implements ConfigProviderInterface
         try {
             $quote = $this->checkoutSession->getQuote();
             $amount = $this->mollieHelper->getOrderAmountByQuote($quote);
-            $params = ["amount[value]"    => $amount['value'],
-                       "amount[currency]" => $amount['currency'],
-                       "resource"         => "orders"
+            $params = [
+                'amount[value]' => $amount['value'],
+                'amount[currency]' => $amount['currency'],
+                'resource' => 'orders',
+                'includeWallets' => 'applepay',
             ];
             $apiMethods = $mollieApi->methods->all($params);
 
