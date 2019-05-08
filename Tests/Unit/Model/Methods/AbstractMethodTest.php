@@ -7,7 +7,6 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Method;
 use Mollie\Api\Endpoints\MethodEndpoint;
 use Mollie\Api\Resources\MethodCollection;
-use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\MollieConfigProvider;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -53,7 +52,7 @@ abstract class AbstractMethodTest extends TestCase
         $reflection = new \ReflectionClass($this->instance);
         $instance = $reflection->newInstanceWithoutConstructor();
 
-        $this->assertEquals($this->code, $instance->getCode());
+        $this->assertEquals('mollie_methods_' . $this->code, $instance->getCode());
     }
 
     public function testIsListedAsActiveMethod()
@@ -72,14 +71,19 @@ abstract class AbstractMethodTest extends TestCase
 
         $methods = $helper->getAllActiveMethods(1);
 
-        $this->assertArrayHasKey($this->code, $methods);
+        if ($this->code == 'paymentlink') {
+            $this->assertArrayNotHasKey('mollie_methods_' . $this->code, $methods);
+            return;
+        }
+
+        $this->assertArrayHasKey('mollie_methods_' . $this->code, $methods);
     }
 
     public function testThatTheMethodIsActive()
     {
         /** @var Method $method */
         $method = $this->objectManager->getObject(Method::class);
-        $method->id = 'applepay';
+        $method->id = $this->code;
         $method->image = new \stdClass;
         $method->image->size2x = 'http://www.example.com/image.png';
 
@@ -95,6 +99,7 @@ abstract class AbstractMethodTest extends TestCase
         $instance = $this->objectManager->getObject(MollieConfigProvider::class);
         $methods = $instance->getActiveMethods($mollieApiClient);
 
-        $this->assertArrayHasKey($this->code, $methods);
+        $this->assertArrayHasKey('mollie_methods_' . $this->code, $methods);
+        $this->assertEquals($method->image->size2x, $methods['mollie_methods_' . $this->code]['image']);
     }
 }
