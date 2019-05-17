@@ -9,7 +9,7 @@
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_applepay/active</config_path>
-            <comment><![CDATA[<strong>Please note: This payment method is only visible when the users device has Apple Pay enabled.</strong>]]></comment>
+            <comment><![CDATA[<strong>Please note: This payment method is only visible when the device of the user Apple Pay has enabled.</strong>]]></comment>
         </field>
         <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
                showInStore="1">
