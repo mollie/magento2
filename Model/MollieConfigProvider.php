@@ -214,7 +214,7 @@ class MollieConfigProvider implements ConfigProviderInterface
                 'resource' => 'orders',
                 'includeWallets' => 'applepay',
             ];
-            $apiMethods = $mollieApi->methods->all($params);
+            $apiMethods = $mollieApi->methods->allActive($params);
 
             foreach ($apiMethods as $method) {
                 $methodId = 'mollie_methods_' . $method->id;
