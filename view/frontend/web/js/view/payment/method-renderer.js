@@ -37,7 +37,7 @@ define(
         /**
          * Only add Apple Pay if the current client supports Apple Pay.
          */
-        if (window.ApplePaySession && window.ApplePaySession.canMakePayments()) {
+        if (window.ApplePaySession) {
             methods.push({
                 type: 'mollie_methods_applepay',
                 component: defaultComponent
