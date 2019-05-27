@@ -82,4 +82,4 @@
 "Let Mollie automatically detect the language or force the language from the store view.","Let Mollie automatically detect the language or force a language for your store view."
 "Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment."
 "Warning: we recommend to use a unique payment status for pending Banktransfer payments","Warning: we recommend to use a unique payment status for pending Banktransfer payments"
-"Please note: This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS.","Please note: This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS."
+"<strong>Please note:</strong> This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS.","<strong>Please note:</strong> This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS."
