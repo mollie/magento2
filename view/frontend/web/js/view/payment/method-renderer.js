@@ -34,10 +34,20 @@ define(
             {type: 'mollie_methods_przelewy24', component: defaultComponent}
         ];
 
+        function canUseApplePay()
+        {
+            try {
+                return window.ApplePaySession && window.ApplePaySession.canMakePayments();
+            } catch (error) {
+                console.warn('Error when trying to check Apple Pay:', error);
+                return false;
+            }
+        }
+
         /**
          * Only add Apple Pay if the current client supports Apple Pay.
          */
-        if (window.ApplePaySession) {
+        if (canUseApplePay()) {
             methods.push({
                 type: 'mollie_methods_applepay',
                 component: defaultComponent
