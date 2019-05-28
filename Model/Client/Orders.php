@@ -19,9 +19,9 @@ use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
-use Mollie\Api\Resources\PaymentFactory;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 
 /**
  * Class Orders
@@ -74,24 +74,24 @@ class Orders extends AbstractModel
      */
     private $registry;
     /**
-     * @var PaymentFactory
+     * @var ProcessAdjustmentFee
      */
-    private $paymentFactory;
+    private $adjustmentFee;
 
     /**
      * Orders constructor.
      *
-     * @param OrderLines        $orderLines
-     * @param OrderSender       $orderSender
-     * @param InvoiceSender     $invoiceSender
-     * @param InvoiceService    $invoiceService
-     * @param OrderRepository   $orderRepository
-     * @param InvoiceRepository $invoiceRepository
-     * @param CheckoutSession   $checkoutSession
-     * @param ManagerInterface  $messageManager
-     * @param Registry          $registry
-     * @param MollieHelper      $mollieHelper
-     * @param PaymentFactory    $paymentFactory
+     * @param OrderLines            $orderLines
+     * @param OrderSender           $orderSender
+     * @param InvoiceSender         $invoiceSender
+     * @param InvoiceService        $invoiceService
+     * @param OrderRepository       $orderRepository
+     * @param InvoiceRepository     $invoiceRepository
+     * @param CheckoutSession       $checkoutSession
+     * @param ManagerInterface      $messageManager
+     * @param Registry              $registry
+     * @param MollieHelper          $mollieHelper
+     * @param ProcessAdjustmentFee  $adjustmentFee
      */
     public function __construct(
         OrderLines $orderLines,
@@ -104,7 +104,7 @@ class Orders extends AbstractModel
         ManagerInterface $messageManager,
         Registry $registry,
         MollieHelper $mollieHelper,
-        PaymentFactory $paymentFactory
+        ProcessAdjustmentFee $adjustmentFee
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -116,7 +116,7 @@ class Orders extends AbstractModel
         $this->messageManager = $messageManager;
         $this->registry = $registry;
         $this->mollieHelper = $mollieHelper;
-        $this->paymentFactory = $paymentFactory;
+        $this->adjustmentFee = $adjustmentFee;
     }
 
     /**
@@ -692,30 +692,7 @@ class Orders extends AbstractModel
         /**
          * Check for creditmemo adjustment fee's, positive and negative.
          */
-        if ($creditmemo->getAdjustment() !== 0.0) {
-            $mollieOrder = $mollieApi->orders->get($order->getMollieTransactionId(), ['embed' => 'payments']);
-            $payments = $mollieOrder->_embedded->payments;
-
-            try {
-                $payment = $this->paymentFactory->create([$mollieApi]);
-                $payment->id = current($payments)->id;
-
-                $mollieApi->payments->refund($payment, [
-                    'amount' => [
-                        'currency' => $order->getOrderCurrencyCode(),
-                        'value' => $this->mollieHelper->formatCurrencyValue(
-                            $creditmemo->getAdjustment(),
-                            $order->getOrderCurrencyCode()
-                        ),
-                    ]
-                ]);
-            } catch (\Exception $exception) {
-                $this->mollieHelper->addTolog('error', $exception->getMessage());
-                throw new LocalizedException(
-                    __('Mollie API: %1', $exception->getMessage())
-                );
-            }
-        }
+        $this->adjustmentFee->handle($mollieApi, $order, $creditmemo);
 
         /**
          * Check if Shipping Fee needs to be refunded.
@@ -734,7 +711,7 @@ class Orders extends AbstractModel
             }
         }
 
-        if (!$creditmemo->getAllItems()) {
+        if (!$creditmemo->getAllItems() || $this->adjustmentFee->doNotRefundInMollie()) {
             return $this;
         }
 
