@@ -44,15 +44,6 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_belfius>
-            <mollie_methods_bitcoin>
-                <active>0</active>
-                <model>Mollie\Payment\Model\Methods\Bitcoin</model>
-                <title>Bitcoin</title>
-                <payment_description>{ordernumber}</payment_description>
-                <payment_action>order</payment_action>
-                <allowspecific>0</allowspecific>
-                <instructions/>
-            </mollie_methods_bitcoin>
             <mollie_methods_creditcard>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Creditcard</model>

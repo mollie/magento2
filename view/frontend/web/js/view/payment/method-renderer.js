@@ -18,7 +18,6 @@ define(
             {type: 'mollie_methods_bancontact', component: defaultComponent},
             {type: 'mollie_methods_banktransfer', component: defaultComponent},
             {type: 'mollie_methods_belfius', component: defaultComponent},
-            {type: 'mollie_methods_bitcoin', component: defaultComponent},
             {type: 'mollie_methods_creditcard', component: defaultComponent},
             {type: 'mollie_methods_ideal', component: idealComponent},
             {type: 'mollie_methods_kbc', component: kbcComponent},

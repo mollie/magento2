@@ -10,9 +10,6 @@
         <method name="mollie_methods_belfius">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
-        <method name="mollie_methods_bitcoin">
-            <allow_multiple_address>0</allow_multiple_address>
-        </method>
         <method name="mollie_methods_creditcard">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
