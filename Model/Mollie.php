@@ -530,6 +530,9 @@ class Mollie extends AbstractMethod
 
         $mollieApi = $this->loadMollieApi($apiKey);
 
-        return $mollieApi->methods->all(["resource" => "orders"]);
+        return $mollieApi->methods->all([
+            'resource' => 'orders',
+            'includeWallets' => 'applepay',
+        ]);
     }
 }
