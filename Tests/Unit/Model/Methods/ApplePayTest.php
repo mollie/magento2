@@ -11,7 +11,7 @@ class ApplePayTest extends AbstractMethodTest
 {
     protected $instance = ApplePay::class;
 
-    protected $code = 'mollie_methods_applepay';
+    protected $code = 'applepay';
 
     public function testTheIncludeWalletsParameterIsUsed()
     {
