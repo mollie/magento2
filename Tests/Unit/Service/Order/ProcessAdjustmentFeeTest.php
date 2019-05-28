@@ -136,12 +136,13 @@ class ProcessAdjustmentFeeTest extends TestCase
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    private function getOrderMock(): \PHPUnit_Framework_MockObject_MockObject
+    private function getOrderMock()
     {
         $order = $this->getMockBuilder(OrderInterface::class)
             ->setMethods(['getMollieTransactionId', 'getOrderCurrencyCode'])
             ->getMockForAbstractClass();
         $order->method('getOrderCurrencyCode')->willReturn('EUR');
+
         return $order;
     }
 }
