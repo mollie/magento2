@@ -6,21 +6,15 @@
 
 namespace Mollie\Payment\Model\Methods;
 
-use Mollie\Payment\Model\Mollie;
-
-/**
- * Class Bitcoin
- *
- * @package Mollie\Payment\Model\Methods
- */
-class Bitcoin extends Mollie
+class ApplePay extends \Mollie\Payment\Model\Mollie
 {
+
     /**
      * Payment method code
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_bitcoin';
+    protected $_code = 'mollie_methods_applepay';
 
     /**
      * Info instructions block path

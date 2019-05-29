@@ -9,7 +9,6 @@
     <include path="Mollie_Payment::methods/bancontact.xml"/>
     <include path="Mollie_Payment::methods/banktransfer.xml"/>
     <include path="Mollie_Payment::methods/belfius.xml"/>
-    <include path="Mollie_Payment::methods/bitcoin.xml"/>
     <include path="Mollie_Payment::methods/creditcard.xml"/>
     <include path="Mollie_Payment::methods/ideal.xml"/>
     <include path="Mollie_Payment::methods/kbc.xml"/>
@@ -24,4 +23,5 @@
     <include path="Mollie_Payment::methods/paymentlink.xml"/>
     <include path="Mollie_Payment::methods/giftcard.xml"/>
     <include path="Mollie_Payment::methods/przelewy24.xml"/>
+    <include path="Mollie_Payment::methods/applepay.xml"/>
 </include>

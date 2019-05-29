@@ -78,6 +78,11 @@ class Webhook extends Action
                 }
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
+
+                $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+                $result->setHttpResponseCode(503);
+
+                return $result;
             }
         }
     }

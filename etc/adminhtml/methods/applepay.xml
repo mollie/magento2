@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="mollie_methods_bitcoin" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1"
-           showInStore="1">
-        <label>Bitcoin</label>
+    <group id="mollie_methods_applepay" translate="label" type="text" sortOrder="22" showInDefault="1"
+           showInWebsite="1" showInStore="1">
+        <label>Apple Pay</label>
         <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-            <config_path>payment/mollie_methods_bitcoin/active</config_path>
+            <config_path>payment/mollie_methods_applepay/active</config_path>
+            <comment><![CDATA[<strong>Please note:</strong> This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS.]]></comment>
         </field>
         <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Title</label>
-            <config_path>payment/mollie_methods_bitcoin/title</config_path>
+            <config_path>payment/mollie_methods_applepay/title</config_path>
             <depends>
                 <field id="active">1</field>
             </depends>
@@ -22,7 +23,7 @@
                showInStore="1">
             <label>Method</label>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\Method</source_model>
-            <config_path>payment/mollie_methods_bitcoin/method</config_path>
+            <config_path>payment/mollie_methods_applepay/method</config_path>
             <depends>
                 <field id="active">1</field>
             </depends>
@@ -32,7 +33,7 @@
         </field>
         <field id="payment_description" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Description</label>
-            <config_path>payment/mollie_methods_bitcoin/payment_description</config_path>
+            <config_path>payment/mollie_methods_applepay/payment_description</config_path>
             <comment><![CDATA[The description to be used for this transaction. These variables are available:<br><br>
             <strong>{ordernumber}</strong>: The order number for this transaction<br>
             <strong>{storename}</strong>: The name of the store<br><br>
@@ -47,7 +48,7 @@
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
-            <config_path>payment/mollie_methods_bitcoin/allowspecific</config_path>
+            <config_path>payment/mollie_methods_applepay/allowspecific</config_path>
             <depends>
                 <field id="active">1</field>
             </depends>
@@ -57,7 +58,7 @@
             <label>Payment from Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
             <can_be_empty>1</can_be_empty>
-            <config_path>payment/mollie_methods_bitcoin/specificcountry</config_path>
+            <config_path>payment/mollie_methods_applepay/specificcountry</config_path>
             <depends>
                 <field id="active">1</field>
             </depends>
@@ -65,7 +66,7 @@
         <field id="min_order_total" translate="label" type="text" sortOrder="98" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Minimum Order Total</label>
-            <config_path>payment/mollie_methods_bitcoin/min_order_total</config_path>
+            <config_path>payment/mollie_methods_applepay/min_order_total</config_path>
             <depends>
                 <field id="active">1</field>
             </depends>
@@ -73,7 +74,7 @@
         <field id="max_order_total" translate="label" type="text" sortOrder="99" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Maximum Order Total</label>
-            <config_path>payment/mollie_methods_bitcoin/max_order_total</config_path>
+            <config_path>payment/mollie_methods_applepay/max_order_total</config_path>
             <depends>
                 <field id="active">1</field>
             </depends>
@@ -82,7 +83,7 @@
                showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>
-            <config_path>payment/mollie_methods_bitcoin/sort_order</config_path>
+            <config_path>payment/mollie_methods_applepay/sort_order</config_path>
             <depends>
                 <field id="active">1</field>
             </depends>
