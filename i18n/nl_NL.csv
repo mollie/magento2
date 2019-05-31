@@ -6,7 +6,6 @@
 "Bancontact","Bancontact"
 "Banktransfer","Banktransfer"
 "Belfius","Belfius"
-"Bitcoin","Bitcoin"
 "Branding","Branding"
 "Check the Mollie extension technical requirements by running the self test. In case of a warning or error please contact your Developer or Hosting Company.","Controleer de technische eisen van de Mollie extensie door de zelf test uit te voeren. In het geval van een error of waarschuwing, neem contact op met uw Developer of Hosting Partij."
 "Compatibility","Compatibility"
@@ -81,3 +80,4 @@
 "Language Payment Page","Taal Betaalpagina"
 "Let Mollie automatically detect the language or force the language from the store view.","Laat Mollie de taal automatisch detecteren of forceer een taal voor deze store-view."
 "Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Betaling van het type %1 is geweigerd. Deze beslissing is gebaseerd op de bestelling en de uitkomst van de risicobeoordeling."
+"Warning: we recommend to use a unique payment status for pending Banktransfer payments","Waarschuwing: Wij adviseren om een unieke betaalstatus the hanteren voor bankoverboekingen in de wacht"

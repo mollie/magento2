@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Model\Client;
 
+use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
@@ -20,6 +21,7 @@ use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 
 /**
  * Class Orders
@@ -71,20 +73,25 @@ class Orders extends AbstractModel
      * @var Registry
      */
     private $registry;
+    /**
+     * @var ProcessAdjustmentFee
+     */
+    private $adjustmentFee;
 
     /**
      * Orders constructor.
      *
-     * @param OrderLines        $orderLines
-     * @param OrderSender       $orderSender
-     * @param InvoiceSender     $invoiceSender
-     * @param InvoiceService    $invoiceService
-     * @param OrderRepository   $orderRepository
-     * @param InvoiceRepository $invoiceRepository
-     * @param CheckoutSession   $checkoutSession
-     * @param ManagerInterface  $messageManager
-     * @param Registry          $registry
-     * @param MollieHelper      $mollieHelper
+     * @param OrderLines            $orderLines
+     * @param OrderSender           $orderSender
+     * @param InvoiceSender         $invoiceSender
+     * @param InvoiceService        $invoiceService
+     * @param OrderRepository       $orderRepository
+     * @param InvoiceRepository     $invoiceRepository
+     * @param CheckoutSession       $checkoutSession
+     * @param ManagerInterface      $messageManager
+     * @param Registry              $registry
+     * @param MollieHelper          $mollieHelper
+     * @param ProcessAdjustmentFee  $adjustmentFee
      */
     public function __construct(
         OrderLines $orderLines,
@@ -96,7 +103,8 @@ class Orders extends AbstractModel
         CheckoutSession $checkoutSession,
         ManagerInterface $messageManager,
         Registry $registry,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        ProcessAdjustmentFee $adjustmentFee
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -108,6 +116,7 @@ class Orders extends AbstractModel
         $this->messageManager = $messageManager;
         $this->registry = $registry;
         $this->mollieHelper = $mollieHelper;
+        $this->adjustmentFee = $adjustmentFee;
     }
 
     /**
@@ -181,7 +190,7 @@ class Orders extends AbstractModel
     {
         return [
             'organizationName' => $address->getCompany(),
-            'title'            => $address->getPrefix(),
+            'title'            => trim($address->getPrefix()),
             'givenName'        => $address->getFirstname(),
             'familyName'       => $address->getLastname(),
             'email'            => $address->getEmail(),
@@ -253,7 +262,7 @@ class Orders extends AbstractModel
             $method = $order->getPayment()->getMethodInstance()->getTitle();
             $order->getPayment()->setAdditionalInformation('payment_status', $lastPaymentStatus);
             $this->orderRepository->save($order);
-            $this->mollieHelper->registerCancellation($order, $status);
+            $this->mollieHelper->registerCancellation($order, $lastPaymentStatus);
             $msg = ['success' => false, 'status' => $lastPaymentStatus, 'order_id' => $orderId, 'type' => $type, 'method' => $method];
             $this->mollieHelper->addTolog('success', $msg);
             return $msg;
@@ -513,26 +522,33 @@ class Orders extends AbstractModel
          * If products ordered qty equals shipping qty,
          * complete order can be shipped incl. shipping & discount itemLines.
          */
-        if ((int)$order->getTotalQtyOrdered() == (int)$shipment->getTotalQty()) {
-            $shipAll = true;
-        }
-
-        /**
-         * If shipping qty equals open physical products count,
-         * all remaining lines can be shipped, incl. shipping & discount itemLines.
-         */
-        $openForShipmentQty = $this->orderLines->getOpenForShipmentQty($orderId);
-        if ((int)$shipment->getTotalQty() == (int)$openForShipmentQty) {
+        if ($this->isShippingAllItems($order, $shipment)) {
             $shipAll = true;
         }
 
         try {
             $mollieApi = $this->loadMollieApi($apiKey);
             $mollieOrder = $mollieApi->orders->get($transactionId);
+
+            if ($mollieOrder->status == 'completed') {
+                $this->messageManager->addWarningMessage(
+                    __('All items in this order where already marked as shipped in the Mollie dashboard.')
+                );
+                return $this;
+            }
+
             if ($shipAll) {
                 $mollieShipment = $mollieOrder->shipAll();
             } else {
                 $orderLines = $this->orderLines->getShipmentOrderLines($shipment);
+
+                if ($mollieOrder->status == 'shipping' && !$this->itemsAreShippable($mollieOrder, $orderLines)) {
+                    $this->messageManager->addWarningMessage(
+                        __('All items in this order where already marked as shipped in the Mollie dashboard.')
+                    );
+                    return $this;
+                }
+
                 $mollieShipment = $mollieOrder->createShipment($orderLines);
             }
             $mollieShipmentId = isset($mollieShipment) ? $mollieShipment->id : 0;
@@ -635,7 +651,8 @@ class Orders extends AbstractModel
          * Registry set at the Mollie\Payment\Model\Mollie::refund and is set once an online refund is used.
          */
         if (!$this->registry->registry('online_refund')) {
-            $this->messageManager->addNoticeMessage(__(
+            $this->messageManager->addNoticeMessage(
+                __(
                     'An offline refund has been created, please make sure to also create this 
                     refund on mollie.com/dashboard or use the online refund option.'
                 )
@@ -663,15 +680,19 @@ class Orders extends AbstractModel
             return $this;
         }
 
-        /**
-         * Check for creditmemo adjusment fee's, positive and negative.
-         * Throw exception if these are set, as this is not supportef by the orders api.
-         */
-        if ($creditmemo->getAdjustmentPositive() > 0 || $creditmemo->getAdjustmentNegative() > 0) {
-            $msg = __('Creating an online refund with adjustment fee\'s is not supported by Mollie');
-            $this->mollieHelper->addTolog('error', $msg);
-            throw new LocalizedException($msg);
+        try {
+            $mollieApi = $this->loadMollieApi($apiKey);
+        } catch (\Exception $exception) {
+            $this->mollieHelper->addTolog('error', $exception->getMessage());
+            throw new LocalizedException(
+                __('Mollie API: %1', $exception->getMessage())
+            );
         }
+
+        /**
+         * Check for creditmemo adjustment fee's, positive and negative.
+         */
+        $this->adjustmentFee->handle($mollieApi, $order, $creditmemo);
 
         /**
          * Check if Shipping Fee needs to be refunded.
@@ -690,8 +711,11 @@ class Orders extends AbstractModel
             }
         }
 
+        if (!$creditmemo->getAllItems() || $this->adjustmentFee->doNotRefundInMollie()) {
+            return $this;
+        }
+
         try {
-            $mollieApi = $this->loadMollieApi($apiKey);
             $mollieOrder = $mollieApi->orders->get($transactionId);
             if ($order->getState() == Order::STATE_CLOSED) {
                 $mollieOrder->refundAll();
@@ -707,5 +731,109 @@ class Orders extends AbstractModel
         }
 
         return $this;
+    }
+
+    /**
+     * When an order line is already marked as shipped in the Mollie dashboard, and we try this action again we get
+     * an exception and the user is unable to create an order. This code checks if the selected lines are already
+     * marked as shipped. If that's the case a warning will be shown, but the order is still created.
+     *
+     * @param \Mollie\Api\Resources\Order $mollieOrder
+     * @param $orderLines
+     * @return bool
+     */
+    private function itemsAreShippable(\Mollie\Api\Resources\Order $mollieOrder, $orderLines)
+    {
+        $lines = [];
+        foreach ($orderLines['lines'] as $line) {
+            $id = $line['id'];
+            $lines[$id] = $line['quantity'];
+        }
+
+        foreach ($mollieOrder->lines as $line) {
+            if (!isset($lines[$line->id])) {
+                continue;
+            }
+
+            $quantityToShip = $lines[$line->id];
+
+            if ($line->shippableQuantity < $quantityToShip) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * This code checks if all products in the order are going to be shipped. This used the qty_shipped column
+     * so it works with partial shipments as well.
+     * Examples:
+     * - You have an order with 2 items. You are shipping both items. This function will return true.
+     * - You have an order with 2 items. The first shipments contains 1 items, the second shipment also. The first
+     *   time this function returns false, the second time true as it is shipping all remaining items.
+     *
+     * @param Order $order
+     * @param Order\Shipment $shipment
+     * @return bool
+     */
+    private function isShippingAllItems(Order $order, Order\Shipment $shipment)
+    {
+        /**
+         * First build an array of all products in the order like this:
+         * [item ID => quantiy]
+         * [123 => 2]
+         * [124 => 1]
+         *
+         * The method `getOrigData('qty_shipped')` is used as the value of `getQtyShipped()` is somewhere adjusted
+         * and invalid, so not reliable to use for our case.
+         */
+        $shippableOrderItems = [];
+        /** @var Order\Item $item */
+        foreach ($order->getAllVisibleItems() as $item) {
+            if ($item->getProducttype() != ProductType::TYPE_BUNDLE || !$item->isShipSeparately()) {
+                $quantity = $item->getQtyOrdered() - $item->getOrigData('qty_shipped');
+                $shippableOrderItems[$item->getId()] = $quantity;
+                continue;
+            }
+
+            /** @var Order\Item $childItem */
+            foreach ($item->getChildrenItems() as $childItem) {
+                if ((float)$childItem->getQtyShipped() === (float)$childItem->getOrigData('qty_shipped')) {
+                    continue;
+                }
+
+                $quantity = $childItem->getQtyOrdered() - $childItem->getOrigData('qty_shipped');
+                $shippableOrderItems[$childItem->getId()] = $quantity;
+            }
+        }
+
+        /**
+         * Now subtract the number of items to ship in this shipment.
+         *
+         * Before:
+         * [123 => 2]
+         *
+         * Shipping 1 item
+         *
+         * After:
+         * [123 => 1]
+         */
+        /** @var Order\Shipment\Item $item */
+        foreach ($shipment->getAllItems() as $item) {
+            if ($item->getOrderItem()->getProductType() == ProductType::TYPE_BUNDLE &&
+                $item->getOrderItem()->isShipSeparately()
+            ) {
+                continue;
+            }
+
+            $shippableOrderItems[$item->getOrderItemId()] -= $item->getQty();
+        }
+
+        /**
+         * Count the total number of items in the array. If it equals 0 then all (remaining) items in the order
+         * are shipped.
+         */
+        return array_sum($shippableOrderItems) == 0;
     }
 }

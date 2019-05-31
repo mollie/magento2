@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Model;
 
+use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
@@ -135,6 +136,24 @@ class OrderLines extends AbstractModel
             }
 
             $orderLines[] = $orderLine;
+
+            if ($item->getProductType() == ProductType::TYPE_BUNDLE) {
+                /** @var Order\Item $childItem */
+                foreach ($item->getChildrenItems() as $childItem) {
+                    $orderLines[] = [
+                        'item_id'        => $childItem->getId(),
+                        'type'           => $childItem->getProduct()->getTypeId() != 'downloadable' ? 'physical' : 'digital',
+                        'name'           => preg_replace("/[^A-Za-z0-9 -]/", "", $childItem->getName()),
+                        'quantity'       => $quantity,
+                        'unitPrice'      => $this->mollieHelper->getAmountArray($currency, 0),
+                        'totalAmount'    => $this->mollieHelper->getAmountArray($currency, 0),
+                        'vatRate'        => sprintf("%.2f", $childItem->getTaxPercent()),
+                        'vatAmount'      => $this->mollieHelper->getAmountArray($currency, 0),
+                        'sku'            => $childItem->getProduct()->getSku(),
+                        'productUrl'     => $childItem->getProduct()->getProductUrl()
+                    ];
+                }
+            }
         }
 
         if (!$order->getIsVirtual()) {

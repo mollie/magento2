@@ -18,6 +18,8 @@ use Mollie\Payment\Model\Mollie as MollieModel;
  */
 class Tests extends AbstractHelper
 {
+    const XML_PATH_BANKTRANSFER_ACTIVE = 'payment/mollie_methods_banktransfer/active';
+    const XML_PATH_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
 
     /**
      * @var ObjectManagerInterface
@@ -64,7 +66,10 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieModel->loadMollieApi($testKey);
-                    $methods = $mollieApi->methods->all(["resource" => "orders"]);
+                    $methods = $mollieApi->methods->all([
+                        'resource' => 'orders',
+                        'includeWallets' => 'applepay',
+                    ]);
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
@@ -94,7 +99,11 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieModel->loadMollieApi($liveKey);
-                    $methods = $mollieApi->methods->all(["resource" => "orders"]);
+                    $methods = $mollieApi->methods->all([
+                        'resource' => 'orders',
+                        'includeWallets' => 'applepay',
+                    ]);
+
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
                     }
@@ -143,6 +152,13 @@ class Tests extends AbstractHelper
             }
         } else {
             $msg = __('Error: Mollie CompatibilityChecker not found.') . '<br/>';
+            $results[] = '<span class="mollie-error">' . $msg . '</span>';
+        }
+
+        $bankTransferActive = $this->scopeConfig->isSetFlag(static::XML_PATH_BANKTRANSFER_ACTIVE);
+        $bankTransferStatus = $this->scopeConfig->getValue(static::XML_PATH_BANKTRANSFER_STATUS_PENDING);
+        if ($bankTransferActive && $bankTransferStatus == 'pending_payment') {
+            $msg = __('Warning: we recommend to use a unique payment status for pending Banktransfer payments');
             $results[] = '<span class="mollie-error">' . $msg . '</span>';
         }
 

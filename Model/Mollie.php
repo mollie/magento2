@@ -405,7 +405,7 @@ class Mollie extends AbstractMethod
 
         /**
          * Order Api does not use amount to refund, but refunds per itemLine
-         * See SalesOrderCreditmemoAfter Observer for logic.
+         * See SalesOrderCreditmemoSaveAfter Observer for logic.
          */
         $checkoutType = $this->mollieHelper->getCheckoutType($order);
         if ($checkoutType == 'order') {
@@ -534,6 +534,9 @@ class Mollie extends AbstractMethod
 
         $mollieApi = $this->loadMollieApi($apiKey);
 
-        return $mollieApi->methods->all(["resource" => "orders"]);
+        return $mollieApi->methods->all([
+            'resource' => 'orders',
+            'includeWallets' => 'applepay',
+        ]);
     }
 }

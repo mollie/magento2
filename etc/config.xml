@@ -14,6 +14,7 @@
                 <debug>1</debug>
                 <model>Mollie\Payment\Model\Methods\General</model>
                 <currency>1</currency>
+                <cancel_failed_orders>0</cancel_failed_orders>
             </mollie_general>
             <mollie_methods_bancontact>
                 <active>0</active>
@@ -44,15 +45,6 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_belfius>
-            <mollie_methods_bitcoin>
-                <active>0</active>
-                <model>Mollie\Payment\Model\Methods\Bitcoin</model>
-                <title>Bitcoin</title>
-                <payment_description>{ordernumber}</payment_description>
-                <payment_action>order</payment_action>
-                <allowspecific>0</allowspecific>
-                <instructions/>
-            </mollie_methods_bitcoin>
             <mollie_methods_creditcard>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Creditcard</model>
@@ -186,6 +178,15 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_przelewy24>
+            <mollie_methods_applepay>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\ApplePay</model>
+                <title>Apple Pay</title>
+                <payment_description>{ordernumber}</payment_description>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_applepay>
         </payment>
     </default>
 </config>

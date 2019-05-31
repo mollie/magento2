@@ -6,7 +6,12 @@
 
 namespace Mollie\Payment\Controller\Checkout;
 
+use Exception;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderManagementInterface;
+use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
@@ -37,27 +42,41 @@ class Redirect extends Action
      * @var MollieHelper
      */
     protected $mollieHelper;
+    /**
+     * @var OrderManagementInterface
+     */
+    private $orderManagement;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
 
     /**
      * Redirect constructor.
      *
-     * @param Context       $context
-     * @param Session       $checkoutSession
-     * @param PageFactory   $resultPageFactory
-     * @param PaymentHelper $paymentHelper
-     * @param MollieHelper  $mollieHelper
+     * @param Context                   $context
+     * @param Session                   $checkoutSession
+     * @param PageFactory               $resultPageFactory
+     * @param PaymentHelper             $paymentHelper
+     * @param MollieHelper              $mollieHelper
+     * @param OrderManagementInterface  $orderManagement
+     * @param ScopeConfigInterface      $scopeConfig
      */
     public function __construct(
         Context $context,
         Session $checkoutSession,
         PageFactory $resultPageFactory,
         PaymentHelper $paymentHelper,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        OrderManagementInterface $orderManagement,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->resultPageFactory = $resultPageFactory;
         $this->paymentHelper = $paymentHelper;
         $this->mollieHelper = $mollieHelper;
+        $this->orderManagement = $orderManagement;
+        $this->scopeConfig = $scopeConfig;
         parent::__construct($context);
     }
 
@@ -102,11 +121,41 @@ class Redirect extends Action
                 $this->checkoutSession->restoreQuote();
                 $this->_redirect('checkout/cart');
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->messageManager->addExceptionMessage($e, __($e->getMessage()));
             $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->checkoutSession->restoreQuote();
+            $this->cancelUnprocessedOrder($order, $e->getMessage());
             $this->_redirect('checkout/cart');
+        }
+    }
+
+    private function cancelUnprocessedOrder(OrderInterface $order, $message)
+    {
+        if (!empty($order->getMollieTransactionId())) {
+            return;
+        }
+
+        if (!$this->scopeConfig->isSetFlag(
+            'payment/mollie_general/cancel_failed_orders',
+            ScopeInterface::SCOPE_STORE
+        )) {
+            return;
+        }
+
+        try {
+            $historyMessage = __('Canceled because an error occurred while redirecting the customer to Mollie');
+            if ($message) {
+                $historyMessage .= ':<br>' . PHP_EOL . $message;
+            }
+
+            $this->orderManagement->cancel($order->getEntityId());
+            $order->addCommentToStatusHistory($order->getEntityId(), $historyMessage);
+
+            $this->mollieHelper->addToLog('info', sprintf('Canceled order %s', $order->getIncrementId()));
+        } catch (Exception $e) {
+            $message = sprintf('Cannot cancel order %s: %s', $order->getIncrementId(), $e->getMessage());
+            $this->mollieHelper->addToLog('error', $message);
         }
     }
 }

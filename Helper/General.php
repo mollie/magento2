@@ -600,7 +600,6 @@ class General extends AbstractHelper
             'mollie_methods_bancontact',
             'mollie_methods_banktransfer',
             'mollie_methods_belfius',
-            'mollie_methods_bitcoin',
             'mollie_methods_creditcard',
             'mollie_methods_ideal',
             'mollie_methods_kbc',
@@ -614,6 +613,7 @@ class General extends AbstractHelper
             'mollie_methods_klarnasliceit',
             'mollie_methods_giftcard',
             'mollie_methods_przelewy24',
+            'mollie_methods_applepay',
         ];
 
         foreach ($methodCodes as $methodCode) {
