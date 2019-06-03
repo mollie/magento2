@@ -17,7 +17,7 @@
                 <cancel_failed_orders>0</cancel_failed_orders>
             </mollie_general>
             <mollie_methods_bancontact>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Bancontact</model>
                 <title>Bancontact</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -26,7 +26,7 @@
                 <instructions/>
             </mollie_methods_bancontact>
             <mollie_methods_banktransfer>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Banktransfer</model>
                 <title>Banktransfer</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -37,7 +37,7 @@
                 <instructions/>
             </mollie_methods_banktransfer>
             <mollie_methods_belfius>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Belfius</model>
                 <title>Belfius</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -46,7 +46,7 @@
                 <instructions/>
             </mollie_methods_belfius>
             <mollie_methods_creditcard>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Creditcard</model>
                 <title>Credit Cards</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -55,7 +55,7 @@
                 <instructions/>
             </mollie_methods_creditcard>
             <mollie_methods_ideal>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Ideal</model>
                 <title>iDeal</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -65,7 +65,7 @@
                 <instructions/>
             </mollie_methods_ideal>
             <mollie_methods_kbc>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Kbc</model>
                 <title>KBC/CBC</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -75,7 +75,7 @@
                 <instructions/>
             </mollie_methods_kbc>
             <mollie_methods_paypal>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Paypal</model>
                 <title>Paypal</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -84,7 +84,7 @@
                 <instructions/>
             </mollie_methods_paypal>
             <mollie_methods_paysafecard>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Paysafecard</model>
                 <title>Paysafecard</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -93,7 +93,7 @@
                 <instructions/>
             </mollie_methods_paysafecard>
             <mollie_methods_sofort>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Sofort</model>
                 <title>Sofort</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -102,7 +102,7 @@
                 <instructions/>
             </mollie_methods_sofort>
             <mollie_methods_inghomepay>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Inghomepay</model>
                 <title>ING Homepay</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -111,7 +111,7 @@
                 <instructions/>
             </mollie_methods_inghomepay>
             <mollie_methods_giropay>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Giropay</model>
                 <title>Giropay</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -120,7 +120,7 @@
                 <instructions/>
             </mollie_methods_giropay>
             <mollie_methods_eps>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Eps</model>
                 <title>EPS</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -129,7 +129,7 @@
                 <instructions/>
             </mollie_methods_eps>
             <mollie_methods_klarnapaylater>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Klarnapaylater</model>
                 <title>Klarna Pay Later</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -139,7 +139,7 @@
                 <instructions/>
             </mollie_methods_klarnapaylater>
             <mollie_methods_klarnasliceit>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Klarnasliceit</model>
                 <title>Klarna Slice It</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -149,7 +149,7 @@
                 <instructions/>
             </mollie_methods_klarnasliceit>
             <mollie_methods_paymentlink>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Paymentlink</model>
                 <title>Mollie: Payment Link</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -160,7 +160,7 @@
                 <instructions/>
             </mollie_methods_paymentlink>
             <mollie_methods_giftcard>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Giftcard</model>
                 <title>Giftcard</title>
                 <payment_description>{ordernumber}</payment_description>
@@ -170,7 +170,7 @@
                 <instructions/>
             </mollie_methods_giftcard>
             <mollie_methods_przelewy24>
-                <active>0</active>
+                <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Przelewy24</model>
                 <title>Przelewy24</title>
                 <payment_description>{ordernumber}</payment_description>
