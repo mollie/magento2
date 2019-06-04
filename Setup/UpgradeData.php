@@ -159,7 +159,7 @@ class UpgradeData implements UpgradeDataInterface
             return;
         }
 
-        $this->resourceConfig->saveConfig($path, '0', 'default');
+        $this->resourceConfig->saveConfig($path, '0', 'default', 0);
     }
 
     private function removeBitcoinConfiguration()
