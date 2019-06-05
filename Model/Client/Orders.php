@@ -18,7 +18,7 @@ use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\Service\InvoiceService;
-use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
