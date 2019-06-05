@@ -95,6 +95,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->upgradeActiveState();
         }
 
+        if (version_compare($context->getVersion(), '1.6.2', '<')) {
+            $this->addIndexes($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -183,5 +187,20 @@ class UpgradeData implements UpgradeDataInterface
                 $this->configWriter->delete($path, 'websites', $store->getId());
             }
         }
+    }
+
+    private function addIndexes(ModuleDataSetupInterface $setup)
+    {
+        $setup->getConnection()->addIndex(
+            $setup->getTable('sales_order'),
+            $this->resourceConnection->getIdxName('sales_order', ['mollie_transaction_id']),
+            ['mollie_transaction_id']
+        );
+
+        $setup->getConnection()->addIndex(
+            $setup->getTable('sales_shipment'),
+            $this->resourceConnection->getIdxName('sales_shipment', ['mollie_shipment_id']),
+            ['mollie_shipment_id']
+        );
     }
 }
