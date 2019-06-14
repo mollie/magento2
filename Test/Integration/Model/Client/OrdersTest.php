@@ -5,10 +5,12 @@ namespace Mollie\Payment\Model\Client;
 use Magento\Framework\Phrase;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
-use Magento\TestFramework\ObjectManager;
+use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
+use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Test\Integration\TestCase;
 
@@ -41,9 +43,14 @@ class OrdersTest extends TestCase
             ],
         ];
     }
+
     /**
      * @dataProvider processTransactionProvider
      * @magentoDataFixture Magento/Sales/_files/order.php
+     *
+     * @param $currency
+     * @param $mollieOrderStatus
+     * @param $orderCommentHistoryMessages
      *
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
@@ -56,12 +63,12 @@ class OrdersTest extends TestCase
         $mollieApiMock = $this->createMock(MollieApiClient::class);
         $mollieApiMock->orders = $orderEndpointMock;
 
-        $orderLinesMock = $this->createMock(\Mollie\Payment\Model\OrderLines::class);
+        $orderLinesMock = $this->createMock(OrderLines::class);
 
-        $orderSenderMock = $this->createMock(\Magento\Sales\Model\Order\Email\Sender\OrderSender::class);
+        $orderSenderMock = $this->createMock(OrderSender::class);
         $orderSenderMock->method('send')->willReturn(true);
 
-        $invoiceSenderMock = $this->createMock(\Magento\Sales\Model\Order\Email\Sender\InvoiceSender::class);
+        $invoiceSenderMock = $this->createMock(InvoiceSender::class);
         $invoiceSenderMock->method('send')->willReturn(true);
 
         $orderCommentHistoryMock = $this->createMock(OrderCommentHistory::class);
