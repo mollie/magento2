@@ -14,6 +14,7 @@ use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Service\Order\OrderCommentHistory;
 
 /**
  * Class Payments
@@ -45,28 +46,35 @@ class Payments extends AbstractModel
      * @var CheckoutSession
      */
     private $checkoutSession;
+    /**
+     * @var OrderCommentHistory
+     */
+    private $orderCommentHistory;
 
     /**
      * Payments constructor.
      *
-     * @param OrderSender     $orderSender
-     * @param InvoiceSender   $invoiceSender
+     * @param OrderSender $orderSender
+     * @param InvoiceSender $invoiceSender
      * @param OrderRepository $orderRepository
      * @param CheckoutSession $checkoutSession
-     * @param MollieHelper    $mollieHelper
+     * @param MollieHelper $mollieHelper
+     * @param OrderCommentHistory $orderCommentHistory
      */
     public function __construct(
         OrderSender $orderSender,
         InvoiceSender $invoiceSender,
         OrderRepository $orderRepository,
         CheckoutSession $checkoutSession,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        OrderCommentHistory $orderCommentHistory
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
         $this->mollieHelper = $mollieHelper;
+        $this->orderCommentHistory = $orderCommentHistory;
     }
 
     /**
@@ -219,8 +227,7 @@ class Payments extends AbstractModel
                                 $paymentData->amount->currency . ' ' . $paymentData->amount->value,
                                 $paymentData->settlementAmount->currency . ' ' . $paymentData->settlementAmount->value
                             );
-                            $order->addStatusHistoryComment($message);
-                            $this->orderRepository->save($order);
+                            $this->orderCommentHistory->add($order, $message);
                         }
                     }
                 }
@@ -232,15 +239,13 @@ class Payments extends AbstractModel
                 if (!$order->getEmailSent()) {
                     $this->orderSender->send($order);
                     $message = __('New order email sent');
-                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true);
-                    $this->orderRepository->save($order);
+                    $this->orderCommentHistory->add($order, $message);
                 }
 
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
                     $this->invoiceSender->send($invoice);
                     $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true);
-                    $this->orderRepository->save($order);
+                    $this->orderCommentHistory->add($order, $message);
                 }
 
                 if (!$order->getIsVirtual()) {
