@@ -4,6 +4,7 @@ namespace Mollie\Payment\Model\Client;
 
 use Magento\Framework\Phrase;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Model\Order;
 use Magento\TestFramework\ObjectManager;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\MollieApiClient;
@@ -100,6 +101,8 @@ class OrdersTest extends TestCase
         }
 
         $instance->processTransaction($order, $mollieApiMock);
+
+        $this->assertEquals(Order::STATE_PROCESSING, $order->getState());
     }
 
     /**

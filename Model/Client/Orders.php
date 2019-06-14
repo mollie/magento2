@@ -323,7 +323,6 @@ class Orders extends AbstractModel
                     }
 
                     $order->setState(Order::STATE_PROCESSING);
-                    $this->orderRepository->save($order);
 
                     if ($mollieOrder->amountCaptured !== null) {
                         if ($mollieOrder->amount->currency != $mollieOrder->amountCaptured->currency) {
@@ -357,9 +356,10 @@ class Orders extends AbstractModel
                     $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
                     if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
                         $order->setStatus($defaultStatusProcessing);
-                        $this->orderRepository->save($order);
                     }
                 }
+
+                $this->orderRepository->save($order);
             }
 
             $msg = ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
