@@ -335,6 +335,15 @@ class Orders extends AbstractModel
                             $this->orderCommentHistory->add($order, $message);
                         }
                     }
+
+                    if (!$order->getIsVirtual()) {
+                        $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
+                        if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
+                            $order->setStatus($defaultStatusProcessing);
+                        }
+                    }
+
+                    $this->orderRepository->save($order);
                 }
 
                 /** @var Order\Invoice $invoice */
@@ -353,14 +362,6 @@ class Orders extends AbstractModel
                     $this->orderCommentHistory->add($order, $message, true);
                 }
 
-                if (!$order->getIsVirtual()) {
-                    $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
-                    if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
-                        $order->setStatus($defaultStatusProcessing);
-                    }
-                }
-
-                $this->orderRepository->save($order);
             }
 
             $msg = ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];

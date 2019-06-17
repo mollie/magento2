@@ -222,7 +222,7 @@ class Payments extends AbstractModel
                     $payment->setIsTransactionClosed(true);
                     $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
                     $order->setState(Order::STATE_PROCESSING);
-                    $this->orderRepository->save($order);
+
                     if ($paymentData->settlementAmount !== null) {
                         if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
                             $message = __(
@@ -233,6 +233,15 @@ class Payments extends AbstractModel
                             $this->orderCommentHistory->add($order, $message);
                         }
                     }
+
+                    if (!$order->getIsVirtual()) {
+                        $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
+                        if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
+                            $order->setStatus($defaultStatusProcessing);
+                        }
+                    }
+
+                    $this->orderRepository->save($order);
                 }
 
                 /** @var Order\Invoice $invoice */
@@ -251,13 +260,6 @@ class Payments extends AbstractModel
                     $this->orderCommentHistory->add($order, $message, true);
                 }
 
-                if (!$order->getIsVirtual()) {
-                    $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
-                    if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
-                        $order->setStatus($defaultStatusProcessing);
-                        $this->orderRepository->save($order);
-                    }
-                }
             }
             $msg = ['success' => true, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);
