@@ -190,8 +190,12 @@ class Payments extends AbstractModel
         $this->mollieHelper->addTolog($type, $paymentData);
 
         $status = $paymentData->status;
-        $order->getPayment()->setAdditionalInformation('payment_status', $status);
-        $this->orderRepository->save($order);
+        $payment = $order->getPayment();
+        if ($type == 'webhook' && $payment->getAdditionalInformation('payment_status') != $status) {
+            $payment->setAdditionalInformation('payment_status', $status);
+            $this->orderRepository->save($order);
+        }
+
         $refunded = isset($paymentData->_links->refunds) ? true : false;
 
         if ($status == 'paid' && !$refunded) {
@@ -203,7 +207,6 @@ class Payments extends AbstractModel
                 $this->mollieHelper->addTolog('error', __('Currency does not match.'));
                 return $msg;
             }
-            $payment = $order->getPayment();
             if ($paymentData->details !== null) {
                 $payment->setAdditionalInformation('details', json_encode($paymentData->details));
             }

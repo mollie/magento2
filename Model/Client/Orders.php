@@ -277,8 +277,11 @@ class Orders extends AbstractModel
         }
 
         $refunded = $mollieOrder->amountRefunded !== null ? true : false;
-        $order->getPayment()->setAdditionalInformation('payment_status', $status);
-        $this->orderRepository->save($order);
+        $payment = $order->getPayment();
+        if ($type == 'webhook' && $payment->getAdditionalInformation('payment_status') != $status) {
+            $payment->setAdditionalInformation('payment_status', $status);
+            $this->orderRepository->save($order);
+        }
 
         if (($mollieOrder->isPaid() || $mollieOrder->isAuthorized()) && !$refunded) {
             $amount = $mollieOrder->amount->value;
@@ -290,8 +293,6 @@ class Orders extends AbstractModel
                 $this->mollieHelper->addTolog('error', __('Currency does not match.'));
                 return $msg;
             }
-
-            $payment = $order->getPayment();
 
             if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
                 if ($order->isCanceled()) {
