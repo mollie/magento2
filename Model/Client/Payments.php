@@ -239,13 +239,13 @@ class Payments extends AbstractModel
                 if (!$order->getEmailSent()) {
                     $this->orderSender->send($order);
                     $message = __('New order email sent');
-                    $this->orderCommentHistory->add($order, $message);
+                    $this->orderCommentHistory->add($order, $message, true);
                 }
 
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
                     $this->invoiceSender->send($invoice);
                     $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $this->orderCommentHistory->add($order, $message);
+                    $this->orderCommentHistory->add($order, $message, true);
                 }
 
                 if (!$order->getIsVirtual()) {
