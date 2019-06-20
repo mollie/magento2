@@ -5,6 +5,7 @@
   "require": {
     "mollie/mollie-api-php": "^2.1",
     "magento/framework": ">=100.1.0",
+    "magento/module-sales": ">=100.1.0",
     "ext-json": "*"
   },
   "type": "magento2-module",

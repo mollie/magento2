@@ -15,4 +15,7 @@
     <event name="sales_order_creditmemo_save_after">
         <observer name="mollie_create_online_refund" instance="Mollie\Payment\Observer\SalesOrderCreditmemoSaveAfter"/>
     </event>
+    <event name="sales_order_uncancel_after_commit">
+        <observer name="mollie_uncancel_reindex" instance="Mollie\Payment\Observer\SalesOrderUnCancelAfterCommit" />
+    </event>
 </config>

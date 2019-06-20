@@ -10,6 +10,7 @@ use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
+use Magento\Framework\Phrase;
 use Magento\Framework\Registry;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
@@ -21,6 +22,7 @@ use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Operation\UnCancelOrderOperation;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 
 /**
@@ -77,6 +79,10 @@ class Orders extends AbstractModel
      * @var ProcessAdjustmentFee
      */
     private $adjustmentFee;
+    /**
+     * @var \Mollie\Payment\Operation\UnCancelOrderOperation
+     */
+    private $unCancelOrderOperation;
 
     /**
      * Orders constructor.
@@ -92,6 +98,7 @@ class Orders extends AbstractModel
      * @param Registry              $registry
      * @param MollieHelper          $mollieHelper
      * @param ProcessAdjustmentFee  $adjustmentFee
+     * @param UnCancelOrderOperation $unCancelOrderOperation
      */
     public function __construct(
         OrderLines $orderLines,
@@ -104,7 +111,8 @@ class Orders extends AbstractModel
         ManagerInterface $messageManager,
         Registry $registry,
         MollieHelper $mollieHelper,
-        ProcessAdjustmentFee $adjustmentFee
+        ProcessAdjustmentFee $adjustmentFee,
+        UnCancelOrderOperation $unCancelOrderOperation
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -117,6 +125,7 @@ class Orders extends AbstractModel
         $this->registry = $registry;
         $this->mollieHelper = $mollieHelper;
         $this->adjustmentFee = $adjustmentFee;
+        $this->unCancelOrderOperation = $unCancelOrderOperation;
     }
 
     /**
@@ -237,10 +246,10 @@ class Orders extends AbstractModel
      * @param \Mollie\Api\MollieApiClient $mollieApi
      * @param string                      $type
      * @param null                        $paymentToken
-     *
      * @return array
      * @throws \Mollie\Api\Exceptions\ApiException
-     * @throws LocalizedException
+     * @throws LocalizedException*
+     * @throws \Throwable
      */
     public function processTransaction(Order $order, $mollieApi, $type = 'webhook', $paymentToken = null)
     {
@@ -287,7 +296,10 @@ class Orders extends AbstractModel
 
             if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
                 if ($order->isCanceled()) {
-                    $order = $this->mollieHelper->uncancelOrder($order);
+                    $order = $this->unCancelOrderOperation->execute(
+                        $order,
+                        (string)(new Phrase('Order uncanceled by webhook.'))
+                    );
                 }
 
                 if (abs($amount - $orderAmount['value']) < 0.01) {
