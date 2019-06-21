@@ -314,7 +314,10 @@ class Mollie extends AbstractMethod
         $mollieApi = $this->loadMollieApi($apiKey);
         $method = $this->mollieHelper->getApiMethod($order);
 
-        $connection = $this->resourceConnection->getConnection();
+        // Defaults to the "default" connection when there is not connection available named "sales".
+        // This is required for stores with a split database (Enterprise only):
+        // https://devdocs.magento.com/guides/v2.3/config-guide/multi-master/multi-master.html
+        $connection = $this->resourceConnection->getConnection('sales');
 
         try {
             $connection->beginTransaction();
