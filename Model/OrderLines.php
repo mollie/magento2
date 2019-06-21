@@ -251,7 +251,7 @@ class OrderLines extends AbstractModel
             $taxPercentage = ($order->getShippingTaxAmount() / $order->getShippingAmount()) * 100;
         }
 
-        return round($taxPercentage, 2);
+        return $taxPercentage;
     }
 
     /**
