@@ -11,6 +11,7 @@ use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Registry;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
@@ -18,7 +19,7 @@ use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\Service\InvoiceService;
-use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
@@ -438,12 +439,12 @@ class Orders extends AbstractModel
     }
 
     /**
-     * @param Order $order
+     * @param OrderInterface $order
      *
      * @return $this
      * @throws LocalizedException
      */
-    public function cancelOrder(Order $order)
+    public function cancelOrder(OrderInterface $order)
     {
         $transactionId = $order->getMollieTransactionId();
         if (empty($transactionId)) {
@@ -465,7 +466,7 @@ class Orders extends AbstractModel
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             throw new LocalizedException(
-                __('Mollie: %1', $e->getMessage())
+                __('Mollie (Order ID: %2): %1', $e->getMessage(), $order->getEntityId())
             );
         }
 

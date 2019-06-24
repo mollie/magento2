@@ -29,4 +29,15 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Payment\Model\Client\Orders">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+    <type name="Mollie\Payment\Model\Client\Payments">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 </config>
