@@ -14,6 +14,7 @@ use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Service\Order\OrderCommentHistory;
 
 /**
  * Class Payments
@@ -45,28 +46,35 @@ class Payments extends AbstractModel
      * @var CheckoutSession
      */
     private $checkoutSession;
+    /**
+     * @var OrderCommentHistory
+     */
+    private $orderCommentHistory;
 
     /**
      * Payments constructor.
      *
-     * @param OrderSender     $orderSender
-     * @param InvoiceSender   $invoiceSender
+     * @param OrderSender $orderSender
+     * @param InvoiceSender $invoiceSender
      * @param OrderRepository $orderRepository
      * @param CheckoutSession $checkoutSession
-     * @param MollieHelper    $mollieHelper
+     * @param MollieHelper $mollieHelper
+     * @param OrderCommentHistory $orderCommentHistory
      */
     public function __construct(
         OrderSender $orderSender,
         InvoiceSender $invoiceSender,
         OrderRepository $orderRepository,
         CheckoutSession $checkoutSession,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        OrderCommentHistory $orderCommentHistory
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
         $this->mollieHelper = $mollieHelper;
+        $this->orderCommentHistory = $orderCommentHistory;
     }
 
     /**
@@ -182,8 +190,12 @@ class Payments extends AbstractModel
         $this->mollieHelper->addTolog($type, $paymentData);
 
         $status = $paymentData->status;
-        $order->getPayment()->setAdditionalInformation('payment_status', $status);
-        $this->orderRepository->save($order);
+        $payment = $order->getPayment();
+        if ($type == 'webhook' && $payment->getAdditionalInformation('payment_status') != $status) {
+            $payment->setAdditionalInformation('payment_status', $status);
+            $this->orderRepository->save($order);
+        }
+
         $refunded = isset($paymentData->_links->refunds) ? true : false;
 
         if ($status == 'paid' && !$refunded) {
@@ -195,7 +207,6 @@ class Payments extends AbstractModel
                 $this->mollieHelper->addTolog('error', __('Currency does not match.'));
                 return $msg;
             }
-            $payment = $order->getPayment();
             if ($paymentData->details !== null) {
                 $payment->setAdditionalInformation('details', json_encode($paymentData->details));
             }
@@ -211,7 +222,7 @@ class Payments extends AbstractModel
                     $payment->setIsTransactionClosed(true);
                     $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
                     $order->setState(Order::STATE_PROCESSING);
-                    $this->orderRepository->save($order);
+
                     if ($paymentData->settlementAmount !== null) {
                         if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
                             $message = __(
@@ -219,10 +230,18 @@ class Payments extends AbstractModel
                                 $paymentData->amount->currency . ' ' . $paymentData->amount->value,
                                 $paymentData->settlementAmount->currency . ' ' . $paymentData->settlementAmount->value
                             );
-                            $order->addStatusHistoryComment($message);
-                            $this->orderRepository->save($order);
+                            $this->orderCommentHistory->add($order, $message);
                         }
                     }
+
+                    if (!$order->getIsVirtual()) {
+                        $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
+                        if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
+                            $order->setStatus($defaultStatusProcessing);
+                        }
+                    }
+
+                    $this->orderRepository->save($order);
                 }
 
                 /** @var Order\Invoice $invoice */
@@ -232,24 +251,15 @@ class Payments extends AbstractModel
                 if (!$order->getEmailSent()) {
                     $this->orderSender->send($order);
                     $message = __('New order email sent');
-                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true);
-                    $this->orderRepository->save($order);
+                    $this->orderCommentHistory->add($order, $message, true);
                 }
 
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
                     $this->invoiceSender->send($invoice);
                     $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true);
-                    $this->orderRepository->save($order);
+                    $this->orderCommentHistory->add($order, $message, true);
                 }
 
-                if (!$order->getIsVirtual()) {
-                    $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
-                    if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
-                        $order->setStatus($defaultStatusProcessing);
-                        $this->orderRepository->save($order);
-                    }
-                }
             }
             $msg = ['success' => true, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);

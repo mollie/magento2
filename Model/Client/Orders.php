@@ -22,6 +22,7 @@ use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 
 /**
@@ -78,6 +79,10 @@ class Orders extends AbstractModel
      * @var ProcessAdjustmentFee
      */
     private $adjustmentFee;
+    /**
+     * @var OrderCommentHistory
+     */
+    private $orderCommentHistory;
 
     /**
      * Orders constructor.
@@ -93,6 +98,7 @@ class Orders extends AbstractModel
      * @param Registry              $registry
      * @param MollieHelper          $mollieHelper
      * @param ProcessAdjustmentFee  $adjustmentFee
+     * @param OrderCommentHistory   $orderCommentHistory
      */
     public function __construct(
         OrderLines $orderLines,
@@ -105,7 +111,8 @@ class Orders extends AbstractModel
         ManagerInterface $messageManager,
         Registry $registry,
         MollieHelper $mollieHelper,
-        ProcessAdjustmentFee $adjustmentFee
+        ProcessAdjustmentFee $adjustmentFee,
+        OrderCommentHistory $orderCommentHistory
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -118,6 +125,7 @@ class Orders extends AbstractModel
         $this->registry = $registry;
         $this->mollieHelper = $mollieHelper;
         $this->adjustmentFee = $adjustmentFee;
+        $this->orderCommentHistory = $orderCommentHistory;
     }
 
     /**
@@ -270,8 +278,11 @@ class Orders extends AbstractModel
         }
 
         $refunded = $mollieOrder->amountRefunded !== null ? true : false;
-        $order->getPayment()->setAdditionalInformation('payment_status', $status);
-        $this->orderRepository->save($order);
+        $payment = $order->getPayment();
+        if ($type == 'webhook' && $payment->getAdditionalInformation('payment_status') != $status) {
+            $payment->setAdditionalInformation('payment_status', $status);
+            $this->orderRepository->save($order);
+        }
 
         if (($mollieOrder->isPaid() || $mollieOrder->isAuthorized()) && !$refunded) {
             $amount = $mollieOrder->amount->value;
@@ -283,8 +294,6 @@ class Orders extends AbstractModel
                 $this->mollieHelper->addTolog('error', __('Currency does not match.'));
                 return $msg;
             }
-
-            $payment = $order->getPayment();
 
             if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
                 if ($order->isCanceled()) {
@@ -316,7 +325,6 @@ class Orders extends AbstractModel
                     }
 
                     $order->setState(Order::STATE_PROCESSING);
-                    $this->orderRepository->save($order);
 
                     if ($mollieOrder->amountCaptured !== null) {
                         if ($mollieOrder->amount->currency != $mollieOrder->amountCaptured->currency) {
@@ -325,10 +333,18 @@ class Orders extends AbstractModel
                                 $mollieOrder->amount->currency . ' ' . $mollieOrder->amount->value,
                                 $mollieOrder->amountCaptured->currency . ' ' . $mollieOrder->amountCaptured->value
                             );
-                            $order->addStatusHistoryComment($message);
-                            $this->orderRepository->save($order);
+                            $this->orderCommentHistory->add($order, $message);
                         }
                     }
+
+                    if (!$order->getIsVirtual()) {
+                        $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
+                        if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
+                            $order->setStatus($defaultStatusProcessing);
+                        }
+                    }
+
+                    $this->orderRepository->save($order);
                 }
 
                 /** @var Order\Invoice $invoice */
@@ -338,24 +354,15 @@ class Orders extends AbstractModel
                 if (!$order->getEmailSent()) {
                     $this->orderSender->send($order);
                     $message = __('New order email sent');
-                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true);
-                    $this->orderRepository->save($order);
+                    $this->orderCommentHistory->add($order, $message, true);
                 }
 
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
                     $this->invoiceSender->send($invoice);
                     $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true);
-                    $this->orderRepository->save($order);
+                    $this->orderCommentHistory->add($order, $message, true);
                 }
 
-                if (!$order->getIsVirtual()) {
-                    $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
-                    if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
-                        $order->setStatus($defaultStatusProcessing);
-                        $this->orderRepository->save($order);
-                    }
-                }
             }
 
             $msg = ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];

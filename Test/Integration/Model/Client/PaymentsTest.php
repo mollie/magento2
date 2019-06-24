@@ -7,42 +7,14 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
-use Mollie\Api\Endpoints\OrderEndpoint;
+use Mollie\Api\Endpoints\PaymentEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
-use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Test\Integration\TestCase;
 
-class OrdersTest extends TestCase
+class PaymentsTest extends TestCase
 {
-    /**
-     * This key is invalid on purpose, as we can't work our way around the `new \Mollie\Api\MollieApiClient()` call.
-     * It turns out that an invalid key also throws an exception, which is what we actually want in this case.
-     *
-     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_TEST_API_KEY
-     * @magentoConfigFixture default_store payment/mollie_general/type test
-     */
-    public function testCancelOrderThrowsAnExceptionWithTheOrderIdIncluded()
-    {
-        /** @var Orders $instance */
-        $instance = $this->objectManager->create(Orders::class);
-
-        /** @var OrderInterface $order */
-        $order = $this->objectManager->create(OrderInterface::class);
-        $order->setEntityId(999);
-        $order->setMollieTransactionId('MOLLIE-999');
-
-        try {
-            $instance->cancelOrder($order);
-        } catch (\Magento\Framework\Exception\LocalizedException $exception) {
-            $this->assertContains('Order ID: 999', $exception->getMessage());
-            return;
-        }
-
-        $this->fail('We expected an exception but this was not thrown');
-    }
-
     public function processTransactionProvider()
     {
         return [
@@ -50,22 +22,9 @@ class OrdersTest extends TestCase
                 'USD',
                 OrderStatus::STATUS_PAID,
                 [
-                    'Mollie: Order Amount %1, Captures Amount %2',
+                    'Mollie: Captured %1, Settlement Amount %2',
+                    'New order email sent',
                     'Notified customer about invoice #%1'
-                ]
-            ],
-            [
-                'EUR',
-                OrderStatus::STATUS_PAID,
-                [
-                    'Notified customer about invoice #%1'
-                ]
-            ],
-            [
-                'EUR',
-                OrderStatus::STATUS_AUTHORIZED,
-                [
-                    'New order email sent'
                 ]
             ],
         ];
@@ -84,13 +43,13 @@ class OrdersTest extends TestCase
      */
     public function testProcessTransaction($currency, $mollieOrderStatus, $orderCommentHistoryMessages)
     {
-        $orderEndpointMock = $this->createMock(OrderEndpoint::class);
-        $orderEndpointMock->method('get')->willReturn($this->mollieOrderMock($mollieOrderStatus, $currency));
+        $paymentEndpointMock = $this->createMock(PaymentEndpoint::class);
+        $paymentEndpointMock->method('get')->willReturn($this->getMolliePayment($mollieOrderStatus, $currency));
 
         $mollieApiMock = $this->createMock(MollieApiClient::class);
-        $mollieApiMock->orders = $orderEndpointMock;
+        $mollieApiMock->payments = $paymentEndpointMock;
 
-        $orderLinesMock = $this->createMock(OrderLines::class);
+        $orderLinesMock = $this->createMock(\Mollie\Payment\Model\OrderLines::class);
 
         $orderSenderMock = $this->createMock(OrderSender::class);
         $orderSenderMock->method('send')->willReturn(true);
@@ -119,7 +78,7 @@ class OrdersTest extends TestCase
         }
 
         /** @var Orders $instance */
-        $instance = $this->objectManager->create(Orders::class, [
+        $instance = $this->objectManager->create(Payments::class, [
             'orderLines' => $orderLinesMock,
             'orderSender' => $orderSenderMock,
             'invoiceSender' => $invoiceSenderMock,
@@ -130,33 +89,30 @@ class OrdersTest extends TestCase
         $order->setBaseCurrencyCode($currency);
         $order->setOrderCurrencyCode($currency);
 
-        if ($mollieOrderStatus == OrderStatus::STATUS_PAID) {
-            $order->setEmailSent(1);
-        }
-
         $instance->processTransaction($order, $mollieApiMock);
 
         $this->assertEquals(Order::STATE_PROCESSING, $order->getState());
     }
 
     /**
-     * @return \Mollie\Api\Resources\Order
+     * @return \Mollie\Api\Resources\Payment
      */
-    protected function mollieOrderMock($status, $currency)
+    protected function getMolliePayment($status, $currency)
     {
-        $mollieOrder = new \Mollie\Api\Resources\Order($this->createMock(MollieApiClient::class));
-        $mollieOrder->status = $status;
-        $mollieOrder->amountCaptured = new \stdClass;
-        $mollieOrder->amountCaptured->value = 50;
-        $mollieOrder->amountCaptured->currency = 'EUR';
+        $payment = new \Mollie\Api\Resources\Payment($this->createMock(MollieApiClient::class));
+        $payment->status = $status;
+        $payment->settlementAmount = new \stdClass;
+        $payment->settlementAmount->value = 50;
+        $payment->settlementAmount->currency = 'EUR';
 
-        $mollieOrder->amount = new \stdClass();
-        $mollieOrder->amount->value = 100;
-        $mollieOrder->amount->currency = $currency;
+        $payment->amount = new \stdClass();
+        $payment->amount->value = 100;
+        $payment->amount->currency = $currency;
 
-        $mollieOrder->_embedded = new \stdClass;
-        $mollieOrder->_embedded->payments = [new \stdClass];
-        $mollieOrder->_embedded->payments[0]->status = 'success';
-        return $mollieOrder;
+        $payment->_embedded = new \stdClass;
+        $payment->_embedded->payments = [new \stdClass];
+        $payment->_embedded->payments[0]->status = 'success';
+
+        return $payment;
     }
 }
