@@ -36,6 +36,7 @@ class ProcessAdjustmentFeeTest extends TestCase
         parent::setUp();
 
         $mockBuilder = $this->getMockBuilder(PaymentFactory::class);
+        $mockBuilder->disableOriginalConstructor();
         $mockBuilder->setMethods(['create']);
         $paymentFactory = $mockBuilder->getMock();
         $paymentFactory->method('create')->willReturn($this->createMock(Payment::class));
@@ -73,11 +74,11 @@ class ProcessAdjustmentFeeTest extends TestCase
         $mollieApi = $this->buildMollieApiMock();
 
         $this->paymentEndpoint->expects($this->once())->method('refund')->with(
-            $this->isInstanceOf(Payment::class), // $payment
+            $this->isInstanceOf(Payment::class),
             $this->callback(function ($argument) {
-                $this->assertSame('123.00', $argument['amount']['value']);
+                $this->assertSame('77.00', $argument['amount']['value']);
                 return true;
-            }) // $data
+            })
         );
 
         $this->instance->handle($mollieApi, $this->getOrderMock(), $creditmemo);
@@ -110,7 +111,6 @@ class ProcessAdjustmentFeeTest extends TestCase
     }
 
     /**
-     * @param \PHPUnit_Framework_MockObject_MockObject $mollieOrder
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
     private function buildMollieApiMock()
@@ -142,6 +142,7 @@ class ProcessAdjustmentFeeTest extends TestCase
             ->setMethods(['getMollieTransactionId', 'getOrderCurrencyCode'])
             ->getMockForAbstractClass();
         $order->method('getOrderCurrencyCode')->willReturn('EUR');
+        $order->method('getGrandTotal')->willReturn(200);
 
         return $order;
     }

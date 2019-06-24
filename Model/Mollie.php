@@ -9,6 +9,7 @@ namespace Mollie\Payment\Model;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DataObject;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\Context;
@@ -106,6 +107,10 @@ class Mollie extends AbstractMethod
      * @var AssetRepository
      */
     private $assetRepository;
+    /**
+     * @var ResourceConnection
+     */
+    private $resourceConnection;
 
     /**
      * Mollie constructor.
@@ -125,6 +130,7 @@ class Mollie extends AbstractMethod
      * @param CheckoutSession            $checkoutSession
      * @param SearchCriteriaBuilder      $searchCriteriaBuilder
      * @param AssetRepository            $assetRepository
+     * @param ResourceConnection         $resourceConnection
      * @param AbstractResource|null      $resource
      * @param AbstractDb|null            $resourceCollection
      * @param array                      $data
@@ -145,6 +151,7 @@ class Mollie extends AbstractMethod
         CheckoutSession $checkoutSession,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AssetRepository $assetRepository,
+        ResourceConnection $resourceConnection,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -170,6 +177,7 @@ class Mollie extends AbstractMethod
         $this->orderFactory = $orderFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->assetRepository = $assetRepository;
+        $this->resourceConnection = $resourceConnection;
     }
 
     /**
@@ -306,10 +314,25 @@ class Mollie extends AbstractMethod
         $mollieApi = $this->loadMollieApi($apiKey);
         $method = $this->mollieHelper->getApiMethod($order);
 
-        if ($method == 'order' && preg_match('/^ord_\w+$/', $transactionId)) {
-            return $this->ordersApi->processTransaction($order, $mollieApi, $type, $paymentToken);
-        } else {
-            return $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
+        // Defaults to the "default" connection when there is not connection available named "sales".
+        // This is required for stores with a split database (Enterprise only):
+        // https://devdocs.magento.com/guides/v2.3/config-guide/multi-master/multi-master.html
+        $connection = $this->resourceConnection->getConnection('sales');
+
+        try {
+            $connection->beginTransaction();
+
+            if ($method == 'order' && preg_match('/^ord_\w+$/', $transactionId)) {
+                $result = $this->ordersApi->processTransaction($order, $mollieApi, $type, $paymentToken);
+            } else {
+                $result = $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
+            }
+
+            $connection->commit();
+            return $result;
+        } catch (\Exception $exception) {
+            $connection->rollBack();
+            throw $exception;
         }
     }
 
