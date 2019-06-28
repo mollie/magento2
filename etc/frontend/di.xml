@@ -7,4 +7,8 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Framework\App\Request\CsrfValidator">
+        <plugin name="mollie_csrf_validation_disable" type="Mollie\Payment\Plugin\Framework\App\Request\CsrfValidatorSkip" />
+    </type>
 </config>
