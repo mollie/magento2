@@ -44,10 +44,10 @@ class StoreCreditTest extends TestCase
         );
     }
 
-    public function testOrderHasStoreCreditReturnsFalseWhenNotApplicable($column)
+    public function testOrderHasStoreCreditReturnsFalseWhenNotApplicable()
     {
         /** @var OrderInterface $order */
-        $order = $this->objectManager->get(OrderInterface::class);
+        $order = $this->objectManager->create(OrderInterface::class);
 
         /** @var StoreCredit $instance */
         $instance = $this->objectManager->get(StoreCredit::class);
@@ -61,7 +61,7 @@ class StoreCreditTest extends TestCase
     public function testThrowsAnExceptionWhenTheStoreCreditCantBeFound()
     {
         /** @var OrderInterface $order */
-        $order = $this->objectManager->get(OrderInterface::class);
+        $order = $this->objectManager->create(OrderInterface::class);
         $order->setEntityId(999);
 
         /** @var StoreCredit $instance */

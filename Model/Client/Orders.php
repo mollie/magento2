@@ -21,6 +21,8 @@ use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session\Proxy as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
+use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 
 /**
@@ -77,6 +79,14 @@ class Orders extends AbstractModel
      * @var ProcessAdjustmentFee
      */
     private $adjustmentFee;
+    /**
+     * @var StoreCredit
+     */
+    private $storeCredit;
+    /**
+     * @var RefundUsingPayment
+     */
+    private $refundUsingPayment;
 
     /**
      * Orders constructor.
@@ -92,6 +102,8 @@ class Orders extends AbstractModel
      * @param Registry              $registry
      * @param MollieHelper          $mollieHelper
      * @param ProcessAdjustmentFee  $adjustmentFee
+     * @param StoreCredit           $storeCredit
+     * @param RefundUsingPayment    $refundUsingPayment
      */
     public function __construct(
         OrderLines $orderLines,
@@ -104,7 +116,9 @@ class Orders extends AbstractModel
         ManagerInterface $messageManager,
         Registry $registry,
         MollieHelper $mollieHelper,
-        ProcessAdjustmentFee $adjustmentFee
+        ProcessAdjustmentFee $adjustmentFee,
+        StoreCredit $storeCredit,
+        RefundUsingPayment $refundUsingPayment
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -117,6 +131,8 @@ class Orders extends AbstractModel
         $this->registry = $registry;
         $this->mollieHelper = $mollieHelper;
         $this->adjustmentFee = $adjustmentFee;
+        $this->storeCredit = $storeCredit;
+        $this->refundUsingPayment = $refundUsingPayment;
     }
 
     /**
@@ -687,6 +703,17 @@ class Orders extends AbstractModel
             throw new LocalizedException(
                 __('Mollie API: %1', $exception->getMessage())
             );
+        }
+
+        if ($this->storeCredit->creditmemoHasStoreCredit($creditmemo)) {
+            $this->refundUsingPayment->execute(
+                $mollieApi,
+                $transactionId,
+                $creditmemo->getOrderCurrencyCode(),
+                $creditmemo->getBaseGrandTotal()
+            );
+
+            return $this;
         }
 
         /**

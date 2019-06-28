@@ -383,10 +383,14 @@ class OrderLines extends AbstractModel
             }
         }
 
+        $orderId = $creditmemo->getOrderId();
         if ($addShipping) {
-            $orderId = $creditmemo->getOrderId();
             $shippingFeeItemLine = $this->getShippingFeeItemLineOrder($orderId);
             $orderLines[] = ['id' => $shippingFeeItemLine->getLineId(), 'quantity' => 1];
+        }
+
+        if ($storeCreditLine = $this->getStoreCreditItemLineOrder($orderId)) {
+            $orderLines[] = ['id' => $storeCreditLine->getLineId(), 'quantity' => 1];
         }
 
         return ['lines' => $orderLines];
@@ -405,6 +409,21 @@ class OrderLines extends AbstractModel
             ->getLastItem();
 
         return $shippingLine;
+    }
+
+    /**
+     * @param $orderId
+     *
+     * @return OrderLines
+     */
+    public function getStoreCreditItemLineOrder($orderId)
+    {
+        $storeCreditLine = $this->orderLinesCollection->create()
+            ->addFieldToFilter('order_id', ['eq' => $orderId])
+            ->addFieldToFilter('type', ['eq' => 'store_credit'])
+            ->getLastItem();
+
+        return $storeCreditLine;
     }
 
     /**

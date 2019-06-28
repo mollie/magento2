@@ -2,7 +2,9 @@
 
 namespace Mollie\Payment\Service\Order\Lines;
 
+use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Model\Order\Creditmemo;
 use Mollie\Payment\Exceptions\NoStoreCreditFound;
 use Mollie\Payment\Helper\General;
 
@@ -25,11 +27,12 @@ class StoreCredit
 
     public function orderHasStoreCredit(OrderInterface $order)
     {
-        if ($order->getData('amstorecredit_amount')) {
-            return true;
-        }
+        return (bool)$order->getData('amstorecredit_amount');
+    }
 
-        return false;
+    public function creditmemoHasStoreCredit(CreditmemoInterface $creditmemo)
+    {
+        return (bool)$creditmemo->getData('amstorecredit_amount');
     }
 
     /**
