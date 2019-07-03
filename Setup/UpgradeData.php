@@ -153,7 +153,7 @@ class UpgradeData implements UpgradeDataInterface
 
     private function setCorrectWebsiteDefault($path)
     {
-        $connection = $connection = $this->resourceConnection->getConnection();
+        $connection = $this->resourceConnection->getConnection();
         $tableName = $this->resourceConnection->getTableName('core_config_data');
 
         $query = 'select value from ' . $tableName . ' where scope = "default" and path = :path';
