@@ -39,7 +39,7 @@ class ProcessAdjustmentFee
             $this->positive($mollieApi, $order, $creditmemo);
         }
 
-        if ($creditmemo->getAdjustmentNegative() < 0) {
+        if ($creditmemo->getAdjustmentNegative() != 0) {
             $this->negative($mollieApi, $order, $creditmemo);
         }
     }
@@ -65,7 +65,7 @@ class ProcessAdjustmentFee
     {
         $this->doNotRefundInMollie = true;
 
-        $amountToRefund = $creditmemo->getSubtotal() - $creditmemo->getAdjustmentNegative();
+        $amountToRefund = $order->getGrandTotal() - abs($creditmemo->getAdjustmentNegative());
 
         $this->refundUsingPayment->execute(
             $mollieApi,
