@@ -4,7 +4,6 @@ namespace Mollie\Payment\Service\Order\Lines;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order\Creditmemo;
 use Mollie\Payment\Exceptions\NoStoreCreditFound;
 use Mollie\Payment\Helper\General;
 
@@ -27,12 +26,28 @@ class StoreCredit
 
     public function orderHasStoreCredit(OrderInterface $order)
     {
-        return (bool)$order->getData('amstorecredit_amount');
+        if ($order->getData('customer_balance_amount')) {
+            return true;
+        }
+
+        if ($order->getData('amstorecredit_amount')) {
+            return true;
+        }
+
+        return false;
     }
 
     public function creditmemoHasStoreCredit(CreditmemoInterface $creditmemo)
     {
-        return (bool)$creditmemo->getData('amstorecredit_amount');
+        if ($creditmemo->getData('customer_balance_amount')) {
+            return true;
+        }
+
+        if ($creditmemo->getData('amstorecredit_amount')) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -67,6 +82,12 @@ class StoreCredit
      */
     private function getUnitPrice(OrderInterface $order, $forceBaseCurrency)
     {
+        if ($order->getData('customer_balance_amount')) {
+            return $forceBaseCurrency ?
+                $order->getData('base_customer_balance_amount') :
+                $order->getData('customer_balance_amount');
+        }
+
         if ($order->getData('amstorecredit_amount')) {
             return $forceBaseCurrency ?
                 $order->getData('amstorecredit_base_amount') :
@@ -82,7 +103,8 @@ class StoreCredit
     }
 
     /**
-     * There's only an implementation for the Amasty Store Credit, which doesn't support tax on the amounts.
+     * The current implementations, Magento Enterprise Store Credit and  Amasty Store Credit,
+     * don't support tax on the amounts.
      *
      * @param OrderInterface $order
      * @param bool $forceBaseCurrency
@@ -94,7 +116,8 @@ class StoreCredit
     }
 
     /**
-     * There's only an implementation for the Amasty Store Credit, which doesn't support tax on the amounts.
+     * The current implementations, Magento Enterprise Store Credit and  Amasty Store Credit,
+     * don't support tax on the amounts.
      *
      * @param OrderInterface $order
      * @param bool $forceBaseCurrency
