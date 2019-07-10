@@ -65,6 +65,7 @@ class General extends AbstractHelper
     const XML_PATH_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const XML_PATH_STATUS_PENDING_BANKTRANSFER = 'payment/mollie_methods_banktransfer/order_status_pending';
     const XML_PATH_BANKTRANSFER_DUE_DAYS = 'payment/mollie_methods_banktransfer/due_days';
+    const XML_PATH_INVOICE_MOMENT = 'payment/mollie_general/invoice_moment';
     const XML_PATH_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const XML_PATH_LOCALE = 'payment/mollie_general/locale';
     const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
@@ -441,6 +442,16 @@ class General extends AbstractHelper
     public function getStatusPendingBanktransfer($storeId = 0)
     {
         return $this->getStoreConfig(self::XML_PATH_STATUS_PENDING_BANKTRANSFER, $storeId);
+    }
+
+    /**
+     * @see \Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment
+     * @param int $storeId
+     * @return string
+     */
+    public function getInvoiceMoment($storeId = 0)
+    {
+        return $this->getStoreConfig(static::XML_PATH_INVOICE_MOMENT, $storeId);
     }
 
     /**

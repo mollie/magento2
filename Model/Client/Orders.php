@@ -11,7 +11,9 @@ use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Registry;
+use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
@@ -309,7 +311,7 @@ class Orders extends AbstractModel
                         $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
                     }
 
-                    if ($mollieOrder->isAuthorized()) {
+                    if ($mollieOrder->isAuthorized() && $this->mollieHelper->getInvoiceMoment($storeId) == 'authorized') {
                         $payment->setIsTransactionClosed(false);
                         $payment->registerAuthorizationNotification($order->getBaseGrandTotal(), true);
 
@@ -503,8 +505,6 @@ class Orders extends AbstractModel
     public function createShipment(Order\Shipment $shipment, Order $order)
     {
         $shipAll = false;
-        $orderId = $order->getId();
-
         $transactionId = $order->getMollieTransactionId();
         if (empty($transactionId)) {
             $msg = ['error' => true, 'msg' => __('Transaction ID not found')];
@@ -559,6 +559,7 @@ class Orders extends AbstractModel
 
                 $mollieShipment = $mollieOrder->createShipment($orderLines);
             }
+
             $mollieShipmentId = isset($mollieShipment) ? $mollieShipment->id : 0;
             $shipment->setMollieShipmentId($mollieShipmentId);
 
@@ -567,17 +568,18 @@ class Orders extends AbstractModel
              */
             $payment = $order->getPayment();
             if (!$payment->getIsTransactionClosed()) {
-                $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
+                $invoice = $this->createPartialInvoice($shipment, $transactionId);
+
+                $captureAmount = $this->getCaptureAmount($order, $invoice);
+
+                $payment->registerCaptureNotification($captureAmount, true);
                 $this->orderRepository->save($order);
 
-                /** @var Order\Invoice $invoice */
-                $invoice = $payment->getCreatedInvoice();
                 $sendInvoice = $this->mollieHelper->sendInvoice($order->getStoreId());
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
                     $this->invoiceSender->send($invoice);
                     $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $order->addStatusHistoryComment($message)->setIsCustomerNotified(true);
-                    $this->orderRepository->save($order);
+                    $this->orderCommentHistory->add($order, $message, true);
                 }
             }
         } catch (\Exception $e) {
@@ -843,5 +845,61 @@ class Orders extends AbstractModel
          * are shipped.
          */
         return array_sum($shippableOrderItems) == 0;
+    }
+
+    /**
+     * @param Order\Shipment $shipment
+     * @param Order $order
+     * @param \Magento\Sales\Api\Data\OrderPaymentInterface $payment
+     * @param $transactionId
+     * @return Invoice
+     * @throws LocalizedException
+     */
+    private function createPartialInvoice(Order\Shipment $shipment)
+    {
+        $order = $shipment->getOrder();
+        $payment = $order->getPayment();
+
+        if (
+            !in_array($payment->getMethod(), ['mollie_methods_klarnapaylater', 'mollie_methods_klarnasliceit']) ||
+            $this->mollieHelper->getInvoiceMoment($order->getStoreId()) != 'shipment'
+        ) {
+            return null;
+        }
+
+        $quantities = [];
+        /** @var ShipmentItemInterface $item */
+        foreach ($shipment->getAllItems() as $item) {
+            $quantities[$item->getOrderItemId()] = $item->getQty();
+        }
+
+        $invoice = $this->invoiceService->prepareInvoice($order, $quantities);
+        $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
+        $invoice->setState(Invoice::STATE_PAID);
+        $invoice->setTransactionId($order->getMollieTransactionId());
+        $invoice->register();
+
+        $this->invoiceRepository->save($invoice);
+
+        return $invoice;
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @param InvoiceInterface|null $invoice
+     * @return double
+     */
+    private function getCaptureAmount(OrderInterface $order, InvoiceInterface $invoice = null)
+    {
+        if ($invoice) {
+            return $invoice->getBaseGrandTotal();
+        }
+
+        $payment = $order->getPayment();
+        if ($invoice = $payment->getCreatedInvoice()) {
+            return $invoice->getBaseGrandTotal();
+        }
+
+        return $order->getBaseGrandTotal();
     }
 }
