@@ -559,7 +559,7 @@ class General extends AbstractHelper
             }
         }
 
-        if ($locale) {
+        if ($locale && $locale != 'store') {
             return $locale;
         }
 

@@ -3,6 +3,7 @@
 namespace Mollie\Payment\Model\Client;
 
 use Magento\Framework\Phrase;
+use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
@@ -138,6 +139,21 @@ class OrdersTest extends TestCase
         $instance->processTransaction($order, $mollieApiMock);
 
         $this->assertEquals(Order::STATE_PROCESSING, $order->getState());
+    }
+
+    public function testRemovesEmptySpaceFromThePrefix()
+    {
+        /** @var Orders $instance */
+        $instance = $this->objectManager->get(Orders::class);
+
+        /** @var OrderAddressInterface $address */
+        $address = $this->objectManager->get(OrderAddressInterface::class);
+
+        $address->setPrefix('     ');
+
+        $result = $instance->getAddressLine($address);
+
+        $this->assertEmpty($result['title']);
     }
 
     /**
