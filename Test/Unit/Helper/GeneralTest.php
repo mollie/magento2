@@ -6,9 +6,17 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Order;
+use Mollie\Payment\Helper\General as MollieHelper;
 
 class GeneralTest extends \PHPUnit\Framework\TestCase
 {
+    /**
+     * @var ObjectManager
+     */
+    private $objectManager;
+
     public function returnsTheCorrectDescriptionProvider()
     {
         return [
@@ -20,13 +28,16 @@ class GeneralTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
+    protected function setUp()
+    {
+        $this->objectManager = new ObjectManager($this);
+    }
+
     /**
      * @dataProvider returnsTheCorrectDescriptionProvider
      */
     public function testReturnsTheCorrectDescription($description, $expected)
     {
-        $ob = new ObjectManager($this);
-
         $storeConfigMock = $this->createMock(ScopeConfigInterface::class);
         $storeManagerMock = $this->createMock(StoreManagerInterface::class);
         $storeMock = $this->createMock(StoreInterface::class);
@@ -36,8 +47,8 @@ class GeneralTest extends \PHPUnit\Framework\TestCase
 
         $storeConfigMock->method('getValue')->willReturn($description);
 
-        /** @var \Mollie\Payment\Helper\General $instance */
-        $instance = $ob->getObject(\Mollie\Payment\Helper\General::class, [
+        /** @var MollieHelper $instance */
+        $instance = $this->objectManager->getObject(MollieHelper::class, [
             'storeManager' => $storeManagerMock,
         ]);
 
@@ -49,5 +60,52 @@ class GeneralTest extends \PHPUnit\Framework\TestCase
         $result = $instance->getPaymentDescription('ideal', '0000025');
 
         $this->assertSame($expected, $result);
+    }
+
+    public function getLastRelevantStatusProvider()
+    {
+        return [
+            [['expired'], 'expired'],
+            [['expired', 'paid'], 'paid'],
+            [['paid', 'expired'], 'paid'],
+            [['authorized', 'paid', 'expired'], 'paid'],
+        ];
+    }
+
+    /**
+     * @param $statuses
+     * @param $expected
+     * @dataProvider getLastRelevantStatusProvider
+     */
+    public function testGetLastRelevantStatus($statuses, $expected)
+    {
+        /** @var MollieHelper $instance */
+        $instance = $this->objectManager->getObject(MollieHelper::class);
+
+        $order = new Order($this->createMock(MollieApiClient::class));
+        $order->_embedded = new \stdClass;
+        $order->_embedded->payments = [];
+
+        foreach ($statuses as $status) {
+            $payment = new \stdClass;
+            $payment->status = $status;
+            $order->_embedded->payments[] = $payment;
+        }
+
+        $status = $instance->getLastRelevantStatus($order);
+
+        $this->assertEquals($expected, $status);
+    }
+
+    public function testReturnsNullIfNoPaymentsAreAvailable()
+    {
+        /** @var MollieHelper $instance */
+        $instance = $this->objectManager->getObject(MollieHelper::class);
+
+        $order = new Order($this->createMock(MollieApiClient::class));
+
+        $status = $instance->getLastRelevantStatus($order);
+
+        $this->assertNull($status);
     }
 }

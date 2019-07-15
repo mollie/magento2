@@ -281,8 +281,7 @@ class Orders extends AbstractModel
         /**
          * Check if last payment was canceled, failed or expired and redirect customer to cart for retry.
          */
-        $lastPayment = isset($mollieOrder->_embedded->payments) ? end($mollieOrder->_embedded->payments) : null;
-        $lastPaymentStatus = isset($lastPayment) ? $lastPayment->status : null;
+        $lastPaymentStatus = $this->mollieHelper->getLastRelevantStatus($mollieOrder);
         if ($lastPaymentStatus == 'canceled' || $lastPaymentStatus == 'failed' || $lastPaymentStatus == 'expired') {
             $method = $order->getPayment()->getMethodInstance()->getTitle();
             $order->getPayment()->setAdditionalInformation('payment_status', $lastPaymentStatus);

@@ -17,6 +17,7 @@ use Magento\Sales\Model\OrderRepository;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Payment\Helper\Data as PaymentHelper;
+use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Payment\Logger\MollieLogger;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
@@ -844,5 +845,27 @@ class General extends AbstractHelper
             array_values($replacements),
             $description
         );
+    }
+
+    /**
+     * If one of the payments has the status 'paid', return that status. Otherwise return the last status.
+     *
+     * @param MollieOrder $order
+     * @return string|null
+     */
+    public function getLastRelevantStatus(MollieOrder $order)
+    {
+        if (!isset($order->_embedded->payments)) {
+            return null;
+        }
+
+        $payments = $order->_embedded->payments;
+        foreach ($payments as $payment) {
+            if ($payment->status == 'paid') {
+                return 'paid';
+            }
+        }
+
+        return end($payments)->status;
     }
 }
