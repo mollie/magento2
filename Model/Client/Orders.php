@@ -22,6 +22,8 @@ use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
+use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 
@@ -80,6 +82,14 @@ class Orders extends AbstractModel
      */
     private $adjustmentFee;
     /**
+     * @var StoreCredit
+     */
+    private $storeCredit;
+    /**
+     * @var RefundUsingPayment
+     */
+    private $refundUsingPayment;
+    /**
      * @var OrderCommentHistory
      */
     private $orderCommentHistory;
@@ -98,6 +108,8 @@ class Orders extends AbstractModel
      * @param Registry              $registry
      * @param MollieHelper          $mollieHelper
      * @param ProcessAdjustmentFee  $adjustmentFee
+     * @param StoreCredit           $storeCredit
+     * @param RefundUsingPayment    $refundUsingPayment
      * @param OrderCommentHistory   $orderCommentHistory
      */
     public function __construct(
@@ -112,6 +124,8 @@ class Orders extends AbstractModel
         Registry $registry,
         MollieHelper $mollieHelper,
         ProcessAdjustmentFee $adjustmentFee,
+        StoreCredit $storeCredit,
+        RefundUsingPayment $refundUsingPayment,
         OrderCommentHistory $orderCommentHistory
     ) {
         $this->orderLines = $orderLines;
@@ -125,6 +139,8 @@ class Orders extends AbstractModel
         $this->registry = $registry;
         $this->mollieHelper = $mollieHelper;
         $this->adjustmentFee = $adjustmentFee;
+        $this->storeCredit = $storeCredit;
+        $this->refundUsingPayment = $refundUsingPayment;
         $this->orderCommentHistory = $orderCommentHistory;
     }
 
@@ -695,6 +711,17 @@ class Orders extends AbstractModel
             throw new LocalizedException(
                 __('Mollie API: %1', $exception->getMessage())
             );
+        }
+
+        if ($this->storeCredit->creditmemoHasStoreCredit($creditmemo)) {
+            $this->refundUsingPayment->execute(
+                $mollieApi,
+                $transactionId,
+                $creditmemo->getOrderCurrencyCode(),
+                $creditmemo->getBaseGrandTotal()
+            );
+
+            return $this;
         }
 
         /**

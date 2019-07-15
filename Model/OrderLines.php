@@ -18,6 +18,7 @@ use Mollie\Payment\Model\ResourceModel\OrderLines\Collection as OrderLinesCollec
 use Mollie\Payment\Model\ResourceModel\OrderLines\CollectionFactory as OrderLinesCollectionFactory;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\Exception\LocalizedException;
+use Mollie\Payment\Service\Order\Lines\StoreCredit;
 
 class OrderLines extends AbstractModel
 {
@@ -34,6 +35,10 @@ class OrderLines extends AbstractModel
      * @var OrderLinesCollectionFactory
      */
     private $orderLinesCollection;
+    /**
+     * @var StoreCredit
+     */
+    private $storeCredit;
 
     /**
      * OrderLines constructor.
@@ -43,6 +48,7 @@ class OrderLines extends AbstractModel
      * @param OrderLinesCollectionFactory $orderLinesCollection
      * @param Context                     $context
      * @param Registry                    $registry
+     * @param StoreCredit                 $storeCredit
      * @param AbstractResource|null       $resource
      * @param AbstractDb|null             $resourceCollection
      * @param array                       $data
@@ -53,6 +59,7 @@ class OrderLines extends AbstractModel
         OrderLinesCollectionFactory $orderLinesCollection,
         Context $context,
         Registry $registry,
+        StoreCredit $storeCredit,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -60,6 +67,7 @@ class OrderLines extends AbstractModel
         $this->mollieHelper = $mollieHelper;
         $this->orderLinesFactory = $orderLinesFactory;
         $this->orderLinesCollection = $orderLinesCollection;
+        $this->storeCredit = $storeCredit;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
     }
 
@@ -173,6 +181,10 @@ class OrderLines extends AbstractModel
             ];
 
             $orderLines[] = $orderLine;
+        }
+
+        if ($this->storeCredit->orderHasStoreCredit($order)) {
+            $orderLines[] = $this->storeCredit->getOrderLine($order, $forceBaseCurrency);
         }
 
         $this->saveOrderLines($orderLines, $order);
@@ -402,10 +414,14 @@ class OrderLines extends AbstractModel
             }
         }
 
+        $orderId = $creditmemo->getOrderId();
         if ($addShipping) {
-            $orderId = $creditmemo->getOrderId();
             $shippingFeeItemLine = $this->getShippingFeeItemLineOrder($orderId);
             $orderLines[] = ['id' => $shippingFeeItemLine->getLineId(), 'quantity' => 1];
+        }
+
+        if ($storeCreditLine = $this->getStoreCreditItemLineOrder($orderId)) {
+            $orderLines[] = ['id' => $storeCreditLine->getLineId(), 'quantity' => 1];
         }
 
         return ['lines' => $orderLines];
@@ -424,6 +440,21 @@ class OrderLines extends AbstractModel
             ->getLastItem();
 
         return $shippingLine;
+    }
+
+    /**
+     * @param $orderId
+     *
+     * @return OrderLines
+     */
+    public function getStoreCreditItemLineOrder($orderId)
+    {
+        $storeCreditLine = $this->orderLinesCollection->create()
+            ->addFieldToFilter('order_id', ['eq' => $orderId])
+            ->addFieldToFilter('type', ['eq' => 'store_credit'])
+            ->getLastItem();
+
+        return $storeCreditLine;
     }
 
     /**
