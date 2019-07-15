@@ -13,8 +13,7 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\ResourceModel\Order\Tax\Item as TaxItem;
-use Magento\Tax\Model\Config as TaxConfig;
+use Magento\Sales\Model\Order\Item;
 use Mollie\Payment\Model\ResourceModel\OrderLines\Collection as OrderLinesCollection;
 use Mollie\Payment\Model\ResourceModel\OrderLines\CollectionFactory as OrderLinesCollectionFactory;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -28,14 +27,6 @@ class OrderLines extends AbstractModel
      */
     private $mollieHelper;
     /**
-     * @var TaxConfig
-     */
-    private $taxConfig;
-    /**
-     * @var TaxItem
-     */
-    private $taxItem;
-    /**
      * @var OrderLinesFactory
      */
     private $orderLinesFactory;
@@ -48,8 +39,6 @@ class OrderLines extends AbstractModel
      * OrderLines constructor.
      *
      * @param MollieHelper                $mollieHelper
-     * @param TaxConfig                   $taxConfig
-     * @param TaxItem                     $taxItem
      * @param OrderLinesFactory           $orderLinesFactory
      * @param OrderLinesCollectionFactory $orderLinesCollection
      * @param Context                     $context
@@ -60,8 +49,6 @@ class OrderLines extends AbstractModel
      */
     public function __construct(
         MollieHelper $mollieHelper,
-        TaxConfig $taxConfig,
-        TaxItem $taxItem,
         OrderLinesFactory $orderLinesFactory,
         OrderLinesCollectionFactory $orderLinesCollection,
         Context $context,
@@ -71,8 +58,6 @@ class OrderLines extends AbstractModel
         array $data = []
     ) {
         $this->mollieHelper = $mollieHelper;
-        $this->taxConfig = $taxConfig;
-        $this->taxItem = $taxItem;
         $this->orderLinesFactory = $orderLinesFactory;
         $this->orderLinesCollection = $orderLinesCollection;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
@@ -93,22 +78,24 @@ class OrderLines extends AbstractModel
 
         /** @var \Magento\Sales\Model\Order\Item $item */
         foreach ($order->getAllVisibleItems() as $item) {
-            $quantity = round($item->getQtyOrdered());
-            $rowTotalInclTax = $forceBaseCurrency ? $item->getBaseRowTotalInclTax() : $item->getRowTotalInclTax();
-            $discountAmount = $forceBaseCurrency ? $item->getBaseDiscountAmount() : $item->getDiscountAmount();
-
-            /**
-             * The price of a single item including VAT in the order line.
-             * Calculated back from the $rowTotalInclTax to overcome rounding issues.
-             */
-            $unitPrice = round($rowTotalInclTax / $quantity, 2);
 
             /**
              * The total amount of the line, including VAT and discounts
              * Should Match: (unitPrice × quantity) - discountAmount
              * NOTE: TotalAmount can differ from actutal Total Amount due to rouding in tax or exchange rate
              */
-            $totalAmount = $rowTotalInclTax - $discountAmount;
+            $totalAmount = $this->getTotalAmountOrderItem($item, $forceBaseCurrency);
+
+            /**
+             * The total discount amount of the line.
+             */
+            $discountAmount = $this->getDiscountAmountOrderItem($item, $forceBaseCurrency);
+
+            /**
+             * The price of a single item including VAT in the order line.
+             * Calculated back from the totalAmount + discountAmount to overcome rounding issues.
+             */
+            $unitPrice = round(($totalAmount + $discountAmount) / $item->getQtyOrdered(), 2);
 
             /**
              * The amount of VAT on the line.
@@ -119,16 +106,16 @@ class OrderLines extends AbstractModel
             $vatAmount = round($totalAmount * ($item->getTaxPercent() / (100 + $item->getTaxPercent())), 2);
 
             $orderLine = [
-                'item_id'        => $item->getId(),
-                'type'           => $item->getProduct()->getTypeId() != 'downloadable' ? 'physical' : 'digital',
-                'name'           => preg_replace("/[^A-Za-z0-9 -]/", "", $item->getName()),
-                'quantity'       => $quantity,
-                'unitPrice'      => $this->mollieHelper->getAmountArray($currency, $unitPrice),
-                'totalAmount'    => $this->mollieHelper->getAmountArray($currency, $totalAmount),
-                'vatRate'        => sprintf("%.2f", $item->getTaxPercent()),
-                'vatAmount'      => $this->mollieHelper->getAmountArray($currency, $vatAmount),
-                'sku'            => $item->getProduct()->getSku(),
-                'productUrl'     => $item->getProduct()->getProductUrl()
+                'item_id'     => $item->getId(),
+                'type'        => $item->getProduct()->getTypeId() != 'downloadable' ? 'physical' : 'digital',
+                'name'        => preg_replace("/[^A-Za-z0-9 -]/", "", $item->getName()),
+                'quantity'    => round($item->getQtyOrdered()),
+                'unitPrice'   => $this->mollieHelper->getAmountArray($currency, $unitPrice),
+                'totalAmount' => $this->mollieHelper->getAmountArray($currency, $totalAmount),
+                'vatRate'     => sprintf("%.2f", $item->getTaxPercent()),
+                'vatAmount'   => $this->mollieHelper->getAmountArray($currency, $vatAmount),
+                'sku'         => $item->getProduct()->getSku(),
+                'productUrl'  => $item->getProduct()->getProductUrl()
             ];
 
             if ($discountAmount) {
@@ -141,57 +128,49 @@ class OrderLines extends AbstractModel
                 /** @var Order\Item $childItem */
                 foreach ($item->getChildrenItems() as $childItem) {
                     $orderLines[] = [
-                        'item_id'        => $childItem->getId(),
-                        'type'           => $childItem->getProduct()->getTypeId() != 'downloadable' ? 'physical' : 'digital',
-                        'name'           => preg_replace("/[^A-Za-z0-9 -]/", "", $childItem->getName()),
-                        'quantity'       => $quantity,
-                        'unitPrice'      => $this->mollieHelper->getAmountArray($currency, 0),
-                        'totalAmount'    => $this->mollieHelper->getAmountArray($currency, 0),
-                        'vatRate'        => sprintf("%.2f", $childItem->getTaxPercent()),
-                        'vatAmount'      => $this->mollieHelper->getAmountArray($currency, 0),
-                        'sku'            => $childItem->getProduct()->getSku(),
-                        'productUrl'     => $childItem->getProduct()->getProductUrl()
+                        'item_id'     => $childItem->getId(),
+                        'type'        => $childItem->getProduct()->getTypeId() != 'downloadable' ? 'physical' : 'digital',
+                        'name'        => preg_replace("/[^A-Za-z0-9 -]/", "", $childItem->getName()),
+                        'quantity'    => round($item->getQtyOrdered()),
+                        'unitPrice'   => $this->mollieHelper->getAmountArray($currency, 0),
+                        'totalAmount' => $this->mollieHelper->getAmountArray($currency, 0),
+                        'vatRate'     => sprintf("%.2f", $childItem->getTaxPercent()),
+                        'vatAmount'   => $this->mollieHelper->getAmountArray($currency, 0),
+                        'sku'         => $childItem->getProduct()->getSku(),
+                        'productUrl'  => $childItem->getProduct()->getProductUrl()
                     ];
                 }
             }
         }
 
         if (!$order->getIsVirtual()) {
-            $baseShipping = $forceBaseCurrency ? $order->getBaseShippingAmount() : $order->getShippingAmount();
-            $rowTotalInclTax = $forceBaseCurrency ? $baseShipping + $order->getBaseShippingTaxAmount() : $baseShipping + $order->getShippingTaxAmount();
-            $discountAmount = $forceBaseCurrency ? $order->getBaseShippingDiscountAmount() : $order->getShippingDiscountAmount();
 
             /**
              * The total amount of the line, including VAT and discounts
-             * Should Match: (unitPrice × quantity) - discountAmount
              * NOTE: TotalAmount can differ from actutal Total Amount due to rouding in tax or exchange rate
              */
-            $totalAmount = $rowTotalInclTax - $discountAmount;
+            $totalAmount = $this->getTotalAmountShipping($order, $forceBaseCurrency);
+
+            $vatRate = $this->getShippingVatRate($order);
 
             /**
              * The amount of VAT on the line.
              * Should Match: totalAmount × (vatRate / (100 + vatRate)).
-             * Due to Mollie API requirements, we calculate this instead of using $order->getBaseShippingTaxAmount() to overcome
-             * any rouding issues.
+             * Due to Mollie API requirements, we recalculare this from totalAmount
              */
-            $vatRate = $this->getShippingVatRate($order);
             $vatAmount = round($totalAmount * ($vatRate / (100 + $vatRate)), 2);
 
             $orderLine = [
-                'item_id'        => '',
-                'type'           => 'shipping_fee',
-                'name'           => preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription()),
-                'quantity'       => 1,
-                'unitPrice'      => $this->mollieHelper->getAmountArray($currency, $rowTotalInclTax),
-                'totalAmount'    => $this->mollieHelper->getAmountArray($currency, $totalAmount),
-                'vatRate'        => sprintf("%.2f", $vatRate),
-                'vatAmount'      => $this->mollieHelper->getAmountArray($currency, $vatAmount),
-                'sku'            => $order->getShippingMethod()
+                'item_id'     => '',
+                'type'        => 'shipping_fee',
+                'name'        => preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription()),
+                'quantity'    => 1,
+                'unitPrice'   => $this->mollieHelper->getAmountArray($currency, $totalAmount),
+                'totalAmount' => $this->mollieHelper->getAmountArray($currency, $totalAmount),
+                'vatRate'     => sprintf("%.2f", $vatRate),
+                'vatAmount'   => $this->mollieHelper->getAmountArray($currency, $vatAmount),
+                'sku'         => $order->getShippingMethod()
             ];
-
-            if ($discountAmount) {
-                $orderLine['discountAmount'] = $this->mollieHelper->getAmountArray($currency, $discountAmount);
-            }
 
             $orderLines[] = $orderLine;
         }
@@ -205,19 +184,71 @@ class OrderLines extends AbstractModel
     }
 
     /**
+     * @param Item $item
+     * @param      $forceBaseCurrency
+     *
+     * @return float
+     */
+    private function getTotalAmountOrderItem(Item $item, $forceBaseCurrency)
+    {
+        if ($forceBaseCurrency) {
+            return $item->getBaseRowTotal()
+                - $item->getBaseDiscountAmount()
+                + $item->getBaseTaxAmount()
+                + $item->getBaseDiscountTaxCompensationAmount();
+        }
+
+        return $item->getRowTotal()
+            - $item->getDiscountAmount()
+            + $item->getTaxAmount()
+            + $item->getDiscountTaxCompensationAmount();
+    }
+
+    /**
+     * @param Item $item
+     * @param      $forceBaseCurrency
+     *
+     * @return float
+     */
+    private function getDiscountAmountOrderItem(Item $item, $forceBaseCurrency)
+    {
+        if ($forceBaseCurrency) {
+            return $item->getBaseDiscountAmount() + $item->getBaseDiscountTaxCompensationAmount();
+        }
+
+        return $item->getDiscountAmount() + $item->getDiscountTaxCompensationAmount();
+    }
+
+    /**
+     * @param Order $order
+     * @param       $forceBaseCurrency
+     *
+     * @return float
+     */
+    private function getTotalAmountShipping(Order $order, $forceBaseCurrency)
+    {
+
+        if ($forceBaseCurrency) {
+            return $order->getBaseShippingAmount()
+                + $order->getBaseShippingTaxAmount()
+                + $order->getBaseShippingDiscountTaxCompensationAmnt();
+        }
+
+        return $order->getShippingAmount()
+            + $order->getShippingTaxAmount()
+            + $order->getShippingDiscountTaxCompensationAmount();
+    }
+
+    /**
      * @param Order $order
      *
      * @return mixed
      */
     public function getShippingVatRate(Order $order)
     {
-        $taxPercentage = '0.00';
-        $taxItems = $this->taxItem->getTaxItemsByOrderId($order->getId());
-        if (is_array($taxItems)) {
-            $key = array_search('shipping', array_column($taxItems, 'taxable_item_type'));
-            if ($key !== false && isset($taxItems[$key]['tax_percent'])) {
-                $taxPercentage = $taxItems[$key]['tax_percent'];
-            }
+        $taxPercentage = 0;
+        if ($order->getShippingAmount() > 0) {
+            $taxPercentage = ($order->getShippingTaxAmount() / $order->getShippingAmount()) * 100;
         }
 
         return $taxPercentage;
