@@ -82,3 +82,8 @@
 "Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment."
 "Warning: we recommend to use a unique payment status for pending Banktransfer payments","Warning: we recommend to use a unique payment status for pending Banktransfer payments"
 "<strong>Please note:</strong> This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS.","<strong>Please note:</strong> This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS."
+Fetching...,Fetching...
+Error While Fetching,Error While Fetching
+Fetch Status,Fetch Status
+The latest status from Mollie has been retrieved,The latest status from Mollie has been retrieved
+The payment-status will updated automatically by default, but in case of any interruption you can use this function to fetch the payment status manually.,The payment-status will updated automatically by default, but in case of any interruption you can use this function to fetch the payment status manually.

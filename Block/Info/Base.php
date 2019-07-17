@@ -137,4 +137,16 @@ class Base extends Info
 
         return $code . '.png';
     }
+
+    /**
+     * @return string
+     */
+    public function getOrderId()
+    {
+        try {
+            return $this->getInfo()->getParentId();
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+    }
 }
