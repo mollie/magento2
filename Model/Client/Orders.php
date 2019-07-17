@@ -23,8 +23,10 @@ use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 
 /**
@@ -85,6 +87,10 @@ class Orders extends AbstractModel
      * @var OrderCommentHistory
      */
     private $orderCommentHistory;
+    /**
+     * @var PartialInvoice
+     */
+    private $partialInvoice;
 
     /**
      * Orders constructor.
@@ -101,6 +107,7 @@ class Orders extends AbstractModel
      * @param MollieHelper          $mollieHelper
      * @param ProcessAdjustmentFee  $adjustmentFee
      * @param OrderCommentHistory   $orderCommentHistory
+     * @param PartialInvoice        $partialInvoice
      */
     public function __construct(
         OrderLines $orderLines,
@@ -114,7 +121,8 @@ class Orders extends AbstractModel
         Registry $registry,
         MollieHelper $mollieHelper,
         ProcessAdjustmentFee $adjustmentFee,
-        OrderCommentHistory $orderCommentHistory
+        OrderCommentHistory $orderCommentHistory,
+        PartialInvoice $partialInvoice
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -128,6 +136,7 @@ class Orders extends AbstractModel
         $this->mollieHelper = $mollieHelper;
         $this->adjustmentFee = $adjustmentFee;
         $this->orderCommentHistory = $orderCommentHistory;
+        $this->partialInvoice = $partialInvoice;
     }
 
     /**
@@ -311,7 +320,9 @@ class Orders extends AbstractModel
                         $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
                     }
 
-                    if ($mollieOrder->isAuthorized() && $this->mollieHelper->getInvoiceMoment($storeId) == 'authorized') {
+                    if ($mollieOrder->isAuthorized() &&
+                        $this->mollieHelper->getInvoiceMoment($storeId) == InvoiceMoment::ON_AUTHORIZE
+                    ) {
                         $payment->setIsTransactionClosed(false);
                         $payment->registerAuthorizationNotification($order->getBaseGrandTotal(), true);
 
@@ -568,7 +579,10 @@ class Orders extends AbstractModel
              */
             $payment = $order->getPayment();
             if (!$payment->getIsTransactionClosed()) {
-                $invoice = $this->createPartialInvoice($shipment, $transactionId);
+                $invoice = null;
+                if (!$shipAll) {
+                    $invoice = $this->partialInvoice->createFromShipment($shipment);
+                }
 
                 $captureAmount = $this->getCaptureAmount($order, $invoice);
 
@@ -845,43 +859,6 @@ class Orders extends AbstractModel
          * are shipped.
          */
         return array_sum($shippableOrderItems) == 0;
-    }
-
-    /**
-     * @param Order\Shipment $shipment
-     * @param Order $order
-     * @param \Magento\Sales\Api\Data\OrderPaymentInterface $payment
-     * @param $transactionId
-     * @return Invoice
-     * @throws LocalizedException
-     */
-    private function createPartialInvoice(Order\Shipment $shipment)
-    {
-        $order = $shipment->getOrder();
-        $payment = $order->getPayment();
-
-        if (
-            !in_array($payment->getMethod(), ['mollie_methods_klarnapaylater', 'mollie_methods_klarnasliceit']) ||
-            $this->mollieHelper->getInvoiceMoment($order->getStoreId()) != 'shipment'
-        ) {
-            return null;
-        }
-
-        $quantities = [];
-        /** @var ShipmentItemInterface $item */
-        foreach ($shipment->getAllItems() as $item) {
-            $quantities[$item->getOrderItemId()] = $item->getQty();
-        }
-
-        $invoice = $this->invoiceService->prepareInvoice($order, $quantities);
-        $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
-        $invoice->setState(Invoice::STATE_PAID);
-        $invoice->setTransactionId($order->getMollieTransactionId());
-        $invoice->register();
-
-        $this->invoiceRepository->save($invoice);
-
-        return $invoice;
     }
 
     /**
