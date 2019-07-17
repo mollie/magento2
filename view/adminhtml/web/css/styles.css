@@ -168,6 +168,8 @@ a.mollie-tooltip:hover span {
     color: #6C6C6C;
     margin-right: 0px;
     padding: 10px;
+    text-align: left;
+    max-width: 360px;
 }
 
 .mollie-admin-method {
