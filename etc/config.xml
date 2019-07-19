@@ -9,6 +9,7 @@
                 <payment_images>1</payment_images>
                 <order_status_pending>pending_payment</order_status_pending>
                 <order_status_processing>processing</order_status_processing>
+                <invoice_moment>authorize</invoice_moment>
                 <invoice_notify>1</invoice_notify>
                 <loading_screen>0</loading_screen>
                 <debug>1</debug>

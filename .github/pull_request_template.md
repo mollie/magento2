@@ -4,7 +4,7 @@ Thank you for creating this pull request! To make the best use of your and our t
 - [ ] The code follows the PSR-2 code style.
 - [ ] When an exception or error is logged the message is accompanied with some context, eg: `Error when trying to get the payment status:`
 - [ ] Contains tests for the changed/added code (great if so but not required).
-- [ ] I have added an scenario to test my changes.
+- [ ] I have added a scenario to test my changes.
 
 **Please describe the bug/feature/etc this PR contains:**
 
