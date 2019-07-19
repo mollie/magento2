@@ -322,7 +322,7 @@ class Mollie extends AbstractMethod
         try {
             $connection->beginTransaction();
 
-            if ($method == 'order' && preg_match('/^ord_\w+$/', $transactionId)) {
+            if (preg_match('/^ord_\w+$/', $transactionId)) {
                 $result = $this->ordersApi->processTransaction($order, $mollieApi, $type, $paymentToken);
             } else {
                 $result = $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
