@@ -3,6 +3,7 @@
 namespace Mollie\Payment\Model\Client;
 
 use Magento\Framework\Phrase;
+use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
@@ -13,6 +14,7 @@ use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Test\Integration\TestCase;
+use stdClass;
 
 class OrdersTest extends TestCase
 {
@@ -139,6 +141,67 @@ class OrdersTest extends TestCase
         $this->assertEquals(Order::STATE_PROCESSING, $order->getState());
     }
 
+    public function testRemovesEmptySpaceFromThePrefix()
+    {
+        /** @var Orders $instance */
+        $instance = $this->objectManager->get(Orders::class);
+
+        /** @var OrderAddressInterface $address */
+        $address = $this->objectManager->get(OrderAddressInterface::class);
+
+        $address->setPrefix('     ');
+
+        $result = $instance->getAddressLine($address);
+
+        $this->assertEmpty($result['title']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function testProcessTransactionHandlesAStackOfPaymentsCorrectly()
+    {
+        $mollieOrderMock = $this->mollieOrderMock('N/A', 'EUR');
+        $mollieOrderMock->status = OrderStatus::STATUS_PAID;
+        $mollieOrderMock->_embedded->payments = [];
+
+        foreach (['cancelled', 'paid', 'expired'] as $status) {
+            $payment = new stdClass;
+            $payment->status = $status;
+
+            $mollieOrderMock->_embedded->payments[] = $payment;
+        }
+
+        $orderEndpointMock = $this->createMock(OrderEndpoint::class);
+        $orderEndpointMock->method('get')->willReturn($mollieOrderMock);
+
+        $mollieApiMock = $this->createMock(MollieApiClient::class);
+        $mollieApiMock->orders = $orderEndpointMock;
+
+        $invoiceSenderMock = $this->createMock(InvoiceSender::class);
+        $invoiceSenderMock->method('send')->willReturn(true);
+
+        $orderLinesMock = $this->createMock(OrderLines::class);
+
+        /** @var Orders $instance */
+        $instance = $this->objectManager->create(Orders::class, [
+            'invoiceSender' => $invoiceSenderMock,
+            'orderLines' => $orderLinesMock,
+        ]);
+
+        $order = $this->loadOrder('100000001');
+        $order->setEmailSent(1);
+        $order->setBaseCurrencyCode('EUR');
+        $order->setOrderCurrencyCode('EUR');
+
+        $result = $instance->processTransaction($order, $mollieApiMock);
+
+        $this->assertTrue($result['success']);
+    }
+
     /**
      * @return \Mollie\Api\Resources\Order
      */
@@ -146,17 +209,18 @@ class OrdersTest extends TestCase
     {
         $mollieOrder = new \Mollie\Api\Resources\Order($this->createMock(MollieApiClient::class));
         $mollieOrder->status = $status;
-        $mollieOrder->amountCaptured = new \stdClass;
+        $mollieOrder->amountCaptured = new stdClass;
         $mollieOrder->amountCaptured->value = 50;
         $mollieOrder->amountCaptured->currency = 'EUR';
 
-        $mollieOrder->amount = new \stdClass();
+        $mollieOrder->amount = new stdClass();
         $mollieOrder->amount->value = 100;
         $mollieOrder->amount->currency = $currency;
 
-        $mollieOrder->_embedded = new \stdClass;
-        $mollieOrder->_embedded->payments = [new \stdClass];
+        $mollieOrder->_embedded = new stdClass;
+        $mollieOrder->_embedded->payments = [new stdClass];
         $mollieOrder->_embedded->payments[0]->status = 'success';
+
         return $mollieOrder;
     }
 }

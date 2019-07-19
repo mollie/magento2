@@ -17,6 +17,7 @@ use Magento\Sales\Model\OrderRepository;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Payment\Helper\Data as PaymentHelper;
+use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Payment\Logger\MollieLogger;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
@@ -65,6 +66,7 @@ class General extends AbstractHelper
     const XML_PATH_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const XML_PATH_STATUS_PENDING_BANKTRANSFER = 'payment/mollie_methods_banktransfer/order_status_pending';
     const XML_PATH_BANKTRANSFER_DUE_DAYS = 'payment/mollie_methods_banktransfer/due_days';
+    const XML_PATH_INVOICE_MOMENT = 'payment/mollie_general/invoice_moment';
     const XML_PATH_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const XML_PATH_LOCALE = 'payment/mollie_general/locale';
     const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
@@ -444,6 +446,16 @@ class General extends AbstractHelper
     }
 
     /**
+     * @see \Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment
+     * @param int $storeId
+     * @return string
+     */
+    public function getInvoiceMoment($storeId = 0)
+    {
+        return $this->getStoreConfig(static::XML_PATH_INVOICE_MOMENT, $storeId);
+    }
+
+    /**
      * Send invoice
      *
      * @param int $storeId
@@ -558,7 +570,7 @@ class General extends AbstractHelper
             }
         }
 
-        if ($locale) {
+        if ($locale && $locale != 'store') {
             return $locale;
         }
 
@@ -844,5 +856,27 @@ class General extends AbstractHelper
             array_values($replacements),
             $description
         );
+    }
+
+    /**
+     * If one of the payments has the status 'paid', return that status. Otherwise return the last status.
+     *
+     * @param MollieOrder $order
+     * @return string|null
+     */
+    public function getLastRelevantStatus(MollieOrder $order)
+    {
+        if (!isset($order->_embedded->payments)) {
+            return null;
+        }
+
+        $payments = $order->_embedded->payments;
+        foreach ($payments as $payment) {
+            if ($payment->status == 'paid') {
+                return 'paid';
+            }
+        }
+
+        return end($payments)->status;
     }
 }
