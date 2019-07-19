@@ -249,18 +249,28 @@ class Payments extends AbstractModel
                 $sendInvoice = $this->mollieHelper->sendInvoice($storeId);
 
                 if (!$order->getEmailSent()) {
-                    $this->orderSender->send($order);
-                    $message = __('New order email sent');
-                    $this->orderCommentHistory->add($order, $message, true);
+                    try {
+                        $this->orderSender->send($order);
+                        $message = __('New order email sent');
+                        $this->orderCommentHistory->add($order, $message, true);
+                    } catch (\Throwable $exception) {
+                        $message = __('Unable to send the new order email: %1', $exception->getMessage());
+                        $this->orderCommentHistory->add($order, $message, false);
+                    }
                 }
 
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
-                    $this->invoiceSender->send($invoice);
-                    $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $this->orderCommentHistory->add($order, $message, true);
+                    try {
+                        $this->invoiceSender->send($invoice);
+                        $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
+                        $this->orderCommentHistory->add($order, $message, true);
+                    } catch (\Throwable $exception) {
+                        $message = __('Unable to send the invoice: %1', $exception->getMessage());
+                        $this->orderCommentHistory->add($order, $message, true);
+                    }
                 }
-
             }
+
             $msg = ['success' => true, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);
             $this->checkCheckoutSession($order, $paymentToken, $paymentData, $type);
@@ -273,8 +283,13 @@ class Payments extends AbstractModel
         }
         if ($status == 'open') {
             if ($paymentData->method == 'banktransfer' && !$order->getEmailSent()) {
-                $this->orderSender->send($order);
-                $message = __('New order email sent');
+                try {
+                    $this->orderSender->send($order);
+                    $message = __('New order email sent');
+                } catch (\Throwable $exception) {
+                    $message = __('Unable to send the new order email: %1', $exception->getMessage());
+                }
+
                 if (!$statusPending = $this->mollieHelper->getStatusPendingBanktransfer($storeId)) {
                     $statusPending = $order->getStatus();
                 }

@@ -312,7 +312,6 @@ class Mollie extends AbstractMethod
         }
 
         $mollieApi = $this->loadMollieApi($apiKey);
-        $method = $this->mollieHelper->getApiMethod($order);
 
         // Defaults to the "default" connection when there is not connection available named "sales".
         // This is required for stores with a split database (Enterprise only):
@@ -322,7 +321,7 @@ class Mollie extends AbstractMethod
         try {
             $connection->beginTransaction();
 
-            if ($method == 'order' && preg_match('/^ord_\w+$/', $transactionId)) {
+            if (preg_match('/^ord_\w+$/', $transactionId)) {
                 $result = $this->ordersApi->processTransaction($order, $mollieApi, $type, $paymentToken);
             } else {
                 $result = $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);

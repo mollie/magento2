@@ -25,6 +25,8 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
+use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
@@ -84,6 +86,14 @@ class Orders extends AbstractModel
      */
     private $adjustmentFee;
     /**
+     * @var StoreCredit
+     */
+    private $storeCredit;
+    /**
+     * @var RefundUsingPayment
+     */
+    private $refundUsingPayment;
+    /**
      * @var OrderCommentHistory
      */
     private $orderCommentHistory;
@@ -106,6 +116,8 @@ class Orders extends AbstractModel
      * @param Registry              $registry
      * @param MollieHelper          $mollieHelper
      * @param ProcessAdjustmentFee  $adjustmentFee
+     * @param StoreCredit           $storeCredit
+     * @param RefundUsingPayment    $refundUsingPayment
      * @param OrderCommentHistory   $orderCommentHistory
      * @param PartialInvoice        $partialInvoice
      */
@@ -122,7 +134,9 @@ class Orders extends AbstractModel
         MollieHelper $mollieHelper,
         ProcessAdjustmentFee $adjustmentFee,
         OrderCommentHistory $orderCommentHistory,
-        PartialInvoice $partialInvoice
+        PartialInvoice $partialInvoice,
+        StoreCredit $storeCredit,
+        RefundUsingPayment $refundUsingPayment
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -135,6 +149,8 @@ class Orders extends AbstractModel
         $this->registry = $registry;
         $this->mollieHelper = $mollieHelper;
         $this->adjustmentFee = $adjustmentFee;
+        $this->storeCredit = $storeCredit;
+        $this->refundUsingPayment = $refundUsingPayment;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->partialInvoice = $partialInvoice;
     }
@@ -276,8 +292,7 @@ class Orders extends AbstractModel
         /**
          * Check if last payment was canceled, failed or expired and redirect customer to cart for retry.
          */
-        $lastPayment = isset($mollieOrder->_embedded->payments) ? end($mollieOrder->_embedded->payments) : null;
-        $lastPaymentStatus = isset($lastPayment) ? $lastPayment->status : null;
+        $lastPaymentStatus = $this->mollieHelper->getLastRelevantStatus($mollieOrder);
         if ($lastPaymentStatus == 'canceled' || $lastPaymentStatus == 'failed' || $lastPaymentStatus == 'expired') {
             $method = $order->getPayment()->getMethodInstance()->getTitle();
             $order->getPayment()->setAdditionalInformation('payment_status', $lastPaymentStatus);
@@ -365,15 +380,25 @@ class Orders extends AbstractModel
                 $sendInvoice = $this->mollieHelper->sendInvoice($storeId);
 
                 if (!$order->getEmailSent()) {
-                    $this->orderSender->send($order);
-                    $message = __('New order email sent');
-                    $this->orderCommentHistory->add($order, $message, true);
+                    try {
+                        $this->orderSender->send($order, true);
+                        $message = __('New order email sent');
+                        $this->orderCommentHistory->add($order, $message, true);
+                    } catch (\Throwable $exception) {
+                        $message = __('Unable to send the new order email: %1', $exception->getMessage());
+                        $this->orderCommentHistory->add($order, $message, false);
+                    }
                 }
 
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
-                    $this->invoiceSender->send($invoice);
-                    $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                    $this->orderCommentHistory->add($order, $message, true);
+                    try {
+                        $this->invoiceSender->send($invoice);
+                        $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
+                        $this->orderCommentHistory->add($order, $message, true);
+                    } catch (\Throwable $exception) {
+                        $message = __('Unable to send the invoice: %1', $exception->getMessage());
+                        $this->orderCommentHistory->add($order, $message, true);
+                    }
                 }
 
             }
@@ -392,8 +417,13 @@ class Orders extends AbstractModel
 
         if ($mollieOrder->isCreated()) {
             if ($mollieOrder->method == 'banktransfer' && !$order->getEmailSent()) {
-                $this->orderSender->send($order);
-                $message = __('New order email sent');
+                try {
+                    $this->orderSender->send($order);
+                    $message = __('New order email sent');
+                } catch (\Throwable $exception) {
+                    $message = __('Unable to send the new order email: %1', $exception->getMessage());
+                }
+
                 if (!$statusPending = $this->mollieHelper->getStatusPendingBanktransfer($storeId)) {
                     $statusPending = $order->getStatus();
                 }
@@ -711,6 +741,17 @@ class Orders extends AbstractModel
             throw new LocalizedException(
                 __('Mollie API: %1', $exception->getMessage())
             );
+        }
+
+        if ($this->storeCredit->creditmemoHasStoreCredit($creditmemo)) {
+            $this->refundUsingPayment->execute(
+                $mollieApi,
+                $transactionId,
+                $creditmemo->getOrderCurrencyCode(),
+                $creditmemo->getBaseGrandTotal()
+            );
+
+            return $this;
         }
 
         /**
