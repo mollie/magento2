@@ -312,7 +312,6 @@ class Mollie extends AbstractMethod
         }
 
         $mollieApi = $this->loadMollieApi($apiKey);
-        $method = $this->mollieHelper->getApiMethod($order);
 
         // Defaults to the "default" connection when there is not connection available named "sales".
         // This is required for stores with a split database (Enterprise only):
