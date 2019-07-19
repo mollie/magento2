@@ -81,8 +81,8 @@
 "Let Mollie automatically detect the language or force the language from the store view.","Laat Mollie de taal automatisch detecteren of forceer een taal voor deze store-view."
 "Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Betaling van het type %1 is geweigerd. Deze beslissing is gebaseerd op de bestelling en de uitkomst van de risicobeoordeling."
 "Warning: we recommend to use a unique payment status for pending Banktransfer payments","Waarschuwing: Wij adviseren om een unieke betaalstatus the hanteren voor bankoverboekingen in de wacht"
-Fetching...,Ophalen...
-Error While Fetching,Error Tijdens Ophalen
-Fetch Status,Status Ophalen
-The latest status from Mollie has been retrieved,De laatste status is bij Mollie opgehaald
-The payment-status will updated automatically by default, but in case of any interruption you can use this function to fetch the payment status manually.,De betaal status wordt standaard bijgewerkt. Mocht dit door omstandigheden niet het geval zijn dan kun u deze hier handmatig laten ophalen.
+"Fetching...","Ophalen..."
+"Error While Fetching","Error Tijdens Ophalen"
+"Fetch Status","Status Ophalen"
+"The latest status from Mollie has been retrieved","De laatste status is bij Mollie opgehaald"
+"The payment-status will updated automatically by default, but in case of any interruption you can use this function to fetch the payment status manually.","De betaal status wordt standaard bijgewerkt. Mocht dit door omstandigheden niet het geval zijn dan kun u deze hier handmatig laten ophalen."

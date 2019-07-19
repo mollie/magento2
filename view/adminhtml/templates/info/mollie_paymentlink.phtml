@@ -45,7 +45,11 @@ $status = $block->getPaymentStatus();
                 <th><?= __('Update Payment Status'); ?></th>
                 <td>
                     <button type="button" class="fetch-mollie-payment-status"><?= __('Fetch Status'); ?></button>
-                    <?php echo __('<a href="#" class="mollie-tooltip">(i)<span>The payment-status will updated automatically by default, but in case of any interruption you can use this function to fetch the payment status manually.</span></a>'); ?>
+                    <a href="#" class="mollie-tooltip">(i)
+                        <span>
+                            <?= __('The payment-status will updated automatically by default, but in case of any interruption you can use this function to fetch the payment status manually.'); ?>
+                        </span>
+                    </a>
                 </td>
             </tr>
             <tr class="mollie-order-status-result" style="display: none;"></tr>
