@@ -6,15 +6,18 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class InvoiceMoment implements OptionSourceInterface
 {
+    const ON_AUTHORIZE = 'authorize';
+    const ON_SHIPMENT = 'shipment';
+
     public function toOptionArray()
     {
         return [
             [
-                'value' => 'authorize',
+                'value' => static::ON_AUTHORIZE,
                 'label' => __('On Authorize'),
             ],
             [
-                'value' => 'shipment',
+                'value' => static::ON_SHIPMENT,
                 'label' => __('On Shipment'),
             ],
         ];
