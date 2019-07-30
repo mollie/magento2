@@ -609,7 +609,7 @@ class Orders extends AbstractModel
              */
             $payment = $order->getPayment();
             if (!$payment->getIsTransactionClosed()) {
-                $invoice = null;
+                $invoice = $order->getInvoiceCollection()->getLastItem();
                 if (!$shipAll) {
                     $invoice = $this->partialInvoice->createFromShipment($shipment);
                 }
@@ -620,7 +620,7 @@ class Orders extends AbstractModel
                 $this->orderRepository->save($order);
 
                 $sendInvoice = $this->mollieHelper->sendInvoice($order->getStoreId());
-                if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
+                if ($invoice && $invoice->getId() && !$invoice->getEmailSent() && $sendInvoice) {
                     $this->invoiceSender->send($invoice);
                     $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
                     $this->orderCommentHistory->add($order, $message, true);
