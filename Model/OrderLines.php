@@ -420,7 +420,8 @@ class OrderLines extends AbstractModel
             $orderLines[] = ['id' => $shippingFeeItemLine->getLineId(), 'quantity' => 1];
         }
 
-        if ($storeCreditLine = $this->getStoreCreditItemLineOrder($orderId)) {
+        $storeCreditLine = $this->getStoreCreditItemLineOrder($orderId);
+        if ($storeCreditLine->getId()) {
             $orderLines[] = ['id' => $storeCreditLine->getLineId(), 'quantity' => 1];
         }
 
