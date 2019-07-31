@@ -4,6 +4,9 @@ namespace Mollie\Payment\Helper;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
+use Magento\Quote\Api\Data\PaymentInterface;
+use Magento\Sales\Api\OrderManagementInterface;
+use Magento\Sales\Model\Order as OrderModel;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\MollieApiClient;
@@ -107,5 +110,58 @@ class GeneralTest extends \PHPUnit\Framework\TestCase
         $status = $instance->getLastRelevantStatus($order);
 
         $this->assertNull($status);
+    }
+
+    public function testRegisterCancellationReturnsFalseWhenAlreadyCanceled()
+    {
+        /** @var OrderModel $order */
+        $order = $this->objectManager->getObject(OrderModel::class);
+        $order->setId(999);
+        $order->setState(OrderModel::STATE_CANCELED);
+
+        /** @var General $instance */
+        $instance = $this->objectManager->getObject(General::class);
+        $result = $instance->registerCancellation($order, 'payment canceled');
+
+        $this->assertFalse($result);
+    }
+
+    public function testRegisterCancellationCancelsTheOrder()
+    {
+        $orderManagementMock = $this->createMock(OrderManagementInterface::class);
+        $orderManagementMock->expects($this->once())->method('cancel');
+
+        /** @var OrderModel $order */
+        $order = $this->createPartialMock(OrderModel::class, ['cancel']);
+        $order->setId(999);
+        $order->setState(OrderModel::STATE_PROCESSING);
+
+        $payment = $this->objectManager->getObject(OrderModel\Payment::class);
+        $order->setPayment($payment);
+
+        /** @var General $instance */
+        $instance = $this->objectManager->getObject(General::class, [
+            'orderManagement' => $orderManagementMock,
+        ]);
+        $result = $instance->registerCancellation($order, 'payment canceled');
+
+        $this->assertTrue($result);
+    }
+
+    public function testRegisterCancellationSetsTheCorrectMessage()
+    {
+        /** @var OrderModel $order */
+        $order = $this->objectManager->getObject(OrderModel::class);
+        $order->setId(999);
+        $order->setState(OrderModel::STATE_PROCESSING);
+
+        $payment = $this->objectManager->getObject(OrderModel\Payment::class);
+        $order->setPayment($payment);
+
+        /** @var General $instance */
+        $instance = $this->objectManager->getObject(General::class);
+        $instance->registerCancellation($order, 'canceled');
+
+        $this->assertEquals('The order was canceled, reason: payment canceled', $payment->getMessage()->render());
     }
 }
