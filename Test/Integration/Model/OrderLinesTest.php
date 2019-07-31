@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Model;
 
+use Magento\Sales\Api\Data\CreditmemoInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class OrderLinesTest extends IntegrationTestCase
@@ -53,5 +54,49 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertEquals(12.1, $row['unitPrice']['value']);
         $this->assertEquals(12.1, $row['totalAmount']['value']);
         $this->assertEquals(2.1, $row['vatAmount']['value']);
+    }
+
+    public function testGetCreditmemoOrderLines()
+    {
+        $creditmemo = $this->objectManager->get(CreditmemoInterface::class);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+        $result = $instance->getCreditmemoOrderLines($creditmemo, false);
+
+        $this->assertCount(0, $result['lines']);
+    }
+
+    public function testGetCreditmemoOrderLinesIncludesTheStoreCredit()
+    {
+        $this->rollbackCreditmemos();
+
+        $orderLine = $this->objectManager->get(\Mollie\Payment\Model\OrderLinesFactory::class)->create();
+        $orderLine->setOrderId(999);
+        $orderLine->setLineId('ord_abc123');
+        $orderLine->setType('store_credit');
+        $orderLine->save();
+
+        $creditmemo = $this->objectManager->get(CreditmemoInterface::class);
+        $creditmemo->setOrderId(999);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+        $result = $instance->getCreditmemoOrderLines($creditmemo, false);
+
+        $this->assertCount(1, $result['lines']);
+
+        $line = $result['lines'][0];
+        $this->assertEquals('ord_abc123', $line['id']);
+        $this->assertEquals(1, $line['quantity']);
+    }
+
+    private function rollbackCreditmemos()
+    {
+        $collection = $this->objectManager->get(\Mollie\Payment\Model\ResourceModel\OrderLines\Collection::class);
+
+        foreach ($collection as $creditmemo) {
+            $creditmemo->delete();
+        }
     }
 }
