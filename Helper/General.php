@@ -12,6 +12,8 @@ use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\Math\Random as MathRandom;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Store\Model\StoreManagerInterface;
@@ -21,6 +23,7 @@ use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Payment\Logger\MollieLogger;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
+use Mollie\Payment\Service\Order\OrderCommentHistory;
 
 /**
  * Class General
@@ -131,6 +134,14 @@ class General extends AbstractHelper
      * @var CouponUsage
      */
     private $couponUsage;
+    /**
+     * @var OrderCommentHistory
+     */
+    private $orderCommentHistory;
+    /**
+     * @var OrderManagementInterface
+     */
+    private $orderManagement;
 
     /**
      * General constructor.
@@ -147,6 +158,8 @@ class General extends AbstractHelper
      * @param MollieLogger             $logger
      * @param Coupon                   $coupon
      * @param CouponUsage              $couponUsage
+     * @param OrderCommentHistory      $orderCommentHistory
+     * @param OrderManagementInterface $orderManagement
      */
     public function __construct(
         Context $context,
@@ -160,7 +173,9 @@ class General extends AbstractHelper
         MathRandom $mathRandom,
         MollieLogger $logger,
         Coupon $coupon,
-        CouponUsage $couponUsage
+        CouponUsage $couponUsage,
+        OrderCommentHistory $orderCommentHistory,
+        OrderManagementInterface $orderManagement
     ) {
         $this->paymentHelper = $paymentHelper;
         $this->storeManager = $storeManager;
@@ -174,7 +189,9 @@ class General extends AbstractHelper
         $this->logger = $logger;
         $this->coupon = $coupon;
         $this->couponUsage = $couponUsage;
+        $this->orderCommentHistory = $orderCommentHistory;
         parent::__construct($context);
+        $this->orderManagement = $orderManagement;
     }
 
     /**
@@ -783,14 +800,13 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Sales\Model\Order $order
-     * @param                            $status
+     * @param OrderInterface $order
+     * @param null $status
      *
      * @return bool
      * @throws \Exception
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function registerCancellation($order, $status = null)
+    public function registerCancellation(OrderInterface $order, $status = null)
     {
         if ($order->getId() && $order->getState() != Order::STATE_CANCELED) {
             $comment = __('The order was canceled');
@@ -798,7 +814,9 @@ class General extends AbstractHelper
                 $comment = __('The order was canceled, reason: payment %1', $status);
             }
             $this->addTolog('info', $order->getIncrementId() . ' ' . $comment);
-            $order->registerCancellation($comment);
+            $this->orderCommentHistory->add($order, $comment);
+            $order->getPayment()->setMessage($comment);
+            $this->orderManagement->cancel($order);
 
             if ($order->getCouponCode()) {
                 $this->resetCouponAfterCancellation($order);

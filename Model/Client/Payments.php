@@ -310,7 +310,9 @@ class Payments extends AbstractModel
         if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
             if ($type == 'webhook') {
                 $this->mollieHelper->registerCancellation($order, $status);
+                $order->cancel();
             }
+
             $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);
             return $msg;
