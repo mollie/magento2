@@ -144,6 +144,7 @@ class UpgradeData implements UpgradeDataInterface
             'payment/mollie_methods_paymentlink/active',
             'payment/mollie_methods_giftcard/active',
             'payment/mollie_methods_przelewy24/active',
+            'payment/mollie_methods_mybank/active',
         ];
 
         foreach ($paths as $path) {

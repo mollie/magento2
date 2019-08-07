@@ -76,6 +76,9 @@
                                                                         <item name="mollie_methods_applepay" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
+                                                                        <item name="mollie_methods_mybank" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
                                                                     </item>
                                                                 </item>
                                                             </item>
@@ -93,4 +96,4 @@
             </arguments>
         </referenceBlock>
     </body>
-</page> 
+</page>

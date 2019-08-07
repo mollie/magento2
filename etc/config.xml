@@ -188,6 +188,15 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_applepay>
+            <mollie_methods_mybank>
+                <active>1</active>
+                <model>Mollie\Payment\Model\Methods\MyBank</model>
+                <title>MyBank</title>
+                <payment_description>{ordernumber}</payment_description>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_mybank>
         </payment>
     </default>
 </config>
