@@ -197,6 +197,11 @@ class Mollie extends AbstractMethod
             return false;
         }
 
+        $activeMethods = $this->mollieHelper->getAllActiveMethods($quote->getStoreId());
+        if (!array_key_exists($this->_code, $activeMethods)) {
+            return false;
+        }
+
         return parent::isAvailable($quote);
     }
 

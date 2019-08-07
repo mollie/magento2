@@ -54,9 +54,7 @@ define(
         }
 
         $.each(methods, function (k, method) {
-            if (window.checkoutConfig.payment.isActive[method['type']]) {
-                rendererList.push(method);
-            }
+            rendererList.push(method);
         });
 
         return Component.extend({});

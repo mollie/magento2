@@ -137,58 +137,53 @@ class MollieConfigProvider implements ConfigProviderInterface
 
         try {
             $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
-            $activeMethods = $this->getActiveMethods($mollieApi);
         } catch (\Exception $e) {
             $mollieApi = '';
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            $activeMethods = [];
         }
 
         foreach ($this->methodCodes as $code) {
-            if (!empty($this->methods[$code]) && $this->methods[$code]->isAvailable()) {
-                if (!empty($activeMethods[$code])) {
-                    $config['payment']['isActive'][$code] = true;
-                    $config['payment']['instructions'][$code] = $this->getInstructions($code);
-                    if ($useImage && isset($activeMethods[$code]['image'])) {
-                        $config['payment']['image'][$code] = $activeMethods[$code]['image'];
-                    } else {
-                        $config['payment']['image'][$code] = '';
-                    }
-                    if ($code == 'mollie_methods_ideal') {
-                        $issuerListType = $this->mollieHelper->getIssuerListType($code);
-                        $config['payment']['issuersListType'][$code] = $issuerListType;
-                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
-                            $mollieApi,
-                            $code,
-                            $issuerListType
-                        );
-                    }
-                    if ($code == 'mollie_methods_kbc') {
-                        $issuerListType = $this->mollieHelper->getIssuerListType($code);
-                        $config['payment']['issuersListType'][$code] = $issuerListType;
-                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
-                            $mollieApi,
-                            $code,
-                            $issuerListType
-                        );
-                    }
-                    if ($code == 'mollie_methods_giftcard') {
-                        $issuerListType = $this->mollieHelper->getIssuerListType($code);
-                        $config['payment']['issuersListType'][$code] = $issuerListType;
-                        $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
-                            $mollieApi,
-                            $code,
-                            $issuerListType
-                        );
-                        if (empty($config['payment']['issuers'][$code])) {
-                            $config['payment']['isActive'][$code] = false;
-                        }
-                    }
-                } else {
-                    $config['payment']['isActive'][$code] = false;
-                }
-            } else {
-                $config['payment']['isActive'][$code] = false;
+            if (empty($this->methods[$code]) || !$this->methods[$code]->isAvailable()) {
+                continue;
+            }
+
+            $config['payment']['instructions'][$code] = $this->getInstructions($code);
+
+            $config['payment']['image'][$code] = '';
+            if ($useImage) {
+                $cleanCode = str_replace('mollie_methods_', '', $code);
+                $url = $this->assetRepository->getUrl('Mollie_Payment::images/methods/' . $cleanCode . '.png');
+                $config['payment']['image'][$code] = $url;
+            }
+
+            if ($code == 'mollie_methods_ideal') {
+                $issuerListType = $this->mollieHelper->getIssuerListType($code);
+                $config['payment']['issuersListType'][$code] = $issuerListType;
+                $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
+                    $mollieApi,
+                    $code,
+                    $issuerListType
+                );
+            }
+
+            if ($code == 'mollie_methods_kbc') {
+                $issuerListType = $this->mollieHelper->getIssuerListType($code);
+                $config['payment']['issuersListType'][$code] = $issuerListType;
+                $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
+                    $mollieApi,
+                    $code,
+                    $issuerListType
+                );
+            }
+
+            if ($code == 'mollie_methods_giftcard') {
+                $issuerListType = $this->mollieHelper->getIssuerListType($code);
+                $config['payment']['issuersListType'][$code] = $issuerListType;
+                $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
+                    $mollieApi,
+                    $code,
+                    $issuerListType
+                );
             }
         }
 
@@ -202,7 +197,11 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     public function getActiveMethods($mollieApi)
     {
-        $methodData = [];
+        static $methodData = null;
+
+        if ($methodData !== null) {
+            return $methodData;
+        }
 
         try {
             $quote = $this->checkoutSession->getQuote();
@@ -223,6 +222,7 @@ class MollieConfigProvider implements ConfigProviderInterface
             }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', 'Function: getActiveMethods: ' . $e->getMessage());
+            $methodData = [];
         }
 
         return $methodData;
