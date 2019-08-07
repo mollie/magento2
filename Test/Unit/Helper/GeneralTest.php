@@ -129,7 +129,7 @@ class GeneralTest extends \PHPUnit\Framework\TestCase
     public function testRegisterCancellationCancelsTheOrder()
     {
         $orderManagementMock = $this->createMock(OrderManagementInterface::class);
-        $orderManagementMock->expects($this->once())->method('cancel');
+        $orderManagementMock->expects($this->once())->method('cancel')->with(999);
 
         /** @var OrderModel $order */
         $order = $this->createPartialMock(OrderModel::class, ['cancel']);
