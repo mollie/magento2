@@ -643,6 +643,7 @@ class General extends AbstractHelper
             'mollie_methods_giftcard',
             'mollie_methods_przelewy24',
             'mollie_methods_applepay',
+            'mollie_methods_mybank',
         ];
 
         foreach ($methodCodes as $methodCode) {
