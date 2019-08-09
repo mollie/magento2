@@ -8,6 +8,8 @@ use Magento\Quote\Api\Data\PaymentInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order as OrderModel;
 use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Model\Information;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
@@ -20,6 +22,11 @@ class GeneralTest extends \PHPUnit\Framework\TestCase
      */
     private $objectManager;
 
+    protected function setUp()
+    {
+        $this->objectManager = new ObjectManager($this);
+    }
+
     public function returnsTheCorrectDescriptionProvider()
     {
         return [
@@ -31,36 +38,28 @@ class GeneralTest extends \PHPUnit\Framework\TestCase
         ];
     }
 
-    protected function setUp()
-    {
-        $this->objectManager = new ObjectManager($this);
-    }
-
     /**
      * @dataProvider returnsTheCorrectDescriptionProvider
      */
     public function testReturnsTheCorrectDescription($description, $expected)
     {
         $storeConfigMock = $this->createMock(ScopeConfigInterface::class);
-        $storeManagerMock = $this->createMock(StoreManagerInterface::class);
-        $storeMock = $this->createMock(StoreInterface::class);
-
-        $storeManagerMock->method('getStore')->willReturn($storeMock);
-        $storeMock->method('getName')->willReturn('My Test Store');
-
-        $storeConfigMock->method('getValue')->willReturn($description);
+        $storeConfigMock->method('getValue')
+            ->withConsecutive(
+                ['payment/mollie_methods_ideal/payment_description', ScopeInterface::SCOPE_STORE, 1],
+                [Information::XML_PATH_STORE_INFO_NAME, ScopeInterface::SCOPE_STORE, 1]
+            )
+            ->willReturnOnConsecutiveCalls($description, 'My Test Store');
 
         /** @var MollieHelper $instance */
-        $instance = $this->objectManager->getObject(MollieHelper::class, [
-            'storeManager' => $storeManagerMock,
-        ]);
+        $instance = $this->objectManager->getObject(MollieHelper::class);
 
         // The scopeConfig is burried in the context, use reflection to swap it with our mock
         $property = (new \ReflectionObject($instance))->getProperty('scopeConfig');
         $property->setAccessible(true);
         $property->setValue($instance, $storeConfigMock);
 
-        $result = $instance->getPaymentDescription('ideal', '0000025');
+        $result = $instance->getPaymentDescription('ideal', '0000025', 1);
 
         $this->assertSame($expected, $result);
     }
