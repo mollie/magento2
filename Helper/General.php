@@ -817,7 +817,7 @@ class General extends AbstractHelper
             $this->addTolog('info', $order->getIncrementId() . ' ' . $comment);
             $this->orderCommentHistory->add($order, $comment);
             $order->getPayment()->setMessage($comment);
-            $this->orderManagement->cancel($order);
+            $this->orderManagement->cancel($order->getId());
 
             if ($order->getCouponCode()) {
                 $this->resetCouponAfterCancellation($order);
