@@ -100,7 +100,7 @@ class Payments extends AbstractModel
         $method = $this->mollieHelper->getMethodCode($order);
         $paymentData = [
             'amount'         => $this->mollieHelper->getOrderAmountByOrder($order),
-            'description'    => $this->mollieHelper->getPaymentDescription($method, $order->getIncrementId()),
+            'description'    => $this->mollieHelper->getPaymentDescription($method, $order->getIncrementId(), $storeId),
             'billingAddress' => $this->getAddressLine($order->getBillingAddress()),
             'redirectUrl'    => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
             'webhookUrl'     => $this->mollieHelper->getWebhookUrl(),

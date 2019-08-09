@@ -16,6 +16,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
+use Magento\Store\Model\Information;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Payment\Helper\Data as PaymentHelper;
@@ -859,7 +860,7 @@ class General extends AbstractHelper
     public function getPaymentDescription($method, $orderNumber, $storeId = 0)
     {
         $xpath = str_replace('%method%', 'mollie_methods_' . $method, self::XML_PATH_PAYMENT_DESCRIPTION);
-        $description = $this->getStoreConfig($xpath);
+        $description = $this->getStoreConfig($xpath, $storeId);
 
         if (!trim($description)) {
             $description = '{ordernumber}';
@@ -867,7 +868,7 @@ class General extends AbstractHelper
 
         $replacements = [
             '{ordernumber}' => $orderNumber,
-            '{storename}' => $this->storeManager->getStore($storeId)->getName(),
+            '{storename}' => $this->getStoreConfig(Information::XML_PATH_STORE_INFO_NAME, $storeId),
         ];
 
         return str_replace(
