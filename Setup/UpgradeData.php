@@ -91,13 +91,12 @@ class UpgradeData implements UpgradeDataInterface
             $this->removeBitcoinConfiguration();
         }
 
-        if (version_compare($context->getVersion(), '1.6.1', '<')) {
-            $this->upgradeActiveState();
-        }
-
         if (version_compare($context->getVersion(), '1.6.2', '<')) {
             $this->addIndexes($setup);
         }
+
+        // This should run every time
+        $this->upgradeActiveState();
 
         $setup->endSetup();
     }
