@@ -223,4 +223,40 @@ class OrdersTest extends TestCase
 
         return $mollieOrder;
     }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 5
+     *
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function testStartTransactionIncludesTheExpiresAtParameter()
+    {
+        $order = $this->loadOrder('100000001');
+        $order->getPayment()->setMethod('mollie_methods_ideal');
+
+        $mollieApiMock = $this->createMock(MollieApiClient::class);
+        $orderEndpointMock = $this->createMock(OrderEndpoint::class);
+        $orderEndpointMock->method('create')->with( $this->callback(function ($orderData) {
+            $this->assertArrayHasKey('expiresAt', $orderData);
+            $this->assertNotEmpty($orderData['expiresAt']);
+
+            $now = new \DateTimeImmutable('now');
+            $expected = $now->add(new \DateInterval('P5D'));
+
+            $this->assertEquals($expected->format('Y-m-d'), $orderData['expiresAt']);
+
+            return true;
+        }))->willReturn($this->createMock(\Mollie\Api\Resources\Order::class));
+
+        $mollieApiMock->orders = $orderEndpointMock;
+
+        /** @var Orders $instance */
+        $instance = $this->objectManager->create(Orders::class, [
+            'orderLines' => $this->createMock(\Mollie\Payment\Model\OrderLines::class),
+        ]);
+
+        $instance->startTransaction($order, $mollieApiMock);
+    }
 }

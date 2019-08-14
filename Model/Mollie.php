@@ -198,7 +198,7 @@ class Mollie extends AbstractMethod
         }
 
         $activeMethods = $this->mollieHelper->getAllActiveMethods($quote->getStoreId());
-        if (!array_key_exists($this->_code, $activeMethods)) {
+        if ($this->_code != 'mollie_methods_paymentlink' && !array_key_exists($this->_code, $activeMethods)) {
             return false;
         }
 

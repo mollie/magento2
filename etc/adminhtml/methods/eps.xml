@@ -87,5 +87,16 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="days_before_expire" translate="label" type="text" sortOrder="101" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Days to expire</label>
+            <frontend_class>validate-digits-range digits-range-1-100</frontend_class>
+            <config_path>payment/mollie_methods_eps/days_before_expire</config_path>
+            <depends>
+                <field id="active">1</field>
+                <field id="method">order</field>
+            </depends>
+            <comment>How many days before orders for this method becomes expired?</comment>
+        </field>
     </group>
 </include>
