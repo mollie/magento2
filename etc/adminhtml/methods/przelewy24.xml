@@ -26,9 +26,9 @@
             <depends>
                 <field id="active">1</field>
             </depends>
-            <comment><![CDATA[<strong>Payment API</strong><br>Use the Payment API Platform for the transactions.<br><br>
-            <strong>Order API</strong><br>Use the new Order API Platform and get additional insights in the orders.
-            Read <a href="https://docs.mollie.com/orders/why-use-orders" target="_blank" >more.</a>]]></comment>
+            <comment><![CDATA[Click
+            <a href="https://github.com/mollie/magento2/wiki/Differences-Payments-API-&-Orders-API" target="_blank">here</a>
+            to read more about the differences between the Payment and Orders API.]]></comment>
         </field>
         <field id="payment_description" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Description</label>
@@ -42,6 +42,17 @@
                 <field id="method">payment</field>
                 <field id="active">1</field>
             </depends>
+        </field>
+        <field id="days_before_expire" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Days to expire</label>
+            <frontend_class>validate-digits-range digits-range-1-100</frontend_class>
+            <config_path>payment/mollie_methods_przelewy24/days_before_expire</config_path>
+            <depends>
+                <field id="active">1</field>
+                <field id="method">order</field>
+            </depends>
+            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
         </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
                showInWebsite="1" showInStore="1">

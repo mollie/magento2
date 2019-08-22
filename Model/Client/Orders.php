@@ -26,6 +26,7 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
+use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
@@ -101,6 +102,10 @@ class Orders extends AbstractModel
      * @var PartialInvoice
      */
     private $partialInvoice;
+    /**
+     * @var Expires
+     */
+    private $expires;
 
     /**
      * Orders constructor.
@@ -116,10 +121,11 @@ class Orders extends AbstractModel
      * @param Registry              $registry
      * @param MollieHelper          $mollieHelper
      * @param ProcessAdjustmentFee  $adjustmentFee
-     * @param StoreCredit           $storeCredit
-     * @param RefundUsingPayment    $refundUsingPayment
      * @param OrderCommentHistory   $orderCommentHistory
      * @param PartialInvoice        $partialInvoice
+     * @param StoreCredit           $storeCredit
+     * @param RefundUsingPayment    $refundUsingPayment
+     * @param Expires               $expires
      */
     public function __construct(
         OrderLines $orderLines,
@@ -136,7 +142,8 @@ class Orders extends AbstractModel
         OrderCommentHistory $orderCommentHistory,
         PartialInvoice $partialInvoice,
         StoreCredit $storeCredit,
-        RefundUsingPayment $refundUsingPayment
+        RefundUsingPayment $refundUsingPayment,
+        Expires $expires
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -153,6 +160,7 @@ class Orders extends AbstractModel
         $this->refundUsingPayment = $refundUsingPayment;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->partialInvoice = $partialInvoice;
+        $this->expires = $expires;
     }
 
     /**
@@ -208,6 +216,10 @@ class Orders extends AbstractModel
 
         if (isset($additionalData['limited_methods'])) {
             $orderData['method'] = $additionalData['limited_methods'];
+        }
+
+        if ($this->expires->availableForMethod($method, $storeId)) {
+            $orderData['expiresAt'] = $this->expires->atDateForMethod($method, $storeId);
         }
 
         $this->mollieHelper->addTolog('request', $orderData);
