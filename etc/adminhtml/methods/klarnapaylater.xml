@@ -71,7 +71,9 @@
                 <field id="active">1</field>
                 <field id="method">order</field>
             </depends>
-            <comment>How many days before orders for this method becomes expired?</comment>
+            <comment><![CDATA[How many days before orders for this method becomes expired? Leave empty to use default
+            expiration (28 days). <br/><br/><strong>Please note:</strong> It is not posible to use an expiry date more
+            than 28 days in the future, unless another maximum is agreed between the merchant and Klarna.]]></comment>
         </field>
     </group>
 </include>

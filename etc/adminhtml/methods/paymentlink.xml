@@ -91,7 +91,7 @@
                 <field id="active">1</field>
                 <field id="method">order</field>
             </depends>
-            <comment>How many days before orders for this method becomes expired?</comment>
+            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
         </field>
     </group>
 </include>
