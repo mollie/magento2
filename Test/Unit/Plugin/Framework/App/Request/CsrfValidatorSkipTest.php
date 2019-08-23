@@ -11,6 +11,10 @@ class CsrfValidatorSkipTest extends UnitTestCase
 {
     public function testCallsTheProcessWhenNotMollie()
     {
+        if (!class_exists(CsrfValidator::class)) {
+            $this->markTestSkipped('The class ' . CsrfValidator::class . ' is only available on Magento 2.3 and later');
+        }
+
         $csrfValidator = $this->objectManager->getObject(CsrfValidator::class);
         $actionMock = $this->createMock(ActionInterface::class);
 
@@ -35,6 +39,10 @@ class CsrfValidatorSkipTest extends UnitTestCase
 
     public function testCallsTheProcessWhenMollie()
     {
+        if (!class_exists(CsrfValidator::class)) {
+            $this->markTestSkipped('The class ' . CsrfValidator::class . ' is only available on Magento 2.3 and later');
+        }
+
         $csrfValidator = $this->objectManager->getObject(CsrfValidator::class);
         $actionMock = $this->createMock(ActionInterface::class);
 

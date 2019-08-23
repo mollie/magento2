@@ -198,3 +198,7 @@ a.mollie-tooltip:hover span {
         background-size: 130px;
     }
 }
+
+.mollie_methods_paymentlink_days_before_expire {
+    text-indent: 5px;
+}

@@ -80,6 +80,11 @@ class MollieConfigProvider implements ConfigProviderInterface
     private $checkoutSession;
 
     /**
+     * @var array|null
+     */
+    private $methodData;
+
+    /**
      * MollieConfigProvider constructor.
      *
      * @param Mollie               $mollieModel
@@ -198,10 +203,8 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     public function getActiveMethods($mollieApi)
     {
-        static $methodData = null;
-
-        if ($methodData !== null) {
-            return $methodData;
+        if ($this->methodData !== null) {
+            return $this->methodData;
         }
 
         try {
@@ -217,16 +220,16 @@ class MollieConfigProvider implements ConfigProviderInterface
 
             foreach ($apiMethods as $method) {
                 $methodId = 'mollie_methods_' . $method->id;
-                $methodData[$methodId] = [
+                $this->methodData[$methodId] = [
                     'image' => $method->image->size2x
                 ];
             }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', 'Function: getActiveMethods: ' . $e->getMessage());
-            $methodData = [];
+            $this->methodData = [];
         }
 
-        return $methodData;
+        return $this->methodData;
     }
 
     /**
