@@ -68,6 +68,10 @@ class Paymentlink extends Mollie
         $order->setCanSendNewEmailFlag(false);
         $order->save();
 
+        if ($status = $this->config->statusNewPaymentLink($order->getStoreId())) {
+            $stateObject->setStatus($status);
+        }
+
         $this->startTransaction($order);
     }
 

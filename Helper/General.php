@@ -18,9 +18,10 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Store\Model\Information;
 use Magento\Store\Model\StoreManagerInterface;
-use Magento\Config\Model\ResourceModel\Config;
+use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Mollie\Api\Resources\Order as MollieOrder;
+use Mollie\Payment\Config;
 use Mollie\Payment\Logger\MollieLogger;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
@@ -30,6 +31,7 @@ use Mollie\Payment\Service\Order\OrderCommentHistory;
  * Class General
  *
  * @package Mollie\Payment\Helper
+ * @deprecated These helper classes will be removed in a future release.
  */
 class General extends AbstractHelper
 {
@@ -96,7 +98,7 @@ class General extends AbstractHelper
      */
     private $storeManager;
     /**
-     * @var Config
+     * @var ResourceConfig
      */
     private $resourceConfig;
     /**
@@ -143,6 +145,10 @@ class General extends AbstractHelper
      * @var OrderManagementInterface
      */
     private $orderManagement;
+    /**
+     * @var Config
+     */
+    private $config;
 
     /**
      * General constructor.
@@ -151,7 +157,7 @@ class General extends AbstractHelper
      * @param PaymentHelper            $paymentHelper
      * @param OrderRepository          $orderRepository
      * @param StoreManagerInterface    $storeManager
-     * @param Config                   $resourceConfig
+     * @param ResourceConfig           $resourceConfig
      * @param ModuleListInterface      $moduleList
      * @param ProductMetadataInterface $metadata
      * @param Resolver                 $resolver
@@ -161,13 +167,14 @@ class General extends AbstractHelper
      * @param CouponUsage              $couponUsage
      * @param OrderCommentHistory      $orderCommentHistory
      * @param OrderManagementInterface $orderManagement
+     * @param Config                   $config
      */
     public function __construct(
         Context $context,
         PaymentHelper $paymentHelper,
         OrderRepository $orderRepository,
         StoreManagerInterface $storeManager,
-        Config $resourceConfig,
+        ResourceConfig $resourceConfig,
         ModuleListInterface $moduleList,
         ProductMetadataInterface $metadata,
         Resolver $resolver,
@@ -176,7 +183,8 @@ class General extends AbstractHelper
         Coupon $coupon,
         CouponUsage $couponUsage,
         OrderCommentHistory $orderCommentHistory,
-        OrderManagementInterface $orderManagement
+        OrderManagementInterface $orderManagement,
+        Config $config
     ) {
         $this->paymentHelper = $paymentHelper;
         $this->storeManager = $storeManager;
@@ -191,8 +199,9 @@ class General extends AbstractHelper
         $this->coupon = $coupon;
         $this->couponUsage = $couponUsage;
         $this->orderCommentHistory = $orderCommentHistory;
-        parent::__construct($context);
         $this->orderManagement = $orderManagement;
+        $this->config = $config;
+        parent::__construct($context);
     }
 
     /**
@@ -455,12 +464,14 @@ class General extends AbstractHelper
      * Selected pending (payment) status for banktransfer
      *
      * @param int $storeId
+     * @deprecated
+     * @see Config::statusPendingBanktransfer()
      *
      * @return mixed
      */
     public function getStatusPendingBanktransfer($storeId = 0)
     {
-        return $this->getStoreConfig(self::XML_PATH_STATUS_PENDING_BANKTRANSFER, $storeId);
+        return $this->config->statusPendingBanktransfer($storeId);
     }
 
     /**
