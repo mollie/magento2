@@ -4,13 +4,13 @@
     <group id="mollie_methods_paymentlink" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
            showInStore="1">
         <label>Payment Link / Admin Payment</label>
-        <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_paymentlink/active</config_path>
         </field>
-        <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
+        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Title</label>
             <config_path>payment/mollie_methods_paymentlink/title</config_path>
@@ -18,7 +18,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="add_message" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1"
+        <field id="add_message" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Add Link to Payment Details</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -27,7 +27,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="message" translate="label" type="textarea" sortOrder="5" showInDefault="1" showInWebsite="1"
+        <field id="message" translate="label" type="textarea" sortOrder="40" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Message / Link</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -38,7 +38,15 @@
                 <field id="add_message">1</field>
             </depends>
         </field>
-        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
+        <field id="order_status_new" translate="label comment" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Status New</label>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\NewStatus</source_model>
+            <config_path>payment/mollie_methods_paymentlink/order_status_new</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="60" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
@@ -47,7 +55,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="97" showInDefault="1"
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="70" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
@@ -57,7 +65,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="min_order_total" translate="label" type="text" sortOrder="98" showInDefault="1" showInWebsite="1"
+        <field id="min_order_total" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Minimum Order Total</label>
             <config_path>payment/mollie_methods_paymentlink/min_order_total</config_path>
@@ -65,7 +73,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="max_order_total" translate="label" type="text" sortOrder="99" showInDefault="1" showInWebsite="1"
+        <field id="max_order_total" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Maximum Order Total</label>
             <config_path>payment/mollie_methods_paymentlink/max_order_total</config_path>

@@ -23,6 +23,7 @@ use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
@@ -67,6 +68,10 @@ class Mollie extends AbstractMethod
      * @var bool
      */
     protected $_canUseInternal = false;
+    /**
+     * @var Config
+     */
+    protected $config;
     /**
      * @var array
      */
@@ -131,6 +136,7 @@ class Mollie extends AbstractMethod
      * @param SearchCriteriaBuilder      $searchCriteriaBuilder
      * @param AssetRepository            $assetRepository
      * @param ResourceConnection         $resourceConnection
+     * @param Config                     $config
      * @param AbstractResource|null      $resource
      * @param AbstractDb|null            $resourceCollection
      * @param array                      $data
@@ -152,6 +158,7 @@ class Mollie extends AbstractMethod
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AssetRepository $assetRepository,
         ResourceConnection $resourceConnection,
+        Config $config,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -178,6 +185,7 @@ class Mollie extends AbstractMethod
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->assetRepository = $assetRepository;
         $this->resourceConnection = $resourceConnection;
+        $this->config = $config;
     }
 
     /**
