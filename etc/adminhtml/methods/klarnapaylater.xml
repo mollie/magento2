@@ -4,13 +4,13 @@
     <group id="mollie_methods_klarnapaylater" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
            showInStore="1">
         <label>Klarna Pay Later</label>
-        <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_klarnapaylater/active</config_path>
         </field>
-        <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
+        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Title</label>
             <config_path>payment/mollie_methods_klarnapaylater/title</config_path>
@@ -18,7 +18,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="96" showInDefault="1"
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="30" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
@@ -27,7 +27,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="97" showInDefault="1"
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="40" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
@@ -37,7 +37,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="min_order_total" translate="label" type="text" sortOrder="98" showInDefault="1" showInWebsite="1"
+        <field id="min_order_total" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Minimum Order Total</label>
             <config_path>payment/mollie_methods_klarnapaylater/min_order_total</config_path>
@@ -45,7 +45,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="max_order_total" translate="label" type="text" sortOrder="99" showInDefault="1" showInWebsite="1"
+        <field id="max_order_total" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Maximum Order Total</label>
             <config_path>payment/mollie_methods_klarnapaylater/max_order_total</config_path>
@@ -53,7 +53,26 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="sort_order" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Klarna Payment Surcharge</label>
+            <config_path>payment/mollie_methods_klarnapaylater/payment_surcharge</config_path>
+            <comment><![CDATA[Enter the extra costs for a Klarna Pay Later payment with a maximum of € 1.95]]></comment>
+            <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="80" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Klarna Payment Surcharge Tax Class</label>
+            <config_path>payment/mollie_methods_klarnapaylater/payment_surcharge_tax_class</config_path>
+            <source_model>Magento\Tax\Model\TaxClass\Source\Product</source_model>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="sort_order" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>
