@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2019 Magmodules.eu. All rights reserved.
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -33,6 +33,12 @@ class PaymentFeeTax extends AbstractTotal
         $this->priceCurrency = $priceCurrency;
     }
 
+    /**
+     * @param Quote $quote
+     * @param ShippingAssignmentInterface $shippingAssignment
+     * @param Total $total
+     * @return $this|AbstractTotal
+     */
     public function collect(Quote $quote, ShippingAssignmentInterface $shippingAssignment, Total $total)
     {
         parent::collect($quote, $shippingAssignment, $total);

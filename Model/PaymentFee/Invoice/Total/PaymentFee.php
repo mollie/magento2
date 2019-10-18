@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2019 Magmodules.eu. All rights reserved.
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -11,6 +11,10 @@ use Magento\Sales\Model\Order\Invoice\Total\AbstractTotal;
 
 class PaymentFee extends AbstractTotal
 {
+    /**
+     * @param Invoice $invoice
+     * @return $this|AbstractTotal
+     */
     public function collect(Invoice $invoice)
     {
         $order = $invoice->getOrder();

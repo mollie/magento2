@@ -1,8 +1,10 @@
 <?php
-
+/**
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Service\Order\Lines;
-
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Helper\General;
@@ -24,11 +26,20 @@ class PaymentFee
         $this->mollieHelper = $mollieHelper;
     }
 
+    /**
+     * @param OrderInterface $order
+     * @return bool
+     */
     public function orderHasPaymentFee(OrderInterface $order)
     {
         return $order->getData('base_mollie_payment_fee') && $order->getData('mollie_payment_fee');
     }
 
+    /**
+     * @param OrderInterface $order
+     * @param $forceBaseCurrency
+     * @return array
+     */
     public function getOrderLine(OrderInterface $order, $forceBaseCurrency)
     {
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();

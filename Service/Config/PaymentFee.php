@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2019 Magmodules.eu. All rights reserved.
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -30,6 +30,10 @@ class PaymentFee
         $this->taxCalculation = $taxCalculation;
     }
 
+    /**
+     * @param Quote $quote
+     * @return float
+     */
     public function includingTax(Quote $quote)
     {
         $method = $quote->getPayment()->getMethod();
@@ -39,6 +43,10 @@ class PaymentFee
         return (double)str_replace(',', '.', $amount);
     }
 
+    /**
+     * @param Quote $quote
+     * @return float
+     */
     public function excludingTax(Quote $quote)
     {
         $amount = $this->includingTax($quote);
@@ -47,6 +55,10 @@ class PaymentFee
         return $amount - $tax;
     }
 
+    /**
+     * @param Quote $quote
+     * @return float
+     */
     public function tax(Quote $quote)
     {
         $shippingAddress = $quote->getShippingAddress();
@@ -77,6 +89,10 @@ class PaymentFee
         return $result;
     }
 
+    /**
+     * @param Quote $quote
+     * @return bool
+     */
     public function isAvailableForMethod(Quote $quote)
     {
         $method = $quote->getPayment()->getMethod();
@@ -84,6 +100,10 @@ class PaymentFee
         return in_array($method, ['mollie_methods_klarnapaylater', 'mollie_methods_klarnasliceit']);
     }
 
+    /**
+     * @param Quote $quote
+     * @return string|null
+     */
     private function getTaxClass(Quote $quote)
     {
         $method = $quote->getPayment()->getMethod();
@@ -95,8 +115,15 @@ class PaymentFee
         if ($method == 'mollie_methods_klarnasliceit') {
             return $this->config->klarnaSliceitPaymentSurchargeTaxClass($quote->getStoreId());
         }
+
+        return null;
     }
 
+    /**
+     * @param $method
+     * @param $storeId
+     * @return int|string
+     */
     private function getAmount($method, $storeId)
     {
         if ($method == 'mollie_methods_klarnapaylater') {

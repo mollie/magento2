@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Service\Order;
 
@@ -8,6 +12,10 @@ use Magento\Sales\Api\Data\OrderItemInterface;
 
 class Creditmemo
 {
+    /**
+     * @param CreditmemoInterface $creditmemo
+     * @return bool
+     */
     public function isFullOrLastPartialCreditmemo(CreditmemoInterface $creditmemo)
     {
         /** @var CreditmemoItemInterface $item */
@@ -24,6 +32,10 @@ class Creditmemo
         return true;
     }
 
+    /**
+     * @param CreditmemoInterface $creditmemo
+     * @return bool
+     */
     public function hasItemsLeftToRefund(CreditmemoInterface $creditmemo)
     {
         /** @var OrderItemInterface $order */

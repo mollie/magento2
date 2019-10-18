@@ -1,4 +1,8 @@
 <?php
+/**
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Service\Order\Lines;
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Copyright © 2019 Magmodules.eu. All rights reserved.
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -25,6 +25,10 @@ class PaymentFee extends AbstractTotal
         parent::__construct($data);
     }
 
+    /**
+     * @param Creditmemo $creditmemo
+     * @return $this|AbstractTotal
+     */
     public function collect(Creditmemo $creditmemo)
     {
         if (!$this->creditmemoService->isFullOrLastPartialCreditmemo($creditmemo)) {
