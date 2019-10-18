@@ -17,6 +17,10 @@ class CopyPaymentFeeToOrder implements ObserverInterface
         /* @var CartInterface $quote */
         $quote = $observer->getEvent()->getData('quote');
 
+        if (!$order || !$quote) {
+            return;
+        }
+
         $quoteExtension = $quote->getExtensionAttributes();
 
         $order->setMolliePaymentFee($quoteExtension->getMolliePaymentFee());

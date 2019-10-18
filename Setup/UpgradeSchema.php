@@ -34,7 +34,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->createTable($setup, MollieOrderLines::getData());
         }
 
-        if (version_compare($context->getVersion(), '1.7.0', '<')) {
+        if (version_compare($context->getVersion(), '1.8.0', '<')) {
             $this->addPaymentFeeColumns($setup);
         }
 

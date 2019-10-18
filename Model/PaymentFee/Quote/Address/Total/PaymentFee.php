@@ -47,8 +47,9 @@ class PaymentFee extends AbstractTotal
         $total->setTotalAmount('mollie_payment_fee', $amount);
         $total->setBaseTotalAmount('mollie_payment_fee', $baseAmount);
 
-        $quote->getExtensionAttributes()->setMolliePaymentFee($amount);
-        $quote->getExtensionAttributes()->setBaseMolliePaymentFee($amount);
+        $attributes = $quote->getExtensionAttributes();
+        $attributes->setMolliePaymentFee($amount);
+        $attributes->setBaseMolliePaymentFee($amount);
 
         return $this;
     }
@@ -61,13 +62,13 @@ class PaymentFee extends AbstractTotal
 
         return [
             'code' => 'mollie_payment_fee',
-            'title' => __('Mollie Payment Fee'),
+            'title' => __('Payment Fee'),
             'value' => $this->paymentFeeConfig->includingTax($quote),
         ];
     }
 
     public function getLabel()
     {
-        return __('Mollie Payment Fee');
+        return __('Payment Fee');
     }
 }

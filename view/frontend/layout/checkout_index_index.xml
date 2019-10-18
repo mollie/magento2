@@ -109,7 +109,7 @@
                                                             <item name="sortOrder" xsi:type="string">20</item>
                                                             <item name="config" xsi:type="array">
                                                                 <item name="template" xsi:type="string">Mollie_Payment/checkout/summary/payment-fee</item>
-                                                                <item name="title" xsi:type="string" translate="true">Mollie Payment Fee</item>
+                                                                <item name="title" xsi:type="string" translate="true">Payment Fee</item>
                                                             </item>
                                                         </item>
                                                     </item>

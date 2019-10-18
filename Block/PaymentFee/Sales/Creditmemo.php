@@ -21,7 +21,7 @@ class Creditmemo extends Template
         $total = new DataObject([
             'code' => 'mollie_payment_fee',
             'value' => $creditmemo->getMolliePaymentFee() + $creditmemo->getMolliePaymentFeeTax(),
-            'label' => __('Mollie Payment Fee'),
+            'label' => __('Payment Fee'),
         ]);
 
         $parentBlock->addTotalBefore($total, 'tax');
