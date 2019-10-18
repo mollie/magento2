@@ -605,7 +605,7 @@ class Orders extends AbstractModel
             $shipment->setMollieShipmentId($mollieShipmentId);
 
             /**
-             * Check if Transactions needs to be captures (eg. Klarna methods)
+             * Check if Transactions needs to be captured (eg. Klarna methods)
              */
             $payment = $order->getPayment();
             if (!$payment->getIsTransactionClosed()) {
@@ -614,7 +614,7 @@ class Orders extends AbstractModel
                     $invoice = $this->partialInvoice->createFromShipment($shipment);
                 }
 
-                $captureAmount = $this->getCaptureAmount($order, $invoice);
+                $captureAmount = $this->getCaptureAmount($order, $invoice->getId() ? $invoice : null);
 
                 $payment->registerCaptureNotification($captureAmount, true);
                 $this->orderRepository->save($order);
