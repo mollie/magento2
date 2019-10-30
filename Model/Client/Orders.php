@@ -517,7 +517,11 @@ class Orders extends AbstractModel
 
         try {
             $mollieApi = $this->loadMollieApi($apiKey);
-            $mollieApi->orders->cancel($transactionId);
+
+            $mollieOrder = $mollieApi->orders->get($transactionId);
+            if ($mollieOrder->status != 'expired') {
+                $mollieApi->orders->cancel($transactionId);
+            }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             throw new LocalizedException(
