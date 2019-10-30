@@ -616,6 +616,7 @@ class Orders extends AbstractModel
 
                 $captureAmount = $this->getCaptureAmount($order, $invoice->getId() ? $invoice : null);
 
+                $payment->setTransactionId($transactionId);
                 $payment->registerCaptureNotification($captureAmount, true);
                 $this->orderRepository->save($order);
 

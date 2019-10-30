@@ -32,7 +32,7 @@ class PaymentFee
      */
     public function orderHasPaymentFee(OrderInterface $order)
     {
-        return $order->getData('base_mollie_payment_fee') && $order->getData('mollie_payment_fee');
+        return (float)$order->getData('base_mollie_payment_fee') && (float)$order->getData('mollie_payment_fee');
     }
 
     /**
