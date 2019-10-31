@@ -28,12 +28,16 @@ class CopyPaymentFeeToOrder implements ObserverInterface
             return;
         }
 
-        $quoteExtension = $quote->getExtensionAttributes();
+        $extensionAttributes = $quote->getExtensionAttributes();
 
-        $order->setMolliePaymentFee($quoteExtension->getMolliePaymentFee());
-        $order->setMolliePaymentFeeTax($quoteExtension->getMolliePaymentFeeTax());
+        if (!$extensionAttributes) {
+            return;
+        }
 
-        $order->setBaseMolliePaymentFee($quoteExtension->getBaseMolliePaymentFee());
-        $order->setBaseMolliePaymentFeeTax($quoteExtension->getBaseMolliePaymentFeeTax());
+        $order->setMolliePaymentFee($extensionAttributes->getMolliePaymentFee());
+        $order->setMolliePaymentFeeTax($extensionAttributes->getMolliePaymentFeeTax());
+
+        $order->setBaseMolliePaymentFee($extensionAttributes->getBaseMolliePaymentFee());
+        $order->setBaseMolliePaymentFeeTax($extensionAttributes->getBaseMolliePaymentFeeTax());
     }
 }
