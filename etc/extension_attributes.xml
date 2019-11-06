@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
+    <extension_attributes for="Magento\Quote\Api\Data\CartInterface">
+        <attribute code="mollie_payment_fee" type="float" />
+        <attribute code="base_mollie_payment_fee" type="float" />
+        <attribute code="mollie_payment_fee_tax" type="float" />
+        <attribute code="base_mollie_payment_fee_tax" type="float" />
+    </extension_attributes>
+
+    <extension_attributes for="Magento\Sales\Api\Data\OrderInterface">
+        <attribute code="mollie_payment_fee" type="float" />
+        <attribute code="base_mollie_payment_fee" type="float" />
+        <attribute code="mollie_payment_fee_tax" type="float" />
+        <attribute code="base_mollie_payment_fee_tax" type="float" />
+    </extension_attributes>
+</config>

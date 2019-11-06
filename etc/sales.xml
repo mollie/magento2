@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Sales:etc/sales.xsd">
+    <section name="quote">
+        <group name="totals">
+            <item name="mollie_payment_fee" instance="Mollie\Payment\Model\PaymentFee\Quote\Address\Total\PaymentFee" sort_order="150"/>
+            <item name="mollie_payment_fee_tax" instance="Mollie\Payment\Model\PaymentFee\Quote\Address\Total\PaymentFeeTax" sort_order="451"/>
+        </group>
+    </section>
+    <section name="order_invoice">
+        <group name="totals">
+            <item name="mollie_payment_fee" instance="Mollie\Payment\Model\PaymentFee\Invoice\Total\PaymentFee" sort_order="150"/>
+        </group>
+    </section>
+    <section name="order_creditmemo">
+        <group name="totals">
+            <item name="mollie_payment_fee" instance="Mollie\Payment\Model\PaymentFee\Creditmemo\Total\PaymentFee" sort_order="160"/>
+        </group>
+    </section>
+</config>

@@ -8,6 +8,16 @@ use PHPUnit\Framework\TestCase;
 
 class SchemaTest extends TestCase
 {
+    /**
+     * @var \Magento\Framework\App\ObjectManager
+     */
+    private $objectManager;
+
+    protected function setUp()
+    {
+        $this->objectManager = ObjectManager::getInstance();
+    }
+
     public function addedColumnsHaveIndexesProvider()
     {
         return [
@@ -21,9 +31,8 @@ class SchemaTest extends TestCase
      */
     public function testAddedColumnsHaveIndexes($tableName, $columnName)
     {
-        $om = ObjectManager::getInstance();
         /** @var ResourceConnection $resource */
-        $resource = $om->get(ResourceConnection::class);
+        $resource = $this->objectManager->get(ResourceConnection::class);
         $connection = $resource->getConnection();
 
         $tableName = $resource->getTableName($tableName);
@@ -38,5 +47,38 @@ class SchemaTest extends TestCase
         }
 
         $this->fail('There was no index found for `' . $columnName . '` in `' . $tableName . '`');
+    }
+
+    public function thePaymentFeeColumnsExistsProvider()
+    {
+        return [
+            ['quote'],
+            ['quote_address'],
+            ['sales_order'],
+            ['sales_invoice'],
+            ['sales_creditmemo'],
+        ];
+    }
+
+    /**
+     * @dataProvider thePaymentFeeColumnsExistsProvider
+     */
+    public function testThePaymentFeeColumnsExists($tableName)
+    {
+        /** @var ResourceConnection $resource */
+        $resource = $this->objectManager->get(ResourceConnection::class);
+        $connection = $resource->getConnection();
+
+        $tableName = $resource->getTableName($tableName);
+        $columns = $connection->fetchAll('SHOW COLUMNS FROM ' . $tableName);
+
+        $columns = array_map( function ($column) {
+            return $column['Field'];
+        }, $columns);
+
+        $this->assertTrue(in_array('mollie_payment_fee', $columns));
+        $this->assertTrue(in_array('base_mollie_payment_fee', $columns));
+        $this->assertTrue(in_array('mollie_payment_fee_tax', $columns));
+        $this->assertTrue(in_array('base_mollie_payment_fee_tax', $columns));
     }
 }

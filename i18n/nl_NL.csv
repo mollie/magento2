@@ -86,3 +86,4 @@
 "Fetch Status","Status Ophalen"
 "The latest status from Mollie has been retrieved","De laatste status is bij Mollie opgehaald"
 "The payment-status will updated automatically by default, but in case of any interruption you can use this function to fetch the payment status manually.","De betaal status wordt standaard bijgewerkt. Mocht dit door omstandigheden niet het geval zijn dan kun u deze hier handmatig laten ophalen."
+"Please make sure the payment surcharge does not exceed %1.","Zorg ervoor dat de betaal fee niet meer bedraagt dan %1."
