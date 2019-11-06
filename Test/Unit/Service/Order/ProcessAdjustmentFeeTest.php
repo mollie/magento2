@@ -65,12 +65,13 @@ class ProcessAdjustmentFeeTest extends TestCase
     {
         $creditmemo = $this->createMock(CreditmemoInterface::class);
         $creditmemo->method('getAdjustmentNegative')->willReturn(-123);
+        $creditmemo->method('getGrandTotal')->willReturn(123);
 
         $this->refundUsingPaymentMock->expects($this->once())->method('execute')->with(
             $this->isInstanceOf(MollieApiClient::class),
             999,
             'EUR',
-            -123
+            123
         );
 
         $this->instance->handle($this->createmock(MollieApiClient::class), $this->getOrderMock(), $creditmemo);
