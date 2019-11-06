@@ -24,11 +24,13 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Config;
+use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
+use Mollie\Payment\Service\Mollie\Timeout;
 
 /**
  * Class Mollie
@@ -116,6 +118,10 @@ class Mollie extends AbstractMethod
      * @var ResourceConnection
      */
     private $resourceConnection;
+    /**
+     * @var Timeout
+     */
+    private $timeout;
 
     /**
      * Mollie constructor.
@@ -137,6 +143,7 @@ class Mollie extends AbstractMethod
      * @param AssetRepository            $assetRepository
      * @param ResourceConnection         $resourceConnection
      * @param Config                     $config
+     * @param Timeout                    $timeout
      * @param AbstractResource|null      $resource
      * @param AbstractDb|null            $resourceCollection
      * @param array                      $data
@@ -159,6 +166,7 @@ class Mollie extends AbstractMethod
         AssetRepository $assetRepository,
         ResourceConnection $resourceConnection,
         Config $config,
+        Timeout $timeout,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -186,6 +194,7 @@ class Mollie extends AbstractMethod
         $this->assetRepository = $assetRepository;
         $this->resourceConnection = $resourceConnection;
         $this->config = $config;
+        $this->timeout = $timeout;
     }
 
     /**
@@ -194,6 +203,8 @@ class Mollie extends AbstractMethod
      * @param \Magento\Quote\Api\Data\CartInterface|null $quote
      *
      * @return bool
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
@@ -253,35 +264,46 @@ class Mollie extends AbstractMethod
         $method = $this->mollieHelper->getApiMethod($order);
 
         if ($method == 'order') {
-            try {
-                $transactionResult = $this->ordersApi->startTransaction($order, $mollieApi);
-            } catch (\Exception $e) {
-                $methodCode = $this->mollieHelper->getMethodCode($order);
-                if ($methodCode != 'klarnapaylater' && $methodCode != 'klarnasliceit') {
-                    $this->mollieHelper->addTolog('error', $e->getMessage());
-                    $transactionResult = $this->paymentsApi->startTransaction($order, $mollieApi);
-                } else {
-                    throw new LocalizedException(__($e->getMessage()));
-                }
-            }
-        } else {
-            $transactionResult = $this->paymentsApi->startTransaction($order, $mollieApi);
+            return $this->startTransactionUsingTheOrdersApi($order, $mollieApi);
         }
 
-        return $transactionResult;
+        return $this->timeout->retry( function () use ($order, $mollieApi) {
+            return $this->paymentsApi->startTransaction($order, $mollieApi);
+        });
+    }
+
+    private function startTransactionUsingTheOrdersApi(Order $order, MollieApiClient $mollieApi)
+    {
+        try {
+            return $this->timeout->retry( function () use ($order, $mollieApi) {
+                return $this->ordersApi->startTransaction($order, $mollieApi);
+            });
+        } catch (\Exception $exception) {
+            $this->mollieHelper->addTolog('error', $exception->getMessage());
+        }
+
+        $methodCode = $this->mollieHelper->getMethodCode($order);
+        if ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit') {
+            throw new LocalizedException(__($exception->getMessage()));
+        }
+
+        // Retry the order using the "payment" method.
+        return $this->timeout->retry( function () use ($order, $mollieApi) {
+            return $this->paymentsApi->startTransaction($order, $mollieApi);
+        });
     }
 
     /**
      * @param $apiKey
      *
-     * @return \Mollie\Api\MollieApiClient
+     * @return MollieApiClient
      * @throws \Mollie\Api\Exceptions\ApiException
      * @throws LocalizedException
      */
     public function loadMollieApi($apiKey)
     {
         if (class_exists('Mollie\Api\MollieApiClient')) {
-            $mollieApiClient = new \Mollie\Api\MollieApiClient();
+            $mollieApiClient = new MollieApiClient();
             $mollieApiClient->setApiKey($apiKey);
             $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
             $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
