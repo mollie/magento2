@@ -65,13 +65,11 @@ class ProcessAdjustmentFee
     {
         $this->doNotRefundInMollie = true;
 
-        $amountToRefund = $order->getGrandTotal() - abs($creditmemo->getAdjustmentNegative());
-
         $this->refundUsingPayment->execute(
             $mollieApi,
             $order->getMollieTransactionId(),
             $order->getOrderCurrencyCode(),
-            $amountToRefund
+            $creditmemo->getGrandTotal()
         );
     }
 }
