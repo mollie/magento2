@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="sales_order_item_price"/>
+    <body>
+        <referenceBlock name="invoice_totals">
+            <block name="mollie_payment_fee" class="Mollie\Payment\Block\PaymentFee\Sales\Order" />
+        </referenceBlock>
+    </body>
+</page>

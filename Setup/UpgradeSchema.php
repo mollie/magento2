@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Setup;
 
+use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\UpgradeSchemaInterface;
@@ -29,8 +30,12 @@ class UpgradeSchema implements UpgradeSchemaInterface
     {
         $setup->startSetup();
 
-        if (version_compare($context->getVersion(), "1.4.0", "<")) {
+        if (version_compare($context->getVersion(), '1.4.0', '<')) {
             $this->createTable($setup, MollieOrderLines::getData());
+        }
+
+        if (version_compare($context->getVersion(), '1.8.0', '<')) {
+            $this->addPaymentFeeColumns($setup);
         }
 
         $setup->endSetup();
@@ -59,6 +64,31 @@ class UpgradeSchema implements UpgradeSchemaInterface
             }
             $table->setComment($tableData['comment']);
             $connection->createTable($table);
+        }
+    }
+
+    /**
+     * @param SchemaSetupInterface $setup
+     */
+    private function addPaymentFeeColumns(SchemaSetupInterface $setup)
+    {
+        $connection = $setup->getConnection();
+
+        $defintion = [
+            'type' => Table::TYPE_DECIMAL,
+            'length' => '12,4',
+            'default' => 0.0000,
+            'nullable' => true,
+            'comment' => 'Mollie Payment Fee',
+        ];
+
+        foreach (['quote', 'quote_address', 'sales_order', 'sales_invoice', 'sales_creditmemo'] as $table) {
+            $tableName = $setup->getTable($table);
+
+            $connection->addColumn($tableName, 'mollie_payment_fee', $defintion);
+            $connection->addColumn($tableName, 'base_mollie_payment_fee', $defintion);
+            $connection->addColumn($tableName, 'mollie_payment_fee_tax', $defintion);
+            $connection->addColumn($tableName, 'base_mollie_payment_fee_tax', $defintion);
         }
     }
 }

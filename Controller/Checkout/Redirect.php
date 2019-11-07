@@ -9,6 +9,7 @@ namespace Mollie\Payment\Controller\Checkout;
 use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
+use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -121,11 +122,11 @@ class Redirect extends Action
                 $this->checkoutSession->restoreQuote();
                 $this->_redirect('checkout/cart');
             }
-        } catch (Exception $e) {
-            $this->messageManager->addExceptionMessage($e, __($e->getMessage()));
-            $this->mollieHelper->addTolog('error', $e->getMessage());
+        } catch (Exception $exception) {
+            $this->formatExceptionMessage($exception, $methodInstance);
+            $this->mollieHelper->addTolog('error', $exception->getMessage());
             $this->checkoutSession->restoreQuote();
-            $this->cancelUnprocessedOrder($order, $e->getMessage());
+            $this->cancelUnprocessedOrder($order, $exception->getMessage());
             $this->_redirect('checkout/cart');
         }
     }
@@ -157,5 +158,26 @@ class Redirect extends Action
             $message = sprintf('Cannot cancel order %s: %s', $order->getIncrementId(), $e->getMessage());
             $this->mollieHelper->addToLog('error', $message);
         }
+    }
+
+    /**
+     * @param Exception $exception
+     * @param MethodInterface $methodInstance
+     */
+    private function formatExceptionMessage(Exception $exception, MethodInterface $methodInstance)
+    {
+        if (stripos($exception->getMessage(), 'cURL error 28') !== false) {
+            $this->messageManager->addErrorMessage(
+                __(
+                    'A Timeout while connecting to %1 occurred, this could be the result of an outage. ' .
+                    'Please try again or select another payment method.',
+                    $methodInstance->getTitle()
+                )
+            );
+
+            return;
+        }
+
+        $this->messageManager->addExceptionMessage($exception, __($exception->getMessage()));
     }
 }
