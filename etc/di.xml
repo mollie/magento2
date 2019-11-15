@@ -40,4 +40,12 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Payment\Service\Order\BuildTransaction">
+        <arguments>
+            <argument name="parts" xsi:type="array">
+                <item name="cardToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CardToken</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

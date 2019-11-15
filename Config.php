@@ -11,8 +11,11 @@ use Magento\Store\Model\ScopeInterface;
 
 class Config
 {
+    const GENERAL_TYPE = 'payment/mollie_general/type';
+    const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const XML_PATH_STATUS_PENDING_BANKTRANSFER = 'payment/mollie_methods_banktransfer/order_status_pending';
     const XML_PATH_STATUS_NEW_PAYMENT_LINK = 'payment/mollie_methods_paymentlink/order_status_new';
+    const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     const PAYMENT_KLARNAPAYLATER_PAYMENT_SURCHARGE = 'payment/mollie_methods_klarnapaylater/payment_surcharge';
     const PAYMENT_KLARNAPAYLATER_PAYMENT_SURCHARGE_TAX_CLASS = 'payment/mollie_methods_klarnapaylater/payment_surcharge_tax_class';
     const PAYMENT_KLARNASLICEIT_PAYMENT_SURCHARGE = 'payment/mollie_methods_klarnasliceit/payment_surcharge';
@@ -37,6 +40,31 @@ class Config
     private function getPath($path, $storeId)
     {
         return $this->config->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    /**
+     * @param $path
+     * @param $storeId
+     * @return string
+     */
+    private function isSetFlag($path, $storeId)
+    {
+        return $this->config->isSetFlag($path, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    public function getTestmode($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_TYPE, $storeId) == 'test';
+    }
+
+    public function getProfileId($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_PROFILEID, $storeId);
+    }
+
+    public function creditcardUseComponents($storeId = null)
+    {
+        return $this->isSetFlag(static::PAYMENT_CREDITCARD_USE_COMPONENTS, $storeId);
     }
 
     public function statusPendingBanktransfer($storeId = null)

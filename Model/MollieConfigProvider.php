@@ -6,6 +6,8 @@
 
 namespace Mollie\Payment\Model;
 
+use Magento\Framework\Locale\Resolver;
+use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Checkout\Model\ConfigProviderInterface;
@@ -83,6 +85,14 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var array|null
      */
     private $methodData;
+    /**
+     * @var Config
+     */
+    private $config;
+    /**
+     * @var Resolver
+     */
+    private $localeResolver;
 
     /**
      * MollieConfigProvider constructor.
@@ -93,7 +103,9 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @param CheckoutSession      $checkoutSession
      * @param AssetRepository      $assetRepository
      * @param ScopeConfigInterface $scopeConfig
+     * @param Resolver             $localeResolver
      * @param Escaper              $escaper
+     * @param Config               $config
      */
     public function __construct(
         MollieModel $mollieModel,
@@ -102,7 +114,9 @@ class MollieConfigProvider implements ConfigProviderInterface
         CheckoutSession $checkoutSession,
         AssetRepository $assetRepository,
         ScopeConfigInterface $scopeConfig,
-        Escaper $escaper
+        Resolver $localeResolver,
+        Escaper $escaper,
+        Config $config
     ) {
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
@@ -111,6 +125,8 @@ class MollieConfigProvider implements ConfigProviderInterface
         $this->escaper = $escaper;
         $this->assetRepository = $assetRepository;
         $this->scopeConfig = $scopeConfig;
+        $this->config = $config;
+        $this->localeResolver = $localeResolver;
         foreach ($this->methodCodes as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
         }
@@ -138,6 +154,10 @@ class MollieConfigProvider implements ConfigProviderInterface
     public function getConfig()
     {
         $config = [];
+        $config['payment']['mollie']['testmode'] = $this->config->getTestmode();
+        $config['payment']['mollie']['profile_id'] = $this->config->getProfileId();
+        $config['payment']['mollie']['locale'] = $this->localeResolver->getLocale();
+        $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents();
         $apiKey = $this->mollieHelper->getApiKey();
         $useImage = $this->mollieHelper->useImage();
 

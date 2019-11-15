@@ -14,6 +14,7 @@ use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 
 /**
@@ -50,6 +51,10 @@ class Payments extends AbstractModel
      * @var OrderCommentHistory
      */
     private $orderCommentHistory;
+    /**
+     * @var BuildTransaction
+     */
+    private $buildTransaction;
 
     /**
      * Payments constructor.
@@ -60,6 +65,7 @@ class Payments extends AbstractModel
      * @param CheckoutSession $checkoutSession
      * @param MollieHelper $mollieHelper
      * @param OrderCommentHistory $orderCommentHistory
+     * @param BuildTransaction $buildTransaction
      */
     public function __construct(
         OrderSender $orderSender,
@@ -67,7 +73,8 @@ class Payments extends AbstractModel
         OrderRepository $orderRepository,
         CheckoutSession $checkoutSession,
         MollieHelper $mollieHelper,
-        OrderCommentHistory $orderCommentHistory
+        OrderCommentHistory $orderCommentHistory,
+        BuildTransaction $buildTransaction
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -75,6 +82,7 @@ class Payments extends AbstractModel
         $this->checkoutSession = $checkoutSession;
         $this->mollieHelper = $mollieHelper;
         $this->orderCommentHistory = $orderCommentHistory;
+        $this->buildTransaction = $buildTransaction;
     }
 
     /**
@@ -126,6 +134,8 @@ class Payments extends AbstractModel
         if ($method == 'przelewy24') {
             $paymentData['billingEmail'] = $order->getCustomerEmail();
         }
+
+        $paymentData = $this->buildTransaction->execute($order, static::CHECKOUT_TYPE, $paymentData);
 
         $paymentData = $this->mollieHelper->validatePaymentData($paymentData);
         $this->mollieHelper->addTolog('request', $paymentData);
