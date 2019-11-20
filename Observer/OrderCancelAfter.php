@@ -52,6 +52,13 @@ class OrderCancelAfter implements ObserverInterface
         /** @var \Magento\Sales\Model\Order $order */
         $order = $observer->getEvent()->getorder();
 
+        /**
+         * When manually marking an order as paid we don't want to communicate to Mollie as it will throw an exception.
+         */
+        if ($order->getReordered()) {
+            return;
+        }
+
         if ($this->mollieHelper->isPaidUsingMollieOrdersApi($order)) {
             $this->mollieModel->cancelOrder($order);
         }
