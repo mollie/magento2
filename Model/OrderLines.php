@@ -12,6 +12,7 @@ use Magento\Framework\Registry;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
+use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item;
 use Mollie\Payment\Model\ResourceModel\OrderLines\Collection as OrderLinesCollection;
@@ -416,12 +417,11 @@ class OrderLines extends AbstractModel
     }
 
     /**
-     * @param Order\Creditmemo $creditmemo
-     * @param                  $addShipping
-     *
+     * @param CreditmemoInterface $creditmemo
+     * @param bool $addShipping
      * @return array
      */
-    public function getCreditmemoOrderLines($creditmemo, $addShipping)
+    public function getCreditmemoOrderLines(CreditmemoInterface $creditmemo, $addShipping)
     {
         $orderLines = [];
 
@@ -429,9 +429,23 @@ class OrderLines extends AbstractModel
         foreach ($creditmemo->getAllItems() as $item) {
             $orderItemId = $item->getOrderItemId();
             $lineId = $this->getOrderLineByItemId($orderItemId)->getLineId();
-            if ($lineId) {
-                $orderLines[] = ['id' => $lineId, 'quantity' => round($item->getQty())];
+            if (!$lineId) {
+                continue;
             }
+
+            $line = [
+                'id' => $lineId,
+                'quantity' => round($item->getQty()),
+            ];
+
+            if ($item->getBaseDiscountAmount()) {
+                $line['amount'] = $this->mollieHelper->getAmountArray(
+                    $creditmemo->getBaseCurrencyCode(),
+                    $item->getBaseRowTotalInclTax() - $item->getBaseDiscountAmount()
+                );
+            }
+
+            $orderLines[] = $line;
         }
 
         $orderId = $creditmemo->getOrderId();
