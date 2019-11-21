@@ -10,15 +10,24 @@ use Magento\Backend\App\Action;
 use Magento\Backend\Model\Session\Quote;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\DB\TransactionFactory;
+use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\AdminOrder\Create;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Service\InvoiceService;
+use Mollie\Payment\Config;
+use Mollie\Payment\Service\Order\OrderCommentHistory;
 
 class MarkAsPaid extends Action
 {
+    /**
+     * @var Config
+     */
+    private $config;
+
     /**
      * @var OrderRepositoryInterface
      */
@@ -45,25 +54,41 @@ class MarkAsPaid extends Action
     private $transactionFactory;
 
     /**
+     * @var InvoiceSender
+     */
+    private $invoiceSender;
+
+    /**
+     * @var OrderCommentHistory
+     */
+    private $orderCommentHistory;
+
+    /**
      * @var Transaction
      */
     private $transaction;
 
     public function __construct(
         Action\Context $context,
+        Config $config,
         OrderRepositoryInterface $orderRepository,
         Create $orderCreate,
         Quote $quoteSession,
         InvoiceService $invoiceService,
+        InvoiceSender $invoiceSender,
+        OrderCommentHistory $orderCommentHistory,
         TransactionFactory $transactionFactory
     ) {
         parent::__construct($context);
 
+        $this->config = $config;
         $this->orderRepository = $orderRepository;
         $this->orderCreate = $orderCreate;
         $this->quoteSession = $quoteSession;
         $this->invoiceService = $invoiceService;
+        $this->invoiceSender = $invoiceSender;
         $this->transactionFactory = $transactionFactory;
+        $this->orderCommentHistory = $orderCommentHistory;
     }
 
     /**
@@ -84,9 +109,11 @@ class MarkAsPaid extends Action
             $this->transaction = $this->transactionFactory->create();
 
             $order = $this->recreateOrder($originalOrder);
-            $this->createInvoiceFor($order);
+            $invoice = $this->createInvoiceFor($order);
             $this->cancelOriginalOrder($originalOrder, $order->getIncrementId());
             $this->transaction->save();
+
+            $this->sendInvoice($invoice, $order);
 
             $this->messageManager->addSuccessMessage(
                 __(
@@ -143,5 +170,24 @@ class MarkAsPaid extends Action
         $invoice->register();
 
         $this->transaction->addObject($invoice);
+
+        return $invoice;
+    }
+
+    private function sendInvoice(InvoiceInterface $invoice, OrderInterface $order)
+    {
+        /** @var Order\Invoice $invoice */
+        if ($invoice->getEmailSent() || !$this->config->sendInvoiceEmail($invoice->getStoreId())) {
+            return;
+        }
+
+        try {
+            $this->invoiceSender->send($invoice);
+            $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
+            $this->orderCommentHistory->add($order, $message, true);
+        } catch (\Throwable $exception) {
+            $message = __('Unable to send the invoice: %1', $exception->getMessage());
+            $this->orderCommentHistory->add($order, $message, true);
+        }
     }
 }

@@ -11,6 +11,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class Config
 {
+    const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const XML_PATH_STATUS_PENDING_BANKTRANSFER = 'payment/mollie_methods_banktransfer/order_status_pending';
     const XML_PATH_STATUS_NEW_PAYMENT_LINK = 'payment/mollie_methods_paymentlink/order_status_new';
     const PAYMENT_KLARNAPAYLATER_PAYMENT_SURCHARGE = 'payment/mollie_methods_klarnapaylater/payment_surcharge';
@@ -48,6 +49,15 @@ class Config
     private function getFlag($path, $storeId)
     {
         return $this->config->isSetFlag($path, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function sendInvoiceEmail($storeId = null)
+    {
+        return $this->getFlag(static::GENERAL_INVOICE_NOTIFY, $storeId);
     }
 
     public function statusPendingBanktransfer($storeId = null)
