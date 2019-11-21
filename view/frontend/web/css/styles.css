@@ -116,3 +116,12 @@
         transform: rotate(360deg);
     }
 }
+
+.mollie-component {
+    padding: 3px;
+    border: 1px solid lightgrey;
+}
+
+.mollie-component.is-invalid {
+    border: 1px solid red;
+}

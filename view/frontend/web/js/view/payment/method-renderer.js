@@ -14,11 +14,18 @@ define(
         var idealComponent = 'Mollie_Payment/js/view/payment/method-renderer/ideal';
         var kbcComponent = 'Mollie_Payment/js/view/payment/method-renderer/kbc';
         var giftcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/giftcard';
+
+        var creditcardComponent = defaultComponent;
+        var checkoutConfig = window.checkoutConfig.payment;
+        if (checkoutConfig.mollie.profile_id && checkoutConfig.mollie.creditcard.use_components) {
+            creditcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/creditcard-with-components';
+        }
+
         var methods = [
             {type: 'mollie_methods_bancontact', component: defaultComponent},
             {type: 'mollie_methods_banktransfer', component: defaultComponent},
             {type: 'mollie_methods_belfius', component: defaultComponent},
-            {type: 'mollie_methods_creditcard', component: defaultComponent},
+            {type: 'mollie_methods_creditcard', component: creditcardComponent},
             {type: 'mollie_methods_ideal', component: idealComponent},
             {type: 'mollie_methods_kbc', component: kbcComponent},
             {type: 'mollie_methods_paypal', component: defaultComponent},
