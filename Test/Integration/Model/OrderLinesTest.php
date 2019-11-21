@@ -3,6 +3,7 @@
 namespace Mollie\Payment\Model;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
+use Magento\Sales\Api\Data\CreditmemoItemInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class OrderLinesTest extends IntegrationTestCase
@@ -88,6 +89,37 @@ class OrderLinesTest extends IntegrationTestCase
 
         $line = $result['lines'][0];
         $this->assertEquals('ord_abc123', $line['id']);
+        $this->assertEquals(1, $line['quantity']);
+    }
+
+    public function testCreditmemoUsesTheDiscount()
+    {
+        /** @var OrderLines $orderLine */
+        $orderLine = $this->objectManager->get(\Mollie\Payment\Model\OrderLinesFactory::class)->create();
+        $orderLine->setItemId(999);
+        $orderLine->setLineId('ord_abc123');
+        $orderLine->save();
+
+        /** @var CreditmemoItemInterface $creditmemoItem */
+        $creditmemoItem = $this->objectManager->create(CreditmemoItemInterface::class);
+        $creditmemoItem->setBaseRowTotalInclTax(45);
+        $creditmemoItem->setBaseDiscountAmount(9);
+        $creditmemoItem->setQty(1);
+        $creditmemoItem->setOrderItemId(999);
+
+        /** @var CreditmemoInterface $creditmemo */
+        $creditmemo = $this->objectManager->get(CreditmemoInterface::class);
+        $creditmemo->setOrderId(999);
+        $creditmemo->setItems([$creditmemoItem]);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+        $result = $instance->getCreditmemoOrderLines($creditmemo, false);
+
+        $this->assertCount(1, $result['lines']);
+
+        $line = $result['lines'][0];
+        $this->assertEquals('36', $line['amount']['value']);
         $this->assertEquals(1, $line['quantity']);
     }
 
