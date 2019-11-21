@@ -56,7 +56,7 @@ class PaymentToken implements PaymentTokenRequestInterface
         $this->cartRepository = $cartRepository;
     }
 
-    public function generate(CartInterface $cart): string
+    public function generate(CartInterface $cart)
     {
         $token = $this->getUniquePaymentToken();
 
@@ -70,14 +70,14 @@ class PaymentToken implements PaymentTokenRequestInterface
         return $token;
     }
 
-    public function generateForCustomer($cartId): string
+    public function generateForCustomer($cartId)
     {
         $cart = $this->cartRepository->get($cartId);
 
         return $this->generate($cart);
     }
 
-    public function generateForGuest($cartId): string
+    public function generateForGuest($cartId)
     {
         $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
         $cart = $this->cartRepository->get($quoteIdMask->getQuoteId());
@@ -88,7 +88,7 @@ class PaymentToken implements PaymentTokenRequestInterface
     /**
      * @return string
      */
-    private function getUniquePaymentToken(): string
+    private function getUniquePaymentToken()
     {
         $token = $this->helper->getPaymentToken();
 

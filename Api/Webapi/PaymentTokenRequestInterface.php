@@ -12,11 +12,11 @@ interface PaymentTokenRequestInterface
      * @param string $cartId
      * @return string
      */
-    public function generateForCustomer($cartId): string;
+    public function generateForCustomer($cartId);
 
     /**
      * @param string $cartId
      * @return string
      */
-    public function generateForGuest($cartId): string;
+    public function generateForGuest($cartId);
 }

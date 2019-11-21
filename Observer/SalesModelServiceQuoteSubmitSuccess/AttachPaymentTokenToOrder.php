@@ -81,7 +81,7 @@ class AttachPaymentTokenToOrder implements ObserverInterface
      * @param OrderInterface $order
      * @throws \Exception
      */
-    private function updateModels(SearchResultsInterface $tokens, OrderInterface $order): void
+    private function updateModels(SearchResultsInterface $tokens, OrderInterface $order)
     {
         $transaction = $this->transactionFactory->create();
 

@@ -37,7 +37,7 @@ class StartTransaction implements StartTransactionRequestInterface
      * @throws LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function execute($token): string
+    public function execute($token)
     {
         $model = $this->paymentTokenRepository->getByToken($token);
         $order = $this->orderRepository->get($model->getOrderId());

@@ -13,5 +13,5 @@ interface StartTransactionRequestInterface
      * @param int $orderId
      * @return string
      */
-    public function execute($token): string;
+    public function execute($token);
 }
