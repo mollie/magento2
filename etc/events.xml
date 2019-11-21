@@ -18,4 +18,7 @@
     <event name="sales_model_service_quote_submit_before">
         <observer name="mollie_copy_payment_fee_to_order" instance="Mollie\Payment\Observer\SalesModelServiceQuoteSubmitBefore\CopyPaymentFeeToOrder" />
     </event>
+    <event name="sales_model_service_quote_submit_success">
+        <observer name="mollie_attach_payment_token_to_order" instance="Mollie\Payment\Observer\SalesModelServiceQuoteSubmitSuccess\AttachPaymentTokenToOrder" />
+    </event>
 </config>

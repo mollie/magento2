@@ -31,6 +31,7 @@ use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
+use Mollie\Payment\Service\Order\Transaction;
 
 /**
  * Class Orders
@@ -106,6 +107,10 @@ class Orders extends AbstractModel
      * @var Expires
      */
     private $expires;
+    /**
+     * @var Transaction
+     */
+    private $transaction;
 
     /**
      * Orders constructor.
@@ -126,6 +131,7 @@ class Orders extends AbstractModel
      * @param StoreCredit           $storeCredit
      * @param RefundUsingPayment    $refundUsingPayment
      * @param Expires               $expires
+     * @param Transaction           $transaction
      */
     public function __construct(
         OrderLines $orderLines,
@@ -143,7 +149,8 @@ class Orders extends AbstractModel
         PartialInvoice $partialInvoice,
         StoreCredit $storeCredit,
         RefundUsingPayment $refundUsingPayment,
-        Expires $expires
+        Expires $expires,
+        Transaction $transaction
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -161,6 +168,7 @@ class Orders extends AbstractModel
         $this->orderCommentHistory = $orderCommentHistory;
         $this->partialInvoice = $partialInvoice;
         $this->expires = $expires;
+        $this->transaction = $transaction;
     }
 
     /**
@@ -191,8 +199,8 @@ class Orders extends AbstractModel
             'billingAddress'      => $this->getAddressLine($order->getBillingAddress()),
             'consumerDateOfBirth' => null,
             'lines'               => $this->orderLines->getOrderLines($order),
-            'redirectUrl'         => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
-            'webhookUrl'          => $this->mollieHelper->getWebhookUrl(),
+            'redirectUrl'         => $this->transaction->getRedirectUrl($orderId, $paymentToken),
+            'webhookUrl'          => $this->transaction->getWebhookUrl(),
             'locale'              => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE),
             'method'              => $method,
             'metadata'            => [
