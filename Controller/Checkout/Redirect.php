@@ -8,11 +8,14 @@ namespace Mollie\Payment\Controller\Checkout;
 
 use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\ScopeInterface;
+use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
@@ -51,17 +54,27 @@ class Redirect extends Action
      * @var ScopeConfigInterface
      */
     private $scopeConfig;
+    /**
+     * @var PaymentTokenRepositoryInterface
+     */
+    private $paymentTokenRepository;
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
 
     /**
      * Redirect constructor.
      *
-     * @param Context                   $context
-     * @param Session                   $checkoutSession
-     * @param PageFactory               $resultPageFactory
-     * @param PaymentHelper             $paymentHelper
-     * @param MollieHelper              $mollieHelper
-     * @param OrderManagementInterface  $orderManagement
-     * @param ScopeConfigInterface      $scopeConfig
+     * @param Context                           $context
+     * @param Session                           $checkoutSession
+     * @param PageFactory                       $resultPageFactory
+     * @param PaymentHelper                     $paymentHelper
+     * @param MollieHelper                      $mollieHelper
+     * @param OrderManagementInterface          $orderManagement
+     * @param ScopeConfigInterface              $scopeConfig
+     * @param PaymentTokenRepositoryInterface   $paymentTokenRepository,
+     * @param OrderRepositoryInterface          $orderRepository
      */
     public function __construct(
         Context $context,
@@ -70,7 +83,9 @@ class Redirect extends Action
         PaymentHelper $paymentHelper,
         MollieHelper $mollieHelper,
         OrderManagementInterface $orderManagement,
-        ScopeConfigInterface $scopeConfig
+        ScopeConfigInterface $scopeConfig,
+        PaymentTokenRepositoryInterface $paymentTokenRepository,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->resultPageFactory = $resultPageFactory;
@@ -78,6 +93,8 @@ class Redirect extends Action
         $this->mollieHelper = $mollieHelper;
         $this->orderManagement = $orderManagement;
         $this->scopeConfig = $scopeConfig;
+        $this->paymentTokenRepository = $paymentTokenRepository;
+        $this->orderRepository = $orderRepository;
         parent::__construct($context);
     }
 
@@ -87,15 +104,14 @@ class Redirect extends Action
     public function execute()
     {
         try {
-            $order = $this->checkoutSession->getLastRealOrder();
+            $order = $this->getOrder();
+        } catch (LocalizedException $exception) {
+            $this->mollieHelper->addTolog('error', $exception->getMessage());
+            $this->_redirect('checkout/cart');
+            return;
+        }
 
-            if (!$order) {
-                $msg = __('Order not found.');
-                $this->mollieHelper->addTolog('error', $msg);
-                $this->_redirect('checkout/cart');
-                return;
-            }
-
+        try {
             $payment = $order->getPayment();
             if (!isset($payment)) {
                 $this->_redirect('checkout/cart');
@@ -179,5 +195,25 @@ class Redirect extends Action
         }
 
         $this->messageManager->addExceptionMessage($exception, __($exception->getMessage()));
+    }
+
+    /**
+     * @return OrderInterface
+     * @throws LocalizedException
+     */
+    private function getOrder()
+    {
+        $token = $this->getRequest()->getParam('paymentToken');
+
+        if (!$token) {
+            throw new LocalizedException(__('The required payment token is not available'));
+        }
+
+        $model = $this->paymentTokenRepository->getByToken($token);
+        if (!$model) {
+            throw new LocalizedException(__('The payment token %1 does not exists', $token));
+        }
+
+        return $this->orderRepository->get($model->getOrderId());
     }
 }

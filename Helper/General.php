@@ -26,6 +26,7 @@ use Mollie\Payment\Logger\MollieLogger;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\Transaction;
 
 /**
  * Class General
@@ -149,6 +150,10 @@ class General extends AbstractHelper
      * @var Config
      */
     private $config;
+    /**
+     * @var Transaction
+     */
+    private $transaction;
 
     /**
      * General constructor.
@@ -168,6 +173,7 @@ class General extends AbstractHelper
      * @param OrderCommentHistory      $orderCommentHistory
      * @param OrderManagementInterface $orderManagement
      * @param Config                   $config
+     * @param Transaction              $transaction
      */
     public function __construct(
         Context $context,
@@ -184,7 +190,8 @@ class General extends AbstractHelper
         CouponUsage $couponUsage,
         OrderCommentHistory $orderCommentHistory,
         OrderManagementInterface $orderManagement,
-        Config $config
+        Config $config,
+        Transaction $transaction
     ) {
         $this->paymentHelper = $paymentHelper;
         $this->storeManager = $storeManager;
@@ -201,6 +208,7 @@ class General extends AbstractHelper
         $this->orderCommentHistory = $orderCommentHistory;
         $this->orderManagement = $orderManagement;
         $this->config = $config;
+        $this->transaction = $transaction;
         parent::__construct($context);
     }
 
@@ -408,24 +416,26 @@ class General extends AbstractHelper
      * @param $paymentToken
      *
      * @return string
+     *
+     * @deprecated since 1.8.1
+     * @see Transaction::getRedirectUrl
      */
     public function getRedirectUrl($orderId, $paymentToken)
     {
-        return $this->urlBuilder->getUrl(
-            'mollie/checkout/success/',
-            ['_query' => 'order_id=' . intval($orderId) . '&payment_token=' . $paymentToken . '&utm_nooverride=1']
-        );
+        return $this->transaction->getRedirectUrl($orderId, $paymentToken);
     }
 
     /**
      * Webhook Url Builder
      *
      * @return string
+     *
+     * @deprecated since 1.8.1
+     * @see Transaction::getWebhookUrl()
      */
     public function getWebhookUrl()
     {
-        /** Temp. added isAjax=1 for Magento 2.3 compatability */
-        return $this->urlBuilder->getUrl('mollie/checkout/webhook/', ['_query' => 'isAjax=1']);
+        return $this->transaction->getWebhookUrl();
     }
 
     /**
