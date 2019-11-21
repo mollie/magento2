@@ -8,11 +8,14 @@ namespace Mollie\Payment\Controller\Adminhtml\Action;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\Model\Session\Quote;
+use Magento\Framework\DB\Transaction;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\AdminOrder\Create;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Invoice;
+use Magento\Sales\Model\Service\InvoiceService;
 
 class MarkAsPaid extends Action
 {
@@ -32,15 +35,26 @@ class MarkAsPaid extends Action
     private $quoteSession;
 
     /**
+     * @var InvoiceService
+     */
+    private $invoiceService;
+
+    /**
      * @var TransactionFactory
      */
     private $transactionFactory;
+
+    /**
+     * @var Transaction
+     */
+    private $transaction;
 
     public function __construct(
         Action\Context $context,
         OrderRepositoryInterface $orderRepository,
         Create $orderCreate,
         Quote $quoteSession,
+        InvoiceService $invoiceService,
         TransactionFactory $transactionFactory
     ) {
         parent::__construct($context);
@@ -48,6 +62,7 @@ class MarkAsPaid extends Action
         $this->orderRepository = $orderRepository;
         $this->orderCreate = $orderCreate;
         $this->quoteSession = $quoteSession;
+        $this->invoiceService = $invoiceService;
         $this->transactionFactory = $transactionFactory;
     }
 
@@ -66,9 +81,12 @@ class MarkAsPaid extends Action
 
         $resultRedirect = $this->resultRedirectFactory->create();
         try {
+            $this->transaction = $this->transactionFactory->create();
+
             $order = $this->recreateOrder($originalOrder);
+            $this->createInvoiceFor($order);
             $this->cancelOriginalOrder($originalOrder, $order->getIncrementId());
-            $this->save($order, $originalOrder);
+            $this->transaction->save();
 
             $this->messageManager->addSuccessMessage(
                 __(
@@ -95,11 +113,14 @@ class MarkAsPaid extends Action
         $this->quoteSession->setOrderId($originalOrder->getEntityId());
         $this->quoteSession->setUseOldShippingMethod(true);
         $this->orderCreate->initFromOrder($originalOrder);
-        $this->orderCreate->setPaymentMethod('checkmo');
+        $this->orderCreate->setPaymentMethod('mollie_methods_reorder');
 
         $order = $this->orderCreate->createOrder();
-        $order->setState(Order::STATE_COMPLETE);
-        $order->setStatus(Order::STATE_COMPLETE);
+        $order->setState(Order::STATE_PROCESSING);
+        $order->setStatus(Order::STATE_PROCESSING);
+
+        $this->transaction->addObject($order);
+        $this->transaction->addObject($originalOrder);
 
         return $order;
     }
@@ -115,16 +136,12 @@ class MarkAsPaid extends Action
         $originalOrder->cancel();
     }
 
-    /**
-     * @param OrderInterface $order
-     * @param OrderInterface $originalOrder
-     * @throws \Exception
-     */
-    private function save(OrderInterface $order, OrderInterface $originalOrder)
+    private function createInvoiceFor(OrderInterface $order)
     {
-        $transaction = $this->transactionFactory->create();
-        $transaction->addObject($order);
-        $transaction->addObject($originalOrder);
-        $transaction->save();
+        $invoice = $this->invoiceService->prepareInvoice($order);
+        $invoice->setRequestedCaptureCase(Invoice::CAPTURE_OFFLINE);
+        $invoice->register();
+
+        $this->transaction->addObject($invoice);
     }
 }

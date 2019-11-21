@@ -11,9 +11,15 @@ use Magento\OfflinePayments\Model\Checkmo;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as Subject;
+use Mollie\Payment\Config;
 
 class View
 {
+    /**
+     * @var Config
+     */
+    private $config;
+
     /**
      * @var UrlInterface
      */
@@ -30,10 +36,12 @@ class View
     private $paymentHelper;
 
     public function __construct(
+        Config $config,
         UrlInterface $url,
         OrderRepositoryInterface $orderRepository,
         PaymentHelper $paymentHelper
     ) {
+        $this->config = $config;
         $this->url = $url;
         $this->orderRepository = $orderRepository;
         $this->paymentHelper = $paymentHelper;
@@ -42,6 +50,10 @@ class View
     public function beforeSetLayout(Subject $subject)
     {
         $order = $subject->getOrder();
+        if (!$this->config->paymentlinkAllowMarkAsPaid($order->getStoreId())) {
+            return;
+        }
+
         $instance = $this->paymentHelper->getMethodInstance(Checkmo::PAYMENT_METHOD_CHECKMO_CODE);
 
         $isAvailable = !$instance->isAvailable();

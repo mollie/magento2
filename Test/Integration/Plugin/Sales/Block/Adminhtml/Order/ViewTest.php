@@ -12,6 +12,26 @@ use Magento\Sales\Block\Adminhtml\Order\View as Subject;
 
 class ViewTest extends IntegrationTestCase
 {
+    /**
+     * @magentoConfigFixture current_store payment/mollie_methods_paymentlink/allow_mark_as_paid 0
+     */
+    public function testDoesNotShowsTheButtonWhenDisabled()
+    {
+        $orderMock = $this->createMock(Order::class);
+
+        $subjectMock = $this->createMock(Subject::class);
+        $subjectMock->method('getOrder')->willReturn($orderMock);
+
+        $subjectMock->expects($this->never())->method('addButton');
+
+        /** @var View $instance */
+        $instance = $this->objectManager->create(View::class);
+        $instance->beforeSetLayout($subjectMock);
+    }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_methods_paymentlink/allow_mark_as_paid 1
+     */
     public function testDoesNotShowsTheButtonWhenWeCantCancel()
     {
         $orderMock = $this->createMock(Order::class);
@@ -28,6 +48,7 @@ class ViewTest extends IntegrationTestCase
     }
 
     /**
+     * @magentoConfigFixture current_store payment/mollie_methods_paymentlink/allow_mark_as_paid 1
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
     public function testDoesNotShowsTheButtonWhenNotPaymentLink()
@@ -47,9 +68,9 @@ class ViewTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @magentoConfigFixture current_store payment/checkmo/active 0
+     * @magentoConfigFixture current_store payment/mollie_methods_paymentlink/allow_mark_as_paid 0
      */
-    public function testDoesNotShowsTheButtonWhenCheckmoIsNotAvailable()
+    public function testDoesNotShowsTheButtonWhenMollieReorderIsNotAvailable()
     {
         $order = $this->loadOrderById('100000001');
         $order->getPayment()->setMethod('mollie_methods_paymentlink');
@@ -66,7 +87,7 @@ class ViewTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @magentoConfigFixture current_store payment/checkmo/active 1
+     * @magentoConfigFixture default_store payment/mollie_methods_paymentlink/allow_mark_as_paid 1
      */
     public function testShowTheButtonWhenApplicable()
     {
