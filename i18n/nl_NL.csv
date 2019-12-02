@@ -32,6 +32,7 @@
 "No order found for transaction id %1","Geen order gevonden met transactie ID %1"
 "Notified customer about invoice #%1","Klant over factuur #%1 genotificeerd"
 "Order not found","Order niet gevonden"
+"Payment canceled, please try again.","Betaling geannuleerd, probeer opnieuw."
 "Payment cancelled, please try again.","Betaling geannuleerd, probeer opnieuw."
 "Payment from Applicable Countries","Betaling van toepasbare landen"
 "Payment from Specific Countries","Betaling uit bepaalde landen"
