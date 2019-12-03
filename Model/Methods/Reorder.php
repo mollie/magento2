@@ -6,7 +6,6 @@
 
 namespace Mollie\Payment\Model\Methods;
 
-use Magento\Directory\Helper\Data as DirectoryHelper;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -18,7 +17,6 @@ use Magento\Framework\Registry;
 use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Payment\Model\Method\Logger;
-use Mollie\Payment\Model\Mollie;
 
 /**
  * Class Reorder
@@ -71,8 +69,7 @@ class Reorder extends AbstractMethod
         RequestInterface $request,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
-        array $data = [],
-        DirectoryHelper $directory = null
+        array $data = []
     ) {
         $this->request = $request;
 
@@ -86,8 +83,7 @@ class Reorder extends AbstractMethod
             $logger,
             $resource,
             $resourceCollection,
-            $data,
-            $directory
+            $data
         );
     }
 

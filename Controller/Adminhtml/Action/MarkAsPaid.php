@@ -110,9 +110,10 @@ class MarkAsPaid extends Action
 
             $order = $this->recreateOrder($originalOrder);
             $invoice = $this->createInvoiceFor($order);
-            $this->cancelOriginalOrder($originalOrder, $order->getIncrementId());
+            $this->cancelOriginalOrder($originalOrder);
             $this->transaction->save();
 
+            $this->addCommentHistoryOriginalOrder($originalOrder, $order->getIncrementId());
             $this->sendInvoice($invoice, $order);
 
             $this->messageManager->addSuccessMessage(
@@ -154,13 +155,20 @@ class MarkAsPaid extends Action
 
     /**
      * @param OrderInterface $originalOrder
+     */
+    private function cancelOriginalOrder(OrderInterface $originalOrder)
+    {
+        $originalOrder->cancel();
+    }
+
+    /**
+     * @param OrderInterface $originalOrder
      * @param string $newIncrementId
      */
-    private function cancelOriginalOrder(OrderInterface $originalOrder, $newIncrementId)
+    private function addCommentHistoryOriginalOrder(OrderInterface $originalOrder, $newIncrementId)
     {
         $comment = __('We created a new order with increment ID: %1', $newIncrementId);
-        $originalOrder->addCommentToStatusHistory($comment);
-        $originalOrder->cancel();
+        $this->orderCommentHistory->add($originalOrder, $comment, false);
     }
 
     private function createInvoiceFor(OrderInterface $order)
@@ -187,7 +195,7 @@ class MarkAsPaid extends Action
             $this->orderCommentHistory->add($order, $message, true);
         } catch (\Throwable $exception) {
             $message = __('Unable to send the invoice: %1', $exception->getMessage());
-            $this->orderCommentHistory->add($order, $message, true);
+            $this->orderCommentHistory->add($order, $message, false);
         }
     }
 }
