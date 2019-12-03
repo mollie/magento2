@@ -16,6 +16,7 @@
                 <model>Mollie\Payment\Model\Methods\General</model>
                 <currency>1</currency>
                 <cancel_failed_orders>0</cancel_failed_orders>
+                <use_custom_redirect_url>1</use_custom_redirect_url>
             </mollie_general>
             <mollie_methods_bancontact>
                 <active>1</active>

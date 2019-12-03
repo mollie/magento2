@@ -378,19 +378,16 @@ class Mollie extends AbstractMethod
      */
     public function assignData(DataObject $data)
     {
-        $issuer = null;
         parent::assignData($data);
 
-        if (is_array($data) && isset($data['selected_issuer'])) {
-            $issuer = $data['selected_issuer'];
-        } elseif ($data instanceof \Magento\Framework\DataObject) {
-            $additionalData = $data->getAdditionalData();
-            if (isset($additionalData['selected_issuer'])) {
-                $issuer = $additionalData['selected_issuer'];
-            }
+        $additionalData = $data->getAdditionalData();
+        if (isset($additionalData['selected_issuer'])) {
+            $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $additionalData['selected_issuer']);
         }
 
-        $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $issuer);
+        if (isset($additionalData['card_token'])) {
+            $this->getInfoInstance()->setAdditionalInformation('card_token', $additionalData['card_token']);
+        }
 
         return $this;
     }
