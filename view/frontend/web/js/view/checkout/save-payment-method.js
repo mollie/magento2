@@ -1,4 +1,5 @@
 define([
+    'ko',
     'uiComponent',
     'mage/storage',
     'Magento_Checkout/js/model/quote',
@@ -6,6 +7,7 @@ define([
     'Magento_Checkout/js/model/totals',
     'Magento_Checkout/js/action/get-totals'
 ], function (
+    ko,
     Component,
     storage,
     quote,
@@ -54,10 +56,25 @@ define([
             var url = resourceUrlManager.getUrl(urls, params);
 
             payload.paymentMethod = {
-                method: method
+                method: method,
+                extension_attributes: {}
             };
 
             payload.billingAddress = quote.billingAddress();
+
+            /**
+             * Problem: We need to set the payment method, therefor we created this function. The api call requires
+             * that the agreements are all agreed by before doing any action. That's why we list all agreement ids
+             * and sent them with the request. In a later point in the checkout this will also be checked.
+             */
+            var config = window.checkoutConfig.checkoutAgreements;
+            if (config.isEnabled) {
+                var ids = config.agreements.map( function (agreement) {
+                    return agreement.agreementId;
+                });
+
+                payload.paymentMethod.extension_attributes.agreement_ids = ids;
+            }
 
             totals.isLoading(true);
             storage.post(

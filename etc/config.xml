@@ -172,6 +172,15 @@
                 <message><![CDATA[Click <a href="%link%">here</a> to pay for your purchase.]]></message>
                 <instructions/>
             </mollie_methods_paymentlink>
+            <mollie_methods_reorder>
+                <active>1</active>
+                <model>Mollie\Payment\Model\Methods\Reorder</model>
+                <title>Mollie: Reorder</title>
+                <payment_description>{ordernumber}</payment_description>
+                <method>order</method>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+            </mollie_methods_reorder>
             <mollie_methods_giftcard>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Giftcard</model>
