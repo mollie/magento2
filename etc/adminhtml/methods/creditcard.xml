@@ -32,13 +32,13 @@
         </field>
         <field id="use_components" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
                showInStore="1">
-            <label>Components</label>
+            <label>Use Mollie Components</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_creditcard/use_components</config_path>
             <depends>
                 <field id="active">1</field>
             </depends>
-            <comment><![CDATA[With Components the customer can enter their credit card details within your webshop. Please not that you need to enter your Profile ID for this to work.]]></comment>
+            <comment><![CDATA[With Components the customer can enter their credit card details within your webshop.<br><strong>Note:</strong> You need to enter your Profile ID in the general section of this extension configuration to use Mollie Components.]]></comment>
         </field>
         <field id="payment_description" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Description</label>
