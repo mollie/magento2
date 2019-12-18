@@ -39,7 +39,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addPaymentFeeColumns($setup);
         }
 
-        if (version_compare($context->getVersion(), '1.9.0', '<')) {
+        if (version_compare($context->getVersion(), '1.10.0', '<')) {
             $this->addMolliePaymentTokenTable($setup);
         }
 
