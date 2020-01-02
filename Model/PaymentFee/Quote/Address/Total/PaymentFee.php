@@ -11,6 +11,7 @@ use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Total;
 use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
+use Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector;
 use Mollie\Payment\Service\Config\PaymentFee as PaymentFeeConfig;
 
 class PaymentFee extends AbstractTotal
@@ -61,6 +62,25 @@ class PaymentFee extends AbstractTotal
 
         $attributes->setMolliePaymentFee($amount);
         $attributes->setBaseMolliePaymentFee($amount);
+
+        $address = $shippingAssignment->getShipping()->getAddress();
+        $associatedTaxables = $address->getAssociatedTaxables();
+        if (!$associatedTaxables) {
+            $associatedTaxables = [];
+        }
+
+        $associatedTaxables[] = [
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TYPE => 'mollie_payment_fee',
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_CODE => 'mollie_payment_fee',
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_UNIT_PRICE => $amount,
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_BASE_UNIT_PRICE => $baseAmount,
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_QUANTITY => 1,
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TAX_CLASS_ID => $this->paymentFeeConfig->getTaxClassId($quote),
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_PRICE_INCLUDES_TAX => true,
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_ASSOCIATION_ITEM_CODE => CommonTaxCollector::ASSOCIATION_ITEM_CODE_FOR_QUOTE,
+        ];
+
+        $address->setAssociatedTaxables($associatedTaxables);
 
         return $this;
     }

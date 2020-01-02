@@ -73,7 +73,7 @@ class PaymentFee
             $storeId
         );
 
-        $taxClassId = $this->getTaxClass($quote);
+        $taxClassId = $this->getTaxClassId($quote);
         $request->setProductClassId($taxClassId);
 
         $rate = $this->taxCalculation->getRate($request);
@@ -104,7 +104,7 @@ class PaymentFee
      * @param Quote $quote
      * @return string|null
      */
-    private function getTaxClass(Quote $quote)
+    public function getTaxClassId(Quote $quote)
     {
         $method = $quote->getPayment()->getMethod();
 
