@@ -73,8 +73,6 @@ class PaymentFeeTaxTest extends IntegrationTestCase
 
         $instance->collect($quote, $shippingAssignment, $total);
 
-        $this->assertEquals(0.33, $total->getTotalAmount('tax'));
-        $this->assertEquals(0.33, $total->getBaseTotalAmount('tax'));
         $this->assertEquals(0.33, $quote->getExtensionAttributes()->getMolliePaymentFeeTax());
         $this->assertEquals(0.33, $quote->getExtensionAttributes()->getBaseMolliePaymentFeeTax());
     }

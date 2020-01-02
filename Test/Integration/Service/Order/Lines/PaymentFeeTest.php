@@ -24,18 +24,4 @@ class PaymentFeeTest extends IntegrationTestCase
 
         $this->assertTrue($instance->orderHasPaymentFee($order));
     }
-
-    public function testGetOrderLine()
-    {
-        /** @var OrderInterface $order */
-        $order = $this->objectManager->create(OrderInterface::class);
-
-        $order->setData('base_mollie_payment_fee', 1);
-        $order->setData('base_mollie_payment_fee_tax', 0.21);
-
-        /** @var PaymentFee $instance */
-        $instance = $this->objectManager->create(PaymentFee::class);
-
-        $line = $instance->getOrderLine($order);
-    }
 }

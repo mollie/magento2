@@ -48,11 +48,14 @@ class PaymentFee extends AbstractTotal
             return $this;
         }
 
-        $baseAmount = $this->paymentFeeConfig->excludingTax($quote);
-        $amount = $this->priceCurrency->convert($baseAmount);
+        $baseAmountExcludingTax = $this->paymentFeeConfig->excludingTax($quote);
+        $amountExcludingTax = $this->priceCurrency->convert($baseAmountExcludingTax);
 
-        $total->setTotalAmount('mollie_payment_fee', $amount);
-        $total->setBaseTotalAmount('mollie_payment_fee', $baseAmount);
+        $baseAmountIncludingTax = $this->paymentFeeConfig->includingTax($quote);
+        $amountIncludingTax = $this->priceCurrency->convert($baseAmountIncludingTax);
+
+        $total->setTotalAmount('mollie_payment_fee', $amountExcludingTax);
+        $total->setBaseTotalAmount('mollie_payment_fee', $baseAmountExcludingTax);
 
         $attributes = $quote->getExtensionAttributes();
 
@@ -60,8 +63,8 @@ class PaymentFee extends AbstractTotal
             return $this;
         }
 
-        $attributes->setMolliePaymentFee($amount);
-        $attributes->setBaseMolliePaymentFee($amount);
+        $attributes->setMolliePaymentFee($amountExcludingTax);
+        $attributes->setBaseMolliePaymentFee($amountExcludingTax);
 
         $address = $shippingAssignment->getShipping()->getAddress();
         $associatedTaxables = $address->getAssociatedTaxables();
@@ -72,8 +75,8 @@ class PaymentFee extends AbstractTotal
         $associatedTaxables[] = [
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TYPE => 'mollie_payment_fee',
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_CODE => 'mollie_payment_fee',
-            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_UNIT_PRICE => $amount,
-            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_BASE_UNIT_PRICE => $baseAmount,
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_UNIT_PRICE => $amountIncludingTax,
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_BASE_UNIT_PRICE => $baseAmountIncludingTax,
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_QUANTITY => 1,
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TAX_CLASS_ID => $this->paymentFeeConfig->getTaxClassId($quote),
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_PRICE_INCLUDES_TAX => true,
