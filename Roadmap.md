@@ -1,11 +1,11 @@
 # Roadmap
 
-Overview of the features we are looking to work on over the next few months.
+Overview of the features we are looking to work on over the next few months and when available a list of features that are ready for beta testing. 
 
 This is a living doc that will evolve as priorities grow and shift. Please feel free to file issues on this repository
 if you have questions, concerns, or suggestions.
 
-## What is finished and in testing at this moment
+## What is ready for beta testing
 
 * **Mollie Components:** 
 [Mollie Components](https://docs.mollie.com/guides/mollie-components/overview) is a set of Javascript APIs that allow you to add the fields needed for credit card holder data to your own checkout, in a way that is fully PCI-DSS SAQ-A compliant.
