@@ -1,4 +1,4 @@
-# Mollie & Magento Roadmap
+# Mollie & Magento 2 Roadmap
 
 This is an overview of the features we are looking to work on over the next few months and a an overview of features that are ready for beta testing. 
 
