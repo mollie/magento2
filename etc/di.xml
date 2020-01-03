@@ -5,6 +5,7 @@
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
         </arguments>
     </type>
+
     <type name="Mollie\Payment\Logger\MollieLogger">
         <arguments>
             <argument name="name" xsi:type="string">Mollie</argument>
@@ -35,9 +36,14 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+
     <type name="Mollie\Payment\Model\Client\Payments">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
+    </type>
+
+    <type name="Magento\Sales\Api\OrderRepositoryInterface">
+        <plugin name="mollie_payment_fee_order" type="Mollie\Payment\Plugin\Sales\AddPaymentFeeToOrder" />
     </type>
 </config>
