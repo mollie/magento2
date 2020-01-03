@@ -17,13 +17,16 @@ To integrate the Mollie extension with a PWA, we added 2 endpoints to the normal
 
 * **Surcharge for all different payment methods:** 
 Due to the new EU law only Klarna and PayPal can be surcharged to a certain amount. However, as Mollie Payemts is also used for B2B transactions and used outside of the EU we are planning to open the payment surcharge for all method in an upcoming release.
+
 Open Issue: https://github.com/mollie/magento2/issues/211
 
 * **Direct integration of Apple Pay:** 
 Adding [direct integration of Apple Pay](https://docs.mollie.com/guides/applepay-direct-integration) into Magento 2 right from the product page. 
+
 Open Issue: https://github.com/mollie/magento2/issues/214
 
 * **Basic Second Chance emails:** 
 Adding an option to the admin to send failed or unfinished payments a second chance email with a payment link to revive the order. This email will be sent from Magento and will be fully customizable. Emails can be sent manually, but we will add options to automate this in a future version.
+
 Open Issue: https://github.com/mollie/magento2/issues/212
 
