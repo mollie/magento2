@@ -14,7 +14,7 @@ Branche: https://github.com/mollie/magento2/tree/1.10.0-pwa-components
 * **PWA integration:** 
 To integrate the Mollie extension with a PWA, we added 2 endpoints to the normal Magento 2 checkout flow, see [manual](https://github.com/mollie/magento2/wiki/PWA-integration)
 
-## What we're working on
+## What we're working on / what is on backlog
 
 * **Surcharge for all different payment methods:** 
 Due to the new EU law only Klarna and PayPal can be surcharged to a certain amount. However as Mollie Payemts is also used for B2B transactions and used outside of the EU we are planning to open the payment surcharge for all method in an upcomming release. 
