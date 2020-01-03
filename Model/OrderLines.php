@@ -246,10 +246,10 @@ class OrderLines extends AbstractModel
     private function getDiscountAmountOrderItem(Item $item, $forceBaseCurrency)
     {
         if ($forceBaseCurrency) {
-            return $item->getBaseDiscountAmount() + $item->getBaseDiscountTaxCompensationAmount();
+            return abs($item->getBaseDiscountAmount() + $item->getBaseDiscountTaxCompensationAmount());
         }
 
-        return $item->getDiscountAmount() + $item->getDiscountTaxCompensationAmount();
+        return abs($item->getDiscountAmount() + $item->getDiscountTaxCompensationAmount());
     }
 
     /**
