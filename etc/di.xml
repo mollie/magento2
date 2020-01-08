@@ -40,4 +40,8 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+
+    <type name="Magento\Quote\Api\CartRepositoryInterface">
+        <plugin name="mollie_add_paymentfee_extension_attributes" type="Mollie\Payment\Plugin\Sales\Cart\AddPaymentFeeToCart" />
+    </type>
 </config>

@@ -16,7 +16,7 @@ define([
     reloadTotals
 ) {
     var isApplicableMethod = function (method) {
-        return method === 'mollie_methods_klarnapaylater' || method === 'mollie_methods_klarnasliceit';
+        return method && method.substring(0, 6) === 'mollie';
     };
 
     return Component.extend({
