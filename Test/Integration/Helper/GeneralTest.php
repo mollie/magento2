@@ -4,9 +4,9 @@ namespace Mollie\Payment\Test\Integration\Helper;
 
 use Magento\Framework\Locale\Resolver;
 use Mollie\Payment\Helper\General;
-use Mollie\Payment\Test\Integration\TestCase;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class GeneralTest extends TestCase
+class GeneralTest extends IntegrationTestCase
 {
     /**
      * @magentoConfigFixture default_store payment/mollie_general/locale en_US

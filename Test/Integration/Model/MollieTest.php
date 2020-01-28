@@ -7,9 +7,9 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
-use Mollie\Payment\Test\Integration\TestCase;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class MollieTest extends TestCase
+class MollieTest extends IntegrationTestCase
 {
     public function processTransactionUsesTheCorrectApiProvider()
     {

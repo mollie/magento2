@@ -3,10 +3,9 @@
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Sales\Api\Data\OrderStatusHistoryInterface;
-use Magento\TestFramework\ObjectManager;
-use Mollie\Payment\Test\Integration\TestCase;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class OrderCommentHistoryTest extends TestCase
+class OrderCommentHistoryTest extends IntegrationTestCase
 {
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
