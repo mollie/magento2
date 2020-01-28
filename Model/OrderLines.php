@@ -13,6 +13,8 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Sales\Api\Data\CreditmemoInterface;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item;
 use Mollie\Payment\Model\ResourceModel\OrderLines\Collection as OrderLinesCollection;
@@ -380,22 +382,38 @@ class OrderLines extends AbstractModel
     }
 
     /**
-     * @param Order\Shipment $shipment
-     *
+     * @param ShipmentInterface $shipment
      * @return array
      */
-    public function getShipmentOrderLines($shipment)
+    public function getShipmentOrderLines(ShipmentInterface $shipment)
     {
         $orderLines = [];
+
+        /** @var OrderInterface $order */
+        $order = $shipment->getOrder();
+        $orderHasDiscount = abs($order->getDiscountAmount()) > 0;
 
         /** @var \Magento\Sales\Model\Order\Shipment\Item $item */
         foreach ($shipment->getItemsCollection() as $item) {
             if (!$item->getQty()) {
                 continue;
             }
+
             $orderItemId = $item->getOrderItemId();
             $lineId = $this->getOrderLineByItemId($orderItemId)->getLineId();
-            $orderLines[] = ['id' => $lineId, 'quantity' => $item->getQty()];
+            $line = ['id' => $lineId, 'quantity' => $item->getQty()];
+
+            if ($orderHasDiscount) {
+                $orderItem = $item->getOrderItem();
+                $rowTotal = $orderItem->getBaseRowTotalInclTax() - $orderItem->getBaseDiscountAmount();
+
+                $line['amount'] = $this->mollieHelper->getAmountArray(
+                    $order->getBaseCurrencyCode(),
+                    (($rowTotal) / $orderItem->getQtyOrdered()) * $item->getQty()
+                );
+            }
+
+            $orderLines[] = $line;
         }
 
         return ['lines' => $orderLines];

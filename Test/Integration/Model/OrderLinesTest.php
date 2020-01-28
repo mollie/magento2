@@ -4,6 +4,10 @@ namespace Mollie\Payment\Model;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use Magento\Sales\Api\Data\OrderItemInterface;
+use Magento\Sales\Api\Data\ShipmentInterface;
+use Magento\Sales\Api\Data\ShipmentItemInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class OrderLinesTest extends IntegrationTestCase
@@ -121,6 +125,85 @@ class OrderLinesTest extends IntegrationTestCase
         $line = $result['lines'][0];
         $this->assertEquals('36', $line['amount']['value']);
         $this->assertEquals(1, $line['quantity']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/shipment.php
+     */
+    public function testGetShipmentOrderLines()
+    {
+        $order = $this->loadOrder('100000001');
+
+        /** @var \Magento\Sales\Model\ResourceModel\Order\Shipment\Collection $shipments */
+        $shipments = $order->getShipmentsCollection();
+
+        /** @var ShipmentInterface $shipment */
+        $shipment = $shipments->getFirstItem();
+
+        foreach ($shipment->getItems() as $item) {
+            /** @var OrderLines $orderLine */
+            $orderLine = $this->objectManager->get(\Mollie\Payment\Model\OrderLines::class);
+            $orderLine->setItemId($item->getOrderItemId());
+            $orderLine->setLineId('ord_abc123');
+            $orderLine->save();
+        }
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->create(OrderLines::class);
+
+        $result = $instance->getShipmentOrderLines($shipment);
+
+        $this->assertCount(1, $result['lines']);
+        $this->assertEquals('ord_abc123', $result['lines'][0]['id']);
+        $this->assertEquals('2', $result['lines'][0]['quantity']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/shipment.php
+     */
+    public function testGetShipmentOrderLinesAddsAnAmountWhenTheOrderHasAnDiscount()
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setDiscountAmount(10);
+        $order->setBaseCurrencyCode('EUR');
+        $this->objectManager->get(OrderRepositoryInterface::class)->save($order);
+
+        /** @var \Magento\Sales\Model\ResourceModel\Order\Shipment\Collection $shipments */
+        $shipments = $order->getShipmentsCollection();
+
+        /** @var ShipmentInterface $shipment */
+        $shipment = $shipments->getFirstItem();
+
+        foreach ($shipment->getItems() as $item) {
+            /** @var OrderLines $orderLine */
+            $orderLine = $this->objectManager->create(\Mollie\Payment\Model\OrderLines::class);
+            $orderLine->setItemId($item->getOrderItemId());
+            $orderLine->setLineId('ord_abc123');
+            $orderLine->save();
+
+            /** @var OrderItemInterface $orderItem */
+            $orderItem = $item->getOrderItem();
+            $orderItem->setBaseRowTotalInclTax(100);
+            $orderItem->setBaseDiscountAmount(30);
+            $orderItem->setQtyOrdered(10);
+        }
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->create(OrderLines::class);
+        $result = $instance->getShipmentOrderLines($shipment);
+
+        $this->assertCount(1, $result['lines']);
+        $this->assertEquals('ord_abc123', $result['lines'][0]['id']);
+        $this->assertEquals('2', $result['lines'][0]['quantity']);
+        $this->assertEquals('EUR', $result['lines'][0]['amount']['currency']);
+
+        // 100 euro subtotal
+        // 30 discount
+        // 70 grand total
+        // 10 items = 10 euro each
+        // 2 items ordered
+        // ((100 - 30) / 10) * 2 = 14
+        $this->assertEquals(14, $result['lines'][0]['amount']['value']);
     }
 
     private function rollbackCreditmemos()
