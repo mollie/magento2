@@ -4,6 +4,7 @@ namespace Mollie\Payment\Model;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -122,6 +123,28 @@ class OrderLinesTest extends IntegrationTestCase
         $line = $result['lines'][0];
         $this->assertEquals('36', $line['amount']['value']);
         $this->assertEquals(1, $line['quantity']);
+    }
+
+    public function testIncludesTheOrderDiscount()
+    {
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setDiscountAmount(10);
+        $order->setBaseDiscountAmount(10);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+        $result = $instance->getOrderLines($order);
+
+        $discount = array_filter($result, function ($line) {
+            return $line['type'] == 'discount';
+        });
+
+        $this->assertCount(1, $discount);
+
+        $discount = array_shift($discount);
+        $this->assertNotNull($discount);
+        $this->assertEquals(10, $discount['unitPrice']['value']);
     }
 
     private function rollbackCreditmemos()

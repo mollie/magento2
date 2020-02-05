@@ -13,6 +13,7 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Sales\Api\Data\CreditmemoInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Item;
 use Mollie\Payment\Model\ResourceModel\OrderLines\Collection as OrderLinesCollection;
@@ -91,11 +92,11 @@ class OrderLines extends AbstractModel
     /**
      * Get Order lines of Order
      *
-     * @param Order $order
+     * @param OrderInterface $order
      *
      * @return array
      */
-    public function getOrderLines(Order $order)
+    public function getOrderLines(OrderInterface $order)
     {
         $forceBaseCurrency = $this->mollieHelper->useBaseCurrency($order->getStoreId());
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
@@ -208,6 +209,10 @@ class OrderLines extends AbstractModel
             $orderLines[] = $this->paymentFee->getOrderLine($order, $forceBaseCurrency);
         }
 
+        if (!empty((float)$order->getBaseDiscountAmount()) || !empty((float)$order->getDiscountAmount())) {
+            $orderLines[] = $this->getOrderDiscount($order, $forceBaseCurrency);
+        }
+
         $this->saveOrderLines($orderLines, $order);
         foreach ($orderLines as &$orderLine) {
             unset($orderLine['item_id']);
@@ -224,6 +229,10 @@ class OrderLines extends AbstractModel
      */
     private function getTotalAmountOrderItem(Item $item, $forceBaseCurrency)
     {
+        if ($item->getProductType() == ProductType::TYPE_BUNDLE) {
+            return $forceBaseCurrency ? $item->getBaseRowTotalInclTax() : $item->getRowTotalInclTax();
+        }
+
         if ($forceBaseCurrency) {
             return $item->getBaseRowTotal()
                 - $item->getBaseDiscountAmount()
@@ -260,7 +269,6 @@ class OrderLines extends AbstractModel
      */
     private function getTotalAmountShipping(Order $order, $forceBaseCurrency)
     {
-
         if ($forceBaseCurrency) {
             return $order->getBaseShippingAmount()
                 + $order->getBaseShippingTaxAmount()
@@ -570,5 +578,26 @@ class OrderLines extends AbstractModel
     public function _construct()
     {
         $this->_init('Mollie\Payment\Model\ResourceModel\OrderLines');
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @param int $forceBaseCurrency
+     * @return array
+     */
+    private function getOrderDiscount(OrderInterface $order, $forceBaseCurrency)
+    {
+        $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
+        $amount = $forceBaseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
+
+        return [
+            'name' => 'Discount',
+            'type' => 'discount',
+            'unitPrice' => $this->mollieHelper->getAmountArray($currency, $amount),
+            'totalAmount' => $this->mollieHelper->getAmountArray($currency, $amount),
+            'vatRate' => 0,
+            'vatAmount' => $this->mollieHelper->getAmountArray($currency, 0),
+            'quantity' => 1,
+        ];
     }
 }
