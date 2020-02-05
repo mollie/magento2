@@ -3,11 +3,9 @@
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Sales\Api\Data\InvoiceInterface;
-use Magento\Sales\Model\Order\Invoice;
-use Magento\Sales\Model\Service\InvoiceService;
-use Mollie\Payment\Test\Integration\TestCase;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class PartialInvoiceTest extends TestCase
+class PartialInvoiceTest extends IntegrationTestCase
 {
     /**
      * @magentoDataFixture Magento/Sales/_files/shipment.php

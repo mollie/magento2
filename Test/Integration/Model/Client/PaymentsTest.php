@@ -11,9 +11,9 @@ use Mollie\Api\Endpoints\PaymentEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
-use Mollie\Payment\Test\Integration\TestCase;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class PaymentsTest extends TestCase
+class PaymentsTest extends IntegrationTestCase
 {
     public function processTransactionProvider()
     {

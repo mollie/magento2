@@ -4,6 +4,7 @@ namespace Mollie\Payment\Test\Integration;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Filesystem\DirectoryList;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\ObjectManager;
 use PHPUnit\Framework\TestCase;
@@ -66,5 +67,22 @@ class IntegrationTestCase extends TestCase
         }
 
         return $path;
+    }
+
+    /**
+     * @return OrderInterface
+     */
+    protected function loadOrder($incrementId)
+    {
+        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
+        $searchCriteriaBuilder = $this->objectManager->create(SearchCriteriaBuilder::class);
+
+        /** @var OrderRepositoryInterface $order */
+        $orderRepository = $this->objectManager->create(OrderRepositoryInterface::class);
+
+        $searchCriteria = $searchCriteriaBuilder->addFilter('increment_id', $incrementId, 'eq')->create();
+        $orderList = $orderRepository->getList($searchCriteria)->getItems();
+
+        return array_shift($orderList);
     }
 }

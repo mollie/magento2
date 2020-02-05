@@ -13,10 +13,10 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
-use Mollie\Payment\Test\Integration\TestCase;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use stdClass;
 
-class OrdersTest extends TestCase
+class OrdersTest extends IntegrationTestCase
 {
     /**
      * This key is invalid on purpose, as we can't work our way around the `new \Mollie\Api\MollieApiClient()` call.

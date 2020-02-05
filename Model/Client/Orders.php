@@ -630,7 +630,7 @@ class Orders extends AbstractModel
                     $invoice = $this->partialInvoice->createFromShipment($shipment);
                 }
 
-                $captureAmount = $this->getCaptureAmount($order, $invoice->getId() ? $invoice : null);
+                $captureAmount = $this->getCaptureAmount($order, $invoice && $invoice->getId() ? $invoice : null);
 
                 $payment->setTransactionId($transactionId);
                 $payment->registerCaptureNotification($captureAmount, true);
