@@ -40,17 +40,20 @@
                     <field id="type" translate="label" type="select" sortOrder="11" showInDefault="1" showInWebsite="1"
                            showInStore="1">
                         <label>Modus</label>
+                        <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
                         <source_model>Mollie\Payment\Model\Adminhtml\Source\ApiKey</source_model>
                         <config_path>payment/mollie_general/type</config_path>
                     </field>
                     <field id="apikey_test" translate="label" type="text" sortOrder="12" showInDefault="1"
                            showInWebsite="1" showInStore="1">
                         <label>Test API Key</label>
+                        <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
                         <config_path>payment/mollie_general/apikey_test</config_path>
                     </field>
                     <field id="apikey_live" translate="label" type="text" sortOrder="13" showInDefault="1"
                            showInWebsite="1" showInStore="1">
                         <label>Live API Key</label>
+                        <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
                         <config_path>payment/mollie_general/apikey_live</config_path>
                     </field>
                     <field id="credentials_checker" translate="label" type="button" sortOrder="14" showInDefault="1"
