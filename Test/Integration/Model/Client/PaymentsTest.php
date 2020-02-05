@@ -10,6 +10,7 @@ use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Mollie\Api\Endpoints\PaymentEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
+use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Test\Integration\TestCase;
 
@@ -114,5 +115,42 @@ class PaymentsTest extends TestCase
         $payment->_embedded->payments[0]->status = 'success';
 
         return $payment;
+    }
+
+    public function checksIfTheOrderHasAnUpdateProvider()
+    {
+        return [
+            [PaymentStatus::STATUS_OPEN, Order::STATE_NEW],
+            [PaymentStatus::STATUS_PENDING, Order::STATE_PENDING_PAYMENT],
+            [PaymentStatus::STATUS_AUTHORIZED, Order::STATE_PROCESSING],
+            [PaymentStatus::STATUS_CANCELED, Order::STATE_CANCELED],
+            [PaymentStatus::STATUS_EXPIRED, Order::STATE_CLOSED],
+            [PaymentStatus::STATUS_PAID, Order::STATE_PROCESSING],
+            [PaymentStatus::STATUS_FAILED, Order::STATE_CANCELED],
+        ];
+    }
+
+    /**
+     * @dataProvider checksIfTheOrderHasAnUpdateProvider
+     */
+    public function testChecksIfTheOrderHasAnUpdate($mollieStatus, $magentoStatus)
+    {
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+
+        $mollieApi = new MollieApiClient();
+        $mollieOrder = new \Mollie\Api\Resources\Order($mollieApi);
+
+        $paymentsApiMock = $this->createMock(PaymentEndpoint::class);
+        $paymentsApiMock->method('get')->willReturn($mollieOrder);
+        $mollieApi->payments = $paymentsApiMock;
+
+        $mollieOrder->status = $mollieStatus;
+        $order->setState($magentoStatus);
+
+        /** @var Payments $instance */
+        $instance = $this->objectManager->create(Payments::class);
+
+        $this->assertFalse($instance->orderHasUpdate($order, $mollieApi));
     }
 }

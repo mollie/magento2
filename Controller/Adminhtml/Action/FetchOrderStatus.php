@@ -3,7 +3,6 @@
 namespace Mollie\Payment\Controller\Adminhtml\Action;
 
 use Magento\Backend\App\Action;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Mollie as MollieModel;
@@ -37,7 +36,10 @@ class FetchOrderStatus extends \Magento\Backend\App\Action
         try {
             $orderId = $this->getRequest()->getParam('order_id');
 
-            $message = $this->mollieModel->processTransaction($orderId, 'webhook');
+            $message = '';
+            if ($this->mollieModel->orderHasUpdate($orderId)) {
+                $message = $this->mollieModel->processTransaction($orderId, 'webhook');
+            }
 
             $this->messageManager->addSuccessMessage(__('The latest status from Mollie has been retrieved'));
 

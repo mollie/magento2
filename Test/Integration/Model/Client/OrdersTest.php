@@ -259,4 +259,43 @@ class OrdersTest extends TestCase
 
         $instance->startTransaction($order, $mollieApiMock);
     }
+
+    public function checksIfTheOrderHasAnUpdateProvider()
+    {
+        return [
+            [OrderStatus::STATUS_CREATED, Order::STATE_NEW],
+            [OrderStatus::STATUS_PAID, Order::STATE_PROCESSING],
+            [OrderStatus::STATUS_AUTHORIZED, Order::STATE_PENDING_PAYMENT],
+            [OrderStatus::STATUS_CANCELED, Order::STATE_CANCELED],
+            [OrderStatus::STATUS_SHIPPING, Order::STATE_PROCESSING],
+            [OrderStatus::STATUS_COMPLETED, Order::STATE_COMPLETE],
+            [OrderStatus::STATUS_EXPIRED, Order::STATE_CANCELED],
+            [OrderStatus::STATUS_PENDING, Order::STATE_PENDING_PAYMENT],
+            [OrderStatus::STATUS_REFUNDED, Order::STATE_CLOSED],
+        ];
+    }
+
+    /**
+     * @dataProvider checksIfTheOrderHasAnUpdateProvider
+     */
+    public function testChecksIfTheOrderHasAnUpdate($mollieStatus, $magentoStatus)
+    {
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+
+        $mollieApi = new MollieApiClient();
+        $mollieOrder = new \Mollie\Api\Resources\Order($mollieApi);
+
+        $ordersApiMock = $this->createMock(OrderEndpoint::class);
+        $ordersApiMock->method('get')->willReturn($mollieOrder);
+        $mollieApi->orders = $ordersApiMock;
+
+        $mollieOrder->status = $mollieStatus;
+        $order->setState($magentoStatus);
+
+        /** @var Orders $instance */
+        $instance = $this->objectManager->create(Orders::class);
+
+        $this->assertFalse($instance->orderHasUpdate($order, $mollieApi));
+    }
 }
