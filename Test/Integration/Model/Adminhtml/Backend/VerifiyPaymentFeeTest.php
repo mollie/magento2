@@ -23,21 +23,15 @@ class VerifiyPaymentFeeTest extends IntegrationTestCase
         $this->assertSame('1.23', $instance->getValue());
     }
 
-    public function testThrowsAnExceptionWhenTheAmountIsTooHigh()
+    public function testStripsPercentageSigns()
     {
         /** @var VerifiyPaymentFee $instance */
         $instance = $this->objectManager->create(VerifiyPaymentFee::class);
 
-        $instance->setValue(VerifiyPaymentFee::MAXIMUM_PAYMENT_FEE_AMOUNT + 0.01);
+        $instance->setValue('1,23%');
 
-        try {
-            $instance->beforeSave();
-        } catch (ValidatorException $exception) {
-            $this->assertInstanceOf(ValidatorException::class, $exception);
-            $this->assertContains((string)VerifiyPaymentFee::MAXIMUM_PAYMENT_FEE_AMOUNT, $exception->getMessage());
-            return;
-        }
+        $instance->beforeSave();
 
-        $this->fail('We expected an ' . ValidatorException::class . ' but got none');
+        $this->assertSame('1.23', $instance->getValue());
     }
 }

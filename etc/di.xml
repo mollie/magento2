@@ -46,4 +46,8 @@
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="mollie_payment_fee_order" type="Mollie\Payment\Plugin\Sales\AddPaymentFeeToOrder" />
     </type>
+
+    <type name="Magento\Quote\Api\CartRepositoryInterface">
+        <plugin name="mollie_add_paymentfee_extension_attributes" type="Mollie\Payment\Plugin\Sales\Cart\AddPaymentFeeToCart" />
+    </type>
 </config>

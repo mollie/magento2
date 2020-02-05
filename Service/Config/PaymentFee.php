@@ -6,9 +6,10 @@
 
 namespace Mollie\Payment\Service\Config;
 
-use Magento\Quote\Model\Quote;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Tax\Model\Calculation;
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType;
 
 class PaymentFee
 {
@@ -31,109 +32,70 @@ class PaymentFee
     }
 
     /**
-     * @param Quote $quote
-     * @return float
-     */
-    public function includingTax(Quote $quote)
-    {
-        $method = $quote->getPayment()->getMethod();
-
-        $amount = $this->getAmount($method, $quote->getStoreId());
-
-        return (double)str_replace(',', '.', $amount);
-    }
-
-    /**
-     * @param Quote $quote
-     * @return float
-     */
-    public function excludingTax(Quote $quote)
-    {
-        $amount = $this->includingTax($quote);
-        $tax = $this->tax($quote);
-
-        return $amount - $tax;
-    }
-
-    /**
-     * @param Quote $quote
-     * @return float
-     */
-    public function tax(Quote $quote)
-    {
-        $shippingAddress = $quote->getShippingAddress();
-        $billingAddress = $quote->getBillingAddress();
-        $customerTaxClassId = $quote->getCustomerTaxClassId();
-        $storeId = $quote->getStoreId();
-
-        $request = $this->taxCalculation->getRateRequest(
-            $shippingAddress,
-            $billingAddress,
-            $customerTaxClassId,
-            $storeId
-        );
-
-        $taxClassId = $this->getTaxClassId($quote);
-        $request->setProductClassId($taxClassId);
-
-        $rate = $this->taxCalculation->getRate($request);
-
-        $fee = $this->includingTax($quote);
-        $result = $this->taxCalculation->calcTaxAmount(
-            $fee,
-            $rate,
-            true,
-            false
-        );
-
-        return $result;
-    }
-
-    /**
-     * @param Quote $quote
+     * @param CartInterface $quote
      * @return bool
      */
-    public function isAvailableForMethod(Quote $quote)
+    public function isAvailableForMethod(CartInterface $quote)
     {
         $method = $quote->getPayment()->getMethod();
 
-        return in_array($method, ['mollie_methods_klarnapaylater', 'mollie_methods_klarnasliceit']);
+        if ($this->config->paymentSurchargeType($method, $quote->getStoreId()) == PaymentFeeType::DISABLED) {
+            return false;
+        }
+
+        return substr($method, 0, 6) == 'mollie';
     }
 
     /**
-     * @param Quote $quote
+     * @param CartInterface $quote
      * @return string|null
      */
-    public function getTaxClassId(Quote $quote)
+    public function getType(CartInterface $quote)
     {
         $method = $quote->getPayment()->getMethod();
 
-        if ($method == 'mollie_methods_klarnapaylater') {
-            return $this->config->klarnaPaylaterPaymentSurchargeTaxClass($quote->getStoreId());
-        }
-
-        if ($method == 'mollie_methods_klarnasliceit') {
-            return $this->config->klarnaSliceitPaymentSurchargeTaxClass($quote->getStoreId());
-        }
-
-        return null;
+        return $this->config->paymentSurchargeType($method, $quote->getStoreId());
     }
 
     /**
      * @param $method
      * @param $storeId
-     * @return int|string
+     * @return float
      */
-    private function getAmount($method, $storeId)
+    public function getFixedAmount($method, $storeId)
     {
-        if ($method == 'mollie_methods_klarnapaylater') {
-            return $this->config->klarnaPaylaterPaymentSurcharge($storeId);
-        }
+        return $this->config->paymentSurchargeFixedAmount($method, $storeId);
+    }
 
-        if ($method == 'mollie_methods_klarnasliceit') {
-            return $this->config->klarnaSliceitPaymentSurcharge($storeId);
-        }
+    /**
+     * @param $method
+     * @param $storeId
+     * @return float
+     */
+    public function getPercentage($method, $storeId)
+    {
+        return (float)$this->config->paymentSurchargePercentage($method, $storeId);
+    }
 
-        return 0;
+    /**
+     * @param CartInterface $cart
+     * @return string
+     */
+    public function getLimit(CartInterface $cart)
+    {
+        $method = $cart->getPayment()->getMethod();
+
+        return $this->config->paymentSurchargeLimit($method, $cart->getStoreId());
+    }
+
+    /**
+     * @param CartInterface $cart
+     * @return string|null
+     */
+    public function getTaxClass(CartInterface $cart)
+    {
+        $method = $cart->getPayment()->getMethod();
+
+        return $this->config->paymentSurchargeTaxClass($method, $cart->getStoreId());
     }
 }

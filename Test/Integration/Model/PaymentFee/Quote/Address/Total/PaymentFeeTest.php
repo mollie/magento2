@@ -13,7 +13,8 @@ use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Api\Data\ShippingInterface;
 use Magento\Quote\Model\Quote\Address\Total;
-use Mollie\Payment\Service\Config\PaymentFee as PaymentFeeConfig;
+use Mollie\Payment\Service\PaymentFee\Calculate;
+use Mollie\Payment\Service\PaymentFee\Result;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentFeeTest extends IntegrationTestCase
@@ -45,13 +46,16 @@ class PaymentFeeTest extends IntegrationTestCase
      */
     public function testDoesApplyIfTheMethodIsSupported()
     {
-        $paymentFeeMock = $this->createPartialMock(PaymentFeeConfig::class, ['excludingTax', 'getTaxClassId']);
-        $paymentFeeMock->method('excludingTax')->willReturn(1.61);
-        $paymentFeeMock->method('getTaxClassId')->willReturn(2);
+        /** @var Result $result */
+        $result = $this->objectManager->create(Result::class);
+        $result->setAmount(1.61);
+
+        $calculateMock = $this->createMock(Calculate::class);
+        $calculateMock->method('forCart')->willReturn($result);
 
         /** @var PaymentFee $instance */
         $instance = $this->objectManager->create(PaymentFee::class, [
-            'paymentFeeConfig' => $paymentFeeMock,
+            'calculate' => $calculateMock,
         ]);
 
         /** @var Total $total */

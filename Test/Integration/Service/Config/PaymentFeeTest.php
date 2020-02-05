@@ -10,106 +10,36 @@ use Magento\Checkout\Model\Session;
 use Magento\Quote\Model\Quote;
 use Magento\Tax\Api\TaxCalculationInterface;
 use Magento\Tax\Api\TaxRateRepositoryInterface;
+use Mollie\Payment\Config;
+use Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentFeeTest extends IntegrationTestCase
 {
-    public function returnsTheCorrectIncludingTaxNumberProvider()
-    {
-        return [
-            ['klarnapaylater', 1.23],
-            ['klarnasliceit', 1.95],
-        ];
-    }
-
-    /**
-     * @magentoDataFixture Magento/Checkout/_files/quote_with_payment_saved.php
-     * @magentoConfigFixture current_store payment/mollie_methods_klarnapaylater/payment_surcharge 1,23
-     * @magentoConfigFixture current_store payment/mollie_methods_klarnasliceit/payment_surcharge 1,95
-     *
-     * @dataProvider returnsTheCorrectIncludingTaxNumberProvider
-     */
-    public function testReturnsTheCorrectIncludingTaxNumber($method, $amount)
-    {
-        /** @var PaymentFee $instance */
-        $instance = $this->objectManager->create(PaymentFee::class);
-
-        /** @var $session \Magento\Checkout\Model\Session  */
-        $session = $this->objectManager->create(Session::class);
-        $quote = $session->getQuote();
-        $quote->getPayment()->setMethod('mollie_methods_' . $method);
-
-        $result = $instance->includingTax($quote);
-
-        $this->assertEquals($amount, $result);
-    }
-
-    /**
-     * @magentoDataFixture Magento/Checkout/_files/quote_with_payment_saved.php
-     * @magentoConfigFixture current_store payment/mollie_methods_klarnasliceit/payment_surcharge 1,95
-     * @magentoConfigFixture current_store payment/mollie_methods_klarnasliceit/payment_surcharge_tax_class 2
-     */
-    public function testReturnsTheCorrectExcludingTaxAmount()
-    {
-        /** @var $session \Magento\Checkout\Model\Session  */
-        $session = $this->objectManager->create(Session::class);
-        $quote = $session->getQuote();
-
-        /** @var \Magento\Tax\Api\Data\TaxRateInterface $rate */
-        $rate = $this->objectManager->create(\Magento\Tax\Api\Data\TaxRateInterface::class);
-        $rate->setTaxCountryId('US');
-        $rate->setTaxRegionId(0);
-        $rate->setTaxPostcode('*');
-        $rate->setCode('testshipping_testshipping');
-        $rate->setRate(21);
-
-        $this->objectManager->get(TaxRateRepositoryInterface::class)->save($rate);
-
-        /** @var \Magento\Tax\Model\ResourceModel\Calculation $taxCalculation */
-        $taxCalculation = $this->objectManager->create(\Magento\Tax\Model\ResourceModel\Calculation::class);
-        $taxCalculation->getConnection()->insert($taxCalculation->getMainTable(), [
-            'tax_calculation_rate_id' => $rate->getId(),
-            'tax_calculation_rule_id' => 1,
-            'customer_tax_class_id' => $quote->getCustomerTaxClassId(),
-            'product_tax_class_id' => 2,
-        ]);
-
-        /** @var PaymentFee $instance */
-        $instance = $this->objectManager->create(PaymentFee::class);
-
-        $quote->getPayment()->setMethod('mollie_methods_klarnasliceit');
-
-        $result = $instance->excludingTax($quote);
-
-        $this->assertEquals(1.6115702479339, $result);
-    }
-
-    /**
-     * @magentoDataFixture Magento/Checkout/_files/quote_with_payment_saved.php
-     */
-    public function testReturnsZeroIfNotAValidPaymentMethod()
-    {
-        /** @var PaymentFee $instance */
-        $instance = $this->objectManager->create(PaymentFee::class);
-
-        /** @var $session \Magento\Checkout\Model\Session  */
-        $session = $this->objectManager->create(Session::class);
-        $quote = $session->getQuote();
-        $quote->getPayment()->setMethod('not_relevant_payment_method');
-
-        $result = $instance->includingTax($quote);
-
-        $this->assertSame(0.0, $result);
-    }
-
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_payment_saved.php
      */
     public function isAvailableForMethodProvider()
     {
         return [
+            ['mollie_methods_bancontact', true],
+            ['mollie_methods_banktransfer', true],
+            ['mollie_methods_belfius', true],
+            ['mollie_methods_creditcard', true],
+            ['mollie_methods_ideal', true],
+            ['mollie_methods_kbc', true],
+            ['mollie_methods_paypal', true],
+            ['mollie_methods_paysafecard', true],
+            ['mollie_methods_sofort', true],
+            ['mollie_methods_inghomepay', true],
+            ['mollie_methods_giropay', true],
+            ['mollie_methods_eps', true],
             ['mollie_methods_klarnapaylater', true],
             ['mollie_methods_klarnasliceit', true],
+            ['mollie_methods_giftcard', true],
+            ['mollie_methods_przelewy24', true],
+            ['mollie_methods_applepay', true],
+            ['mollie_methods_mybank', true],
             ['not_relevant_payment_method', false],
         ];
     }
@@ -119,8 +49,13 @@ class PaymentFeeTest extends IntegrationTestCase
      */
     public function testIsAvailableForMethod($method, $expected)
     {
+        $configMock = $this->createMock(Config::class);
+        $configMock->method('paymentSurchargeType')->willReturn(PaymentFeeType::PERCENTAGE);
+
         /** @var PaymentFee $instance */
-        $instance = $this->objectManager->create(PaymentFee::class);
+        $instance = $this->objectManager->create(PaymentFee::class, [
+            'config' => $configMock,
+        ]);
 
         /** @var $session \Magento\Checkout\Model\Session  */
         $session = $this->objectManager->create(Session::class);

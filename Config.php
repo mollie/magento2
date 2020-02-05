@@ -14,10 +14,11 @@ class Config
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const XML_PATH_STATUS_PENDING_BANKTRANSFER = 'payment/mollie_methods_banktransfer/order_status_pending';
     const XML_PATH_STATUS_NEW_PAYMENT_LINK = 'payment/mollie_methods_paymentlink/order_status_new';
-    const PAYMENT_KLARNAPAYLATER_PAYMENT_SURCHARGE = 'payment/mollie_methods_klarnapaylater/payment_surcharge';
-    const PAYMENT_KLARNAPAYLATER_PAYMENT_SURCHARGE_TAX_CLASS = 'payment/mollie_methods_klarnapaylater/payment_surcharge_tax_class';
-    const PAYMENT_KLARNASLICEIT_PAYMENT_SURCHARGE = 'payment/mollie_methods_klarnasliceit/payment_surcharge';
-    const PAYMENT_KLARNASLICEIT_PAYMENT_SURCHARGE_TAX_CLASS = 'payment/mollie_methods_klarnasliceit/payment_surcharge_tax_class';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_TYPE = 'payment/mollie_methods_%s/payment_surcharge_type';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_TAX_CLASS = 'payment/mollie_methods_%s/payment_surcharge_tax_class';
     const PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID = 'payment/mollie_methods_paymentlink/allow_mark_as_paid';
 
     /**
@@ -79,39 +80,53 @@ class Config
     }
 
     /**
+     * @param string $method
      * @param int|null $storeId
      * @return string
      */
-    public function klarnaPaylaterPaymentSurcharge($storeId = null)
+    public function paymentSurchargeType($method, $storeId = null)
     {
-        return $this->getPath(static::PAYMENT_KLARNAPAYLATER_PAYMENT_SURCHARGE, $storeId);
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_SURCHARGE_TYPE, $method), $storeId);
     }
 
     /**
+     * @param string $method
      * @param int|null $storeId
      * @return string
      */
-    public function klarnaPaylaterPaymentSurchargeTaxClass($storeId = null)
+    public function paymentSurchargeFixedAmount($method, $storeId = null)
     {
-        return $this->getPath(static::PAYMENT_KLARNAPAYLATER_PAYMENT_SURCHARGE_TAX_CLASS, $storeId);
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT, $method), $storeId);
     }
 
     /**
+     * @param string $method
      * @param int|null $storeId
      * @return string
      */
-    public function klarnaSliceitPaymentSurcharge($storeId = null)
+    public function paymentSurchargePercentage($method, $storeId = null)
     {
-        return $this->getPath(static::PAYMENT_KLARNASLICEIT_PAYMENT_SURCHARGE, $storeId);
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE, $method), $storeId);
     }
 
     /**
+     * @param string $method
      * @param int|null $storeId
      * @return string
      */
-    public function klarnaSliceitPaymentSurchargeTaxClass($storeId = null)
+    public function paymentSurchargeLimit($method, $storeId = null)
     {
-        return $this->getPath(static::PAYMENT_KLARNASLICEIT_PAYMENT_SURCHARGE_TAX_CLASS, $storeId);
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT, $method), $storeId);
+    }
+
+    /**
+     * @param string $method
+     * @param int|null $storeId
+     * @return string
+     */
+    public function paymentSurchargeTaxClass($method, $storeId = null)
+    {
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_SURCHARGE_TAX_CLASS, $method), $storeId);
     }
 
     /**
@@ -121,5 +136,17 @@ class Config
     public function paymentlinkAllowMarkAsPaid($storeId = null)
     {
         return $this->getFlag(static::PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID, $storeId);
+    }
+
+    /**
+     * @param $method
+     * @return string
+     */
+    private function addMethodToPath($path, $method): string
+    {
+        return sprintf(
+            $path,
+            str_replace('mollie_methods_', '', $method)
+        );
     }
 }

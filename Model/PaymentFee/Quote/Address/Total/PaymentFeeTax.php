@@ -12,6 +12,7 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Total;
 use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
 use Mollie\Payment\Service\Config\PaymentFee as PaymentFeeConfig;
+use Mollie\Payment\Service\PaymentFee\Calculate;
 
 class PaymentFeeTax extends AbstractTotal
 {
@@ -25,12 +26,19 @@ class PaymentFeeTax extends AbstractTotal
      */
     private $priceCurrency;
 
+    /**
+     * @var Calculate
+     */
+    private $calculate;
+
     public function __construct(
         PaymentFeeConfig $paymentFeeConfig,
-        PriceCurrencyInterface $priceCurrency
+        PriceCurrencyInterface $priceCurrency,
+        Calculate $calculate
     ) {
         $this->paymentFeeConfig = $paymentFeeConfig;
         $this->priceCurrency = $priceCurrency;
+        $this->calculate = $calculate;
     }
 
     /**
@@ -43,12 +51,15 @@ class PaymentFeeTax extends AbstractTotal
     {
         parent::collect($quote, $shippingAssignment, $total);
 
-        if (!$shippingAssignment->getItems() || !$this->paymentFeeConfig->isAvailableForMethod($quote)) {
+        if (!$shippingAssignment->getItems()) {
             return $this;
         }
 
-        $baseAmount = $this->paymentFeeConfig->tax($quote);
-        $amount = $this->priceCurrency->convert($baseAmount);
+        $result = $this->calculate->forCart($quote, $total);
+        $amount = $this->priceCurrency->convert($result->getTaxAmount());
+
+        $total->addTotalAmount('tax', $amount);
+        $total->addBaseTotalAmount('tax', $result->getTaxAmount());
 
         $extensionAttributes = $quote->getExtensionAttributes();
 
@@ -57,7 +68,7 @@ class PaymentFeeTax extends AbstractTotal
         }
 
         $extensionAttributes->setMolliePaymentFeeTax($amount);
-        $extensionAttributes->setBaseMolliePaymentFeeTax($baseAmount);
+        $extensionAttributes->setBaseMolliePaymentFeeTax($result->getTaxAmount());
 
         return $this;
     }
