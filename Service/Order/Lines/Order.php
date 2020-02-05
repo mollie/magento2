@@ -89,6 +89,10 @@ class Order
             $orderLines[] = $this->paymentFee->getOrderLine($order, $this->forceBaseCurrency);
         }
 
+        if (!empty((float)$order->getBaseDiscountAmount()) || !empty((float)$order->getDiscountAmount())) {
+            $orderLines[] = $this->getOrderDiscount($order);
+        }
+
         $this->saveOrderLines($orderLines, $order);
         foreach ($orderLines as &$orderLine) {
             unset($orderLine['item_id']);
@@ -199,6 +203,10 @@ class Order
      */
     private function getTotalAmountOrderItem(OrderItemInterface $item)
     {
+        if ($item->getProductType() == ProductType::TYPE_BUNDLE) {
+            return $this->forceBaseCurrency ? $item->getBaseRowTotalInclTax() : $item->getRowTotalInclTax();
+        }
+
         if ($this->forceBaseCurrency) {
             return $item->getBaseRowTotal()
                 - $item->getBaseDiscountAmount()
@@ -220,10 +228,10 @@ class Order
     private function getDiscountAmountOrderItem(OrderItemInterface $item)
     {
         if ($this->forceBaseCurrency) {
-            return $item->getBaseDiscountAmount() + $item->getBaseDiscountTaxCompensationAmount();
+            return abs($item->getBaseDiscountAmount() + $item->getBaseDiscountTaxCompensationAmount());
         }
 
-        return $item->getDiscountAmount() + $item->getDiscountTaxCompensationAmount();
+        return abs($item->getDiscountAmount() + $item->getDiscountTaxCompensationAmount());
     }
 
     /**
@@ -257,6 +265,26 @@ class Order
         }
 
         return $taxPercentage;
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @return array
+     */
+    private function getOrderDiscount(OrderInterface $order)
+    {
+        $currency = $this->forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
+        $amount = $this->forceBaseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
+
+        return [
+            'name' => 'Discount',
+            'type' => 'discount',
+            'unitPrice' => $this->mollieHelper->getAmountArray($currency, $amount),
+            'totalAmount' => $this->mollieHelper->getAmountArray($currency, $amount),
+            'vatRate' => 0,
+            'vatAmount' => $this->mollieHelper->getAmountArray($currency, 0),
+            'quantity' => 1,
+        ];
     }
 
     /**

@@ -80,6 +80,7 @@ class Webhook extends Action
                 $this->mollieHelper->addTolog('error', $e->getMessage());
 
                 $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+                $result->setData('error', true);
                 $result->setHttpResponseCode(503);
 
                 return $result;
