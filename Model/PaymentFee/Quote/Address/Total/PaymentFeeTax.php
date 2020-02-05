@@ -50,9 +50,6 @@ class PaymentFeeTax extends AbstractTotal
         $baseAmount = $this->paymentFeeConfig->tax($quote);
         $amount = $this->priceCurrency->convert($baseAmount);
 
-        $total->addTotalAmount('tax', $amount);
-        $total->addBaseTotalAmount('tax', $baseAmount);
-
         $extensionAttributes = $quote->getExtensionAttributes();
 
         if (!$extensionAttributes) {

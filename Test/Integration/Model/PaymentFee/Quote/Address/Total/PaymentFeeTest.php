@@ -45,8 +45,9 @@ class PaymentFeeTest extends IntegrationTestCase
      */
     public function testDoesApplyIfTheMethodIsSupported()
     {
-        $paymentFeeMock = $this->createPartialMock(PaymentFeeConfig::class, ['excludingTax']);
+        $paymentFeeMock = $this->createPartialMock(PaymentFeeConfig::class, ['excludingTax', 'getTaxClassId']);
         $paymentFeeMock->method('excludingTax')->willReturn(1.61);
+        $paymentFeeMock->method('getTaxClassId')->willReturn(2);
 
         /** @var PaymentFee $instance */
         $instance = $this->objectManager->create(PaymentFee::class, [
