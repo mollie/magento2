@@ -4,6 +4,7 @@ namespace Mollie\Payment\Model;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use Magento\Sales\Api\Data\OrderItemInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class OrderLinesTest extends IntegrationTestCase
@@ -130,5 +131,35 @@ class OrderLinesTest extends IntegrationTestCase
         foreach ($collection as $creditmemo) {
             $creditmemo->delete();
         }
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+     *
+     * @throws \Exception
+     */
+    public function testHandlesNegativeDiscountAmounts()
+    {
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = $this->objectManager->create(OrderItemInterface::class);
+        $orderItem->setProductId(1);
+        $orderItem->setQtyOrdered(1);
+        $orderItem->setBaseRowTotal(12.95);
+        $orderItem->setBaseDiscountAmount(0);
+        $orderItem->setBaseDiscountTaxCompensationAmount(-0.01);
+
+        $order = $this->loadOrderById('100000001');
+        $order->setItems([$orderItem]);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+
+        $result = $instance->getOrderLines($order);
+
+        $productLine = $result[0];
+        $this->assertEquals(0.01, $productLine['discountAmount']['value']);
+        $this->assertEquals(12.94, $productLine['totalAmount']['value']);
+        $this->assertEquals(12.95, $productLine['unitPrice']['value']);
     }
 }
