@@ -256,11 +256,11 @@ class OrderLines extends AbstractModel
     {
         $orderLines = [];
 
-        /** @var \Magento\Sales\Model\Order\Creditmemo\Item $item */
+        /** @var CreditmemoItemInterface $item */
         foreach ($creditmemo->getAllItems() as $item) {
             $orderItemId = $item->getOrderItemId();
             $lineId = $this->getOrderLineByItemId($orderItemId)->getLineId();
-            if (!$lineId) {
+            if (!$lineId || $item->getOrderItem()->getProductType() == 'bundle') {
                 continue;
             }
 
