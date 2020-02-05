@@ -18,6 +18,7 @@ use Magento\Framework\Registry;
 use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Payment\Model\Method\Logger;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
@@ -367,6 +368,33 @@ class Mollie extends AbstractMethod
         } catch (\Exception $exception) {
             $connection->rollBack();
             throw $exception;
+        }
+    }
+
+    public function orderHasUpdate($orderId)
+    {
+        $order = $this->orderRepository->get($orderId);
+
+        $transactionId = $order->getMollieTransactionId();
+        if (empty($transactionId)) {
+            $msg = ['error' => true, 'msg' => __('Transaction ID not found')];
+            $this->mollieHelper->addTolog('error', $msg);
+            return $msg;
+        }
+
+        $storeId = $order->getStoreId();
+        if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
+            $msg = ['error' => true, 'msg' => __('API Key not found')];
+            $this->mollieHelper->addTolog('error', $msg);
+            return $msg;
+        }
+
+        $mollieApi = $this->loadMollieApi($apiKey);
+
+        if (preg_match('/^ord_\w+$/', $transactionId)) {
+            return $this->ordersApi->orderHasUpdate($order, $mollieApi);
+        } else {
+            return $this->paymentsApi->orderHasUpdate($order, $mollieApi);
         }
     }
 

@@ -13,7 +13,6 @@ use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
@@ -23,6 +22,9 @@ use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\ResourceModel\Order\Handler\State;
 use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\OrderLines;
@@ -173,11 +175,11 @@ class Orders extends AbstractModel
 
     /**
      * @param Order                       $order
-     * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param MollieApiClient $mollieApi
      *
      * @return string
      * @throws LocalizedException
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
     public function startTransaction(Order $order, $mollieApi)
     {
@@ -290,12 +292,12 @@ class Orders extends AbstractModel
 
     /**
      * @param Order                       $order
-     * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param MollieApiClient $mollieApi
      * @param string                      $type
      * @param null                        $paymentToken
      *
      * @return array
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      * @throws LocalizedException
      */
     public function processTransaction(Order $order, $mollieApi, $type = 'webhook', $paymentToken = null)
@@ -478,6 +480,28 @@ class Orders extends AbstractModel
         return $msg;
     }
 
+    public function orderHasUpdate(OrderInterface $order, MollieApiClient $mollieApi)
+    {
+        $transactionId = $order->getMollieTransactionId();
+        $mollieOrder = $mollieApi->orders->get($transactionId);
+
+        $mapping = [
+            OrderStatus::STATUS_CREATED => Order::STATE_NEW,
+            OrderStatus::STATUS_PAID => Order::STATE_PROCESSING,
+            OrderStatus::STATUS_AUTHORIZED => Order::STATE_PENDING_PAYMENT,
+            OrderStatus::STATUS_CANCELED => Order::STATE_CANCELED,
+            OrderStatus::STATUS_SHIPPING => Order::STATE_PROCESSING,
+            OrderStatus::STATUS_COMPLETED => Order::STATE_COMPLETE,
+            OrderStatus::STATUS_EXPIRED => Order::STATE_CANCELED,
+            OrderStatus::STATUS_PENDING => Order::STATE_PENDING_PAYMENT,
+            OrderStatus::STATUS_REFUNDED => Order::STATE_CLOSED,
+        ];
+
+        $expectedStatus = $mapping[$mollieOrder->status];
+
+        return $expectedStatus != $order->getState();
+    }
+
     /**
      * @param Order $order
      * @param       $paymentToken
@@ -543,14 +567,14 @@ class Orders extends AbstractModel
     /**
      * @param $apiKey
      *
-     * @return \Mollie\Api\MollieApiClient
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @return MollieApiClient
+     * @throws ApiException
      * @throws LocalizedException
      */
     public function loadMollieApi($apiKey)
     {
         if (class_exists('Mollie\Api\MollieApiClient')) {
-            $mollieApiClient = new \Mollie\Api\MollieApiClient();
+            $mollieApiClient = new MollieApiClient();
             $mollieApiClient->setApiKey($apiKey);
             $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
             $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
