@@ -13,8 +13,8 @@ use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Sales\Api\Data\CreditmemoInterface;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Handler\State;
@@ -256,11 +256,11 @@ class OrderLines extends AbstractModel
     {
         $orderLines = [];
 
-        /** @var \Magento\Sales\Model\Order\Creditmemo\Item $item */
+        /** @var CreditmemoItemInterface $item */
         foreach ($creditmemo->getAllItems() as $item) {
             $orderItemId = $item->getOrderItemId();
             $lineId = $this->getOrderLineByItemId($orderItemId)->getLineId();
-            if (!$lineId) {
+            if (!$lineId || $item->getOrderItem()->getProductType() == 'bundle') {
                 continue;
             }
 

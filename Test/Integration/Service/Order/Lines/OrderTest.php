@@ -6,7 +6,6 @@
 
 namespace Mollie\Payment\Service\Order\Lines;
 
-use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Order\Lines\Order as Subject;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -59,5 +58,48 @@ class OrderTest extends IntegrationTestCase
         $this->assertEquals(12.1, $row['unitPrice']['value']);
         $this->assertEquals(12.1, $row['totalAmount']['value']);
         $this->assertEquals(2.1, $row['vatAmount']['value']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order_with_bundle.php
+     */
+    public function testGeneratesAnEmptyLineForTheMainBundleProduct()
+    {
+        $order = $this->loadOrderById('100000001');
+
+        /** @var Subject $instance */
+        $instance = $this->objectManager->get(Subject::class);
+
+        $result = $instance->get($order);
+
+        $lines = array_filter($result, function ($line) {
+            return $line['name'] == 'bundle1';
+        });
+
+        $line = array_shift($lines);
+        $this->assertEquals(0, $line['unitPrice']['value']);
+        $this->assertEquals(0, $line['totalAmount']['value']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order_with_bundle.php
+     * @magentoConfigFixture current_store payment/mollie_general/currency 0
+     */
+    public function testTheSimpleProductsHaveAPriceAvailable()
+    {
+        $order = $this->loadOrderById('100000001');
+
+        /** @var Subject $instance */
+        $instance = $this->objectManager->get(Subject::class);
+
+        $result = $instance->get($order);
+
+        $lines = array_filter($result, function ($line) {
+            return $line['sku'] == 'bundle_simple_1';
+        });
+
+        $line = array_shift($lines);
+        $this->assertEquals(9.2, $line['unitPrice']['value']);
+        $this->assertEquals(92, $line['totalAmount']['value']);
     }
 }

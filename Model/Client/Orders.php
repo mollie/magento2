@@ -20,6 +20,7 @@ use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
+use Magento\Sales\Model\ResourceModel\Order\Handler\State;
 use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -106,6 +107,10 @@ class Orders extends AbstractModel
      * @var Expires
      */
     private $expires;
+    /**
+     * @var State
+     */
+    private $orderState;
 
     /**
      * Orders constructor.
@@ -126,6 +131,7 @@ class Orders extends AbstractModel
      * @param StoreCredit           $storeCredit
      * @param RefundUsingPayment    $refundUsingPayment
      * @param Expires               $expires
+     * @param State                 $orderState
      */
     public function __construct(
         OrderLines $orderLines,
@@ -143,7 +149,8 @@ class Orders extends AbstractModel
         PartialInvoice $partialInvoice,
         StoreCredit $storeCredit,
         RefundUsingPayment $refundUsingPayment,
-        Expires $expires
+        Expires $expires,
+        State $orderState
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -161,6 +168,7 @@ class Orders extends AbstractModel
         $this->orderCommentHistory = $orderCommentHistory;
         $this->partialInvoice = $partialInvoice;
         $this->expires = $expires;
+        $this->orderState = $orderState;
     }
 
     /**
@@ -798,6 +806,10 @@ class Orders extends AbstractModel
         }
 
         try {
+            /**
+             * Sometimes we don't get the correct state when working with bundles, so manually check it.
+             */
+            $this->orderState->check($order);
             $mollieOrder = $mollieApi->orders->get($transactionId);
             if ($order->getState() == Order::STATE_CLOSED) {
                 $mollieOrder->refundAll();
