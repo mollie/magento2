@@ -21,4 +21,7 @@
     <event name="sales_quote_save_before">
         <observer name="mollie_set_paymentfee_on_quote" instance="Mollie\Payment\Observer\SalesQuoteSaveBefore\SetPaymentFeeDataOnQuote" />
     </event>
+    <event name="sales_model_service_quote_submit_success">
+        <observer name="mollie_attach_payment_token_to_order" instance="Mollie\Payment\Observer\SalesModelServiceQuoteSubmitSuccess\AttachPaymentTokenToOrder" />
+    </event>
 </config>

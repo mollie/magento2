@@ -30,7 +30,17 @@
             <a href="https://github.com/mollie/magento2/wiki/Differences-Payments-API-&-Orders-API" target="_blank">here</a>
             to read more about the differences between the Payment and Orders API.]]></comment>
         </field>
-        <field id="payment_description" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="use_components" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Use Mollie Components</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/mollie_methods_creditcard/use_components</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+            <comment><![CDATA[With Components the customer can enter their credit card details within your webshop.<br><strong>Note:</strong> You need to enter your Profile ID in the general section of this extension configuration to use Mollie Components.]]></comment>
+        </field>
+        <field id="payment_description" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Description</label>
             <config_path>payment/mollie_methods_creditcard/payment_description</config_path>
             <comment><![CDATA[The description to be used for this transaction. These variables are available:<br><br>
@@ -43,7 +53,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="days_before_expire" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1"
+        <field id="days_before_expire" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Days to expire</label>
             <frontend_class>validate-digits-range digits-range-1-100</frontend_class>
@@ -54,7 +64,7 @@
             </depends>
             <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
         </field>
-        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="60" showInDefault="1"
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
@@ -63,7 +73,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="70" showInDefault="1"
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="80" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
@@ -73,7 +83,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="min_order_total" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1"
+        <field id="min_order_total" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Minimum Order Total</label>
             <config_path>payment/mollie_methods_creditcard/min_order_total</config_path>
@@ -81,7 +91,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="max_order_total" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
+        <field id="max_order_total" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Maximum Order Total</label>
             <config_path>payment/mollie_methods_creditcard/max_order_total</config_path>

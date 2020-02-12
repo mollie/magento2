@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Setup;
 
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\DB\Ddl\Table;
 use Magento\Framework\Setup\SchemaSetupInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
@@ -36,6 +37,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         if (version_compare($context->getVersion(), '1.8.0', '<')) {
             $this->addPaymentFeeColumns($setup);
+        }
+
+        if (version_compare($context->getVersion(), '1.10.0', '<')) {
+            $this->addMolliePaymentTokenTable($setup);
         }
 
         $setup->endSetup();
@@ -90,5 +95,73 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $connection->addColumn($tableName, 'mollie_payment_fee_tax', $defintion);
             $connection->addColumn($tableName, 'base_mollie_payment_fee_tax', $defintion);
         }
+    }
+
+    private function addMolliePaymentTokenTable(SchemaSetupInterface $setup)
+    {
+        $connection = $setup->getConnection();
+        $tableName = $setup->getTable('mollie_payment_paymenttoken');
+
+        $table = $connection->newTable($tableName);
+
+        $table->addColumn(
+            'entity_id',
+            Table::TYPE_INTEGER,
+            null,
+            ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+            'Entity Id'
+        );
+
+        $table->addColumn(
+            'cart_id',
+            Table::TYPE_INTEGER,
+            null,
+            ['unsigned' => true, 'nullable' => false],
+            'Quote Id'
+        );
+
+        $table->addColumn(
+            'order_id',
+            Table::TYPE_INTEGER,
+            null,
+            ['unsigned' => true, 'nullable' => true],
+            'Order Id'
+        );
+
+        $table->addColumn(
+            'token',
+            Table::TYPE_TEXT,
+            32,
+            [],
+            'Token'
+        );
+
+        $table->addForeignKey(
+            $setup->getFkName('mollie_payment_token', 'cart_id', 'quote', 'entity_id'),
+            'cart_id',
+            $setup->getTable('quote'),
+            'entity_id',
+            Table::ACTION_CASCADE
+        );
+
+        $table->addForeignKey(
+            $setup->getFkName('mollie_payment_token', 'order_id', 'sales_order', 'entity_id'),
+            'order_id',
+            $setup->getTable('sales_order'),
+            'entity_id',
+            Table::ACTION_CASCADE
+        );
+
+        $table->addIndex(
+            $setup->getIdxName(
+                $tableName,
+                ['token'],
+                AdapterInterface::INDEX_TYPE_UNIQUE
+            ),
+            ['token'],
+            ['type' => AdapterInterface::INDEX_TYPE_UNIQUE]
+        );
+
+        $connection->createTable($table);
     }
 }

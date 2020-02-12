@@ -116,3 +116,32 @@
         transform: rotate(360deg);
     }
 }
+
+.mollie-component {
+    width: 90%;
+    height: 20px;
+    background-color: #FFF;
+    padding: 10px 15px;
+    border-radius: 6px;
+    color: #222;
+    transition: all .05s ease;
+    box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1), 0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
+
+.mollie-component.is-invalid {
+    background-color: #FFF0F0;
+    box-shadow: 0px 1px 1px 0px rgba(255, 51, 68, 0.1), 0px 1px 3px 0px rgba(255, 51, 68, 0.1);
+}
+
+.payment-method-content .card-container {
+    max-width: 400px;
+    overflow: auto;
+    background-color: #FFF;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    display: block;
+    padding: 20px;
+    margin-bottom: 10px;
+}

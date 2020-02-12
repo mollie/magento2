@@ -11,14 +11,17 @@ use Magento\Store\Model\ScopeInterface;
 
 class Config
 {
+    const GENERAL_TYPE = 'payment/mollie_general/type';
+    const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
-    const XML_PATH_STATUS_PENDING_BANKTRANSFER = 'payment/mollie_methods_banktransfer/order_status_pending';
-    const XML_PATH_STATUS_NEW_PAYMENT_LINK = 'payment/mollie_methods_paymentlink/order_status_new';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_TYPE = 'payment/mollie_methods_%s/payment_surcharge_type';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_TAX_CLASS = 'payment/mollie_methods_%s/payment_surcharge_tax_class';
+    const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
+    const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
+    const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
     const PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID = 'payment/mollie_methods_paymentlink/allow_mark_as_paid';
 
     /**
@@ -47,7 +50,7 @@ class Config
      * @param $storeId
      * @return bool
      */
-    private function getFlag($path, $storeId)
+    private function isSetFlag($path, $storeId)
     {
         return $this->config->isSetFlag($path, ScopeInterface::SCOPE_STORE, $storeId);
     }
@@ -58,22 +61,57 @@ class Config
      */
     public function sendInvoiceEmail($storeId = null)
     {
-        return $this->getFlag(static::GENERAL_INVOICE_NOTIFY, $storeId);
+        return $this->isSetFlag(static::GENERAL_INVOICE_NOTIFY, $storeId);
     }
 
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function getTestmode($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_TYPE, $storeId) == 'test';
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function getProfileId($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_PROFILEID, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function creditcardUseComponents($storeId = null)
+    {
+        return $this->isSetFlag(static::PAYMENT_CREDITCARD_USE_COMPONENTS, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return mixed
+     */
     public function statusPendingBanktransfer($storeId = null)
     {
         return $this->config->getValue(
-            static::XML_PATH_STATUS_PENDING_BANKTRANSFER,
+            static::PAYMENT_BANKTRANSFER_STATUS_PENDING,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
     }
 
+    /**
+     * @param null $storeId
+     * @return mixed
+     */
     public function statusNewPaymentLink($storeId = null)
     {
         return $this->config->getValue(
-            static::XML_PATH_STATUS_NEW_PAYMENT_LINK,
+            static::PAYMENT_PAYMENTLINK_NEW_STATUS,
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
@@ -135,7 +173,7 @@ class Config
      */
     public function paymentlinkAllowMarkAsPaid($storeId = null)
     {
-        return $this->getFlag(static::PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID, $storeId);
+        return $this->isSetFlag(static::PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID, $storeId);
     }
 
     /**
