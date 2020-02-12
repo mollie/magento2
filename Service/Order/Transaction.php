@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\Helper\Context;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\ScopeInterface;
 
@@ -24,10 +25,10 @@ class Transaction
 
     public function __construct(
         ScopeConfigInterface $config,
-        UrlInterface $urlBuilder
+        Context $context
     ) {
         $this->config = $config;
-        $this->urlBuilder = $urlBuilder;
+        $this->urlBuilder = $context->getUrlBuilder();
     }
 
     /**
