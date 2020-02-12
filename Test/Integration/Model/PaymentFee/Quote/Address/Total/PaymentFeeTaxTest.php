@@ -13,7 +13,8 @@ use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Api\Data\ShippingInterface;
 use Magento\Quote\Model\Quote\Address\Total;
-use Mollie\Payment\Service\Config\PaymentFee as PaymentFeeConfig;
+use Mollie\Payment\Service\PaymentFee\Calculate;
+use Mollie\Payment\Service\PaymentFee\Result;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentFeeTaxTest extends IntegrationTestCase
@@ -47,12 +48,16 @@ class PaymentFeeTaxTest extends IntegrationTestCase
      */
     public function testDoesApplyIfTheMethodIsSupported()
     {
-        $paymentFeeMock = $this->createPartialMock(PaymentFeeConfig::class, ['tax']);
-        $paymentFeeMock->method('tax')->willReturn(0.33);
+        /** @var Result $result */
+        $result = $this->objectManager->create(Result::class);
+        $result->setTaxAmount(0.33);
 
-        /** @var PaymentFeeTax $instance */
+        $calculateMock = $this->createMock(Calculate::class);
+        $calculateMock->method('forCart')->willReturn($result);
+
+        /** @var PaymentFee $instance */
         $instance = $this->objectManager->create(PaymentFeeTax::class, [
-            'paymentFeeConfig' => $paymentFeeMock,
+            'calculate' => $calculateMock,
         ]);
 
         /** @var Total $total */
@@ -73,8 +78,6 @@ class PaymentFeeTaxTest extends IntegrationTestCase
 
         $instance->collect($quote, $shippingAssignment, $total);
 
-        $this->assertEquals(0.33, $total->getTotalAmount('tax'));
-        $this->assertEquals(0.33, $total->getBaseTotalAmount('tax'));
         $this->assertEquals(0.33, $quote->getExtensionAttributes()->getMolliePaymentFeeTax());
         $this->assertEquals(0.33, $quote->getExtensionAttributes()->getBaseMolliePaymentFeeTax());
     }

@@ -13,24 +13,29 @@ use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
+use Magento\Sales\Model\ResourceModel\Order\Handler\State;
 use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
+use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
+use Mollie\Payment\Service\Order\Transaction;
 
 /**
  * Class Orders
@@ -106,6 +111,18 @@ class Orders extends AbstractModel
      * @var Expires
      */
     private $expires;
+    /**
+     * @var State
+     */
+    private $orderState;
+    /**
+     * @var Transaction
+     */
+    private $transaction;
+    /**
+     * @var BuildTransaction
+     */
+    private $buildTransaction;
 
     /**
      * Orders constructor.
@@ -126,6 +143,9 @@ class Orders extends AbstractModel
      * @param StoreCredit           $storeCredit
      * @param RefundUsingPayment    $refundUsingPayment
      * @param Expires               $expires
+     * @param State                 $orderState
+     * @param Transaction           $transaction
+     * @param BuildTransaction      $buildTransaction
      */
     public function __construct(
         OrderLines $orderLines,
@@ -143,7 +163,10 @@ class Orders extends AbstractModel
         PartialInvoice $partialInvoice,
         StoreCredit $storeCredit,
         RefundUsingPayment $refundUsingPayment,
-        Expires $expires
+        Expires $expires,
+        State $orderState,
+        Transaction $transaction,
+        BuildTransaction $buildTransaction
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -161,15 +184,18 @@ class Orders extends AbstractModel
         $this->orderCommentHistory = $orderCommentHistory;
         $this->partialInvoice = $partialInvoice;
         $this->expires = $expires;
+        $this->orderState = $orderState;
+        $this->transaction = $transaction;
+        $this->buildTransaction = $buildTransaction;
     }
 
     /**
-     * @param Order                       $order
-     * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param Order $order
+     * @param MollieApiClient $mollieApi
      *
      * @return string
      * @throws LocalizedException
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
     public function startTransaction(Order $order, $mollieApi)
     {
@@ -191,8 +217,8 @@ class Orders extends AbstractModel
             'billingAddress'      => $this->getAddressLine($order->getBillingAddress()),
             'consumerDateOfBirth' => null,
             'lines'               => $this->orderLines->getOrderLines($order),
-            'redirectUrl'         => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
-            'webhookUrl'          => $this->mollieHelper->getWebhookUrl(),
+            'redirectUrl'         => $this->transaction->getRedirectUrl($orderId, $paymentToken),
+            'webhookUrl'          => $this->transaction->getWebhookUrl(),
             'locale'              => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE),
             'method'              => $method,
             'metadata'            => [
@@ -221,6 +247,8 @@ class Orders extends AbstractModel
         if ($this->expires->availableForMethod($method, $storeId)) {
             $orderData['expiresAt'] = $this->expires->atDateForMethod($method, $storeId);
         }
+
+        $orderData = $this->buildTransaction->execute($order, static::CHECKOUT_TYPE, $orderData);
 
         $this->mollieHelper->addTolog('request', $orderData);
         $mollieOrder = $mollieApi->orders->create($orderData);
@@ -282,12 +310,12 @@ class Orders extends AbstractModel
 
     /**
      * @param Order                       $order
-     * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param MollieApiClient $mollieApi
      * @param string                      $type
      * @param null                        $paymentToken
      *
      * @return array
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      * @throws LocalizedException
      */
     public function processTransaction(Order $order, $mollieApi, $type = 'webhook', $paymentToken = null)
@@ -470,6 +498,28 @@ class Orders extends AbstractModel
         return $msg;
     }
 
+    public function orderHasUpdate(OrderInterface $order, MollieApiClient $mollieApi)
+    {
+        $transactionId = $order->getMollieTransactionId();
+        $mollieOrder = $mollieApi->orders->get($transactionId);
+
+        $mapping = [
+            OrderStatus::STATUS_CREATED => Order::STATE_NEW,
+            OrderStatus::STATUS_PAID => Order::STATE_PROCESSING,
+            OrderStatus::STATUS_AUTHORIZED => Order::STATE_PENDING_PAYMENT,
+            OrderStatus::STATUS_CANCELED => Order::STATE_CANCELED,
+            OrderStatus::STATUS_SHIPPING => Order::STATE_PROCESSING,
+            OrderStatus::STATUS_COMPLETED => Order::STATE_COMPLETE,
+            OrderStatus::STATUS_EXPIRED => Order::STATE_CANCELED,
+            OrderStatus::STATUS_PENDING => Order::STATE_PENDING_PAYMENT,
+            OrderStatus::STATUS_REFUNDED => Order::STATE_CLOSED,
+        ];
+
+        $expectedStatus = $mapping[$mollieOrder->status];
+
+        return $expectedStatus != $order->getState();
+    }
+
     /**
      * @param Order $order
      * @param       $paymentToken
@@ -535,14 +585,14 @@ class Orders extends AbstractModel
     /**
      * @param $apiKey
      *
-     * @return \Mollie\Api\MollieApiClient
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @return MollieApiClient
+     * @throws ApiException
      * @throws LocalizedException
      */
     public function loadMollieApi($apiKey)
     {
         if (class_exists('Mollie\Api\MollieApiClient')) {
-            $mollieApiClient = new \Mollie\Api\MollieApiClient();
+            $mollieApiClient = new MollieApiClient();
             $mollieApiClient->setApiKey($apiKey);
             $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
             $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
@@ -630,7 +680,7 @@ class Orders extends AbstractModel
                     $invoice = $this->partialInvoice->createFromShipment($shipment);
                 }
 
-                $captureAmount = $this->getCaptureAmount($order, $invoice->getId() ? $invoice : null);
+                $captureAmount = $this->getCaptureAmount($order, $invoice && $invoice->getId() ? $invoice : null);
 
                 $payment->setTransactionId($transactionId);
                 $payment->registerCaptureNotification($captureAmount, true);
@@ -724,7 +774,7 @@ class Orders extends AbstractModel
         if (!$this->registry->registry('online_refund')) {
             $this->messageManager->addNoticeMessage(
                 __(
-                    'An offline refund has been created, please make sure to also create this 
+                    'An offline refund has been created, please make sure to also create this
                     refund on mollie.com/dashboard or use the online refund option.'
                 )
             );
@@ -798,6 +848,10 @@ class Orders extends AbstractModel
         }
 
         try {
+            /**
+             * Sometimes we don't get the correct state when working with bundles, so manually check it.
+             */
+            $this->orderState->check($order);
             $mollieOrder = $mollieApi->orders->get($transactionId);
             if ($order->getState() == Order::STATE_CLOSED) {
                 $mollieOrder->refundAll();

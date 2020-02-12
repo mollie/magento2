@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Model\Methods;
+namespace Mollie\Payment\Test\Ingegration\Model\Methods;
 
 use Magento\Framework\DataObject;
 use Magento\Payment\Model\InfoInterface;

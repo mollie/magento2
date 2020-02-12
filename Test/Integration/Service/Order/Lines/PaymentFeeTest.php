@@ -36,6 +36,6 @@ class PaymentFeeTest extends IntegrationTestCase
         /** @var PaymentFee $instance */
         $instance = $this->objectManager->create(PaymentFee::class);
 
-        $line = $instance->getOrderLine($order);
+        $line = $instance->getOrderLine($order, true);
     }
 }

@@ -18,6 +18,7 @@ use Magento\Framework\Registry;
 use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Payment\Model\Method\Logger;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
@@ -370,6 +371,33 @@ class Mollie extends AbstractMethod
         }
     }
 
+    public function orderHasUpdate($orderId)
+    {
+        $order = $this->orderRepository->get($orderId);
+
+        $transactionId = $order->getMollieTransactionId();
+        if (empty($transactionId)) {
+            $msg = ['error' => true, 'msg' => __('Transaction ID not found')];
+            $this->mollieHelper->addTolog('error', $msg);
+            return $msg;
+        }
+
+        $storeId = $order->getStoreId();
+        if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
+            $msg = ['error' => true, 'msg' => __('API Key not found')];
+            $this->mollieHelper->addTolog('error', $msg);
+            return $msg;
+        }
+
+        $mollieApi = $this->loadMollieApi($apiKey);
+
+        if (preg_match('/^ord_\w+$/', $transactionId)) {
+            return $this->ordersApi->orderHasUpdate($order, $mollieApi);
+        } else {
+            return $this->paymentsApi->orderHasUpdate($order, $mollieApi);
+        }
+    }
+
     /**
      * @param DataObject $data
      *
@@ -378,19 +406,16 @@ class Mollie extends AbstractMethod
      */
     public function assignData(DataObject $data)
     {
-        $issuer = null;
         parent::assignData($data);
 
-        if (is_array($data) && isset($data['selected_issuer'])) {
-            $issuer = $data['selected_issuer'];
-        } elseif ($data instanceof \Magento\Framework\DataObject) {
-            $additionalData = $data->getAdditionalData();
-            if (isset($additionalData['selected_issuer'])) {
-                $issuer = $additionalData['selected_issuer'];
-            }
+        $additionalData = $data->getAdditionalData();
+        if (isset($additionalData['selected_issuer'])) {
+            $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $additionalData['selected_issuer']);
         }
 
-        $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $issuer);
+        if (isset($additionalData['card_token'])) {
+            $this->getInfoInstance()->setAdditionalInformation('card_token', $additionalData['card_token']);
+        }
 
         return $this;
     }

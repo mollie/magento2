@@ -8,12 +8,16 @@ namespace Mollie\Payment\Model\Client;
 
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 
 /**
@@ -50,6 +54,10 @@ class Payments extends AbstractModel
      * @var OrderCommentHistory
      */
     private $orderCommentHistory;
+    /**
+     * @var BuildTransaction
+     */
+    private $buildTransaction;
 
     /**
      * Payments constructor.
@@ -60,6 +68,7 @@ class Payments extends AbstractModel
      * @param CheckoutSession $checkoutSession
      * @param MollieHelper $mollieHelper
      * @param OrderCommentHistory $orderCommentHistory
+     * @param BuildTransaction $buildTransaction
      */
     public function __construct(
         OrderSender $orderSender,
@@ -67,7 +76,8 @@ class Payments extends AbstractModel
         OrderRepository $orderRepository,
         CheckoutSession $checkoutSession,
         MollieHelper $mollieHelper,
-        OrderCommentHistory $orderCommentHistory
+        OrderCommentHistory $orderCommentHistory,
+        BuildTransaction $buildTransaction
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -75,6 +85,7 @@ class Payments extends AbstractModel
         $this->checkoutSession = $checkoutSession;
         $this->mollieHelper = $mollieHelper;
         $this->orderCommentHistory = $orderCommentHistory;
+        $this->buildTransaction = $buildTransaction;
     }
 
     /**
@@ -126,6 +137,8 @@ class Payments extends AbstractModel
         if ($method == 'przelewy24') {
             $paymentData['billingEmail'] = $order->getCustomerEmail();
         }
+
+        $paymentData = $this->buildTransaction->execute($order, static::CHECKOUT_TYPE, $paymentData);
 
         $paymentData = $this->mollieHelper->validatePaymentData($paymentData);
         $this->mollieHelper->addTolog('request', $paymentData);
@@ -320,6 +333,26 @@ class Payments extends AbstractModel
         $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
         $this->mollieHelper->addTolog('success', $msg);
         return $msg;
+    }
+
+    public function orderHasUpdate(OrderInterface $order, MollieApiClient $mollieApi)
+    {
+        $transactionId = $order->getMollieTransactionId();
+        $paymentData = $mollieApi->payments->get($transactionId);
+
+        $mapping = [
+            PaymentStatus::STATUS_OPEN => Order::STATE_NEW,
+            PaymentStatus::STATUS_PENDING => Order::STATE_PENDING_PAYMENT,
+            PaymentStatus::STATUS_AUTHORIZED => Order::STATE_PROCESSING,
+            PaymentStatus::STATUS_CANCELED => Order::STATE_CANCELED,
+            PaymentStatus::STATUS_EXPIRED => Order::STATE_CLOSED,
+            PaymentStatus::STATUS_PAID => Order::STATE_PROCESSING,
+            PaymentStatus::STATUS_FAILED => Order::STATE_CANCELED,
+        ];
+
+        $expectedStatus = $mapping[$paymentData->status];
+
+        return $expectedStatus != $order->getState();
     }
 
     /**

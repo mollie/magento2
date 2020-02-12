@@ -2,14 +2,15 @@
 
 namespace Mollie\Payment\Model;
 
+use Magento\Framework\DataObject;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
-use Mollie\Payment\Test\Integration\TestCase;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class MollieTest extends TestCase
+class MollieTest extends IntegrationTestCase
 {
     public function processTransactionUsesTheCorrectApiProvider()
     {
@@ -140,5 +141,45 @@ class MollieTest extends TestCase
         $result = $instance->startTransaction($order);
 
         $this->assertEquals('payment', $result);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function testAssignsIssuerId()
+    {
+        $data = new DataObject;
+        $data->setAdditionalData(['selected_issuer' => 'TESTBANK']);
+
+        $order = $this->loadOrder('100000001');
+        $payment = $order->getPayment();
+
+        /** @var Mollie $instance */
+        $instance = $this->objectManager->create(\Mollie\Payment\Model\Methods\Ideal::class);
+        $instance->setInfoInstance($payment);
+        $instance->assignData($data);
+
+        $this->assertEquals('TESTBANK', $payment->getAdditionalInformation()['selected_issuer']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function testAssignsCardToken()
+    {
+        $data = new DataObject;
+        $data->setAdditionalData(['card_token' => 'abc123']);
+
+        $order = $this->loadOrder('100000001');
+        $payment = $order->getPayment();
+
+        /** @var Mollie $instance */
+        $instance = $this->objectManager->create(\Mollie\Payment\Model\Methods\Ideal::class);
+        $instance->setInfoInstance($payment);
+        $instance->assignData($data);
+
+        $this->assertEquals('abc123', $payment->getAdditionalInformation()['card_token']);
     }
 }

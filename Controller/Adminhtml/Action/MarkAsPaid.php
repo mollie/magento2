@@ -158,7 +158,7 @@ class MarkAsPaid extends Action
      */
     private function cancelOriginalOrder(OrderInterface $originalOrder)
     {
-         $originalOrder->cancel();
+        $originalOrder->cancel();
     }
 
     /**

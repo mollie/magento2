@@ -11,7 +11,9 @@ use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Total;
 use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
+use Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector;
 use Mollie\Payment\Service\Config\PaymentFee as PaymentFeeConfig;
+use Mollie\Payment\Service\PaymentFee\Calculate;
 
 class PaymentFee extends AbstractTotal
 {
@@ -25,12 +27,19 @@ class PaymentFee extends AbstractTotal
      */
     private $priceCurrency;
 
+    /**
+     * @var Calculate
+     */
+    private $calculate;
+
     public function __construct(
         PaymentFeeConfig $paymentFeeConfig,
-        PriceCurrencyInterface $priceCurrency
+        PriceCurrencyInterface $priceCurrency,
+        Calculate $calculate
     ) {
         $this->paymentFeeConfig = $paymentFeeConfig;
         $this->priceCurrency = $priceCurrency;
+        $this->calculate = $calculate;
     }
 
     /**
@@ -43,15 +52,15 @@ class PaymentFee extends AbstractTotal
     {
         parent::collect($quote, $shippingAssignment, $total);
 
-        if (!$shippingAssignment->getItems() || !$this->paymentFeeConfig->isAvailableForMethod($quote)) {
+        if (!$shippingAssignment->getItems()) {
             return $this;
         }
 
-        $baseAmount = $this->paymentFeeConfig->excludingTax($quote);
-        $amount = $this->priceCurrency->convert($baseAmount);
+        $result = $this->calculate->forCart($quote, $total);
+        $amount = $this->priceCurrency->convert($result->getAmount());
 
         $total->setTotalAmount('mollie_payment_fee', $amount);
-        $total->setBaseTotalAmount('mollie_payment_fee', $baseAmount);
+        $total->setBaseTotalAmount('mollie_payment_fee', $result->getAmount());
 
         $attributes = $quote->getExtensionAttributes();
 
@@ -60,7 +69,7 @@ class PaymentFee extends AbstractTotal
         }
 
         $attributes->setMolliePaymentFee($amount);
-        $attributes->setBaseMolliePaymentFee($amount);
+        $attributes->setBaseMolliePaymentFee($result->getAmount());
 
         return $this;
     }
@@ -72,14 +81,16 @@ class PaymentFee extends AbstractTotal
      */
     public function fetch(Quote $quote, Total $total)
     {
-        if (!$this->paymentFeeConfig->isAvailableForMethod($quote)) {
+        if (!$this->paymentFeeConfig->isAvailableForMethod($quote) || !$quote->getExtensionAttributes()) {
             return [];
         }
+
+        $extensionAttributes = $quote->getExtensionAttributes();
 
         return [
             'code' => 'mollie_payment_fee',
             'title' => __('Payment Fee'),
-            'value' => $this->paymentFeeConfig->includingTax($quote),
+            'value' => $extensionAttributes->getMolliePaymentFee() + $extensionAttributes->getMolliePaymentFeeTax(),
         ];
     }
 

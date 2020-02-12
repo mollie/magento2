@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/carts/mine/mollie/payment-token" method="GET">
+        <service class="Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface" method="generateForCustomer"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/guest-carts/:cartId/mollie/payment-token" method="GET">
+        <service class="Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface" method="generateForGuest"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/mollie/transaction/start" method="POST">
+        <service class="Mollie\Payment\Api\Webapi\StartTransactionRequestInterface" method="execute"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+</routes>

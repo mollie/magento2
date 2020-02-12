@@ -6,6 +6,11 @@
 
 namespace Mollie\Payment\Model;
 
+use Magento\Framework\App\CacheInterface;
+use Magento\Framework\Serialize\SerializerInterface;
+use Mollie\Api\MollieApiClient;
+use Magento\Framework\Locale\Resolver;
+use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Checkout\Model\ConfigProviderInterface;
@@ -22,6 +27,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
  */
 class MollieConfigProvider implements ConfigProviderInterface
 {
+    const CACHE_IDENTIFIER_PREFIX = 'mollie_payment_issuers_';
 
     /**
      * @var array
@@ -78,11 +84,26 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var CheckoutSession
      */
     private $checkoutSession;
-
     /**
      * @var array|null
      */
     private $methodData;
+    /**
+     * @var CacheInterface
+     */
+    private $cache;
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+    /**
+     * @var Config
+     */
+    private $config;
+    /**
+     * @var Resolver
+     */
+    private $localeResolver;
 
     /**
      * MollieConfigProvider constructor.
@@ -94,6 +115,10 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @param AssetRepository      $assetRepository
      * @param ScopeConfigInterface $scopeConfig
      * @param Escaper              $escaper
+     * @param CacheInterface       $cache
+     * @param SerializerInterface  $serializer
+     * @param Resolver             $localeResolver
+     * @param Config               $config
      */
     public function __construct(
         MollieModel $mollieModel,
@@ -102,7 +127,11 @@ class MollieConfigProvider implements ConfigProviderInterface
         CheckoutSession $checkoutSession,
         AssetRepository $assetRepository,
         ScopeConfigInterface $scopeConfig,
-        Escaper $escaper
+        Escaper $escaper,
+        CacheInterface $cache,
+        SerializerInterface $serializer,
+        Resolver $localeResolver,
+        Config $config
     ) {
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
@@ -111,6 +140,10 @@ class MollieConfigProvider implements ConfigProviderInterface
         $this->escaper = $escaper;
         $this->assetRepository = $assetRepository;
         $this->scopeConfig = $scopeConfig;
+        $this->cache = $cache;
+        $this->serializer = $serializer;
+        $this->config = $config;
+        $this->localeResolver = $localeResolver;
         foreach ($this->methodCodes as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
         }
@@ -138,6 +171,10 @@ class MollieConfigProvider implements ConfigProviderInterface
     public function getConfig()
     {
         $config = [];
+        $config['payment']['mollie']['testmode'] = $this->config->getTestmode();
+        $config['payment']['mollie']['profile_id'] = $this->config->getProfileId();
+        $config['payment']['mollie']['locale'] = $this->localeResolver->getLocale();
+        $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents();
         $apiKey = $this->mollieHelper->getApiKey();
         $useImage = $this->mollieHelper->useImage();
 
@@ -163,33 +200,15 @@ class MollieConfigProvider implements ConfigProviderInterface
             }
 
             if ($code == 'mollie_methods_ideal') {
-                $issuerListType = $this->mollieHelper->getIssuerListType($code);
-                $config['payment']['issuersListType'][$code] = $issuerListType;
-                $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
-                    $mollieApi,
-                    $code,
-                    $issuerListType
-                );
+                $config = $this->getIssuers($mollieApi, $code, $config);
             }
 
             if ($code == 'mollie_methods_kbc') {
-                $issuerListType = $this->mollieHelper->getIssuerListType($code);
-                $config['payment']['issuersListType'][$code] = $issuerListType;
-                $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
-                    $mollieApi,
-                    $code,
-                    $issuerListType
-                );
+                $config = $this->getIssuers($mollieApi, $code, $config);
             }
 
             if ($code == 'mollie_methods_giftcard') {
-                $issuerListType = $this->mollieHelper->getIssuerListType($code);
-                $config['payment']['issuersListType'][$code] = $issuerListType;
-                $config['payment']['issuers'][$code] = $this->mollieModel->getIssuers(
-                    $mollieApi,
-                    $code,
-                    $issuerListType
-                );
+                $config = $this->getIssuers($mollieApi, $code, $config);
             }
         }
 
@@ -242,5 +261,50 @@ class MollieConfigProvider implements ConfigProviderInterface
     protected function getInstructions($code)
     {
         return nl2br($this->escaper->escapeHtml($this->methods[$code]->getInstructions()));
+    }
+
+    /**
+     * @param MollieApiClient $mollieApi
+     * @param string $code
+     * @param array $config
+     * @return array
+     */
+    private function getIssuers($mollieApi, $code, array $config)
+    {
+        $issuerListType = $this->mollieHelper->getIssuerListType($code);
+        $config['payment']['issuersListType'][$code] = $issuerListType;
+        $config['payment']['issuers'][$code] = $this->loadIssuers($code, $mollieApi, $issuerListType);
+
+        return $config;
+    }
+
+    /**
+     * @param $code
+     * @param MollieApiClient $mollieApi
+     * @param $type
+     * @return array
+     */
+    private function loadIssuers($code, $mollieApi, $type)
+    {
+        $identifier = static::CACHE_IDENTIFIER_PREFIX . $code;
+        $result = $this->cache->load($identifier);
+        if ($result) {
+            return $this->serializer->unserialize($result);
+        }
+
+        $result = $this->mollieModel->getIssuers(
+            $mollieApi,
+            $code,
+            $type
+        );
+
+        $this->cache->save(
+            $this->serializer->serialize($result),
+            $identifier,
+            ['mollie_payment', 'mollie_payment_issuers'],
+            60 * 60 // Cache for 1 hour
+        );
+
+        return $result;
     }
 }
