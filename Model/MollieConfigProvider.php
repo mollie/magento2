@@ -284,7 +284,7 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @param $type
      * @return array
      */
-    private function loadIssuers($code, $mollieApi, $type): array
+    private function loadIssuers($code, $mollieApi, $type)
     {
         $identifier = static::CACHE_IDENTIFIER_PREFIX . $code;
         $result = $this->cache->load($identifier);

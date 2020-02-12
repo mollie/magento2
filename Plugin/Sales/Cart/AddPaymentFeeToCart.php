@@ -49,7 +49,7 @@ class AddPaymentFeeToCart
      */
     private function processCart(CartInterface $cart)
     {
-        $extensionAttributes = $cart->getExtensionAttributes() ?? $this->factory->create();
+        $extensionAttributes = $cart->getExtensionAttributes() ? $cart->getExtensionAttributes() : $this->factory->create();
 
         $extensionAttributes->setMolliePaymentFee($cart->getData('mollie_payment_fee'));
         $extensionAttributes->setBaseMolliePaymentFee($cart->getData('base_mollie_payment_fee'));

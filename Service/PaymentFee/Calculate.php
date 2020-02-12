@@ -97,7 +97,7 @@ class Calculate
      * @return Result
      * @throws UnknownPaymentFeeType
      */
-    private function calculatePaymentFee(CartInterface $cart, Total $total): Result
+    private function calculatePaymentFee(CartInterface $cart, Total $total)
     {
         $paymentFeeType = $this->config->getType($cart);
         if ($paymentFeeType == PaymentFeeType::FIXED_FEE) {

@@ -180,7 +180,7 @@ class Config
      * @param $method
      * @return string
      */
-    private function addMethodToPath($path, $method): string
+    private function addMethodToPath($path, $method)
     {
         return sprintf(
             $path,
