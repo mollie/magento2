@@ -8,6 +8,7 @@ namespace Mollie\Payment\Model;
 
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Payment\Model\MethodInterface;
 use Mollie\Api\MollieApiClient;
 use Magento\Framework\Locale\Resolver;
 use Mollie\Payment\Config;
@@ -151,8 +152,7 @@ class MollieConfigProvider implements ConfigProviderInterface
 
     /**
      * @param $code
-     *
-     * @return \Magento\Payment\Model\MethodInterface
+     * @return MethodInterface|null
      */
     public function getMethodInstance($code)
     {
@@ -160,6 +160,7 @@ class MollieConfigProvider implements ConfigProviderInterface
             return $this->paymentHelper->getMethodInstance($code);
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', 'Function: getMethodInstance: ' . $e->getMessage());
+            return null;
         }
     }
 
@@ -186,7 +187,8 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
 
         foreach ($this->methodCodes as $code) {
-            if (empty($this->methods[$code]) || !$this->methods[$code]->isAvailable()) {
+            $isAvailable = $this->methods[$code]->isAvailable();
+            if (empty($this->methods[$code])) {
                 continue;
             }
 
@@ -199,15 +201,15 @@ class MollieConfigProvider implements ConfigProviderInterface
                 $config['payment']['image'][$code] = $url;
             }
 
-            if ($code == 'mollie_methods_ideal') {
+            if ($isAvailable && $code == 'mollie_methods_ideal') {
                 $config = $this->getIssuers($mollieApi, $code, $config);
             }
 
-            if ($code == 'mollie_methods_kbc') {
+            if ($isAvailable && $code == 'mollie_methods_kbc') {
                 $config = $this->getIssuers($mollieApi, $code, $config);
             }
 
-            if ($code == 'mollie_methods_giftcard') {
+            if ($isAvailable && $code == 'mollie_methods_giftcard') {
                 $config = $this->getIssuers($mollieApi, $code, $config);
             }
         }
