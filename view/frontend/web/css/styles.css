@@ -145,3 +145,9 @@
     padding: 20px;
     margin-bottom: 10px;
 }
+
+.component-error {
+    color: #FF0000;
+    display: none;
+    margin-bottom: 10px;
+}

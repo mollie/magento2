@@ -96,12 +96,27 @@ function ($, Component, Mollie) {
                 return;
             }
 
-            this.components.cardHolder.mount('#card-holder');
-            this.components.cardNumber.mount('#card-number');
-            this.components.expiryDate.mount('#expiry-date');
-            this.components.verificationCode.mount('#verification-code');
+            this.mountElement(this.components.cardHolder, '#card-holder');
+            this.mountElement(this.components.cardNumber, '#card-number');
+            this.mountElement(this.components.expiryDate, '#expiry-date');
+            this.mountElement(this.components.verificationCode, '#verification-code');
 
             this.mounted(true);
+        },
+
+        mountElement: function (element, id) {
+            element.mount(id);
+
+            var errorElement = document.querySelector(id + '-error');
+            element.addEventListener('change', function (event) {
+                if (event.error && event.touched) {
+                    errorElement.textContent = event.error;
+                    errorElement.style.display = 'block';
+                } else {
+                    errorElement.textContent = '';
+                    errorElement.style.display = 'none';
+                }
+            });
         },
 
         unmount: function () {
