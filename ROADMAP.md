@@ -16,7 +16,7 @@ To integrate the Mollie extension with a PWA, we added 2 endpoints to the normal
 ## What we're working on / what is on our backlog
 
 * **Surcharge for all different payment methods:** 
-Due to the new EU law only Klarna and PayPal can be surcharged to a certain amount. However, as Mollie Payemts is also used for B2B transactions and used outside of the EU we are planning to open the payment surcharge for all method in an upcoming release.
+Due to the new EU law only Klarna and PayPal can be surcharged to a certain amount. However, as Mollie Payments is also used for B2B transactions and used outside of the EU we are planning to open the payment surcharge for all method in an upcoming release.
 Open Issue: https://github.com/mollie/magento2/issues/211
 
 * **Direct integration of Apple Pay:** 
