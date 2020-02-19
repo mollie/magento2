@@ -14,6 +14,7 @@ class Config
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
+    const GENERAL_ORDER_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_TYPE = 'payment/mollie_methods_%s/payment_surcharge_type';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
@@ -62,6 +63,15 @@ class Config
     public function sendInvoiceEmail($storeId = null)
     {
         return $this->isSetFlag(static::GENERAL_INVOICE_NOTIFY, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function orderStatusPending($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_ORDER_STATUS_PENDING, $storeId);
     }
 
     /**
