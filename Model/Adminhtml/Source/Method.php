@@ -6,14 +6,14 @@
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Framework\Data\OptionSourceInterface;
 
 /**
  * Class TransactionType
  *
  * @package Mollie\Payment\Model\Adminhtml\Source
  */
-class Method implements ArrayInterface
+class Method implements OptionSourceInterface
 {
 
     /**
