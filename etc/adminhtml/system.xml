@@ -139,10 +139,10 @@
                     </field>
                     <field id="cancel_failed_orders" translate="label" type="select" sortOrder="200" showInDefault="1"
                            showInWebsite="0" showInStore="1">
-                        <label>Cancel the order when the connection fails</label>
+                        <label>Cancel order when connection Fails</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/mollie_general/cancel_failed_orders</config_path>
-                        <comment><![CDATA[When an error occurs while sending data to Mollie the order will be cancelled if this option is enabled.]]></comment>
+                        <comment><![CDATA[When the order can't be created due to various reasons (connection failure or data verification errors), the just created order will be canceled.]]></comment>
                     </field>
                     <field id="heading_advanced" translate="label comment" type="text" sortOrder="210" showInDefault="1"
                            showInWebsite="0" showInStore="0">
