@@ -27,6 +27,7 @@ use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\Transaction;
+use Mollie\Payment\Service\Order\Uncancel;
 
 /**
  * Class General
@@ -154,6 +155,10 @@ class General extends AbstractHelper
      * @var Transaction
      */
     private $transaction;
+    /**
+     * @var Uncancel
+     */
+    private $uncancel;
 
     /**
      * General constructor.
@@ -174,6 +179,7 @@ class General extends AbstractHelper
      * @param OrderManagementInterface $orderManagement
      * @param Config                   $config
      * @param Transaction              $transaction
+     * @param Uncancel                 $uncancel
      */
     public function __construct(
         Context $context,
@@ -191,7 +197,8 @@ class General extends AbstractHelper
         OrderCommentHistory $orderCommentHistory,
         OrderManagementInterface $orderManagement,
         Config $config,
-        Transaction $transaction
+        Transaction $transaction,
+        Uncancel $uncancel
     ) {
         $this->paymentHelper = $paymentHelper;
         $this->storeManager = $storeManager;
@@ -209,6 +216,7 @@ class General extends AbstractHelper
         $this->orderManagement = $orderManagement;
         $this->config = $config;
         $this->transaction = $transaction;
+        $this->uncancel = $uncancel;
         parent::__construct($context);
     }
 
@@ -788,21 +796,15 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param \Magento\Sales\Model\Order $order
+     * @param OrderInterface $order
      *
-     * @return \Magento\Sales\Model\Order
+     * @return OrderInterface
+     * @see Uncancel::execute()
      */
     public function uncancelOrder($order)
     {
         try {
-            $status = $this->getStatusPending($order->getStoreId());
-            $message = __('Order uncanceled by webhook.');
-            $order->setState(Order::STATE_NEW);
-            $order->addStatusToHistory($status, $message, true);
-            foreach ($order->getAllItems() as $item) {
-                $item->setQtyCanceled(0)->save();
-            }
-            $this->orderRepository->save($order);
+            $this->uncancel->execute($order);
         } catch (\Exception $e) {
             $this->addTolog('error', $e->getMessage());
         }
@@ -819,7 +821,7 @@ class General extends AbstractHelper
      */
     public function getStatusPending($storeId = 0)
     {
-        return $this->getStoreConfig(self::XML_PATH_STATUS_PENDING, $storeId);
+        return $this->config->orderStatusPending($storeId);
     }
 
     /**
