@@ -31,6 +31,10 @@ define([
             }, this, 'beforeChange');
 
             quote.paymentMethod.subscribe( function (newValue) {
+                if (!newValue) {
+                    return;
+                }
+
                 // If the old method was a payment fee method we also need to update
                 if (isApplicableMethod(oldMethod) || isApplicableMethod(newValue.method)) {
                     this.savePaymentMethod(newValue.method);
