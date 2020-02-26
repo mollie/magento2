@@ -65,4 +65,10 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Payment\Service\Order\SecondChanceEmail">
+        <arguments>
+            <argument name="identityContainer" xsi:type="object">Magento\Sales\Model\Order\Email\Container\OrderIdentity</argument>
+        </arguments>
+    </type>
 </config>

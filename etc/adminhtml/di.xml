@@ -3,4 +3,19 @@
     <type name="Magento\Sales\Block\Adminhtml\Order\View">
         <plugin name="mollie_payment_sales_order_view_buttons" type="Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\View" />
     </type>
+
+    <type name="Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\View">
+        <arguments>
+            <argument name="buttons" xsi:type="array">
+                <item xsi:type="object" name="payment_link_button">Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons\PaymentLinkButton</item>
+                <item xsi:type="object" name="second_chance_button">Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons\SecondChanceButton</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Service\Order\SecondChanceEmail">
+        <arguments>
+            <argument name="url" xsi:type="object">Magento\Framework\Url</argument>
+        </arguments>
+    </type>
 </config>

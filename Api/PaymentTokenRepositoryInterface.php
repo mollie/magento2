@@ -29,13 +29,13 @@ interface PaymentTokenRepositoryInterface
     /**
      * Retrieve PaymentToken by token
      * @param string $token
-     * @return \Mollie\Payment\Api\Data\PaymentTokenInterface
+     * @return \Mollie\Payment\Api\Data\PaymentTokenInterface|null
      */
     public function getByToken($token);
 
     /**
      * Retrieve PaymentToken by order
-     * @return \Magento\Framework\Api\SearchResultsInterface
+     * @return \Mollie\Payment\Model\PaymentToken|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getByOrder(\Magento\Sales\Api\Data\OrderInterface $order);

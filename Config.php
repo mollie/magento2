@@ -14,6 +14,8 @@ class Config
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
+    const GENERAL_ENABLE_SECOND_CHANCE_EMAIL = 'payment/mollie_general/enable_second_chance_email';
+    const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_TYPE = 'payment/mollie_methods_%s/payment_surcharge_type';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
@@ -62,6 +64,24 @@ class Config
     public function sendInvoiceEmail($storeId = null)
     {
         return $this->isSetFlag(static::GENERAL_INVOICE_NOTIFY, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function isSecondChanceEmailEnabled($storeId = null)
+    {
+        return $this->isSetFlag(static::GENERAL_ENABLE_SECOND_CHANCE_EMAIL, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function secondChanceEmailTemplate($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE, $storeId);
     }
 
     /**
