@@ -46,10 +46,10 @@ class OrderReservation
     public function __construct(
         WebsiteRepositoryInterface $websiteRepository,
         Processor $priceIndexer,
-        SalesChannelInterfaceFactory $salesChannelFactory = null,
-        SalesEventInterfaceFactory $salesEventFactory = null,
-        PlaceReservationsForSalesEventInterface $placeReservationsForSalesEvent = null,
-        ItemToSellInterfaceFactory $itemToSellFactory = null
+        SalesChannelInterfaceFactory $salesChannelFactory,
+        SalesEventInterfaceFactory $salesEventFactory,
+        PlaceReservationsForSalesEventInterface $placeReservationsForSalesEvent,
+        ItemToSellInterfaceFactory $itemToSellFactory
     ) {
         $this->websiteRepository = $websiteRepository;
         $this->priceIndexer = $priceIndexer;
@@ -61,16 +61,6 @@ class OrderReservation
 
     public function execute(OrderItemInterface $orderItem)
     {
-        /**
-         * If these classes are not loaded then MSI is not available so skip the rest of the code.
-         */
-        if (!$this->salesChannelFactory ||
-            !$this->salesEventFactory ||
-            !$this->placeReservationsForSalesEvent ||
-            !$this->itemToSellFactory) {
-            return;
-        }
-
         $websiteId = $orderItem->getStore()->getWebsiteId();
         $websiteCode = $this->websiteRepository->getById($websiteId)->getCode();
         $salesChannel = $this->salesChannelFactory->create([
