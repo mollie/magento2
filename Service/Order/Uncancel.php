@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Module\Manager;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -36,20 +37,34 @@ class Uncancel
      */
     private $eventManager;
 
+    /**
+     * @var Manager
+     */
+    private $moduleManager;
+
+    /**
+     * @var bool
+     */
+    private $isInventorySalesApiEnabled;
+
     public function __construct(
         Config $config,
         OrderRepositoryInterface $orderRepository,
         OrderReservation $uncancelOrderItemReservation,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        Manager $moduleManager
     ) {
         $this->config = $config;
         $this->orderRepository = $orderRepository;
         $this->uncancelOrderItemReservation = $uncancelOrderItemReservation;
         $this->eventManager = $eventManager;
+        $this->moduleManager = $moduleManager;
     }
 
     public function execute(OrderInterface $order)
     {
+        $this->isInventorySalesApiEnabled = $this->moduleManager->isEnabled('Magento_InventorySalesApi');
+
         $this->updateOrder($order);
         $this->updateOrderItems($order);
 
@@ -86,7 +101,10 @@ class Uncancel
     {
         /** @var OrderItemInterface $item */
         foreach ($order->getAllItems() as $item) {
-            $this->uncancelOrderItemReservation->execute($item);
+            if ($this->isInventorySalesApiEnabled) {
+                $this->uncancelOrderItemReservation->execute($item);
+            }
+
             $this->uncancelItem($item);
         }
     }
