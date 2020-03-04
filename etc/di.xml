@@ -65,4 +65,10 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Payment\Service\Order\Uncancel">
+        <arguments>
+            <argument name="uncancelOrderItemReservation" xsi:type="object">\Mollie\Payment\Service\Order\Uncancel\OrderReservation\Proxy</argument>
+        </arguments>
+    </type>
 </config>
