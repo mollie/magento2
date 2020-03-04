@@ -9,6 +9,7 @@ namespace Mollie\Payment\Block\Adminhtml\Render;
 use Magento\Config\Block\System\Config\Form\Field;
 use Magento\Backend\Block\Template\Context;
 use Magento\Framework\Data\Form\Element\AbstractElement;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 
 /**
@@ -18,24 +19,23 @@ use Mollie\Payment\Helper\General as MollieHelper;
  */
 class Version extends Field
 {
-
     /**
-     * @var MollieHelper
+     * @var Config
      */
-    private $mollieHelper;
+    private $config;
 
     /**
      * Version constructor.
      *
-     * @param Context      $context
-     * @param MollieHelper $mollieHelper
+     * @param Context $context
+     * @param Config $config
      */
     public function __construct(
         Context $context,
-        MollieHelper $mollieHelper
+        Config $config
     ) {
-        $this->mollieHelper = $mollieHelper;
         parent::__construct($context);
+        $this->config = $config;
     }
 
     /**
@@ -49,7 +49,7 @@ class Version extends Field
     {
         $html = '<tr id="row_' . $element->getHtmlId() . '">';
         $html .= '  <td class="label">' . $element->getData('label') . '</td>';
-        $html .= '  <td class="value">' . $this->mollieHelper->getExtensionVersion() . '</td>';
+        $html .= '  <td class="value">' . $this->config->getVersion() . '</td>';
         $html .= '  <td></td>';
         $html .= '</tr>';
 
