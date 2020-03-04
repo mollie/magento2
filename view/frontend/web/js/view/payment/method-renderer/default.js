@@ -6,11 +6,25 @@ define(
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/quote',
+        'Magento_Checkout/js/checkout-data',
         'Magento_Customer/js/model/customer',
-        'Magento_Checkout/js/model/url-builder'
+        'Magento_Checkout/js/model/url-builder',
+        'Mollie_Payment/js/model/checkout-config'
     ],
-    function ($, url, storage, Component, placeOrderAction, quote, customer, urlBuilder) {
+    function (
+        $,
+        url,
+        storage,
+        Component,
+        placeOrderAction,
+        quote,
+        checkoutData,
+        customer,
+        urlBuilder,
+        checkoutConfigData
+    ) {
         'use strict';
+
         var checkoutConfig = window.checkoutConfig.payment;
 
         return Component.extend(
@@ -23,6 +37,12 @@ define(
                     this._super().observe([
                         'paymentToken'
                     ]);
+
+                    var config = checkoutConfigData().selectedMethod;
+                    var shouldSelect = this.item.method === config || config === 'first_mollie_method';
+                    if (!checkoutData.getSelectedPaymentMethod() && shouldSelect) {
+                        this.selectPaymentMethod();
+                    }
 
                     return this;
                 },

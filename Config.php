@@ -14,6 +14,8 @@ class Config
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
+    const GENERAL_DEFAULT_SELECTED_METHOD = 'payment/mollie_general/default_selected_method';
+    const PAYMENT_METHOD_PAYMENT_TITLE = 'payment/mollie_methods_%s/title';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_TYPE = 'payment/mollie_methods_%s/payment_surcharge_type';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
@@ -80,6 +82,15 @@ class Config
     public function getProfileId($storeId = null)
     {
         return $this->getPath(static::GENERAL_PROFILEID, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function getDefaultSelectedMethod($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_DEFAULT_SELECTED_METHOD, $storeId);
     }
 
     /**
@@ -174,6 +185,16 @@ class Config
     public function paymentlinkAllowMarkAsPaid($storeId = null)
     {
         return $this->isSetFlag(static::PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID, $storeId);
+    }
+
+    /**
+     * @param $method
+     * @param null $storeId
+     * @return string
+     */
+    public function getMethodTitle($method, $storeId = null)
+    {
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_TITLE, $method), $storeId);
     }
 
     /**
