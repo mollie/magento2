@@ -11,6 +11,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class Config
 {
+    const GENERAL_VERSION = 'payment/mollie_general/version';
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
@@ -54,6 +55,14 @@ class Config
     private function isSetFlag($path, $storeId)
     {
         return $this->config->isSetFlag($path, ScopeInterface::SCOPE_STORE, $storeId);
+    }
+
+    /**
+     * @return string
+     */
+    public function getVersion()
+    {
+        return $this->getPath(static::GENERAL_VERSION, null);
     }
 
     /**
