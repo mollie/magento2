@@ -59,7 +59,7 @@
             <label>Status Pending</label>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\Pending</source_model>
             <config_path>payment/mollie_methods_banktransfer/order_status_pending</config_path>
-            <comment><![CDATA[<b>Note:</b> We recommend using another pending state as the default Magento pending state can automatically cancel the order before the Mollie expiry time is achieved. By default the status "Pending Payment" is not visible for customers on the frontend, we advise you to create a new visible status for this, otherwise, the orders will not show up on the frontend.]]></comment>
+            <comment><![CDATA[We recommend using another 'pending' status as the default Magento pending status can automatically cancel the order before the payment expiry time is reached.<br>By default the status "Pending Payment" is not visible for customers, therefore we advise you to create a new status for this, which should also be visible to the customer, informing them they still have to complete their payment.]]></comment>
             <depends>
                 <field id="active">1</field>
             </depends>
