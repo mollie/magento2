@@ -22,7 +22,7 @@ define(
             totals: quote.getTotals(),
             isTaxDisplayedInGrandTotal: window.checkoutConfig.includeTaxInGrandTotal || false,
 
-            initialize() {
+            initialize: function() {
                 this._super();
 
                 this.price = ko.computed( function () {
