@@ -687,6 +687,7 @@ class General extends AbstractHelper
      * Returns current version of the extension for admin display
      *
      * @return mixed
+     * @deprecated since v1.12.0. The version is now determined by \Mollie\Payment\Config::getVersion.
      */
     public function getExtensionVersion()
     {
