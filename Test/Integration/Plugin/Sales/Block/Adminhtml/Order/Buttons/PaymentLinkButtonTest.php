@@ -4,13 +4,14 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order;
+namespace Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons;
 
 use Magento\Sales\Model\Order;
+use Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons\PaymentLinkButton;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Magento\Sales\Block\Adminhtml\Order\View as Subject;
 
-class ViewTest extends IntegrationTestCase
+class PaymentLinkButtonTest extends IntegrationTestCase
 {
     /**
      * @magentoConfigFixture current_store payment/mollie_methods_paymentlink/allow_mark_as_paid 0
@@ -24,9 +25,9 @@ class ViewTest extends IntegrationTestCase
 
         $subjectMock->expects($this->never())->method('addButton');
 
-        /** @var View $instance */
-        $instance = $this->objectManager->create(View::class);
-        $instance->beforeSetLayout($subjectMock);
+        /** @var PaymentLinkButton $instance */
+        $instance = $this->objectManager->create(PaymentLinkButton::class);
+        $instance->add($subjectMock);
     }
 
     /**
@@ -42,9 +43,9 @@ class ViewTest extends IntegrationTestCase
 
         $subjectMock->expects($this->never())->method('addButton');
 
-        /** @var View $instance */
-        $instance = $this->objectManager->create(View::class);
-        $instance->beforeSetLayout($subjectMock);
+        /** @var PaymentLinkButton $instance */
+        $instance = $this->objectManager->create(PaymentLinkButton::class);
+        $instance->add($subjectMock);
     }
 
     /**
@@ -61,9 +62,9 @@ class ViewTest extends IntegrationTestCase
 
         $subjectMock->expects($this->never())->method('addButton');
 
-        /** @var View $instance */
-        $instance = $this->objectManager->create(View::class);
-        $instance->beforeSetLayout($subjectMock);
+        /** @var PaymentLinkButton $instance */
+        $instance = $this->objectManager->create(PaymentLinkButton::class);
+        $instance->add($subjectMock);
     }
 
     /**
@@ -80,9 +81,9 @@ class ViewTest extends IntegrationTestCase
 
         $subjectMock->expects($this->never())->method('addButton');
 
-        /** @var View $instance */
-        $instance = $this->objectManager->create(View::class);
-        $instance->beforeSetLayout($subjectMock);
+        /** @var PaymentLinkButton $instance */
+        $instance = $this->objectManager->create(PaymentLinkButton::class);
+        $instance->add($subjectMock);
     }
 
     /**
@@ -99,8 +100,8 @@ class ViewTest extends IntegrationTestCase
 
         $subjectMock->expects($this->once())->method('addButton');
 
-        /** @var View $instance */
-        $instance = $this->objectManager->create(View::class);
-        $instance->beforeSetLayout($subjectMock);
+        /** @var PaymentLinkButton $instance */
+        $instance = $this->objectManager->create(PaymentLinkButton::class);
+        $instance->add($subjectMock);
     }
 }

@@ -6,27 +6,27 @@
 
 namespace Mollie\Payment\Model;
 
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Api\ExtensibleDataObjectConverter;
+use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
+use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Framework\Api\SearchResultsInterfaceFactory;
+use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Reflection\DataObjectProcessor;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Api\Data\PaymentTokenInterface;
-use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Api\Data\PaymentTokenInterfaceFactory;
-use Magento\Framework\Api\DataObjectHelper;
-use Magento\Framework\Exception\CouldNotDeleteException;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Reflection\DataObjectProcessor;
-use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
+use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Model\ResourceModel\PaymentToken as ResourcePaymentToken;
 use Mollie\Payment\Model\ResourceModel\PaymentToken\Collection as PaymentTokenCollection;
 use Mollie\Payment\Model\ResourceModel\PaymentToken\CollectionFactory as PaymentTokenCollectionFactory;
-use Magento\Store\Model\StoreManagerInterface;
-use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
-use Magento\Framework\Api\ExtensibleDataObjectConverter;
 
 class PaymentTokenRepository implements PaymentTokenRepositoryInterface
 {
@@ -198,7 +198,8 @@ class PaymentTokenRepository implements PaymentTokenRepositoryInterface
     /**
      * {@inheritdoc}
      */
-    public function getList(SearchCriteriaInterface $criteria) {
+    public function getList(SearchCriteriaInterface $criteria)
+    {
         /** @var PaymentTokenCollection $collection */
         $collection = $this->paymentTokenCollectionFactory->create();
 

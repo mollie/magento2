@@ -17,6 +17,7 @@ use Magento\Framework\Registry;
 use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Payment\Model\Method\Logger;
+use Magento\Quote\Api\Data\CartInterface;
 
 /**
  * Class Reorder
@@ -105,7 +106,11 @@ class Reorder extends AbstractMethod
         $order->save();
     }
 
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    /**
+     * @param CartInterface|null $quote
+     * @return bool
+     */
+    public function isAvailable(CartInterface $quote = null)
     {
         return $this->request->getModuleName() == 'mollie' && $this->request->getActionName() == 'markAsPaid';
     }
