@@ -41,14 +41,15 @@ class Transaction
     {
         $useCustomUrl = $this->config->getValue('payment/mollie_general/use_custom_redirect_url', ScopeInterface::SCOPE_STORE, $storeId);
         $customUrl = $this->config->getValue('payment/mollie_general/custom_redirect_url', ScopeInterface::SCOPE_STORE, $storeId);
+        $parameters = 'order_id=' . intval($orderId) . '&payment_token=' . $paymentToken . '&utm_nooverride=1';
 
         if ($useCustomUrl && $customUrl) {
-            return $customUrl;
+            return $customUrl . '?' . $parameters;
         }
 
         return $this->urlBuilder->getUrl(
             'mollie/checkout/process/',
-            ['_query' => 'order_id=' . intval($orderId) . '&payment_token=' . $paymentToken . '&utm_nooverride=1']
+            ['_query' => $parameters]
         );
     }
 
