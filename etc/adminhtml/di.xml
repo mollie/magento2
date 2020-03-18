@@ -18,4 +18,8 @@
             <argument name="url" xsi:type="object">Magento\Framework\Url</argument>
         </arguments>
     </type>
+
+    <type name="Magento\Email\Model\Template\Config">
+        <plugin name="mollie_payment_fix_the_path" type="Mollie\Payment\Plugin\Email\Model\Template\Config" />
+    </type>
 </config>
