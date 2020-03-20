@@ -146,7 +146,7 @@ class Order
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
             'vatRate' => sprintf("%.2f", $item->getTaxPercent()),
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
-            'sku' => $item->getSku(),
+            'sku' => substr($item->getSku(), 0, 64),
             'productUrl' => $item->getProduct() ? $item->getProduct()->getProductUrl() : null,
         ];
 
