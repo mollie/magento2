@@ -6,12 +6,24 @@
 
 namespace Mollie\Payment\Plugin\Sales;
 
+use Magento\Sales\Api\Data\OrderExtensionFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 
 class AddPaymentFeeToOrder
 {
+    /**
+     * @var OrderExtensionFactory
+     */
+    private $orderExtensionFactory;
+
+    public function __construct(
+        OrderExtensionFactory $orderExtensionFactory
+    ) {
+        $this->orderExtensionFactory = $orderExtensionFactory;
+    }
+
     public function afterGetList(
         OrderRepositoryInterface $subject,
         OrderSearchResultInterface $searchCriteria
@@ -37,7 +49,7 @@ class AddPaymentFeeToOrder
      */
     private function addMolliePaymentFeeTo(OrderInterface $entity)
     {
-        $extensionAttributes = $entity->getExtensionAttributes();
+        $extensionAttributes = $entity->getExtensionAttributes() ?? $this->orderExtensionFactory->create();
         $extensionAttributes->setMolliePaymentFee($entity->getData('mollie_payment_fee'));
         $extensionAttributes->setMolliePaymentFeeTax($entity->getData('mollie_payment_fee_tax'));
         $entity->setExtensionAttributes($extensionAttributes);
