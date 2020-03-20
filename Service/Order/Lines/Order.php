@@ -67,7 +67,8 @@ class Order
         /** @var OrderItemInterface $item */
         foreach ($order->getAllVisibleItems() as $item) {
             $isBundleProduct = $item->getProductType() == ProductType::TYPE_BUNDLE;
-            $orderLines[] = $this->getOrderLine($item, $isBundleProduct);
+            $isZeroPriceLine = $isBundleProduct && $item->getProduct() && $item->getProduct()->getPriceType() == 0;
+            $orderLines[] = $this->getOrderLine($item, $isZeroPriceLine);
 
             if ($isBundleProduct) {
                 /** @var OrderItemInterface $childItem */
