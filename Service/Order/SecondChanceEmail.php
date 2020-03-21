@@ -123,8 +123,12 @@ class SecondChanceEmail
      * @param $token
      * @return string
      */
-    private function getUrl(OrderInterface $order, $token): string
+    private function getUrl(OrderInterface $order, $token)
     {
-        return $this->url->getUrl('mollie/checkout/secondChance/', ['_scope' => $order->getStoreId(), 'order_id' => $order->getEntityId(), 'payment_token' => $token->getToken()]);
+        return $this->url->getUrl('mollie/checkout/secondChance/', [
+            '_scope' => $order->getStoreId(),
+            'order_id' => $order->getEntityId(),
+            'payment_token' => $token->getToken()
+        ]);
     }
 }
