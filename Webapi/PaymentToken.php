@@ -9,11 +9,8 @@ namespace Mollie\Payment\Webapi;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Model\QuoteIdMaskFactory;
-use Mollie\Payment\Api\Data\PaymentTokenInterface;
-use Mollie\Payment\Api\Data\PaymentTokenInterfaceFactory;
-use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface;
-use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Service\PaymentToken\Generate;
 
 class PaymentToken implements PaymentTokenRequestInterface
 {
@@ -23,49 +20,28 @@ class PaymentToken implements PaymentTokenRequestInterface
     private $cartRepository;
 
     /**
-     * @var MollieHelper
-     */
-    private $helper;
-
-    /**
      * @var QuoteIdMaskFactory
      */
     private $quoteIdMaskFactory;
 
     /**
-     * @var PaymentTokenRepositoryInterface
+     * @var Generate
      */
-    private $paymentTokenRepository;
-
-    /**
-     * @var PaymentTokenInterfaceFactory
-     */
-    private $paymentTokenFactory;
+    private $paymentToken;
 
     public function __construct(
         CartRepositoryInterface $cartRepository,
-        MollieHelper $helper,
         QuoteIdMaskFactory $quoteIdMaskFactory,
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        PaymentTokenInterfaceFactory $paymentTokenFactory
+        Generate $paymentToken
     ) {
-        $this->helper = $helper;
         $this->quoteIdMaskFactory = $quoteIdMaskFactory;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->paymentTokenFactory = $paymentTokenFactory;
         $this->cartRepository = $cartRepository;
+        $this->paymentToken = $paymentToken;
     }
 
     public function generate(CartInterface $cart)
     {
-        $token = $this->getUniquePaymentToken();
-
-        /** @var PaymentTokenInterface $model */
-        $model = $this->paymentTokenFactory->create();
-        $model->setCartId($cart->getId());
-        $model->setToken($token);
-
-        $this->paymentTokenRepository->save($model);
+        $token = $this->paymentToken->forCart($cart);
 
         return $token;
     }
@@ -83,22 +59,5 @@ class PaymentToken implements PaymentTokenRequestInterface
         $cart = $this->cartRepository->get($quoteIdMask->getQuoteId());
 
         return $this->generate($cart);
-    }
-
-    /**
-     * @return string
-     */
-    private function getUniquePaymentToken()
-    {
-        $token = $this->helper->getPaymentToken();
-
-        /**
-         * If the token already exists, call this function again to generate a new token.
-         */
-        if ($this->paymentTokenRepository->getByToken($token)) {
-            return $this->getUniquePaymentToken();
-        }
-
-        return $token;
     }
 }

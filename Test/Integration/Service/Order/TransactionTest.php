@@ -50,4 +50,20 @@ class TransactionTest extends IntegrationTestCase
 
         $this->assertContains('https://www.mollie.com', $result);
     }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/use_custom_redirect_url 1
+     * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url https://www.mollie.com
+     */
+    public function testAppendsTheParamsToTheUrl()
+    {
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+
+        $result = $instance->getRedirectUrl(9999, 'paymenttoken');
+
+        $this->assertContains('order_id=9999', $result);
+        $this->assertContains('payment_token=paymenttoken', $result);
+        $this->assertContains('utm_nooverride=1', $result);
+    }
 }

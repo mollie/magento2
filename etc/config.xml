@@ -18,6 +18,7 @@
                 <currency>1</currency>
                 <cancel_failed_orders>0</cancel_failed_orders>
                 <use_custom_redirect_url>0</use_custom_redirect_url>
+                <second_chance_email_template>payment_other_mollie_mollie_general_second_chance_email_template</second_chance_email_template>
             </mollie_general>
             <mollie_methods_bancontact>
                 <active>1</active>

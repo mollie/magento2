@@ -67,7 +67,8 @@ class Order
         /** @var OrderItemInterface $item */
         foreach ($order->getAllVisibleItems() as $item) {
             $isBundleProduct = $item->getProductType() == ProductType::TYPE_BUNDLE;
-            $orderLines[] = $this->getOrderLine($item, $isBundleProduct);
+            $isZeroPriceLine = $isBundleProduct && $item->getProduct() && $item->getProduct()->getPriceType() == 0;
+            $orderLines[] = $this->getOrderLine($item, $isZeroPriceLine);
 
             if ($isBundleProduct) {
                 /** @var OrderItemInterface $childItem */
@@ -146,7 +147,7 @@ class Order
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
             'vatRate' => sprintf("%.2f", $item->getTaxPercent()),
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
-            'sku' => $item->getSku(),
+            'sku' => substr($item->getSku(), 0, 64),
             'productUrl' => $item->getProduct() ? $item->getProduct()->getProductUrl() : null,
         ];
 

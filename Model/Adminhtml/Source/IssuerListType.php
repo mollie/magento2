@@ -6,14 +6,14 @@
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Framework\Data\OptionSourceInterface;
 
 /**
  * Class IssuerListType
  *
  * @package Mollie\Payment\Model\Adminhtml\Source
  */
-class IssuerListType implements ArrayInterface
+class IssuerListType implements OptionSourceInterface
 {
 
     /**

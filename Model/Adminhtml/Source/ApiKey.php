@@ -6,14 +6,14 @@
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Framework\Data\OptionSourceInterface;
 
 /**
  * Class ApiKey
  *
  * @package Mollie\Payment\Model\Adminhtml\Source
  */
-class ApiKey implements ArrayInterface
+class ApiKey implements OptionSourceInterface
 {
 
     /**
