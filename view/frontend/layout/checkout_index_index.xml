@@ -135,5 +135,8 @@
                 </argument>
             </arguments>
         </referenceBlock>
+        <referenceBlock name="before.body.end">
+            <block class="Mollie\Payment\Block\Checkout\CheckoutConfig" template="Mollie_Payment::checkout/checkout-config.phtml" />
+        </referenceBlock>
     </body>
 </page>

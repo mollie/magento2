@@ -6,7 +6,7 @@
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
-use Magento\Framework\Option\ArrayInterface;
+use Magento\Framework\Data\OptionSourceInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 
 /**
@@ -14,7 +14,7 @@ use Mollie\Payment\Helper\General as MollieHelper;
  *
  * @package Mollie\Payment\Model\Adminhtml\Source
  */
-class Locale implements ArrayInterface
+class Locale implements OptionSourceInterface
 {
 
     /**

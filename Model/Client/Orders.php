@@ -506,7 +506,7 @@ class Orders extends AbstractModel
         $mapping = [
             OrderStatus::STATUS_CREATED => Order::STATE_NEW,
             OrderStatus::STATUS_PAID => Order::STATE_PROCESSING,
-            OrderStatus::STATUS_AUTHORIZED => Order::STATE_PENDING_PAYMENT,
+            OrderStatus::STATUS_AUTHORIZED => Order::STATE_PROCESSING,
             OrderStatus::STATUS_CANCELED => Order::STATE_CANCELED,
             OrderStatus::STATUS_SHIPPING => Order::STATE_PROCESSING,
             OrderStatus::STATUS_COMPLETED => Order::STATE_COMPLETE,

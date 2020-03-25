@@ -1,0 +1,41 @@
+<!--@subject {{trans "Complete your payment from %store_name" store_name=$store.getFrontendName()}} @-->
+<!--@vars {
+"var link":"Second Chance URL",
+"var customer.email":"Customer Email",
+"var customer.name":"Customer Name",
+"var order.total": "Order Total",
+"var order.number": "Order Number",
+"var store.name": "Store name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<p class="greeting">{{trans "Dear %name," name=$order.getCustomerName()}}</p>
+<p>{{trans "Thank you for shopping at %store_name." store_name=$store.frontend_name}}</p>
+<p>{{trans "We noticed that you have placed an order with the following products but did not complete your payment. Use the link below to complete your order and make sure you don’t miss out on your items!"}}</p>
+
+<p>{{trans "<strong>Description:</strong> Order #%order_id from %store_name" store_name=$store.frontend_name order_id=$order.increment_id |raw}}</p>
+
+{{layout handle="sales_email_order_items" order=$order area="frontend"}}
+
+<br>
+
+<table class="button" width="100%" border="0" cellspacing="0" cellpadding="0">
+    <tr>
+        <td>
+            <table class="inner-wrapper" border="0" cellspacing="0" cellpadding="0" align="center">
+                <tr>
+                    <td align="center">
+                        <a href="{{var link }}" target="_blank">
+                            {{trans "Click here to complete your payment" }}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+
+<small>{{trans "You can ignore this email if you:<br />&bull; Do not wish to complete the order<br />&bull; Have completed the order via a different route." |raw}}</small>
+
+{{template config_path="design/email/footer_template"}}

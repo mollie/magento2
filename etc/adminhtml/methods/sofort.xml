@@ -92,7 +92,7 @@
         <field id="payment_surcharge_type" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge</label>
-            <config_path>payment/mollie_methods_applepay/payment_surcharge_type</config_path>
+            <config_path>payment/mollie_methods_sofort/payment_surcharge_type</config_path>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType</source_model>
             <depends>
                 <field id="active">1</field>
@@ -101,7 +101,7 @@
         <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge fixed amount</label>
-            <config_path>payment/mollie_methods_applepay/payment_surcharge_fixed_amount</config_path>
+            <config_path>payment/mollie_methods_sofort/payment_surcharge_fixed_amount</config_path>
             <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
             <frontend_class>validate-not-negative-number</frontend_class>
             <depends>
@@ -112,7 +112,7 @@
         <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge percentage</label>
-            <config_path>payment/mollie_methods_applepay/payment_surcharge_percentage</config_path>
+            <config_path>payment/mollie_methods_sofort/payment_surcharge_percentage</config_path>
             <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
             <frontend_class>validate-number-range number-range-0-10</frontend_class>
             <depends>
@@ -123,7 +123,7 @@
         <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge limit</label>
-            <config_path>payment/mollie_methods_applepay/payment_surcharge_limit</config_path>
+            <config_path>payment/mollie_methods_sofort/payment_surcharge_limit</config_path>
             <comment><![CDATA[Enter the maximum amount of payment surchage to should be charged to the customer.]]></comment>
             <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
             <frontend_class>validate-not-negative-number</frontend_class>
@@ -135,7 +135,7 @@
         <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="140" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment Surcharge Tax Class</label>
-            <config_path>payment/mollie_methods_applepay/payment_surcharge_tax_class</config_path>
+            <config_path>payment/mollie_methods_sofort/payment_surcharge_tax_class</config_path>
             <source_model>\Magento\Tax\Model\TaxClass\Source\Product</source_model>
             <depends>
                 <field id="active">1</field>

@@ -6,31 +6,30 @@
 
 namespace Mollie\Payment\Model;
 
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Api\AttributeValueFactory;
 use Magento\Framework\Api\ExtensionAttributesFactory;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\DataObject;
 use Magento\Framework\Data\Collection\AbstractDb;
+use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
+use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Payment\Model\Method\Logger;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Checkout\Model\Session as CheckoutSession;
-use Mollie\Payment\Config;
 use Mollie\Api\MollieApiClient;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
-use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Mollie\Payment\Service\Mollie\Timeout;
 
 /**
@@ -40,7 +39,6 @@ use Mollie\Payment\Service\Mollie\Timeout;
  */
 class Mollie extends AbstractMethod
 {
-
     /**
      * Enable Initialize
      *
@@ -219,6 +217,10 @@ class Mollie extends AbstractMethod
 
         $activeMethods = $this->mollieHelper->getAllActiveMethods($quote->getStoreId());
         if ($this->_code != 'mollie_methods_paymentlink' && !array_key_exists($this->_code, $activeMethods)) {
+            return false;
+        }
+
+        if (!$this->canUseForCountry($quote->getShippingAddress()->getCountryId())) {
             return false;
         }
 
