@@ -3,15 +3,26 @@
 namespace Mollie\Payment\Service\Order\Uncancel;
 
 use Magento\Catalog\Model\Indexer\Product\Price\Processor;
-use Magento\InventorySalesApi\Api\Data\ItemToSellInterfaceFactory;
+use Magento\Framework\App\ObjectManager;
 use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
 use Magento\InventorySalesApi\Api\Data\SalesChannelInterfaceFactory;
 use Magento\InventorySalesApi\Api\Data\SalesEventInterface;
-use Magento\InventorySalesApi\Api\Data\SalesEventInterfaceFactory;
-use Magento\InventorySalesApi\Api\PlaceReservationsForSalesEventInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
 
+/**
+ * Class OrderReservation
+ * @package Mollie\Payment\Service\Order\Uncancel
+ *
+ * This class has also some hidden dependencies not listed in the constuctor:
+ * - \Magento\InventorySalesApi\Api\Data\ItemToSellInterfac
+ * - \Magento\InventorySalesApi\Api\Data\SalesChannelInterface
+ * - \Magento\InventorySalesApi\Api\Data\SalesEventInterface
+ * - \Magento\InventorySalesApi\Api\PlaceReservationsForSalesEventInterface
+ *
+ * This class is only loaded when MSI is enabled, but when setup:di:compile runs it will still fail on thoses classes
+ * in Magento 2.2 because they don't exists. That's why they are loaded using the object manager.
+ */
 class OrderReservation
 {
     /**
@@ -20,63 +31,44 @@ class OrderReservation
     private $websiteRepository;
 
     /**
-     * @var SalesChannelInterfaceFactory
-     */
-    private $salesChannelFactory;
-
-    /**
-     * @var SalesEventInterfaceFactory
-     */
-    private $salesEventFactory;
-
-    /**
-     * @var PlaceReservationsForSalesEventInterface
-     */
-    private $placeReservationsForSalesEvent;
-
-    /**
      * @var Processor
      */
     private $priceIndexer;
+
     /**
-     * @var ItemToSellInterfaceFactory
+     * @var ObjectManager
      */
-    private $itemToSellFactory;
+    private $objectManager;
 
     public function __construct(
         WebsiteRepositoryInterface $websiteRepository,
         Processor $priceIndexer,
-        SalesChannelInterfaceFactory $salesChannelFactory,
-        SalesEventInterfaceFactory $salesEventFactory,
-        PlaceReservationsForSalesEventInterface $placeReservationsForSalesEvent,
-        ItemToSellInterfaceFactory $itemToSellFactory
+        ObjectManager $objectManager
     ) {
         $this->websiteRepository = $websiteRepository;
         $this->priceIndexer = $priceIndexer;
-        $this->salesChannelFactory = $salesChannelFactory;
-        $this->salesEventFactory = $salesEventFactory;
-        $this->placeReservationsForSalesEvent = $placeReservationsForSalesEvent;
-        $this->itemToSellFactory = $itemToSellFactory;
+        $this->objectManager = $objectManager;
     }
 
     public function execute(OrderItemInterface $orderItem)
     {
         $websiteId = $orderItem->getStore()->getWebsiteId();
         $websiteCode = $this->websiteRepository->getById($websiteId)->getCode();
-        $salesChannel = $this->salesChannelFactory->create([
+        $salesChannel = $this->objectManager->create(SalesChannelInterfaceFactory::class, [
             'data' => [
                 'type' => SalesChannelInterface::TYPE_WEBSITE,
                 'code' => $websiteCode
             ]
         ]);
 
-        $salesEvent = $this->salesEventFactory->create([
+        $salesEvent = $this->objectManager->create(SalesEventFactory::class, [
             'type' => 'order_uncanceled',
             'objectType' => SalesEventInterface::OBJECT_TYPE_ORDER,
             'objectId' => (string)$orderItem->getOrderId()
         ]);
 
-        $this->placeReservationsForSalesEvent->execute($this->getItemsToUncancel($orderItem), $salesChannel, $salesEvent);
+        $placeReservationsForSalesEvent = $this->objectManager->create(PlaceReservationsForSalesEvent::class);
+        $placeReservationsForSalesEvent->execute($this->getItemsToUncancel($orderItem), $salesChannel, $salesEvent);
 
         $this->priceIndexer->reindexRow($orderItem->getProductId());
     }
@@ -84,7 +76,7 @@ class OrderReservation
     private function getItemsToUncancel(OrderItemInterface $orderItem)
     {
         $itemsToUncancel = [];
-        $itemsToUncancel[] = $this->itemToSellFactory->create([
+        $itemsToUncancel[] = $this->objectManager->create(ItemToSellInterface::class, [
             'sku' => $orderItem->getSku(),
             // 0 - X = make it negative.
             'qty' => 0 - $orderItem->getQtyCanceled(),
@@ -92,7 +84,7 @@ class OrderReservation
 
         if ($orderItem->getHasChildren()) {
             foreach ($itemsToUncancel as $item) {
-                $itemsToUncancel[] = $this->itemToSellFactory->create([
+                $itemsToUncancel[] = $this->objectManager->create(ItemToSellInterface::class, [
                     'sku' => $orderItem->getSku(),
                     // 0 - X = make it negative.
                     'qty' => 0 - $orderItem->getQtyCanceled(),

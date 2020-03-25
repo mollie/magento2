@@ -49,9 +49,23 @@ class AddPaymentFeeToOrder
      */
     private function addMolliePaymentFeeTo(OrderInterface $entity)
     {
-        $extensionAttributes = $entity->getExtensionAttributes() ?? $this->orderExtensionFactory->create();
+        $extensionAttributes = $this->getExtensionAttributes($entity);
         $extensionAttributes->setMolliePaymentFee($entity->getData('mollie_payment_fee'));
         $extensionAttributes->setMolliePaymentFeeTax($entity->getData('mollie_payment_fee_tax'));
         $entity->setExtensionAttributes($extensionAttributes);
+    }
+
+    /**
+     * @param OrderInterface $entity
+     * @return \Magento\Sales\Api\Data\OrderExtension|\Magento\Sales\Api\Data\OrderExtensionInterface|null
+     */
+    private function getExtensionAttributes(OrderInterface $entity)
+    {
+        $extensionAttributes = $entity->getExtensionAttributes();
+        if ($extensionAttributes) {
+            return $extensionAttributes;
+        }
+
+        return $this->orderExtensionFactory->create();
     }
 }
