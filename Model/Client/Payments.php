@@ -16,6 +16,7 @@ use Magento\Sales\Model\OrderRepository;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\PaymentStatus;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
@@ -58,6 +59,10 @@ class Payments extends AbstractModel
      * @var BuildTransaction
      */
     private $buildTransaction;
+    /**
+     * @var Config
+     */
+    private $config;
 
     /**
      * Payments constructor.
@@ -69,6 +74,7 @@ class Payments extends AbstractModel
      * @param MollieHelper $mollieHelper
      * @param OrderCommentHistory $orderCommentHistory
      * @param BuildTransaction $buildTransaction
+     * @param Config $config
      */
     public function __construct(
         OrderSender $orderSender,
@@ -77,7 +83,8 @@ class Payments extends AbstractModel
         CheckoutSession $checkoutSession,
         MollieHelper $mollieHelper,
         OrderCommentHistory $orderCommentHistory,
-        BuildTransaction $buildTransaction
+        BuildTransaction $buildTransaction,
+        Config $config
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -86,6 +93,7 @@ class Payments extends AbstractModel
         $this->mollieHelper = $mollieHelper;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->buildTransaction = $buildTransaction;
+        $this->config = $config;
     }
 
     /**
@@ -178,7 +186,11 @@ class Payments extends AbstractModel
             $order->getPayment()->setAdditionalInformation('expires_at', $payment->expiresAt);
         }
 
-        $status = $this->mollieHelper->getStatusPending($order->getStoreId());
+        $status = $this->config->orderStatusPending($order->getStoreId());
+        if ($order->getPayment()->getMethod() == 'mollie_methods_banktransfer') {
+            $status = $this->config->statusPendingBanktransfer($order->getStoreId());
+        }
+
         $order->addStatusToHistory($status, __('Customer redirected to Mollie'), false);
         $order->setMollieTransactionId($payment->id);
         $this->orderRepository->save($order);
