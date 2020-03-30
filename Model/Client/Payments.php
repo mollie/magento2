@@ -186,10 +186,7 @@ class Payments extends AbstractModel
             $order->getPayment()->setAdditionalInformation('expires_at', $payment->expiresAt);
         }
 
-        $status = $this->config->orderStatusPending($order->getStoreId());
-        if ($order->getPayment()->getMethod() == 'mollie_methods_banktransfer') {
-            $status = $this->config->statusPendingBanktransfer($order->getStoreId());
-        }
+        $status = $this->mollieHelper->getPendingPaymentStatus($order);
 
         $order->addStatusToHistory($status, __('Customer redirected to Mollie'), false);
         $order->setMollieTransactionId($payment->id);

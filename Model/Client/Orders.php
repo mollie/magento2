@@ -304,10 +304,7 @@ class Orders extends AbstractModel
 
         $this->orderLines->linkOrderLines($mollieOrder->lines, $order);
 
-        $status = $this->config->orderStatusPending($order->getStoreId());
-        if ($order->getPayment()->getMethod() == 'mollie_methods_banktransfer') {
-            $status = $this->config->statusPendingBanktransfer($order->getStoreId());
-        }
+        $status = $this->mollieHelper->getPendingPaymentStatus($order);
 
         $msg = __('Customer redirected to Mollie');
         if ($order->getPayment()->getMethodInstance()->getCode() == 'mollie_methods_paymentlink') {
