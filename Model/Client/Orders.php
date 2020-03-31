@@ -25,6 +25,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\OrderLines;
@@ -123,6 +124,10 @@ class Orders extends AbstractModel
      * @var BuildTransaction
      */
     private $buildTransaction;
+    /**
+     * @var Config
+     */
+    private $config;
 
     /**
      * Orders constructor.
@@ -146,6 +151,7 @@ class Orders extends AbstractModel
      * @param State                 $orderState
      * @param Transaction           $transaction
      * @param BuildTransaction      $buildTransaction
+     * @param Config                $config
      */
     public function __construct(
         OrderLines $orderLines,
@@ -166,7 +172,8 @@ class Orders extends AbstractModel
         Expires $expires,
         State $orderState,
         Transaction $transaction,
-        BuildTransaction $buildTransaction
+        BuildTransaction $buildTransaction,
+        Config $config
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -187,6 +194,7 @@ class Orders extends AbstractModel
         $this->orderState = $orderState;
         $this->transaction = $transaction;
         $this->buildTransaction = $buildTransaction;
+        $this->config = $config;
     }
 
     /**
@@ -296,7 +304,7 @@ class Orders extends AbstractModel
 
         $this->orderLines->linkOrderLines($mollieOrder->lines, $order);
 
-        $status = $this->mollieHelper->getStatusPending($order->getStoreId());
+        $status = $this->mollieHelper->getPendingPaymentStatus($order);
 
         $msg = __('Customer redirected to Mollie');
         if ($order->getPayment()->getMethodInstance()->getCode() == 'mollie_methods_paymentlink') {
