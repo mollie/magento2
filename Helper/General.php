@@ -923,4 +923,22 @@ class General extends AbstractHelper
 
         return end($payments)->status;
     }
+
+    /**
+     * @param OrderInterface $order
+     * @return string
+     */
+    public function getPendingPaymentStatus(OrderInterface $order)
+    {
+        $status = null;
+        if ($order->getPayment()->getMethod() == 'mollie_methods_banktransfer') {
+            $status = $this->config->statusPendingBanktransfer($order->getStoreId());
+        }
+
+        if (!$status) {
+            $status = $this->config->orderStatusPending($order->getStoreId());
+        }
+
+        return $status;
+    }
 }

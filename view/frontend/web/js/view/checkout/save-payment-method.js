@@ -72,7 +72,7 @@ define([
              * and sent them with the request. In a later point in the checkout this will also be checked.
              */
             var config = window.checkoutConfig.checkoutAgreements;
-            if (config.isEnabled) {
+            if (config && config.isEnabled) {
                 var ids = config.agreements.map( function (agreement) {
                     return agreement.agreementId;
                 });

@@ -6,10 +6,6 @@ This document is created in collaboration with the merchants, agencies, the Moll
 
 ## What we're working on / what is on our backlog
 
-* **Basic Second Chance emails:** 
-Adding an option to the admin to send failed or unfinished payments a second chance email with a payment link to revive the order. This email will be sent from Magento and will be fully customizable. Emails can be sent manually, but we will add options to automate this in a future version.
-Open Issue: https://github.com/mollie/magento2/issues/212
-
 * **GraphQL support for PWA:** 
 As of version 1.11.0 we support PWA integation using REST (see [PWA-integration](https://github.com/mollie/magento2/wiki/PWA-integration)). Support for GraphQL will also be added in the near future. 
 
