@@ -81,7 +81,7 @@
 "Language Payment Page","Taal betaalpagina"
 "Let Mollie automatically detect the language or force the language from the store view.","Laat Mollie de taal automatisch detecteren of forceer een taal voor deze store-view."
 "Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Betaling van het type %1 is geweigerd. Deze beslissing is gebaseerd op de bestelling en de uitkomst van de risicobeoordeling."
-"Warning: we recommend to use a unique payment status for pending Banktransfer payments","Waarschuwing: Wij adviseren om een unieke betaalstatus the hanteren voor bankoverboekingen in de wacht"
+"Warning: We recommend to use a unique payment status for pending Banktransfer payments","Waarschuwing: Wij adviseren om een unieke betaalstatus the hanteren voor bankoverboekingen in de wacht"
 "Fetching...","Ophalen..."
 "Error While Fetching","Error tijdens ophalen"
 "Fetch Status","Status ophalen"
@@ -101,3 +101,4 @@
 "<strong>Description:</strong> Order #%order_id from %store_name", "<strong>Beschrijving:</strong> Bestelling #%order_id bij %store_name"
 "Click here to complete your payment", "Klik hier om uw betaling af te ronden"
 "You can ignore this email if you:<br />&bull; Do not wish to complete the order<br />&bull; Have completed the order via a different route.", "U kunt deze email negeren indien u:<br />&bull; Deze order niet wilt afronden<br />&bull; De order heeft afgerond op een andere manier."
+"Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Waarschuwing: Wij adviseren om de Mollie extensie te installeren met behulp van Composer. Momenteel is deze geinstalleerd in de app/code folder."
