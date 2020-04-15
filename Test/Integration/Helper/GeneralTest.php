@@ -3,6 +3,8 @@
 namespace Mollie\Payment\Test\Integration\Helper;
 
 use Magento\Framework\Locale\Resolver;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -87,5 +89,20 @@ class GeneralTest extends IntegrationTestCase
         $result = $instance->getLocaleCode(null, 'payment');
 
         $this->assertNull($result);
+    }
+
+    public function testIsPaidUsingMollieOrdersApiCatchesExceptions()
+    {
+        $order = $this->objectManager->create(OrderInterface::class);
+
+        $payment = $this->objectManager->create(OrderPaymentInterface::class);
+        $payment->setMethod('non-existing-method');
+        $order->setPayment($payment);
+
+        /** @var General $instance */
+        $instance = $this->objectManager->create(General::class);
+        $result = $instance->isPaidUsingMollieOrdersApi($order);
+
+        $this->assertFalse($result);
     }
 }
