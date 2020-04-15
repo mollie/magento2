@@ -187,11 +187,11 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
 
         foreach ($this->methodCodes as $code) {
-            $isAvailable = $this->methods[$code]->isAvailable();
             if (empty($this->methods[$code])) {
                 continue;
             }
 
+            $isActive = $this->methods[$code]->isActive();
             $config['payment']['instructions'][$code] = $this->getInstructions($code);
 
             $config['payment']['image'][$code] = '';
@@ -201,15 +201,15 @@ class MollieConfigProvider implements ConfigProviderInterface
                 $config['payment']['image'][$code] = $url;
             }
 
-            if ($isAvailable && $code == 'mollie_methods_ideal') {
+            if ($isActive && $code == 'mollie_methods_ideal') {
                 $config = $this->getIssuers($mollieApi, $code, $config);
             }
 
-            if ($isAvailable && $code == 'mollie_methods_kbc') {
+            if ($isActive && $code == 'mollie_methods_kbc') {
                 $config = $this->getIssuers($mollieApi, $code, $config);
             }
 
-            if ($isAvailable && $code == 'mollie_methods_giftcard') {
+            if ($isActive && $code == 'mollie_methods_giftcard') {
                 $config = $this->getIssuers($mollieApi, $code, $config);
             }
         }
