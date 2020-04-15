@@ -80,7 +80,7 @@
 "Language Payment Page","Language Payment Page"
 "Let Mollie automatically detect the language or force the language from the store view.","Let Mollie automatically detect the language or force a language for your store view."
 "Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment."
-"Warning: we recommend to use a unique payment status for pending Banktransfer payments","Warning: we recommend to use a unique payment status for pending Banktransfer payments"
+"Warning: We recommend to use a unique payment status for pending Banktransfer payments","Warning: We recommend to use a unique payment status for pending Banktransfer payments"
 "<strong>Please note:</strong> This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS.","<strong>Please note:</strong> This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS."
 "Fetching...","Fetching..."
 "Error While Fetching","Error While Fetching"
@@ -103,3 +103,4 @@ When to create the invoice?,When to create the invoice?
 "<strong>Description:</strong> Order #%order_id from %store_name", "<strong>Description:</strong> Order #%order_id from %store_name"
 "Click here to complete your payment.", "Click here to complete your payment."
 "You can ignore this email if you:<br />&bull; Do not wish to complete the order<br />&bull; Have completed the order via a different route.", "You can ignore this email if you:<br />&bull; Do not wish to complete the order<br />&bull; Have completed the order via a different route."
+"Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder."
