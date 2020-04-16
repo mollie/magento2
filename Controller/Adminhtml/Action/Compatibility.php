@@ -91,7 +91,7 @@ class Compatibility extends Action
      * @param \Magento\Framework\Controller\Result\Json $result
      * @return \Magento\Framework\Controller\Result\Json
      */
-    private function getPhpApiErrorMessage(\Magento\Framework\Controller\Result\Json $result): \Magento\Framework\Controller\Result\Json
+    private function getPhpApiErrorMessage(\Magento\Framework\Controller\Result\Json $result)
     {
         $results = ['<span class="mollie-error">' . $this->mollieHelper->getPhpApiErrorMessage() . '</span>'];
 
