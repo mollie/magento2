@@ -770,7 +770,12 @@ class General extends AbstractHelper
     public function isPaidUsingMollieOrdersApi(Order $order)
     {
         $method = $order->getPayment()->getMethod();
-        $methodInstance = $this->paymentHelper->getMethodInstance($method);
+        try {
+            $methodInstance = $this->paymentHelper->getMethodInstance($method);
+        } catch (\Exception $exception) {
+            return false;
+        }
+
         if (!$methodInstance instanceof \Mollie\Payment\Model\Mollie) {
             return false;
         }
