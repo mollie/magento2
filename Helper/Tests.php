@@ -131,6 +131,7 @@ class Tests extends AbstractHelper
      */
     public function compatibilityChecker()
     {
+        $results = [];
         if (class_exists('Mollie\Api\CompatibilityChecker')) {
             $compatibilityChecker = new \Mollie\Api\CompatibilityChecker();
             if (!$compatibilityChecker->satisfiesPhpVersion()) {
@@ -158,7 +159,12 @@ class Tests extends AbstractHelper
         $bankTransferActive = $this->scopeConfig->isSetFlag(static::XML_PATH_BANKTRANSFER_ACTIVE);
         $bankTransferStatus = $this->scopeConfig->getValue(static::XML_PATH_BANKTRANSFER_STATUS_PENDING);
         if ($bankTransferActive && $bankTransferStatus == 'pending_payment') {
-            $msg = __('Warning: we recommend to use a unique payment status for pending Banktransfer payments');
+            $msg = __('Warning: We recommend to use a unique payment status for pending Banktransfer payments');
+            $results[] = '<span class="mollie-error">' . $msg . '</span>';
+        }
+
+        if (stripos(__DIR__, 'app/code') !== false) {
+            $msg = __('Warning: We recommend to install the Mollie extension using Composer, currently it\'s installed in the app/code folder.');
             $results[] = '<span class="mollie-error">' . $msg . '</span>';
         }
 

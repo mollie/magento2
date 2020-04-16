@@ -577,7 +577,7 @@ class Orders extends AbstractModel
             $mollieApi = $this->loadMollieApi($apiKey);
 
             $mollieOrder = $mollieApi->orders->get($transactionId);
-            if ($mollieOrder->status != 'expired') {
+            if (!in_array($mollieOrder->status, [OrderStatus::STATUS_EXPIRED, OrderStatus::STATUS_CANCELED])) {
                 $mollieApi->orders->cancel($transactionId);
             }
         } catch (\Exception $e) {

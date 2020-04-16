@@ -71,9 +71,7 @@ class Compatibility extends Action
         $result = $this->resultJsonFactory->create();
 
         if (!class_exists('Mollie\Api\CompatibilityChecker')) {
-            $apiErrorMsg = ['<span class="mollie-error">' . $this->mollieHelper->getPhpApiErrorMessage() . '</span>'];
-            $result->setData(['success' => false, 'msg' => $apiErrorMsg]);
-            return $result;
+            return $this->getPhpApiErrorMessage($result);
         }
 
         $compatibilityResult = $this->testsHelper->compatibilityChecker();
@@ -87,5 +85,22 @@ class Compatibility extends Action
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed('Mollie_Payment::config');
+    }
+
+    /**
+     * @param \Magento\Framework\Controller\Result\Json $result
+     * @return \Magento\Framework\Controller\Result\Json
+     */
+    private function getPhpApiErrorMessage(\Magento\Framework\Controller\Result\Json $result)
+    {
+        $results = ['<span class="mollie-error">' . $this->mollieHelper->getPhpApiErrorMessage() . '</span>'];
+
+        if (stripos(__DIR__, 'app/code') !== false) {
+            $msg = __('Warning: We recommend to install the Mollie extension using Composer, currently it\'s installed in the app/code folder.');
+            $results[] = '<span class="mollie-error">' . $msg . '</span>';
+        }
+
+        $result->setData(['success' => true, 'msg' => implode('<br/>', $results)]);
+        return $result;
     }
 }
