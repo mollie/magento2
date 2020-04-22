@@ -18,6 +18,10 @@ class UncancelTest extends IntegrationTestCase
         $order = $this->loadOrder('100000001');
         $order->cancel();
 
+        foreach ($order->getItems() as $item) {
+            $item->setSku(uniqid());
+        }
+
         $this->assertEquals(100, $order->getSubtotalCanceled());
         $this->assertEquals(100, $order->getTotalCanceled());
 

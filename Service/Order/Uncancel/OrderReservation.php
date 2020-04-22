@@ -4,11 +4,13 @@ namespace Mollie\Payment\Service\Order\Uncancel;
 
 use Magento\Catalog\Model\Indexer\Product\Price\Processor;
 use Magento\Framework\App\ObjectManager;
+use Magento\InventorySales\Model\SalesEvent;
+use Magento\InventorySalesApi\Api\Data\ItemToSellInterface;
 use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
-use Magento\InventorySalesApi\Api\Data\SalesChannelInterfaceFactory;
 use Magento\InventorySalesApi\Api\Data\SalesEventInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
+use Magento\InventorySales\Model\PlaceReservationsForSalesEvent;
 
 /**
  * Class OrderReservation
@@ -54,17 +56,17 @@ class OrderReservation
     {
         $websiteId = $orderItem->getStore()->getWebsiteId();
         $websiteCode = $this->websiteRepository->getById($websiteId)->getCode();
-        $salesChannel = $this->objectManager->create(SalesChannelInterfaceFactory::class, [
+        $salesChannel = $this->objectManager->create(SalesChannelInterface::class, [
             'data' => [
                 'type' => SalesChannelInterface::TYPE_WEBSITE,
                 'code' => $websiteCode
             ]
         ]);
 
-        $salesEvent = $this->objectManager->create(SalesEventFactory::class, [
+        $salesEvent = $this->objectManager->create(SalesEvent::class, [
             'type' => 'order_uncanceled',
             'objectType' => SalesEventInterface::OBJECT_TYPE_ORDER,
-            'objectId' => (string)$orderItem->getOrderId()
+            'objectId' => (string)$orderItem->getOrderId(),
         ]);
 
         $placeReservationsForSalesEvent = $this->objectManager->create(PlaceReservationsForSalesEvent::class);

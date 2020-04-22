@@ -4,18 +4,16 @@ namespace Mollie\Payment\Helper;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use Magento\Quote\Api\Data\PaymentInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order as OrderModel;
-use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\Information;
 use Magento\Store\Model\ScopeInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Payment\Helper\General as MollieHelper;
+use PHPUnit\Framework\TestCase;
 
-class GeneralTest extends \PHPUnit\Framework\TestCase
+class GeneralTest extends TestCase
 {
     /**
      * @var ObjectManager

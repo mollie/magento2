@@ -8,6 +8,7 @@ namespace Mollie\Payment\Model\PaymentFee\Quote\Address\Total;
 
 use Magento\Checkout\Model\Session;
 use Magento\Quote\Api\Data\AddressInterface;
+use Magento\Quote\Api\Data\CartExtension;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
@@ -28,17 +29,25 @@ class PaymentFeeTest extends IntegrationTestCase
         $total = $this->objectManager->create(Total::class);
 
         $quote = $this->getQuote();
+        $extensionAttributes = $quote->getExtensionAttributes();
+
         $this->assertEquals(0, $total->getTotalAmount('mollie_payment_fee'));
         $this->assertEquals(0, $total->getBaseTotalAmount('mollie_payment_fee'));
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getMolliePaymentFee());
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getBaseMolliePaymentFee());
+
+        if ($extensionAttributes) {
+            $this->assertEquals(0, $extensionAttributes->getMolliePaymentFee());
+            $this->assertEquals(0, $extensionAttributes->getBaseMolliePaymentFee());
+        }
 
         $instance->collect($quote, $this->getShippingAssignment(), $total);
 
         $this->assertEquals(0, $total->getTotalAmount('mollie_payment_fee'));
         $this->assertEquals(0, $total->getBaseTotalAmount('mollie_payment_fee'));
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getMolliePaymentFee());
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getBaseMolliePaymentFee());
+
+        if ($extensionAttributes) {
+            $this->assertEquals(0, $extensionAttributes->getMolliePaymentFee());
+            $this->assertEquals(0, $extensionAttributes->getBaseMolliePaymentFee());
+        }
     }
 
     /**
@@ -68,18 +77,25 @@ class PaymentFeeTest extends IntegrationTestCase
         ]);
 
         $quote = $this->getQuote('mollie_methods_klarnapaylater');
+        $extensionAttributes = $quote->getExtensionAttributes();
 
         $this->assertEquals(0, $total->getTotalAmount('mollie_payment_fee'));
         $this->assertEquals(0, $total->getBaseTotalAmount('mollie_payment_fee'));
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getMolliePaymentFee());
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getBaseMolliePaymentFee());
+
+        if ($extensionAttributes) {
+            $this->assertEquals(0, $extensionAttributes->getMolliePaymentFee());
+            $this->assertEquals(0, $extensionAttributes->getBaseMolliePaymentFee());
+        }
 
         $instance->collect($quote, $shippingAssignment, $total);
 
         $this->assertEquals(1.61, $total->getTotalAmount('mollie_payment_fee'));
         $this->assertEquals(1.61, $total->getBaseTotalAmount('mollie_payment_fee'));
-        $this->assertEquals(1.61, $quote->getExtensionAttributes()->getMolliePaymentFee());
-        $this->assertEquals(1.61, $quote->getExtensionAttributes()->getBaseMolliePaymentFee());
+
+        if ($extensionAttributes) {
+            $this->assertEquals(1.61, $extensionAttributes->getMolliePaymentFee());
+            $this->assertEquals(1.61, $extensionAttributes->getBaseMolliePaymentFee());
+        }
     }
 
     /**
