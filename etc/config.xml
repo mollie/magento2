@@ -84,6 +84,16 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_kbc>
+            <mollie_methods_limonetik>
+                <active>1</active>
+                <model>Mollie\Payment\Model\Methods\Limonetik</model>
+                <title>Limonetik</title>
+                <payment_description>{ordernumber}</payment_description>
+                <method>payment</method>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_limonetik>
             <mollie_methods_paypal>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Paypal</model>

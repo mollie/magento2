@@ -19,6 +19,9 @@
         <method name="mollie_methods_kbc">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="mollie_methods_limonetik">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="mollie_methods_paypal">
             <allow_multiple_address>0</allow_multiple_address>
         </method>

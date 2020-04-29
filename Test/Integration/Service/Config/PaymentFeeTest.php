@@ -28,6 +28,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_creditcard', true],
             ['mollie_methods_ideal', true],
             ['mollie_methods_kbc', true],
+            ['mollie_methods_limonetik', true],
             ['mollie_methods_paypal', true],
             ['mollie_methods_paysafecard', true],
             ['mollie_methods_sofort', true],
