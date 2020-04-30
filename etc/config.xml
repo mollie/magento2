@@ -62,6 +62,16 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_creditcard>
+            <mollie_methods_directdebit>
+                <active>1</active>
+                <model>Mollie\Payment\Model\Methods\Directdebit</model>
+                <title>SEPA Direct Debit</title>
+                <payment_description>{ordernumber}</payment_description>
+                <method>payment</method>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+            </mollie_methods_directdebit>
             <mollie_methods_ideal>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Ideal</model>

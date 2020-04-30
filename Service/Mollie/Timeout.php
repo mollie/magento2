@@ -22,7 +22,8 @@ class Timeout
     {
         $tries = 0;
         do {
-            if ($result = $this->attemptCallback($callback)) {
+            $result = $this->attemptCallback($callback);
+            if ($result !== false) {
                 return $result;
             }
 

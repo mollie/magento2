@@ -11,6 +11,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class Config
 {
+    const GENERAL_CANCEL_FAILED_ORDERS = 'payment/mollie_general/cancel_failed_orders';
     const GENERAL_VERSION = 'payment/mollie_general/version';
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
@@ -109,7 +110,7 @@ class Config
      * @param null $storeId
      * @return bool
      */
-    public function getTestmode($storeId = null)
+    public function isTestMode($storeId = null)
     {
         return $this->getPath(static::GENERAL_TYPE, $storeId) == 'test';
     }
@@ -234,6 +235,15 @@ class Config
     public function getMethodTitle($method, $storeId = null)
     {
         return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_TITLE, $method), $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function cancelFailedOrders($storeId = null)
+    {
+        return $this->isSetFlag(static::GENERAL_CANCEL_FAILED_ORDERS, $storeId);
     }
 
     /**
