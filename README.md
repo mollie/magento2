@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://info.mollie.com/hubfs/github/magento-2/logo.png" width="128" height="128"/>
 </p>
-<h1 align="center">Mollie for Magento 2.x</h1>
+<h1 align="center">Mollie for Magento 2.2.x and higher</h1>
 
 > **Magento 1.x** users check out our [Mollie Magento 1 plugin](https://github.com/mollie/Magento).
 
