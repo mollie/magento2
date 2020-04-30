@@ -38,7 +38,7 @@ define(
                         'paymentToken'
                     ]);
 
-                    var config = checkoutConfigData().selectedMethod;
+                    var config = checkoutConfigData() ? checkoutConfigData().selectedMethod : null;
                     var shouldSelect = this.item.method === config || config === 'first_mollie_method';
                     if (!checkoutData.getSelectedPaymentMethod() && shouldSelect) {
                         this.selectPaymentMethod();
