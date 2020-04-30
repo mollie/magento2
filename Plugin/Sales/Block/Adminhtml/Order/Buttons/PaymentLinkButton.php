@@ -57,13 +57,8 @@ class PaymentLinkButton implements ButtonInterface
             return;
         }
 
-        $instance = $this->paymentHelper->getMethodInstance(Checkmo::PAYMENT_METHOD_CHECKMO_CODE);
-
-        $isAvailable = !$instance->isAvailable();
         if (!$order->canCancel() ||
-            $order->getPayment()->getMethod() != 'mollie_methods_paymentlink' ||
-            !$instance ||
-            $isAvailable
+            $order->getPayment()->getMethod() != 'mollie_methods_paymentlink'
         ) {
             return;
         }
