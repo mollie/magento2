@@ -65,4 +65,4 @@ If you experience problems with the extension installation, setup or whenever yo
 
 ## License ##
 [BSD (Berkeley Software Distribution) License](http://www.opensource.org/licenses/bsd-license.php).
-Copyright (c) 2011-2019, Mollie B.V.
+Copyright (c) 2011-2020, Mollie B.V.
