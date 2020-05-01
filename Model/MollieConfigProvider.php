@@ -38,6 +38,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         'mollie_methods_banktransfer',
         'mollie_methods_belfius',
         'mollie_methods_creditcard',
+        'mollie_methods_directdebit',
         'mollie_methods_ideal',
         'mollie_methods_kbc',
         'mollie_methods_paypal',
@@ -172,7 +173,7 @@ class MollieConfigProvider implements ConfigProviderInterface
     public function getConfig()
     {
         $config = [];
-        $config['payment']['mollie']['testmode'] = $this->config->getTestmode();
+        $config['payment']['mollie']['testmode'] = $this->config->isTestMode();
         $config['payment']['mollie']['profile_id'] = $this->config->getProfileId();
         $config['payment']['mollie']['locale'] = $this->localeResolver->getLocale();
         $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents();
