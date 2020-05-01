@@ -106,7 +106,16 @@
                 <field id="payment_surcharge_type" separator=",">fixed_fee,percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="days_before_expire" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1"
+        <field id="sort_order" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/mollie_methods_klarnapaylater/sort_order</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="days_before_expire" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Days to expire</label>
             <frontend_class>validate-digits-range digits-range-1-100</frontend_class>
