@@ -6,7 +6,6 @@
 
 namespace Mollie\Payment\Service\Order;
 
-use Magento\Backend\Model\Session\Quote;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Quote\Api\Data\CartInterface;
@@ -30,11 +29,6 @@ class Reorder
      * @var Create
      */
     private $orderCreate;
-
-    /**
-     * @var Quote
-     */
-    private $quoteSession;
 
     /**
      * @var InvoiceService
@@ -69,7 +63,6 @@ class Reorder
     public function __construct(
         Config $config,
         Create $orderCreate,
-        Quote $quoteSession,
         InvoiceService $invoiceService,
         InvoiceSender $invoiceSender,
         OrderCommentHistory $orderCommentHistory,
@@ -78,7 +71,6 @@ class Reorder
     ) {
         $this->config = $config;
         $this->orderCreate = $orderCreate;
-        $this->quoteSession = $quoteSession;
         $this->invoiceService = $invoiceService;
         $this->invoiceSender = $invoiceSender;
         $this->orderCommentHistory = $orderCommentHistory;
@@ -90,8 +82,7 @@ class Reorder
     {
         $this->transaction = $this->transactionFactory->create();
 
-        $this->cart->removeAllItems();
-        $order = $this->recreate($originalOrder);
+        $order = $this->recreate($originalOrder, $originalOrder->getPayment()->getMethod());
         $this->cancelOriginalOrder($originalOrder);
 
         $this->transaction->save();
@@ -105,7 +96,6 @@ class Reorder
     {
         $this->transaction = $this->transactionFactory->create();
 
-        $this->cart->removeAllItems();
         $order = $this->recreate($originalOrder);
         $invoice = $this->createInvoiceFor($order);
         $this->cancelOriginalOrder($originalOrder);
@@ -124,13 +114,17 @@ class Reorder
      * @return OrderInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function recreate(OrderInterface $originalOrder, $method = 'mollie_methods_reorder')
+    private function recreate(OrderInterface $originalOrder, string $method = 'mollie_methods_reorder')
     {
         $originalOrder->setReordered(true);
-        $this->quoteSession->destroy();
-        $this->quoteSession->setOrderId($originalOrder->getEntityId());
-        $this->quoteSession->setUseOldShippingMethod(true);
-        $this->orderCreate->setPaymentMethod($originalOrder->getPayment()->getMethod());
+        $session = $this->orderCreate->getSession();
+        $session->clearStorage();
+        $session->setOrderId($originalOrder->getEntityId());
+        $session->setUseOldShippingMethod(true);
+        $this->orderCreate->setPaymentMethod($method);
+        $cart = $this->orderCreate->getQuote();
+        $cart->setCustomerId($originalOrder->getCustomerId());
+        $cart->setCustomerIsGuest($originalOrder->getCustomerIsGuest());
         $this->orderCreate->initFromOrder($originalOrder);
 
         $order = $this->orderCreate->createOrder();
