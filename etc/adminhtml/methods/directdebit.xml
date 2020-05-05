@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="mollie_methods_directdebit" translate="label" type="text" sortOrder="60" showInDefault="1"
+    <group id="mollie_methods_directdebit" translate="label" type="text" sortOrder="70" showInDefault="1"
            showInWebsite="1" showInStore="1">
-        <label>Credit Card</label>
+        <label>SEPA Direct Debit</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_directdebit/active</config_path>
+            <comment><![CDATA[<strong>Please note:</strong> This payment method doesn't have a test-mode and needs to be manually enabled by the Mollie Support team based on the API Key.]]></comment>
         </field>
         <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
                showInStore="1">
@@ -29,16 +30,6 @@
             <comment><![CDATA[Click
             <a href="https://github.com/mollie/magento2/wiki/Differences-Payments-API-&-Orders-API" target="_blank">here</a>
             to read more about the differences between the Payment and Orders API.]]></comment>
-        </field>
-        <field id="use_components" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
-               showInStore="1">
-            <label>Use Mollie Components</label>
-            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-            <config_path>payment/mollie_methods_directdebit/use_components</config_path>
-            <depends>
-                <field id="active">1</field>
-            </depends>
-            <comment><![CDATA[With Components the customer can enter their credit card details within your webshop.<br><strong>Note:</strong> You need to enter your Profile ID in the general section of this extension configuration to use Mollie Components.]]></comment>
         </field>
         <field id="payment_description" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Description</label>
