@@ -68,7 +68,7 @@ class Webhook extends Action
             $result = $this->resultFactory->create(ResultFactory::TYPE_RAW);
             $result->setHeader('content-type', 'text/plain');
             $result->setContents('OK', true);
-            return;
+            return $result;
         }
 
         if ($transactionId = $this->getRequest()->getParam('id')) {
