@@ -1,10 +1,11 @@
 <?php
 
-namespace Mollie\Payment\Model\Methods;
+namespace Mollie\Payment\Test\Integration\Model\Methods;
 
+use Mollie\Payment\Model\Methods\Directdebit;
 use Mollie\Payment\Test\Unit\Model\Methods\AbstractMethodTest;
 
-class CreditcardTest extends AbstractMethodTest
+class DirectdebitTest extends AbstractMethodTest
 {
     protected $instance = Directdebit::class;
 
