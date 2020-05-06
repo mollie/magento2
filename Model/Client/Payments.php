@@ -18,6 +18,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 
@@ -63,6 +64,10 @@ class Payments extends AbstractModel
      * @var Config
      */
     private $config;
+    /**
+     * @var DashboardUrl
+     */
+    private $dashboardUrl;
 
     /**
      * Payments constructor.
@@ -75,6 +80,7 @@ class Payments extends AbstractModel
      * @param OrderCommentHistory $orderCommentHistory
      * @param BuildTransaction $buildTransaction
      * @param Config $config
+     * @param DashboardUrl $dashboardUrl
      */
     public function __construct(
         OrderSender $orderSender,
@@ -84,7 +90,8 @@ class Payments extends AbstractModel
         MollieHelper $mollieHelper,
         OrderCommentHistory $orderCommentHistory,
         BuildTransaction $buildTransaction,
-        Config $config
+        Config $config,
+        DashboardUrl $dashboardUrl
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -94,6 +101,7 @@ class Payments extends AbstractModel
         $this->orderCommentHistory = $orderCommentHistory;
         $this->buildTransaction = $buildTransaction;
         $this->config = $config;
+        $this->dashboardUrl = $dashboardUrl;
     }
 
     /**
@@ -210,6 +218,9 @@ class Payments extends AbstractModel
         $transactionId = $order->getMollieTransactionId();
         $paymentData = $mollieApi->payments->get($transactionId);
         $this->mollieHelper->addTolog($type, $paymentData);
+        $dashboardUrl = $this->dashboardUrl->forPaymentsApi($order->getStoreId(), $paymentData->id);
+        $order->getPayment()->setAdditionalInformation('dashboard_url', $dashboardUrl);
+        $order->getPayment()->setAdditionalInformation('mollie_id', $paymentData->id);
 
         $status = $paymentData->status;
         $payment = $order->getPayment();

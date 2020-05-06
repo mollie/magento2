@@ -29,6 +29,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Service\Order\BuildTransaction;
@@ -128,6 +129,10 @@ class Orders extends AbstractModel
      * @var Config
      */
     private $config;
+    /**
+     * @var DashboardUrl
+     */
+    private $dashboardUrl;
 
     /**
      * Orders constructor.
@@ -152,6 +157,7 @@ class Orders extends AbstractModel
      * @param Transaction           $transaction
      * @param BuildTransaction      $buildTransaction
      * @param Config                $config
+     * @param DashboardUrl          $dashboardUrl
      */
     public function __construct(
         OrderLines $orderLines,
@@ -173,7 +179,8 @@ class Orders extends AbstractModel
         State $orderState,
         Transaction $transaction,
         BuildTransaction $buildTransaction,
-        Config $config
+        Config $config,
+        DashboardUrl $dashboardUrl
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -195,6 +202,7 @@ class Orders extends AbstractModel
         $this->transaction = $transaction;
         $this->buildTransaction = $buildTransaction;
         $this->config = $config;
+        $this->dashboardUrl = $dashboardUrl;
     }
 
     /**
@@ -334,6 +342,9 @@ class Orders extends AbstractModel
         $mollieOrder = $mollieApi->orders->get($transactionId, ["embed" => "payments"]);
         $this->mollieHelper->addTolog($type, $mollieOrder);
         $status = $mollieOrder->status;
+        $dashboardUrl = $this->dashboardUrl->forOrdersApi($order->getStoreId(), $mollieOrder->id);
+        $order->getPayment()->setAdditionalInformation('mollie_id', $mollieOrder->id);
+        $order->getPayment()->setAdditionalInformation('dashboard_url', $dashboardUrl);
 
         $this->orderLines->updateOrderLinesByWebhook($mollieOrder->lines, $mollieOrder->isPaid());
 

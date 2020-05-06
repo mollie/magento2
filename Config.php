@@ -12,24 +12,26 @@ use Magento\Store\Model\ScopeInterface;
 class Config
 {
     const GENERAL_CANCEL_FAILED_ORDERS = 'payment/mollie_general/cancel_failed_orders';
-    const GENERAL_VERSION = 'payment/mollie_general/version';
-    const GENERAL_TYPE = 'payment/mollie_general/type';
-    const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
+    const GENERAL_DEFAULT_SELECTED_METHOD = 'payment/mollie_general/default_selected_method';
+    const GENERAL_DASHBOARD_URL_ORDERS_API = 'payment/mollie_general/dashboard_url_orders_api';
+    const GENERAL_DASHBOARD_URL_PAYMENTS_API = 'payment/mollie_general/dashboard_url_payments_api';
+    const GENERAL_ENABLE_SECOND_CHANCE_EMAIL = 'payment/mollie_general/enable_second_chance_email';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const GENERAL_ORDER_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
-    const GENERAL_DEFAULT_SELECTED_METHOD = 'payment/mollie_general/default_selected_method';
-    const GENERAL_ENABLE_SECOND_CHANCE_EMAIL = 'payment/mollie_general/enable_second_chance_email';
+    const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
-    const PAYMENT_METHOD_PAYMENT_TITLE = 'payment/mollie_methods_%s/title';
-    const PAYMENT_METHOD_PAYMENT_SURCHARGE_TYPE = 'payment/mollie_methods_%s/payment_surcharge_type';
-    const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
-    const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
-    const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
-    const PAYMENT_METHOD_PAYMENT_SURCHARGE_TAX_CLASS = 'payment/mollie_methods_%s/payment_surcharge_tax_class';
-    const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
+    const GENERAL_TYPE = 'payment/mollie_general/type';
+    const GENERAL_VERSION = 'payment/mollie_general/version';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
-    const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
+    const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_TAX_CLASS = 'payment/mollie_methods_%s/payment_surcharge_tax_class';
+    const PAYMENT_METHOD_PAYMENT_SURCHARGE_TYPE = 'payment/mollie_methods_%s/payment_surcharge_type';
+    const PAYMENT_METHOD_PAYMENT_TITLE = 'payment/mollie_methods_%s/title';
     const PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID = 'payment/mollie_methods_paymentlink/allow_mark_as_paid';
+    const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
 
     /**
      * @var ScopeConfigInterface
@@ -244,6 +246,23 @@ class Config
     public function cancelFailedOrders($storeId = null)
     {
         return $this->isSetFlag(static::GENERAL_CANCEL_FAILED_ORDERS, $storeId);
+    }
+
+    /**
+     * @return string
+     */
+    public function getDashboardUrlForOrdersApi($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_DASHBOARD_URL_ORDERS_API, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function getDashboardUrlForPaymentsApi($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_DASHBOARD_URL_PAYMENTS_API, $storeId);
     }
 
     /**
