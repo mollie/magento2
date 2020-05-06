@@ -202,3 +202,10 @@ a.mollie-tooltip:hover span {
 .mollie_methods_paymentlink_days_before_expire {
     text-indent: 5px;
 }
+
+.copy-dashboard-url {
+    cursor: pointer;
+    font-size: 175%;
+    margin-top: -10px;
+    display: inline-block;
+}
