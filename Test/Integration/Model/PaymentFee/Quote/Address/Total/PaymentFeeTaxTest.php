@@ -28,17 +28,24 @@ class PaymentFeeTaxTest extends IntegrationTestCase
         $total = $this->objectManager->create(Total::class);
 
         $quote = $this->getQuote();
+        $extensionAttributes = $quote->getExtensionAttributes();
         $this->assertEquals(0, $total->getTotalAmount('tax'));
         $this->assertEquals(0, $total->getBaseTotalAmount('tax'));
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getMolliePaymentFeeTax());
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getBaseMolliePaymentFeeTax());
+
+        if ($extensionAttributes) {
+            $this->assertEquals(0, $extensionAttributes->getMolliePaymentFeeTax());
+            $this->assertEquals(0, $extensionAttributes->getBaseMolliePaymentFeeTax());
+        }
 
         $instance->collect($quote, $this->getShippingAssignment(), $total);
 
         $this->assertEquals(0, $total->getTotalAmount('tax'));
         $this->assertEquals(0, $total->getBaseTotalAmount('tax'));
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getMolliePaymentFeeTax());
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getBaseMolliePaymentFeeTax());
+
+        if ($extensionAttributes) {
+            $this->assertEquals(0, $extensionAttributes->getMolliePaymentFeeTax());
+            $this->assertEquals(0, $extensionAttributes->getBaseMolliePaymentFeeTax());
+        }
     }
 
     /**
@@ -70,16 +77,22 @@ class PaymentFeeTaxTest extends IntegrationTestCase
         ]);
 
         $quote = $this->getQuote('mollie_methods_klarnapaylater');
+        $extensionAttributes = $quote->getExtensionAttributes();
 
         $this->assertEquals(0, $total->getTotalAmount('tax'));
         $this->assertEquals(0, $total->getBaseTotalAmount('tax'));
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getMolliePaymentFeeTax());
-        $this->assertEquals(0, $quote->getExtensionAttributes()->getBaseMolliePaymentFeeTax());
+
+        if ($extensionAttributes) {
+            $this->assertEquals(0, $extensionAttributes->getMolliePaymentFeeTax());
+            $this->assertEquals(0, $extensionAttributes->getBaseMolliePaymentFeeTax());
+        }
 
         $instance->collect($quote, $shippingAssignment, $total);
 
-        $this->assertEquals(0.33, $quote->getExtensionAttributes()->getMolliePaymentFeeTax());
-        $this->assertEquals(0.33, $quote->getExtensionAttributes()->getBaseMolliePaymentFeeTax());
+        if ($extensionAttributes) {
+            $this->assertEquals(0.33, $extensionAttributes->getMolliePaymentFeeTax());
+            $this->assertEquals(0.33, $extensionAttributes->getBaseMolliePaymentFeeTax());
+        }
     }
 
     /**
