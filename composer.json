@@ -45,7 +45,8 @@
   ],
   "require": {
     "mollie/mollie-api-php": "^2.1",
-    "magento/framework": ">=100.1.0",
+    "magento/framework": ">=101.0.0",
+    "php": ">=7.0",
     "ext-json": "*"
   },
   "type": "magento2-module",
