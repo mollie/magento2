@@ -65,7 +65,7 @@
                 <instructions/>
             </mollie_methods_creditcard>
             <mollie_methods_directdebit>
-                <active>1</active>
+                <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Directdebit</model>
                 <title>SEPA Direct Debit</title>
                 <payment_description>{ordernumber}</payment_description>
