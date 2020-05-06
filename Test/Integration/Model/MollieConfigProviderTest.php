@@ -40,8 +40,8 @@ class MollieConfigProviderTest extends IntegrationTestCase
 
         $result = $instance->getConfig();
 
-        $this->assertCount(18, $result['payment']['instructions']);
-        $this->assertCount(18, $result['payment']['image']);
+        $this->assertCount(19, $result['payment']['instructions']);
+        $this->assertCount(19, $result['payment']['image']);
 
         $this->assertArrayHasKey('mollie_methods_ideal', $result['payment']['issuersListType']);
         $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['issuersListType']);
@@ -72,7 +72,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
     public function configContainsGeneralSettingsProvider()
     {
         return [
-            ['testmode', 'getTestmode', rand(0, 1) ? 'live' : 'test'],
+            ['testmode', 'isTestMode', rand(0, 1) ? 'live' : 'test'],
             ['profile_id', 'getProfileId', 'ProfileId' . uniqid()],
         ];
     }
