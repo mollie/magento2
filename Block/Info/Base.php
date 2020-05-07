@@ -45,20 +45,20 @@ class Base extends Info
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
     public function getCheckoutType()
     {
         try {
-            $checkoutType = $this->getInfo()->getAdditionalInformation('checkout_type');
-            return $checkoutType;
+            return $this->getInfo()->getAdditionalInformation('checkout_type');
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+            return false;
         }
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
     public function getExpiresAt()
     {
@@ -69,41 +69,71 @@ class Base extends Info
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
         }
+
+        return false;
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
     public function getPaymentLink()
     {
         if ($checkoutUrl = $this->getCheckoutUrl()) {
             return $this->mollieHelper->getPaymentLinkMessage($checkoutUrl);
         }
+
+        return false;
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
     public function getCheckoutUrl()
     {
         try {
-            $checkoutUrl = $this->getInfo()->getAdditionalInformation('checkout_url');
-            return $checkoutUrl;
+            return $this->getInfo()->getAdditionalInformation('checkout_url');
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+            return false;
         }
     }
 
     /**
-     * @return string
+     * @return bool|string
      */
     public function getPaymentStatus()
     {
         try {
-            $paymentStatus = $this->getInfo()->getAdditionalInformation('payment_status');
-            return $paymentStatus;
+            return $this->getInfo()->getAdditionalInformation('payment_status');
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getDashboardUrl()
+    {
+        try {
+            return $this->getInfo()->getAdditionalInformation('dashboard_url');
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getMollieId()
+    {
+        try {
+            return $this->getInfo()->getAdditionalInformation('mollie_id');
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+            return false;
         }
     }
 

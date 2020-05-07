@@ -20,13 +20,10 @@ class Config
      */
     public function beforeGetTemplateLabel(Subject $subject, $templateId)
     {
-        return [str_replace(
-            [
-                'payment_mollie_mollie_general_second_chance_email_template',
-                'payment_us_mollie_mollie_general_second_chance_email_template',
-            ],
-            'payment_other_mollie_mollie_general_second_chance_email_template',
-            $templateId
-        )];
+        if (strpos($templateId, 'mollie_general_second_chance_email_template') !== false) {
+            return ['payment_other_mollie_mollie_general_second_chance_email_template'];
+        }
+
+        return $templateId;
     }
 }

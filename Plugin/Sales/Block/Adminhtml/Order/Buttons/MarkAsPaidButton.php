@@ -11,9 +11,11 @@ use Magento\OfflinePayments\Model\Checkmo;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Block\Adminhtml\Order\View;
+use Magento\Sales\Helper\Reorder;
+use Magento\Sales\Model\Order\Reorder\UnavailableProductsProvider;
 use Mollie\Payment\Config;
 
-class PaymentLinkButton implements ButtonInterface
+class MarkAsPaidButton implements ButtonInterface
 {
     /**
      * @var Config
@@ -35,16 +37,30 @@ class PaymentLinkButton implements ButtonInterface
      */
     private $paymentHelper;
 
+    /**
+     * @var Reorder
+     */
+    private $reorderHelper;
+
+    /**
+     * @var UnavailableProductsProvider
+     */
+    private $unavailableProductsProvider;
+
     public function __construct(
         Config $config,
         UrlInterface $url,
         OrderRepositoryInterface $orderRepository,
-        PaymentHelper $paymentHelper
+        PaymentHelper $paymentHelper,
+        Reorder $reorderHelper,
+        UnavailableProductsProvider $unavailableProductsProvider
     ) {
         $this->config = $config;
         $this->url = $url;
         $this->orderRepository = $orderRepository;
         $this->paymentHelper = $paymentHelper;
+        $this->reorderHelper = $reorderHelper;
+        $this->unavailableProductsProvider = $unavailableProductsProvider;
     }
 
     /**
@@ -53,17 +69,16 @@ class PaymentLinkButton implements ButtonInterface
     public function add(View $view)
     {
         $order = $view->getOrder();
-        if (!$this->config->paymentlinkAllowMarkAsPaid($order->getStoreId())) {
+        if (!$this->config->paymentlinkAllowMarkAsPaid($order->getStoreId()) ||
+            !$this->reorderHelper->canReorder($order->getId())
+        ) {
             return;
         }
 
-        $instance = $this->paymentHelper->getMethodInstance(Checkmo::PAYMENT_METHOD_CHECKMO_CODE);
-
-        $isAvailable = !$instance->isAvailable();
+        $unavailableProducts = $this->unavailableProductsProvider->getForOrder($order);
         if (!$order->canCancel() ||
             $order->getPayment()->getMethod() != 'mollie_methods_paymentlink' ||
-            !$instance ||
-            $isAvailable
+            $unavailableProducts
         ) {
             return;
         }

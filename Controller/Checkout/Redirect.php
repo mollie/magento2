@@ -7,20 +7,21 @@
 namespace Mollie\Payment\Controller\Checkout;
 
 use Exception;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Result\PageFactory;
+use Mollie\Payment\Model\Methods\Directdebit;
+use Mollie\Payment\Model\Mollie;
 
 /**
  * Class Redirect
@@ -51,9 +52,9 @@ class Redirect extends Action
      */
     private $orderManagement;
     /**
-     * @var ScopeConfigInterface
+     * @var Config
      */
-    private $scopeConfig;
+    private $config;
     /**
      * @var PaymentTokenRepositoryInterface
      */
@@ -72,7 +73,7 @@ class Redirect extends Action
      * @param PaymentHelper                     $paymentHelper
      * @param MollieHelper                      $mollieHelper
      * @param OrderManagementInterface          $orderManagement
-     * @param ScopeConfigInterface              $scopeConfig
+     * @param Config                            $config
      * @param PaymentTokenRepositoryInterface   $paymentTokenRepository,
      * @param OrderRepositoryInterface          $orderRepository
      */
@@ -83,7 +84,7 @@ class Redirect extends Action
         PaymentHelper $paymentHelper,
         MollieHelper $mollieHelper,
         OrderManagementInterface $orderManagement,
-        ScopeConfigInterface $scopeConfig,
+        Config $config,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         OrderRepositoryInterface $orderRepository
     ) {
@@ -92,7 +93,7 @@ class Redirect extends Action
         $this->paymentHelper = $paymentHelper;
         $this->mollieHelper = $mollieHelper;
         $this->orderManagement = $orderManagement;
-        $this->scopeConfig = $scopeConfig;
+        $this->config = $config;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->orderRepository = $orderRepository;
         parent::__construct($context);
@@ -120,9 +121,9 @@ class Redirect extends Action
 
             $method = $order->getPayment()->getMethod();
             $methodInstance = $this->paymentHelper->getMethodInstance($method);
-            if ($methodInstance instanceof \Mollie\Payment\Model\Mollie) {
+            if ($methodInstance instanceof Mollie) {
                 $storeId = $order->getStoreId();
-                $redirectUrl = $methodInstance->startTransaction($order);
+                $redirectUrl = $this->startTransaction($methodInstance, $order);
                 if ($this->mollieHelper->useLoadingScreen($storeId)) {
                     $resultPage = $this->resultPageFactory->create();
                     $resultPage->getLayout()->initMessages();
@@ -153,10 +154,7 @@ class Redirect extends Action
             return;
         }
 
-        if (!$this->scopeConfig->isSetFlag(
-            'payment/mollie_general/cancel_failed_orders',
-            ScopeInterface::SCOPE_STORE
-        )) {
+        if (!$this->config->cancelFailedOrders()) {
             return;
         }
 
@@ -215,5 +213,24 @@ class Redirect extends Action
         }
 
         return $this->orderRepository->get($model->getOrderId());
+    }
+
+    /**
+     * @param Mollie $methodInstance
+     * @param OrderInterface $order
+     * @return mixed
+     */
+    private function startTransaction(Mollie $methodInstance, OrderInterface $order)
+    {
+        $redirectUrl = $methodInstance->startTransaction($order);
+
+        /**
+         * Directdebit does not return an url when in test mode.
+         */
+        if (!$redirectUrl && $methodInstance instanceof Directdebit && $this->config->isTestMode()) {
+            $redirectUrl = $this->_url->getUrl('checkout/onepage/success/');
+        }
+
+        return $redirectUrl;
     }
 }

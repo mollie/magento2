@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: magento-test
+      MYSQL_USER: magento
+      MYSQL_PASSWORD: magento
+      MYSQL_SQL_TO_RUN: 'GRANT ALL ON *.* TO "root"@"%";'
+  web:
+    image: michielgerritsen/magento-project-community-edition:${PHP_VERSION}-${MAGENTO_VERSION}
+    container_name: magento-project-community-edition
+    depends_on:
+      - db
+    volumes:
+      - ./:/data/extensions/workdir

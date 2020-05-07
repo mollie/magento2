@@ -3,9 +3,8 @@
 namespace Mollie\Payment\Test\Ingegration\Model\Methods;
 
 use Magento\Framework\DataObject;
-use Magento\Payment\Model\InfoInterface;
+use Mollie\Payment\Model\Methods\Paymentlink;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
-use Mollie\Payment\Test\Unit\Model\Methods\AbstractMethodTest;
 
 class PaymentlinkTest extends IntegrationTestCase
 {

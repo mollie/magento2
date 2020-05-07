@@ -7,7 +7,7 @@
 namespace Mollie\Payment\Controller\Adminhtml\Action;
 
 use Magento\Backend\App\Action;
-use Magento\Framework\DB\Transaction;
+use Magento\Backend\Model\Session\Quote;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Service\Order\Reorder;
 
@@ -19,23 +19,26 @@ class MarkAsPaid extends Action
     private $orderRepository;
 
     /**
-     * @var Transaction
-     */
-    private $transaction;
-    /**
      * @var Reorder
      */
     private $reorder;
 
+    /**
+     * @var Quote
+     */
+    private $session;
+
     public function __construct(
         Action\Context $context,
         OrderRepositoryInterface $orderRepository,
-        Reorder $reorder
+        Reorder $reorder,
+        Quote $session
     ) {
         parent::__construct($context);
 
         $this->orderRepository = $orderRepository;
         $this->reorder = $reorder;
+        $this->session = $session;
     }
 
     /**
@@ -46,10 +49,10 @@ class MarkAsPaid extends Action
      */
     public function execute()
     {
-        $orderId = $this->getRequest()->getParam('order_id');
+        $this->session->clearStorage();
 
+        $orderId = $this->getRequest()->getParam('order_id');
         $originalOrder = $this->orderRepository->get($orderId);
-        $originalOrder->setReordered(true);
 
         $resultRedirect = $this->resultRedirectFactory->create();
         try {

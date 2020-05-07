@@ -660,6 +660,7 @@ class General extends AbstractHelper
             'mollie_methods_banktransfer',
             'mollie_methods_belfius',
             'mollie_methods_creditcard',
+            'mollie_methods_directdebit',
             'mollie_methods_ideal',
             'mollie_methods_kbc',
             'mollie_methods_paypal',

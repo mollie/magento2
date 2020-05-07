@@ -1,13 +1,14 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "1.12.2",
+  "version": "1.13.0",
   "keywords": [
     "mollie",
     "payment",
     "service",
     "ideal",
     "creditcard",
+    "directdebit",
     "apple pay",
     "mistercash",
     "bancontact",
@@ -44,7 +45,8 @@
   ],
   "require": {
     "mollie/mollie-api-php": "^2.1",
-    "magento/framework": ">=100.1.0",
+    "magento/framework": ">=101.0.0",
+    "php": ">=7.0",
     "ext-json": "*"
   },
   "type": "magento2-module",
