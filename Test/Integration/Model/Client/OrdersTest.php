@@ -3,6 +3,7 @@
 namespace Mollie\Payment\Model\Client;
 
 use Magento\Framework\Phrase;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
@@ -242,7 +243,7 @@ class OrdersTest extends IntegrationTestCase
             $this->assertArrayHasKey('expiresAt', $orderData);
             $this->assertNotEmpty($orderData['expiresAt']);
 
-            $now = new \DateTimeImmutable('now');
+            $now = $this->objectManager->create(TimezoneInterface::class)->scopeDate(null);
             $expected = $now->add(new \DateInterval('P5D'));
 
             $this->assertEquals($expected->format('Y-m-d'), $orderData['expiresAt']);

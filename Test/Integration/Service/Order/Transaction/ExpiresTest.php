@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Test\Integration\Service\Order\Transaction;
 
 use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -39,7 +40,7 @@ class ExpiresTest extends IntegrationTestCase
      */
     public function testReturnsTheCorrectDate()
     {
-        $now = new \DateTimeImmutable('now');
+        $now = $this->objectManager->create(TimezoneInterface::class)->scopeDate(null);
         $expected = $now->add(new \DateInterval('P5D'));
 
         /** @var Expires $instance */
