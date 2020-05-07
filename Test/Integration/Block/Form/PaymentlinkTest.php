@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Test\Integration\Block\Form;
 
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Mollie\Payment\Block\Form\Paymentlink;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -19,7 +20,7 @@ class PaymentlinkTest extends IntegrationTestCase
         /** @var Paymentlink $instance */
         $instance = $this->objectManager->create(Paymentlink::class);
 
-        $now = new \DateTimeImmutable('now');
+        $now = $this->objectManager->create(TimezoneInterface::class)->scopeDate(null);
         $expected = $now->add(new \DateInterval('P10D'));
 
         $this->assertEquals($expected->format('Y-m-d'), $instance->getExpiresAt());
