@@ -29,6 +29,8 @@ class Config
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
     const PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID = 'payment/mollie_methods_paymentlink/allow_mark_as_paid';
+    const PAYMENT_LIMONETIK_CATEGORY = 'payment/mollie_methods_limonetik/category';
+    const PAYMENT_LIMONETIK_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_limonetik/custom_attribute';
 
     /**
      * @var ScopeConfigInterface
@@ -234,6 +236,24 @@ class Config
     public function getMethodTitle($method, $storeId = null)
     {
         return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_TITLE, $method), $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function getLimonetikCategory($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_LIMONETIK_CATEGORY, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function getLimonetikCustomAttribute($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_LIMONETIK_CUSTOM_ATTRIBUTE, $storeId);
     }
 
     /**

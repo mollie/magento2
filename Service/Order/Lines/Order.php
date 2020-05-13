@@ -13,6 +13,7 @@ use Magento\Sales\Model\Order\Item;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Model\OrderLinesFactory;
+use Mollie\Payment\Service\Order\Lines\Product\LimonetikCategory;
 
 class Order
 {
@@ -46,20 +47,33 @@ class Order
      */
     private $forceBaseCurrency;
 
+    /**
+     * @var LimonetikCategory
+     */
+    private $limonetikCategory;
+
+    /**
+     * @var OrderInterface
+     */
+    private $order;
+
     public function __construct(
         MollieHelper $mollieHelper,
         StoreCredit $storeCredit,
         PaymentFee $paymentFee,
-        OrderLinesFactory $orderLinesFactory
+        OrderLinesFactory $orderLinesFactory,
+        LimonetikCategory $limonetikCategory
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->storeCredit = $storeCredit;
         $this->paymentFee = $paymentFee;
         $this->orderLinesFactory = $orderLinesFactory;
+        $this->limonetikCategory = $limonetikCategory;
     }
 
     public function get(OrderInterface $order)
     {
+        $this->order = $order;
         $this->forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
         $this->currency = $this->forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $orderLines = [];
@@ -154,6 +168,8 @@ class Order
         if ($discountAmount) {
             $orderLine['discountAmount'] = $this->mollieHelper->getAmountArray($this->currency, $discountAmount);
         }
+
+        $orderLine = $this->limonetikCategory->addToOrderLine($this->order, $item, $orderLine);
 
         return $orderLine;
     }

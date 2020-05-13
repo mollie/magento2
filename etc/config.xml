@@ -89,7 +89,8 @@
                 <model>Mollie\Payment\Model\Methods\Limonetik</model>
                 <title>Limonetik</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
+                <method>order</method>
+                <category>null</category>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
