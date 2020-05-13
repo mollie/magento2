@@ -62,6 +62,7 @@
         <arguments>
             <argument name="parts" xsi:type="array">
                 <item name="cardToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CardToken</item>
+                <item name="issuer" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\Issuer</item>
             </argument>
         </arguments>
     </type>
