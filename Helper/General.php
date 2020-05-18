@@ -669,7 +669,7 @@ class General extends AbstractHelper
             'mollie_methods_kbc',
             'mollie_methods_klarnapaylater',
             'mollie_methods_klarnasliceit',
-            'mollie_methods_limonetik',
+            'mollie_methods_mealvoucher',
             'mollie_methods_mybank',
             'mollie_methods_paypal',
             'mollie_methods_paysafecard',

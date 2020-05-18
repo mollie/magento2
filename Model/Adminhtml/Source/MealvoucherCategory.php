@@ -8,7 +8,7 @@ namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 
-class LimonetikCategory implements OptionSourceInterface
+class MealvoucherCategory implements OptionSourceInterface
 {
     const NULL = 'null';
     const FOOD_AND_DRINKS = 'food_and_drinks';

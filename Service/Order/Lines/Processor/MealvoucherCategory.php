@@ -11,7 +11,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Mollie\Payment\Config;
 
-class LimonetikCategory implements ProcessorInterface
+class MealvoucherCategory implements ProcessorInterface
 {
     /**
      * @var Config
@@ -26,11 +26,11 @@ class LimonetikCategory implements ProcessorInterface
 
     public function process($orderLine, OrderInterface $order, OrderItemInterface $orderItem = null): array
     {
-        if (!$orderItem || !$order->getPayment() || $order->getPayment()->getMethod() != 'mollie_methods_limonetik') {
+        if (!$orderItem || !$order->getPayment() || $order->getPayment()->getMethod() != 'mollie_methods_mealvoucher') {
             return $orderLine;
         }
 
-        $category = $this->config->getLimonetikCategory($order->getStoreId());
+        $category = $this->config->getMealvoucherCategory($order->getStoreId());
         if ($category == 'custom_attribute') {
             $orderLine['category'] = $this->getCustomAttribute($orderItem, $orderLine);
             return $orderLine;
@@ -45,6 +45,6 @@ class LimonetikCategory implements ProcessorInterface
         /** @var ProductInterface $product */
         $product = $orderItem->getProduct();
 
-        return $product->getData($this->config->getLimonetikCustomAttribute());
+        return $product->getData($this->config->getMealvoucherCustomAttribute());
     }
 }

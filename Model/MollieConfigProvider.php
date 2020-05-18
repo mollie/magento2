@@ -40,7 +40,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         'mollie_methods_creditcard',
         'mollie_methods_ideal',
         'mollie_methods_kbc',
-        'mollie_methods_limonetik',
+        'mollie_methods_mealvoucher',
         'mollie_methods_paypal',
         'mollie_methods_paysafecard',
         'mollie_methods_sofort',

@@ -6,14 +6,14 @@
 
 namespace Mollie\Payment\Model\Methods;
 
-class Limonetik extends \Mollie\Payment\Model\Mollie
+class Mealvoucher extends \Mollie\Payment\Model\Mollie
 {
     /**
      * Payment method code
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_limonetik';
+    protected $_code = 'mollie_methods_mealvoucher';
 
     /**
      * Info instructions block path

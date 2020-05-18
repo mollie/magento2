@@ -6,19 +6,19 @@
 
 namespace Mollie\Payment\Test\Unit\Model\Adminhtml\Source;
 
-use Mollie\Payment\Model\Adminhtml\Source\LimonetikCategory;
+use Mollie\Payment\Model\Adminhtml\Source\MealvoucherCategory;
 use Mollie\Payment\Test\Unit\UnitTestCase;
 
-class LimonetikCategoryTest extends UnitTestCase
+class MealvoucherCategoryTest extends UnitTestCase
 {
     public function returnsTheRightOptions()
     {
         return [
-            [LimonetikCategory::FOOD_AND_DRINKS],
-            [LimonetikCategory::HOME_AND_GARDEN],
-            [LimonetikCategory::GIFTS_AND_FLOWERS],
-            [LimonetikCategory::NULL],
-            [LimonetikCategory::CUSTOM_ATTRIBUTE],
+            [MealvoucherCategory::FOOD_AND_DRINKS],
+            [MealvoucherCategory::HOME_AND_GARDEN],
+            [MealvoucherCategory::GIFTS_AND_FLOWERS],
+            [MealvoucherCategory::NULL],
+            [MealvoucherCategory::CUSTOM_ATTRIBUTE],
         ];
     }
 
@@ -27,8 +27,8 @@ class LimonetikCategoryTest extends UnitTestCase
      */
     public function testReturnsTheRightOptions($type)
     {
-        /** @var LimonetikCategory $instance */
-        $instance = $this->objectManager->getObject(LimonetikCategory::class);
+        /** @var MealvoucherCategory $instance */
+        $instance = $this->objectManager->getObject(MealvoucherCategory::class);
         $options = $instance->toOptionArray();
 
         foreach ($options as $option) {

@@ -84,17 +84,17 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_kbc>
-            <mollie_methods_limonetik>
+            <mollie_methods_mealvoucher>
                 <active>1</active>
-                <model>Mollie\Payment\Model\Methods\Limonetik</model>
-                <title>Limonetik</title>
+                <model>Mollie\Payment\Model\Methods\Mealvoucher</model>
+                <title>Mealvoucher</title>
                 <payment_description>{ordernumber}</payment_description>
                 <method>order</method>
                 <category>null</category>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
-            </mollie_methods_limonetik>
+            </mollie_methods_mealvoucher>
             <mollie_methods_paypal>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Paypal</model>
