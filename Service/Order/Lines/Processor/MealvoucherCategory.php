@@ -32,7 +32,8 @@ class MealvoucherCategory implements ProcessorInterface
 
         $category = $this->config->getMealvoucherCategory($order->getStoreId());
         if ($category == 'custom_attribute') {
-            $orderLine['category'] = $this->getCustomAttribute($orderItem, $orderLine);
+            $orderLine['category'] = $this->getCustomAttribute($orderItem);
+
             return $orderLine;
         }
 
@@ -45,6 +46,6 @@ class MealvoucherCategory implements ProcessorInterface
         /** @var ProductInterface $product */
         $product = $orderItem->getProduct();
 
-        return $product->getData($this->config->getMealvoucherCustomAttribute());
+        return $product->getAttributeText($this->config->getMealvoucherCustomAttribute());
     }
 }
