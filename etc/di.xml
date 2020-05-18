@@ -77,4 +77,12 @@
             <argument name="identityContainer" xsi:type="object">Magento\Sales\Model\Order\Email\Container\OrderIdentity</argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Payment\Service\Order\Lines\OrderLinesProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="limonetikCategory" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\LimonetikCategory</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

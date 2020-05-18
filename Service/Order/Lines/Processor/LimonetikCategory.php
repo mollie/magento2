@@ -4,14 +4,14 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Order\Lines\Product;
+namespace Mollie\Payment\Service\Order\Lines\Processor;
 
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Mollie\Payment\Config;
 
-class LimonetikCategory
+class LimonetikCategory implements ProcessorInterface
 {
     /**
      * @var Config
@@ -24,8 +24,12 @@ class LimonetikCategory
         $this->config = $config;
     }
 
-    public function addToOrderLine(OrderInterface $order, OrderItemInterface $orderItem, $orderLine)
+    public function process($orderLine, OrderInterface $order, OrderItemInterface $orderItem = null): array
     {
+        if (!$orderItem || !$order->getPayment() || $order->getPayment()->getMethod() != 'mollie_methods_limonetik') {
+            return $orderLine;
+        }
+
         $category = $this->config->getLimonetikCategory($order->getStoreId());
         if ($category == 'custom_attribute') {
             $orderLine['category'] = $this->getCustomAttribute($orderItem, $orderLine);
@@ -36,7 +40,7 @@ class LimonetikCategory
         return $orderLine;
     }
 
-    private function getCustomAttribute(OrderItemInterface $orderItem, $orderLine)
+    private function getCustomAttribute(OrderItemInterface $orderItem)
     {
         /** @var ProductInterface $product */
         $product = $orderItem->getProduct();
