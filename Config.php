@@ -23,6 +23,7 @@ class Config
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_VERSION = 'payment/mollie_general/version';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
+    const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
@@ -142,6 +143,15 @@ class Config
     public function creditcardUseComponents($storeId = null)
     {
         return $this->isSetFlag(static::PAYMENT_CREDITCARD_USE_COMPONENTS, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function creditcardEnableCustomersApi($storeId = null)
+    {
+        return $this->isSetFlag(static::PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API, $storeId);
     }
 
     /**
