@@ -15,13 +15,21 @@ class StoreCredit
     private $mollieHelper;
 
     /**
+     * @var OrderLinesProcessor
+     */
+    private $orderLinesProcessor;
+
+    /**
      * StoreCredit constructor.
      * @param General $mollieHelper
+     * @param OrderLinesProcessor $orderLinesProcessor
      */
     public function __construct(
-        General $mollieHelper
+        General $mollieHelper,
+        OrderLinesProcessor $orderLinesProcessor
     ) {
         $this->mollieHelper = $mollieHelper;
+        $this->orderLinesProcessor = $orderLinesProcessor;
     }
 
     public function orderHasStoreCredit(OrderInterface $order)
@@ -63,7 +71,7 @@ class StoreCredit
         $vatRate = $this->getVatRate($order, $forceBaseCurrency);
         $vatAmount = $this->getVatAmount($order, $forceBaseCurrency);
 
-        return [
+        $orderLine = [
             'type' => 'store_credit',
             'name' => __('Store Credit'),
             'quantity' => 1,
@@ -72,6 +80,8 @@ class StoreCredit
             'vatRate' => $vatRate,
             'vatAmount' => $this->mollieHelper->getAmountArray($currency, $vatAmount),
         ];
+
+        return $this->orderLinesProcessor->process($orderLine, $order);
     }
 
     /**

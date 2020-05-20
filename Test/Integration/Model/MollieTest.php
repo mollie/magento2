@@ -3,6 +3,7 @@
 namespace Mollie\Payment\Model;
 
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Exceptions\ApiException;
@@ -181,5 +182,33 @@ class MollieTest extends IntegrationTestCase
         $instance->assignData($data);
 
         $this->assertEquals('abc123', $payment->getAdditionalInformation()['card_token']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
+     */
+    public function testDoesNotFallbackOnPaymentsApiForSpecificMethods()
+    {
+        $this->expectException(LocalizedException::class);
+
+        $order = $this->loadOrder('100000001');
+        $order->getPayment()->setMethod('mollie_methods_mealvoucher');
+
+        $ordersApi = $this->createMock(Orders::class);
+        $ordersApi->expects($this->once())->method('startTransaction')->willThrowException(
+            new \Exception('[test] Error while starting transaction')
+        );
+
+        $paymentsApi = $this->createMock(Payments::class);
+        $paymentsApi->expects($this->never())->method('startTransaction');
+
+        /** @var Mollie $instance */
+        $instance = $this->objectManager->create(Mollie::class, [
+            'ordersApi' => $ordersApi,
+            'paymentsApi' => $paymentsApi,
+        ]);
+
+        $instance->startTransaction($order);
     }
 }

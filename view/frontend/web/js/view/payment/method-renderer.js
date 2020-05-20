@@ -29,6 +29,7 @@ define(
             {type: 'mollie_methods_directdebit', component: defaultComponent},
             {type: 'mollie_methods_ideal', component: idealComponent},
             {type: 'mollie_methods_kbc', component: kbcComponent},
+            {type: 'mollie_methods_mealvoucher', component: defaultComponent},
             {type: 'mollie_methods_paypal', component: defaultComponent},
             {type: 'mollie_methods_paysafecard', component: defaultComponent},
             {type: 'mollie_methods_sofort', component: defaultComponent},
