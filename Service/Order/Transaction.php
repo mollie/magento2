@@ -47,6 +47,7 @@ class Transaction
             return $customUrl . '?' . $parameters;
         }
 
+        $this->urlBuilder->setScope($storeId);
         return $this->urlBuilder->getUrl(
             'mollie/checkout/process/',
             ['_query' => $parameters]
