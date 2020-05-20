@@ -85,7 +85,7 @@
                 <instructions/>
             </mollie_methods_kbc>
             <mollie_methods_mealvoucher>
-                <active>1</active>
+                <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Mealvoucher</model>
                 <title>Mealvoucher</title>
                 <payment_description>{ordernumber}</payment_description>
