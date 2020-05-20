@@ -11,7 +11,11 @@ type MollieTransactionOutput {
 }
 
 type Cart {
-    mollie_available_issuers: [MollieIssuer!] @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\AvailableIssuers") @doc(description: "Available issuers for this payment method")
+    mollie_available_issuers: [MollieIssuer!] @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\AvailableIssuersForCart") @doc(description: "Available issuers for the selected payment method")
+}
+
+type AvailablePaymentMethod {
+    mollie_available_issuers: [MollieIssuer!] @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\AvailableIssuersForMethod") @doc(description: "Available issuers for this payment method")
 }
 
 type MollieIssuer {
