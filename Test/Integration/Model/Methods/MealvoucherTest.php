@@ -30,6 +30,7 @@ class MealvoucherTest extends IntegrationTestCase
     /**
      * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      * @magentoConfigFixture default_store payment/mollie_methods_mealvoucher/category food_and_drinks
+     * @magentoConfigFixture default_store payment/mollie_methods_mealvoucher/active 1
      * @magentoConfigFixture default_store payment/mollie_general/enabled true
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
