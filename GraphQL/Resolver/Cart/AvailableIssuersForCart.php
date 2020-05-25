@@ -14,7 +14,7 @@ use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 
-class AvailableIssuers implements ResolverInterface
+class AvailableIssuersForCart implements ResolverInterface
 {
     /**
      * @var Mollie
@@ -54,30 +54,6 @@ class AvailableIssuers implements ResolverInterface
             return null;
         }
 
-        $apiKey = $this->mollieHelper->getApiKey();
-
-        try {
-            $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
-        } catch (\Exception $e) {
-            $this->mollieHelper->addTolog('error', $e->getMessage());
-            return null;
-        }
-
-        $issuers = $this->getIssuers->execute($mollieApi, $method, 'radio');
-
-        $output = [];
-        foreach ($issuers as $issuer) {
-            $issuer = (array)$issuer;
-            $issuer['image'] = (array)$issuer['image'];
-
-            $output[] = [
-                'name' => $issuer['name'],
-                'code' => $issuer['id'],
-                'image' => $issuer['image']['size2x'],
-                'svg' => $issuer['image']['svg'],
-            ];
-        }
-
-        return $output;
+        return $this->getIssuers->getForGraphql($cart->getStoreId(), $method);
     }
 }

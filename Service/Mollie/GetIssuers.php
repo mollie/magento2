@@ -69,4 +69,26 @@ class GetIssuers
 
         return $result;
     }
+
+    public function getForGraphql($storeId, $method)
+    {
+        $mollieApi = $this->mollieModel->getMollieApi($storeId);
+
+        $issuers = $this->execute($mollieApi, $method, 'radio');
+
+        $output = [];
+        foreach ($issuers as $issuer) {
+            $issuer = (array)$issuer;
+            $issuer['image'] = (array)$issuer['image'];
+
+            $output[] = [
+                'name' => $issuer['name'],
+                'code' => $issuer['id'],
+                'image' => $issuer['image']['size2x'],
+                'svg' => $issuer['image']['svg'],
+            ];
+        }
+
+        return $output;
+    }
 }
