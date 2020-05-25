@@ -56,7 +56,10 @@
   ],
   "autoload": {
     "files": [
-      "registration.php"
+      "registration.php",
+      "LegacySupport/GraphQl/Field.php",
+      "LegacySupport/GraphQl/ResolveInfo.php",
+      "LegacySupport/GraphQl/ResolverInterface.php"
     ],
     "psr-4": {
       "Mollie\\Payment\\": ""
