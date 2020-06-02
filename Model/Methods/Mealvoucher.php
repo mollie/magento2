@@ -26,7 +26,7 @@ class Mealvoucher extends \Mollie\Payment\Model\Mollie
 
     public function isAvailable(CartInterface $quote = null)
     {
-        if (!$this->config->getMealvoucherCategory($quote->getStoreId())) {
+        if ($quote && !$this->config->getMealvoucherCategory($quote->getStoreId())) {
             return false;
         }
 
