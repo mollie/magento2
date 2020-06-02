@@ -10,6 +10,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\ObjectManagerInterface;
 use Mollie\Payment\Model\Mollie as MollieModel;
+use Mollie\Payment\Service\Mollie\Compatibility\TestExtensionAttributes;
 
 /**
  * Class Tests
@@ -29,21 +30,28 @@ class Tests extends AbstractHelper
      * @var MollieModel
      */
     private $mollieModel;
+    /**
+     * @var TestExtensionAttributes
+     */
+    private $testExtensionAttributes;
 
     /**
      * Tests constructor.
      *
-     * @param Context                $context
-     * @param ObjectManagerInterface $objectManager
-     * @param MollieModel            $mollieModel
+     * @param Context                 $context
+     * @param ObjectManagerInterface  $objectManager
+     * @param MollieModel             $mollieModel
+     * @param TestExtensionAttributes $testExtensionAttributes
      */
     public function __construct(
         Context $context,
         ObjectManagerInterface $objectManager,
-        MollieModel $mollieModel
+        MollieModel $mollieModel,
+        TestExtensionAttributes $testExtensionAttributes
     ) {
         $this->objectManager = $objectManager;
         $this->mollieModel = $mollieModel;
+        $this->testExtensionAttributes = $testExtensionAttributes;
         parent::__construct($context);
     }
 
@@ -167,6 +175,8 @@ class Tests extends AbstractHelper
             $msg = __('Warning: We recommend to install the Mollie extension using Composer, currently it\'s installed in the app/code folder.');
             $results[] = '<span class="mollie-error">' . $msg . '</span>';
         }
+
+        $results = $this->testExtensionAttributes->execute($results);
 
         return $results;
     }
