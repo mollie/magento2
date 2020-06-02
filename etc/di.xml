@@ -87,4 +87,12 @@
     <type name="Magento\Customer\Api\CustomerRepositoryInterface">
         <plugin name="mollie_customer_id_extension_attributes" type="Mollie\Payment\Plugin\Customer\CustomerId" />
     </type>
+
+    <type name="Mollie\Payment\Service\Order\Lines\OrderLinesProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="mealvoucherCategory" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\MealvoucherCategory</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

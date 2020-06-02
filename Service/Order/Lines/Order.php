@@ -9,7 +9,6 @@ namespace Mollie\Payment\Service\Order\Lines;
 use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
-use Magento\Sales\Model\Order\Item;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Model\OrderLinesFactory;
@@ -46,20 +45,33 @@ class Order
      */
     private $forceBaseCurrency;
 
+    /**
+     * @var OrderInterface
+     */
+    private $order;
+
+    /**
+     * @var OrderLinesProcessor
+     */
+    private $orderLinesProcessor;
+
     public function __construct(
         MollieHelper $mollieHelper,
         StoreCredit $storeCredit,
         PaymentFee $paymentFee,
-        OrderLinesFactory $orderLinesFactory
+        OrderLinesFactory $orderLinesFactory,
+        OrderLinesProcessor $orderLinesProcessor
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->storeCredit = $storeCredit;
         $this->paymentFee = $paymentFee;
         $this->orderLinesFactory = $orderLinesFactory;
+        $this->orderLinesProcessor = $orderLinesProcessor;
     }
 
     public function get(OrderInterface $order)
     {
+        $this->order = $order;
         $this->forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
         $this->currency = $this->forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $orderLines = [];
@@ -155,7 +167,7 @@ class Order
             $orderLine['discountAmount'] = $this->mollieHelper->getAmountArray($this->currency, $discountAmount);
         }
 
-        return $orderLine;
+        return $this->orderLinesProcessor->process($orderLine, $this->order, $item);
     }
 
     /**
@@ -190,7 +202,8 @@ class Order
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
             'sku' => $order->getShippingMethod()
         ];
-        return $orderLine;
+
+        return $this->orderLinesProcessor->process($orderLine, $this->order);
     }
 
     /**

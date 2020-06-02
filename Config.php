@@ -33,6 +33,8 @@ class Config
     const PAYMENT_METHOD_PAYMENT_TITLE = 'payment/mollie_methods_%s/title';
     const PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID = 'payment/mollie_methods_paymentlink/allow_mark_as_paid';
     const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
+    const PAYMENT_MEALVOUCHER_CATEGORY = 'payment/mollie_methods_mealvoucher/category';
+    const PAYMENT_MEALVOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_mealvoucher/custom_attribute';
 
     /**
      * @var ScopeConfigInterface
@@ -251,6 +253,7 @@ class Config
 
     /**
      * @param null $storeId
+<<<<<<< HEAD
      * @return bool
      */
     public function cancelFailedOrders($storeId = null)
@@ -273,6 +276,29 @@ class Config
     public function getDashboardUrlForPaymentsApi($storeId = null)
     {
         return $this->getPath(static::GENERAL_DASHBOARD_URL_PAYMENTS_API, $storeId);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMealvoucherCategory($storeId = null)
+    {
+        $value = $this->getPath(static::PAYMENT_MEALVOUCHER_CATEGORY, $storeId);
+
+        if ($value == 'null') {
+            return null;
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function getMealvoucherCustomAttribute($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_MEALVOUCHER_CUSTOM_ATTRIBUTE, $storeId);
     }
 
     /**

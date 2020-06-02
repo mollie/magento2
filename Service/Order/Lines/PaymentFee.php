@@ -17,13 +17,21 @@ class PaymentFee
     private $mollieHelper;
 
     /**
+     * @var OrderLinesProcessor
+     */
+    private $orderLinesProcessor;
+
+    /**
      * StoreCredit constructor.
      * @param General $mollieHelper
+     * @param OrderLinesProcessor $orderLinesProcessor
      */
     public function __construct(
-        General $mollieHelper
+        General $mollieHelper,
+        OrderLinesProcessor $orderLinesProcessor
     ) {
         $this->mollieHelper = $mollieHelper;
+        $this->orderLinesProcessor = $orderLinesProcessor;
     }
 
     /**
@@ -51,7 +59,7 @@ class PaymentFee
             $vatRate = round(($taxAmount / $amount) * 100, 2);
         }
 
-        return [
+        $orderLine = [
             'type' => 'surcharge',
             'name' => __('Payment Fee'),
             'quantity' => 1,
@@ -60,5 +68,7 @@ class PaymentFee
             'vatRate' => $vatRate,
             'vatAmount' => $this->mollieHelper->getAmountArray($currency, $taxAmount),
         ];
+
+        return $this->orderLinesProcessor->process($orderLine, $order);
     }
 }
