@@ -21,6 +21,7 @@ class TestExtensionAttributesTest extends IntegrationTestCase
                     public function getBaseMolliePaymentFee() {}
                     public function getMolliePaymentFeeTax() {}
                     public function getBaseMolliePaymentFeeTax() {}
+                    public function getMollieCustomerId() {}
                 };
             }
         };
