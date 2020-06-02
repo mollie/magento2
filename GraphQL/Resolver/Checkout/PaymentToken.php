@@ -7,11 +7,14 @@
 namespace Mollie\Payment\GraphQL\Resolver\Checkout;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Query\ResolverInterface;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Service\PaymentToken\Generate;
 
-class PaymentToken
+class PaymentToken implements ResolverInterface
 {
     /**
      * @var OrderRepositoryInterface
@@ -48,7 +51,7 @@ class PaymentToken
     /**
      * @inheritDoc
      */
-    public function resolve($field, $context, $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
     {
         $order = $this->getOrderByIncrementId($value['order_id']);
 

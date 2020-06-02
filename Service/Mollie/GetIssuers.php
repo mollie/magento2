@@ -78,6 +78,9 @@ class GetIssuers
 
         $output = [];
         foreach ($issuers as $issuer) {
+            $issuer = (array)$issuer;
+            $issuer['image'] = (array)$issuer['image'];
+
             $output[] = [
                 'name' => $issuer['name'],
                 'code' => $issuer['id'],

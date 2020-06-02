@@ -72,7 +72,18 @@ class PaymentTokenTest extends IntegrationTestCase
                 'isList' => false,
             ]),
             $this->objectManager->create(\Magento\Framework\GraphQl\Query\Resolver\ContextInterface::class),
-            null,
+            $this->objectManager->create(\Magento\Framework\GraphQl\Schema\Type\ResolveInfo::class, [
+                'fieldName' => 'testfield',
+                'fieldNodes' => [],
+                'returnType' => 'string',
+                'parentType' => new \GraphQL\Type\Definition\ObjectType(['name' => 'testfield']),
+                'path' => [],
+                'schema' => $this->objectManager->create(\GraphQL\Type\Schema::class, ['config' => []]),
+                'fragments' => [],
+                'rootValue' => '',
+                'operation' => null,
+                'variableValues' => [],
+            ]),
             $value,
             $args
         );

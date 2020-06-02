@@ -6,12 +6,15 @@
 
 namespace Mollie\Payment\GraphQL\Resolver\Cart;
 
+use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 
-class AvailableIssuersForCart
+class AvailableIssuersForCart implements ResolverInterface
 {
     /**
      * @var Mollie
@@ -41,7 +44,7 @@ class AvailableIssuersForCart
     /**
      * @inheritDoc
      */
-    public function resolve($field, $context, $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
     {
         /** @var CartInterface $cart */
         $cart = $value['model'];

@@ -6,10 +6,13 @@
 
 namespace Mollie\Payment\GraphQL\Resolver\Checkout;
 
+use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\Framework\GraphQl\Query\ResolverInterface;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Mollie\Payment\Service\Order\StartTransaction;
 
-class CreateMollieTransaction
+class CreateMollieTransaction implements ResolverInterface
 {
     /**
      * @var StartTransaction
@@ -30,7 +33,7 @@ class CreateMollieTransaction
     /**
      * @inheritDoc
      */
-    public function resolve($field, $context, $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
     {
         self::$issuer = isset($args['input']['issuer']) ? $args['input']['issuer'] : null;
         $paymentToken = $args['input']['payment_token'];
