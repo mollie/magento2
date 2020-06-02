@@ -190,7 +190,7 @@ class Payments extends AbstractModel
         $order->getPayment()->setAdditionalInformation('checkout_url', $payment->getCheckoutUrl());
         $order->getPayment()->setAdditionalInformation('checkout_type', self::CHECKOUT_TYPE);
         $order->getPayment()->setAdditionalInformation('payment_status', $payment->status);
-        if (isset($paymentData->expiresAt)) {
+        if (isset($payment->expiresAt)) {
             $order->getPayment()->setAdditionalInformation('expires_at', $payment->expiresAt);
         }
 

@@ -13,7 +13,7 @@ $specificInfo = $block->getSpecificInformation();
 $status = $block->getPaymentStatus();
 ?>
 <div class="mollie-method">
-    <img src="<?= $block->escapeUrl($this->getViewFileUrl('Mollie_Payment::images/' . $this->getPaymentImage())) ?>"/>
+    <img src="<?= $block->escapeUrl($block->getViewFileUrl('Mollie_Payment::images/' . $block->getPaymentImage())) ?>"/>
     <?= $block->escapeHtml($block->getMethod()->getTitle()); ?>
     <table class="data-table admin__table-secondary">
         <tbody>
