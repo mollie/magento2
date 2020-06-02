@@ -132,7 +132,6 @@ class Payments extends AbstractModel
             'redirectUrl'    => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
             'webhookUrl'     => $this->mollieHelper->getWebhookUrl(),
             'method'         => $method,
-            'issuer'         => isset($additionalData['selected_issuer']) ? $additionalData['selected_issuer'] : null,
             'metadata'       => [
                 'order_id'      => $orderId,
                 'store_id'      => $order->getStoreId(),

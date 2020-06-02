@@ -1,0 +1,31 @@
+type Mutation {
+    createMollieTransaction(input: MollieTransactionInput): MollieTransactionOutput @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\CreateMollieTransaction")
+}
+
+type Order {
+    mollie_payment_token: String @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\PaymentToken")
+}
+
+type MollieTransactionOutput {
+    checkout_url: String
+}
+
+type Cart {
+    mollie_available_issuers: [MollieIssuer!] @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\AvailableIssuersForCart") @doc(description: "Available issuers for the selected payment method")
+}
+
+type AvailablePaymentMethod {
+    mollie_available_issuers: [MollieIssuer!] @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\AvailableIssuersForMethod") @doc(description: "Available issuers for this payment method")
+}
+
+type MollieIssuer {
+    name: String
+    code: String
+    image: String!
+    svg: String!
+}
+
+input MollieTransactionInput {
+    payment_token: String!
+    issuer: String
+}
