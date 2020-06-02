@@ -13,4 +13,8 @@
         <attribute code="mollie_payment_fee_tax" type="float" />
         <attribute code="base_mollie_payment_fee_tax" type="float" />
     </extension_attributes>
+
+    <extension_attributes for="Magento\Customer\Api\Data\CustomerInterface">
+        <attribute code="mollie_customer_id" type="string" />
+    </extension_attributes>
 </config>

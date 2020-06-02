@@ -7,6 +7,10 @@
     <preference for="Mollie\Payment\Api\Data\PaymentTokenInterface" type="Mollie\Payment\Model\Data\PaymentToken"/>
     <preference for="Mollie\Payment\Api\Data\PaymentTokenSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
+    <preference for="Mollie\Payment\Api\MollieCustomerRepositoryInterface" type="Mollie\Payment\Model\MollieCustomerRepository"/>
+    <preference for="Mollie\Payment\Api\Data\MollieCustomerInterface" type="Mollie\Payment\Model\Data\MollieCustomer"/>
+    <preference for="Mollie\Payment\Api\Data\CustomerSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
     <type name="Mollie\Payment\Logger\Handler">
         <arguments>
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
@@ -62,6 +66,7 @@
         <arguments>
             <argument name="parts" xsi:type="array">
                 <item name="cardToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CardToken</item>
+                <item name="customerId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CustomerId</item>
             </argument>
         </arguments>
     </type>
@@ -76,5 +81,9 @@
         <arguments>
             <argument name="identityContainer" xsi:type="object">Magento\Sales\Model\Order\Email\Container\OrderIdentity</argument>
         </arguments>
+    </type>
+
+    <type name="Magento\Customer\Api\CustomerRepositoryInterface">
+        <plugin name="mollie_customer_id_extension_attributes" type="Mollie\Payment\Plugin\Customer\CustomerId" />
     </type>
 </config>
