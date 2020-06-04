@@ -6,43 +6,39 @@
 
 namespace Mollie\Payment\Model;
 
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Api\MollieApiClient;
 
 class Api extends MollieApiClient
 {
+    /**
+     * @var Config
+     */
+    private $config;
 
     /**
      * @var
      */
     public $mollieHelper;
 
-    /**
-     * Api constructor.
-     *
-     * @param MollieHelper $mollieHelper
-     *
-     * @throws \Mollie\Api\Exceptions\IncompatiblePlatform
-     */
     public function __construct(
+        Config $config,
         MollieHelper $mollieHelper
     ) {
+        $this->config = $config;
         $this->mollieHelper = $mollieHelper;
         parent::__construct();
     }
 
     /**
-     * @param $apiKey
-     *
-     * @return MollieApiClient
+     * @param null $storeId
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function load($apiKey)
+    public function load($storeId = null)
     {
-        $mollieApiClient = new MollieApiClient();
-        $mollieApiClient->setApiKey($apiKey);
-        $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
-        $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
-        return $mollieApiClient;
+        $this->setApiKey($this->mollieHelper->getApiKey($storeId));
+        $this->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
+        $this->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
     }
 }

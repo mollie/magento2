@@ -11,7 +11,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
 {
     /**
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
-     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_TEST_API_KEY
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_TEST_API_KEY_THAT_IS_LONG_ENOUGH
      * @magentoConfigFixture default_store payment/mollie_general/type test
      *
      * @magentoConfigFixture default_store payment/mollie_methods_bancontact/active 1

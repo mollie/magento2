@@ -248,10 +248,6 @@ class Orders extends AbstractModel
             $orderData['shippingAddress'] = $this->getAddressLine($order->getShippingAddress());
         }
 
-        if (isset($additionalData['selected_issuer'])) {
-            $orderData['payment']['issuer'] = $additionalData['selected_issuer'];
-        }
-
         if ($method == 'banktransfer') {
             $orderData['payment']['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
         }

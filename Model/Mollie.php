@@ -317,6 +317,22 @@ class Mollie extends AbstractMethod
     }
 
     /**
+     * @param $storeId
+     * @return MollieApiClient|null
+     */
+    public function getMollieApi($storeId)
+    {
+        $apiKey = $this->mollieHelper->getApiKey($storeId);
+
+        try {
+            return $this->loadMollieApi($apiKey);
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
      * @param        $orderId
      * @param string $type
      * @param null   $paymentToken
