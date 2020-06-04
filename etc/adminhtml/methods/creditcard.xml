@@ -59,7 +59,7 @@
             <label>Enable Customers API?</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_creditcard/enable_customers_api</config_path>
-            <comment>The Customers API allows customers to remember their creditcard data for the next order.</comment>
+            <comment><![CDATA[The Customers API allows customers to remember their Credit Card data for the next order which enables <a href="https://help.mollie.com/hc/nl/articles/115000671249-Wat-is-single-click-payments-en-hoe-werkt-het" target="_blank">Single Click Payments</a>.]]></comment>
             <depends>
                 <field id="active">1</field>
                 <field id="use_components">0</field>
