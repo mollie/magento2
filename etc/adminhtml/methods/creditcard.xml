@@ -56,7 +56,7 @@
         </field>
         <field id="enable_customers_api" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1"
                showInStore="1">
-            <label>Enable Customers API?</label>
+            <label>Enable Single Click Payments</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_creditcard/enable_customers_api</config_path>
             <comment><![CDATA[This allows the customers to remember their Credit Card data for their next order using the <a href="https://docs.mollie.com/guides/checkout#single-click-payments-for-returning-customers" target="_blank">Customers API</a>.]]></comment>
