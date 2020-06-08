@@ -286,7 +286,7 @@ class Mollie extends AbstractMethod
         }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
-        if ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit') {
+        if ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit' || $methodCode == 'mealvoucher') {
             throw new LocalizedException(__($exception->getMessage()));
         }
 
@@ -313,6 +313,22 @@ class Mollie extends AbstractMethod
             return $mollieApiClient;
         } else {
             throw new LocalizedException(__('Class Mollie\Api\MollieApiClient does not exist'));
+        }
+    }
+
+    /**
+     * @param $storeId
+     * @return MollieApiClient|null
+     */
+    public function getMollieApi($storeId)
+    {
+        $apiKey = $this->mollieHelper->getApiKey($storeId);
+
+        try {
+            return $this->loadMollieApi($apiKey);
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+            return null;
         }
     }
 

@@ -233,7 +233,7 @@ class Orders extends AbstractModel
             'billingAddress'      => $this->getAddressLine($order->getBillingAddress()),
             'consumerDateOfBirth' => null,
             'lines'               => $this->orderLines->getOrderLines($order),
-            'redirectUrl'         => $this->transaction->getRedirectUrl($orderId, $paymentToken),
+            'redirectUrl'         => $this->transaction->getRedirectUrl($orderId, $paymentToken, $storeId),
             'webhookUrl'          => $this->transaction->getWebhookUrl(),
             'locale'              => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE),
             'method'              => $method,
@@ -246,10 +246,6 @@ class Orders extends AbstractModel
 
         if (!$order->getIsVirtual() && $order->hasData('shipping_address_id')) {
             $orderData['shippingAddress'] = $this->getAddressLine($order->getShippingAddress());
-        }
-
-        if (isset($additionalData['selected_issuer'])) {
-            $orderData['payment']['issuer'] = $additionalData['selected_issuer'];
         }
 
         if ($method == 'banktransfer') {

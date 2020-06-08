@@ -43,6 +43,14 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $this->addMolliePaymentTokenTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '1.10.0', '<')) {
+            $this->addMolliePaymentTokenTable($setup);
+        }
+
+        if (version_compare($context->getVersion(), '1.12.0', '<')) {
+            $this->addMollieCustomerTable($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -160,6 +168,48 @@ class UpgradeSchema implements UpgradeSchemaInterface
             ),
             ['token'],
             ['type' => AdapterInterface::INDEX_TYPE_UNIQUE]
+        );
+
+        $connection->createTable($table);
+    }
+
+    private function addMollieCustomerTable(SchemaSetupInterface $setup)
+    {
+        $connection = $setup->getConnection();
+        $tableName = $setup->getTable('mollie_payment_customer');
+
+        $table = $connection->newTable($tableName);
+
+        $table->addColumn(
+            'entity_id',
+            Table::TYPE_INTEGER,
+            null,
+            ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+            'Entity Id'
+        );
+
+        $table->addColumn(
+            'customer_id',
+            Table::TYPE_INTEGER,
+            null,
+            ['unsigned' => true, 'nullable' => false],
+            'Quote Id'
+        );
+
+        $table->addColumn(
+            'mollie_customer_id',
+            Table::TYPE_TEXT,
+            null,
+            ['unsigned' => true, 'nullable' => true],
+            'Mollie Customer Id'
+        );
+
+        $table->addForeignKey(
+            $setup->getFkName('mollie_customer', 'customer_id', 'customer_entity', 'entity_id'),
+            'customer_id',
+            $setup->getTable('customer_entity'),
+            'entity_id',
+            Table::ACTION_CASCADE
         );
 
         $connection->createTable($table);

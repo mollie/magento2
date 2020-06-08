@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "keywords": [
     "mollie",
     "payment",
@@ -31,6 +31,7 @@
     "recurring",
     "charges",
     "kbc",
+    "mealvoucher",
     "cbc",
     "gift cards",
     "intersolve",
@@ -56,7 +57,10 @@
   ],
   "autoload": {
     "files": [
-      "registration.php"
+      "registration.php",
+      "LegacySupport/GraphQl/Field.php",
+      "LegacySupport/GraphQl/ResolveInfo.php",
+      "LegacySupport/GraphQl/ResolverInterface.php"
     ],
     "psr-4": {
       "Mollie\\Payment\\": ""

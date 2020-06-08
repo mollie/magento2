@@ -11,7 +11,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
 {
     /**
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
-     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_TEST_API_KEY
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_TEST_API_KEY_THAT_IS_LONG_ENOUGH
      * @magentoConfigFixture default_store payment/mollie_general/type test
      *
      * @magentoConfigFixture default_store payment/mollie_methods_bancontact/active 1
@@ -40,8 +40,8 @@ class MollieConfigProviderTest extends IntegrationTestCase
 
         $result = $instance->getConfig();
 
-        $this->assertCount(19, $result['payment']['instructions']);
-        $this->assertCount(19, $result['payment']['image']);
+        $this->assertCount(20, $result['payment']['instructions']);
+        $this->assertCount(20, $result['payment']['image']);
 
         $this->assertArrayHasKey('mollie_methods_ideal', $result['payment']['issuersListType']);
         $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['issuersListType']);

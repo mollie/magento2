@@ -23,6 +23,7 @@ class Config
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_VERSION = 'payment/mollie_general/version';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
+    const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
@@ -32,6 +33,8 @@ class Config
     const PAYMENT_METHOD_PAYMENT_TITLE = 'payment/mollie_methods_%s/title';
     const PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID = 'payment/mollie_methods_paymentlink/allow_mark_as_paid';
     const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
+    const PAYMENT_MEALVOUCHER_CATEGORY = 'payment/mollie_methods_mealvoucher/category';
+    const PAYMENT_MEALVOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_mealvoucher/custom_attribute';
 
     /**
      * @var ScopeConfigInterface
@@ -146,6 +149,15 @@ class Config
 
     /**
      * @param null $storeId
+     * @return bool
+     */
+    public function creditcardEnableCustomersApi($storeId = null)
+    {
+        return $this->isSetFlag(static::PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API, $storeId);
+    }
+
+    /**
+     * @param null $storeId
      * @return mixed
      */
     public function statusPendingBanktransfer($storeId = null)
@@ -241,6 +253,7 @@ class Config
 
     /**
      * @param null $storeId
+<<<<<<< HEAD
      * @return bool
      */
     public function cancelFailedOrders($storeId = null)
@@ -263,6 +276,29 @@ class Config
     public function getDashboardUrlForPaymentsApi($storeId = null)
     {
         return $this->getPath(static::GENERAL_DASHBOARD_URL_PAYMENTS_API, $storeId);
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getMealvoucherCategory($storeId = null)
+    {
+        $value = $this->getPath(static::PAYMENT_MEALVOUCHER_CATEGORY, $storeId);
+
+        if ($value == 'null') {
+            return null;
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function getMealvoucherCustomAttribute($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_MEALVOUCHER_CUSTOM_ATTRIBUTE, $storeId);
     }
 
     /**

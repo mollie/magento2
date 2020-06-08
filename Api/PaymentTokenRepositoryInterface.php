@@ -35,7 +35,7 @@ interface PaymentTokenRepositoryInterface
 
     /**
      * Retrieve PaymentToken by order
-     * @return \Mollie\Payment\Model\PaymentToken|null
+     * @return \Mollie\Payment\Api\Data\PaymentTokenInterface|null
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getByOrder(\Magento\Sales\Api\Data\OrderInterface $order);

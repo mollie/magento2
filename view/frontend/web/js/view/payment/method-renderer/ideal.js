@@ -17,10 +17,10 @@ define(
                     return $('#' + this.item.method + '-form');
                 },
                 getIssuers: function () {
-                    return checkoutConfig.issuers[this.item.method];
+                    return checkoutConfig.issuers ? checkoutConfig.issuers[this.item.method] : [];
                 },
                 getIssuerListType: function () {
-                    return checkoutConfig.issuersListType[this.item.method];
+                    return checkoutConfig.issuersListType ? checkoutConfig.issuersListType[this.item.method] : 'dropdown';
                 },
                 getSelectedIssuer: function () {
                     if (this.getIssuerListType() === 'radio') {

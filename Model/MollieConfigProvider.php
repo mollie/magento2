@@ -6,20 +6,19 @@
 
 namespace Mollie\Payment\Model;
 
-use Magento\Framework\App\CacheInterface;
-use Magento\Framework\Serialize\SerializerInterface;
-use Magento\Payment\Model\MethodInterface;
 use Mollie\Api\MollieApiClient;
-use Magento\Framework\Locale\Resolver;
 use Mollie\Payment\Config;
-use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\Mollie as MollieModel;
+use Mollie\Payment\Service\Mollie\GetIssuers;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\Escaper;
-use Magento\Payment\Helper\Data as PaymentHelper;
-use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Escaper;
+use Magento\Framework\Locale\Resolver;
+use Magento\Framework\View\Asset\Repository as AssetRepository;
+use Magento\Payment\Helper\Data as PaymentHelper;
+use Magento\Payment\Model\MethodInterface;
 
 /**
  * Class MollieConfigProvider
@@ -28,8 +27,6 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
  */
 class MollieConfigProvider implements ConfigProviderInterface
 {
-    const CACHE_IDENTIFIER_PREFIX = 'mollie_payment_issuers_';
-
     /**
      * @var array
      */
@@ -41,6 +38,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         'mollie_methods_directdebit',
         'mollie_methods_ideal',
         'mollie_methods_kbc',
+        'mollie_methods_mealvoucher',
         'mollie_methods_paypal',
         'mollie_methods_paysafecard',
         'mollie_methods_sofort',
@@ -91,14 +89,6 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     private $methodData;
     /**
-     * @var CacheInterface
-     */
-    private $cache;
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-    /**
      * @var Config
      */
     private $config;
@@ -106,6 +96,10 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var Resolver
      */
     private $localeResolver;
+    /**
+     * @var GetIssuers
+     */
+    private $getIssuers;
 
     /**
      * MollieConfigProvider constructor.
@@ -117,10 +111,9 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @param AssetRepository      $assetRepository
      * @param ScopeConfigInterface $scopeConfig
      * @param Escaper              $escaper
-     * @param CacheInterface       $cache
-     * @param SerializerInterface  $serializer
      * @param Resolver             $localeResolver
      * @param Config               $config
+     * @param GetIssuers           $getIssuers
      */
     public function __construct(
         MollieModel $mollieModel,
@@ -130,10 +123,9 @@ class MollieConfigProvider implements ConfigProviderInterface
         AssetRepository $assetRepository,
         ScopeConfigInterface $scopeConfig,
         Escaper $escaper,
-        CacheInterface $cache,
-        SerializerInterface $serializer,
         Resolver $localeResolver,
-        Config $config
+        Config $config,
+        GetIssuers $getIssuers
     ) {
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
@@ -142,10 +134,9 @@ class MollieConfigProvider implements ConfigProviderInterface
         $this->escaper = $escaper;
         $this->assetRepository = $assetRepository;
         $this->scopeConfig = $scopeConfig;
-        $this->cache = $cache;
-        $this->serializer = $serializer;
         $this->config = $config;
         $this->localeResolver = $localeResolver;
+        $this->getIssuers = $getIssuers;
         foreach ($this->methodCodes as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
         }
@@ -182,9 +173,9 @@ class MollieConfigProvider implements ConfigProviderInterface
 
         try {
             $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
-        } catch (\Exception $e) {
-            $mollieApi = '';
-            $this->mollieHelper->addTolog('error', $e->getMessage());
+        } catch (\Exception $exception) {
+            $mollieApi = null;
+            $this->mollieHelper->addTolog('error', $exception->getMessage());
         }
 
         foreach ($this->methodCodes as $code) {
@@ -192,7 +183,7 @@ class MollieConfigProvider implements ConfigProviderInterface
                 continue;
             }
 
-            $isActive = $this->methods[$code]->isActive();
+            $isAvailable = $this->methods[$code]->isAvailable();
             $config['payment']['instructions'][$code] = $this->getInstructions($code);
 
             $config['payment']['image'][$code] = '';
@@ -202,15 +193,10 @@ class MollieConfigProvider implements ConfigProviderInterface
                 $config['payment']['image'][$code] = $url;
             }
 
-            if ($isActive && $code == 'mollie_methods_ideal') {
-                $config = $this->getIssuers($mollieApi, $code, $config);
-            }
-
-            if ($isActive && $code == 'mollie_methods_kbc') {
-                $config = $this->getIssuers($mollieApi, $code, $config);
-            }
-
-            if ($isActive && $code == 'mollie_methods_giftcard') {
+            if ($isAvailable &&
+                $mollieApi &&
+                in_array($code, ['mollie_methods_ideal', 'mollie_methods_kbc', 'mollie_methods_giftcard'])
+            ) {
                 $config = $this->getIssuers($mollieApi, $code, $config);
             }
         }
@@ -272,42 +258,12 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @param array $config
      * @return array
      */
-    private function getIssuers($mollieApi, $code, array $config)
+    private function getIssuers(MollieApiClient $mollieApi, $code, array $config)
     {
         $issuerListType = $this->mollieHelper->getIssuerListType($code);
         $config['payment']['issuersListType'][$code] = $issuerListType;
-        $config['payment']['issuers'][$code] = $this->loadIssuers($code, $mollieApi, $issuerListType);
+        $config['payment']['issuers'][$code] = $this->getIssuers->execute($mollieApi, $code, $issuerListType);
 
         return $config;
-    }
-
-    /**
-     * @param $code
-     * @param MollieApiClient $mollieApi
-     * @param $type
-     * @return array
-     */
-    private function loadIssuers($code, $mollieApi, $type)
-    {
-        $identifier = static::CACHE_IDENTIFIER_PREFIX . $code;
-        $result = $this->cache->load($identifier);
-        if ($result) {
-            return $this->serializer->unserialize($result);
-        }
-
-        $result = $this->mollieModel->getIssuers(
-            $mollieApi,
-            $code,
-            $type
-        );
-
-        $this->cache->save(
-            $this->serializer->serialize($result),
-            $identifier,
-            ['mollie_payment', 'mollie_payment_issuers'],
-            60 * 60 // Cache for 1 hour
-        );
-
-        return $result;
     }
 }

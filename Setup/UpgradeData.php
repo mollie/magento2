@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Setup;
 
+use Magento\Customer\Setup\CustomerSetupFactory;
 use Magento\Sales\Setup\SalesSetupFactory;
 use Magento\Config\Model\ResourceModel\Config;
 use Magento\Store\Model\StoreManagerInterface;

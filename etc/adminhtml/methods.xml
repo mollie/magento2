@@ -13,6 +13,7 @@
     <include path="Mollie_Payment::methods/directdebit.xml"/>
     <include path="Mollie_Payment::methods/ideal.xml"/>
     <include path="Mollie_Payment::methods/kbc.xml"/>
+    <include path="Mollie_Payment::methods/mealvoucher.xml"/>
     <include path="Mollie_Payment::methods/paypal.xml"/>
     <include path="Mollie_Payment::methods/paysafecard.xml"/>
     <include path="Mollie_Payment::methods/sofort.xml"/>
