@@ -16,8 +16,8 @@ define(
         var giftcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/giftcard';
 
         var creditcardComponent = defaultComponent;
-        var checkoutConfig = window.checkoutConfig.payment;
-        if (checkoutConfig.mollie.profile_id && checkoutConfig.mollie.creditcard.use_components) {
+        var checkoutConfig = window.checkoutConfig.payment.mollie;
+        if (checkoutConfig.profile_id && checkoutConfig.creditcard.use_components) {
             creditcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/creditcard-with-components';
         }
 
@@ -29,7 +29,6 @@ define(
             {type: 'mollie_methods_directdebit', component: defaultComponent},
             {type: 'mollie_methods_ideal', component: idealComponent},
             {type: 'mollie_methods_kbc', component: kbcComponent},
-            {type: 'mollie_methods_mealvoucher', component: defaultComponent},
             {type: 'mollie_methods_paypal', component: defaultComponent},
             {type: 'mollie_methods_paysafecard', component: defaultComponent},
             {type: 'mollie_methods_sofort', component: defaultComponent},
@@ -57,9 +56,14 @@ define(
          * Only add Apple Pay if the current client supports Apple Pay.
          */
         if (canUseApplePay()) {
+            var applePayComponent = defaultComponent;
+            if (checkoutConfig.appleypay.integration_type === 'direct') {
+                applePayComponent = 'Mollie_Payment/js/view/payment/method-renderer/applepay-direct';
+            }
+
             methods.push({
                 type: 'mollie_methods_applepay',
-                component: defaultComponent
+                component: applePayComponent
             });
         }
 

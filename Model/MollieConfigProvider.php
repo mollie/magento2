@@ -6,19 +6,19 @@
 
 namespace Mollie\Payment\Model;
 
-use Mollie\Api\MollieApiClient;
-use Mollie\Payment\Config;
-use Mollie\Payment\Helper\General as MollieHelper;
-use Mollie\Payment\Model\Mollie as MollieModel;
-use Mollie\Payment\Service\Mollie\GetIssuers;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Escaper;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Mollie\Api\MollieApiClient;
+use Mollie\Payment\Config;
+use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\Mollie as MollieModel;
+use Mollie\Payment\Service\Mollie\GetIssuers;
 
 /**
  * Class MollieConfigProvider
@@ -65,10 +65,6 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     private $assetRepository;
     /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-    /**
      * @var Mollie
      */
     private $mollieModel;
@@ -100,20 +96,24 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var GetIssuers
      */
     private $getIssuers;
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
 
     /**
      * MollieConfigProvider constructor.
      *
-     * @param Mollie               $mollieModel
-     * @param MollieHelper         $mollieHelper
-     * @param PaymentHelper        $paymentHelper
-     * @param CheckoutSession      $checkoutSession
-     * @param AssetRepository      $assetRepository
-     * @param ScopeConfigInterface $scopeConfig
-     * @param Escaper              $escaper
-     * @param Resolver             $localeResolver
-     * @param Config               $config
-     * @param GetIssuers           $getIssuers
+     * @param Mollie                $mollieModel
+     * @param MollieHelper          $mollieHelper
+     * @param PaymentHelper         $paymentHelper
+     * @param CheckoutSession       $checkoutSession
+     * @param AssetRepository       $assetRepository
+     * @param Escaper               $escaper
+     * @param Resolver              $localeResolver
+     * @param Config                $config
+     * @param GetIssuers            $getIssuers
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         MollieModel $mollieModel,
@@ -121,11 +121,11 @@ class MollieConfigProvider implements ConfigProviderInterface
         PaymentHelper $paymentHelper,
         CheckoutSession $checkoutSession,
         AssetRepository $assetRepository,
-        ScopeConfigInterface $scopeConfig,
         Escaper $escaper,
         Resolver $localeResolver,
         Config $config,
-        GetIssuers $getIssuers
+        GetIssuers $getIssuers,
+        StoreManagerInterface $storeManager
     ) {
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
@@ -133,10 +133,10 @@ class MollieConfigProvider implements ConfigProviderInterface
         $this->checkoutSession = $checkoutSession;
         $this->escaper = $escaper;
         $this->assetRepository = $assetRepository;
-        $this->scopeConfig = $scopeConfig;
         $this->config = $config;
         $this->localeResolver = $localeResolver;
         $this->getIssuers = $getIssuers;
+        $this->storeManager = $storeManager;
         foreach ($this->methodCodes as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
         }
@@ -163,11 +163,15 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
+        $storeName = $this->storeManager->getStore()->getFrontendName();
+
         $config = [];
         $config['payment']['mollie']['testmode'] = $this->config->isTestMode();
         $config['payment']['mollie']['profile_id'] = $this->config->getProfileId();
         $config['payment']['mollie']['locale'] = $this->localeResolver->getLocale();
         $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents();
+        $config['payment']['mollie']['appleypay']['integration_type'] = $this->config->applePayIntegrationType();
+        $config['payment']['mollie']['store']['name'] = $storeName;
         $apiKey = $this->mollieHelper->getApiKey();
         $useImage = $this->mollieHelper->useImage();
 
