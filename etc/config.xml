@@ -237,6 +237,7 @@
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
+                <integration_type>external</integration_type>
             </mollie_methods_applepay>
             <mollie_methods_mybank>
                 <active>1</active>
