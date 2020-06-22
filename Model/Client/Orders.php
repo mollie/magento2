@@ -682,6 +682,7 @@ class Orders extends AbstractModel
                 $mollieShipment = $mollieOrder->createShipment($orderLines);
             }
 
+            // @phpstan-ignore-next-line
             $mollieShipmentId = isset($mollieShipment) ? $mollieShipment->id : 0;
             $shipment->setMollieShipmentId($mollieShipmentId);
 

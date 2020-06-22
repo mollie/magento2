@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 ?>
-<?php $redirectUrl = $this->getRedirectUrl(); ?>
+<?php $redirectUrl = $block->getRedirectUrl(); ?>
 <div class="mollie-loading" id="mollie-loading">
     <div class="redirect-block">
         <h1><?= __('Redirecting to Mollie'); ?></h1>
@@ -13,7 +13,7 @@
 </div>
 <div class="mollie-buttons" id="mollie-buttons" style="display:none">
     <div class="redirect-block">
-        <a class="button" href="<?= $this->getBackUrl(); ?>">
+        <a class="button" href="<?= $block->getBackUrl(); ?>">
             <?= __('Back to Checkout'); ?>
         </a>
         <a class="button" href="<?= $redirectUrl; ?>">

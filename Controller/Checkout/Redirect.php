@@ -141,6 +141,7 @@ class Redirect extends Action
                 $this->_redirect('checkout/cart');
             }
         } catch (Exception $exception) {
+            // @phpstan-ignore-next-line
             $this->formatExceptionMessage($exception, $methodInstance);
             $this->mollieHelper->addTolog('error', $exception->getMessage());
             $this->checkoutSession->restoreQuote();
