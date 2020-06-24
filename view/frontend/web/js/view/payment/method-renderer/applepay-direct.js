@@ -18,6 +18,7 @@ define(
         return Component.extend({
             session: null,
             redirectAfterPlaceOrder: false,
+            totalsLoading: totals.isLoading,
             defaults: {
                 template: 'Mollie_Payment/payment/applepay-direct'
             },
