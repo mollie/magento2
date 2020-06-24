@@ -31,7 +31,7 @@
 
         <div class="actions-toolbar">
             <div class="primary">
-                <!-- ko if: isPlaceOrderActionAllowed() -->
+                <!-- ko if: isPlaceOrderActionAllowed() && !totalsLoading() -->
                 <div class="apple-pay-button-with-text apple-pay-button-white-with-text" data-bind="click: placeApplePayOrder">
                     <span class="text">Buy with</span>
                     <span class="logo"></span>
