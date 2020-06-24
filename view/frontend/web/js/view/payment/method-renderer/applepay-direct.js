@@ -45,14 +45,16 @@ define(
             },
 
             placeApplePayOrder(event) {
+                var amount = totals.getSegment('grand_total').value;
+
                 var request = {
                     countryCode: 'NL',
                     currencyCode: 'EUR',
-                    supportedNetworks: ["amex", "maestro", "masterCard", "visa", "vPay"],
+                    supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
                     merchantCapabilities: ['supports3DS'],
                     total: {
                         label: checkoutConfig.mollie.store.name,
-                        amount: totals.totals()['grand_total']
+                        amount: amount
                     },
                 }
 
@@ -64,7 +66,7 @@ define(
                     var finalTotal = {
                         label: 'Total',
                         type: 'final',
-                        amount: totals.totals()['grand_total']
+                        amount: amount
                     };
 
                     this.session.completePaymentMethodSelection(finalTotal, []);
