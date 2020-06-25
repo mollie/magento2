@@ -22,6 +22,7 @@ class Config
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_VERSION = 'payment/mollie_general/version';
+    const PAYMENT_APPLEPAY_INTEGRATION_TYPE = 'payment/mollie_methods_applepay/integration_type';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
@@ -136,6 +137,15 @@ class Config
     public function getDefaultSelectedMethod($storeId = null)
     {
         return $this->getPath(static::GENERAL_DEFAULT_SELECTED_METHOD, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function applePayIntegrationType($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_APPLEPAY_INTEGRATION_TYPE, $storeId);
     }
 
     /**

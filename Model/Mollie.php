@@ -435,6 +435,10 @@ class Mollie extends AbstractMethod
             $this->getInfoInstance()->setAdditionalInformation('card_token', $additionalData['card_token']);
         }
 
+        if (isset($additionalData['applepay_payment_token'])) {
+            $this->getInfoInstance()->setAdditionalInformation('applepay_payment_token', $additionalData['applepay_payment_token']);
+        }
+
         return $this;
     }
 

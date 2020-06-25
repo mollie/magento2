@@ -12,14 +12,12 @@ namespace Magento\Framework\GraphQl\Schema\Type;
  * GraphQL, but for that we need to implement the ResolverInterface. As this class does not exists in Magento 2.2 the
  * `setup:di:compile` command will fail. That's why we use this trick to make sure this class exists in 2.2.
  */
-if (\class_exists('\Magento\Framework\GraphQl\Schema\Type\ResolveInfo')) {
-    return;
-}
+if (!\class_exists('\Magento\Framework\GraphQl\Schema\Type\ResolveInfo')) {
+    /**
+     * Wrapper for GraphQl ResolveInfo
+     */
+    class ResolveInfo
+    {
 
-/**
- * Wrapper for GraphQl ResolveInfo
- */
-class ResolveInfo
-{
-
+    }
 }

@@ -44,7 +44,19 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="days_before_expire" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1"
+        <field id="integration_type" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Integration type</label>
+            <config_path>payment/mollie_methods_applepay/integration_type</config_path>
+            <comment><![CDATA[What kind of integration should be used?<br><br>
+            <strong>External</strong>: The user is redirected to a Mollie page. No extra configuration required.<br>
+            <strong>Direct</strong>: The user can use Apple Pay in you checkout. You need upload a certificate to your server for this to work. <a target="_BLANK" href="https://docs.mollie.com/guides/applepay-direct-integration#prepare-your-server">View instructions</a>.
+            ]]></comment>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\AppleyPayIntegrationType</source_model>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="days_before_expire" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1"
                showInStore="1" >
             <label>Days to expire</label>
             <frontend_class>validate-digits-range digits-range-1-100</frontend_class>
@@ -55,7 +67,7 @@
             </depends>
             <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
         </field>
-        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="60" showInDefault="1"
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
@@ -64,7 +76,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="70" showInDefault="1"
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="80" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
@@ -74,7 +86,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="min_order_total" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1"
+        <field id="min_order_total" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Minimum Order Total</label>
             <config_path>payment/mollie_methods_applepay/min_order_total</config_path>
@@ -82,7 +94,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="max_order_total" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
+        <field id="max_order_total" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Maximum Order Total</label>
             <config_path>payment/mollie_methods_applepay/max_order_total</config_path>
@@ -90,7 +102,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_surcharge_type" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_type" translate="label" type="select" sortOrder="110" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_type</config_path>
@@ -99,7 +111,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge fixed amount</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_fixed_amount</config_path>
@@ -110,7 +122,7 @@
                 <field id="payment_surcharge_type" separator=",">fixed_fee,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge percentage</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_percentage</config_path>
@@ -121,7 +133,7 @@
                 <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge limit</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_limit</config_path>
@@ -133,7 +145,7 @@
                 <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="140" showInDefault="1"
+        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="150" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment Surcharge Tax Class</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_tax_class</config_path>
@@ -143,7 +155,7 @@
                 <field id="payment_surcharge_type" separator=",">fixed_fee,percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
+        <field id="sort_order" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>

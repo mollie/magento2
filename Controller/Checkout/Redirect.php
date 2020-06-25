@@ -20,6 +20,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Result\PageFactory;
+use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\Methods\Directdebit;
 use Mollie\Payment\Model\Mollie;
 
@@ -140,6 +141,7 @@ class Redirect extends Action
                 $this->_redirect('checkout/cart');
             }
         } catch (Exception $exception) {
+            // @phpstan-ignore-next-line
             $this->formatExceptionMessage($exception, $methodInstance);
             $this->mollieHelper->addTolog('error', $exception->getMessage());
             $this->checkoutSession->restoreQuote();
@@ -228,6 +230,10 @@ class Redirect extends Action
          * Directdebit does not return an url when in test mode.
          */
         if (!$redirectUrl && $methodInstance instanceof Directdebit && $this->config->isTestMode()) {
+            $redirectUrl = $this->_url->getUrl('checkout/onepage/success/');
+        }
+
+        if (!$redirectUrl && $methodInstance instanceof ApplePay) {
             $redirectUrl = $this->_url->getUrl('checkout/onepage/success/');
         }
 
