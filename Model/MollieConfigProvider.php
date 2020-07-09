@@ -183,7 +183,7 @@ class MollieConfigProvider implements ConfigProviderInterface
                 continue;
             }
 
-            $isAvailable = $this->methods[$code]->isAvailable();
+            $isAvailable = $this->methods[$code]->isActive();
             $config['payment']['instructions'][$code] = $this->getInstructions($code);
 
             $config['payment']['image'][$code] = '';
