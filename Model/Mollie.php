@@ -573,7 +573,7 @@ class Mollie extends AbstractMethod
      * @param $method
      * @param $issuerListType
      *
-     * @return array
+     * @return array|null
      */
     public function getIssuers($mollieApi, $method, $issuerListType)
     {
@@ -587,6 +587,10 @@ class Mollie extends AbstractMethod
 
         try {
             $issuersList = $mollieApi->methods->get($methodCode, ["include" => "issuers"])->issuers;
+            if (!$issuersList) {
+                return null;
+            }
+
             foreach ($issuersList as $issuer) {
                 $issuers[] = $issuer;
             }

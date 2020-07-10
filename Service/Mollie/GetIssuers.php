@@ -44,11 +44,11 @@ class GetIssuers
      * @param MollieApiClient $mollieApi
      * @param string $method
      * @param string $type On of: dropdown, radio, none
-     * @return array
+     * @return array|null
      */
     public function execute(MollieApiClient $mollieApi, $method, $type)
     {
-        $identifier = static::CACHE_IDENTIFIER_PREFIX . $method;
+        $identifier = static::CACHE_IDENTIFIER_PREFIX . $method . $type;
         $result = $this->cache->load($identifier);
         if ($result) {
             return $this->serializer->unserialize($result);
@@ -70,11 +70,19 @@ class GetIssuers
         return $result;
     }
 
+    /**
+     * @param $storeId
+     * @param $method
+     * @return array|null
+     */
     public function getForGraphql($storeId, $method)
     {
         $mollieApi = $this->mollieModel->getMollieApi($storeId);
 
         $issuers = $this->execute($mollieApi, $method, 'radio');
+        if (!$issuers) {
+            return null;
+        }
 
         $output = [];
         foreach ($issuers as $issuer) {
