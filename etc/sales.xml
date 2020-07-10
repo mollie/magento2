@@ -2,8 +2,8 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Sales:etc/sales.xsd">
     <section name="quote">
         <group name="totals">
-            <item name="mollie_payment_fee" instance="Mollie\Payment\Model\PaymentFee\Quote\Address\Total\PaymentFee" sort_order="150"/>
-            <item name="mollie_payment_fee_tax" instance="Mollie\Payment\Model\PaymentFee\Quote\Address\Total\PaymentFeeTax" sort_order="451"/>
+            <item name="mollie_payment_fee" instance="Mollie\Payment\Model\PaymentFee\Quote\Address\Total\PaymentFee" sort_order="360"/>
+            <item name="mollie_payment_fee_tax" instance="Mollie\Payment\Model\PaymentFee\Quote\Address\Total\PaymentFeeTax" sort_order="440"/>
         </group>
     </section>
     <section name="order_invoice">

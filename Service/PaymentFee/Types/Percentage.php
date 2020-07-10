@@ -46,10 +46,19 @@ class Percentage implements TypeInterface
     public function calculate(CartInterface $cart, Total $total)
     {
         $percentage = $this->config->getPercentage($cart->getPayment()->getMethod(), $cart->getStoreId());
-        $subtotal = $total->getTotalAmount('subtotal');
 
-        $calculatedResult = ($subtotal / 100) * $percentage;
+        $shipping = $total->getTotalAmount('shipping');
+        $subtotal = $total->getData('subtotal_incl_tax');
+        if (!$subtotal) {
+            $subtotal = $total->getTotalAmount('subtotal');
+        }
 
+        $amount = $subtotal;
+        if ($this->config->includeShippingInSurcharge($cart->getStoreId())) {
+            $amount = $subtotal + $shipping;
+        }
+
+        $calculatedResult = ($amount / 100) * $percentage;
         $tax = $this->taxCalculate->getTaxFromAmountIncludingTax($cart, $calculatedResult);
 
         /** @var Result $result */
