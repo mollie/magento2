@@ -93,7 +93,7 @@ class PaymentFeeTax extends AbstractTotal
      * @param Result $result
      * @param Quote $quote
      */
-    private function addAssociatedTaxable(ShippingAssignmentInterface $shippingAssignment, Result $result, Quote $quote): void
+    private function addAssociatedTaxable(ShippingAssignmentInterface $shippingAssignment, Result $result, Quote $quote)
     {
         $fullAmount = $this->priceCurrency->convert($result->getAmount());
 
