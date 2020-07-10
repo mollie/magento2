@@ -250,5 +250,10 @@
                 <instructions/>
             </mollie_methods_mybank>
         </payment>
+        <sales>
+            <totals_sort>
+                <mollie_payment_fee>25</mollie_payment_fee>
+            </totals_sort>
+        </sales>
     </default>
 </config>
