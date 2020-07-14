@@ -191,10 +191,15 @@ class Order
          */
         $vatAmount = round($totalAmount * ($vatRate / (100 + $vatRate)), 2);
 
+        $name = preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription());
+        if (!$name) {
+            $name = $order->getShippingMethod();
+        }
+
         $orderLine = [
             'item_id' => '',
             'type' => 'shipping_fee',
-            'name' => preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription()),
+            'name' => $name,
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
