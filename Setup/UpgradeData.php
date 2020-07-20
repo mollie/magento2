@@ -16,6 +16,7 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Mollie\Payment\Config as MollieConfig;
 
 /**
  * Class UpgradeData
@@ -50,6 +51,10 @@ class UpgradeData implements UpgradeDataInterface
      * @var StoreManagerInterface
      */
     private $storeManager;
+    /**
+     * @var MollieConfig
+     */
+    private $mollieConfig;
 
     /**
      * UpgradeData constructor.
@@ -59,19 +64,22 @@ class UpgradeData implements UpgradeDataInterface
      * @param Config $resourceConfig
      * @param WriterInterface $configWriter
      * @param StoreManagerInterface $storeManager
+     * @param MollieConfig $mollieConfig
      */
     public function __construct(
         SalesSetupFactory $salesSetupFactory,
         ResourceConnection $resourceConnection,
         Config $resourceConfig,
         WriterInterface $configWriter,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        MollieConfig $mollieConfig
     ) {
         $this->salesSetupFactory = $salesSetupFactory;
         $this->resourceConnection = $resourceConnection;
         $this->resourceConfig = $resourceConfig;
         $this->configWriter = $configWriter;
         $this->storeManager = $storeManager;
+        $this->mollieConfig = $mollieConfig;
     }
 
     /**
@@ -94,6 +102,10 @@ class UpgradeData implements UpgradeDataInterface
 
         if (version_compare($context->getVersion(), '1.6.2', '<')) {
             $this->addIndexes($setup);
+        }
+
+        if (version_compare($context->getVersion(), '1.13.0', '<')) {
+            $this->updateCustomerReturnUrl();
         }
 
         // This should run every time
@@ -202,6 +214,40 @@ class UpgradeData implements UpgradeDataInterface
             $setup->getTable('sales_shipment'),
             $this->resourceConnection->getIdxName('sales_shipment', ['mollie_shipment_id']),
             ['mollie_shipment_id']
+        );
+    }
+
+    /**
+     * The return url is changed. Before this params where added by default, but now you can now add placeholders in
+     * the url which will be replaced. That's why we append this variables to the url by default when the url is set.
+     */
+    private function updateCustomerReturnUrl()
+    {
+        $this->updateCustomerReturnUrlForScope(ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
+
+        foreach ($this->storeManager->getWebsites() as $store) {
+            $this->updateCustomerReturnUrlForScope('website', $store->getId());
+        }
+
+        foreach ($this->storeManager->getStores() as $store) {
+            $this->updateCustomerReturnUrlForScope(ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $store->getId());
+        }
+    }
+
+    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId)
+    {
+        $value = $this->mollieConfig->customRedirectUrl($scopeId);
+        if (!$value) {
+            return;
+        }
+
+        $newValue = $value . '?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&utm_nooverride=1';
+
+        $this->configWriter->save(
+            'payment/mollie_general/custom_redirect_url',
+            $newValue,
+            $scope,
+            $scopeId
         );
     }
 }

@@ -6,15 +6,16 @@
 
 namespace Mollie\Payment\Service\Order;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
+use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\UrlInterface;
-use Magento\Store\Model\ScopeInterface;
+use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Payment\Config;
 
 class Transaction
 {
     /**
-     * @var ScopeConfigInterface
+     * @var Config
      */
     private $config;
 
@@ -23,29 +24,37 @@ class Transaction
      */
     private $urlBuilder;
 
+    /**
+     * @var Encryptor
+     */
+    private $encryptor;
+
     public function __construct(
-        ScopeConfigInterface $config,
-        Context $context
+        Config $config,
+        Context $context,
+        Encryptor $encryptor
     ) {
         $this->config = $config;
         $this->urlBuilder = $context->getUrlBuilder();
+        $this->encryptor = $encryptor;
     }
 
     /**
-     * @param int $orderId
+     * @param OrderInterface $order
      * @param string $paymentToken
-     * @param string $storeId
      * @return string
      */
-    public function getRedirectUrl($orderId, $paymentToken, $storeId = null)
+    public function getRedirectUrl(OrderInterface $order, $paymentToken)
     {
-        $useCustomUrl = $this->config->getValue('payment/mollie_general/use_custom_redirect_url', ScopeInterface::SCOPE_STORE, $storeId);
-        $customUrl = $this->config->getValue('payment/mollie_general/custom_redirect_url', ScopeInterface::SCOPE_STORE, $storeId);
-        $parameters = 'order_id=' . intval($orderId) . '&payment_token=' . $paymentToken . '&utm_nooverride=1';
+        $storeId = $order->getStoreId();
+        $useCustomUrl = $this->config->useCustomRedirectUrl($storeId);
+        $customUrl = $this->config->customRedirectUrl($storeId);
 
         if ($useCustomUrl && $customUrl) {
-            return $customUrl . '?' . $parameters;
+            return $this->addParametersToCustomUrl($order, $paymentToken, $storeId);
         }
+
+        $parameters = 'order_id=' . intval($order->getId()) . '&payment_token=' . $paymentToken . '&utm_nooverride=1';
 
         $this->urlBuilder->setScope($storeId);
         return $this->urlBuilder->getUrl(
@@ -60,5 +69,24 @@ class Transaction
     public function getWebhookUrl()
     {
         return $this->urlBuilder->getUrl('mollie/checkout/webhook/', ['_query' => 'isAjax=1']);
+    }
+
+    private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, int $storeId = null)
+    {
+        $replacements = [
+            '{{ORDER_ID}}' => $order->getId(),
+            '{{INCREMENT_ID}}' => $order->getIncrementId(),
+            '{{PAYMENT_TOKEN}}' => $paymentToken,
+            '{{ORDER_HASH}}' => base64_encode($this->encryptor->encrypt((string)$order->getId())),
+        ];
+
+        $customUrl = $this->config->customRedirectUrl($storeId);
+        $customUrl = str_replace(
+            array_keys($replacements),
+            array_values($replacements),
+            $customUrl
+        );
+
+        return $customUrl;
     }
 }

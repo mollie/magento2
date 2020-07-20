@@ -12,6 +12,7 @@ use Magento\Store\Model\ScopeInterface;
 class Config
 {
     const GENERAL_CANCEL_FAILED_ORDERS = 'payment/mollie_general/cancel_failed_orders';
+    const GENERAL_CUSTOM_REDIRECT_URL = 'payment/mollie_general/custom_redirect_url';
     const GENERAL_DEFAULT_SELECTED_METHOD = 'payment/mollie_general/default_selected_method';
     const GENERAL_DASHBOARD_URL_ORDERS_API = 'payment/mollie_general/dashboard_url_orders_api';
     const GENERAL_DASHBOARD_URL_PAYMENTS_API = 'payment/mollie_general/dashboard_url_payments_api';
@@ -22,6 +23,7 @@ class Config
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
     const GENERAL_TYPE = 'payment/mollie_general/type';
+    const GENERAL_USE_CUSTOM_REDIRECT_URL = 'payment/mollie_general/use_custom_redirect_url';
     const GENERAL_VERSION = 'payment/mollie_general/version';
     const PAYMENT_APPLEPAY_INTEGRATION_TYPE = 'payment/mollie_methods_applepay/integration_type';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
@@ -273,7 +275,6 @@ class Config
 
     /**
      * @param null $storeId
-<<<<<<< HEAD
      * @return bool
      */
     public function cancelFailedOrders($storeId = null)
@@ -319,6 +320,24 @@ class Config
     public function getMealvoucherCustomAttribute($storeId = null)
     {
         return $this->getPath(static::PAYMENT_MEALVOUCHER_CUSTOM_ATTRIBUTE, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function useCustomRedirectUrl($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_USE_CUSTOM_REDIRECT_URL, $storeId);
+    }
+
+    /**
+     * @param null $storeId
+     * @return string
+     */
+    public function customRedirectUrl($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_CUSTOM_REDIRECT_URL, $storeId);
     }
 
     /**

@@ -21,6 +21,7 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\Transaction;
 
 /**
  * Class Payments
@@ -68,6 +69,10 @@ class Payments extends AbstractModel
      * @var DashboardUrl
      */
     private $dashboardUrl;
+    /**
+     * @var Transaction
+     */
+    private $transaction;
 
     /**
      * Payments constructor.
@@ -81,6 +86,7 @@ class Payments extends AbstractModel
      * @param BuildTransaction $buildTransaction
      * @param Config $config
      * @param DashboardUrl $dashboardUrl
+     * @param Transaction $transaction
      */
     public function __construct(
         OrderSender $orderSender,
@@ -91,7 +97,8 @@ class Payments extends AbstractModel
         OrderCommentHistory $orderCommentHistory,
         BuildTransaction $buildTransaction,
         Config $config,
-        DashboardUrl $dashboardUrl
+        DashboardUrl $dashboardUrl,
+        Transaction $transaction
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -102,6 +109,7 @@ class Payments extends AbstractModel
         $this->buildTransaction = $buildTransaction;
         $this->config = $config;
         $this->dashboardUrl = $dashboardUrl;
+        $this->transaction = $transaction;
     }
 
     /**
@@ -129,7 +137,7 @@ class Payments extends AbstractModel
             'amount'         => $this->mollieHelper->getOrderAmountByOrder($order),
             'description'    => $this->mollieHelper->getPaymentDescription($method, $order->getIncrementId(), $storeId),
             'billingAddress' => $this->getAddressLine($order->getBillingAddress()),
-            'redirectUrl'    => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
+            'redirectUrl'    => $this->transaction->getRedirectUrl($order, $paymentToken),
             'webhookUrl'     => $this->mollieHelper->getWebhookUrl(),
             'method'         => $method,
             'metadata'       => [
