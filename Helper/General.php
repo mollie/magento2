@@ -515,14 +515,15 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param     $checkoutUrl
+     * @param string $checkoutUrl
+     * @param int|null $storeId
      *
      * @return mixed
      */
-    public function getPaymentLinkMessage($checkoutUrl)
+    public function getPaymentLinkMessage($checkoutUrl, $storeId = null)
     {
-        if ($this->getStoreConfig(self::XML_PATH_PAYMENTLINK_ADD_MESSAGE)) {
-            $message = $this->getStoreConfig(self::XML_PATH_PAYMENTLINK_MESSAGE);
+        if ($this->getStoreConfig(self::XML_PATH_PAYMENTLINK_ADD_MESSAGE, $storeId)) {
+            $message = $this->getStoreConfig(self::XML_PATH_PAYMENTLINK_MESSAGE, $storeId);
             return str_replace('%link%', $checkoutUrl, $message);
         }
     }
