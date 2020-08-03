@@ -11,6 +11,7 @@ use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Adminhtml\Source\WebhookUrlOptions;
 
 class Transaction
 {
@@ -64,11 +65,21 @@ class Transaction
     }
 
     /**
+     * @param null|int|string $storeId
      * @return string
      */
-    public function getWebhookUrl()
+    public function getWebhookUrl($storeId = null)
     {
-        return $this->urlBuilder->getUrl('mollie/checkout/webhook/', ['_query' => 'isAjax=1']);
+        if ($this->config->isProductionMode($storeId) ||
+            $this->config->useWebhooks($storeId) == WebhookUrlOptions::ENABLED) {
+            return $this->urlBuilder->getUrl('mollie/checkout/webhook/', ['_query' => 'isAjax=1']);
+        }
+
+        if ($this->config->useWebhooks($storeId) == WebhookUrlOptions::DISABLED) {
+            return '';
+        }
+
+        return $this->config->customWebhookUrl($storeId);
     }
 
     private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, int $storeId = null)

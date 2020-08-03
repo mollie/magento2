@@ -13,6 +13,7 @@ class Config
 {
     const GENERAL_CANCEL_FAILED_ORDERS = 'payment/mollie_general/cancel_failed_orders';
     const GENERAL_CUSTOM_REDIRECT_URL = 'payment/mollie_general/custom_redirect_url';
+    const GENERAL_CUSTOM_WEBHOOK_URL = 'payment/mollie_general/custom_webhook_url';
     const GENERAL_DEFAULT_SELECTED_METHOD = 'payment/mollie_general/default_selected_method';
     const GENERAL_DASHBOARD_URL_ORDERS_API = 'payment/mollie_general/dashboard_url_orders_api';
     const GENERAL_DASHBOARD_URL_PAYMENTS_API = 'payment/mollie_general/dashboard_url_payments_api';
@@ -24,6 +25,7 @@ class Config
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_USE_CUSTOM_REDIRECT_URL = 'payment/mollie_general/use_custom_redirect_url';
+    const GENERAL_USE_WEBHOOKS = 'payment/mollie_general/use_webhooks';
     const GENERAL_VERSION = 'payment/mollie_general/version';
     const PAYMENT_APPLEPAY_INTEGRATION_TYPE = 'payment/mollie_methods_applepay/integration_type';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
@@ -53,7 +55,7 @@ class Config
 
     /**
      * @param $path
-     * @param $storeId
+     * @param null|int|string $storeId
      * @return string
      */
     private function getPath($path, $storeId)
@@ -63,7 +65,7 @@ class Config
 
     /**
      * @param $path
-     * @param $storeId
+     * @param null|int|string $storeId
      * @return bool
      */
     private function isSetFlag($path, $storeId)
@@ -80,7 +82,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return bool
      */
     public function sendInvoiceEmail($storeId = null)
@@ -89,7 +91,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return string
      */
     public function orderStatusPending($storeId = null)
@@ -98,7 +100,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return bool
      */
     public function isSecondChanceEmailEnabled($storeId = null)
@@ -107,7 +109,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return bool
      */
     public function includeShippingInSurcharge($storeId = null)
@@ -116,7 +118,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return string
      */
     public function secondChanceEmailTemplate($storeId = null)
@@ -125,16 +127,25 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function isProductionMode($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_TYPE, $storeId) == 'live';
+    }
+
+    /**
+     * @param null|int|string $storeId
      * @return bool
      */
     public function isTestMode($storeId = null)
     {
-        return $this->getPath(static::GENERAL_TYPE, $storeId) == 'test';
+        return !$this->isProductionMode($storeId);
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return string
      */
     public function getProfileId($storeId = null)
@@ -143,7 +154,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return string
      */
     public function getDefaultSelectedMethod($storeId = null)
@@ -152,7 +163,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return bool
      */
     public function applePayIntegrationType($storeId = null)
@@ -161,7 +172,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return bool
      */
     public function creditcardUseComponents($storeId = null)
@@ -170,7 +181,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return bool
      */
     public function creditcardEnableCustomersApi($storeId = null)
@@ -179,7 +190,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return mixed
      */
     public function statusPendingBanktransfer($storeId = null)
@@ -192,7 +203,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return mixed
      */
     public function statusNewPaymentLink($storeId = null)
@@ -255,7 +266,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return bool
      */
     public function paymentlinkAllowMarkAsPaid($storeId = null)
@@ -265,7 +276,7 @@ class Config
 
     /**
      * @param $method
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return string
      */
     public function getMethodTitle($method, $storeId = null)
@@ -274,7 +285,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return bool
      */
     public function cancelFailedOrders($storeId = null)
@@ -291,7 +302,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return string
      */
     public function getDashboardUrlForPaymentsApi($storeId = null)
@@ -314,7 +325,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return string
      */
     public function getMealvoucherCustomAttribute($storeId = null)
@@ -323,7 +334,7 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
      * @return string
      */
     public function useCustomRedirectUrl($storeId = null)
@@ -332,7 +343,25 @@ class Config
     }
 
     /**
-     * @param null $storeId
+     * @param null|int|string $storeId
+     * @return string
+     */
+    public function useWebhooks($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_USE_WEBHOOKS, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return string
+     */
+    public function customWebhookUrl($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_CUSTOM_WEBHOOK_URL, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
      * @return string
      */
     public function customRedirectUrl($storeId = null)
