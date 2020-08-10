@@ -16,7 +16,7 @@ use Magento\Framework\Xml\Parser;
  * that are required so we can see if `setup:di:compile` has run. For this we use the object manager, as the list of
  * extension attributes can be (and will be) changed over time, and we don't now which classes are required.
  */
-class TestExtensionAttributes
+class TestExtensionAttributes implements CompatibilityTestInterface
 {
     /**
      * @var Reader

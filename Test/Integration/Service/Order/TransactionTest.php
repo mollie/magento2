@@ -112,4 +112,58 @@ class TransactionTest extends IntegrationTestCase
 
         $this->assertEquals(9999, $encryptor->decrypt($hash));
     }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/type live
+     * @magentoConfigFixture current_store payment/mollie_general/use_webhooks enabled
+     */
+    public function testReturnsTheDefaultWebhookUrl()
+    {
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+        $result = $instance->getWebhookUrl();
+
+        $this->assertContains('mollie/checkout/webhook/', $result);
+    }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/type live
+     * @magentoConfigFixture current_store payment/mollie_general/use_webhooks disabled
+     */
+    public function testIgnoresTheDisabledFlagWhenInLiveMode()
+    {
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+        $result = $instance->getWebhookUrl();
+
+        $this->assertContains('mollie/checkout/webhook/', $result);
+    }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/use_webhooks disabled
+     * @magentoConfigFixture current_store payment/mollie_general/custom_webhook_url custom_url_for_test
+     */
+    public function testReturnsNothingWhenDisabledAndInTestMode()
+    {
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+        $result = $instance->getWebhookUrl();
+
+        $this->assertEmpty($result);
+    }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/use_webhooks custom_url
+     * @magentoConfigFixture current_store payment/mollie_general/custom_webhook_url custom_url_for_test
+     */
+    public function testReturnsTheCustomWebhookUrl()
+    {
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+        $result = $instance->getWebhookUrl();
+
+        $this->assertEquals('custom_url_for_test', $result);
+    }
 }

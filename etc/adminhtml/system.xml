@@ -160,20 +160,37 @@
                             <strong>Yes</strong>: The surcharge is calculated on the total of subtotal + shipping.
                         ]]></comment>
                     </field>
-                    <field id="heading_second_chance_email" translate="label comment" type="text" sortOrder="220" showInDefault="1"
+                    <field id="use_webhooks" translate="label" type="select" sortOrder="220" showInDefault="1"
+                           showInWebsite="0" showInStore="1">
+                        <label>Use webhooks</label>
+                        <source_model>Mollie\Payment\Model\Adminhtml\Source\WebhookUrlOptions</source_model>
+                        <config_path>payment/mollie_general/use_webhooks</config_path>
+                        <comment><![CDATA[
+                            <strong>Note:</strong> This setting has only effect when the store deploy mode is in <u>development</u>. When the store deploy mode is in production, this setting is ignored and the webhooks are always <u>enabled</u>.
+                        ]]></comment>
+                    </field>
+                    <field id="custom_webhook_url" translate="label" type="text" sortOrder="230" showInDefault="1"
+                           showInWebsite="0" showInStore="1">
+                        <label>Custom webhook url</label>
+                        <config_path>payment/mollie_general/custom_webhook_url</config_path>
+                        <depends>
+                            <field id="use_webhooks">custom_url</field>
+                        </depends>
+                    </field>
+                    <field id="heading_second_chance_email" translate="label comment" type="text" sortOrder="240" showInDefault="1"
                            showInWebsite="0" showInStore="0">
                         <label>Second Chance Email</label>
                         <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
                         <comment><![CDATA[Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.]]></comment>
                     </field>
-                    <field id="enable_second_chance_email" translate="label" type="select" sortOrder="230" showInDefault="1"
+                    <field id="enable_second_chance_email" translate="label" type="select" sortOrder="250" showInDefault="1"
                            showInWebsite="0" showInStore="1">
                         <label>Enable Second Chance Email</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/mollie_general/enable_second_chance_email</config_path>
                         <comment><![CDATA[This will add a "sent second chance email" button to the orders in the back-end. This email is only sent after triggering this manually.]]></comment>
                     </field>
-                    <field id="second_chance_email_template" translate="label" type="select" sortOrder="240" showInDefault="1"
+                    <field id="second_chance_email_template" translate="label" type="select" sortOrder="260" showInDefault="1"
                            showInWebsite="0" showInStore="1" canRestore="1">
                         <label>Second Chance Email Template</label>
                         <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
@@ -183,20 +200,20 @@
                             <field id="enable_second_chance_email">1</field>
                         </depends>
                     </field>
-                    <field id="heading_advanced" translate="label comment" type="text" sortOrder="250" showInDefault="1"
+                    <field id="heading_advanced" translate="label comment" type="text" sortOrder="270" showInDefault="1"
                            showInWebsite="0" showInStore="0">
                         <label>Advanced: PWA storefront integration</label>
                         <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
                         <comment><![CDATA[Only use this function if you want to integrate the Mollie extension with a PWA storefront.
                         More information can be found <a href="https://github.com/mollie/magento2/wiki/PWA-integration" target="_blank">here</a>.]]></comment>
                     </field>
-                    <field id="use_custom_redirect_url" translate="label" type="select" sortOrder="260" showInDefault="1" showInWebsite="1"
+                    <field id="use_custom_redirect_url" translate="label" type="select" sortOrder="280" showInDefault="1" showInWebsite="1"
                            showInStore="1">
                         <label>Use custom return url?</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/mollie_general/use_custom_redirect_url</config_path>
                     </field>
-                    <field id="custom_redirect_url" translate="label" type="text" sortOrder="270" showInDefault="1" showInWebsite="1"
+                    <field id="custom_redirect_url" translate="label" type="text" sortOrder="290" showInDefault="1" showInWebsite="1"
                            showInStore="1">
                         <label>Custom return url</label>
                         <config_path>payment/mollie_general/custom_redirect_url</config_path>
@@ -213,20 +230,20 @@
                             <field id="use_custom_redirect_url">1</field>
                         </depends>
                     </field>
-                    <field id="heading_debug" translate="label comment" type="text" sortOrder="300" showInDefault="1"
+                    <field id="heading_debug" translate="label comment" type="text" sortOrder="310" showInDefault="1"
                            showInWebsite="0" showInStore="0">
                         <label>Debug</label>
                         <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
                         <comment><![CDATA[Especially for Developers you can enable the Debug mode.]]></comment>
                     </field>
-                    <field id="debug" translate="label" type="select" sortOrder="310" showInDefault="1" showInWebsite="0"
+                    <field id="debug" translate="label" type="select" sortOrder="320" showInDefault="1" showInWebsite="0"
                            showInStore="0">
                         <label>Debug requests</label>
                         <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                         <config_path>payment/mollie_general/debug</config_path>
                         <comment>When activated the debug file will be located in: var/log/mollie.log</comment>
                     </field>
-                    <field id="heading_compatibility" translate="label comment" type="text" sortOrder="320"
+                    <field id="heading_compatibility" translate="label comment" type="text" sortOrder="330"
                            showInDefault="1" showInWebsite="0" showInStore="1">
                         <label>Compatibility</label>
                         <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
@@ -235,11 +252,11 @@
                     Specific information about the errors and warnings can be found
                     <a href="https://github.com/mollie/magento2/wiki/compatability" target="_blank">here</a>.]]></comment>
                     </field>
-                    <field id="compatibility_checker" translate="label" type="button" sortOrder="330" showInDefault="1"
+                    <field id="compatibility_checker" translate="label" type="button" sortOrder="340" showInDefault="1"
                            showInWebsite="0" showInStore="1">
                         <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker</frontend_model>
                     </field>
-                    <field id="compatibility_result" translate="label" type="text" sortOrder="340" showInDefault="1"
+                    <field id="compatibility_result" translate="label" type="text" sortOrder="350" showInDefault="1"
                            showInWebsite="0" showInStore="1">
                         <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Result</frontend_model>
                     </field>
