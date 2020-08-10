@@ -29,4 +29,11 @@
             <resource ref="self" />
         </resources>
     </route>
+
+    <route url="/V1/mollie/get-order/:hash" method="GET">
+        <service class="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" method="byHash"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
 </routes>

@@ -430,7 +430,9 @@ class General extends AbstractHelper
      */
     public function getRedirectUrl($orderId, $paymentToken)
     {
-        return $this->transaction->getRedirectUrl($orderId, $paymentToken);
+        $order = $this->orderRepository->get($orderId);
+
+        return $this->transaction->getRedirectUrl($order, $paymentToken);
     }
 
     /**

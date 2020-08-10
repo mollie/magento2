@@ -233,7 +233,7 @@ class Orders extends AbstractModel
             'billingAddress'      => $this->getAddressLine($order->getBillingAddress()),
             'consumerDateOfBirth' => null,
             'lines'               => $this->orderLines->getOrderLines($order),
-            'redirectUrl'         => $this->transaction->getRedirectUrl($orderId, $paymentToken, $storeId),
+            'redirectUrl'         => $this->transaction->getRedirectUrl($order, $paymentToken),
             'webhookUrl'          => $this->transaction->getWebhookUrl(),
             'locale'              => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE),
             'method'              => $method,
