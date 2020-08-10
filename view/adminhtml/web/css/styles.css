@@ -209,3 +209,12 @@ a.mollie-tooltip:hover span {
     margin-top: -10px;
     display: inline-block;
 }
+
+.admin__page-nav._collapsed.mollie-tab .title,
+.admin__page-nav._collapsed._show.mollie-tab .title {
+    background-image: url('../images/mollie_logo_configuration_tab.png');
+    background-position: 10px center;
+    background-repeat: no-repeat;
+    background-size: auto 70%;
+    text-indent: 40px;
+}
