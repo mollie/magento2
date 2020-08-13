@@ -166,7 +166,7 @@
                         <source_model>Mollie\Payment\Model\Adminhtml\Source\WebhookUrlOptions</source_model>
                         <config_path>payment/mollie_general/use_webhooks</config_path>
                         <comment><![CDATA[
-                            <strong>Note:</strong> This setting has only effect when the store deploy mode is in <u>development</u>. When the store deploy mode is in production, this setting is ignored and the webhooks are always <u>enabled</u>.
+                            <strong>Note:</strong> This setting has only effect when the <u>test modus</u> is enabled. This setting is ignored when <u>live modus</u> is active.
                         ]]></comment>
                     </field>
                     <field id="custom_webhook_url" translate="label" type="text" sortOrder="230" showInDefault="1"
