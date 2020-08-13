@@ -74,12 +74,13 @@ class Base extends Info
     }
 
     /**
+     * @param int|null $storeId
      * @return bool|string
      */
-    public function getPaymentLink()
+    public function getPaymentLink($storeId = null)
     {
         if ($checkoutUrl = $this->getCheckoutUrl()) {
-            return $this->mollieHelper->getPaymentLinkMessage($checkoutUrl);
+            return $this->mollieHelper->getPaymentLinkMessage($checkoutUrl, $storeId);
         }
 
         return false;

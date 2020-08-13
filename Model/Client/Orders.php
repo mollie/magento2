@@ -233,8 +233,8 @@ class Orders extends AbstractModel
             'billingAddress'      => $this->getAddressLine($order->getBillingAddress()),
             'consumerDateOfBirth' => null,
             'lines'               => $this->orderLines->getOrderLines($order),
-            'redirectUrl'         => $this->transaction->getRedirectUrl($orderId, $paymentToken, $storeId),
-            'webhookUrl'          => $this->transaction->getWebhookUrl(),
+            'redirectUrl'         => $this->transaction->getRedirectUrl($order, $paymentToken),
+            'webhookUrl'          => $this->transaction->getWebhookUrl($storeId),
             'locale'              => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE),
             'method'              => $method,
             'metadata'            => [
@@ -338,6 +338,11 @@ class Orders extends AbstractModel
         $mollieOrder = $mollieApi->orders->get($transactionId, ["embed" => "payments"]);
         $this->mollieHelper->addTolog($type, $mollieOrder);
         $status = $mollieOrder->status;
+
+        if ($mollieOrder->isCompleted()) {
+            return ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
+        }
+
         $dashboardUrl = $this->dashboardUrl->forOrdersApi($order->getStoreId(), $mollieOrder->id);
         $order->getPayment()->setAdditionalInformation('mollie_id', $mollieOrder->id);
         $order->getPayment()->setAdditionalInformation('dashboard_url', $dashboardUrl);
