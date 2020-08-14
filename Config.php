@@ -56,9 +56,10 @@ class Config
     /**
      * @param $path
      * @param null|int|string $storeId
+     * @param string $scope
      * @return string
      */
-    private function getPath($path, $storeId)
+    private function getPath($path, $storeId, $scope = ScopeInterface::SCOPE_STORE)
     {
         return $this->config->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
     }
@@ -362,11 +363,12 @@ class Config
 
     /**
      * @param null|int|string $storeId
+     * @param string $scope
      * @return string
      */
-    public function customRedirectUrl($storeId = null)
+    public function customRedirectUrl($storeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return $this->getPath(static::GENERAL_CUSTOM_REDIRECT_URL, $storeId);
+        return $this->getPath(static::GENERAL_CUSTOM_REDIRECT_URL, $storeId, $scope);
     }
 
     /**
