@@ -29,4 +29,12 @@
         </tr>
         </tbody>
     </table>
+
+    <button id="mm-dummy-button_test" title="<?= $block->escapeUrl(__('Run Self-test')); ?>"
+            type="button" class="action-default scalable"
+            data-mage-init='{"Mollie_Payment/js/button-functions": {}}'
+    >
+        <i class="mm-dummy-icon__list-unordered-four"></i>
+        <span><?= $block->escapeUrl(__('Run Self-test')); ?></span>
+    </button>
 </div>
