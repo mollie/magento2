@@ -61,7 +61,7 @@ class Config
      */
     private function getPath($path, $storeId, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return $this->config->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
+        return $this->config->getValue($path, $scope, $storeId);
     }
 
     /**
