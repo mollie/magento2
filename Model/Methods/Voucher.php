@@ -8,7 +8,7 @@ namespace Mollie\Payment\Model\Methods;
 
 use Magento\Quote\Api\Data\CartInterface;
 
-class Mealvoucher extends \Mollie\Payment\Model\Mollie
+class Voucher extends \Mollie\Payment\Model\Mollie
 {
     /**
      * Payment method code

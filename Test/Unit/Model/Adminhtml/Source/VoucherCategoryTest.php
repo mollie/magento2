@@ -6,19 +6,21 @@
 
 namespace Mollie\Payment\Test\Unit\Model\Adminhtml\Source;
 
-use Mollie\Payment\Model\Adminhtml\Source\MealvoucherCategory;
+use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 use Mollie\Payment\Test\Unit\UnitTestCase;
 
-class MealvoucherCategoryTest extends UnitTestCase
+class VoucherCategoryTest extends UnitTestCase
 {
     public function returnsTheRightOptions()
     {
+        require_once __DIR__ . '/../../../../../Model/Adminhtml/Source/VoucherCategory.php';
+
         return [
-            [MealvoucherCategory::FOOD_AND_DRINKS],
-            [MealvoucherCategory::HOME_AND_GARDEN],
-            [MealvoucherCategory::GIFTS_AND_FLOWERS],
-            [MealvoucherCategory::NULL],
-            [MealvoucherCategory::CUSTOM_ATTRIBUTE],
+            [VoucherCategory::MEAL],
+            [VoucherCategory::ECO],
+            [VoucherCategory::GIFT],
+            [VoucherCategory::NULL],
+            [VoucherCategory::CUSTOM_ATTRIBUTE],
         ];
     }
 
@@ -27,8 +29,8 @@ class MealvoucherCategoryTest extends UnitTestCase
      */
     public function testReturnsTheRightOptions($type)
     {
-        /** @var MealvoucherCategory $instance */
-        $instance = $this->objectManager->getObject(MealvoucherCategory::class);
+        /** @var VoucherCategory $instance */
+        $instance = $this->objectManager->getObject(VoucherCategory::class);
         $options = $instance->toOptionArray();
 
         foreach ($options as $option) {

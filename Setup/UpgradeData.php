@@ -118,6 +118,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->updateCustomerReturnUrl();
         }
 
+        if (version_compare($context->getVersion(), '1.17.0', '<')) {
+            $this->renameMealVoucherToVoucher();
+        }
+
         // This should run every time
         $this->upgradeActiveState();
 
@@ -263,5 +267,35 @@ class UpgradeData implements UpgradeDataInterface
             $scope,
             $scopeId
         );
+    }
+
+    private function renameMealVoucherToVoucher()
+    {
+        $collection = $this->configReader->addFieldToFilter('path', [
+            'eq' => 'payment/mollie_methods_mealvoucher/category'
+        ]);
+
+        $replacements = [
+            'food_and_drinks' => 'meal',
+            'home_and_garden' => 'eco',
+            'gifts_and_flowers' => 'gift',
+        ];
+
+        foreach ($collection as $item) {
+            var_dump($item->getData());
+
+            $value = str_replace(
+                array_keys($replacements),
+                array_values($replacements),
+                $item->getData('value')
+            );
+
+            $this->configWriter->save(
+                'payment/mollie_methods_mealvoucher/category',
+                $value,
+                $item->getData('scope'),
+                $item->getData('scope_id')
+            );
+        }
     }
 }

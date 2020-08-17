@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="mollie_methods_mealvoucher" translate="label" type="text" sortOrder="150" showInDefault="1"
+    <group id="mollie_methods_mealvoucher" translate="label" type="text" sortOrder="220" showInDefault="1"
            showInWebsite="1" showInStore="1">
-        <label>Meal Voucher</label>
+        <label>Voucher</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Enabled</label>
@@ -34,7 +34,7 @@
         <field id="category" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Category</label>
-            <source_model>Mollie\Payment\Model\Adminhtml\Source\MealvoucherCategory</source_model>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\VoucherCategory</source_model>
             <config_path>payment/mollie_methods_mealvoucher/category</config_path>
             <depends>
                 <field id="active">1</field>
