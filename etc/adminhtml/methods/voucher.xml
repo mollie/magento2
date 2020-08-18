@@ -24,7 +24,6 @@
             <comment><![CDATA[The description to be used for this transaction. These variables are available:<br><br>
             <strong>{ordernumber}</strong>: The order number for this transaction<br>
             <strong>{storename}</strong>: The name of the store<br><br>
-            (Note: This only works when the method is set to Payments API)
             ]]></comment>
             <depends>
                 <field id="method">payment</field>
