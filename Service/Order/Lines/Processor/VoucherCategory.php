@@ -30,15 +30,22 @@ class VoucherCategory implements ProcessorInterface
             return $orderLine;
         }
 
-        $category = $this->config->getVoucherCategory($order->getStoreId());
-        if ($category == 'custom_attribute') {
-            $orderLine['category'] = $this->getCustomAttribute($orderItem);
-
-            return $orderLine;
+        $category = $this->getCategoryValue($order, $orderItem);
+        if ($category !== null) {
+            $orderLine['category'] = $category;
         }
 
-        $orderLine['category'] = $category;
         return $orderLine;
+    }
+
+    private function getCategoryValue(OrderInterface $order, OrderItemInterface $orderItem)
+    {
+        $category = $this->config->getVoucherCategory($order->getStoreId());
+        if ($category == 'custom_attribute') {
+            return $this->getCustomAttribute($orderItem);
+        }
+
+        return $category;
     }
 
     private function getCustomAttribute(OrderItemInterface $orderItem)
@@ -46,6 +53,12 @@ class VoucherCategory implements ProcessorInterface
         /** @var ProductInterface $product */
         $product = $orderItem->getProduct();
 
-        return $product->getAttributeText($this->config->getVoucherCustomAttribute());
+        $attributeCode = $this->config->getVoucherCustomAttribute();
+        $value = $product->getAttributeText($attributeCode);
+        if ($value) {
+            return $value;
+        }
+
+        return $product->getData($attributeCode);
     }
 }
