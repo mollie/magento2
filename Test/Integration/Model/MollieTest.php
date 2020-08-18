@@ -193,7 +193,7 @@ class MollieTest extends IntegrationTestCase
         $this->expectException(LocalizedException::class);
 
         $order = $this->loadOrder('100000001');
-        $order->getPayment()->setMethod('mollie_methods_mealvoucher');
+        $order->getPayment()->setMethod('mollie_methods_voucher');
 
         $ordersApi = $this->createMock(Orders::class);
         $ordersApi->expects($this->once())->method('startTransaction')->willThrowException(

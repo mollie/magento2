@@ -14,10 +14,10 @@ class VoucherTest extends IntegrationTestCase
 {
     protected $instance = Voucher::class;
 
-    protected $code = 'mealvoucher';
+    protected $code = 'voucher';
 
     /**
-     * @magentoConfigFixture default_store payment/mollie_methods_mealvoucher/category null
+     * @magentoConfigFixture default_store payment/mollie_methods_voucher/category null
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
@@ -33,8 +33,8 @@ class VoucherTest extends IntegrationTestCase
 
     /**
      * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
-     * @magentoConfigFixture default_store payment/mollie_methods_mealvoucher/category meal
-     * @magentoConfigFixture default_store payment/mollie_methods_mealvoucher/active 1
+     * @magentoConfigFixture default_store payment/mollie_methods_voucher/category meal
+     * @magentoConfigFixture default_store payment/mollie_methods_voucher/active 1
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException

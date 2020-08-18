@@ -15,7 +15,7 @@ class Voucher extends \Mollie\Payment\Model\Mollie
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_mealvoucher';
+    protected $_code = 'mollie_methods_voucher';
 
     /**
      * Info instructions block path
@@ -26,7 +26,7 @@ class Voucher extends \Mollie\Payment\Model\Mollie
 
     public function isAvailable(CartInterface $quote = null)
     {
-        if ($quote && !$this->config->getMealvoucherCategory($quote->getStoreId())) {
+        if ($quote && !$this->config->getVoucherCategory($quote->getStoreId())) {
             return false;
         }
 

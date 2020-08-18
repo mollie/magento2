@@ -39,8 +39,8 @@ class Config
     const PAYMENT_METHOD_PAYMENT_TITLE = 'payment/mollie_methods_%s/title';
     const PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID = 'payment/mollie_methods_paymentlink/allow_mark_as_paid';
     const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
-    const PAYMENT_MEALVOUCHER_CATEGORY = 'payment/mollie_methods_mealvoucher/category';
-    const PAYMENT_MEALVOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_mealvoucher/custom_attribute';
+    const PAYMENT_VOUCHER_CATEGORY = 'payment/mollie_methods_voucher/category';
+    const PAYMENT_VOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_voucher/custom_attribute';
 
     /**
      * @var ScopeConfigInterface
@@ -314,9 +314,9 @@ class Config
     /**
      * @return string|null
      */
-    public function getMealvoucherCategory($storeId = null)
+    public function getVoucherCategory($storeId = null)
     {
-        $value = $this->getPath(static::PAYMENT_MEALVOUCHER_CATEGORY, $storeId);
+        $value = $this->getPath(static::PAYMENT_VOUCHER_CATEGORY, $storeId);
 
         if ($value == 'null') {
             return null;
@@ -329,9 +329,9 @@ class Config
      * @param null|int|string $storeId
      * @return string
      */
-    public function getMealvoucherCustomAttribute($storeId = null)
+    public function getVoucherCustomAttribute($storeId = null)
     {
-        return $this->getPath(static::PAYMENT_MEALVOUCHER_CUSTOM_ATTRIBUTE, $storeId);
+        return $this->getPath(static::PAYMENT_VOUCHER_CUSTOM_ATTRIBUTE, $storeId);
     }
 
     /**

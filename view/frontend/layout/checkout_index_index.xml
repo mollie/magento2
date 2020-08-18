@@ -43,7 +43,7 @@
                                                                         <item name="mollie_methods_kbc" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
-                                                                        <item name="mollie_methods_mealvoucher" xsi:type="array">
+                                                                        <item name="mollie_methods_voucher" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                         <item name="mollie_methods_paypal" xsi:type="array">

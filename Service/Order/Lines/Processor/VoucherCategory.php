@@ -11,7 +11,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Mollie\Payment\Config;
 
-class MealvoucherCategory implements ProcessorInterface
+class VoucherCategory implements ProcessorInterface
 {
     /**
      * @var Config
@@ -26,11 +26,11 @@ class MealvoucherCategory implements ProcessorInterface
 
     public function process($orderLine, OrderInterface $order, OrderItemInterface $orderItem = null): array
     {
-        if (!$orderItem || !$order->getPayment() || $order->getPayment()->getMethod() != 'mollie_methods_mealvoucher') {
+        if (!$orderItem || !$order->getPayment() || $order->getPayment()->getMethod() != 'mollie_methods_voucher') {
             return $orderLine;
         }
 
-        $category = $this->config->getMealvoucherCategory($order->getStoreId());
+        $category = $this->config->getVoucherCategory($order->getStoreId());
         if ($category == 'custom_attribute') {
             $orderLine['category'] = $this->getCustomAttribute($orderItem);
 
@@ -46,6 +46,6 @@ class MealvoucherCategory implements ProcessorInterface
         /** @var ProductInterface $product */
         $product = $orderItem->getProduct();
 
-        return $product->getAttributeText($this->config->getMealvoucherCustomAttribute());
+        return $product->getAttributeText($this->config->getVoucherCustomAttribute());
     }
 }

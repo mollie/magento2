@@ -97,7 +97,7 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_kbc>
-            <mollie_methods_mealvoucher>
+            <mollie_methods_voucher>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Voucher</model>
                 <title>Voucher</title>
@@ -107,7 +107,7 @@
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
-            </mollie_methods_mealvoucher>
+            </mollie_methods_voucher>
             <mollie_methods_paypal>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Paypal</model>

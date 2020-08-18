@@ -32,7 +32,7 @@ class PaymentMethods
         'mollie_methods_directdebit',
         'mollie_methods_ideal',
         'mollie_methods_kbc',
-        'mollie_methods_mealvoucher',
+        'mollie_methods_voucher',
         'mollie_methods_paypal',
         'mollie_methods_paysafecard',
         'mollie_methods_sofort',
