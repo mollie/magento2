@@ -9,9 +9,20 @@ namespace Mollie\Payment\Webapi;
 use Magento\Quote\Model\Quote;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use Mollie\Payment\Test\Integration\Webapi\AbstractWebApiTest;
 
-class PaymentTokenTest extends IntegrationTestCase
+class PaymentTokenTest extends AbstractWebApiTest
 {
+    /**
+     * @var string
+     */
+    protected $class = PaymentToken::class;
+
+    /**
+     * @var string
+     */
+    protected $methods = ['byToken', 'generateForCustomer', 'generateForGuest'];
+
     /**
      * @magentoDataFixture Magento/Sales/_files/quote.php
      */
