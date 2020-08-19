@@ -10,7 +10,7 @@ interface GetCustomerOrderInterface
 {
     /**
      * @param string $hash
-     * @return array
+     * @return mixed[]
      */
     public function byHash(string $hash): array;
 }

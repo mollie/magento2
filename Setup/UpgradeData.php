@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Setup;
 
+use Magento\Config\Model\ResourceModel\Config\Data\Collection as ConfigReader;
 use Magento\Customer\Setup\CustomerSetupFactory;
 use Magento\Sales\Setup\SalesSetupFactory;
 use Magento\Config\Model\ResourceModel\Config;
@@ -51,10 +52,16 @@ class UpgradeData implements UpgradeDataInterface
      * @var StoreManagerInterface
      */
     private $storeManager;
+
     /**
      * @var MollieConfig
      */
     private $mollieConfig;
+
+    /**
+     * @var Config\Data\Collection
+     */
+    private $configReader;
 
     /**
      * UpgradeData constructor.
@@ -65,6 +72,7 @@ class UpgradeData implements UpgradeDataInterface
      * @param WriterInterface $configWriter
      * @param StoreManagerInterface $storeManager
      * @param MollieConfig $mollieConfig
+     * @param ConfigReader $configReader
      */
     public function __construct(
         SalesSetupFactory $salesSetupFactory,
@@ -72,7 +80,8 @@ class UpgradeData implements UpgradeDataInterface
         Config $resourceConfig,
         WriterInterface $configWriter,
         StoreManagerInterface $storeManager,
-        MollieConfig $mollieConfig
+        MollieConfig $mollieConfig,
+        ConfigReader $configReader
     ) {
         $this->salesSetupFactory = $salesSetupFactory;
         $this->resourceConnection = $resourceConnection;
@@ -80,6 +89,7 @@ class UpgradeData implements UpgradeDataInterface
         $this->configWriter = $configWriter;
         $this->storeManager = $storeManager;
         $this->mollieConfig = $mollieConfig;
+        $this->configReader = $configReader;
     }
 
     /**
@@ -104,7 +114,7 @@ class UpgradeData implements UpgradeDataInterface
             $this->addIndexes($setup);
         }
 
-        if (version_compare($context->getVersion(), '1.13.0', '<')) {
+        if (version_compare($context->getVersion(), '1.13.1', '<')) {
             $this->updateCustomerReturnUrl();
         }
 
@@ -223,25 +233,29 @@ class UpgradeData implements UpgradeDataInterface
      */
     private function updateCustomerReturnUrl()
     {
-        $this->updateCustomerReturnUrlForScope(ScopeConfigInterface::SCOPE_TYPE_DEFAULT, 0);
+        $collection = $this->configReader->addFieldToFilter('path', [
+            'eq' => 'payment/mollie_general/custom_redirect_url'
+        ]);
 
-        foreach ($this->storeManager->getWebsites() as $store) {
-            $this->updateCustomerReturnUrlForScope('website', $store->getId());
-        }
-
-        foreach ($this->storeManager->getStores() as $store) {
-            $this->updateCustomerReturnUrlForScope(ScopeConfigInterface::SCOPE_TYPE_DEFAULT, $store->getId());
+        foreach ($collection as $configItem) {
+            $this->updateCustomerReturnUrlForScope(
+                $configItem->getData('scope'),
+                $configItem->getData('scope_id'),
+                $configItem->getData('value')
+            );
         }
     }
 
-    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId)
+    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId, string $currentValue)
     {
-        $value = $this->mollieConfig->customRedirectUrl($scopeId);
-        if (!$value) {
+        $append = '?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&utm_nooverride=1';
+
+        // The value already contains the new string so don't append it twice.
+        if (strpos($currentValue, $append) !== false) {
             return;
         }
 
-        $newValue = $value . '?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&utm_nooverride=1';
+        $newValue = $currentValue . $append;
 
         $this->configWriter->save(
             'payment/mollie_general/custom_redirect_url',

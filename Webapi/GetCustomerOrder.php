@@ -30,6 +30,11 @@ class GetCustomerOrder implements GetCustomerOrderInterface
         $this->orderRepository = $orderRepository;
     }
 
+    /**
+     * @param string $hash
+     * @return mixed[]
+     * @throws \Exception
+     */
     public function byHash(string $hash): array
     {
         $decodedHash = base64_decode($hash);
