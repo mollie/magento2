@@ -32,7 +32,7 @@ class VoucherCategory implements ProcessorInterface
 
         $category = $this->getCategoryValue($order, $orderItem);
         if ($category !== null) {
-            $orderLine['category'] = $category;
+            $orderLine['category'] = strtolower($category);
         }
 
         return $orderLine;
