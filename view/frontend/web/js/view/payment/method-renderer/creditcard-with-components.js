@@ -32,10 +32,7 @@ function ($, Component, Mollie) {
             this.checkIfVisible();
 
             try {
-                this.mollie = Mollie(checkoutConfig.mollie.profile_id, {
-                    locale: checkoutConfig.mollie.locale,
-                    testMode: checkoutConfig.mollie.testmode
-                });
+                this.mollie = Mollie(checkoutConfig.mollie.profile_id, this.getMollieOptions());
 
                 this.components.cardHolder = this.mollie.createComponent('cardHolder', this.getOptions('cardHolder'));
                 this.components.cardNumber = this.mollie.createComponent('cardNumber', this.getOptions('cardNumber'));
@@ -47,6 +44,18 @@ function ($, Component, Mollie) {
             }
 
             return this;
+        },
+
+        getMollieOptions: function () {
+            var options = {
+                testMode: checkoutConfig.mollie.testmode
+            };
+
+            if (checkoutConfig.mollie.locale) {
+                options['locale'] = checkoutConfig.mollie.locale;
+            }
+
+            return options;
         },
 
         checkIfVisible: function () {

@@ -20,6 +20,7 @@ class Config
     const GENERAL_ENABLE_SECOND_CHANCE_EMAIL = 'payment/mollie_general/enable_second_chance_email';
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
+    const GENERAL_LOCALE = 'payment/mollie_general/locale';
     const GENERAL_ORDER_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
@@ -367,6 +368,15 @@ class Config
     public function customRedirectUrl($storeId = null)
     {
         return $this->getPath(static::GENERAL_CUSTOM_REDIRECT_URL, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return string
+     */
+    public function getLocale($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_LOCALE, $storeId);
     }
 
     /**
