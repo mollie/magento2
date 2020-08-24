@@ -2,6 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface" type="Mollie\Payment\Webapi\PaymentToken" />
     <preference for="Mollie\Payment\Api\Webapi\StartTransactionRequestInterface" type="Mollie\Payment\Webapi\StartTransaction" />
+    <preference for="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" type="Mollie\Payment\Webapi\GetCustomerOrder" />
 
     <preference for="Mollie\Payment\Api\PaymentTokenRepositoryInterface" type="Mollie\Payment\Model\PaymentTokenRepository"/>
     <preference for="Mollie\Payment\Api\Data\PaymentTokenInterface" type="Mollie\Payment\Model\Data\PaymentToken"/>
@@ -38,6 +39,8 @@
                 <item name="payment/mollie_general/apikey_live" xsi:type="string">1</item>
                 <item name="payment/mollie_general/type" xsi:type="string">1</item>
                 <item name="payment/mollie_general/debug" xsi:type="string">1</item>
+                <item name="payment/mollie_general/use_webhooks" xsi:type="string">1</item>
+                <item name="payment/mollie_general/custom_webhook_url" xsi:type="string">1</item>
             </argument>
         </arguments>
     </type>

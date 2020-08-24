@@ -39,6 +39,10 @@ class PaymentToken implements PaymentTokenRequestInterface
         $this->paymentToken = $paymentToken;
     }
 
+    /**
+     * @param CartInterface $cart
+     * @return string
+     */
     public function generate(CartInterface $cart)
     {
         $token = $this->paymentToken->forCart($cart);
@@ -46,6 +50,11 @@ class PaymentToken implements PaymentTokenRequestInterface
         return $token;
     }
 
+    /**
+     * @param string $cartId
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function generateForCustomer($cartId)
     {
         $cart = $this->cartRepository->get($cartId);
@@ -53,6 +62,11 @@ class PaymentToken implements PaymentTokenRequestInterface
         return $this->generate($cart);
     }
 
+    /**
+     * @param string $cartId
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
     public function generateForGuest($cartId)
     {
         $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');

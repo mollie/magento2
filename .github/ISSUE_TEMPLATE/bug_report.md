@@ -25,7 +25,7 @@ Steps to reproduce the behavior:
 **Expected behavior**
 A clear and concise description of what you expected to happen.
 
-**Expected behavior**
+**Actual behavior**
 A clear and concise description of what actually happens.
 
 **Screenshots**

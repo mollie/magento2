@@ -10,7 +10,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\ObjectManagerInterface;
 use Mollie\Payment\Model\Mollie as MollieModel;
-use Mollie\Payment\Service\Mollie\Compatibility\TestExtensionAttributes;
+use Mollie\Payment\Service\Mollie\Compatibility\CompatibilityTestInterface;
 
 /**
  * Class Tests
@@ -31,9 +31,9 @@ class Tests extends AbstractHelper
      */
     private $mollieModel;
     /**
-     * @var TestExtensionAttributes
+     * @var CompatibilityTestInterface[]
      */
-    private $testExtensionAttributes;
+    private $tests;
 
     /**
      * Tests constructor.
@@ -41,17 +41,17 @@ class Tests extends AbstractHelper
      * @param Context                 $context
      * @param ObjectManagerInterface  $objectManager
      * @param MollieModel             $mollieModel
-     * @param TestExtensionAttributes $testExtensionAttributes
+     * @param array                   $tests
      */
     public function __construct(
         Context $context,
         ObjectManagerInterface $objectManager,
         MollieModel $mollieModel,
-        TestExtensionAttributes $testExtensionAttributes
+        array $tests
     ) {
         $this->objectManager = $objectManager;
         $this->mollieModel = $mollieModel;
-        $this->testExtensionAttributes = $testExtensionAttributes;
+        $this->tests = $tests;
         parent::__construct($context);
     }
 
@@ -176,7 +176,9 @@ class Tests extends AbstractHelper
             $results[] = '<span class="mollie-error">' . $msg . '</span>';
         }
 
-        $results = $this->testExtensionAttributes->execute($results);
+        foreach ($this->tests as $test) {
+            $results = $test->execute($results);
+        }
 
         return $results;
     }

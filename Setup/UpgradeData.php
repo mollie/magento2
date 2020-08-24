@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Setup;
 
+use Magento\Config\Model\ResourceModel\Config\Data\Collection as ConfigReader;
 use Magento\Customer\Setup\CustomerSetupFactory;
 use Magento\Sales\Setup\SalesSetupFactory;
 use Magento\Config\Model\ResourceModel\Config;
@@ -16,6 +17,7 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Mollie\Payment\Config as MollieConfig;
 
 /**
  * Class UpgradeData
@@ -52,6 +54,16 @@ class UpgradeData implements UpgradeDataInterface
     private $storeManager;
 
     /**
+     * @var MollieConfig
+     */
+    private $mollieConfig;
+
+    /**
+     * @var Config\Data\Collection
+     */
+    private $configReader;
+
+    /**
      * UpgradeData constructor.
      *
      * @param SalesSetupFactory $salesSetupFactory
@@ -59,19 +71,25 @@ class UpgradeData implements UpgradeDataInterface
      * @param Config $resourceConfig
      * @param WriterInterface $configWriter
      * @param StoreManagerInterface $storeManager
+     * @param MollieConfig $mollieConfig
+     * @param ConfigReader $configReader
      */
     public function __construct(
         SalesSetupFactory $salesSetupFactory,
         ResourceConnection $resourceConnection,
         Config $resourceConfig,
         WriterInterface $configWriter,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        MollieConfig $mollieConfig,
+        ConfigReader $configReader
     ) {
         $this->salesSetupFactory = $salesSetupFactory;
         $this->resourceConnection = $resourceConnection;
         $this->resourceConfig = $resourceConfig;
         $this->configWriter = $configWriter;
         $this->storeManager = $storeManager;
+        $this->mollieConfig = $mollieConfig;
+        $this->configReader = $configReader;
     }
 
     /**
@@ -94,6 +112,10 @@ class UpgradeData implements UpgradeDataInterface
 
         if (version_compare($context->getVersion(), '1.6.2', '<')) {
             $this->addIndexes($setup);
+        }
+
+        if (version_compare($context->getVersion(), '1.13.1', '<')) {
+            $this->updateCustomerReturnUrl();
         }
 
         // This should run every time
@@ -202,6 +224,44 @@ class UpgradeData implements UpgradeDataInterface
             $setup->getTable('sales_shipment'),
             $this->resourceConnection->getIdxName('sales_shipment', ['mollie_shipment_id']),
             ['mollie_shipment_id']
+        );
+    }
+
+    /**
+     * The return url is changed. Before this params where added by default, but now you can now add placeholders in
+     * the url which will be replaced. That's why we append this variables to the url by default when the url is set.
+     */
+    private function updateCustomerReturnUrl()
+    {
+        $collection = $this->configReader->addFieldToFilter('path', [
+            'eq' => 'payment/mollie_general/custom_redirect_url'
+        ]);
+
+        foreach ($collection as $configItem) {
+            $this->updateCustomerReturnUrlForScope(
+                $configItem->getData('scope'),
+                $configItem->getData('scope_id'),
+                $configItem->getData('value')
+            );
+        }
+    }
+
+    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId, string $currentValue)
+    {
+        $append = '?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&utm_nooverride=1';
+
+        // The value already contains the new string so don't append it twice.
+        if (strpos($currentValue, $append) !== false) {
+            return;
+        }
+
+        $newValue = $currentValue . $append;
+
+        $this->configWriter->save(
+            'payment/mollie_general/custom_redirect_url',
+            $newValue,
+            $scope,
+            $scopeId
         );
     }
 }

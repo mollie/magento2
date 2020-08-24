@@ -193,7 +193,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
             Table::TYPE_INTEGER,
             null,
             ['unsigned' => true, 'nullable' => false],
-            'Quote Id'
+            'Customer Id'
         );
 
         $table->addColumn(

@@ -3,7 +3,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v1.15.1</version>
+                <version>v1.16.1</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -21,6 +21,7 @@
                 <second_chance_email_template>payment_other_mollie_mollie_general_second_chance_email_template</second_chance_email_template>
                 <dashboard_url_orders_api>https://www.mollie.com/dashboard/orders/{id}</dashboard_url_orders_api>
                 <dashboard_url_payments_api>https://www.mollie.com/dashboard/payments/{id}</dashboard_url_payments_api>
+                <use_webhooks>enabled</use_webhooks>
             </mollie_general>
             <mollie_methods_bancontact>
                 <active>1</active>

@@ -9,9 +9,8 @@ namespace Mollie\Payment\Api\Webapi;
 interface StartTransactionRequestInterface
 {
     /**
-     * @param string $cartId
-     * @param int $orderId
+     * @param string $token
      * @return string
      */
-    public function execute($token);
+    public function execute(string $token);
 }

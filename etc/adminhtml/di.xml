@@ -22,4 +22,13 @@
     <type name="Magento\Email\Model\Template\Config">
         <plugin name="mollie_payment_fix_the_path" type="Mollie\Payment\Plugin\Email\Model\Template\Config" />
     </type>
+
+    <type name="Mollie\Payment\Helper\Tests">
+        <arguments>
+            <argument name="tests" xsi:type="array">
+                <item xsi:type="object" name="extension_attributes">Mollie\Payment\Service\Mollie\Compatibility\TestExtensionAttributes</item>
+                <item xsi:type="object" name="webhooks_disabled">Mollie\Payment\Service\Mollie\Compatibility\TestWebhooksDisabled</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
