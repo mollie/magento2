@@ -28,7 +28,7 @@ require([
             if (Array.isArray(result)) {
 
                 var lisHtml = result.map(function (err) {
-                    return '<li class="mm-dummy-result_debug-item"><strong>' + err.date + '</strong><p>' + err.msg + '</p></li>';
+                    return '<li class="mm-mollie-result_debug-item"><strong>' + err.date + '</strong><p>' + err.msg + '</p></li>';
                 }).join('');
 
                 $container.find('.result').empty().append('<ul>' + lisHtml + '</ul>');
@@ -47,7 +47,7 @@ require([
             if (Array.isArray(result)) {
 
                 var lisHtml = result.map(function (err) {
-                    return '<li class="mm-dummy-result_error-item"><strong>' + err.date + '</strong><p>' + err.msg + '</p></li>';
+                    return '<li class="mm-mollie-result_error-item"><strong>' + err.date + '</strong><p>' + err.msg + '</p></li>';
                 }).join('');
 
                 $container.find('.result').empty().append('<ul>' + lisHtml + '</ul>');
@@ -62,7 +62,7 @@ require([
          * @param{Object} $container - jQuery container element.
          */
         test: function (result, $container) {
-            var html = '<li class="mm-dummy-result_test-item ' + (result.success ? 'success' : 'failed')
+            var html = '<li class="mm-mollie-result_test-item ' + (result.success ? 'success' : 'failed')
                 + '">'
                 + '<div><p><em>' + result.msg + '</em></p></div></li>';
 
@@ -80,15 +80,15 @@ require([
             var latestVersion = result.last_version.replace(/v|version/gi, '');
 
             if (currentVersion === latestVersion) {
-                resultHtml = '<strong class="mm-dummy-version mm-dummy-icon__thumbs-up">'
+                resultHtml = '<strong class="mm-mollie-version mm-mollie-icon__thumbs-up">'
                     + $.mage.__('Great, you are using the latest version.')
                     + '</strong>';
             } else {
 
-                var translatedResult = $.mage.__('There is a new version available <span>(%1)</span> see <button type="button" id="mm-dummy-button_changelog">changelog</button>.')
+                var translatedResult = $.mage.__('There is a new version available <span>(%1)</span> see <button type="button" id="mm-mollie-button_changelog">changelog</button>.')
                     .replace('%1', latestVersion);
 
-                resultHtml = '<strong class="mm-dummy-version mm-dummy-icon__thumbs-down">'
+                resultHtml = '<strong class="mm-mollie-version mm-mollie-icon__thumbs-down">'
                     + translatedResult
                     + '</strong>';
             }
@@ -108,8 +108,8 @@ require([
                 var date = result[key].date;
                 var resultHtml = result[key].changelog;
 
-                return '<li class="mm-dummy-result_changelog-item"><b>'
-                    + version + '</b><span class="mm-dummy-divider">|</span><b>'
+                return '<li class="mm-mollie-result_changelog-item"><b>'
+                    + version + '</b><span class="mm-mollie-divider">|</span><b>'
                     + date + '</b><div>'
                     + resultHtml + '</div></li>';
             }).join('');
@@ -119,7 +119,7 @@ require([
     }
 
     // init debug modal
-    initModal('#mm-dummy-result_debug-modal', {
+    initModal('#mm-mollie-result_debug-modal', {
         type: 'popup',
         responsive: true,
         innerScroll: true,
@@ -127,10 +127,10 @@ require([
         buttons: [
             {
                 text: $.mage.__('download as .txt file'),
-                class: 'mm-dummy-button__download mm-dummy-icon__download-alt',
+                class: 'mm-mollie-button__download mm-mollie-icon__download-alt',
                 click: function () {
 
-                    var elText = document.getElementById('mm-dummy-result_debug').innerText || '';
+                    var elText = document.getElementById('mm-mollie-result_debug').innerText || '';
                     var link = document.createElement('a');
 
                     link.setAttribute('download', 'debug-log.txt');
@@ -149,7 +149,7 @@ require([
     });
 
     // init error modal
-    initModal('#mm-dummy-result_error-modal', {
+    initModal('#mm-mollie-result_error-modal', {
         type: 'popup',
         responsive: true,
         innerScroll: true,
@@ -157,10 +157,10 @@ require([
         buttons: [
             {
                 text: $.mage.__('download as .txt file'),
-                class: 'mm-dummy-button__download mm-dummy-icon__download-alt',
+                class: 'mm-mollie-button__download mm-mollie-icon__download-alt',
                 click: function () {
 
-                    var elText = document.getElementById('mm-dummy-result_error').innerText || '';
+                    var elText = document.getElementById('mm-mollie-result_error').innerText || '';
                     var link = document.createElement('a');
 
                     link.setAttribute('download', 'error-log.txt');
@@ -179,7 +179,7 @@ require([
     });
 
     // init selftest modal
-    initModal('#mm-dummy-result_test-modal', {
+    initModal('#mm-mollie-result_test-modal', {
         type: 'popup',
         responsive: true,
         innerScroll: true,
@@ -196,7 +196,7 @@ require([
     });
 
     // init changelog modal
-    initModal('#mm-dummy-result_changelog-modal', {
+    initModal('#mm-mollie-result_changelog-modal', {
         type: 'popup',
         responsive: true,
         innerScroll: true,
@@ -213,19 +213,19 @@ require([
     });
 
     // init loader on the Check Version block
-    $('.mm-dummy-result_version-wrapper').loader({texts: ''});
+    $('.mm-mollie-result_version-wrapper').loader({texts: ''});
 
     /**
      * Ajax request event
      */
-    $(document).on('click', '[id^=mm-dummy-button]', function () {
+    $(document).on('click', '[id^=mm-mollie-button]', function () {
         var actionName = this.id.split('_')[1];
-        var $modal = $('#mm-dummy-result_' + actionName + '-modal');
-        var $result = $('#mm-dummy-result_' + actionName);
+        var $modal = $('#mm-mollie-result_' + actionName + '-modal');
+        var $result = $('#mm-mollie-result_' + actionName);
 
         if (actionName === 'version') {
-            $(this).fadeOut(300).addClass('mm-dummy-disabled');
-            $modal = $('.mm-dummy-result_' + actionName + '-wrapper');
+            $(this).fadeOut(300).addClass('mm-mollie-disabled');
+            $modal = $('.mm-mollie-result_' + actionName + '-wrapper');
             $modal.loader('show');
         } else {
             $modal.modal('openModal').loader('show');
@@ -233,7 +233,7 @@ require([
 
         $result.hide();
 
-        new Ajax.Request($modal.data('mm-dummy-endpoind-url'), {
+        new Ajax.Request($modal.data('mm-mollie-endpoint-url'), {
             loaderArea: false,
             asynchronous: true,
             onSuccess: function (response) {

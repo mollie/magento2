@@ -4,15 +4,15 @@
  * See COPYING.txt for license details.
  */
 
-use Magmodules\Dummy\Block\Adminhtml\System\Config\Button\Selftest;
+use Mollie\Payment\Block\Adminhtml\System\Config\Button\Selftest;
 
 /**
- * @see \Magmodules\Dummy\Block\Adminhtml\System\Config\Button\Selftest
+ * @see \Mollie\Payment\Block\Adminhtml\System\Config\Button\Selftest
  * @var Selftest $block
  */
 ?>
-<div id="mm-dummy-result_test-modal" data-mm-dummy-endpoind-url="<?= $block->escapeUrl($block->getSelftestUrl()) ?>">
-    <div id="mm-dummy-result_test">
+<div id="mm-mollie-result_test-modal" data-mm-mollie-endpoint-url="<?= $block->escapeUrl($block->getSelftestUrl()) ?>">
+    <div id="mm-mollie-result_test">
         <ul class="result"></ul>
     </div>
 </div>

@@ -116,8 +116,12 @@
                     <config_path>payment/mollie_general/debug</config_path>
                     <comment>When activated the debug file will be located in: var/log/mollie.log</comment>
                 </field>
-
-                <field id="selftest_button" translate="label" type="button" sortOrder="21" showInDefault="1"
+                <field id="debug_button" translate="label" type="button" sortOrder="21" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label/>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Button\DebugCheck</frontend_model>
+                </field>
+                <field id="selftest_button" translate="label" type="button" sortOrder="23" showInDefault="1"
                        showInWebsite="0" showInStore="0">
                     <label/>
                     <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Button\Selftest</frontend_model>
