@@ -11,7 +11,6 @@ use Magento\Backend\App\Action;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
-use Magmodules\Dummy\Api\Config\RepositoryInterface as ConfigRepository;
 use Mollie\Payment\Config;
 
 class VersionCheck extends Action
@@ -86,7 +85,7 @@ class VersionCheck extends Action
             return $this->file->fileGetContents(
                 sprintf(
                     'http://version.magmodules.eu/%s.json',
-                    ConfigRepository::EXTENSION_CODE
+                    Config::EXTENSION_CODE
                 )
             );
         } catch (\Exception $exception) {
