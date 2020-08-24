@@ -26,10 +26,10 @@
             <group id="version" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
                    showInStore="1">
                 <label>Version</label>
-                <field id="version" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
-                       showInStore="1">
+                <field id="version_button" translate="label" type="button" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
                     <label>Version</label>
-                    <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Version</frontend_model>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Button\VersionCheck</frontend_model>
                 </field>
                 <field id="enabled" translate="label" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="1">
@@ -287,6 +287,18 @@
                         <field id="enable_second_chance_email">1</field>
                     </depends>
                 </field>
+            </group>
+        </section>
+
+        <section id="payment">
+            <group id="mollie" translate="label" type="text" sortOrder="101" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Mollie</label>
+                <group id="branding" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Branding</label>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\Render\PaymentMethodsHeader</frontend_model>
+                </group>
             </group>
         </section>
 

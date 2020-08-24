@@ -10,7 +10,6 @@ namespace Mollie\Payment\Controller\Adminhtml\Log;
 use Exception;
 use Magento\Backend\App\Action;
 use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\FileSystemException;
@@ -18,14 +17,8 @@ use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Serialize\Serializer\Json as SerializerJson;
 
-/**
- * Class debug
- *
- * AJAX controller to check debug log
- */
 class Debug extends Action
 {
-
     /**
      * Debug log file path pattern
      */
@@ -51,15 +44,6 @@ class Debug extends Action
      */
     private $serializerJson;
 
-    /**
-     * Check constructor.
-     *
-     * @param Action\Context $context
-     * @param JsonFactory $resultJsonFactory
-     * @param DirectoryList $dir
-     * @param File $file
-     * @param SerializerJson $serializerJson
-     */
     public function __construct(
         Action\Context $context,
         JsonFactory $resultJsonFactory,
@@ -74,10 +58,6 @@ class Debug extends Action
         parent::__construct($context);
     }
 
-    /**
-     * @return ResponseInterface|Json|ResultInterface
-     * @throws FileSystemException
-     */
     public function execute()
     {
         $resultJson = $this->resultJsonFactory->create();
@@ -89,13 +69,6 @@ class Debug extends Action
         return $resultJson->setData($result);
     }
 
-    /**
-     * Check is log file exists
-     *
-     * @param string $file
-     *
-     * @return bool
-     */
     private function isLogExists(string $file): bool
     {
         try {
@@ -106,14 +79,6 @@ class Debug extends Action
         }
     }
 
-    /**
-     * Prepare encoded log text
-     *
-     * @param string $file
-     *
-     * @return array
-     * @throws FileSystemException
-     */
     private function prepareLogText(string $file): array
     {
         $logFile = sprintf($file, $this->dir->getPath('var'));

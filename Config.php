@@ -11,6 +11,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class Config
 {
+    const EXTENSION_CODE = 'Mollie_Payment';
     const GENERAL_CANCEL_FAILED_ORDERS = 'payment/mollie_general/cancel_failed_orders';
     const GENERAL_DEFAULT_SELECTED_METHOD = 'payment/mollie_general/default_selected_method';
     const GENERAL_DASHBOARD_URL_ORDERS_API = 'payment/mollie_general/dashboard_url_orders_api';
