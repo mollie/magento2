@@ -15,7 +15,7 @@ class StoreCreditTest extends TestCase
      */
     private $objectManager;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = ObjectManager::getInstance();
     }

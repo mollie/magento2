@@ -9,7 +9,7 @@ use Mollie\Payment\Test\Unit\UnitTestCase;
 
 class CsrfValidatorSkipTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

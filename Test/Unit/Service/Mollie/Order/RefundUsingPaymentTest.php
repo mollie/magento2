@@ -29,7 +29,7 @@ class RefundUsingPaymentTest extends TestCase
      */
     private $instance;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->objectManager = new ObjectManager($this);
 

@@ -17,7 +17,7 @@ use Mollie\Payment\Test\Fakes\Model\Methods\IdealFake;
 
 class RedirectTest extends ControllerTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

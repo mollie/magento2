@@ -15,7 +15,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentTokenTest extends IntegrationTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

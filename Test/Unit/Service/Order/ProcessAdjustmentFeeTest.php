@@ -32,7 +32,7 @@ class ProcessAdjustmentFeeTest extends TestCase
      */
     private $refundUsingPaymentMock;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
