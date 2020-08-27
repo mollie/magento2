@@ -256,5 +256,12 @@
                 <mollie_payment_fee>25</mollie_payment_fee>
             </totals_sort>
         </sales>
+        <dev>
+            <js>
+                <minify_exclude>
+                    <mollie>https://js.mollie.com/v1/mollie.js</mollie>
+                </minify_exclude>
+            </js>
+        </dev>
     </default>
 </config>
