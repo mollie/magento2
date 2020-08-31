@@ -1,11 +1,15 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ *  * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Model\Methods;
 
 use Mollie\Api\Endpoints\MethodEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Model\MollieConfigProvider;
-use Mollie\Payment\Test\Unit\Model\Methods\AbstractMethodTest;
+use Mollie\Payment\Test\Integration\Model\Methods\AbstractMethodTest;
 
 class ApplePayTest extends AbstractMethodTest
 {
@@ -26,7 +30,7 @@ class ApplePayTest extends AbstractMethodTest
         }));
 
         /** @var MollieConfigProvider $instance */
-        $instance = $this->objectManager->getObject(MollieConfigProvider::class);
+        $instance = $this->objectManager->get(MollieConfigProvider::class);
         $instance->getActiveMethods($mollieApiClient);
     }
 }

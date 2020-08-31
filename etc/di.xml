@@ -95,7 +95,9 @@
     <type name="Mollie\Payment\Service\Order\Lines\OrderLinesProcessor">
         <arguments>
             <argument name="processors" xsi:type="array">
-                <item name="mealvoucherCategory" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\MealvoucherCategory</item>
+                <item name="voucherCategory" xsi:type="object">
+                    Mollie\Payment\Service\Order\Lines\Processor\VoucherCategory
+                </item>
             </argument>
         </arguments>
     </type>

@@ -8,6 +8,10 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentlinkTest extends IntegrationTestCase
 {
+    protected $instance = Paymentlink::class;
+
+    protected $code = 'paymentlink';
+
     /**
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException

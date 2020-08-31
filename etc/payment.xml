@@ -22,7 +22,7 @@
         <method name="mollie_methods_kbc">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
-        <method name="mollie_methods_mealvoucher">
+        <method name="mollie_methods_voucher">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
         <method name="mollie_methods_paypal">

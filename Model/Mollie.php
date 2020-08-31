@@ -286,7 +286,7 @@ class Mollie extends AbstractMethod
         }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
-        if ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit' || $methodCode == 'mealvoucher') {
+        if ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit' || $methodCode == 'voucher') {
             throw new LocalizedException(__($exception->getMessage()));
         }
 

@@ -2,7 +2,7 @@
 
 namespace Mollie\Payment\Model\Methods;
 
-use Mollie\Payment\Test\Unit\Model\Methods\AbstractMethodTest;
+use Mollie\Payment\Test\Integration\Model\Methods\AbstractMethodTest;
 
 class SofortTest extends AbstractMethodTest
 {

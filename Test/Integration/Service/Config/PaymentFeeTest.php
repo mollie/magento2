@@ -29,7 +29,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_directdebit', true],
             ['mollie_methods_ideal', true],
             ['mollie_methods_kbc', true],
-            ['mollie_methods_mealvoucher', true],
+            ['mollie_methods_voucher', true],
             ['mollie_methods_paypal', true],
             ['mollie_methods_paysafecard', true],
             ['mollie_methods_sofort', true],

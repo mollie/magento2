@@ -8,14 +8,14 @@ namespace Mollie\Payment\Model\Methods;
 
 use Magento\Quote\Api\Data\CartInterface;
 
-class Mealvoucher extends \Mollie\Payment\Model\Mollie
+class Voucher extends \Mollie\Payment\Model\Mollie
 {
     /**
      * Payment method code
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_mealvoucher';
+    protected $_code = 'mollie_methods_voucher';
 
     /**
      * Info instructions block path
@@ -26,7 +26,7 @@ class Mealvoucher extends \Mollie\Payment\Model\Mollie
 
     public function isAvailable(CartInterface $quote = null)
     {
-        if ($quote && !$this->config->getMealvoucherCategory($quote->getStoreId())) {
+        if ($quote && !$this->config->getVoucherCategory($quote->getStoreId())) {
             return false;
         }
 
