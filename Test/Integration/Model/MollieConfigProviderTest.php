@@ -95,13 +95,13 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertSame($expected, $result['payment']['mollie'][$key]);
     }
 
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/locale nl_NL
+     */
     public function testContainsTheLocale()
     {
-        $localeResolverMock = $this->createMock(Resolver::class);
-        $localeResolverMock->method('getLocale')->willReturn('nl_NL');
-
         /** @var MollieConfigProvider $instance */
-        $instance = $this->objectManager->create(MollieConfigProvider::class, ['localeResolver' => $localeResolverMock]);
+        $instance = $this->objectManager->create(MollieConfigProvider::class);
         $result = $instance->getConfig();
 
         $this->assertArrayHasKey('mollie', $result['payment']);
