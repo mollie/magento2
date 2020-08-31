@@ -219,7 +219,7 @@ class MollieConfigProvider implements ConfigProviderInterface
             return $this->methodData;
         }
 
-        try {
+//        try {
             $quote = $this->checkoutSession->getQuote();
             $amount = $this->mollieHelper->getOrderAmountByQuote($quote);
             $params = [
@@ -236,10 +236,10 @@ class MollieConfigProvider implements ConfigProviderInterface
                     'image' => $method->image->size2x
                 ];
             }
-        } catch (\Exception $e) {
-            $this->mollieHelper->addTolog('error', 'Function: getActiveMethods: ' . $e->getMessage());
-            $this->methodData = [];
-        }
+//        } catch (\Exception $e) {
+//            $this->mollieHelper->addTolog('error', 'Function: getActiveMethods: ' . $e->getMessage());
+//            $this->methodData = [];
+//        }
 
         return $this->methodData;
     }

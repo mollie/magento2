@@ -4,10 +4,11 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Order;
+namespace Mollie\Payment\Test\Integration\Service\Order;
 
 use Magento\Payment\Helper\Data;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Order\StartTransaction;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class StartTransactionTest extends IntegrationTestCase

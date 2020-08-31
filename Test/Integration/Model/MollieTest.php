@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Model;
+namespace Mollie\Payment\Test\Integration\Model;
 
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
@@ -9,6 +9,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
+use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieTest extends IntegrationTestCase

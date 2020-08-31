@@ -4,10 +4,11 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Order\TransactionPart;
+namespace Mollie\Payment\Test\Integration\Service\Order\TransactionPart;
 
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
+use Mollie\Payment\Service\Order\TransactionPart\CardToken;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class CardTokenTest extends IntegrationTestCase

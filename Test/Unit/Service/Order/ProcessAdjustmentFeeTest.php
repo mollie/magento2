@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Service\Order;
+namespace Mollie\Payment\Test\Unit\Service\Order;
 
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Sales\Api\Data\CreditmemoInterface;
@@ -8,15 +8,11 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
-use PHPUnit\Framework\TestCase;
+use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
+use Mollie\Payment\Test\Unit\UnitTestCase;
 
-class ProcessAdjustmentFeeTest extends TestCase
+class ProcessAdjustmentFeeTest extends UnitTestCase
 {
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
-
     /**
      * @var ProcessAdjustmentFee
      */
@@ -32,12 +28,8 @@ class ProcessAdjustmentFeeTest extends TestCase
      */
     private $refundUsingPaymentMock;
 
-    protected function setUp()
+    protected function setUpWithoutVoid()
     {
-        parent::setUp();
-
-        $this->objectManager = new ObjectManager($this);
-
         $this->refundUsingPaymentMock = $this->createMock(RefundUsingPayment::class);
 
         $this->instance = $this->objectManager->getObject(ProcessAdjustmentFee::class, [

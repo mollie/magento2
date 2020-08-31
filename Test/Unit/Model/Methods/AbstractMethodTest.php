@@ -1,20 +1,18 @@
 <?php
 
-
 namespace Mollie\Payment\Test\Unit\Model\Methods;
 
-use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Method;
-use Mollie\Api\Endpoints\MethodEndpoint;
-use Mollie\Api\Resources\MethodCollection;
-use Mollie\Payment\Model\MollieConfigProvider;
-use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
-use PHPUnit\Framework\TestCase;
+use Mollie\Api\Endpoints\MethodEndpoint;
+use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Method;
+use Mollie\Api\Resources\MethodCollection;
+use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\MollieConfigProvider;
+use Mollie\Payment\Test\Unit\UnitTestCase;
 
-abstract class AbstractMethodTest extends TestCase
+abstract class AbstractMethodTest extends UnitTestCase
 {
     /**
      * The class to test.
@@ -27,16 +25,6 @@ abstract class AbstractMethodTest extends TestCase
      * @var string
      */
     protected $code = '';
-
-    /**
-     * @var ObjectManager
-     */
-    protected $objectManager;
-
-    protected function setUp()
-    {
-        $this->objectManager = new ObjectManager($this);
-    }
 
     public function testHasAnExistingModel()
     {
@@ -81,6 +69,9 @@ abstract class AbstractMethodTest extends TestCase
 
     public function testThatTheMethodIsActive()
     {
+        $mollieHelperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
+        $mollieHelperMock->method('getOrderAmountByQuote')->willReturn(['value' => 100, 'currency' => 'EUR']);
+
         /** @var Method $method */
         $method = $this->objectManager->getObject(Method::class);
         $method->id = $this->code;
@@ -96,7 +87,9 @@ abstract class AbstractMethodTest extends TestCase
         $mollieApiClient->methods->method('all')->willReturn($methodCollection);
 
         /** @var MollieConfigProvider $instance */
-        $instance = $this->objectManager->getObject(MollieConfigProvider::class);
+        $instance = $this->objectManager->getObject(MollieConfigProvider::class, [
+            'mollieHelper' => $mollieHelperMock,
+        ]);
         $methods = $instance->getActiveMethods($mollieApiClient);
 
         $this->assertArrayHasKey('mollie_methods_' . $this->code, $methods);

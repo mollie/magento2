@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Model\Client;
+namespace Mollie\Payment\Test\Integration\Model\Client;
 
 use Magento\Framework\Phrase;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -11,6 +11,8 @@ use Mollie\Api\Endpoints\PaymentEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Api\Types\PaymentStatus;
+use Mollie\Payment\Model\Client\Orders;
+use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 

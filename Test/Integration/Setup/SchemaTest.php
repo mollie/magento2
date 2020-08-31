@@ -3,21 +3,10 @@
 namespace Mollie\Payment\Test\Integration\Setup;
 
 use Magento\Framework\App\ResourceConnection;
-use Magento\TestFramework\ObjectManager;
-use PHPUnit\Framework\TestCase;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class SchemaTest extends TestCase
+class SchemaTest extends IntegrationTestCase
 {
-    /**
-     * @var \Magento\Framework\App\ObjectManager
-     */
-    private $objectManager;
-
-    protected function setUp()
-    {
-        $this->objectManager = ObjectManager::getInstance();
-    }
-
     public function addedColumnsHaveIndexesProvider()
     {
         return [

@@ -4,11 +4,12 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Webapi;
+namespace Mollie\Payment\Test\Integration\Webapi;
 
 use Magento\Quote\Model\Quote;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use Mollie\Payment\Webapi\PaymentToken;
 
 class PaymentTokenTest extends IntegrationTestCase
 {

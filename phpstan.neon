@@ -3,7 +3,7 @@ parameters:
     ignoreErrors:
 # Not applicable on level 1
 #        - '#Call to an undefined method [a-zA-Z0-9\\_]+::(get|set|uns|has|calc|unset)[A-Z]#'
-        - '#Undefined variable: \$block#'
+        - '#Variable \$block might not be defined.#'
     fileExtensions:
         - php
         - phtml

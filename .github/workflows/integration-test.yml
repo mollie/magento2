@@ -6,13 +6,21 @@ jobs:
   build:
     strategy:
       matrix:
-        PHP_VERSION: [php7-fpm, php71-fpm, php72-fpm]
-        MAGENTO_VERSION: [2.2.11, 2.3.5-p1]
-        exclude:
+        include:
           - PHP_VERSION: php7-fpm
-            MAGENTO_VERSION: 2.3.5-p1
-          - PHP_VERSION: php72-fpm
             MAGENTO_VERSION: 2.2.11
+          - PHP_VERSION: php71-fpm
+            MAGENTO_VERSION: 2.2.11
+          - PHP_VERSION: php71-fpm
+            MAGENTO_VERSION: 2.3.4
+          - PHP_VERSION: php72-fpm
+            MAGENTO_VERSION: 2.3.4
+          - PHP_VERSION: php73-fpm
+            MAGENTO_VERSION: 2.3.4
+          - PHP_VERSION: php73-fpm
+            MAGENTO_VERSION: 2.4.0
+          - PHP_VERSION: php74-fpm
+            MAGENTO_VERSION: 2.4.0
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
@@ -20,11 +28,11 @@ jobs:
       - name: Start Docker
         run: PHP_VERSION=${{ matrix.PHP_VERSION }} MAGENTO_VERSION=magento${{ matrix.MAGENTO_VERSION }} docker-compose -f .github/workflows/templates/docker-compose.yml up -d
 
-      - name: Upload our code into the docker container
-        run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition composer require mollie/magento2:@dev
+      - name: Upload the code into the docker container
+        run: docker cp $(pwd)/. magento-project-community-edition:/data/extensions && docker exec magento-project-community-edition composer require mollie/magento2:@dev && docker exec magento-project-community-edition bash -c "rm -rf /data/vendor/mollie/magento2 && ln -s /data/extensions /data/vendor/mollie/magento2"
 
       - name: Enable developer mode
         run: docker exec magento-project-community-edition php bin/magento deploy:mode:set developer
 
       - name: Run tests
-        run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && ../../../vendor/bin/phpunit"
+        run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && /data/vendor/bin/phpunit -c /data/dev/tests/integration/phpunit.xml"

@@ -1,7 +1,8 @@
 <?php
 
-namespace Mollie\Payment\Model\Methods;
+namespace Mollie\Payment\Test\Unit\Model\Methods;
 
+use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Test\Unit\Model\Methods\AbstractMethodTest;
 
 class IdealTest extends AbstractMethodTest

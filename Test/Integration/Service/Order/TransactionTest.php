@@ -4,10 +4,11 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Order;
+namespace Mollie\Payment\Test\Integration\Service\Order;
 
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class TransactionTest extends IntegrationTestCase
@@ -26,7 +27,7 @@ class TransactionTest extends IntegrationTestCase
 
         $result = $instance->getRedirectUrl($order, 'paymenttoken');
 
-        $this->assertContains('mollie/checkout/process', $result);
+        $this->assertStringContainsString('mollie/checkout/process', $result);
     }
 
     /**
@@ -44,7 +45,7 @@ class TransactionTest extends IntegrationTestCase
 
         $result = $instance->getRedirectUrl($order, 'paymenttoken');
 
-        $this->assertContains('mollie/checkout/process', $result);
+        $this->assertStringContainsString('mollie/checkout/process', $result);
     }
 
     /**
@@ -62,7 +63,7 @@ class TransactionTest extends IntegrationTestCase
 
         $result = $instance->getRedirectUrl($order, 'paymenttoken');
 
-        $this->assertContains('https://www.mollie.com', $result);
+        $this->assertStringContainsString('https://www.mollie.com', $result);
     }
 
     /**
@@ -81,9 +82,9 @@ class TransactionTest extends IntegrationTestCase
 
         $result = $instance->getRedirectUrl($order, 'paymenttoken');
 
-        $this->assertContains('order_id=9999', $result);
-        $this->assertContains('increment_id=8888', $result);
-        $this->assertContains('payment_token=paymenttoken', $result);
+        $this->assertStringContainsString('order_id=9999', $result);
+        $this->assertStringContainsString('increment_id=8888', $result);
+        $this->assertStringContainsString('payment_token=paymenttoken', $result);
     }
 
     /**
@@ -123,7 +124,7 @@ class TransactionTest extends IntegrationTestCase
         $instance = $this->objectManager->create(Transaction::class);
         $result = $instance->getWebhookUrl();
 
-        $this->assertContains('mollie/checkout/webhook/', $result);
+        $this->assertStringContainsString('mollie/checkout/webhook/', $result);
     }
 
     /**
@@ -136,7 +137,7 @@ class TransactionTest extends IntegrationTestCase
         $instance = $this->objectManager->create(Transaction::class);
         $result = $instance->getWebhookUrl();
 
-        $this->assertContains('mollie/checkout/webhook/', $result);
+        $this->assertStringContainsString('mollie/checkout/webhook/', $result);
     }
 
     /**

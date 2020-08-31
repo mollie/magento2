@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Test\Integration\Model\Methods;
+namespace Mollie\Payment\Test\Unit\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Directdebit;
 use Mollie\Payment\Test\Unit\Model\Methods\AbstractMethodTest;
