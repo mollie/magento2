@@ -73,6 +73,9 @@ abstract class AbstractMethodTest extends IntegrationTestCase
 
     public function testThatTheMethodIsActive()
     {
+        $mollieHelperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
+        $mollieHelperMock->method('getOrderAmountByQuote')->willReturn(['value' => 100, 'currency' => 'EUR']);
+
         /** @var Method $method */
         $method = $this->objectManager->create(Method::class);
         $method->id = $this->code;
@@ -88,7 +91,9 @@ abstract class AbstractMethodTest extends IntegrationTestCase
         $mollieApiClient->methods->method('all')->willReturn($methodCollection);
 
         /** @var MollieConfigProvider $instance */
-        $instance = $this->objectManager->create(MollieConfigProvider::class);
+        $instance = $this->objectManager->create(MollieConfigProvider::class, [
+            'mollieHelper' => $mollieHelperMock,
+        ]);
         $methods = $instance->getActiveMethods($mollieApiClient);
 
         $this->assertArrayHasKey('mollie_methods_' . $this->code, $methods);

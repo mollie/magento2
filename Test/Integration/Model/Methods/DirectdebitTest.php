@@ -7,7 +7,6 @@
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Directdebit;
-use Mollie\Payment\Test\Integration\Model\Methods\AbstractMethodTest;
 
 class DirectdebitTest extends AbstractMethodTest
 {

@@ -4,9 +4,9 @@
  *  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Model\Methods;
+namespace Mollie\Payment\Test\Integration\Model\Methods;
 
-use Mollie\Payment\Test\Integration\Model\Methods\AbstractMethodTest;
+use Mollie\Payment\Model\Methods\Eps;
 
 class EpsTest extends AbstractMethodTest
 {

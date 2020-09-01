@@ -4,9 +4,10 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Order\Lines;
+namespace Mollie\Payment\Test\Integration\Service\Order\Lines;
 
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Payment\Service\Order\Lines\PaymentFee;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentFeeTest extends IntegrationTestCase

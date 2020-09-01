@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Test\Ingegration\Model\Methods;
+namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Magento\Quote\Api\Data\CartInterface;
 use Mollie\Payment\Model\Methods\Voucher;

@@ -4,12 +4,15 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\PaymentFee;
+namespace Mollie\Payment\Test\Integration\Service\PaymentFee;
 
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote\Address\Total;
 use Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType;
 use Mollie\Payment\Service\Config\PaymentFee;
+use Mollie\Payment\Service\PaymentFee\Calculate;
+use Mollie\Payment\Service\PaymentFee\MaximumSurcharge;
+use Mollie\Payment\Service\PaymentFee\Result;
 use Mollie\Payment\Service\PaymentFee\Types\FixedAmount;
 use Mollie\Payment\Service\PaymentFee\Types\FixedAmountAndPercentage;
 use Mollie\Payment\Service\PaymentFee\Types\Percentage;

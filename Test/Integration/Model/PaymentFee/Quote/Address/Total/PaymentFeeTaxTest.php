@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Model\PaymentFee\Quote\Address\Total;
+namespace Mollie\Payment\Test\Integration\Model\PaymentFee\Quote\Address\Total;
 
 use Magento\Checkout\Model\Session;
 use Magento\Quote\Api\Data\AddressInterface;
@@ -13,6 +13,7 @@ use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Api\Data\ShippingInterface;
 use Magento\Quote\Model\Quote\Address\Total;
+use Mollie\Payment\Model\PaymentFee\Quote\Address\Total\PaymentFeeTax;
 use Mollie\Payment\Service\PaymentFee\Calculate;
 use Mollie\Payment\Service\PaymentFee\Result;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;

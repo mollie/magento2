@@ -1,8 +1,8 @@
 <?php
 
-namespace Mollie\Payment\Model\Methods;
+namespace Mollie\Payment\Test\Integration\Model\Methods;
 
-use Mollie\Payment\Test\Integration\Model\Methods\AbstractMethodTest;
+use Mollie\Payment\Model\Methods\Sofort;
 
 class SofortTest extends AbstractMethodTest
 {

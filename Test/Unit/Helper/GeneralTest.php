@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Helper;
+namespace Mollie\Payment\Test\Unit\Helper;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
@@ -10,21 +10,12 @@ use Magento\Store\Model\Information;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
+use Mollie\Payment\Helper\General;
 use Mollie\Payment\Helper\General as MollieHelper;
-use PHPUnit\Framework\TestCase;
+use Mollie\Payment\Test\Unit\UnitTestCase;
 
-class GeneralTest extends TestCase
+class GeneralTest extends UnitTestCase
 {
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
-
-    protected function setUp()
-    {
-        $this->objectManager = new ObjectManager($this);
-    }
-
     public function returnsTheCorrectDescriptionProvider()
     {
         return [

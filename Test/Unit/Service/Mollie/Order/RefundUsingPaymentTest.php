@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Service\Mollie\Order;
+namespace Mollie\Payment\Test\Unit\Service\Mollie\Order;
 
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Mollie\Api\Endpoints\OrderEndpoint;
@@ -10,15 +10,11 @@ use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Resources\PaymentFactory;
 use Mollie\Payment\Helper\General;
-use PHPUnit\Framework\TestCase;
+use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
+use Mollie\Payment\Test\Unit\UnitTestCase;
 
-class RefundUsingPaymentTest extends TestCase
+class RefundUsingPaymentTest extends UnitTestCase
 {
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
-
     /**
      * @var \PHPUnit\Framework\MockObject\MockObject
      */
@@ -29,10 +25,8 @@ class RefundUsingPaymentTest extends TestCase
      */
     private $instance;
 
-    protected function setUp()
+    protected function setUpWithoutVoid()
     {
-        $this->objectManager = new ObjectManager($this);
-
         $mockBuilder = $this->getMockBuilder(PaymentFactory::class);
         $mockBuilder->disableOriginalConstructor();
         $mockBuilder->setMethods(['create']);

@@ -4,12 +4,12 @@
  *  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Model\Methods;
+namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Api\Endpoints\MethodEndpoint;
 use Mollie\Api\MollieApiClient;
+use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\MollieConfigProvider;
-use Mollie\Payment\Test\Integration\Model\Methods\AbstractMethodTest;
 
 class ApplePayTest extends AbstractMethodTest
 {
@@ -19,6 +19,9 @@ class ApplePayTest extends AbstractMethodTest
 
     public function testTheIncludeWalletsParameterIsUsed()
     {
+        $mollieHelperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
+        $mollieHelperMock->method('getOrderAmountByQuote')->willReturn(['value' => 100, 'currency' => 'EUR']);
+
         $mollieApiClient = $this->createMock(MollieApiClient::class);
         $mollieApiClient->methods = $this->createMock(MethodEndpoint::class);
 
@@ -27,10 +30,12 @@ class ApplePayTest extends AbstractMethodTest
             $this->assertEquals('applepay', $arguments['includeWallets']);
 
             return true;
-        }));
+        }))->willReturn([]);
 
         /** @var MollieConfigProvider $instance */
-        $instance = $this->objectManager->get(MollieConfigProvider::class);
+        $instance = $this->objectManager->create(MollieConfigProvider::class, [
+            'mollieHelper' => $mollieHelperMock,
+        ]);
         $instance->getActiveMethods($mollieApiClient);
     }
 }
