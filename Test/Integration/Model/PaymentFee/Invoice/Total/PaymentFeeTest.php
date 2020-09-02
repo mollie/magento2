@@ -4,10 +4,11 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Model\PaymentFee\Invoice\Total;
+namespace Mollie\Payment\Test\Integration\Model\PaymentFee\Invoice\Total;
 
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Payment\Model\PaymentFee\Invoice\Total\PaymentFee;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentFeeTest extends IntegrationTestCase

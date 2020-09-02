@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Model;
+namespace Mollie\Payment\Test\Integration\Model;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
@@ -9,6 +9,7 @@ use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class OrderLinesTest extends IntegrationTestCase
@@ -73,7 +74,7 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertCount(1, $result['lines']);
 
         $line = $result['lines'][0];
-        $this->assertEquals('36', $line['amount']['value']);
+        $this->assertEquals(36, $line['amount']['value']);
         $this->assertEquals(1, $line['quantity']);
     }
 
@@ -109,7 +110,7 @@ class OrderLinesTest extends IntegrationTestCase
 
         $this->assertCount(1, $result['lines']);
         $this->assertEquals('ord_abc123', $result['lines'][0]['id']);
-        $this->assertEquals('2', $result['lines'][0]['quantity']);
+        $this->assertEquals(2, $result['lines'][0]['quantity']);
     }
 
     /**
@@ -152,7 +153,7 @@ class OrderLinesTest extends IntegrationTestCase
 
         $this->assertCount(1, $result['lines']);
         $this->assertEquals('ord_abc123', $result['lines'][0]['id']);
-        $this->assertEquals('2', $result['lines'][0]['quantity']);
+        $this->assertEquals(2, $result['lines'][0]['quantity']);
         $this->assertEquals('EUR', $result['lines'][0]['amount']['currency']);
 
         // 100 euro subtotal
@@ -164,7 +165,7 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertEquals(14, $result['lines'][0]['amount']['value']);
     }
 
-    public function tearDown()
+    public function tearDownWithoutVoid()
     {
         $collection = $this->objectManager->create(\Mollie\Payment\Model\ResourceModel\OrderLines\Collection::class);
 

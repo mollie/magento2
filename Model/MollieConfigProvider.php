@@ -38,7 +38,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         'mollie_methods_directdebit',
         'mollie_methods_ideal',
         'mollie_methods_kbc',
-        'mollie_methods_mealvoucher',
+        'mollie_methods_voucher',
         'mollie_methods_paypal',
         'mollie_methods_paysafecard',
         'mollie_methods_sofort',
@@ -168,7 +168,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config = [];
         $config['payment']['mollie']['testmode'] = $this->config->isTestMode();
         $config['payment']['mollie']['profile_id'] = $this->config->getProfileId();
-        $config['payment']['mollie']['locale'] = $this->localeResolver->getLocale();
+        $config['payment']['mollie']['locale'] = $this->config->getLocale();
         $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents();
         $config['payment']['mollie']['appleypay']['integration_type'] = $this->config->applePayIntegrationType();
         $config['payment']['mollie']['store']['name'] = $storeName;

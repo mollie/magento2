@@ -12,6 +12,9 @@ class MollieConfigProviderTest extends UnitTestCase
     {
         $client = new \Mollie\Api\MollieApiClient;
 
+        $mollieHelperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
+        $mollieHelperMock->method('getOrderAmountByQuote')->willReturn(['value' => 100, 'currency' => 'EUR']);
+
         $methodsEndpointMock = $this->createMock(\Mollie\Api\Endpoints\MethodEndpoint::class);
         $methodsEndpointMock->expects($this->once())->method('all')->willReturn([
             (object)[
@@ -24,7 +27,9 @@ class MollieConfigProviderTest extends UnitTestCase
         $client->methods = $methodsEndpointMock;
 
         /** @var MollieConfigProvider $instance */
-        $instance = $this->objectManager->getObject(MollieConfigProvider::class);
+        $instance = $this->objectManager->getObject(MollieConfigProvider::class, [
+            'mollieHelper' => $mollieHelperMock,
+        ]);
 
         $result = $instance->getActiveMethods($client);
         $this->assertTrue(is_array($result));

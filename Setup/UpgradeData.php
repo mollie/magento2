@@ -6,7 +6,7 @@
 
 namespace Mollie\Payment\Setup;
 
-use Magento\Config\Model\ResourceModel\Config\Data\Collection as ConfigReader;
+use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigReaderFactory;
 use Magento\Customer\Setup\CustomerSetupFactory;
 use Magento\Sales\Setup\SalesSetupFactory;
 use Magento\Config\Model\ResourceModel\Config;
@@ -61,7 +61,7 @@ class UpgradeData implements UpgradeDataInterface
     /**
      * @var Config\Data\Collection
      */
-    private $configReader;
+    private $configReaderFactory;
 
     /**
      * UpgradeData constructor.
@@ -72,7 +72,7 @@ class UpgradeData implements UpgradeDataInterface
      * @param WriterInterface $configWriter
      * @param StoreManagerInterface $storeManager
      * @param MollieConfig $mollieConfig
-     * @param ConfigReader $configReader
+     * @param ConfigReaderFactory $configReaderFactory
      */
     public function __construct(
         SalesSetupFactory $salesSetupFactory,
@@ -81,7 +81,7 @@ class UpgradeData implements UpgradeDataInterface
         WriterInterface $configWriter,
         StoreManagerInterface $storeManager,
         MollieConfig $mollieConfig,
-        ConfigReader $configReader
+        ConfigReaderFactory $configReaderFactory
     ) {
         $this->salesSetupFactory = $salesSetupFactory;
         $this->resourceConnection = $resourceConnection;
@@ -89,7 +89,7 @@ class UpgradeData implements UpgradeDataInterface
         $this->configWriter = $configWriter;
         $this->storeManager = $storeManager;
         $this->mollieConfig = $mollieConfig;
-        $this->configReader = $configReader;
+        $this->configReaderFactory = $configReaderFactory;
     }
 
     /**
@@ -116,6 +116,10 @@ class UpgradeData implements UpgradeDataInterface
 
         if (version_compare($context->getVersion(), '1.13.1', '<')) {
             $this->updateCustomerReturnUrl();
+        }
+
+        if (version_compare($context->getVersion(), '1.17.0', '<')) {
+            $this->renameMealVoucherToVoucher();
         }
 
         // This should run every time
@@ -233,7 +237,7 @@ class UpgradeData implements UpgradeDataInterface
      */
     private function updateCustomerReturnUrl()
     {
-        $collection = $this->configReader->addFieldToFilter('path', [
+        $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
             'eq' => 'payment/mollie_general/custom_redirect_url'
         ]);
 
@@ -263,5 +267,71 @@ class UpgradeData implements UpgradeDataInterface
             $scope,
             $scopeId
         );
+    }
+
+    private function renameMealVoucherToVoucher()
+    {
+        $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
+            'eq' => 'payment/mollie_methods_mealvoucher/category'
+        ]);
+
+        $replacements = [
+            'food_and_drinks' => 'meal',
+            'home_and_garden' => 'eco',
+            'gifts_and_flowers' => 'gift',
+        ];
+
+        foreach ($collection as $item) {
+            $value = str_replace(
+                array_keys($replacements),
+                array_values($replacements),
+                $item->getData('value')
+            );
+
+            $this->configWriter->save(
+                'payment/mollie_methods_mealvoucher/category',
+                $value,
+                $item->getData('scope'),
+                $item->getData('scope_id')
+            );
+        }
+
+        $paths = [
+            'payment/mollie_methods_%s/active',
+            'payment/mollie_methods_%s/title',
+            'payment/mollie_methods_%s/payment_description',
+            'payment/mollie_methods_%s/category',
+            'payment/mollie_methods_%s/custom_attribute',
+            'payment/mollie_methods_%s/days_before_expire',
+            'payment/mollie_methods_%s/allowspecific',
+            'payment/mollie_methods_%s/specificcountry',
+            'payment/mollie_methods_%s/min_order_total',
+            'payment/mollie_methods_%s/max_order_total',
+            'payment/mollie_methods_%s/payment_surcharge_type',
+            'payment/mollie_methods_%s/payment_surcharge_fixed_amount',
+            'payment/mollie_methods_%s/payment_surcharge_percentage',
+            'payment/mollie_methods_%s/payment_surcharge_limit',
+            'payment/mollie_methods_%s/payment_surcharge_tax_class',
+            'payment/mollie_methods_%s/sort_order',
+        ];
+
+        foreach ($paths as $path) {
+            $this->changeConfigPath(
+                sprintf($path, 'mealvoucher'),
+                sprintf($path, 'voucher')
+            );
+        }
+    }
+
+    private function changeConfigPath($oldPath, $newPath)
+    {
+        $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
+            'eq' => $oldPath,
+        ]);
+
+        foreach ($collection as $item) {
+            $item->setData('path', $newPath);
+            $item->save();
+        }
     }
 }

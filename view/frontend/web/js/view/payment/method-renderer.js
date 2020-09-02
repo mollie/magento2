@@ -39,7 +39,8 @@ define(
             {type: 'mollie_methods_klarnasliceit', component: defaultComponent},
             {type: 'mollie_methods_giftcard', component: giftcardComponent},
             {type: 'mollie_methods_przelewy24', component: defaultComponent},
-            {type: 'mollie_methods_mybank', component: defaultComponent}
+            {type: 'mollie_methods_mybank', component: defaultComponent},
+            {type: 'mollie_methods_voucher', component: defaultComponent}
         ];
 
         function canUseApplePay()

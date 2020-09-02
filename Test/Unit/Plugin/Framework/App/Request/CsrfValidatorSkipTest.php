@@ -1,18 +1,19 @@
 <?php
 
-namespace Mollie\Payment\Plugin\Framework\App\Request;
+namespace Mollie\Payment\Test\Unit\Plugin\Framework\App\Request;
 
 use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\Request\CsrfValidator;
 use Magento\Framework\UrlInterface;
+use Mollie\Payment\Plugin\Framework\App\Request\CsrfValidatorSkip;
 use Mollie\Payment\Test\Unit\UnitTestCase;
+
+require_once __DIR__ . '/../../../../UnitTestCase.php';
 
 class CsrfValidatorSkipTest extends UnitTestCase
 {
-    protected function setUp()
+    protected function setUpWithoutVoid()
     {
-        parent::setUp();
-
         if (!class_exists(CsrfValidator::class)) {
             $this->markTestSkipped('The class ' . CsrfValidator::class . ' is only available on Magento 2.3 and later');
         }

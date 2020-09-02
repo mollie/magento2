@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Config;
+namespace Mollie\Payment\Test\Integration\Service\Config;
 
 use Magento\Checkout\Model\Session;
 use Magento\Quote\Model\Quote;
@@ -12,6 +12,7 @@ use Magento\Tax\Api\TaxCalculationInterface;
 use Magento\Tax\Api\TaxRateRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType;
+use Mollie\Payment\Service\Config\PaymentFee;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentFeeTest extends IntegrationTestCase
@@ -29,7 +30,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_directdebit', true],
             ['mollie_methods_ideal', true],
             ['mollie_methods_kbc', true],
-            ['mollie_methods_mealvoucher', true],
+            ['mollie_methods_voucher', true],
             ['mollie_methods_paypal', true],
             ['mollie_methods_paysafecard', true],
             ['mollie_methods_sofort', true],

@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Order\Lines;
+namespace Mollie\Payment\Test\Integration\Service\Order\Lines;
 
 use Mollie\Payment\Service\Order\Lines\Order as Subject;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;

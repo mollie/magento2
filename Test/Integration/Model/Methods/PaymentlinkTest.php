@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Test\Ingegration\Model\Methods;
+namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Magento\Framework\DataObject;
 use Mollie\Payment\Model\Methods\Paymentlink;
@@ -8,6 +8,10 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentlinkTest extends IntegrationTestCase
 {
+    protected $instance = Paymentlink::class;
+
+    protected $code = 'paymentlink';
+
     /**
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException

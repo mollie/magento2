@@ -1,8 +1,9 @@
 <?php
 
-namespace Mollie\Payment\Service\Order;
+namespace Mollie\Payment\Test\Integration\Service\Order;
 
 use Magento\Sales\Api\Data\InvoiceInterface;
+use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PartialInvoiceTest extends IntegrationTestCase

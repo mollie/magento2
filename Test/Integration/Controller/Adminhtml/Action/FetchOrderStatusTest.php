@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Controller\Adminhtml\Action;
+namespace Mollie\Payment\Test\Integration\Controller\Adminhtml\Action;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\MessageInterface;

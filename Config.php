@@ -20,6 +20,7 @@ class Config
     const GENERAL_ENABLE_SECOND_CHANCE_EMAIL = 'payment/mollie_general/enable_second_chance_email';
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
+    const GENERAL_LOCALE = 'payment/mollie_general/locale';
     const GENERAL_ORDER_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
@@ -39,8 +40,8 @@ class Config
     const PAYMENT_METHOD_PAYMENT_TITLE = 'payment/mollie_methods_%s/title';
     const PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID = 'payment/mollie_methods_paymentlink/allow_mark_as_paid';
     const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
-    const PAYMENT_MEALVOUCHER_CATEGORY = 'payment/mollie_methods_mealvoucher/category';
-    const PAYMENT_MEALVOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_mealvoucher/custom_attribute';
+    const PAYMENT_VOUCHER_CATEGORY = 'payment/mollie_methods_voucher/category';
+    const PAYMENT_VOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_voucher/custom_attribute';
 
     /**
      * @var ScopeConfigInterface
@@ -314,9 +315,9 @@ class Config
     /**
      * @return string|null
      */
-    public function getMealvoucherCategory($storeId = null)
+    public function getVoucherCategory($storeId = null)
     {
-        $value = $this->getPath(static::PAYMENT_MEALVOUCHER_CATEGORY, $storeId);
+        $value = $this->getPath(static::PAYMENT_VOUCHER_CATEGORY, $storeId);
 
         if ($value == 'null') {
             return null;
@@ -329,9 +330,9 @@ class Config
      * @param null|int|string $storeId
      * @return string
      */
-    public function getMealvoucherCustomAttribute($storeId = null)
+    public function getVoucherCustomAttribute($storeId = null)
     {
-        return $this->getPath(static::PAYMENT_MEALVOUCHER_CUSTOM_ATTRIBUTE, $storeId);
+        return $this->getPath(static::PAYMENT_VOUCHER_CUSTOM_ATTRIBUTE, $storeId);
     }
 
     /**
@@ -369,6 +370,15 @@ class Config
     public function customRedirectUrl($storeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
         return $this->getPath(static::GENERAL_CUSTOM_REDIRECT_URL, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return string
+     */
+    public function getLocale($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_LOCALE, $storeId);
     }
 
     /**

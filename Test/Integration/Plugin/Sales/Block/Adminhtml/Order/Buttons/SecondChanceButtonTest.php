@@ -4,12 +4,13 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons;
+namespace Mollie\Payment\Test\Integration\Plugin\Sales\Block\Adminhtml\Order\Buttons;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as Subject;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Config;
+use Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons\SecondChanceButton;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class SecondChanceButtonTest extends IntegrationTestCase
