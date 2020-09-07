@@ -258,6 +258,8 @@ class Mollie extends AbstractMethod
      */
     public function startTransaction(Order $order)
     {
+        $this->_eventManager->dispatch('mollie_start_transaction', ['order' => $order]);
+
         $storeId = $order->getStoreId();
         if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
             return false;
@@ -345,6 +347,7 @@ class Mollie extends AbstractMethod
     {
         /** @var \Magento\Sales\Model\Order $order */
         $order = $this->orderRepository->get($orderId);
+        $this->_eventManager->dispatch('mollie_process_transaction_start', ['order' => $order]);
         if (empty($order)) {
             $msg = ['error' => true, 'msg' => __('Order not found')];
             $this->mollieHelper->addTolog('error', $msg);
@@ -386,6 +389,8 @@ class Mollie extends AbstractMethod
         } catch (\Exception $exception) {
             $connection->rollBack();
             throw $exception;
+        } finally {
+            $this->_eventManager->dispatch('mollie_process_transaction_end', ['order' => $order]);
         }
     }
 
