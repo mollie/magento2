@@ -101,4 +101,8 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Framework\View\Asset\Minification">
+        <plugin name="disable_minification_for_components_js" type="Mollie\Payment\Plugin\Framework\View\Asset\DisableMinificationForComponentsJs" />
+    </type>
 </config>
