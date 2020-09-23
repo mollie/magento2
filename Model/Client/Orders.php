@@ -978,11 +978,19 @@ class Orders extends AbstractModel
          */
         /** @var Order\Shipment\Item $item */
         foreach ($shipment->getAllItems() as $item) {
+            /**
+             * Some extensions create shipments for all items, but that causes problems, so ignore them.
+             */
+            if (!isset($shippableOrderItems[$item->getOrderItemId()])) {
+                continue;
+            }
+
             if ($item->getOrderItem()->getProductType() == ProductType::TYPE_BUNDLE &&
                 $item->getOrderItem()->isShipSeparately()
             ) {
                 continue;
             }
+
 
             $shippableOrderItems[$item->getOrderItemId()] -= $item->getQty();
         }
