@@ -105,4 +105,10 @@
     <type name="Magento\Framework\View\Asset\Minification">
         <plugin name="disable_minification_for_components_js" type="Mollie\Payment\Plugin\Framework\View\Asset\DisableMinificationForComponentsJs" />
     </type>
+
+    <type name="Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex\RestoreQuoteOfUnsuccessfulPayment">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 </config>
