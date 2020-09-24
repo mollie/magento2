@@ -11,8 +11,4 @@
     <type name="Magento\Framework\App\Request\CsrfValidator">
         <plugin name="mollie_csrf_validation_disable" type="Mollie\Payment\Plugin\Framework\App\Request\CsrfValidatorSkip" />
     </type>
-
-    <type name="Magento\Framework\View\Asset\Minification">
-        <plugin name="disable_minification_for_components_js" type="Mollie\Payment\Plugin\Framework\View\Asset\DisableMinificationForComponentsJs" />
-    </type>
 </config>
