@@ -287,6 +287,13 @@
                         <field id="enable_second_chance_email">1</field>
                     </depends>
                 </field>
+                <field id="automatically_send_second_chance_emails" translate="label" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="0" showInStore="1">
+                    <label>Automatically Send Second Chance Emails</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/automatically_send_second_chance_emails</config_path>
+                    <comment><![CDATA[This will add a "sent second chance email" button to the orders in the back-end. This email is only sent after triggering this manually.]]></comment>
+                </field>
             </group>
         </section>
 

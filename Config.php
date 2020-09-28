@@ -12,6 +12,7 @@ use Magento\Store\Model\ScopeInterface;
 class Config
 {
     const EXTENSION_CODE = 'Mollie_Payment';
+    const GENERAL_AUTOMATICALLY_SEND_SECOND_CHANCE_EMAILS = 'payment/mollie_general/automatically_send_second_chance_emails';
     const GENERAL_CANCEL_FAILED_ORDERS = 'payment/mollie_general/cancel_failed_orders';
     const GENERAL_CUSTOM_REDIRECT_URL = 'payment/mollie_general/custom_redirect_url';
     const GENERAL_CUSTOM_WEBHOOK_URL = 'payment/mollie_general/custom_webhook_url';
@@ -109,6 +110,15 @@ class Config
     public function isSecondChanceEmailEnabled($storeId = null)
     {
         return $this->isSetFlag(static::GENERAL_ENABLE_SECOND_CHANCE_EMAIL, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function automaticallySendSecondChanceEmails($storeId = null)
+    {
+        return $this->isSetFlag(static::GENERAL_AUTOMATICALLY_SEND_SECOND_CHANCE_EMAILS, $storeId);
     }
 
     /**

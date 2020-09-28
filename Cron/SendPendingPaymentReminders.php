@@ -12,10 +12,16 @@ use Magento\Framework\Api\SortOrderFactory;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
+use Mollie\Payment\Config;
 use Mollie\Payment\Service\Order\PaymentReminder;
 
 class SendPendingPaymentReminders
 {
+    /**
+     * @var Config
+     */
+    private $config;
+
     /**
      * @var PendingPaymentReminderRepositoryInterface
      */
@@ -42,12 +48,14 @@ class SendPendingPaymentReminders
     private $paymentReminder;
 
     public function __construct(
+        Config $config,
         PendingPaymentReminderRepositoryInterface $paymentReminderRepository,
         SearchCriteriaBuilder $builder,
         SortOrderFactory $sortOrderFactory,
         DateTime $dateTime,
         PaymentReminder $paymentReminder
     ) {
+        $this->config = $config;
         $this->paymentReminderRepository = $paymentReminderRepository;
         $this->builder = $builder;
         $this->sortOrderFactory = $sortOrderFactory;
@@ -57,6 +65,10 @@ class SendPendingPaymentReminders
 
     public function execute()
     {
+        if (!$this->config->automaticallySendSecondChanceEmails()) {
+            return;
+        }
+
         do {
             /** @var SortOrder $sortOrder */
             $sortOrder = $this->sortOrderFactory->create();
