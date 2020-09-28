@@ -11,6 +11,7 @@ use Magento\Store\Model\ScopeInterface;
 
 class Config
 {
+    const EXTENSION_CODE = 'Mollie_Payment';
     const GENERAL_CANCEL_FAILED_ORDERS = 'payment/mollie_general/cancel_failed_orders';
     const GENERAL_CUSTOM_REDIRECT_URL = 'payment/mollie_general/custom_redirect_url';
     const GENERAL_CUSTOM_WEBHOOK_URL = 'payment/mollie_general/custom_webhook_url';

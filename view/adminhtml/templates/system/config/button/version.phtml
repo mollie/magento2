@@ -1,0 +1,25 @@
+<?php
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Mollie\Payment\Block\Adminhtml\System\Config\Button\VersionCheck;
+
+/**
+ * @see \Mollie\Payment\Block\Adminhtml\System\Config\Button\VersionCheck
+ * @var VersionCheck $block
+ */
+?>
+<div class="mm-mollie-result_version-wrapper"
+     data-mm-mollie-endpoint-url="<?= $block->escapeUrl($block->getVersionCheckUrl()) ?>">
+    <span><?= $block->escapeHtml($block->getVersion()); ?></span>
+    <?= $block->getButtonHtml() ?>
+    <div id="mm-mollie-result_version"></div>
+    <div id="mm-mollie-result_changelog-modal"
+         data-mm-mollie-endpoint-url="<?= $block->escapeUrl($block->getChangeLogUrl()) ?>">
+        <div id="mm-mollie-result_changelog">
+            <ul class="result"></ul>
+        </div>
+    </div>
+</div>
