@@ -12,6 +12,14 @@
     <preference for="Mollie\Payment\Api\Data\MollieCustomerInterface" type="Mollie\Payment\Model\Data\MollieCustomer"/>
     <preference for="Mollie\Payment\Api\Data\CustomerSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
+    <preference for="Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface" type="Mollie\Payment\Model\PendingPaymentReminderRepository"/>
+    <preference for="Mollie\Payment\Api\Data\PendingPaymentReminderInterface" type="Mollie\Payment\Model\Data\PendingPaymentReminder"/>
+    <preference for="Mollie\Payment\Api\Data\PendingPaymentReminderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <preference for="Mollie\Payment\Api\SentPaymentReminderRepositoryInterface" type="Mollie\Payment\Model\SentPaymentReminderRepository"/>
+    <preference for="Mollie\Payment\Api\Data\SentPaymentReminderInterface" type="Mollie\Payment\Model\Data\SentPaymentReminder"/>
+    <preference for="Mollie\Payment\Api\Data\SentPaymentReminderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
     <type name="Mollie\Payment\Logger\Handler">
         <arguments>
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
@@ -101,4 +109,27 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="mollie_pending_payment_reminders_data_source" xsi:type="string">PendingPaymentReminderCollection</item>
+                <item name="mollie_sent_payment_reminders_data_source" xsi:type="string">SentPaymentReminderCollection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="PendingPaymentReminderCollection" type="Mollie\Payment\Ui\DataProvider\PaymentReminder\Listing\Pending\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mollie_pending_payment_reminder</argument>
+            <argument name="resourceModel" xsi:type="string">Mollie\Payment\Model\ResourceModel\PendingPaymentReminder</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SentPaymentReminderCollection" type="Mollie\Payment\Ui\DataProvider\PaymentReminder\Listing\Sent\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mollie_sent_payment_reminder</argument>
+            <argument name="resourceModel" xsi:type="string">Mollie\Payment\Model\ResourceModel\SentPaymentReminder</argument>
+        </arguments>
+    </virtualType>
 </config>

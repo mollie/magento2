@@ -24,4 +24,10 @@
     <event name="sales_model_service_quote_submit_success">
         <observer name="mollie_attach_payment_token_to_order" instance="Mollie\Payment\Observer\SalesModelServiceQuoteSubmitSuccess\AttachPaymentTokenToOrder" />
     </event>
+    <event name="mollie_start_transaction">
+        <observer name="mollie_save_pending_payment_reminder" instance="Mollie\Payment\Observer\MollieStartTransaction\SavePendingOrder" />
+    </event>
+    <event name="mollie_process_transaction_end">
+        <observer name="mollie_remove_from_pending_payment_reminder" instance="Mollie\Payment\Observer\MollieProcessTransactionEnd\RemoveCompletedOrdersFromPendingPaymentTable" />
+    </event>
 </config>
