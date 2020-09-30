@@ -122,6 +122,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->renameMealVoucherToVoucher();
         }
 
+        if (version_compare($context->getVersion(), '1.18.0', '<')) {
+            $this->changeSecondChanceEmailTemplatePath();
+        }
+
         // This should run every time
         $this->upgradeActiveState();
 
@@ -332,6 +336,26 @@ class UpgradeData implements UpgradeDataInterface
         foreach ($collection as $item) {
             $item->setData('path', $newPath);
             $item->save();
+        }
+    }
+
+    private function changeSecondChanceEmailTemplatePath()
+    {
+        $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
+            'eq' => 'payment/mollie_general/second_chance_email_template'
+        ]);
+
+        foreach ($collection as $item) {
+            if (stripos($item->getData('value'), 'mollie_general_second_chance_email_template') === false) {
+                return;
+            }
+
+            $this->configWriter->save(
+                'payment/mollie_general/second_chance_email_template',
+                'mollie_second_chance_email_second_chance_email_second_chance_email_template',
+                $item->getData('scope'),
+                $item->getData('scope_id')
+            );
         }
     }
 }
