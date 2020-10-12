@@ -26,6 +26,7 @@ class Config
     const GENERAL_ORDER_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
+    const GENERAL_SECOND_CHANCE_DELAY = 'payment/mollie_general/second_chance_email_delay';
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_USE_CUSTOM_REDIRECT_URL = 'payment/mollie_general/use_custom_redirect_url';
     const GENERAL_USE_WEBHOOKS = 'payment/mollie_general/use_webhooks';
@@ -137,6 +138,15 @@ class Config
     public function secondChanceEmailTemplate($storeId = null)
     {
         return $this->getPath(static::GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return string
+     */
+    public function secondChanceEmailDelay($storeId = null)
+    {
+        return $this->getPath(static::GENERAL_SECOND_CHANCE_DELAY, $storeId);
     }
 
     /**

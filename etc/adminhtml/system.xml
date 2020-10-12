@@ -294,6 +294,15 @@
                     <config_path>payment/mollie_general/automatically_send_second_chance_emails</config_path>
                     <comment><![CDATA[This will add a "sent second chance email" button to the orders in the back-end. This email is only sent after triggering this manually.]]></comment>
                 </field>
+                <field id="second_chance_email_delay" translate="label" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="0" showInStore="1" canRestore="1">
+                    <label>Second Chance Email Delay</label>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\SecondChanceEmailDelay</source_model>
+                    <config_path>payment/mollie_general/second_chance_email_delay</config_path>
+                    <depends>
+                        <field id="enable_second_chance_email">1</field>
+                    </depends>
+                </field>
             </group>
         </section>
 
