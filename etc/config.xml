@@ -23,6 +23,7 @@
                 <dashboard_url_payments_api>https://www.mollie.com/dashboard/payments/{id}</dashboard_url_payments_api>
                 <use_webhooks>enabled</use_webhooks>
                 <automatically_send_second_chance_emails>0</automatically_send_second_chance_emails>
+                <second_chance_email_delay>1</second_chance_email_delay>
             </mollie_general>
             <mollie_methods_bancontact>
                 <active>1</active>

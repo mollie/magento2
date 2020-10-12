@@ -47,11 +47,6 @@ class SendPendingPaymentReminders
      */
     private $paymentReminder;
 
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
         Config $config,
         PendingPaymentReminderRepositoryInterface $paymentReminderRepository,
@@ -75,13 +70,13 @@ class SendPendingPaymentReminders
             return;
         }
 
-        $delay = $this->config->secondChanceEmailDelay();
         do {
             /** @var SortOrder $sortOrder */
             $sortOrder = $this->sortOrderFactory->create();
             $sortOrder->setField('entity_id');
             $sortOrder->setDirection(SortOrder::SORT_ASC);
 
+            $delay = $this->config->secondChanceEmailDelay();
             $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT' . $delay . 'H'));
             $this->builder->addFilter(Order::CREATED_AT, $date, 'lt');
             $this->builder->addSortOrder($sortOrder);
