@@ -200,6 +200,15 @@
                             <field id="enable_second_chance_email">1</field>
                         </depends>
                     </field>
+                    <field id="second_chance_email_delay" translate="label" type="select" sortOrder="270" showInDefault="1"
+                           showInWebsite="0" showInStore="1" canRestore="1">
+                        <label>Second Chance Email Delay</label>
+                        <source_model>Mollie\Payment\Model\Adminhtml\Source\SecondChanceEmailDelay</source_model>
+                        <config_path>payment/mollie_general/second_chance_email_delay</config_path>
+                        <depends>
+                            <field id="enable_second_chance_email">1</field>
+                        </depends>
+                    </field>
                     <field id="heading_advanced" translate="label comment" type="text" sortOrder="270" showInDefault="1"
                            showInWebsite="0" showInStore="0">
                         <label>Advanced: PWA storefront integration</label>

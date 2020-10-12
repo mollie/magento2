@@ -12,6 +12,7 @@ use Magento\Framework\Api\SortOrderFactory;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
+use Mollie\Payment\Config;
 use Mollie\Payment\Service\Order\PaymentReminder;
 
 class SendPendingPaymentReminders
@@ -41,7 +42,13 @@ class SendPendingPaymentReminders
      */
     private $paymentReminder;
 
+    /**
+     * @var Config
+     */
+    private $config;
+
     public function __construct(
+        Config $config,
         PendingPaymentReminderRepositoryInterface $paymentReminderRepository,
         SearchCriteriaBuilder $builder,
         SortOrderFactory $sortOrderFactory,
@@ -53,17 +60,20 @@ class SendPendingPaymentReminders
         $this->sortOrderFactory = $sortOrderFactory;
         $this->dateTime = $dateTime;
         $this->paymentReminder = $paymentReminder;
+        $this->config = $config;
     }
 
     public function execute()
     {
+        $delay = $this->config->secondChanceEmailDelay();
+
         do {
             /** @var SortOrder $sortOrder */
             $sortOrder = $this->sortOrderFactory->create();
             $sortOrder->setField('entity_id');
             $sortOrder->setDirection(SortOrder::SORT_ASC);
 
-            $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT1H'));
+            $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT' . $delay . 'H'));
             $this->builder->addFilter(Order::CREATED_AT, $date, 'lt');
             $this->builder->addSortOrder($sortOrder);
             $this->builder->setPageSize(10);
