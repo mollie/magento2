@@ -22,6 +22,7 @@
                 <dashboard_url_orders_api>https://www.mollie.com/dashboard/orders/{id}</dashboard_url_orders_api>
                 <dashboard_url_payments_api>https://www.mollie.com/dashboard/payments/{id}</dashboard_url_payments_api>
                 <use_webhooks>enabled</use_webhooks>
+                <second_chance_email_delay>1</second_chance_email_delay>
             </mollie_general>
             <mollie_methods_bancontact>
                 <active>1</active>
