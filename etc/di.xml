@@ -111,4 +111,12 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Payment\Service\Order\TransactionProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="saveRemainingAmount" xsi:type="object">Mollie\Payment\Service\Order\ProcessTransaction\SaveRemainingAmount</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
