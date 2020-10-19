@@ -177,7 +177,7 @@
                     <label>Send Invoice Email</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/invoice_notify</config_path>
-                    <comment><![CDATA[Set the notification for to Notify the customer with the Invoice]]></comment>
+                    <comment><![CDATA[Set to yes to send the invoice email to the customer after the invoice is created.]]></comment>
                 </field>
                 <field id="cancel_failed_orders" translate="label" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="0" showInStore="1">
@@ -262,20 +262,19 @@
 
             <group id="second_chance_email" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
                    showInStore="1">
-                <label>Second Change Email</label>
-
+                <label>Second Chance Email</label>
                 <field id="heading_second_chance_email" translate="label comment" type="text" sortOrder="10" showInDefault="1"
                        showInWebsite="0" showInStore="0">
                     <label>Second Chance Email</label>
                     <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-                    <comment><![CDATA[Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either sent these payment reminders manually or activate the e-mail fully automated. ]]></comment>
+                    <comment><![CDATA[Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated.]]></comment>
                 </field>
                 <field id="enable_second_chance_email" translate="label" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="0" showInStore="1">
                     <label>Enable Second Chance Email</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/enable_second_chance_email</config_path>
-                    <comment><![CDATA[This will add a "sent second chance email" button to the orders in the back-end. This email is only sent after triggering this manually.]]></comment>
+                    <comment><![CDATA[This will add a "send second chance email" button to the orders in the back-end. This email is only sent after triggering this manually.]]></comment>
                 </field>
                 <field id="second_chance_email_template" translate="label" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="0" showInStore="1" canRestore="1">

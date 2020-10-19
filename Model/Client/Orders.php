@@ -417,7 +417,7 @@ class Orders extends AbstractModel
                     if ($mollieOrder->amountCaptured !== null) {
                         if ($mollieOrder->amount->currency != $mollieOrder->amountCaptured->currency) {
                             $message = __(
-                                'Mollie: Order Amount %1, Captures Amount %2',
+                                'Mollie: Order Amount %1, Captured Amount %2',
                                 $mollieOrder->amount->currency . ' ' . $mollieOrder->amount->value,
                                 $mollieOrder->amountCaptured->currency . ' ' . $mollieOrder->amountCaptured->value
                             );
@@ -804,7 +804,7 @@ class Orders extends AbstractModel
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
         if (!$order->hasShipments() && ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit')) {
-            $msg = __('Order can only be refunded after Klara has been captured (after shipment)');
+            $msg = __('Order can only be refunded after Klarna has been captured (after shipment)');
             throw new LocalizedException($msg);
         }
 
@@ -857,7 +857,7 @@ class Orders extends AbstractModel
             if ($creditmemo->getShippingAmount() > 0) {
                 $addShippingToRefund = true;
                 if (abs($creditmemo->getShippingInclTax() - $shippingCostsLine->getTotalAmount()) > 0.01) {
-                    $msg = __('Can not create online refund, as shipping costs do not match');
+                    $msg = __('Unable to create online refund, as shipping costs do not match');
                     $this->mollieHelper->addTolog('error', $msg);
                     throw new LocalizedException($msg);
                 }

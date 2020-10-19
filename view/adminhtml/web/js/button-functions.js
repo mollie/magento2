@@ -123,10 +123,10 @@ require([
         type: 'popup',
         responsive: true,
         innerScroll: true,
-        title: $.mage.__('last 100 debug log lines'),
+        title: $.mage.__('Last 100 debug log lines'),
         buttons: [
             {
-                text: $.mage.__('download as .txt file'),
+                text: $.mage.__('Download as .txt file'),
                 class: 'mm-mollie-button__download mm-mollie-icon__download-alt',
                 click: function () {
 
@@ -153,10 +153,10 @@ require([
         type: 'popup',
         responsive: true,
         innerScroll: true,
-        title: $.mage.__('last 100 error log records'),
+        title: $.mage.__('Last 100 error log records'),
         buttons: [
             {
-                text: $.mage.__('download as .txt file'),
+                text: $.mage.__('Download as .txt file'),
                 class: 'mm-mollie-button__download mm-mollie-icon__download-alt',
                 click: function () {
 

@@ -96,7 +96,7 @@ class StoreCreditTest extends IntegrationTestCase
             $instance->getOrderLine($order, true);
         } catch (NoStoreCreditFound $exception) {
             $this->assertEquals(
-                'We where unable to find the store credit for order #999',
+                'We were unable to find the store credit for order #999',
                 $exception->getMessage()
             );
             return;

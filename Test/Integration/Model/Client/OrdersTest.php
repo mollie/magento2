@@ -54,7 +54,7 @@ class OrdersTest extends IntegrationTestCase
                 'USD',
                 OrderStatus::STATUS_PAID,
                 [
-                    'Mollie: Order Amount %1, Captures Amount %2',
+                    'Mollie: Order Amount %1, Captured Amount %2',
                     'Notified customer about invoice #%1'
                 ]
             ],
