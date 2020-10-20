@@ -7,12 +7,18 @@
 namespace Mollie\Payment;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Payment\Model\MethodInterface;
 use Magento\Store\Model\ScopeInterface;
+use Mollie\Payment\Logger\MollieLogger;
+use phpDocumentor\Reflection\Types\Static_;
 
 class Config
 {
     const EXTENSION_CODE = 'Mollie_Payment';
+    const GENERAL_APIKEY_LIVE = 'payment/mollie_general/apikey_live';
+    const GENERAL_APIKEY_TEST = 'payment/mollie_general/apikey_test';
     const GENERAL_AUTOMATICALLY_SEND_SECOND_CHANCE_EMAILS = 'payment/mollie_general/automatically_send_second_chance_emails';
+    const GENERAL_DEBUG = 'payment/mollie_general/debug';
     const GENERAL_CANCEL_FAILED_ORDERS = 'payment/mollie_general/cancel_failed_orders';
     const GENERAL_CUSTOM_REDIRECT_URL = 'payment/mollie_general/custom_redirect_url';
     const GENERAL_CUSTOM_WEBHOOK_URL = 'payment/mollie_general/custom_webhook_url';
@@ -51,10 +57,17 @@ class Config
      */
     private $config;
 
+    /**
+     * @var MollieLogger
+     */
+    private $logger;
+
     public function __construct(
-        ScopeConfigInterface $config
+        ScopeConfigInterface $config,
+        MollieLogger $logger
     ) {
         $this->config = $config;
+        $this->logger = $logger;
     }
 
     /**
@@ -79,11 +92,78 @@ class Config
     }
 
     /**
+     * @param string $type
+     * @param string $data
+     * @return void
+     */
+    private function addToLog(string $type, string $data)
+    {
+        if (!$this->isDebugMode()) {
+            return;
+        }
+
+        if ($type == 'error') {
+            $this->logger->addErrorLog($type, $data);
+        } else {
+            $this->logger->addInfoLog($type, $data);
+        }
+    }
+
+    /**
      * @return string
      */
     public function getVersion()
     {
         return $this->getPath(static::GENERAL_VERSION, null);
+    }
+
+    /**
+     * Returns API key
+     *
+     * @param null|int|string $storeId
+     * @return string
+     */
+    public function getApiKey($storeId = null)
+    {
+        static $keys;
+
+        if (isset($keys[$storeId])) {
+            return $keys[$storeId];
+        }
+
+        if (!$this->isProductionMode($storeId)) {
+            $apiKey = trim($this->getPath(static::GENERAL_APIKEY_TEST, $storeId));
+            if (empty($apiKey)) {
+                $this->addToLog('error', 'Mollie API key not set (test modus)');
+            }
+            if (!preg_match('/^test_\w+$/', $apiKey)) {
+                $this->addToLog('error', 'Mollie set to test modus, but API key does not start with "test_"');
+            }
+
+            $keys[$storeId] = $apiKey;
+            return $apiKey;
+        }
+
+        $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId));
+        if (empty($apiKey)) {
+            $this->addToLog('error', 'Mollie API key not set (live modus)');
+        }
+
+        if (!preg_match('/^live_\w+$/', $apiKey)) {
+            $this->addToLog('error', 'Mollie set to live modus, but API key does not start with "live_"');
+        }
+
+        $keys[$storeId] = $apiKey;
+        return $apiKey;
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function isDebugMode($storeId = null)
+    {
+        return $this->isSetFlag(static::GENERAL_DEBUG, $storeId);
     }
 
     /**

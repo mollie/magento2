@@ -163,20 +163,25 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        $storeName = $this->storeManager->getStore()->getFrontendName();
+        $store = $this->storeManager->getStore();
+        $storeId = $store->getId();
+        $storeName = $store->getFrontendName();
+        $locale = $this->config->getLocale($storeId);
 
         $config = [];
-        $config['payment']['mollie']['testmode'] = $this->config->isTestMode();
-        $config['payment']['mollie']['profile_id'] = $this->config->getProfileId();
-        $config['payment']['mollie']['locale'] = $this->config->getLocale();
-        $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents();
-        $config['payment']['mollie']['appleypay']['integration_type'] = $this->config->applePayIntegrationType();
+        $config['payment']['mollie']['testmode'] = $this->config->isTestMode($storeId);
+        $config['payment']['mollie']['profile_id'] = $this->config->getProfileId($storeId);
+        $config['payment']['mollie']['locale'] = $locale == 'store' ? $this->localeResolver->getLocale() : $locale;
+        $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
+        $config['payment']['mollie']['appleypay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
         $config['payment']['mollie']['store']['name'] = $storeName;
         $apiKey = $this->mollieHelper->getApiKey();
         $useImage = $this->mollieHelper->useImage();
 
+        $activeMethods = [];
         try {
             $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
+            $activeMethods = $this->getActiveMethods($mollieApi);
         } catch (\Exception $exception) {
             $mollieApi = null;
             $this->mollieHelper->addTolog('error', $exception->getMessage());
