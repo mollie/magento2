@@ -38,6 +38,7 @@ use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 use Mollie\Payment\Service\Order\Transaction;
+use Mollie\Payment\Service\Order\TransactionProcessor;
 
 /**
  * Class Orders
@@ -133,6 +134,10 @@ class Orders extends AbstractModel
      * @var DashboardUrl
      */
     private $dashboardUrl;
+    /**
+     * @var TransactionProcessor
+     */
+    private $transactionProcessor;
 
     /**
      * Orders constructor.
@@ -158,6 +163,7 @@ class Orders extends AbstractModel
      * @param BuildTransaction      $buildTransaction
      * @param Config                $config
      * @param DashboardUrl          $dashboardUrl
+     * @param TransactionProcessor  $transactionProcessor
      */
     public function __construct(
         OrderLines $orderLines,
@@ -180,7 +186,8 @@ class Orders extends AbstractModel
         Transaction $transaction,
         BuildTransaction $buildTransaction,
         Config $config,
-        DashboardUrl $dashboardUrl
+        DashboardUrl $dashboardUrl,
+        TransactionProcessor $transactionProcessor
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -203,6 +210,7 @@ class Orders extends AbstractModel
         $this->buildTransaction = $buildTransaction;
         $this->config = $config;
         $this->dashboardUrl = $dashboardUrl;
+        $this->transactionProcessor = $transactionProcessor;
     }
 
     /**
@@ -358,6 +366,7 @@ class Orders extends AbstractModel
             $order->getPayment()->setAdditionalInformation('payment_status', $lastPaymentStatus);
             $this->orderRepository->save($order);
             $this->mollieHelper->registerCancellation($order, $lastPaymentStatus);
+            $this->transactionProcessor->process($order, $mollieOrder);
             $msg = ['success' => false, 'status' => $lastPaymentStatus, 'order_id' => $orderId, 'type' => $type, 'method' => $method];
             $this->mollieHelper->addTolog('success', $msg);
             return $msg;
@@ -413,6 +422,7 @@ class Orders extends AbstractModel
                     }
 
                     $order->setState(Order::STATE_PROCESSING);
+                    $this->transactionProcessor->process($order, $mollieOrder);
 
                     if ($mollieOrder->amountCaptured !== null) {
                         if ($mollieOrder->amount->currency != $mollieOrder->amountCaptured->currency) {
@@ -489,6 +499,7 @@ class Orders extends AbstractModel
                 }
 
                 $order->setState(Order::STATE_PENDING_PAYMENT);
+                $this->transactionProcessor->process($order, $mollieOrder);
                 $order->addStatusToHistory($statusPending, $message, true);
                 $this->orderRepository->save($order);
             }
@@ -829,6 +840,23 @@ class Orders extends AbstractModel
             throw new LocalizedException(
                 __('Mollie API: %1', $exception->getMessage())
             );
+        }
+
+        $remainderAmount = $order->getPayment()->getAdditionalInformation('remainder_amount');
+        $maximumAmountToRefund = $order->getBaseGrandTotal() - $remainderAmount;
+        if ($remainderAmount) {
+            $amount = $creditmemo->getBaseGrandTotal() > $maximumAmountToRefund ? $maximumAmountToRefund : $creditmemo->getBaseGrandTotal();
+
+            $this->refundUsingPayment->execute(
+                $mollieApi,
+                $transactionId,
+                'EUR',
+                $amount
+            );
+
+            $order->setState(Order::STATE_CLOSED);
+
+            return $this;
         }
 
         if ($this->storeCredit->creditmemoHasStoreCredit($creditmemo)) {
