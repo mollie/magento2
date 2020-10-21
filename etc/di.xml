@@ -146,4 +146,12 @@
     <type name="Magento\Quote\Api\PaymentMethodManagementInterface">
         <plugin name="mollie_hide_methods_that_are_not_allowed" type="Mollie\Payment\Plugin\Quote\Api\PaymentMethodManagementPlugin" />
     </type>
+
+    <type name="Mollie\Payment\Service\Order\TransactionProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="saveRemainingAmount" xsi:type="object">Mollie\Payment\Service\Order\ProcessTransaction\SaveRemainingAmount</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
