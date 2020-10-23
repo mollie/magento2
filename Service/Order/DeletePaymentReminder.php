@@ -12,9 +12,15 @@ use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
+use Mollie\Payment\Config;
 
 class DeletePaymentReminder
 {
+    /**
+     * @var Config
+     */
+    private $config;
+
     /**
      * @var DateTime
      */
@@ -36,11 +42,13 @@ class DeletePaymentReminder
     private $paymentReminderRepository;
 
     public function __construct(
+        Config $config,
         DateTime $dateTime,
         SearchCriteriaBuilderFactory $criteriaBuilderFactory,
         OrderRepositoryInterface $orderRepository,
         PendingPaymentReminderRepositoryInterface $paymentReminderRepository
     ) {
+        $this->config = $config;
         $this->dateTime = $dateTime;
         $this->criteriaBuilderFactory = $criteriaBuilderFactory;
         $this->orderRepository = $orderRepository;
@@ -49,7 +57,9 @@ class DeletePaymentReminder
 
     public function byEmail(string $email)
     {
-        $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT1H'));
+        // Delay + 1 hour.
+        $delay = (int)$this->config->secondChanceEmailDelay() + 1;
+        $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT' . $delay . 'H'));
 
         $criteria = $this->criteriaBuilderFactory->create();
         $criteria->addFilter(Order::CUSTOMER_EMAIL, $email);

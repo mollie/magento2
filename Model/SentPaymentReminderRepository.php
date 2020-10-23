@@ -151,6 +151,19 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
     /**
      * {@inheritdoc}
      */
+    public function getByOrderId(int $id)
+    {
+        $sentPaymentReminder = $this->sentPaymentReminderFactory->create();
+        $this->resource->load($sentPaymentReminder, $id, 'order_id');
+        if (!$sentPaymentReminder->getId()) {
+            throw new NoSuchEntityException(__('SentPaymentReminder with id "%1" does not exist.', $id));
+        }
+        return $sentPaymentReminder->getDataModel();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getList(SearchCriteriaInterface $criteria)
     {
         $collection = $this->sentPaymentReminderCollectionFactory->create();

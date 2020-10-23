@@ -19,6 +19,12 @@ interface SentPaymentReminderRepositoryInterface
     public function get(int $id);
 
     /**
+     * @param int $orderId
+     * @return SentPaymentReminderInterface
+     */
+    public function getByOrderId(int $orderId);
+
+    /**
      * @param SearchCriteriaInterface $criteria
      * @return SentPaymentReminderSearchResultsInterface
      */

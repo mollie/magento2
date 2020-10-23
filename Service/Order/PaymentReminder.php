@@ -7,7 +7,7 @@
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\Data\PendingPaymentReminderInterface;
@@ -94,16 +94,28 @@ class PaymentReminder
 
     private function moveReminderFromPendingToSent(OrderInterface $order, PendingPaymentReminderInterface $pendingPaymentReminder): void
     {
-        try {
-            /** @var SentPaymentReminderInterface $sent */
-            $sent = $this->sentPaymentReminderFactory->create();
-            $sent->setOrderId($pendingPaymentReminder->getOrderId());
-
-            $this->sentPaymentReminderRepository->save($sent);
-        } catch (CouldNotSaveException $exception) {
-            // It might already exist
+        if ($this->isAlreadySend($order)) {
+            return;
         }
 
+        /** @var SentPaymentReminderInterface $sent */
+        $sent = $this->sentPaymentReminderFactory->create();
+        $sent->setOrderId($pendingPaymentReminder->getOrderId());
+
+        $this->sentPaymentReminderRepository->save($sent);
+
         $this->deletePaymentReminder->byEmail($order->getCustomerEmail());
+    }
+
+    private function isAlreadySend(OrderInterface $order): bool
+    {
+        try {
+            // The next line throws an exception if the order does not exists
+            $this->sentPaymentReminderRepository->getByOrderId($order->getEntityId());
+            $this->deletePaymentReminder->byEmail($order->getCustomerEmail());
+            return true;
+        } catch (NoSuchEntityException $exception) {
+            return false;
+        }
     }
 }
