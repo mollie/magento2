@@ -292,6 +292,9 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/automatically_send_second_chance_emails</config_path>
                     <comment><![CDATA[This will schedule the "second chance email" fully automatically based on the delay configured below. The sent and queued emails can be found in the Sales > Mollie Payment Reminders tab. Only orders with the status "pending" without a valid transaction on the same email address of the client will be added to the queue.]]></comment>
+                    <depends>
+                        <field id="enable_second_chance_email">1</field>
+                    </depends>
                 </field>
                 <field id="second_chance_email_delay" translate="label" type="select" sortOrder="50" showInDefault="1"
                        showInWebsite="0" showInStore="1" canRestore="1">
