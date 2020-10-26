@@ -9,12 +9,25 @@
  * @var \Mollie\Payment\Block\Info\Base $block
  * @see \Mollie\Payment\Block\Info\Base
  */
+use Mollie\Payment\Model\Methods\Voucher;
+
 $specificInfo = $block->getSpecificInformation();
 $status = $block->getPaymentStatus();
 ?>
 <div class="mollie-method">
     <img src="<?= $block->escapeUrl($block->getViewFileUrl('Mollie_Payment::images/' . $block->getPaymentImage())) ?>"/>
     <?= $block->escapeHtml($block->getMethod()->getTitle()); ?>
+    <?php if ($block->getMethod() instanceof Voucher): ?>
+    |
+    <?php
+    echo __(
+        '%1 using Voucher, %2 direct.',
+        $block->formatPrice($block->getAmountPaidByVoucher()),
+        $block->formatPrice($block->getRemainderAmount())
+    );
+    ?>
+    <?php $block->getMethod(); ?>
+    <?php endif; ?>
     <table class="data-table admin__table-secondary">
         <tbody>
             <?php if ($block->getCheckoutType()): ?>

@@ -12,6 +12,14 @@
     <preference for="Mollie\Payment\Api\Data\MollieCustomerInterface" type="Mollie\Payment\Model\Data\MollieCustomer"/>
     <preference for="Mollie\Payment\Api\Data\CustomerSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
+    <preference for="Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface" type="Mollie\Payment\Model\PendingPaymentReminderRepository"/>
+    <preference for="Mollie\Payment\Api\Data\PendingPaymentReminderInterface" type="Mollie\Payment\Model\Data\PendingPaymentReminder"/>
+    <preference for="Mollie\Payment\Api\Data\PendingPaymentReminderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <preference for="Mollie\Payment\Api\SentPaymentReminderRepositoryInterface" type="Mollie\Payment\Model\SentPaymentReminderRepository"/>
+    <preference for="Mollie\Payment\Api\Data\SentPaymentReminderInterface" type="Mollie\Payment\Model\Data\SentPaymentReminder"/>
+    <preference for="Mollie\Payment\Api\Data\SentPaymentReminderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
     <type name="Mollie\Payment\Logger\Handler">
         <arguments>
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
@@ -102,6 +110,29 @@
         </arguments>
     </type>
 
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="mollie_pending_payment_reminders_data_source" xsi:type="string">PendingPaymentReminderCollection</item>
+                <item name="mollie_sent_payment_reminders_data_source" xsi:type="string">SentPaymentReminderCollection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <virtualType name="PendingPaymentReminderCollection" type="Mollie\Payment\Ui\DataProvider\PaymentReminder\Listing\Pending\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mollie_pending_payment_reminder</argument>
+            <argument name="resourceModel" xsi:type="string">Mollie\Payment\Model\ResourceModel\PendingPaymentReminder</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SentPaymentReminderCollection" type="Mollie\Payment\Ui\DataProvider\PaymentReminder\Listing\Sent\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mollie_sent_payment_reminder</argument>
+            <argument name="resourceModel" xsi:type="string">Mollie\Payment\Model\ResourceModel\SentPaymentReminder</argument>
+        </arguments>
+    </virtualType>
+
     <type name="Magento\Framework\View\Asset\Minification">
         <plugin name="disable_minification_for_components_js" type="Mollie\Payment\Plugin\Framework\View\Asset\DisableMinificationForComponentsJs" />
     </type>
@@ -109,6 +140,18 @@
     <type name="Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex\RestoreQuoteOfUnsuccessfulPayment">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Quote\Api\PaymentMethodManagementInterface">
+        <plugin name="mollie_hide_methods_that_are_not_allowed" type="Mollie\Payment\Plugin\Quote\Api\PaymentMethodManagementPlugin" />
+    </type>
+
+    <type name="Mollie\Payment\Service\Order\TransactionProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="saveRemainingAmount" xsi:type="object">Mollie\Payment\Service\Order\ProcessTransaction\SaveRemainingAmount</item>
+            </argument>
         </arguments>
     </type>
 </config>

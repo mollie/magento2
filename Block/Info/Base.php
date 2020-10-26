@@ -6,9 +6,12 @@
 
 namespace Mollie\Payment\Block\Info;
 
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Framework\Registry;
 use Magento\Payment\Block\Info;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Stdlib\DateTime;
+use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Klarnapaylater;
 use Mollie\Payment\Model\Methods\Klarnasliceit;
@@ -30,18 +33,34 @@ class Base extends Info
     private $timezone;
 
     /**
+     * @var Registry
+     */
+    private $registry;
+
+    /**
+     * @var PriceCurrencyInterface
+     */
+    private $price;
+
+    /**
      * Base constructor.
      *
-     * @param Context      $context
+     * @param Context $context
      * @param MollieHelper $mollieHelper
+     * @param Registry $registry
+     * @param PriceCurrencyInterface $price
      */
     public function __construct(
         Context $context,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        Registry $registry,
+        PriceCurrencyInterface $price
     ) {
         parent::__construct($context);
         $this->mollieHelper = $mollieHelper;
         $this->timezone = $context->getLocaleDate();
+        $this->registry = $registry;
+        $this->price = $price;
     }
 
     /**
@@ -179,5 +198,38 @@ class Base extends Info
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
         }
+    }
+
+    public function getAmountPaidByVoucher()
+    {
+        if (!$this->getOrder()) {
+            return false;
+        }
+
+        return $this->getOrder()->getGrandTotal() - $this->getRemainderAmount();
+    }
+
+    public function getRemainderAmount()
+    {
+        try {
+            return $this->getInfo()->getAdditionalInformation('remainder_amount');
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+
+        return false;
+    }
+
+    public function formatPrice($amount)
+    {
+        return $this->price->format($amount);
+    }
+
+    /**
+     * @return OrderInterface|null
+     */
+    private function getOrder()
+    {
+        return $this->registry->registry('current_order');
     }
 }

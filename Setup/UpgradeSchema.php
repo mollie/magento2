@@ -20,6 +20,10 @@ use Mollie\Payment\Setup\Tables\MollieOrderLines;
  */
 class UpgradeSchema implements UpgradeSchemaInterface
 {
+    /**
+     * @var SchemaSetupInterface
+     */
+    private $setup;
 
     /**
      * @param SchemaSetupInterface   $setup
@@ -30,6 +34,7 @@ class UpgradeSchema implements UpgradeSchemaInterface
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
     {
         $setup->startSetup();
+        $this->setup = $setup;
 
         if (version_compare($context->getVersion(), '1.4.0', '<')) {
             $this->createTable($setup, MollieOrderLines::getData());
@@ -49,6 +54,10 @@ class UpgradeSchema implements UpgradeSchemaInterface
 
         if (version_compare($context->getVersion(), '1.12.0', '<')) {
             $this->addMollieCustomerTable($setup);
+        }
+
+        if (version_compare($context->getVersion(), '1.18.0', '<')) {
+            $this->addPaymentRemindersTables();
         }
 
         $setup->endSetup();
@@ -210,6 +219,56 @@ class UpgradeSchema implements UpgradeSchemaInterface
             $setup->getTable('customer_entity'),
             'entity_id',
             Table::ACTION_CASCADE
+        );
+
+        $connection->createTable($table);
+    }
+
+    private function addPaymentRemindersTables()
+    {
+        $this->createPaymentReminderTable('pending');
+        $this->createPaymentReminderTable('sent');
+    }
+
+    private function createPaymentReminderTable($table)
+    {
+        $connection = $this->setup->getConnection();
+        $tableName = $this->setup->getTable(sprintf('mollie_%s_payment_reminder', $table));
+
+        $table = $connection->newTable($tableName);
+
+        $table->addColumn(
+            'entity_id',
+            Table::TYPE_INTEGER,
+            null,
+            ['identity' => true, 'unsigned' => true, 'nullable' => false, 'primary' => true],
+            'Entity Id'
+        );
+
+        $table->addColumn(
+            'order_id',
+            Table::TYPE_INTEGER,
+            null,
+            ['unsigned' => true, 'nullable' => false, 'unique' => true],
+            'Order Id'
+        );
+
+        $table->addColumn(
+            'created_at',
+            Table::TYPE_TIMESTAMP,
+            null,
+            ['nullable' => false, 'default' => Table::TIMESTAMP_INIT],
+            'Created At'
+        );
+
+        $table->addIndex(
+            $this->setup->getIdxName(
+                $tableName,
+                ['order_id'],
+                AdapterInterface::INDEX_TYPE_UNIQUE
+            ),
+            ['order_id'],
+            ['type' => AdapterInterface::INDEX_TYPE_UNIQUE]
         );
 
         $connection->createTable($table);

@@ -48,7 +48,7 @@ class SecondChanceButton implements ButtonInterface
         $view->addButton(
             'mollie_payment_second_chance_email',
             [
-                'label' => __('Sent Payment Reminder'),
+                'label' => __('Send Payment Reminder'),
                 'onclick' => 'setLocation("' . $this->getUrl($view->getOrderId()) . '")',
             ]
         );

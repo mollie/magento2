@@ -58,6 +58,7 @@ class MollieTest extends IntegrationTestCase
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
+        $order->setEntityId(1);
 
         $helperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
         $helperMock->method('getApiKey')->willReturn('test_dummyapikeywhichmustbe30characterslong');
@@ -85,6 +86,7 @@ class MollieTest extends IntegrationTestCase
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
+        $order->setEntityId(1);
 
         $helperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
         $helperMock->method('getApiKey')->willReturn('test_dummyapikeywhichmustbe30characterslong');
@@ -117,6 +119,7 @@ class MollieTest extends IntegrationTestCase
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
+        $order->setEntityId(1);
 
         $helperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
         $helperMock->method('getApiKey')->willReturn('test_dummyapikeywhichmustbe30characterslong');

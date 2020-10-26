@@ -106,7 +106,7 @@ class StoreCredit
 
         throw new NoStoreCreditFound(
             __(
-                'We where unable to find the store credit for order #%1',
+                'We were unable to find the store credit for order #%1',
                 $order->getEntityId()
             )
         );

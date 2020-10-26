@@ -6,11 +6,21 @@
  */
 ?>
 <div class="mm-block-mollie">
+    <button id="mm-mollie-button_test" title="<?= $block->escapeUrl(__('Run Self-test')); ?>"
+            type="button" class="action-default scalable"
+            data-mage-init='{"Mollie_Payment/js/button-functions": {}}'
+    >
+        <i class="mm-mollie-icon__list-unordered-four"></i>
+        <span><?= $block->escapeUrl(__('Run Self-test')); ?></span>
+    </button>
+
     <a class="helpbutton" href="https://www.mollie.com/dashboard/settings/profiles" target="_blank"></a>
+
     <p>
         <strong>Developed by Magmodules.</strong>
         A Magento only eCommerce Agency located in the Netherlands.
     </p>
+
     <table>
         <tbody>
         <tr>

@@ -40,7 +40,8 @@ class BaseTest extends IntegrationTestCase
     {
         return [
             ['getDashboardUrl'],
-            ['getMollieId']
+            ['getMollieId'],
+            ['getRemainderAmount'],
         ];
     }
 
@@ -52,5 +53,17 @@ class BaseTest extends IntegrationTestCase
         /** @var Base $instance */
         $instance = $this->objectManager->create(Base::class);
         $this->assertFalse($instance->{$method}());
+    }
+
+    public function testReturnsTheRemainderAmount()
+    {
+        /** @var Info $info */
+        $info = $this->objectManager->create(Info::class);
+        $info->setAdditionalInformation('remainder_amount', '100');
+
+        /** @var Base $instance */
+        $instance = $this->objectManager->create(Base::class);
+        $instance->setData('info', $info);
+        $this->assertEquals('100', $instance->getRemainderAmount());
     }
 }

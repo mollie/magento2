@@ -17,8 +17,8 @@
         var resultSpan = jQuery('#result_apikey');
         jQuery('#apikey_button').click(function () {
             var params = {
-                "test_key": jQuery("input[name='groups[mollie][groups][mollie_general][fields][apikey_test][value]']").val(),
-                "live_key": jQuery("input[name='groups[mollie][groups][mollie_general][fields][apikey_live][value]']").val()
+                "test_key": jQuery("#mollie_general_api_details_apikey_test").val(),
+                "live_key": jQuery("#mollie_general_api_details_apikey_live").val()
             	};
             new Ajax.Request('<?= $block->getAjaxUrl() ?>', {
                 parameters: params,

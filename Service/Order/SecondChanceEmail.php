@@ -14,6 +14,7 @@ use Magento\Sales\Model\Order\Email\Container\IdentityInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Config;
+use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Service\PaymentToken\Generate;
 
 class SecondChanceEmail
@@ -58,6 +59,11 @@ class SecondChanceEmail
      */
     private $url;
 
+    /**
+     * @var MollieLogger
+     */
+    private $logger;
+
     public function __construct(
         Config $config,
         SenderResolverInterface $senderResolver,
@@ -66,7 +72,8 @@ class SecondChanceEmail
         StoreManagerInterface $storeManager,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         Generate $paymentToken,
-        UrlInterface $url
+        UrlInterface $url,
+        MollieLogger $logger
     ) {
         $this->config = $config;
         $this->senderResolver = $senderResolver;
@@ -76,6 +83,7 @@ class SecondChanceEmail
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->paymentToken = $paymentToken;
         $this->url = $url;
+        $this->logger = $logger;
     }
 
     public function send(OrderInterface $order)
@@ -93,6 +101,8 @@ class SecondChanceEmail
         $builder->setFromByScope($this->identityContainer->getEmailIdentity(), $storeId);
         $builder->addTo($order->getCustomerEmail(), $customerName);
         $builder->setTemplateVars($this->getTemplateVars($order));
+
+        $this->logger->addInfoLog('info', 'Sending second chance email for order #' . $order->getIncrementId());
 
         $transport = $builder->getTransport();
         $transport->sendMessage();

@@ -6,9 +6,6 @@ This document is created in collaboration with the merchants, agencies, the Moll
 
 ## What we're working on / what is on our backlog
 
-* **GraphQL support for PWA:** 
-As of version 1.11.0 we support PWA integation using REST (see [PWA-integration](https://github.com/mollie/magento2/wiki/PWA-integration)). Support for GraphQL will also be added in the near future. 
-
 * **Direct integration of Apple Pay:** 
 Adding [direct integration of Apple Pay](https://docs.mollie.com/guides/applepay-direct-integration) into Magento 2 right from the product page. 
 Open Issue: https://github.com/mollie/magento2/issues/214

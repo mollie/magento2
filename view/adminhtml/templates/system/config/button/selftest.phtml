@@ -1,0 +1,18 @@
+<?php
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Mollie\Payment\Block\Adminhtml\System\Config\Button\Selftest;
+
+/**
+ * @see \Mollie\Payment\Block\Adminhtml\System\Config\Button\Selftest
+ * @var Selftest $block
+ */
+?>
+<div id="mm-mollie-result_test-modal" data-mm-mollie-endpoint-url="<?= $block->escapeUrl($block->getSelftestUrl()) ?>">
+    <div id="mm-mollie-result_test">
+        <ul class="result"></ul>
+    </div>
+</div>
