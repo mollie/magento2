@@ -95,9 +95,8 @@
     <type name="Mollie\Payment\Service\Order\Lines\OrderLinesProcessor">
         <arguments>
             <argument name="processors" xsi:type="array">
-                <item name="voucherCategory" xsi:type="object">
-                    Mollie\Payment\Service\Order\Lines\Processor\VoucherCategory
-                </item>
+                <item name="voucherCategory" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\VoucherCategory</item>
+                <item name="bundleWithoutDynamicPrice" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\BundleWithoutDynamicPricing</item>
             </argument>
         </arguments>
     </type>
