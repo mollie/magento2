@@ -178,8 +178,10 @@ class MollieConfigProvider implements ConfigProviderInterface
         $apiKey = $this->mollieHelper->getApiKey();
         $useImage = $this->mollieHelper->useImage();
 
+        $activeMethods = [];
         try {
             $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
+            $activeMethods = $this->getActiveMethods($mollieApi);
         } catch (\Exception $exception) {
             $mollieApi = null;
             $this->mollieHelper->addTolog('error', $exception->getMessage());

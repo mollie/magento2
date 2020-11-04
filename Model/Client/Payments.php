@@ -22,6 +22,7 @@ use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\Transaction;
+use Mollie\Payment\Service\Order\TransactionProcessor;
 
 /**
  * Class Payments
@@ -73,6 +74,10 @@ class Payments extends AbstractModel
      * @var Transaction
      */
     private $transaction;
+    /**
+     * @var TransactionProcessor
+     */
+    private $transactionProcessor;
 
     /**
      * Payments constructor.
@@ -87,6 +92,7 @@ class Payments extends AbstractModel
      * @param Config $config
      * @param DashboardUrl $dashboardUrl
      * @param Transaction $transaction
+     * @param TransactionProcessor $transactionProcessor
      */
     public function __construct(
         OrderSender $orderSender,
@@ -98,7 +104,8 @@ class Payments extends AbstractModel
         BuildTransaction $buildTransaction,
         Config $config,
         DashboardUrl $dashboardUrl,
-        Transaction $transaction
+        Transaction $transaction,
+        TransactionProcessor $transactionProcessor
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -110,6 +117,7 @@ class Payments extends AbstractModel
         $this->config = $config;
         $this->dashboardUrl = $dashboardUrl;
         $this->transaction = $transaction;
+        $this->transactionProcessor = $transactionProcessor;
     }
 
     /**
@@ -262,6 +270,7 @@ class Payments extends AbstractModel
                     $payment->setIsTransactionClosed(true);
                     $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
                     $order->setState(Order::STATE_PROCESSING);
+                    $this->transactionProcessor->process($order, null, $paymentData);
 
                     if ($paymentData->settlementAmount !== null) {
                         if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
@@ -334,6 +343,7 @@ class Payments extends AbstractModel
                     $statusPending = $order->getStatus();
                 }
                 $order->setState(Order::STATE_PENDING_PAYMENT);
+                $this->transactionProcessor->process($order, null, $paymentData);
                 $order->addStatusToHistory($statusPending, $message, true);
                 $this->orderRepository->save($order);
             }
@@ -351,6 +361,7 @@ class Payments extends AbstractModel
             if ($type == 'webhook') {
                 $this->mollieHelper->registerCancellation($order, $status);
                 $order->cancel();
+                $this->transactionProcessor->process($order, null, $paymentData);
             }
 
             $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];

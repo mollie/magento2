@@ -17,9 +17,8 @@ use Mollie\Payment\Helper\Tests as TestsHelper;
  *
  * @package Mollie\Payment\Controller\Adminhtml\Action
  */
-class Compatibility extends Action
+class SelfTest extends Action
 {
-
     /**
      * @var \Magento\Framework\App\RequestInterface
      */

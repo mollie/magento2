@@ -1,6 +1,8 @@
 .mm-comment-mollie {
-    padding: 10px 0px;
-    font-size: 12px;
+    padding: 1rem 0rem 0rem 1rem;
+    font-size: 1.2rem;
+    line-height: 2.5rem;
+    border-left: 4px solid #f8f8f8;
 }
 
 .mollie-method img {
@@ -208,4 +210,16 @@ a.mollie-tooltip:hover span {
     font-size: 175%;
     margin-top: -10px;
     display: inline-block;
+}
+
+.admin__page-nav._collapsed.mollie-tab .title,
+.admin__page-nav._collapsed._show.mollie-tab .title {
+    background-image: url('../images/mollie_logo_configuration_tab.png');
+    background-position: 10px center;
+    background-position: 15px center;
+    background-repeat: no-repeat;
+    background-size: auto 70%;
+    text-indent: 40px;
+    background-size: auto 50%;
+    text-indent: 35px;
 }
