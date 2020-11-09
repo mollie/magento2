@@ -44,11 +44,10 @@ class BundleWithoutDynamicPricing implements ProcessorInterface
             return $orderLine;
         }
 
-        // Magento provides us with a discount amount without tax, but calculates with tax is this case. So calculate
-        // the correct amount with tax and recalculate the unit price, total amount vat amount and discount amount.
+        // Magento provides us with a discount amount without tax, but calculates with tax in this case. So recalculate
+        // the unit price, total amount and vat amount.
 
         $taxPercent = $orderItem->getTaxPercent();
-        $discountAmount = $discountAmount + (($discountAmount / 100) * $taxPercent);
         $unitPrice = $orderLine['totalAmount']['value'] / $orderItem->getQtyOrdered();
         $newVatAmount = (($unitPrice - $discountAmount) / (100 + $taxPercent)) * $taxPercent;
 
@@ -63,9 +62,9 @@ class BundleWithoutDynamicPricing implements ProcessorInterface
     private function getDiscountAmountWithTax(OrderItemInterface $item, bool $forceBaseCurrency)
     {
         if ($forceBaseCurrency) {
-            return abs($item->getBaseDiscountAmount() + $item->getBaseDiscountTaxCompensationAmount());
+            return abs($item->getBaseDiscountAmount());
         }
 
-        return abs($item->getDiscountAmount() + $item->getDiscountTaxCompensationAmount());
+        return abs($item->getDiscountAmount());
     }
 }
