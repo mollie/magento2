@@ -26,7 +26,7 @@
     <route url="/V1/mollie/transaction/start" method="POST">
         <service class="Mollie\Payment\Api\Webapi\StartTransactionRequestInterface" method="execute"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
     </route>
 
