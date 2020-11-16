@@ -7,13 +7,16 @@
 namespace Mollie\Payment\Test\Integration\Controller\Checkout;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SortOrderFactory;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\TestFramework\TestCase\AbstractController;
+use Mollie\Payment\Cron\SendPendingPaymentReminders;
 use Mollie\Payment\Service\Order\Reorder;
 use Mollie\Payment\Service\PaymentToken\Generate;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class SecondChanceTest extends AbstractController
 {
@@ -88,6 +91,29 @@ class SecondChanceTest extends AbstractController
 
         $this->dispatch('/mollie/checkout/secondChance/');
         $this->assertRedirect($this->equalTo('http://example.com'));
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/enable_second_chance_email 0
+     * @magentoConfigFixture default_store payment/mollie_general/automatically_send_second_chance_emails 1
+     */
+    public function testSecondChanceDisabledAutoSendEnabled()
+    {
+        /** @var SortOrderFactory|MockObject $sortOrderFactoryMock */
+        $sortOrderFactoryMock = $this->getMockBuilder(SortOrderFactory::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['create'])
+            ->getMock();
+        $sortOrderFactoryMock->expects($this->never())->method('create');
+
+        $this->_objectManager->addSharedInstance(
+            $sortOrderFactoryMock,
+            SortOrderFactory::class
+        );
+
+        /** @var SendPendingPaymentReminders $sendReminderJob */
+        $sendReminderJob = $this->_objectManager->get(SendPendingPaymentReminders::class);
+        $sendReminderJob->execute();
     }
 
     /**
