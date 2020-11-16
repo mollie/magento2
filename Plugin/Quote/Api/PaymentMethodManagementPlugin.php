@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Plugin\Quote\Api;
 
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
@@ -28,25 +29,35 @@ class PaymentMethodManagementPlugin
      */
     private $mollieConfigProvider;
 
+    /**
+     * @var CartRepositoryInterface
+     */
+    private $cartRepository;
+
     public function __construct(
         Config $config,
         Mollie $mollieModel,
-        MollieConfigProvider $mollieConfigProvider
+        MollieConfigProvider $mollieConfigProvider,
+        CartRepositoryInterface $cartRepository
     ) {
         $this->config = $config;
         $this->mollieModel = $mollieModel;
         $this->mollieConfigProvider = $mollieConfigProvider;
+        $this->cartRepository = $cartRepository;
     }
 
-    public function afterGetList(PaymentMethodManagementInterface $subject, $result)
+    public function aroundGetList(PaymentMethodManagementInterface $subject, Callable $proceed, $cartId)
     {
+        $result = $proceed($cartId);
+
         if (!$this->containsMollieMethods($result)) {
             return $result;
         }
 
         $apiKey = $this->config->getApiKey();
         $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
-        $activeMethods = $this->mollieConfigProvider->getActiveMethods($mollieApi);
+        $cart = $this->cartRepository->get($cartId);
+        $activeMethods = $this->mollieConfigProvider->getActiveMethods($mollieApi, $cart);
 
         return array_filter($result, function ($method) use ($activeMethods) {
             if (!$method instanceof Mollie) {
