@@ -87,7 +87,7 @@ class SecondChanceTest extends AbstractController
         $this->getRequest()->setParam('payment_token', $token->getToken());
 
         $this->dispatch('/mollie/checkout/secondChance/');
-        $this->assertRedirect($this->equalTo('http://example.com'));
+        $this->assertRedirect($this->stringContains('mollie/checkout/redirect/paymentToken'));
     }
 
     /**
