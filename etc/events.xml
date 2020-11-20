@@ -33,4 +33,7 @@
     <event name="controller_action_predispatch_checkout_index_index">
         <observer name="mollie_restore_quote_after_unsuccessful_payment" instance="Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex\RestoreQuoteOfUnsuccessfulPayment" />
     </event>
+    <event name="sales_order_place_before">
+        <observer name="mollie_remove_from_pending_payment_reminders_table" instance="Mollie\Payment\Observer\SalesOrderPlaceBefore\RemovePendingPaymentReminders" />
+    </event>
 </config>
