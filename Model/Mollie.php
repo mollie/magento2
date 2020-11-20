@@ -322,7 +322,7 @@ class Mollie extends AbstractMethod
      * @param $storeId
      * @return MollieApiClient|null
      */
-    public function getMollieApi($storeId)
+    public function getMollieApi($storeId = null)
     {
         $apiKey = $this->mollieHelper->getApiKey($storeId);
 

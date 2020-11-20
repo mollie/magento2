@@ -13,9 +13,15 @@ use Mollie\Payment\Api\Data\PendingPaymentReminderInterface;
 use Mollie\Payment\Api\Data\PendingPaymentReminderInterfaceFactory;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Config;
+use Mollie\Payment\Helper\General;
 
 class SavePendingOrder implements ObserverInterface
 {
+    /**
+     * @var General
+     */
+    private $mollieHelper;
+
     /**
      * @var Config
      */
@@ -32,13 +38,15 @@ class SavePendingOrder implements ObserverInterface
     private $repository;
 
     public function __construct(
+        General $mollieHelper,
         Config $config,
         PendingPaymentReminderInterfaceFactory $reminderFactory,
         PendingPaymentReminderRepositoryInterface $repository
     ) {
+        $this->mollieHelper = $mollieHelper;
+        $this->config = $config;
         $this->reminderFactory = $reminderFactory;
         $this->repository = $repository;
-        $this->config = $config;
     }
 
     public function execute(Observer $observer)
@@ -50,10 +58,24 @@ class SavePendingOrder implements ObserverInterface
             return;
         }
 
-        /** @var PendingPaymentReminderInterface $reminder */
-        $reminder = $this->reminderFactory->create();
-        $reminder->setOrderId($order->getEntityId());
+        try {
+            // If this succeeds there already exists a reminder.
+            $this->repository->getByOrderId($order->getEntityId());
+            return;
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
+            // Ignore.
+        }
 
-        $this->repository->save($reminder);
+        try {
+            /** @var PendingPaymentReminderInterface $reminder */
+            $reminder = $this->reminderFactory->create();
+            $reminder->setOrderId($order->getEntityId());
+
+            $this->repository->save($reminder);
+        } catch (\Exception $exception) {
+            $message = 'Got an exception while trying to save a payment reminder: ' . $exception->getMessage();
+            $message .= ' - Store ID: ' . $order->getStoreId();
+            $this->mollieHelper->addTolog('error', $message);
+        }
     }
 }

@@ -102,10 +102,15 @@ class SecondChanceEmail
         $builder->addTo($order->getCustomerEmail(), $customerName);
         $builder->setTemplateVars($this->getTemplateVars($order));
 
-        $this->logger->addInfoLog('info', 'Sending second chance email for order #' . $order->getIncrementId());
+        $this->logger->addInfoLog(
+            'info',
+            sprintf('Sending second chance email for order #%s', $order->getIncrementId())
+        );
 
         $transport = $builder->getTransport();
         $transport->sendMessage();
+
+        $this->logger->addInfoLog('info', sprintf('Second chance email for order #%s sent', $order->getIncrementId()));
     }
 
     private function getTemplateVars(OrderInterface $order)
