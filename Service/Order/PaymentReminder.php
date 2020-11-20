@@ -6,7 +6,6 @@
 
 namespace Mollie\Payment\Service\Order;
 
-use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -15,13 +14,14 @@ use Mollie\Payment\Api\Data\SentPaymentReminderInterface;
 use Mollie\Payment\Api\Data\SentPaymentReminderInterfaceFactory;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Api\SentPaymentReminderRepositoryInterface;
+use Mollie\Payment\Logger\MollieLogger;
 
 class PaymentReminder
 {
     /**
-     * @var ResourceConnection
+     * @var MollieLogger
      */
-    private $resourceConnection;
+    private $logger;
 
     /**
      * @var OrderRepositoryInterface
@@ -54,7 +54,7 @@ class PaymentReminder
     private $deletePaymentReminder;
 
     public function __construct(
-        ResourceConnection $resourceConnection,
+        MollieLogger $logger,
         OrderRepositoryInterface $orderRepository,
         SentPaymentReminderInterfaceFactory $sentPaymentReminderFactory,
         SentPaymentReminderRepositoryInterface $sentPaymentReminderRepository,
@@ -62,39 +62,40 @@ class PaymentReminder
         SecondChanceEmail $secondChanceEmail,
         DeletePaymentReminder $deletePaymentReminder
     ) {
+        $this->logger = $logger;
         $this->orderRepository = $orderRepository;
         $this->sentPaymentReminderFactory = $sentPaymentReminderFactory;
         $this->sentPaymentReminderRepository = $sentPaymentReminderRepository;
         $this->pendingPaymentReminderRepository = $pendingPaymentReminderRepository;
         $this->secondChanceEmail = $secondChanceEmail;
-        $this->resourceConnection = $resourceConnection;
         $this->deletePaymentReminder = $deletePaymentReminder;
     }
 
     public function send(PendingPaymentReminderInterface $pendingPaymentReminder): OrderInterface
     {
-        $connection = $this->resourceConnection->getConnection();
-        $connection->beginTransaction();
+        $order = $this->orderRepository->get($pendingPaymentReminder->getOrderId());
+        $this->logger->addInfoLog(
+            'info',
+            sprintf('Preparing to send the payment reminder for order #%s', $order->getIncrementId())
+        );
 
-        try {
-            $order = $this->orderRepository->get($pendingPaymentReminder->getOrderId());
-            $this->moveReminderFromPendingToSent($order, $pendingPaymentReminder);
+        $this->moveReminderFromPendingToSent($order, $pendingPaymentReminder);
 
-            $this->secondChanceEmail->send($order);
+        $this->logger->addInfoLog(
+            'info',
+            sprintf('Payment reminder record moved to sent table for order #%s', $order->getIncrementId())
+        );
 
-            $connection->commit();
+        $this->secondChanceEmail->send($order);
 
-            return $order;
-        } catch (\Exception $exception) {
-            $connection->rollBack();
-
-            throw $exception;
-        }
+        return $order;
     }
 
     private function moveReminderFromPendingToSent(OrderInterface $order, PendingPaymentReminderInterface $pendingPaymentReminder): void
     {
         if ($this->isAlreadySend($order)) {
+            // Already sent, so delete the pending payment reminder.
+            $this->pendingPaymentReminderRepository->delete($pendingPaymentReminder);
             return;
         }
 
