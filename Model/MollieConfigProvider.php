@@ -13,6 +13,7 @@ use Magento\Framework\Locale\Resolver;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
@@ -215,18 +216,22 @@ class MollieConfigProvider implements ConfigProviderInterface
 
     /**
      * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param CartInterface|null $cart
      *
      * @return array
      */
-    public function getActiveMethods($mollieApi)
+    public function getActiveMethods($mollieApi, CartInterface $cart = null)
     {
+        if (!$cart) {
+            $cart = $this->checkoutSession->getQuote();
+        }
+
         if ($this->methodData !== null) {
             return $this->methodData;
         }
 
         try {
-            $quote = $this->checkoutSession->getQuote();
-            $amount = $this->mollieHelper->getOrderAmountByQuote($quote);
+            $amount = $this->mollieHelper->getOrderAmountByQuote($cart);
             $params = [
                 'amount[value]' => $amount['value'],
                 'amount[currency]' => $amount['currency'],
