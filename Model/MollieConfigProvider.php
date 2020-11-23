@@ -199,7 +199,7 @@ class MollieConfigProvider implements ConfigProviderInterface
             $config['payment']['image'][$code] = '';
             if ($useImage) {
                 $cleanCode = str_replace('mollie_methods_', '', $code);
-                $url = $this->assetRepository->getUrl('Mollie_Payment::images/methods/' . $cleanCode . '.png');
+                $url = $this->assetRepository->getUrl('Mollie_Payment::images/methods/' . $cleanCode . '.svg');
                 $config['payment']['image'][$code] = $url;
             }
 

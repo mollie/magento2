@@ -185,7 +185,7 @@ class Base extends Info
             $code = str_replace('mollie_methods_', '', $code);
         }
 
-        return $code . '.png';
+        return $code . '.svg';
     }
 
     /**
