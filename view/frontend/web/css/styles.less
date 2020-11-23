@@ -152,7 +152,6 @@
     margin-bottom: 10px;
 }
 
-/* CSS */
 @supports (-webkit-appearance: -apple-pay-button) {
     .apple-pay-button-with-text {
         display: inline-block;
@@ -176,7 +175,6 @@
 
 @supports not (-webkit-appearance: -apple-pay-button) {
     .apple-pay-button-with-text {
-        --apple-pay-scale: 1; /* (height / 32) */
         display: inline-flex;
         justify-content: center;
         font-size: 12px;
@@ -214,18 +212,18 @@
     }
     .apple-pay-button-with-text > .text {
         font-family: -apple-system;
-        font-size: calc(1em * var(--apple-pay-scale));
+        font-size: 1em;
         font-weight: 300;
         align-self: center;
-        margin-right: calc(2px * var(--apple-pay-scale));
+        margin-right: 2px;
     }
     .apple-pay-button-with-text > .logo {
-        width: calc(35px * var(--scale));
+        width: 35px;
         height: 100%;
         background-size: 100% 60%;
         background-repeat: no-repeat;
         background-position: 0 50%;
-        margin-left: calc(2px * var(--apple-pay-scale));
+        margin-left: 2px;
         border: none;
     }
 }
