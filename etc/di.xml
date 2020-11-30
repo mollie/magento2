@@ -159,4 +159,8 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+
+    <type name="Magento\Config\Model\Config\Loader">
+        <plugin name="mollie_load_correct_group" type="Mollie\Payment\Plugin\Config\LoadCorrectGroup" />
+    </type>
 </config>
