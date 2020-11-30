@@ -1,4 +1,5 @@
 .idea
 *.zip
-.DS_Storeview/adminhtml/web/css/styles.css
+.DS_Store
+view/adminhtml/web/css/styles.css
 view/frontend/web/css/styles.css
