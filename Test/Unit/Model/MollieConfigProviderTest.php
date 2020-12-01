@@ -20,7 +20,7 @@ class MollieConfigProviderTest extends UnitTestCase
             (object)[
                 'id' => 'ideal',
                 'image' => (object)[
-                    'size2x' => 'ideal.png',
+                    'size2x' => 'ideal.svg',
                 ]
             ]
         ]);
@@ -34,11 +34,11 @@ class MollieConfigProviderTest extends UnitTestCase
         $result = $instance->getActiveMethods($client);
         $this->assertTrue(is_array($result));
         $this->assertArrayHasKey('mollie_methods_ideal', $result);
-        $this->assertEquals('ideal.png', $result['mollie_methods_ideal']['image']);
+        $this->assertEquals('ideal.svg', $result['mollie_methods_ideal']['image']);
 
         $result = $instance->getActiveMethods($client);
         $this->assertTrue(is_array($result));
         $this->assertArrayHasKey('mollie_methods_ideal', $result);
-        $this->assertEquals('ideal.png', $result['mollie_methods_ideal']['image']);
+        $this->assertEquals('ideal.svg', $result['mollie_methods_ideal']['image']);
     }
 }

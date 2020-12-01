@@ -616,7 +616,7 @@ class Mollie extends AbstractMethod
                 'resource' => 'issuer',
                 'id'       => '',
                 'name'     => __('QR Code'),
-                'image'    => ['size2x' => $this->assetRepository->getUrl("Mollie_Payment::images/qr-select.png")]
+                'image'    => ['size2x' => $this->assetRepository->getUrl("Mollie_Payment::images/qr-select.svg")]
             ];
         }
 
