@@ -22,7 +22,6 @@ type MollieIssuer {
     name: String
     code: String
     image: String!
-    svg: String!
 }
 
 input MollieTransactionInput {
