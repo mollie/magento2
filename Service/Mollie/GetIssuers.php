@@ -93,7 +93,6 @@ class GetIssuers
                 'name' => $issuer['name'],
                 'code' => $issuer['id'],
                 'image' => $issuer['image']['size2x'],
-                'svg' => $issuer['image']['svg'],
             ];
         }
 
