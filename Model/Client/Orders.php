@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Model\Client;
 
 use Magento\Catalog\Model\Product\Type as ProductType;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
@@ -24,6 +25,7 @@ use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -140,6 +142,11 @@ class Orders extends AbstractModel
     private $transactionProcessor;
 
     /**
+     * @var EventManager
+     */
+    private $eventManager;
+
+    /**
      * Orders constructor.
      *
      * @param OrderLines            $orderLines
@@ -164,6 +171,7 @@ class Orders extends AbstractModel
      * @param Config                $config
      * @param DashboardUrl          $dashboardUrl
      * @param TransactionProcessor  $transactionProcessor
+     * @param EventManager          $eventManager
      */
     public function __construct(
         OrderLines $orderLines,
@@ -187,7 +195,8 @@ class Orders extends AbstractModel
         BuildTransaction $buildTransaction,
         Config $config,
         DashboardUrl $dashboardUrl,
-        TransactionProcessor $transactionProcessor
+        TransactionProcessor $transactionProcessor,
+        EventManager $eventManager
     ) {
         $this->orderLines = $orderLines;
         $this->orderSender = $orderSender;
@@ -211,6 +220,7 @@ class Orders extends AbstractModel
         $this->config = $config;
         $this->dashboardUrl = $dashboardUrl;
         $this->transactionProcessor = $transactionProcessor;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -300,12 +310,20 @@ class Orders extends AbstractModel
 
     /**
      * @param Order $order
-     * @param       $mollieOrder
+     * @param MollieOrder $mollieOrder
      *
      * @throws LocalizedException
      */
     public function processResponse(Order $order, $mollieOrder)
     {
+        $eventData = [
+            'order' => $order,
+            'mollie_order' => $mollieOrder,
+        ];
+
+        $this->eventManager->dispatch('mollie_process_response', $eventData);
+        $this->eventManager->dispatch('mollie_process_response_orders_api', $eventData);
+
         $this->mollieHelper->addTolog('response', $mollieOrder);
         $order->getPayment()->setAdditionalInformation('checkout_url', $mollieOrder->getCheckoutUrl());
         $order->getPayment()->setAdditionalInformation('checkout_type', self::CHECKOUT_TYPE);
@@ -923,11 +941,11 @@ class Orders extends AbstractModel
      * an exception and the user is unable to create an order. This code checks if the selected lines are already
      * marked as shipped. If that's the case a warning will be shown, but the order is still created.
      *
-     * @param \Mollie\Api\Resources\Order $mollieOrder
+     * @param MollieOrder $mollieOrder
      * @param $orderLines
      * @return bool
      */
-    private function itemsAreShippable(\Mollie\Api\Resources\Order $mollieOrder, $orderLines)
+    private function itemsAreShippable(MollieOrder $mollieOrder, $orderLines)
     {
         $lines = [];
         foreach ($orderLines['lines'] as $line) {
