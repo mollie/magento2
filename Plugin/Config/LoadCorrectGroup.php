@@ -10,7 +10,7 @@ use Magento\Config\Model\Config\Loader;
 
 class LoadCorrectGroup
 {
-    public function beforeGetConfigByPath(Loader $subject, $path, $scope, $scopeId, $full)
+    public function beforeGetConfigByPath(Loader $subject, $path, $scope, $scopeId, $full = true)
     {
         $groups = ['mollie_second_chance_email', 'mollie_advanced', 'mollie_payment_methods', 'mollie_general'];
         if (in_array($path, $groups)) {
