@@ -282,3 +282,7 @@
 "Firstname","Vorname"
 "Lastname","Nachname"
 "E-mail","E-Mail-Adresse"
+"Card Holder","Kartenhalter"
+"Card Number","Kartennummer"
+"Expiry Date","Verfallsdatum"
+"Verification Code", "Verifizierungs-Schlüssel"

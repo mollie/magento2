@@ -41,7 +41,7 @@ class SecondChanceButton implements ButtonInterface
         }
 
         $state = $view->getOrder()->getState();
-        if (!in_array($state, [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT])) {
+        if (!in_array($state, [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT, Order::STATE_CANCELED])) {
             return;
         }
 

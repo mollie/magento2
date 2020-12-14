@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Model\Client;
 
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -15,6 +16,7 @@ use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -80,6 +82,11 @@ class Payments extends AbstractModel
     private $transactionProcessor;
 
     /**
+     * @var EventManager
+     */
+    private $eventManager;
+
+    /**
      * Payments constructor.
      *
      * @param OrderSender $orderSender
@@ -93,6 +100,7 @@ class Payments extends AbstractModel
      * @param DashboardUrl $dashboardUrl
      * @param Transaction $transaction
      * @param TransactionProcessor $transactionProcessor
+     * @param EventManager $eventManager
      */
     public function __construct(
         OrderSender $orderSender,
@@ -105,7 +113,8 @@ class Payments extends AbstractModel
         Config $config,
         DashboardUrl $dashboardUrl,
         Transaction $transaction,
-        TransactionProcessor $transactionProcessor
+        TransactionProcessor $transactionProcessor,
+        EventManager $eventManager
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -118,6 +127,7 @@ class Payments extends AbstractModel
         $this->dashboardUrl = $dashboardUrl;
         $this->transaction = $transaction;
         $this->transactionProcessor = $transactionProcessor;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -197,10 +207,18 @@ class Payments extends AbstractModel
 
     /**
      * @param Order $order
-     * @param       $payment
+     * @param MolliePayment $payment
      */
     public function processResponse(Order $order, $payment)
     {
+        $eventData = [
+            'order' => $order,
+            'mollie_payment' => $payment,
+        ];
+
+        $this->eventManager->dispatch('mollie_process_response', $eventData);
+        $this->eventManager->dispatch('mollie_process_response_payments_api', $eventData);
+
         $this->mollieHelper->addTolog('response', $payment);
         $order->getPayment()->setAdditionalInformation('checkout_url', $payment->getCheckoutUrl());
         $order->getPayment()->setAdditionalInformation('checkout_type', self::CHECKOUT_TYPE);

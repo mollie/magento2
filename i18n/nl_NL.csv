@@ -282,3 +282,7 @@
 "Firstname","Voornaam"
 "Lastname","Achternaam"
 "E-mail","E-mail"
+"Card Holder","Kaarthouder"
+"Card Number","Kaartnummer"
+"Expiry Date","Vervaldatum"
+"Verification Code", "Verificatie code"

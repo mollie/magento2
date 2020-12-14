@@ -6,9 +6,9 @@
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label data-bind="attr: {'for': getCode()}" class="label">
             <!-- ko if: getMethodImage() -->
-		    <img data-bind="attr: {src: getMethodImage()}" class="mollie-payment-icon"/>
+            <img data-bind="attr: {src: getMethodImage()}" class="mollie-payment-icon"/>
             <!--/ko-->
-        	<span data-bind="text: getTitle()"></span>
+            <span data-bind="text: getTitle()"></span>
         </label>
 
     </div>
@@ -18,19 +18,19 @@
         <!--/ko-->
 
         <div class="card-container">
-            <label for="card-holder">Card Holder</label>
+            <label for="card-holder" data-bind="i18n: 'Card Holder'"></label>
             <div id="card-holder"></div>
             <div id="card-holder-error" class="component-error"></div>
 
-            <label for="card-number">Card Number</label>
+            <label for="card-number" data-bind="i18n: 'Card Number'"></label></label>
             <div id="card-number"></div>
             <div id="card-number-error" class="component-error"></div>
 
-            <label for="expiry-date">Expiry Date</label>
+            <label for="expiry-date" data-bind="i18n: 'Expiry Date'"></label>
             <div id="expiry-date"></div>
             <div id="expiry-date-error" class="component-error"></div>
 
-            <label for="verification-code">Verification Code</label>
+            <label for="verification-code" data-bind="i18n: 'Verification Code'"></label>
             <div id="verification-code"></div>
             <div id="verification-code-error" class="component-error"></div>
         </div>
