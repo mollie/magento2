@@ -167,12 +167,11 @@ class MollieConfigProvider implements ConfigProviderInterface
         $store = $this->storeManager->getStore();
         $storeId = $store->getId();
         $storeName = $store->getFrontendName();
-        $locale = $this->config->getLocale($storeId);
 
         $config = [];
         $config['payment']['mollie']['testmode'] = $this->config->isTestMode($storeId);
         $config['payment']['mollie']['profile_id'] = $this->config->getProfileId($storeId);
-        $config['payment']['mollie']['locale'] = $locale == 'store' ? $this->localeResolver->getLocale() : $locale;
+        $config['payment']['mollie']['locale'] = $this->getLocale($storeId);
         $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
         $config['payment']['mollie']['appleypay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
         $config['payment']['mollie']['store']['name'] = $storeName;
@@ -279,5 +278,21 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['issuers'][$code] = $this->getIssuers->execute($mollieApi, $code, $issuerListType);
 
         return $config;
+    }
+
+    /**
+     * @param int $storeId
+     * @return string
+     */
+    private function getLocale($storeId)
+    {
+        $locale = $this->config->getLocale($storeId);
+
+        // Empty == autodetect, so use the store.
+        if (!$locale || $locale == 'store') {
+            return $this->localeResolver->getLocale();
+        }
+
+        return $locale;
     }
 }

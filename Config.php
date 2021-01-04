@@ -478,6 +478,7 @@ class Config
     }
 
     /**
+     * @see \Mollie\Payment\Model\Adminhtml\Source\Locale for possible values
      * @param null|int|string $storeId
      * @return string
      */
