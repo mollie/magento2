@@ -726,7 +726,7 @@ class Orders extends AbstractModel
             $payment = $order->getPayment();
             if (!$payment->getIsTransactionClosed()) {
                 $invoice = $order->getInvoiceCollection()->getLastItem();
-                if (!$shipAll) {
+                if ($this->mollieHelper->getInvoiceMoment($order->getStoreId()) == InvoiceMoment::ON_SHIPMENT) {
                     $invoice = $this->partialInvoice->createFromShipment($shipment);
                 }
 
