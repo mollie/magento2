@@ -15,6 +15,8 @@ use Mollie\Payment\Model\SentPaymentReminder;
 
 class DeleteSentMassAction extends AbstractAction
 {
+    const ADMIN_RESOURCE = 'Mollie_Payment::sent_payment_reminders';
+
     /**
      * @var SentPaymentReminderRepositoryInterface
      */

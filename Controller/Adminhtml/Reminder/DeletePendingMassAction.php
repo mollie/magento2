@@ -15,6 +15,8 @@ use Mollie\Payment\Model\ResourceModel\PendingPaymentReminder\CollectionFactory;
 
 class DeletePendingMassAction extends AbstractAction
 {
+    const ADMIN_RESOURCE = 'Mollie_Payment::pending_payment_reminders';
+
     /**
      * @var PendingPaymentReminderRepositoryInterface
      */

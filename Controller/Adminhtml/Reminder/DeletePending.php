@@ -12,6 +12,8 @@ use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 
 class DeletePending extends AbstractAction
 {
+    const ADMIN_RESOURCE = 'Mollie_Payment::pending_payment_reminders';
+
     /**
      * @var PendingPaymentReminderRepositoryInterface
      */
