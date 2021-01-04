@@ -202,6 +202,7 @@ class Config
         if (!$this->isSecondChanceEmailEnabled($storeId)) {
             return false;
         }
+
         return $this->isSetFlag(static::GENERAL_AUTOMATICALLY_SEND_SECOND_CHANCE_EMAILS, $storeId);
     }
 
