@@ -163,4 +163,8 @@
     <type name="Magento\Config\Model\Config\Loader">
         <plugin name="mollie_load_correct_group" type="Mollie\Payment\Plugin\Config\LoadCorrectGroup" />
     </type>
+
+    <type name="Magento\Catalog\Model\Attribute\Config">
+        <plugin name="mollie_add_mealvoucher_category_to_loaded_attribute" type="Mollie\Payment\Plugin\Catalog\Model\AddMealVoucherCategoryToLoadedAttributes" />
+    </type>
 </config>
