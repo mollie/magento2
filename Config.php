@@ -10,6 +10,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Logger\MollieLogger;
+use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 use phpDocumentor\Reflection\Types\Static_;
 
 class Config
@@ -202,6 +203,7 @@ class Config
         if (!$this->isSecondChanceEmailEnabled($storeId)) {
             return false;
         }
+
         return $this->isSetFlag(static::GENERAL_AUTOMATICALLY_SEND_SECOND_CHANCE_EMAILS, $storeId);
     }
 
@@ -417,6 +419,7 @@ class Config
     }
 
     /**
+     * @see VoucherCategory for possible values
      * @return string|null
      */
     public function getVoucherCategory($storeId = null)
@@ -477,6 +480,7 @@ class Config
     }
 
     /**
+     * @see \Mollie\Payment\Model\Adminhtml\Source\Locale for possible values
      * @param null|int|string $storeId
      * @return string
      */
