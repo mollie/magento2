@@ -13,6 +13,8 @@ use Mollie\Payment\Service\Order\PaymentReminder;
 
 class SendNow extends AbstractAction
 {
+    const ADMIN_RESOURCE = 'Mollie_Payment::sent_payment_reminders';
+
     /**
      * @var PaymentReminder
      */

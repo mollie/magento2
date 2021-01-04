@@ -12,6 +12,8 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Pending extends AbstractAction
 {
+    const ADMIN_RESOURCE = 'Mollie_Payment::pending_payment_reminders';
+
     /**
      * @var PageFactory
      */

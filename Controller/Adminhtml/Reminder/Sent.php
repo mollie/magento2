@@ -12,6 +12,8 @@ use Magento\Framework\View\Result\PageFactory;
 
 class Sent extends AbstractAction
 {
+    const ADMIN_RESOURCE = 'Mollie_Payment::sent_payment_reminders';
+
     /**
      * @var PageFactory
      */
