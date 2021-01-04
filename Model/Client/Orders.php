@@ -732,8 +732,9 @@ class Orders extends AbstractModel
 
                 $captureAmount = $this->getCaptureAmount($order, $invoice && $invoice->getId() ? $invoice : null);
 
-                $payment->setTransactionId($transactionId);
+                $payment->setTransactionId($transactionId . '-' . $shipment->getMollieShipmentId());
                 $payment->registerCaptureNotification($captureAmount, true);
+                $invoice->setState(Invoice::STATE_PAID);
                 $this->orderRepository->save($order);
 
                 $sendInvoice = $this->mollieHelper->sendInvoice($order->getStoreId());

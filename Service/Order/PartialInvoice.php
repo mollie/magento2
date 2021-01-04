@@ -58,8 +58,8 @@ class PartialInvoice
 
         $invoice = $this->invoiceService->prepareInvoice($order, $quantities);
         $invoice->setRequestedCaptureCase(Invoice::CAPTURE_ONLINE);
-        $invoice->setState(Invoice::STATE_PAID);
-        $invoice->setTransactionId($order->getMollieTransactionId());
+        $invoice->setState(Invoice::STATE_OPEN);
+        $invoice->setTransactionId($order->getMollieTransactionId() . '-' . $shipment->getMollieShipmentId());
         $invoice->register();
 
         $this->invoiceRepository->save($invoice);
