@@ -41,11 +41,16 @@ class VoucherCategory implements ProcessorInterface
     private function getCategoryValue(OrderInterface $order, OrderItemInterface $orderItem)
     {
         $category = $this->config->getVoucherCategory($order->getStoreId());
-        if ($category == 'custom_attribute') {
-            return $this->getCustomAttribute($orderItem);
+        if ($category != 'custom_attribute') {
+            return $category;
         }
 
-        return $category;
+        $value = $this->getCustomAttribute($orderItem);
+        if ($value == 'none') {
+            return null;
+        }
+
+        return $value;
     }
 
     private function getCustomAttribute(OrderItemInterface $orderItem)

@@ -10,6 +10,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Logger\MollieLogger;
+use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 use phpDocumentor\Reflection\Types\Static_;
 
 class Config
@@ -417,6 +418,7 @@ class Config
     }
 
     /**
+     * @see VoucherCategory for possible values
      * @return string|null
      */
     public function getVoucherCategory($storeId = null)
