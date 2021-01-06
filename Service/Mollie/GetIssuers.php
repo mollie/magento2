@@ -8,6 +8,7 @@ namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Locale\Resolver;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Model\Mollie as MollieModel;
 
@@ -33,11 +34,13 @@ class GetIssuers
     public function __construct(
         CacheInterface $cache,
         SerializerInterface $serializer,
-        MollieModel $mollieModel
+        MollieModel $mollieModel,
+        Resolver $resolver
     ) {
         $this->cache = $cache;
         $this->serializer = $serializer;
         $this->mollieModel = $mollieModel;
+        $this->resolver = $resolver;
     }
 
     /**
@@ -48,7 +51,7 @@ class GetIssuers
      */
     public function execute(MollieApiClient $mollieApi, $method, $type)
     {
-        $identifier = static::CACHE_IDENTIFIER_PREFIX . $method . $type;
+        $identifier = static::CACHE_IDENTIFIER_PREFIX . $method . $type . $this->resolver->getLocale();
         $result = $this->cache->load($identifier);
         if ($result) {
             return $this->serializer->unserialize($result);
