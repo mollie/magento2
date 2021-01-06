@@ -31,6 +31,11 @@ class GetIssuers
      */
     private $mollieModel;
 
+    /**
+     * @var Resolver
+     */
+    private $resolver;
+
     public function __construct(
         CacheInterface $cache,
         SerializerInterface $serializer,
