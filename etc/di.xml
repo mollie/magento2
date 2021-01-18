@@ -49,6 +49,8 @@
                 <item name="payment/mollie_general/debug" xsi:type="string">1</item>
                 <item name="payment/mollie_general/use_webhooks" xsi:type="string">1</item>
                 <item name="payment/mollie_general/custom_webhook_url" xsi:type="string">1</item>
+                <item name="payment/mollie_general/use_custom_redirect_url" xsi:type="string">1</item>
+                <item name="payment/mollie_general/custom_redirect_url" xsi:type="string">1</item>
             </argument>
         </arguments>
     </type>

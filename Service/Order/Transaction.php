@@ -6,10 +6,12 @@
 
 namespace Mollie\Payment\Service\Order;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Store\Model\ScopeInterface as StoreScope;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Adminhtml\Source\WebhookUrlOptions;
 
@@ -30,14 +32,21 @@ class Transaction
      */
     private $encryptor;
 
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
     public function __construct(
         Config $config,
         Context $context,
-        Encryptor $encryptor
+        Encryptor $encryptor,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->config = $config;
         $this->urlBuilder = $context->getUrlBuilder();
         $this->encryptor = $encryptor;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -85,14 +94,17 @@ class Transaction
     private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, int $storeId = null)
     {
         $replacements = [
-            '{{ORDER_ID}}' => $order->getId(),
-            '{{INCREMENT_ID}}' => $order->getIncrementId(),
-            '{{PAYMENT_TOKEN}}' => $paymentToken,
-            '{{ORDER_HASH}}' => base64_encode($this->encryptor->encrypt((string)$order->getId())),
+            '{{order_id}}' => $order->getId(),
+            '{{increment_id}}' => $order->getIncrementId(),
+            '{{payment_token}}' => $paymentToken,
+            '{{order_hash}}' => base64_encode($this->encryptor->encrypt((string)$order->getId())),
+            '{{base_url}}' => $this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
+            '{{unsecure_base_url}}' => $this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
+            '{{secure_base_url}}' => $this->scopeConfig->getValue('web/secure/base_url', StoreScope::SCOPE_STORE, $storeId),
         ];
 
         $customUrl = $this->config->customRedirectUrl($storeId);
-        $customUrl = str_replace(
+        $customUrl = str_ireplace(
             array_keys($replacements),
             array_values($replacements),
             $customUrl
