@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Test\Integration\Service\Order;
 
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Service\Order\Transaction;
@@ -68,12 +69,29 @@ class TransactionTest extends IntegrationTestCase
 
     /**
      * @magentoConfigFixture current_store payment/mollie_general/use_custom_redirect_url 1
-     * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url https://www.mollie.com/?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&increment_id={{INCREMENT_ID}}
+     * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url https://www.mollie.com/?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&increment_id={{INCREMENT_ID}}&short_base_url={{base_url}}&unsecure_base_url={{unsecure_base_url}}&secure_base_url={{secure_base_url}}
      */
     public function testAppendsTheParamsToTheUrl()
     {
+        $configMock = $this->createMock(ScopeConfigInterface::class);
+
+        $configMock
+            ->method('getValue')
+            ->withConsecutive(
+                ['web/unsecure/base_url', 'store', null],
+                ['web/unsecure/base_url', 'store', null],
+                ['web/secure/base_url', 'store', null]
+            )
+            ->willReturnOnConsecutiveCalls(
+                'http://base_url.test/',
+                'http://unsecure_base_url.test/',
+                'https://secure_base_url.test/'
+            );
+
         /** @var Transaction $instance */
-        $instance = $this->objectManager->create(Transaction::class);
+        $instance = $this->objectManager->create(Transaction::class, [
+            'scopeConfig' => $configMock,
+        ]);
 
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
@@ -85,6 +103,18 @@ class TransactionTest extends IntegrationTestCase
         $this->assertStringContainsString('order_id=9999', $result);
         $this->assertStringContainsString('increment_id=8888', $result);
         $this->assertStringContainsString('payment_token=paymenttoken', $result);
+        $this->assertStringContainsString('short_base_url=http://base_url.test/', $result);
+        $this->assertStringContainsString('unsecure_base_url=http://unsecure_base_url.test/', $result);
+        $this->assertStringContainsString('secure_base_url=https://secure_base_url.test/', $result);
+    }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/use_custom_redirect_url 1
+     * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url https://www.mollie.com/?order_id={{order_id}}&payment_token={{payment_token}}&increment_id={{increment_id}}&short_base_url={{base_url}}&unsecure_base_url={{unsecure_base_url}}&secure_base_url={{secure_base_url}}
+     */
+    public function testTheVariablesAreCaseInsensitive()
+    {
+       $this->testAppendsTheParamsToTheUrl();
     }
 
     /**

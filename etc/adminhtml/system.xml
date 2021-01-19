@@ -263,7 +263,17 @@
                        showInStore="1">
                     <label>Custom return url</label>
                     <config_path>payment/mollie_general/custom_redirect_url</config_path>
-                    <comment><![CDATA[<strong>Note:</strong> This URL is not being parsed.<br>You need to enter the complete url.]]></comment>
+                    <comment><![CDATA[
+                        <strong>Note:</strong> You can use the following placeholders:<br>
+                        <br>
+                        <strong>{{order_id}}</strong>: The entity ID of the order.<br>
+                        <strong>{{increment_id}}</strong>: The increment ID of the order.<br>
+                        <strong>{{payment_token}}</strong>: The generated payment token.<br>
+                        <strong>{{order_hash}}</strong>: The entity ID encrypted and base64 encoded.<br>
+                        <strong>{{base_url}}</strong>: The store base url.<br>
+                        <strong>{{unsecure_base_url}}</strong>: The store base url.<br>
+                        <strong>{{secure_base_url}}</strong>: The secure store base url.
+                    ]]></comment>
                     <validate>validate-url</validate>
                     <depends>
                         <field id="use_custom_redirect_url">1</field>

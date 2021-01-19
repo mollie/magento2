@@ -81,6 +81,7 @@ define(
                     return promise;
                 },
                 afterPlaceOrder: function () {
+                    this._super();
                     window.location = url.build('mollie/checkout/redirect/paymentToken/' + this.paymentToken());
                 }
             }
