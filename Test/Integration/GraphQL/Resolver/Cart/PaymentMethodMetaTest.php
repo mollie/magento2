@@ -38,6 +38,15 @@ class PaymentMethodMetaTest extends IntegrationTestCase
         $this->assertStringContainsString('Mollie_Payment/images/methods/ideal.svg', $result['image']);
     }
 
+    public function testTheImagesIsAFrontendPath()
+    {
+        $instance = $this->objectManager->create(PaymentMethodMeta::class);
+
+        $result = $this->callResolve($instance, ['code' => 'mollie_methods_ideal']);
+
+        $this->assertStringContainsString('frontend/Magento/luma', $result['image']);
+    }
+
     public function callResolve(PaymentMethodMeta $instance, $value = null, $args = null)
     {
         return $instance->resolve(
