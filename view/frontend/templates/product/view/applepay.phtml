@@ -1,0 +1,32 @@
+<?php /** @var \Mollie\Payment\Block\Product\View\ApplePay $block */ ?>
+<!--data-bind="click: placeApplePayOrder"-->
+<div id="product-page-mollie-apple-pay-button" data-bind="scope:'mollie-apple-pay-button'">
+    <!-- TODO: Wrap with this IF: -->
+    <!-- ko if: canUseApplePay() --><!-- /ko -->
+    <!-- TODO: Only load this when applepay is enabled. -->
+
+    <div class="apple-pay-button-with-text apple-pay-button-white-with-text" data-bind="click: payWithApplePay">
+        <span class="text">Buy with</span>
+        <span class="logo"></span>
+    </div>
+</div>
+<script type="text/x-magento-init">
+{
+    "#product-page-mollie-apple-pay-button": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "mollie-apple-pay-button": {
+                    "component": "Mollie_Payment/js/view/product/apple-pay-button",
+                    "config": {
+                        "formSelector": "#product_addtocart_form",
+                        "currencyCode": "<?php echo $block->escapeJs($block->getCurrencyCode()); ?>",
+                        "countryCode": "<?php echo $block->escapeJs($block->getCountryCode()); ?>",
+                        "productName": "<?php echo $block->escapeJs($block->getProductName()); ?>",
+                        "storeName": "<?php echo $block->escapeJs($block->getStoreName()); ?>"
+                    }
+                }
+            }
+        }
+    }
+}
+</script>
