@@ -96,4 +96,10 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Payment\Controller\ApplePay\BuyNowPlaceOrder">
+        <arguments>
+            <argument xsi:type="object" name="checkoutSession">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 </config>

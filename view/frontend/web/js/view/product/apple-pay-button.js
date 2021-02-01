@@ -66,12 +66,14 @@ define([
                 requiredBillingContactFields: [
                     'postalAddress',
                     'name',
-                    'email'
+                    'email',
+                    'phone'
                 ],
                 requiredShippingContactFields: [
                     'postalAddress',
                     'name',
-                    'email'
+                    'email',
+                    'phone'
                 ]
             }
 
@@ -80,7 +82,9 @@ define([
             }
 
             this.session.onshippingcontactselected = function (event) {
+                console.log('onshippingcontactselected');
                 $.ajax({
+                    global: false,
                     type: 'POST',
                     url: url.build('mollie/applePay/shippingMethods'),
                     data: {
@@ -104,6 +108,7 @@ define([
             }.bind(this)
 
             this.session.onshippingmethodselected = function (event) {
+                console.log('onshippingmethodselected');
                 this.selectedShippingMethod = event.shippingMethod
 
                 this.session.completeShippingMethodSelection(
@@ -116,7 +121,9 @@ define([
             this.session.onpaymentauthorized = function (event) {
                 console.log('onpaymentauthorized', event);
 
+                var session = this.session;
                 $.ajax({
+                    global: false,
                     type: 'POST',
                     url: url.build('mollie/applePay/buyNowPlaceOrder'),
                     data: {
@@ -128,7 +135,12 @@ define([
                     },
                     success: function (result) {
                         console.log('order placed', result);
-                    }.bind(this)
+                        session.completePayment(ApplePaySession.STATUS_SUCCESS);
+
+                        setTimeout( function () {
+                            location.href = url.build('checkout/onepage/success')
+                        }, 1000);
+                    }
                 })
 
                 try {
@@ -146,6 +158,7 @@ define([
                 formData.append('validationURL', event.validationURL);
 
                 $.ajax({
+                    global: false,
                     type: 'POST',
                     url: url.build('mollie/applePay/buyNowValidation'),
                     data: formData,
