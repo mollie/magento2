@@ -10,11 +10,14 @@ use Exception;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Mollie\Payment\Api\Data\PaymentTokenInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Model\Methods\Paymentlink;
 use Mollie\Payment\Service\Order\Reorder;
+use Mollie\Payment\Service\PaymentToken\Generate;
 
 class SecondChance extends Action
 {
@@ -38,18 +41,25 @@ class SecondChance extends Action
      */
     private $paymentlink;
 
+    /**
+     * @var Generate
+     */
+    private $generatePaymentToken;
+
     public function __construct(
         Context $context,
         OrderRepositoryInterface $orderRepository,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         Reorder $reorder,
-        Paymentlink $paymentlink
+        Paymentlink $paymentlink,
+        Generate $paymentTokenPaymentToken
     ) {
         parent::__construct($context);
         $this->orderRepository = $orderRepository;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->reorder = $reorder;
         $this->paymentlink = $paymentlink;
+        $this->generatePaymentToken = $paymentTokenPaymentToken;
     }
 
     public function execute()
@@ -88,7 +98,25 @@ class SecondChance extends Action
         }
 
         $order = $this->reorder->create($order);
-        $information = $order->getPayment()->getAdditionalInformation();
-        return $this->_redirect($information['checkout_url']);
+
+        $token = $this->getToken($order);
+        $url = $this->_url->getUrl('mollie/checkout/redirect', ['paymentToken' => $token->getToken()]);
+
+        return $this->_redirect($url);
+    }
+
+    /**
+     * @param OrderInterface $order
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return PaymentTokenInterface|null
+     */
+    private function getToken(OrderInterface $order): PaymentTokenInterface
+    {
+        $token = $this->paymentTokenRepository->getByOrder($order);
+        if ($token) {
+            return $token;
+        }
+
+        return $this->generatePaymentToken->forOrder($order);
     }
 }

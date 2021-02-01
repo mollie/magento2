@@ -4,7 +4,7 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Controller\Checkout;
+namespace Mollie\Payment\Test\Integration\Controller\Checkout;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Quote\Model\Quote;
@@ -19,10 +19,11 @@ class SecondChanceTest extends AbstractController
 {
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @expectedException \Magento\Framework\Exception\NoSuchEntityException
      */
     public function testThrowsNotFoundExceptionWhenTheTokenIsIncorrect()
     {
+        $this->expectException(\Magento\Framework\Exception\NoSuchEntityException::class);
+
         $order = $this->loadOrder('100000001');
 
         $this->getRequest()->setParam('order_id', $order->getId());
@@ -86,7 +87,7 @@ class SecondChanceTest extends AbstractController
         $this->getRequest()->setParam('payment_token', $token->getToken());
 
         $this->dispatch('/mollie/checkout/secondChance/');
-        $this->assertRedirect($this->equalTo('http://example.com'));
+        $this->assertRedirect($this->stringContains('mollie/checkout/redirect/paymentToken'));
     }
 
     /**

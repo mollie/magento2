@@ -1,0 +1,30 @@
+name: setup:di:compile
+
+on: [push, pull_request]
+
+jobs:
+    build:
+        strategy:
+            matrix:
+                PHP_VERSION: [php7-fpm, php71-fpm, php72-fpm]
+                MAGENTO_VERSION: [2.2.11, 2.3.5-p1]
+                exclude:
+                    - PHP_VERSION: php7-fpm
+                      MAGENTO_VERSION: 2.3.5-p1
+                    - PHP_VERSION: php72-fpm
+                      MAGENTO_VERSION: 2.2.11
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v1
+
+            - name: Start Docker
+              run: docker run --detach --name magento-project-community-edition michielgerritsen/magento-project-community-edition:${{ matrix.PHP_VERSION }}-magento${{ matrix.MAGENTO_VERSION }}
+
+            - name: Upload our code into the docker container
+              run: docker cp $(pwd) magento-project-community-edition:/data/extensions/
+
+            - name: Install the extension in Magento
+              run: docker exec magento-project-community-edition composer require mollie/magento2:@dev
+
+            - name: Run setup:di:compile
+              run: docker exec magento-project-community-edition php bin/magento setup:di:compile

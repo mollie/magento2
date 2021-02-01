@@ -2,6 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface" type="Mollie\Payment\Webapi\PaymentToken" />
     <preference for="Mollie\Payment\Api\Webapi\StartTransactionRequestInterface" type="Mollie\Payment\Webapi\StartTransaction" />
+    <preference for="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" type="Mollie\Payment\Webapi\GetCustomerOrder" />
 
     <preference for="Mollie\Payment\Api\PaymentTokenRepositoryInterface" type="Mollie\Payment\Model\PaymentTokenRepository"/>
     <preference for="Mollie\Payment\Api\Data\PaymentTokenInterface" type="Mollie\Payment\Model\Data\PaymentToken"/>
@@ -10,6 +11,14 @@
     <preference for="Mollie\Payment\Api\MollieCustomerRepositoryInterface" type="Mollie\Payment\Model\MollieCustomerRepository"/>
     <preference for="Mollie\Payment\Api\Data\MollieCustomerInterface" type="Mollie\Payment\Model\Data\MollieCustomer"/>
     <preference for="Mollie\Payment\Api\Data\CustomerSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <preference for="Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface" type="Mollie\Payment\Model\PendingPaymentReminderRepository"/>
+    <preference for="Mollie\Payment\Api\Data\PendingPaymentReminderInterface" type="Mollie\Payment\Model\Data\PendingPaymentReminder"/>
+    <preference for="Mollie\Payment\Api\Data\PendingPaymentReminderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <preference for="Mollie\Payment\Api\SentPaymentReminderRepositoryInterface" type="Mollie\Payment\Model\SentPaymentReminderRepository"/>
+    <preference for="Mollie\Payment\Api\Data\SentPaymentReminderInterface" type="Mollie\Payment\Model\Data\SentPaymentReminder"/>
+    <preference for="Mollie\Payment\Api\Data\SentPaymentReminderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
     <type name="Mollie\Payment\Logger\Handler">
         <arguments>
@@ -38,6 +47,10 @@
                 <item name="payment/mollie_general/apikey_live" xsi:type="string">1</item>
                 <item name="payment/mollie_general/type" xsi:type="string">1</item>
                 <item name="payment/mollie_general/debug" xsi:type="string">1</item>
+                <item name="payment/mollie_general/use_webhooks" xsi:type="string">1</item>
+                <item name="payment/mollie_general/custom_webhook_url" xsi:type="string">1</item>
+                <item name="payment/mollie_general/use_custom_redirect_url" xsi:type="string">1</item>
+                <item name="payment/mollie_general/custom_redirect_url" xsi:type="string">1</item>
             </argument>
         </arguments>
     </type>
@@ -92,7 +105,17 @@
     <type name="Mollie\Payment\Service\Order\Lines\OrderLinesProcessor">
         <arguments>
             <argument name="processors" xsi:type="array">
-                <item name="mealvoucherCategory" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\MealvoucherCategory</item>
+                <item name="voucherCategory" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\VoucherCategory</item>
+                <item name="bundleWithoutDynamicPrice" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\BundleWithoutDynamicPricing</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="mollie_pending_payment_reminders_data_source" xsi:type="string">PendingPaymentReminderCollection</item>
+                <item name="mollie_sent_payment_reminders_data_source" xsi:type="string">SentPaymentReminderCollection</item>
             </argument>
         </arguments>
     </type>
@@ -101,5 +124,55 @@
         <arguments>
             <argument xsi:type="object" name="checkoutSession">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
+    </type>
+
+    <virtualType name="PendingPaymentReminderCollection" type="Mollie\Payment\Ui\DataProvider\PaymentReminder\Listing\Pending\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mollie_pending_payment_reminder</argument>
+            <argument name="resourceModel" xsi:type="string">Mollie\Payment\Model\ResourceModel\PendingPaymentReminder</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SentPaymentReminderCollection" type="Mollie\Payment\Ui\DataProvider\PaymentReminder\Listing\Sent\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mollie_sent_payment_reminder</argument>
+            <argument name="resourceModel" xsi:type="string">Mollie\Payment\Model\ResourceModel\SentPaymentReminder</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Asset\Minification">
+        <plugin name="disable_minification_for_components_js" type="Mollie\Payment\Plugin\Framework\View\Asset\DisableMinificationForComponentsJs" />
+    </type>
+
+    <type name="Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex\RestoreQuoteOfUnsuccessfulPayment">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Quote\Api\PaymentMethodManagementInterface">
+        <plugin name="mollie_hide_methods_that_are_not_allowed" type="Mollie\Payment\Plugin\Quote\Api\PaymentMethodManagementPlugin" />
+    </type>
+
+    <type name="Mollie\Payment\Service\Order\TransactionProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="saveRemainingAmount" xsi:type="object">Mollie\Payment\Service\Order\ProcessTransaction\SaveRemainingAmount</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Service\Order\Reorder">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Config\Model\Config\Loader">
+        <plugin name="mollie_load_correct_group" type="Mollie\Payment\Plugin\Config\LoadCorrectGroup" />
+    </type>
+
+    <type name="Magento\Catalog\Model\Attribute\Config">
+        <plugin name="mollie_add_mealvoucher_category_to_loaded_attribute" type="Mollie\Payment\Plugin\Catalog\Model\AddMealVoucherCategoryToLoadedAttributes" />
     </type>
 </config>

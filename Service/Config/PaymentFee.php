@@ -98,4 +98,13 @@ class PaymentFee
 
         return $this->config->paymentSurchargeTaxClass($method, $cart->getStoreId());
     }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function includeShippingInSurcharge($storeId = null)
+    {
+        return $this->config->includeShippingInSurcharge($storeId);
+    }
 }

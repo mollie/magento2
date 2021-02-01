@@ -4,5 +4,9 @@
         <referenceBlock name="creditmemo_totals">
             <block name="mollie_payment_fee" class="Mollie\Payment\Block\PaymentFee\Sales\CreditmemoNew" />
         </referenceBlock>
+
+        <referenceBlock name="submit_before">
+            <block name="mollie_voucher_warning" class="Mollie\Payment\Block\Adminhtml\Sales\Creditmemo\VoucherWarning" />
+        </referenceBlock>
     </body>
 </page>

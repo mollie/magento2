@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "1.14.0",
+  "version": "1.21.0",
   "keywords": [
     "mollie",
     "payment",
@@ -31,7 +31,7 @@
     "recurring",
     "charges",
     "kbc",
-    "mealvoucher",
+    "voucher",
     "cbc",
     "gift cards",
     "intersolve",

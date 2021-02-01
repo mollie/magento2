@@ -15,10 +15,8 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentTokenTest extends IntegrationTestCase
 {
-    protected function setUp()
+    protected function setUpWithoutVoid()
     {
-        parent::setUp();
-
         $version = $this->objectManager->get(ProductMetadataInterface::class)->getVersion();
         if (version_compare($version, '2.3', '<=')) {
             $this->markTestSkipped('This test only works on Magento 2.3 and higher.');

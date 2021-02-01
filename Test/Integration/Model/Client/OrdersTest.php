@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Model\Client;
+namespace Mollie\Payment\Test\Integration\Model\Client;
 
 use Magento\Framework\Phrase;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -12,6 +12,7 @@ use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
+use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -39,7 +40,7 @@ class OrdersTest extends IntegrationTestCase
         try {
             $instance->cancelOrder($order);
         } catch (\Magento\Framework\Exception\LocalizedException $exception) {
-            $this->assertContains('Order ID: 999', $exception->getMessage());
+            $this->assertStringContainsString('Order ID: 999', $exception->getMessage());
             return;
         }
 
@@ -53,7 +54,7 @@ class OrdersTest extends IntegrationTestCase
                 'USD',
                 OrderStatus::STATUS_PAID,
                 [
-                    'Mollie: Order Amount %1, Captures Amount %2',
+                    'Mollie: Order Amount %1, Captured Amount %2',
                     'Notified customer about invoice #%1'
                 ]
             ],

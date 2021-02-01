@@ -8,6 +8,334 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Config:etc/system_file.xsd">
     <system>
+        <tab id="mollie" sortOrder="210" translate="label" class="mollie-tab">
+            <label>Mollie</label>
+        </tab>
+
+        <section id="mollie_general" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+            <label>General</label>
+            <tab>mollie</tab>
+            <resource>Mollie_Payment::config</resource>
+
+            <group id="branding" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Branding</label>
+                <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Header</frontend_model>
+            </group>
+
+            <group id="version" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Version</label>
+                <field id="version_button" translate="label" type="button" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Version</label>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Button\VersionCheck</frontend_model>
+                </field>
+                <field id="enabled" translate="label" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/enabled</config_path>
+                </field>
+            </group>
+
+            <group id="api_details" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>API Details</label>
+                <field id="heading_api" translate="label comment" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>API Details</label>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
+                    <comment><![CDATA[You can find your Api Keys in your <a href="https://www.mollie.com/dashboard/" title="Mollie Profiles">Mollie Profile</a>.<br>]]></comment>
+                </field>
+                <field id="type" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Modus</label>
+                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\ApiKey</source_model>
+                    <config_path>payment/mollie_general/type</config_path>
+                </field>
+                <field id="apikey_test" translate="label" type="text" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Test API Key</label>
+                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
+                    <config_path>payment/mollie_general/apikey_test</config_path>
+                </field>
+                <field id="apikey_live" translate="label" type="text" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Live API Key</label>
+                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
+                    <config_path>payment/mollie_general/apikey_live</config_path>
+                </field>
+                <field id="profileid" translate="label" type="text" sortOrder="50" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Profile ID</label>
+                    <config_path>payment/mollie_general/profileid</config_path>
+                </field>
+                <field id="credentials_checker" translate="label" type="button" sortOrder="60" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker</frontend_model>
+                </field>
+                <field id="credentials_result" translate="label" type="text" sortOrder="70" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Result</frontend_model>
+                </field>
+            </group>
+
+            <group id="settings" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Settings</label>
+                <field id="payment_images" translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Show Icons</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/payment_images</config_path>
+                    <comment><![CDATA[Show Payment Icons on Checkout]]></comment>
+                </field>
+                <field id="default_selected_method" translate="label" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="1">
+                    <label>Default selected method</label>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\MolliePaymentMethod</source_model>
+                    <config_path>payment/mollie_general/default_selected_method</config_path>
+                </field>
+            </group>
+
+            <group id="debug_and_logging" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Debug &amp; Logging</label>
+                <field id="heading_debug" translate="label comment" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Debug</label>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
+                    <comment><![CDATA[Especially for Developers you can enable the Debug mode.]]></comment>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Debug requests</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/debug</config_path>
+                    <comment>When activated the debug file will be located in: var/log/mollie.log</comment>
+                </field>
+                <field id="debug_button" translate="label" type="button" sortOrder="21" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label/>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Button\DebugCheck</frontend_model>
+                </field>
+                <field id="selftest_button" translate="label" type="button" sortOrder="23" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label/>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Button\Selftest</frontend_model>
+                </field>
+            </group>
+        </section>
+
+        <section id="mollie_payment_methods" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label">
+            <label>Payment Methods</label>
+            <tab>mollie</tab>
+            <resource>Mollie_Payment::config</resource>
+            <include path="Mollie_Payment::methods.xml"/>
+        </section>
+
+        <section id="mollie_advanced" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label">
+            <label>Advanced</label>
+            <tab>mollie</tab>
+            <resource>Mollie_Payment::config</resource>
+
+            <group id="statuses" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Statuses</label>
+
+                <field id="order_status_pending" translate="label comment" type="select" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Status Pending</label>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\Pending</source_model>
+                    <config_path>payment/mollie_general/order_status_pending</config_path>
+                    <comment><![CDATA[Set the order status before the customer is redirected to Payment Gateway]]></comment>
+                </field>
+                <field id="order_status_processing" translate="label comment" type="select" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Status Processing</label>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\Processing</source_model>
+                    <config_path>payment/mollie_general/order_status_processing</config_path>
+                    <comment><![CDATA[Set the order status for Completed Payments]]></comment>
+                </field>
+            </group>
+
+            <group id="triggers_and_languages" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Triggers &amp; Languages</label>
+
+                <field id="invoice_moment" translate="label comment" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>When to create the invoice?</label>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment</source_model>
+                    <config_path>payment/mollie_general/invoice_moment</config_path>
+                    <comment><![CDATA[When do you want create the invoice for <strong>Klarna Payments</strong>?<br><strong>On Authorize</strong>: Create a full invoice when the order is authorized.<br><strong>On Shipment</strong>: Create a (partial) invoice when a shipment is created.]]></comment>
+                </field>
+                <field id="invoice_notify" translate="label comment" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Send Invoice Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/invoice_notify</config_path>
+                    <comment><![CDATA[Set to yes to send the invoice email to the customer after the invoice is created.]]></comment>
+                </field>
+                <field id="cancel_failed_orders" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="1">
+                    <label>Cancel order when connection Fails</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/cancel_failed_orders</config_path>
+                    <comment><![CDATA[When the order can't be created due to various reasons (connection failure or data verification errors), the just created order will be canceled.]]></comment>
+                </field>
+                <field id="include_shipping_in_surcharge" translate="label" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="0" showInStore="1">
+                    <label>Include shipping in Surcharge calculation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/include_shipping_in_surcharge</config_path>
+                    <comment><![CDATA[
+                        <strong>No</strong>: The surcharge is calculated over the subtotal<br>
+                        <strong>Yes</strong>: The surcharge is calculated on the total of subtotal + shipping.
+                    ]]></comment>
+                </field>
+                <field id="currency" translate="label" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Use Base Currency</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/currency</config_path>
+                    <comment>Force use of base currency for the payment request. Is set to no the selected currency of the storeview will be used for request.</comment>
+                </field>
+                <field id="locale" translate="label comment" type="select" sortOrder="60" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Language Payment Page</label>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\Locale</source_model>
+                    <config_path>payment/mollie_general/locale</config_path>
+                    <comment><![CDATA[Let Mollie automatically detect the language or force the language from the store view.]]></comment>
+                </field>
+                <field id="transaction_details" translate="label" type="select" sortOrder="70" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Show Transaction Details</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Display Transaction Details like e.g. IBAN, BIC, Paypal Reference, Card Holder etc.</comment>
+                </field>
+                <field id="loading_screen" translate="label" type="select" sortOrder="80" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Use Loading Screen</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/loading_screen</config_path>
+                    <comment><![CDATA[Use loading screen before redirect. This will enable mobile users to use the back button.]]></comment>
+                </field>
+                <field id="use_webhooks" translate="label" type="select" sortOrder="220" showInDefault="1"
+                       showInWebsite="0" showInStore="1">
+                    <label>Use webhooks</label>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\WebhookUrlOptions</source_model>
+                    <config_path>payment/mollie_general/use_webhooks</config_path>
+                    <comment><![CDATA[
+                            <strong>Note:</strong> This setting has only effect when the store deploy mode is in <u>development</u>. When the store deploy mode is in production, this setting is ignored and the webhooks are always <u>enabled</u>.
+                        ]]></comment>
+                </field>
+                <field id="custom_webhook_url" translate="label" type="text" sortOrder="230" showInDefault="1"
+                       showInWebsite="0" showInStore="1">
+                    <label>Custom webhook url</label>
+                    <config_path>payment/mollie_general/custom_webhook_url</config_path>
+                    <depends>
+                        <field id="use_webhooks">custom_url</field>
+                    </depends>
+                </field>
+            </group>
+
+            <group id="pwa_storefront_integration" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>PWA Storefront Integration</label>
+
+                <field id="heading_advanced" translate="label comment" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Advanced: PWA storefront integration</label>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
+                    <comment><![CDATA[Only use this function if you want to integrate the Mollie extension with a PWA storefront.
+                    More information can be found <a href="https://github.com/mollie/magento2/wiki/PWA-integration" target="_blank">here</a>.]]></comment>
+                </field>
+                <field id="use_custom_redirect_url" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Use custom return url?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/use_custom_redirect_url</config_path>
+                </field>
+                <field id="custom_redirect_url" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Custom return url</label>
+                    <config_path>payment/mollie_general/custom_redirect_url</config_path>
+                    <comment><![CDATA[
+                        <strong>Note:</strong> You can use the following placeholders:<br>
+                        <br>
+                        <strong>{{order_id}}</strong>: The entity ID of the order.<br>
+                        <strong>{{increment_id}}</strong>: The increment ID of the order.<br>
+                        <strong>{{payment_token}}</strong>: The generated payment token.<br>
+                        <strong>{{order_hash}}</strong>: The entity ID encrypted and base64 encoded.<br>
+                        <strong>{{base_url}}</strong>: The store base url.<br>
+                        <strong>{{unsecure_base_url}}</strong>: The store base url.<br>
+                        <strong>{{secure_base_url}}</strong>: The secure store base url.
+                    ]]></comment>
+                    <validate>validate-url</validate>
+                    <depends>
+                        <field id="use_custom_redirect_url">1</field>
+                    </depends>
+                </field>
+            </group>
+        </section>
+
+        <section id="mollie_second_chance_email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label">
+            <label>Second Chance Email</label>
+            <tab>mollie</tab>
+            <resource>Mollie_Payment::config</resource>
+
+            <group id="second_chance_email" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Second Chance Email</label>
+                <field id="heading_second_chance_email" translate="label comment" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Second Chance Email</label>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
+                    <comment><![CDATA[Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated.]]></comment>
+                </field>
+                <field id="enable_second_chance_email" translate="label" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="1">
+                    <label>Enable Second Chance Email</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/enable_second_chance_email</config_path>
+                    <comment><![CDATA[This will add a "send second chance email" button to the orders in the back-end. This email is only sent after triggering this manually.]]></comment>
+                </field>
+                <field id="second_chance_email_template" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="1" canRestore="1">
+                    <label>Second Chance Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <config_path>payment/mollie_general/second_chance_email_template</config_path>
+                    <comment><![CDATA[Email template chosen based on theme fallback when "Default" option is selected. You can edit this e-mail using the Email Template Manager in Magento and assign your personalized Template.]]></comment>
+                    <depends>
+                        <field id="enable_second_chance_email">1</field>
+                    </depends>
+                </field>
+                <field id="automatically_send_second_chance_emails" translate="label" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="0" showInStore="1">
+                    <label>Automatically Send Second Chance Emails</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/automatically_send_second_chance_emails</config_path>
+                    <comment><![CDATA[This will schedule the "second chance email" fully automatically based on the delay configured below. The sent and queued emails can be found in the Sales > Mollie Payment Reminders tab. Only orders with the status "pending" without a valid transaction on the same email address of the client will be added to the queue.]]></comment>
+                    <depends>
+                        <field id="enable_second_chance_email">1</field>
+                    </depends>
+                </field>
+                <field id="second_chance_email_delay" translate="label" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="0" showInStore="1" canRestore="1">
+                    <label>Second Chance Email Delay</label>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\SecondChanceEmailDelay</source_model>
+                    <config_path>payment/mollie_general/second_chance_email_delay</config_path>
+                    <depends>
+                        <field id="enable_second_chance_email">1</field>
+                    </depends>
+                    <comment><![CDATA[Configure the delay in hours when the "second chance email" should be sent.]]></comment>
+                </field>
+            </group>
+        </section>
+
         <section id="payment">
             <group id="mollie" translate="label" type="text" sortOrder="101" showInDefault="1" showInWebsite="1"
                    showInStore="1">
@@ -15,219 +343,17 @@
                 <group id="branding" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1"
                        showInStore="1">
                     <label>Branding</label>
-                    <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Header</frontend_model>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\Render\PaymentMethodsHeader</frontend_model>
                 </group>
-                <group id="mollie_general" translate="label" type="text" sortOrder="10" showInDefault="1"
-                       showInWebsite="1" showInStore="1">
-                    <label>General</label>
-                    <field id="version" translate="label" type="text" sortOrder="15" showInDefault="1" showInWebsite="1"
-                           showInStore="1">
-                        <label>Version</label>
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Version</frontend_model>
-                    </field>
-                    <field id="enabled" translate="label" type="select" sortOrder="20" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Enabled</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/mollie_general/enabled</config_path>
-                    </field>
-                    <field id="heading_api" translate="label comment" type="text" sortOrder="30" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>API Details</label>
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-                        <comment><![CDATA[You can find your Api Keys in your <a href="https://www.mollie.com/dashboard/" title="Mollie Profiles">Mollie Profile</a>.<br>]]></comment>
-                    </field>
-                    <field id="type" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
-                           showInStore="1">
-                        <label>Modus</label>
-                        <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
-                        <source_model>Mollie\Payment\Model\Adminhtml\Source\ApiKey</source_model>
-                        <config_path>payment/mollie_general/type</config_path>
-                    </field>
-                    <field id="profileid" translate="label" type="text" sortOrder="50" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Profile ID</label>
-                        <config_path>payment/mollie_general/profileid</config_path>
-                    </field>
-                    <field id="apikey_test" translate="label" type="text" sortOrder="60" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Test API Key</label>
-                        <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
-                        <config_path>payment/mollie_general/apikey_test</config_path>
-                    </field>
-                    <field id="apikey_live" translate="label" type="text" sortOrder="70" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Live API Key</label>
-                        <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
-                        <config_path>payment/mollie_general/apikey_live</config_path>
-                    </field>
-                    <field id="credentials_checker" translate="label" type="button" sortOrder="80" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker</frontend_model>
-                    </field>
-                    <field id="credentials_result" translate="label" type="text" sortOrder="90" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Result</frontend_model>
-                    </field>
-                    <field id="heading_settings" translate="label comment" type="text" sortOrder="100" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Settings</label>
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-                        <comment><![CDATA[Configure the general Mollie Payment Payment status and Payment Icons.]]></comment>
-                    </field>
-                    <field id="loading_screen" translate="label" type="select" sortOrder="110" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Use Loading Screen</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/mollie_general/loading_screen</config_path>
-                        <comment><![CDATA[Use loading screen before redirect. This will enable mobile users to use the back button.]]></comment>
-                    </field>
-                    <field id="payment_images" translate="label" type="select" sortOrder="120" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Show Icons</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/mollie_general/payment_images</config_path>
-                        <comment><![CDATA[Show Payment Icons on Checkout]]></comment>
-                    </field>
-                    <field id="order_status_pending" translate="label comment" type="select" sortOrder="130"
-                           showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Status Pending</label>
-                        <source_model>Mollie\Payment\Model\Adminhtml\Source\Pending</source_model>
-                        <config_path>payment/mollie_general/order_status_pending</config_path>
-                        <comment><![CDATA[Set the order status before the customer is redirected to Payment Gateway]]></comment>
-                    </field>
-                    <field id="order_status_processing" translate="label comment" type="select" sortOrder="140"
-                           showInDefault="1" showInWebsite="1" showInStore="1">
-                        <label>Status Processing</label>
-                        <source_model>Mollie\Payment\Model\Adminhtml\Source\Processing</source_model>
-                        <config_path>payment/mollie_general/order_status_processing</config_path>
-                        <comment><![CDATA[Set the order status for Completed Payments]]></comment>
-                    </field>
-                    <field id="invoice_moment" translate="label comment" type="select" sortOrder="150" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>When to create the invoice?</label>
-                        <source_model>Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment</source_model>
-                        <config_path>payment/mollie_general/invoice_moment</config_path>
-                        <comment><![CDATA[When do you want create the invoice for <strong>Klarna Payments</strong>?<br><strong>On Authorize</strong>: Create a full invoice when the order is authorized.<br><strong>On Shipment</strong>: Create a (partial) invoice when a shipment is created.]]></comment>
-                    </field>
-                    <field id="invoice_notify" translate="label comment" type="select" sortOrder="160" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Send Invoice Email</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/mollie_general/invoice_notify</config_path>
-                        <comment><![CDATA[Set the notification for to Notify the customer with the Invoice]]></comment>
-                    </field>
-                    <field id="locale" translate="label comment" type="select" sortOrder="170" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Language Payment Page</label>
-                        <source_model>Mollie\Payment\Model\Adminhtml\Source\Locale</source_model>
-                        <config_path>payment/mollie_general/locale</config_path>
-                        <comment><![CDATA[Let Mollie automatically detect the language or force the language from the store view.]]></comment>
-                    </field>
-                    <field id="currency" translate="label" type="select" sortOrder="180" showInDefault="1"
-                           showInWebsite="1" showInStore="1">
-                        <label>Use Base Currency</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/mollie_general/currency</config_path>
-                        <comment>Force use of base currency for the payment request. Is set to no the selected currency of the storeview will be used for request.</comment>
-                    </field>
-                    <field id="transaction_details" translate="label" type="select" sortOrder="190" showInDefault="1"
-                           showInWebsite="0" showInStore="0">
-                        <label>Show Transaction Details</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <comment>Display Transaction Details like e.g. IBAN, BIC, Paypal Reference, Card Holder etc.</comment>
-                    </field>
-                    <field id="cancel_failed_orders" translate="label" type="select" sortOrder="200" showInDefault="1"
-                           showInWebsite="0" showInStore="1">
-                        <label>Cancel order when connection Fails</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/mollie_general/cancel_failed_orders</config_path>
-                        <comment><![CDATA[When the order can't be created due to various reasons (connection failure or data verification errors), the just created order will be canceled.]]></comment>
-                    </field>
-                    <field id="default_selected_method" translate="label" type="select" sortOrder="200" showInDefault="1"
-                           showInWebsite="0" showInStore="1">
-                        <label>Default selected method</label>
-                        <source_model>Mollie\Payment\Model\Adminhtml\Source\MolliePaymentMethod</source_model>
-                        <config_path>payment/mollie_general/default_selected_method</config_path>
-                    </field>
-                    <field id="heading_second_chance_email" translate="label comment" type="text" sortOrder="210" showInDefault="1"
-                           showInWebsite="0" showInStore="0">
-                        <label>Second Chance Email</label>
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-                        <comment><![CDATA[Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.]]></comment>
-                    </field>
-                    <field id="enable_second_chance_email" translate="label" type="select" sortOrder="220" showInDefault="1"
-                           showInWebsite="0" showInStore="1">
-                        <label>Enable Second Chance Email</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/mollie_general/enable_second_chance_email</config_path>
-                        <comment><![CDATA[This will add a "sent second chance email" button to the orders in the back-end. This email is only sent after triggering this manually.]]></comment>
-                    </field>
-                    <field id="second_chance_email_template" translate="label" type="select" sortOrder="230" showInDefault="1"
-                           showInWebsite="0" showInStore="1" canRestore="1">
-                        <label>Second Chance Email Template</label>
-                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
-                        <config_path>payment/mollie_general/second_chance_email_template</config_path>
-                        <comment><![CDATA[Email template chosen based on theme fallback when "Default" option is selected. You can edit this e-mail using the Email Template Manager in Magento and assign your personalized Template.]]></comment>
-                        <depends>
-                            <field id="enable_second_chance_email">1</field>
-                        </depends>
-                    </field>
-                    <field id="heading_advanced" translate="label comment" type="text" sortOrder="240" showInDefault="1"
-                           showInWebsite="0" showInStore="0">
-                        <label>Advanced: PWA storefront integration</label>
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-                        <comment><![CDATA[Only use this function if you want to integrate the Mollie extension with a PWA storefront.
-                        More information can be found <a href="https://github.com/mollie/magento2/wiki/PWA-integration" target="_blank">here</a>.]]></comment>
-                    </field>
-                    <field id="use_custom_redirect_url" translate="label" type="select" sortOrder="250" showInDefault="1" showInWebsite="1"
-                           showInStore="1">
-                        <label>Use custom return url?</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/mollie_general/use_custom_redirect_url</config_path>
-                    </field>
-                    <field id="custom_redirect_url" translate="label" type="text" sortOrder="260" showInDefault="1" showInWebsite="1"
-                           showInStore="1">
-                        <label>Custom return url</label>
-                        <config_path>payment/mollie_general/custom_redirect_url</config_path>
-                        <comment><![CDATA[<strong>Note:</strong> This URL is not being parsed.<br>You need to enter the complete url.]]></comment>
-                        <validate>validate-url</validate>
-                        <depends>
-                            <field id="use_custom_redirect_url">1</field>
-                        </depends>
-                    </field>
-                    <field id="heading_debug" translate="label comment" type="text" sortOrder="270" showInDefault="1"
-                           showInWebsite="0" showInStore="0">
-                        <label>Debug</label>
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-                        <comment><![CDATA[Especially for Developers you can enable the Debug mode.]]></comment>
-                    </field>
-                    <field id="debug" translate="label" type="select" sortOrder="280" showInDefault="1" showInWebsite="0"
-                           showInStore="0">
-                        <label>Debug requests</label>
-                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                        <config_path>payment/mollie_general/debug</config_path>
-                        <comment>When activated the debug file will be located in: var/log/mollie.log</comment>
-                    </field>
-                    <field id="heading_compatibility" translate="label comment" type="text" sortOrder="290"
-                           showInDefault="1" showInWebsite="0" showInStore="1">
-                        <label>Compatibility</label>
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-                        <comment><![CDATA[Run the selftest to check if the Mollie extension meets the technical requirements.
-                    In case of a warning or error please contact your Developer or Hosting Company.
-                    Specific information about the errors and warnings can be found
-                    <a href="https://github.com/mollie/magento2/wiki/compatability" target="_blank">here</a>.]]></comment>
-                    </field>
-                    <field id="compatibility_checker" translate="label" type="button" sortOrder="300" showInDefault="1"
-                           showInWebsite="0" showInStore="1">
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker</frontend_model>
-                    </field>
-                    <field id="compatibility_result" translate="label" type="text" sortOrder="310" showInDefault="1"
-                           showInWebsite="0" showInStore="1">
-                        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Result</frontend_model>
-                    </field>
-                </group>
-                <include path="Mollie_Payment::methods.xml"/>
+            </group>
+        </section>
+
+        <section id="sales">
+            <group id="totals_sort">
+                <field id="mollie_payment_fee" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+                    <label>Mollie Payment Fee</label>
+                    <validate>required-number validate-number</validate>
+                </field>
             </group>
         </section>
     </system>

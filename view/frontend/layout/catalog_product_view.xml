@@ -6,9 +6,16 @@
  */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <!-- Required for Apple Pay styling -->
+        <css src="Mollie_Payment::css/styles.css"/>
+    </head>
     <body>
-        <referenceContainer name="product.info.addtocart">
+        <referenceBlock name="product.info.addtocart">
             <block class="Mollie\Payment\Block\Product\View\ApplePay" name="mollie.applepay.button" template="Mollie_Payment::product/view/applepay.phtml" />
-        </referenceContainer>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.additional">
+            <block class="Mollie\Payment\Block\Product\View\ApplePay" name="mollie.applepay.button.additional" template="Mollie_Payment::product/view/applepay.phtml" />
+        </referenceBlock>
     </body>
 </page>

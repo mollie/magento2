@@ -10,6 +10,7 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
+use Mollie\Payment\Config;
 
 class ApplePay extends Template
 {
@@ -18,13 +19,20 @@ class ApplePay extends Template
      */
     private $registry;
 
+    /**
+     * @var Config
+     */
+    private $config;
+
     public function __construct(
         Template\Context $context,
         Registry $registry,
+        Config $config,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->registry = $registry;
+        $this->config = $config;
     }
 
     public function getProductName(): string
@@ -51,5 +59,12 @@ class ApplePay extends Template
     public function getCurrencyCode(): string
     {
         return $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->config->isProductionMode() &&
+            $this->config->isMethodActive('mollie_methods_applepay') &&
+            $this->config->applePayEnableBuyNowButton();
     }
 }

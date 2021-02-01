@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Model\Client;
 
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -15,12 +16,15 @@ use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\Transaction;
+use Mollie\Payment\Service\Order\TransactionProcessor;
 
 /**
  * Class Payments
@@ -68,6 +72,19 @@ class Payments extends AbstractModel
      * @var DashboardUrl
      */
     private $dashboardUrl;
+    /**
+     * @var Transaction
+     */
+    private $transaction;
+    /**
+     * @var TransactionProcessor
+     */
+    private $transactionProcessor;
+
+    /**
+     * @var EventManager
+     */
+    private $eventManager;
 
     /**
      * Payments constructor.
@@ -81,6 +98,9 @@ class Payments extends AbstractModel
      * @param BuildTransaction $buildTransaction
      * @param Config $config
      * @param DashboardUrl $dashboardUrl
+     * @param Transaction $transaction
+     * @param TransactionProcessor $transactionProcessor
+     * @param EventManager $eventManager
      */
     public function __construct(
         OrderSender $orderSender,
@@ -91,7 +111,10 @@ class Payments extends AbstractModel
         OrderCommentHistory $orderCommentHistory,
         BuildTransaction $buildTransaction,
         Config $config,
-        DashboardUrl $dashboardUrl
+        DashboardUrl $dashboardUrl,
+        Transaction $transaction,
+        TransactionProcessor $transactionProcessor,
+        EventManager $eventManager
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -102,6 +125,9 @@ class Payments extends AbstractModel
         $this->buildTransaction = $buildTransaction;
         $this->config = $config;
         $this->dashboardUrl = $dashboardUrl;
+        $this->transaction = $transaction;
+        $this->transactionProcessor = $transactionProcessor;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -129,8 +155,8 @@ class Payments extends AbstractModel
             'amount'         => $this->mollieHelper->getOrderAmountByOrder($order),
             'description'    => $this->mollieHelper->getPaymentDescription($method, $order->getIncrementId(), $storeId),
             'billingAddress' => $this->getAddressLine($order->getBillingAddress()),
-            'redirectUrl'    => $this->mollieHelper->getRedirectUrl($orderId, $paymentToken),
-            'webhookUrl'     => $this->mollieHelper->getWebhookUrl(),
+            'redirectUrl'    => $this->transaction->getRedirectUrl($order, $paymentToken),
+            'webhookUrl'     => $this->transaction->getWebhookUrl($storeId),
             'method'         => $method,
             'metadata'       => [
                 'order_id'      => $orderId,
@@ -181,15 +207,23 @@ class Payments extends AbstractModel
 
     /**
      * @param Order $order
-     * @param       $payment
+     * @param MolliePayment $payment
      */
     public function processResponse(Order $order, $payment)
     {
+        $eventData = [
+            'order' => $order,
+            'mollie_payment' => $payment,
+        ];
+
+        $this->eventManager->dispatch('mollie_process_response', $eventData);
+        $this->eventManager->dispatch('mollie_process_response_payments_api', $eventData);
+
         $this->mollieHelper->addTolog('response', $payment);
         $order->getPayment()->setAdditionalInformation('checkout_url', $payment->getCheckoutUrl());
         $order->getPayment()->setAdditionalInformation('checkout_type', self::CHECKOUT_TYPE);
         $order->getPayment()->setAdditionalInformation('payment_status', $payment->status);
-        if (isset($paymentData->expiresAt)) {
+        if (isset($payment->expiresAt)) {
             $order->getPayment()->setAdditionalInformation('expires_at', $payment->expiresAt);
         }
 
@@ -254,6 +288,7 @@ class Payments extends AbstractModel
                     $payment->setIsTransactionClosed(true);
                     $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
                     $order->setState(Order::STATE_PROCESSING);
+                    $this->transactionProcessor->process($order, null, $paymentData);
 
                     if ($paymentData->settlementAmount !== null) {
                         if ($paymentData->amount->currency != $paymentData->settlementAmount->currency) {
@@ -326,6 +361,7 @@ class Payments extends AbstractModel
                     $statusPending = $order->getStatus();
                 }
                 $order->setState(Order::STATE_PENDING_PAYMENT);
+                $this->transactionProcessor->process($order, null, $paymentData);
                 $order->addStatusToHistory($statusPending, $message, true);
                 $this->orderRepository->save($order);
             }
@@ -343,6 +379,7 @@ class Payments extends AbstractModel
             if ($type == 'webhook') {
                 $this->mollieHelper->registerCancellation($order, $status);
                 $order->cancel();
+                $this->transactionProcessor->process($order, null, $paymentData);
             }
 
             $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];

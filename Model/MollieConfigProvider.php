@@ -13,6 +13,7 @@ use Magento\Framework\Locale\Resolver;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
@@ -38,7 +39,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         'mollie_methods_directdebit',
         'mollie_methods_ideal',
         'mollie_methods_kbc',
-        'mollie_methods_mealvoucher',
+        'mollie_methods_voucher',
         'mollie_methods_paypal',
         'mollie_methods_paysafecard',
         'mollie_methods_sofort',
@@ -163,20 +164,24 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     public function getConfig()
     {
-        $storeName = $this->storeManager->getStore()->getFrontendName();
+        $store = $this->storeManager->getStore();
+        $storeId = $store->getId();
+        $storeName = $store->getFrontendName();
 
         $config = [];
-        $config['payment']['mollie']['testmode'] = $this->config->isTestMode();
-        $config['payment']['mollie']['profile_id'] = $this->config->getProfileId();
-        $config['payment']['mollie']['locale'] = $this->localeResolver->getLocale();
-        $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents();
-        $config['payment']['mollie']['appleypay']['integration_type'] = $this->config->applePayIntegrationType();
+        $config['payment']['mollie']['testmode'] = $this->config->isTestMode($storeId);
+        $config['payment']['mollie']['profile_id'] = $this->config->getProfileId($storeId);
+        $config['payment']['mollie']['locale'] = $this->getLocale($storeId);
+        $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
+        $config['payment']['mollie']['appleypay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
         $config['payment']['mollie']['store']['name'] = $storeName;
         $apiKey = $this->mollieHelper->getApiKey();
         $useImage = $this->mollieHelper->useImage();
 
+        $activeMethods = [];
         try {
             $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
+            $activeMethods = $this->getActiveMethods($mollieApi);
         } catch (\Exception $exception) {
             $mollieApi = null;
             $this->mollieHelper->addTolog('error', $exception->getMessage());
@@ -187,13 +192,13 @@ class MollieConfigProvider implements ConfigProviderInterface
                 continue;
             }
 
-            $isAvailable = $this->methods[$code]->isAvailable();
+            $isAvailable = $this->methods[$code]->isActive();
             $config['payment']['instructions'][$code] = $this->getInstructions($code);
 
             $config['payment']['image'][$code] = '';
             if ($useImage) {
                 $cleanCode = str_replace('mollie_methods_', '', $code);
-                $url = $this->assetRepository->getUrl('Mollie_Payment::images/methods/' . $cleanCode . '.png');
+                $url = $this->assetRepository->getUrl('Mollie_Payment::images/methods/' . $cleanCode . '.svg');
                 $config['payment']['image'][$code] = $url;
             }
 
@@ -210,18 +215,22 @@ class MollieConfigProvider implements ConfigProviderInterface
 
     /**
      * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param CartInterface|null $cart
      *
      * @return array
      */
-    public function getActiveMethods($mollieApi)
+    public function getActiveMethods($mollieApi, CartInterface $cart = null)
     {
+        if (!$cart) {
+            $cart = $this->checkoutSession->getQuote();
+        }
+
         if ($this->methodData !== null) {
             return $this->methodData;
         }
 
         try {
-            $quote = $this->checkoutSession->getQuote();
-            $amount = $this->mollieHelper->getOrderAmountByQuote($quote);
+            $amount = $this->mollieHelper->getOrderAmountByQuote($cart);
             $params = [
                 'amount[value]' => $amount['value'],
                 'amount[currency]' => $amount['currency'],
@@ -269,5 +278,21 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['issuers'][$code] = $this->getIssuers->execute($mollieApi, $code, $issuerListType);
 
         return $config;
+    }
+
+    /**
+     * @param int $storeId
+     * @return string
+     */
+    private function getLocale($storeId)
+    {
+        $locale = $this->config->getLocale($storeId);
+
+        // Empty == autodetect, so use the store.
+        if (!$locale || $locale == 'store') {
+            return $this->localeResolver->getLocale();
+        }
+
+        return $locale;
     }
 }

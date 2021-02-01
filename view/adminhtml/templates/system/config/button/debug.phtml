@@ -1,0 +1,20 @@
+<?php
+/**
+ * Copyright © Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Mollie\Payment\Block\Adminhtml\System\Config\Button\DebugCheck;
+
+/**
+ * @see \Mollie\Payment\Block\Adminhtml\System\Config\Button\DebugCheck
+ * @var DebugCheck $block
+ */
+?>
+<div id="mm-mollie-result_debug-modal" data-mm-mollie-endpoint-url="<?= $block->escapeUrl($block->getDebugCheckUrl()) ?>">
+    <div id="mm-mollie-result_debug">
+        <div class="result"></div>
+    </div>
+</div>
+<?= $block->getButtonHtml() ?>
+

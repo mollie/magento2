@@ -430,7 +430,9 @@ class General extends AbstractHelper
      */
     public function getRedirectUrl($orderId, $paymentToken)
     {
-        return $this->transaction->getRedirectUrl($orderId, $paymentToken);
+        $order = $this->orderRepository->get($orderId);
+
+        return $this->transaction->getRedirectUrl($order, $paymentToken);
     }
 
     /**
@@ -515,14 +517,15 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param     $checkoutUrl
+     * @param string $checkoutUrl
+     * @param int|null $storeId
      *
      * @return mixed
      */
-    public function getPaymentLinkMessage($checkoutUrl)
+    public function getPaymentLinkMessage($checkoutUrl, $storeId = null)
     {
-        if ($this->getStoreConfig(self::XML_PATH_PAYMENTLINK_ADD_MESSAGE)) {
-            $message = $this->getStoreConfig(self::XML_PATH_PAYMENTLINK_MESSAGE);
+        if ($this->getStoreConfig(self::XML_PATH_PAYMENTLINK_ADD_MESSAGE, $storeId)) {
+            $message = $this->getStoreConfig(self::XML_PATH_PAYMENTLINK_MESSAGE, $storeId);
             return str_replace('%link%', $checkoutUrl, $message);
         }
     }
@@ -670,7 +673,7 @@ class General extends AbstractHelper
             'mollie_methods_kbc',
             'mollie_methods_klarnapaylater',
             'mollie_methods_klarnasliceit',
-            'mollie_methods_mealvoucher',
+            'mollie_methods_voucher',
             'mollie_methods_mybank',
             'mollie_methods_paypal',
             'mollie_methods_paysafecard',

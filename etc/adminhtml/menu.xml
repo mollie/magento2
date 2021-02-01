@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Mollie_Payment::payment_reminders" title="Mollie Payment Reminders" translate="title" module="Mollie_Payment" sortOrder="10" parent="Magento_Sales::sales" resource="Mollie_Payment::payment_reminders" />
+        <add id="Mollie_Payment::pending_payment_reminders" title="Pending" translate="title" module="Mollie_Payment" sortOrder="10" parent="Mollie_Payment::payment_reminders" action="mollie/reminder/pending" resource="Mollie_Payment::pending_payment_reminders"/>
+        <add id="Mollie_Payment::sent_payment_reminders" title="Sent" translate="title" module="Mollie_Payment" sortOrder="20" parent="Mollie_Payment::payment_reminders" action="mollie/reminder/sent" resource="Mollie_Payment::sent_payment_reminders"/>
+    </menu>
+</config>

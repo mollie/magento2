@@ -8,6 +8,7 @@ namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Locale\Resolver;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Model\Mollie as MollieModel;
 
@@ -30,25 +31,32 @@ class GetIssuers
      */
     private $mollieModel;
 
+    /**
+     * @var Resolver
+     */
+    private $resolver;
+
     public function __construct(
         CacheInterface $cache,
         SerializerInterface $serializer,
-        MollieModel $mollieModel
+        MollieModel $mollieModel,
+        Resolver $resolver
     ) {
         $this->cache = $cache;
         $this->serializer = $serializer;
         $this->mollieModel = $mollieModel;
+        $this->resolver = $resolver;
     }
 
     /**
      * @param MollieApiClient $mollieApi
      * @param string $method
      * @param string $type On of: dropdown, radio, none
-     * @return array
+     * @return array|null
      */
     public function execute(MollieApiClient $mollieApi, $method, $type)
     {
-        $identifier = static::CACHE_IDENTIFIER_PREFIX . $method;
+        $identifier = static::CACHE_IDENTIFIER_PREFIX . $method . $type . $this->resolver->getLocale();
         $result = $this->cache->load($identifier);
         if ($result) {
             return $this->serializer->unserialize($result);
@@ -70,11 +78,19 @@ class GetIssuers
         return $result;
     }
 
+    /**
+     * @param $storeId
+     * @param $method
+     * @return array|null
+     */
     public function getForGraphql($storeId, $method)
     {
         $mollieApi = $this->mollieModel->getMollieApi($storeId);
 
         $issuers = $this->execute($mollieApi, $method, 'radio');
+        if (!$issuers) {
+            return null;
+        }
 
         $output = [];
         foreach ($issuers as $issuer) {

@@ -17,8 +17,9 @@ define([
         cartId: null,
         shippingMethods: [],
         selectedShippingMethod: null,
-        paymentFeeAmount: null,
         session: null,
+        totals: [],
+        postalCode: null,
 
         // Variables that are set from the template: view/frontend/templates/product/view/applepay.phtml
         formSelector: null,
@@ -36,20 +37,14 @@ define([
         },
 
         payWithApplePay: function () {
-            // Steps:
-            // 1. Create new quote. - Done
-            // 2. Add current product to the quote. - Done
-            // 3. Set shipping method on quote.
-            // 4. Set payment method on quote (apple pay).
-            // 5. Initialize Apple pay.
-            // 6. When verified, place order.
-            // 7. Redirect user to success page.
-
             this.createApplePaySession();
         },
 
         getProductPrice: function () {
-            return $('[data-role=priceBox][data-product-id] [itemprop="price"]').attr('content');
+            return $('[data-role=priceBox][data-product-id] [data-price-type="finalPrice"] .price')
+                .html()
+                .replace(/[^\d,.-]/g, '')
+                .replace(',', '.');
         },
 
         createApplePaySession: function () {
@@ -59,8 +54,9 @@ define([
                 supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
                 merchantCapabilities: ['supports3DS'],
                 total: {
-                    label: this.productName,
-                    amount: this.getTotal().amount,
+                    type: 'final',
+                    label: this.storeName,
+                    amount: this.getProductPrice(),
                 },
                 shippingType: 'shipping',
                 requiredBillingContactFields: [
@@ -81,10 +77,36 @@ define([
                 this.session = new ApplePaySession(10, request);
             }
 
-            this.session.onshippingcontactselected = function (event) {
-                console.log('onshippingcontactselected');
+            this.session.onvalidatemerchant = function (event) {
+                var form = $(this.formSelector);
+                var formData = new FormData(form[0]);
+                formData.append('validationURL', event.validationURL);
+
                 $.ajax({
                     global: false,
+                    context: this,
+                    type: 'POST',
+                    url: url.build('mollie/applePay/buyNowValidation'),
+                    data: formData,
+                    dataType: 'json',
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    success: function (result) {
+                        this.cartId = result.cartId;
+
+                        this.session.completeMerchantValidation(result.validationData);
+                    }
+                })
+            }.bind(this);
+
+            this.session.onshippingcontactselected = function (event) {
+                this.countryCode = event.shippingContact.countryCode;
+                this.postalCode = event.shippingContact.postalCode;
+
+                $.ajax({
+                    global: false,
+                    context: this,
                     type: 'POST',
                     url: url.build('mollie/applePay/shippingMethods'),
                     data: {
@@ -95,35 +117,48 @@ define([
                     success: function (result) {
                         this.shippingMethods = result.shipping_methods;
                         this.selectedShippingMethod = result.shipping_methods[0];
-                        this.paymentFeeAmount = result.mollie_payment_fee;
+                        this.quoteTotals = result.totals;
 
                         this.session.completeShippingContactSelection(
                             ApplePaySession.STATUS_SUCCESS,
                             result.shipping_methods,
                             this.getTotal(),
                             this.getLineItems()
-                        )
+                        );
                     }.bind(this)
                 })
-            }.bind(this)
+            }.bind(this);
 
             this.session.onshippingmethodselected = function (event) {
-                console.log('onshippingmethodselected');
-                this.selectedShippingMethod = event.shippingMethod
+                this.selectedShippingMethod = event.shippingMethod;
 
-                this.session.completeShippingMethodSelection(
-                    ApplePaySession.STATUS_SUCCESS,
-                    this.getTotal(),
-                    this.getLineItems()
-                )
+                $.ajax({
+                    global: false,
+                    context: this,
+                    type: 'POST',
+                    url: url.build('mollie/applePay/shippingMethods'),
+                    data: {
+                        cartId: this.cartId,
+                        shippingMethod: this.selectedShippingMethod,
+                        countryCode: this.countryCode,
+                        postalCode: this.postalCode
+                    },
+                    success: function (result) {
+                        this.quoteTotals = result.totals;
+
+                        this.session.completeShippingMethodSelection(
+                            ApplePaySession.STATUS_SUCCESS,
+                            this.getTotal(),
+                            this.getLineItems()
+                        )
+                    }.bind(this)
+                });
             }.bind(this);
 
             this.session.onpaymentauthorized = function (event) {
-                console.log('onpaymentauthorized', event);
-
-                var session = this.session;
                 $.ajax({
                     global: false,
+                    context: this,
                     type: 'POST',
                     url: url.build('mollie/applePay/buyNowPlaceOrder'),
                     data: {
@@ -134,13 +169,17 @@ define([
                         applePayPaymentToken: JSON.stringify(event.payment.token)
                     },
                     success: function (result) {
-                        console.log('order placed', result);
-                        session.completePayment(ApplePaySession.STATUS_SUCCESS);
+                        if (!this.session) {
+                            console.warn('Payment canceled');
+                            return;
+                        }
+
+                        this.session.completePayment(ApplePaySession.STATUS_SUCCESS);
 
                         setTimeout( function () {
-                            location.href = url.build('checkout/onepage/success')
+                            location.href = result.url
                         }, 1000);
-                    }
+                    }.bind(this)
                 })
 
                 try {
@@ -150,31 +189,7 @@ define([
                 }
             }.bind(this);
 
-            this.session.onvalidatemerchant = function (event) {
-                console.log('onvalidatemerchant');
-
-                var form = $(this.formSelector);
-                var formData = new FormData(form[0]);
-                formData.append('validationURL', event.validationURL);
-
-                $.ajax({
-                    global: false,
-                    type: 'POST',
-                    url: url.build('mollie/applePay/buyNowValidation'),
-                    data: formData,
-                    dataType: 'json',
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function (result) {
-                        this.cartId = result.cartId;
-                        this.session.completeMerchantValidation(result.validationData);
-                    }.bind(this)
-                })
-            }.bind(this);
-
-            this.session.oncancel = function () {
-                console.log('oncancel');
+            this.session.oncancel = function (event) {
                 this.session = null;
                 this.shippingMethods = null;
                 this.selectedShippingMethod = null;
@@ -193,43 +208,20 @@ define([
         },
 
         getLineItems: function () {
-            var lines = [];
+            let totals = [...this.quoteTotals];
+            totals.pop();
 
-            lines.push({
-                type: 'final',
-                label: this.productName,
-                amount: this.getProductPrice(),
-            })
-
-            if (this.selectedShippingMethod) {
-                lines.push({
-                    type: 'final',
-                    label: this.selectedShippingMethod.label,
-                    amount: this.selectedShippingMethod.amount,
-                })
-            }
-
-            if (this.paymentFeeAmount) {
-                lines.push({
-                    type: 'final',
-                    label: __('Apple Pay fee'),
-                    amount: this.paymentFeeAmount,
-                })
-            }
-
-            return lines;
+            return totals;
         },
 
         getTotal: function () {
-            var total = this.getLineItems()
-                .map(item => parseFloat(item.amount))
-                .reduce((a, b) => a + b, 0);
+            let totals = [...this.quoteTotals];
 
-            return {
-                type: 'final',
-                label: this.storeName,
-                amount: total
-            };
+            var total = totals.pop();
+
+            total.label = this.storeName;
+
+            return total;
         }
     });
 })

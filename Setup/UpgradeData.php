@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Setup;
 
+use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigReaderFactory;
 use Magento\Customer\Setup\CustomerSetupFactory;
 use Magento\Sales\Setup\SalesSetupFactory;
 use Magento\Config\Model\ResourceModel\Config;
@@ -16,6 +17,7 @@ use Magento\Framework\App\Config\Storage\WriterInterface;
 use Magento\Framework\Setup\UpgradeDataInterface;
 use Magento\Framework\Setup\ModuleContextInterface;
 use Magento\Framework\Setup\ModuleDataSetupInterface;
+use Mollie\Payment\Config as MollieConfig;
 
 /**
  * Class UpgradeData
@@ -52,6 +54,16 @@ class UpgradeData implements UpgradeDataInterface
     private $storeManager;
 
     /**
+     * @var MollieConfig
+     */
+    private $mollieConfig;
+
+    /**
+     * @var Config\Data\Collection
+     */
+    private $configReaderFactory;
+
+    /**
      * UpgradeData constructor.
      *
      * @param SalesSetupFactory $salesSetupFactory
@@ -59,19 +71,25 @@ class UpgradeData implements UpgradeDataInterface
      * @param Config $resourceConfig
      * @param WriterInterface $configWriter
      * @param StoreManagerInterface $storeManager
+     * @param MollieConfig $mollieConfig
+     * @param ConfigReaderFactory $configReaderFactory
      */
     public function __construct(
         SalesSetupFactory $salesSetupFactory,
         ResourceConnection $resourceConnection,
         Config $resourceConfig,
         WriterInterface $configWriter,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        MollieConfig $mollieConfig,
+        ConfigReaderFactory $configReaderFactory
     ) {
         $this->salesSetupFactory = $salesSetupFactory;
         $this->resourceConnection = $resourceConnection;
         $this->resourceConfig = $resourceConfig;
         $this->configWriter = $configWriter;
         $this->storeManager = $storeManager;
+        $this->mollieConfig = $mollieConfig;
+        $this->configReaderFactory = $configReaderFactory;
     }
 
     /**
@@ -94,6 +112,18 @@ class UpgradeData implements UpgradeDataInterface
 
         if (version_compare($context->getVersion(), '1.6.2', '<')) {
             $this->addIndexes($setup);
+        }
+
+        if (version_compare($context->getVersion(), '1.13.1', '<')) {
+            $this->updateCustomerReturnUrl();
+        }
+
+        if (version_compare($context->getVersion(), '1.17.0', '<')) {
+            $this->renameMealVoucherToVoucher();
+        }
+
+        if (version_compare($context->getVersion(), '1.18.0', '<')) {
+            $this->changeSecondChanceEmailTemplatePath();
         }
 
         // This should run every time
@@ -203,5 +233,129 @@ class UpgradeData implements UpgradeDataInterface
             $this->resourceConnection->getIdxName('sales_shipment', ['mollie_shipment_id']),
             ['mollie_shipment_id']
         );
+    }
+
+    /**
+     * The return url is changed. Before this params where added by default, but now you can now add placeholders in
+     * the url which will be replaced. That's why we append this variables to the url by default when the url is set.
+     */
+    private function updateCustomerReturnUrl()
+    {
+        $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
+            'eq' => 'payment/mollie_general/custom_redirect_url'
+        ]);
+
+        foreach ($collection as $configItem) {
+            $this->updateCustomerReturnUrlForScope(
+                $configItem->getData('scope'),
+                $configItem->getData('scope_id'),
+                $configItem->getData('value')
+            );
+        }
+    }
+
+    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId, string $currentValue)
+    {
+        $append = '?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&utm_nooverride=1';
+
+        // The value already contains the new string so don't append it twice.
+        if (strpos($currentValue, $append) !== false) {
+            return;
+        }
+
+        $newValue = $currentValue . $append;
+
+        $this->configWriter->save(
+            'payment/mollie_general/custom_redirect_url',
+            $newValue,
+            $scope,
+            $scopeId
+        );
+    }
+
+    private function renameMealVoucherToVoucher()
+    {
+        $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
+            'eq' => 'payment/mollie_methods_mealvoucher/category'
+        ]);
+
+        $replacements = [
+            'food_and_drinks' => 'meal',
+            'home_and_garden' => 'eco',
+            'gifts_and_flowers' => 'gift',
+        ];
+
+        foreach ($collection as $item) {
+            $value = str_replace(
+                array_keys($replacements),
+                array_values($replacements),
+                $item->getData('value')
+            );
+
+            $this->configWriter->save(
+                'payment/mollie_methods_mealvoucher/category',
+                $value,
+                $item->getData('scope'),
+                $item->getData('scope_id')
+            );
+        }
+
+        $paths = [
+            'payment/mollie_methods_%s/active',
+            'payment/mollie_methods_%s/title',
+            'payment/mollie_methods_%s/payment_description',
+            'payment/mollie_methods_%s/category',
+            'payment/mollie_methods_%s/custom_attribute',
+            'payment/mollie_methods_%s/days_before_expire',
+            'payment/mollie_methods_%s/allowspecific',
+            'payment/mollie_methods_%s/specificcountry',
+            'payment/mollie_methods_%s/min_order_total',
+            'payment/mollie_methods_%s/max_order_total',
+            'payment/mollie_methods_%s/payment_surcharge_type',
+            'payment/mollie_methods_%s/payment_surcharge_fixed_amount',
+            'payment/mollie_methods_%s/payment_surcharge_percentage',
+            'payment/mollie_methods_%s/payment_surcharge_limit',
+            'payment/mollie_methods_%s/payment_surcharge_tax_class',
+            'payment/mollie_methods_%s/sort_order',
+        ];
+
+        foreach ($paths as $path) {
+            $this->changeConfigPath(
+                sprintf($path, 'mealvoucher'),
+                sprintf($path, 'voucher')
+            );
+        }
+    }
+
+    private function changeConfigPath($oldPath, $newPath)
+    {
+        $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
+            'eq' => $oldPath,
+        ]);
+
+        foreach ($collection as $item) {
+            $item->setData('path', $newPath);
+            $item->save();
+        }
+    }
+
+    private function changeSecondChanceEmailTemplatePath()
+    {
+        $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
+            'eq' => 'payment/mollie_general/second_chance_email_template'
+        ]);
+
+        foreach ($collection as $item) {
+            if (stripos($item->getData('value'), 'mollie_general_second_chance_email_template') === false) {
+                return;
+            }
+
+            $this->configWriter->save(
+                'payment/mollie_general/second_chance_email_template',
+                'mollie_second_chance_email_second_chance_email_second_chance_email_template',
+                $item->getData('scope'),
+                $item->getData('scope_id')
+            );
+        }
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Model;
+namespace Mollie\Payment\Test\Integration\Model;
 
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
@@ -9,6 +9,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
+use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieTest extends IntegrationTestCase
@@ -57,6 +58,7 @@ class MollieTest extends IntegrationTestCase
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
+        $order->setEntityId(1);
 
         $helperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
         $helperMock->method('getApiKey')->willReturn('test_dummyapikeywhichmustbe30characterslong');
@@ -84,6 +86,7 @@ class MollieTest extends IntegrationTestCase
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
+        $order->setEntityId(1);
 
         $helperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
         $helperMock->method('getApiKey')->willReturn('test_dummyapikeywhichmustbe30characterslong');
@@ -116,6 +119,7 @@ class MollieTest extends IntegrationTestCase
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
+        $order->setEntityId(1);
 
         $helperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
         $helperMock->method('getApiKey')->willReturn('test_dummyapikeywhichmustbe30characterslong');
@@ -193,7 +197,7 @@ class MollieTest extends IntegrationTestCase
         $this->expectException(LocalizedException::class);
 
         $order = $this->loadOrder('100000001');
-        $order->getPayment()->setMethod('mollie_methods_mealvoucher');
+        $order->getPayment()->setMethod('mollie_methods_voucher');
 
         $ordersApi = $this->createMock(Orders::class);
         $ordersApi->expects($this->once())->method('startTransaction')->willThrowException(

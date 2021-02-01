@@ -41,14 +41,14 @@ class SecondChanceButton implements ButtonInterface
         }
 
         $state = $view->getOrder()->getState();
-        if (!in_array($state, [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT])) {
+        if (!in_array($state, [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT, Order::STATE_CANCELED])) {
             return;
         }
 
         $view->addButton(
             'mollie_payment_second_chance_email',
             [
-                'label' => __('Sent Payment Reminder'),
+                'label' => __('Send Payment Reminder'),
                 'onclick' => 'setLocation("' . $this->getUrl($view->getOrderId()) . '")',
             ]
         );

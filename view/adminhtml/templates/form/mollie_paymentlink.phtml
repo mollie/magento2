@@ -30,14 +30,14 @@ $code; ?>" style="display:none">
                     <option value="kbc">KBC/CBC</option>
                     <option value="klarnapaylater">Klarna Pay Later</option>
                     <option value="klarnasliceit">Klarna Slice It</option>
-                    <option value="mealvoucher">Mealvoucher</option>
+                    <option value="voucher">Voucher</option>
                     <option value="paypal">Paypal</option>
                     <option value="paysafecard">Paysafecard</option>
                     <option value="sofort">Sofort</option>
                 </select>
             </div>
         </div>
-        <p><?= $block->escapeHtml(__('If one method is chosen, it will skip the selection screen and the customer is sent directly to the payment method.')); ?></p>
+        <p><?= $block->escapeHtml(__('If only one method is chosen, the selection screen is skipped and the customer is sent directly to the payment method.')); ?></p>
 
         <div class="field admin__field">
             <label for="<?= $code ?>_days_before_expire" class="label admin__field-label"><span><?= $block->escapeHtml(__('This order expires at:')) ?></span></label>
@@ -52,7 +52,7 @@ $code; ?>" style="display:none">
 
                 <a href="#" class="mollie-tooltip">(i)
                     <span>
-                        <?php echo __('It is not posible to use Klarna Slice it or Klarna Pay later as method when your expiry date is more than 28 days in the future, unless another maximum is agreed between the merchant and Klarna.'); ?>
+                        <?php echo __('It is not posible to use Klarna Slice it or Klarna Pay later as method when your expiry date is more than 28 days, unless another maximum is agreed between the merchant and Klarna.'); ?>
                     </span>
                 </a>
             </div>

@@ -14,6 +14,9 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\GuestCartRepositoryInterface;
 use Magento\Quote\Model\QuoteManagement;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface;
+use Mollie\Payment\Service\PaymentToken\Generate;
 
 class BuyNowPlaceOrder extends Action
 {
@@ -37,12 +40,29 @@ class BuyNowPlaceOrder extends Action
      */
     private $checkoutSession;
 
+    /**
+     * @var PaymentTokenRequestInterface
+     */
+    private $paymentTokenRequest;
+
+    /**
+     * @var Generate
+     */
+    private $paymentToken;
+
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
+
     public function __construct(
         Context $context,
         GuestCartRepositoryInterface $guestCartRepository,
         CartRepositoryInterface $cartRepository,
         QuoteManagement $quoteManagement,
-        Session $checkoutSession
+        Session $checkoutSession,
+        Generate $paymentToken,
+        OrderRepositoryInterface $orderRepository
     ) {
         parent::__construct($context);
 
@@ -50,6 +70,8 @@ class BuyNowPlaceOrder extends Action
         $this->cartRepository = $cartRepository;
         $this->quoteManagement = $quoteManagement;
         $this->checkoutSession = $checkoutSession;
+        $this->paymentToken = $paymentToken;
+        $this->orderRepository = $orderRepository;
     }
 
     public function execute()
@@ -62,8 +84,6 @@ class BuyNowPlaceOrder extends Action
 
         $cart->setCustomerEmail($this->getRequest()->getParam('shippingAddress')['emailAddress']);
 
-        $shippingAddress->setCollectShippingRates(true);
-        $shippingAddress->collectShippingRates();
         $shippingAddress->setShippingMethod($this->getRequest()->getParam('shippingMethod')['identifier']);
 
         $cart->setPaymentMethod('mollie_methods_applepay');
@@ -74,6 +94,16 @@ class BuyNowPlaceOrder extends Action
         $cart->getPayment()->addData(['method' => 'mollie_methods_applepay']);
 
         $order = $this->quoteManagement->submit($cart);
+        $order->getPayment()->setAdditionalInformation(
+            'applepay_payment_token',
+            $this->getRequest()->getParam('applePayPaymentToken')
+        );
+
+        $this->orderRepository->save($order);
+
+        $paymentToken = $this->paymentToken->forOrder($order);
+
+        $url = $this->_url->getUrl('mollie/checkout/redirect', ['paymentToken' => $paymentToken->getToken()]);
 
         $this->checkoutSession->clearHelperData();
         $this->checkoutSession
@@ -82,7 +112,7 @@ class BuyNowPlaceOrder extends Action
             ->setLastOrderId($order->getId());
 
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        return $response->setData(['order_placed' => false, 'order' => $order]);
+        return $response->setData(['url' => $url]);
     }
 
     private function updateAddress(AddressInterface $address, array $input)

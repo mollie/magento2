@@ -6,8 +6,14 @@
                 <resource id="Magento_Backend::stores">
                     <resource id="Magento_Backend::stores_settings">
                         <resource id="Magento_Config::config">
-                            <resource id="Mollie_Payment::config" title="Mollie"/>
+                            <resource id="Mollie_Payment::config" title="Mollie Configuration" translate="title" />
                         </resource>
+                    </resource>
+                </resource>
+                <resource id="Magento_Sales::sales">
+                    <resource id="Mollie_Payment::payment_reminders" title="Mollie Payment Reminders" translate="title">
+                        <resource id="Mollie_Payment::pending_payment_reminders" title="Pending Payment Reminders"  translate="title" />
+                        <resource id="Mollie_Payment::sent_payment_reminders" title="Sent Payment Reminders" translate="title" />
                     </resource>
                 </resource>
             </resource>

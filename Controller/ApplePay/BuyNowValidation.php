@@ -16,6 +16,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\GuestCartManagementInterface;
@@ -78,11 +79,17 @@ class BuyNowValidation extends Action
      */
     private $quoteIdMaskFactory;
 
+    /**
+     * @var ResolverInterface
+     */
+    private $resolver;
+
     public function __construct(
         Context $context,
         Session $customerSession,
         CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $accountManagement,
+        ResolverInterface $resolver,
         Validator $formKeyValidator,
         GuestCartManagementInterface $cartManagement,
         GuestCartRepositoryInterface $guestCartRepository,
@@ -96,6 +103,7 @@ class BuyNowValidation extends Action
     ) {
         parent::__construct($context, $customerSession, $customerRepository, $accountManagement);
 
+        $this->resolver = $resolver;
         $this->formKeyValidator = $formKeyValidator;
         $this->cartManagement = $cartManagement;
         $this->guestCartRepository = $guestCartRepository;
@@ -141,13 +149,11 @@ class BuyNowValidation extends Action
 
         $params = $this->getRequest()->getParams();
 
+        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+
         try {
             if (isset($params['qty'])) {
-                $filter = new \Zend_Filter_LocalizedToNormalized(
-                    ['locale' => $this->_objectManager->get(
-                        \Magento\Framework\Locale\ResolverInterface::class
-                    )->getLocale()]
-                );
+                $filter = new \Zend_Filter_LocalizedToNormalized(['locale' => $this->resolver->getLocale()]);
                 $params['qty'] = $filter->filter($params['qty']);
             }
 
@@ -158,7 +164,11 @@ class BuyNowValidation extends Action
              * Check product availability
              */
             if (!$product) {
-                return $this->goBack();
+                $response->setHttpResponseCode(404);
+                return $response->setData([
+                    'error' => true,
+                    'message' => __('Product not found')
+                ]);
             }
 
             $cart->addProduct($product, new \Magento\Framework\DataObject($params));
@@ -173,7 +183,12 @@ class BuyNowValidation extends Action
                 __('We can\'t add this item to your shopping cart right now.')
             );
             $this->_objectManager->get(LoggerInterface::class)->critical($e);
-            return $this->goBack();
+
+            $response->setHttpResponseCode(403);
+            return $response->setData([
+                'error' => true,
+                'message' => __('We can\'t add this item to your shopping cart right now.')
+            ]);
         }
 
         $store = $this->storeManager->getStore();
@@ -184,8 +199,6 @@ class BuyNowValidation extends Action
             parse_url($url, PHP_URL_HOST),
             $this->getRequest()->getParam('validationURL')
         );
-
-        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         $response->setData([
             'cartId' => $cartId,

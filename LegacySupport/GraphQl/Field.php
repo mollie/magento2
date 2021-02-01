@@ -12,184 +12,185 @@ namespace Magento\Framework\GraphQl\Config\Element;
  * GraphQL, but for that we need to implement the ResolverInterface. As this class does not exists in Magento 2.2 the
  * `setup:di:compile` command will fail. That's why we use this trick to make sure this class exists in 2.2.
  */
-if (\class_exists('\Magento\Framework\GraphQl\Config\Element\Field')) {
-    return;
-}
 
-/**
- * Class representing 'field' GraphQL config element.
- *
- * Fields are used to describe possible values for a type/interface.
- */
-class Field
-{
-    /**
-     * @var string
-     */
-    private $name;
+if (!\class_exists('\Magento\Framework\GraphQl\Config\Element\Field')) {
 
     /**
-     * @var string
-     */
-    private $type;
-
-    /**
-     * @var array
-     */
-    private $arguments;
-
-    /**
-     * @var bool
-     */
-    private $required;
-
-    /**
-     * @var bool
-     */
-    private $isList;
-
-    /**
-     * @var string
-     */
-    private $resolver;
-    /**
-     * @var string
-     */
-    private $description;
-
-    /**
-     * @var array
-     */
-    private $cache;
-
-    /**
-     * @var array
-     */
-    private $deprecated;
-
-    /**
-     * @param string $name
-     * @param string $type
-     * @param bool $required
-     * @param bool $isList
-     * @param string $itemType
-     * @param string $resolver
-     * @param string $description
-     * @param array $arguments
-     * @param array $cache
-     * @param array $deprecated
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
-     */
-    public function __construct(
-        string $name,
-        string $type,
-        bool $required,
-        bool $isList,
-        string $itemType = '',
-        string $resolver = '',
-        string $description = '',
-        array $arguments = [],
-        array $cache = [],
-        array $deprecated = []
-    ) {
-        $this->name = $name;
-        $this->type = $isList ? $itemType : $type;
-        $this->required = $required;
-        $this->isList = $isList;
-        $this->resolver = $resolver;
-        $this->description = $description;
-        $this->arguments = $arguments;
-        $this->cache = $cache;
-        $this->deprecated = $deprecated;
-    }
-
-    /**
-     * Get the field name.
+     * Class representing 'field' GraphQL config element.
      *
-     * @return string
+     * Fields are used to describe possible values for a type/interface.
      */
-    public function getName() : string
+    class Field
     {
-        return $this->name;
-    }
+        /**
+         * @var string
+         */
+        private $name;
 
-    /**
-     * Get the type's configured name.
-     *
-     * @return string
-     */
-    public function getTypeName() : string
-    {
-        return $this->type;
-    }
+        /**
+         * @var string
+         */
+        private $type;
 
-    /**
-     * Return true if field is a list of items. False otherwise.
-     *
-     * @return bool
-     */
-    public function isList() : bool
-    {
-        return $this->isList;
-    }
+        /**
+         * @var array
+         */
+        private $arguments;
 
-    /**
-     * Return true if the field is required by an input type to be populated. False otherwise.
-     *
-     * @return bool
-     */
-    public function isRequired() : bool
-    {
-        return $this->required;
-    }
+        /**
+         * @var bool
+         */
+        private $required;
 
-    /**
-     * Get the resolver for a given field. If no resolver is specified, return an empty string.
-     *
-     * @return string
-     */
-    public function getResolver() : string
-    {
-        return $this->resolver;
-    }
+        /**
+         * @var bool
+         */
+        private $isList;
 
-    /**
-     * Get the list of arguments configured for the field. Return an empty array if no arguments are configured.
-     *
-     * @return Argument[]
-     */
-    public function getArguments() : array
-    {
-        return $this->arguments;
-    }
+        /**
+         * @var string
+         */
+        private $resolver;
+        /**
+         * @var string
+         */
+        private $description;
 
-    /**
-     * Return the human-readable description of the field.
-     *
-     * @return string|null
-     */
-    public function getDescription() : string
-    {
-        return $this->description;
-    }
+        /**
+         * @var array
+         */
+        private $cache;
 
-    /**
-     * Return the cache tag for the field.
-     *
-     * @return array|null
-     */
-    public function getCache() : array
-    {
-        return $this->cache;
-    }
+        /**
+         * @var array
+         */
+        private $deprecated;
 
-    /**
-     * Return the deprecated annotation for the field
-     *
-     * @return array
-     */
-    public function getDeprecated() : array
-    {
-        return $this->deprecated;
+        /**
+         * @param string $name
+         * @param string $type
+         * @param bool $required
+         * @param bool $isList
+         * @param string $itemType
+         * @param string $resolver
+         * @param string $description
+         * @param array $arguments
+         * @param array $cache
+         * @param array $deprecated
+         * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+         */
+        public function __construct(
+            string $name,
+            string $type,
+            bool $required,
+            bool $isList,
+            string $itemType = '',
+            string $resolver = '',
+            string $description = '',
+            array $arguments = [],
+            array $cache = [],
+            array $deprecated = []
+        )
+        {
+            $this->name = $name;
+            $this->type = $isList ? $itemType : $type;
+            $this->required = $required;
+            $this->isList = $isList;
+            $this->resolver = $resolver;
+            $this->description = $description;
+            $this->arguments = $arguments;
+            $this->cache = $cache;
+            $this->deprecated = $deprecated;
+        }
+
+        /**
+         * Get the field name.
+         *
+         * @return string
+         */
+        public function getName(): string
+        {
+            return $this->name;
+        }
+
+        /**
+         * Get the type's configured name.
+         *
+         * @return string
+         */
+        public function getTypeName(): string
+        {
+            return $this->type;
+        }
+
+        /**
+         * Return true if field is a list of items. False otherwise.
+         *
+         * @return bool
+         */
+        public function isList(): bool
+        {
+            return $this->isList;
+        }
+
+        /**
+         * Return true if the field is required by an input type to be populated. False otherwise.
+         *
+         * @return bool
+         */
+        public function isRequired(): bool
+        {
+            return $this->required;
+        }
+
+        /**
+         * Get the resolver for a given field. If no resolver is specified, return an empty string.
+         *
+         * @return string
+         */
+        public function getResolver(): string
+        {
+            return $this->resolver;
+        }
+
+        /**
+         * Get the list of arguments configured for the field. Return an empty array if no arguments are configured.
+         *
+         * @return Argument[]
+         */
+        public function getArguments(): array
+        {
+            return $this->arguments;
+        }
+
+        /**
+         * Return the human-readable description of the field.
+         *
+         * @return string|null
+         */
+        public function getDescription(): string
+        {
+            return $this->description;
+        }
+
+        /**
+         * Return the cache tag for the field.
+         *
+         * @return array|null
+         */
+        public function getCache(): array
+        {
+            return $this->cache;
+        }
+
+        /**
+         * Return the deprecated annotation for the field
+         *
+         * @return array
+         */
+        public function getDeprecated(): array
+        {
+            return $this->deprecated;
+        }
     }
 }

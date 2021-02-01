@@ -9,6 +9,7 @@ namespace Mollie\Payment\Service\Order\Lines;
 use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
+use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Model\OrderLinesFactory;
@@ -55,18 +56,25 @@ class Order
      */
     private $orderLinesProcessor;
 
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
     public function __construct(
         MollieHelper $mollieHelper,
         StoreCredit $storeCredit,
         PaymentFee $paymentFee,
         OrderLinesFactory $orderLinesFactory,
-        OrderLinesProcessor $orderLinesProcessor
+        OrderLinesProcessor $orderLinesProcessor,
+        StoreManagerInterface $storeManager
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->storeCredit = $storeCredit;
         $this->paymentFee = $paymentFee;
         $this->orderLinesFactory = $orderLinesFactory;
         $this->orderLinesProcessor = $orderLinesProcessor;
+        $this->storeManager = $storeManager;
     }
 
     public function get(OrderInterface $order)
@@ -160,7 +168,7 @@ class Order
             'vatRate' => sprintf("%.2f", $item->getTaxPercent()),
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
             'sku' => substr($item->getSku(), 0, 64),
-            'productUrl' => $item->getProduct() ? $item->getProduct()->getProductUrl() : null,
+            'productUrl' => $this->getProductUrl($item),
         ];
 
         if ($discountAmount) {
@@ -191,10 +199,15 @@ class Order
          */
         $vatAmount = round($totalAmount * ($vatRate / (100 + $vatRate)), 2);
 
+        $name = preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription());
+        if (!$name) {
+            $name = $order->getShippingMethod();
+        }
+
         $orderLine = [
             'item_id' => '',
             'type' => 'shipping_fee',
-            'name' => preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription()),
+            'name' => $name,
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
@@ -288,5 +301,28 @@ class Order
             $orderLine = $this->orderLinesFactory->create();
             $orderLine->addData($line)->setOrderId($order->getId())->save();
         }
+    }
+
+    /**
+     * @param OrderItemInterface $item
+     * @return string|null
+     */
+    private function getProductUrl(OrderItemInterface $item)
+    {
+        $product = $item->getProduct();
+        if (!$product) {
+            return null;
+        }
+
+        // Magento allows spaces in the product url, but Mollie does not allows this. So if the URL contains spaces then
+        // we will return the base url with the direct url to the controller.
+        // Magento bug: https://github.com/magento/magento2/issues/26672
+        $url = $product->getProductUrl();
+        if (strpos($url, ' ')) {
+            $baseUrl = rtrim($this->storeManager->getStore()->getBaseUrl(), '/');
+            return $baseUrl . '/catalog/product/view/id/' . $item->getProductId();
+        }
+
+        return $url;
     }
 }

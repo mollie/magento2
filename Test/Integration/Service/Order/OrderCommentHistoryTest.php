@@ -1,8 +1,9 @@
 <?php
 
-namespace Mollie\Payment\Service\Order;
+namespace Mollie\Payment\Test\Integration\Service\Order;
 
 use Magento\Sales\Api\Data\OrderStatusHistoryInterface;
+use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class OrderCommentHistoryTest extends IntegrationTestCase

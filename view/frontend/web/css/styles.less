@@ -1,0 +1,229 @@
+.mollie-buttons {
+    margin-top: 10%;
+    text-align: center;
+    opacity: 0;
+    animation: fadeIn 1s;
+    animation-delay: 1s;
+    animation-fill-mode: forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.mollie-buttons .button {
+    display: inline-block;
+    margin: 20px;
+    max-width: 100%;
+    padding: 0 16px;
+    border: 0;
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .19);
+    border-radius: 6px;
+    background-color: #0095FF;
+    color: #FFF;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 4.4rem;
+    text-align: center;
+    text-decoration: none;
+    outline: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-transition: background .15s;
+    transition: background .15s;
+    white-space: nowrap;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.mollie-buttons {
+    opacity: 0;
+    -webkit-transition: opacity 2s ease-in;
+    -moz-transition: opacity 2s ease-in;
+    -ms-transition: opacity 2s ease-in;
+    -o-transition: opacity 2s ease-in;
+    transition: opacity 2s ease-in;
+}
+
+.mollie-buttons .button:hover {
+    background-color: #0077CB;
+}
+
+.mollie-loading .redirect-block {
+    padding: 10%;
+    text-align: center;
+}
+
+.checkout-payment-method #mollie_methods_ideal-form .label {
+    height: 35px;
+    display: inline-block;
+}
+
+.checkout-payment-method #mollie_methods_ideal-form .payment-icon {
+    width: 35px;
+    max-height: 30px;
+}
+
+.checkout-payment-method #mollie_methods_kbc-form .label {
+    height: 35px;
+    display: inline-block;
+}
+
+.checkout-payment-method #mollie_methods_kbc-form .payment-icon {
+    width: 35px;
+    max-height: 30px;
+}
+
+.checkout-payment-method #mollie_methods_giftcard-form .label {
+    height: 40px;
+    display: inline-block;
+}
+
+.checkout-payment-method #mollie_methods_giftcard-form .payment-icon {
+    width: 35px;
+    max-height: 30px;
+}
+
+.mollie-payment-icon {
+    width: 25px;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+.mollie-loading .loader {
+    border: 16px solid #E3F0FA;
+    border-top: 16px solid #31A8F0;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 2s linear infinite;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.mollie-component {
+    width: 90%;
+    height: 20px;
+    background-color: #FFF;
+    padding: 10px 15px;
+    border-radius: 6px;
+    color: #222;
+    transition: all .05s ease;
+    box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.1), 0px 1px 3px 0px rgba(0, 0, 0, 0.1), 0px 0px 0px 1px rgba(0, 0, 0, 0.05);
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
+
+.mollie-component.is-invalid {
+    background-color: #FFF0F0;
+    box-shadow: 0px 1px 1px 0px rgba(255, 51, 68, 0.1), 0px 1px 3px 0px rgba(255, 51, 68, 0.1);
+}
+
+.payment-method-content .card-container {
+    max-width: 400px;
+    overflow: auto;
+    background-color: #FFF;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    display: block;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+.component-error {
+    color: #FF0000;
+    display: none;
+    margin-bottom: 10px;
+}
+
+@supports (-webkit-appearance: -apple-pay-button) {
+    .apple-pay-button-with-text {
+        display: inline-block;
+        -webkit-appearance: -apple-pay-button;
+        -apple-pay-button-type: buy;
+    }
+    .apple-pay-button-with-text > * {
+        display: none;
+    }
+    .apple-pay-button-black-with-text {
+        -apple-pay-button-style: black;
+    }
+    .apple-pay-button-white-with-text {
+        -apple-pay-button-style: white;
+        cursor: pointer;
+    }
+    .apple-pay-button-white-with-line-with-text {
+        -apple-pay-button-style: white-outline;
+    }
+}
+
+@supports not (-webkit-appearance: -apple-pay-button) {
+    .apple-pay-button-with-text {
+        display: inline-flex;
+        justify-content: center;
+        font-size: 12px;
+        border-radius: 5px;
+        padding: 0px;
+        box-sizing: border-box;
+        min-width: 200px;
+        min-height: 32px;
+        max-height: 64px;
+    }
+    .apple-pay-button-black-with-text {
+        background-color: black;
+        color: white;
+    }
+    .apple-pay-button-white-with-text {
+        background-color: white;
+        color: black;
+    }
+    .apple-pay-button-white-with-line-with-text {
+        background-color: white;
+        color: black;
+        border: .5px solid black;
+    }
+    .apple-pay-button-with-text.apple-pay-button-black-with-text > .logo {
+        background-image: -webkit-named-image(apple-pay-logo-white);
+        background-color: black;
+    }
+    .apple-pay-button-with-text.apple-pay-button-white-with-text > .logo {
+        background-image: -webkit-named-image(apple-pay-logo-black);
+        background-color: white;
+    }
+    .apple-pay-button-with-text.apple-pay-button-white-with-line-with-text > .logo {
+        background-image: -webkit-named-image(apple-pay-logo-black);
+        background-color: white;
+    }
+    .apple-pay-button-with-text > .text {
+        font-family: -apple-system;
+        font-size: 1em;
+        font-weight: 300;
+        align-self: center;
+        margin-right: 2px;
+    }
+    .apple-pay-button-with-text > .logo {
+        width: 35px;
+        height: 100%;
+        background-size: 100% 60%;
+        background-repeat: no-repeat;
+        background-position: 0 50%;
+        margin-left: 2px;
+        border: none;
+    }
+}

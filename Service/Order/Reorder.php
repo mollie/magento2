@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Service\Order;
 
+use Magento\Checkout\Model\Session;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Quote\Api\Data\CartInterface;
@@ -60,6 +61,11 @@ class Reorder
      */
     private $cart;
 
+    /**
+     * @var Session
+     */
+    private $checkoutSession;
+
     public function __construct(
         Config $config,
         Create $orderCreate,
@@ -67,7 +73,8 @@ class Reorder
         InvoiceSender $invoiceSender,
         OrderCommentHistory $orderCommentHistory,
         TransactionFactory $transactionFactory,
-        CartInterface $cart
+        CartInterface $cart,
+        Session $checkoutSession
     ) {
         $this->config = $config;
         $this->orderCreate = $orderCreate;
@@ -76,6 +83,7 @@ class Reorder
         $this->orderCommentHistory = $orderCommentHistory;
         $this->transactionFactory = $transactionFactory;
         $this->cart = $cart;
+        $this->checkoutSession = $checkoutSession;
     }
 
     public function create(OrderInterface $originalOrder)
@@ -88,6 +96,11 @@ class Reorder
         $this->transaction->save();
 
         $this->addCommentHistoryOriginalOrder($originalOrder, $order->getIncrementId());
+
+        $this->checkoutSession->setLastQuoteId($order->getQuoteId())
+            ->setLastSuccessQuoteId($order->getQuoteId())
+            ->setLastOrderId($order->getId())
+            ->setLastRealOrderId($order->getIncrementId());
 
         return $order;
     }

@@ -9,8 +9,11 @@ namespace Mollie\Payment\GraphQL\Resolver\Cart;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\GetIssuers;
+use Magento\Framework\GraphQl\Query\ResolverInterface;
+use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 
-class AvailableIssuersForMethod
+class AvailableIssuersForMethod implements ResolverInterface
 {
     /**
      * @var Mollie
@@ -40,7 +43,7 @@ class AvailableIssuersForMethod
     /**
      * @inheritDoc
      */
-    public function resolve($field, $context, $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
     {
         $storeId = $context->getExtensionAttributes()->getStore()->getId();
         $method = $value['code'];

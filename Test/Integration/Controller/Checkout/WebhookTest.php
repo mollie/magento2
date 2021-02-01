@@ -1,6 +1,6 @@
 <?php
 
-namespace Mollie\Payment\Controller\Checkout;
+namespace Mollie\Payment\Test\Integration\Controller\Checkout;
 
 use Magento\TestFramework\Request;
 use Magento\TestFramework\TestCase\AbstractController as ControllerTestCase;

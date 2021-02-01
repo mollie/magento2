@@ -1,25 +1,16 @@
 <?php
 
-namespace Mollie\Payment\Service\Order\Lines;
+namespace Mollie\Payment\Test\Integration\Service\Order\Lines;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\TestFramework\ObjectManager;
 use Mollie\Payment\Exceptions\NoStoreCreditFound;
-use PHPUnit\Framework\TestCase;
+use Mollie\Payment\Service\Order\Lines\StoreCredit;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class StoreCreditTest extends TestCase
+class StoreCreditTest extends IntegrationTestCase
 {
-    /**
-     * @var \Magento\Framework\App\ObjectManager
-     */
-    private $objectManager;
-
-    protected function setUp()
-    {
-        $this->objectManager = ObjectManager::getInstance();
-    }
-
     public function orderHasStoreCreditProvider()
     {
         return [
@@ -105,7 +96,7 @@ class StoreCreditTest extends TestCase
             $instance->getOrderLine($order, true);
         } catch (NoStoreCreditFound $exception) {
             $this->assertEquals(
-                'We where unable to find the store credit for order #999',
+                'We were unable to find the store credit for order #999',
                 $exception->getMessage()
             );
             return;

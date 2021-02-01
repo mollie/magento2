@@ -1,14 +1,18 @@
-<?php /** @var \Mollie\Payment\Block\Product\View\ApplePay $block */ ?>
-<!--data-bind="click: placeApplePayOrder"-->
-<div id="product-page-mollie-apple-pay-button" data-bind="scope:'mollie-apple-pay-button'">
-    <!-- TODO: Wrap with this IF: -->
-    <!-- ko if: canUseApplePay() --><!-- /ko -->
-    <!-- TODO: Only load this when applepay is enabled. -->
+<?php
+/** @var \Mollie\Payment\Block\Product\View\ApplePay $block */
 
+if (!$block->isEnabled()) {
+    return;
+}
+?>
+
+<div id="product-page-mollie-apple-pay-button" data-bind="scope:'mollie-apple-pay-button'">
+    <!-- ko if: canUseApplePay() -->
     <div class="apple-pay-button-with-text apple-pay-button-white-with-text" data-bind="click: payWithApplePay">
         <span class="text">Buy with</span>
         <span class="logo"></span>
     </div>
+    <!-- /ko -->
 </div>
 <script type="text/x-magento-init">
 {
