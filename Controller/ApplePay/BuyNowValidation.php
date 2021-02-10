@@ -191,14 +191,24 @@ class BuyNowValidation extends Action
             ]);
         }
 
-        $store = $this->storeManager->getStore();
-        $api = $this->mollie->loadMollieApi($this->mollieHelper->getApiKey($store->getId()));
-        $url = $this->url->getBaseUrl();
+        try {
+            $store = $this->storeManager->getStore();
+            $api = $this->mollie->loadMollieApi($this->mollieHelper->getApiKey($store->getId()));
+            $url = $this->url->getBaseUrl();
 
-        $result = $api->wallets->requestApplePayPaymentSession(
-            parse_url($url, PHP_URL_HOST),
-            $this->getRequest()->getParam('validationURL')
-        );
+            $result = $api->wallets->requestApplePayPaymentSession(
+                parse_url($url, PHP_URL_HOST),
+                $this->getRequest()->getParam('validationURL')
+            );
+        } catch (\Exception $exception) {
+            $response->setHttpResponseCode(500);
+            $response->setData([
+                'error' => true,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return $response;
+        }
 
         $response->setData([
             'cartId' => $cartId,

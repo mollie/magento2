@@ -6,12 +6,14 @@ define([
     'uiComponent',
     'mage/url',
     'mage/translate',
-    'jquery'
+    'jquery',
+    'Magento_Customer/js/customer-data'
 ], function (
     Component,
     url,
     __,
-    $
+    $,
+    customerData
 ) {
     return Component.extend({
         cartId: null,
@@ -37,7 +39,11 @@ define([
         },
 
         payWithApplePay: function () {
-            this.createApplePaySession();
+            var validator = $(this.formSelector).mage('validation');
+
+            if (validator.validation('isValid')) {
+                this.createApplePaySession();
+            }
         },
 
         getProductPrice: function () {
@@ -96,7 +102,8 @@ define([
                         this.cartId = result.cartId;
 
                         this.session.completeMerchantValidation(result.validationData);
-                    }
+                    },
+                    error: this.handleAjaxError
                 })
             }.bind(this);
 
@@ -125,7 +132,8 @@ define([
                             this.getTotal(),
                             this.getLineItems()
                         );
-                    }.bind(this)
+                    }.bind(this),
+                    error: this.handleAjaxError
                 })
             }.bind(this);
 
@@ -151,7 +159,8 @@ define([
                             this.getTotal(),
                             this.getLineItems()
                         )
-                    }.bind(this)
+                    }.bind(this),
+                    error: this.handleAjaxError
                 });
             }.bind(this);
 
@@ -179,7 +188,8 @@ define([
                         setTimeout( function () {
                             location.href = result.url
                         }, 1000);
-                    }.bind(this)
+                    }.bind(this),
+                    error: this.handleAjaxError
                 })
 
                 try {
@@ -222,6 +232,22 @@ define([
             total.label = this.storeName;
 
             return total;
+        },
+
+        handleAjaxError: function (response) {
+            this.session.abort();
+
+            var customerMessages = customerData.get('messages')() || {},
+                messages = customerMessages.messages || [];
+
+            messages.push({
+                text: response.responseJSON.message,
+                type: 'error'
+            });
+
+            customerMessages.messages = messages;
+
+            customerData.set('messages', customerMessages);
         }
     });
 })
