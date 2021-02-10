@@ -126,6 +126,10 @@ class UpgradeData implements UpgradeDataInterface
             $this->changeSecondChanceEmailTemplatePath();
         }
 
+        if (version_compare($context->getVersion(), '1.19.0', '<')) {
+            $this->removeInghomepayConfiguration();
+        }
+
         // This should run every time
         $this->upgradeActiveState();
 
@@ -356,6 +360,35 @@ class UpgradeData implements UpgradeDataInterface
                 $item->getData('scope'),
                 $item->getData('scope_id')
             );
+        }
+    }
+
+    private function removeInghomepayConfiguration()
+    {
+        $paths = [
+            'payment/mollie_methods_inghomepay/active',
+            'payment/mollie_methods_inghomepay/title',
+            'payment/mollie_methods_inghomepay/method',
+            'payment/mollie_methods_inghomepay/payment_description',
+            'payment/mollie_methods_inghomepay/days_before_expire',
+            'payment/mollie_methods_inghomepay/allowspecific',
+            'payment/mollie_methods_inghomepay/specificcountry',
+            'payment/mollie_methods_inghomepay/min_order_total',
+            'payment/mollie_methods_inghomepay/max_order_total',
+            'payment/mollie_methods_inghomepay/payment_surcharge_type',
+            'payment/mollie_methods_inghomepay/payment_surcharge_fixed_amount',
+            'payment/mollie_methods_inghomepay/payment_surcharge_percentage',
+            'payment/mollie_methods_inghomepay/payment_surcharge_limit',
+            'payment/mollie_methods_inghomepay/payment_surcharge_tax_class',
+            'payment/mollie_methods_inghomepay/sort_order',
+        ];
+
+        foreach ($this->storeManager->getStores() as $store) {
+            foreach ($paths as $path) {
+                $this->configWriter->delete($path, ScopeConfigInterface::SCOPE_TYPE_DEFAULT);
+                $this->configWriter->delete($path, 'stores', $store->getId());
+                $this->configWriter->delete($path, 'websites', $store->getId());
+            }
         }
     }
 }

@@ -140,16 +140,6 @@
                 <allowspecific>0</allowspecific>
                 <instructions/>
             </mollie_methods_sofort>
-            <mollie_methods_inghomepay>
-                <active>1</active>
-                <model>Mollie\Payment\Model\Methods\Inghomepay</model>
-                <title>ING Homepay</title>
-                <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
-                <payment_action>order</payment_action>
-                <allowspecific>0</allowspecific>
-                <instructions/>
-            </mollie_methods_inghomepay>
             <mollie_methods_giropay>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Giropay</model>
