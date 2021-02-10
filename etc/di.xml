@@ -120,6 +120,12 @@
         </arguments>
     </type>
 
+    <type name="Mollie\Payment\Controller\ApplePay\BuyNowPlaceOrder">
+        <arguments>
+            <argument xsi:type="object" name="checkoutSession">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
     <virtualType name="PendingPaymentReminderCollection" type="Mollie\Payment\Ui\DataProvider\PaymentReminder\Listing\Pending\Collection">
         <arguments>
             <argument name="mainTable" xsi:type="string">mollie_pending_payment_reminder</argument>

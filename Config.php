@@ -38,10 +38,12 @@ class Config
     const GENERAL_USE_CUSTOM_REDIRECT_URL = 'payment/mollie_general/use_custom_redirect_url';
     const GENERAL_USE_WEBHOOKS = 'payment/mollie_general/use_webhooks';
     const GENERAL_VERSION = 'payment/mollie_general/version';
+    const PAYMENT_APPLEPAY_ENABLE_BUY_NOW_BUTTON = 'payment/mollie_methods_applepay/enable_buy_now_button';
     const PAYMENT_APPLEPAY_INTEGRATION_TYPE = 'payment/mollie_methods_applepay/integration_type';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
+    const PAYMENT_METHOD_PAYMENT_ACTIVE = 'payment/mollie_methods_%s/active';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
@@ -274,6 +276,15 @@ class Config
      * @param null|int|string $storeId
      * @return bool
      */
+    public function applePayEnableBuyNowButton($storeId = null)
+    {
+        return $this->isSetFlag(static::PAYMENT_APPLEPAY_ENABLE_BUY_NOW_BUTTON, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
     public function applePayIntegrationType($storeId = null)
     {
         return $this->getPath(static::PAYMENT_APPLEPAY_INTEGRATION_TYPE, $storeId);
@@ -321,6 +332,16 @@ class Config
             ScopeInterface::SCOPE_STORE,
             $storeId
         );
+    }
+
+    /**
+     * @param string $method
+     * @param int|null $storeId
+     * @return string
+     */
+    public function isMethodActive($method, $storeId = null)
+    {
+        return $this->isSetFlag($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_ACTIVE, $method), $storeId);
     }
 
     /**
