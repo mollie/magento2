@@ -254,12 +254,12 @@ class UpgradeData implements UpgradeDataInterface
         }
     }
 
-    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId, string $currentValue)
+    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId, string $currentValue = null)
     {
         $append = '?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&utm_nooverride=1';
 
         // The value already contains the new string so don't append it twice.
-        if (strpos($currentValue, $append) !== false) {
+        if (!$currentValue || strpos($currentValue, $append) !== false) {
             return;
         }
 
