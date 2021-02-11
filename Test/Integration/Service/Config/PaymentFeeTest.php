@@ -34,7 +34,6 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_paypal', true],
             ['mollie_methods_paysafecard', true],
             ['mollie_methods_sofort', true],
-            ['mollie_methods_inghomepay', true],
             ['mollie_methods_giropay', true],
             ['mollie_methods_eps', true],
             ['mollie_methods_klarnapaylater', true],

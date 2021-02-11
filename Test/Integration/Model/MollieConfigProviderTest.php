@@ -22,7 +22,6 @@ class MollieConfigProviderTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_methods_paypal/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_paysafecard/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_sofort/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_inghomepay/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_giropay/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_eps/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_klarnapaylater/active 1
@@ -40,8 +39,8 @@ class MollieConfigProviderTest extends IntegrationTestCase
 
         $result = $instance->getConfig();
 
-        $this->assertCount(20, $result['payment']['instructions']);
-        $this->assertCount(20, $result['payment']['image']);
+        $this->assertCount(19, $result['payment']['instructions']);
+        $this->assertCount(19, $result['payment']['image']);
 
         $this->assertArrayHasKey('mollie_methods_ideal', $result['payment']['issuersListType']);
         $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['issuersListType']);

@@ -34,9 +34,6 @@
         <method name="mollie_methods_sofort">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
-        <method name="mollie_methods_inghomepay">
-            <allow_multiple_address>0</allow_multiple_address>
-        </method>
         <method name="mollie_methods_giropay">
             <allow_multiple_address>0</allow_multiple_address>
         </method>

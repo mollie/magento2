@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "1.21.0",
+  "version": "1.22.0",
   "keywords": [
     "mollie",
     "payment",
@@ -36,7 +36,6 @@
     "gift cards",
     "intersolve",
     "fashioncheque",
-    "inghomepay",
     "klarna",
     "paylater",
     "sliceit",

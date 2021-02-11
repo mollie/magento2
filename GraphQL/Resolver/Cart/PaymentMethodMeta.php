@@ -7,17 +7,19 @@
 namespace Mollie\Payment\GraphQL\Resolver\Cart;
 
 use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Magento\Framework\View\Asset\Repository;
 
-class PaymentMethodMeta implements \Magento\Framework\GraphQl\Query\ResolverInterface
+class PaymentMethodMeta implements ResolverInterface
 {
     /**
-     * @var \Magento\Framework\View\Asset\Repository
+     * @var Repository
      */
     private $assetRepository;
 
     public function __construct(
-        \Magento\Framework\View\Asset\Repository $assertRepository
+        Repository $assertRepository
     ) {
         $this->assetRepository = $assertRepository;
     }
@@ -35,9 +37,12 @@ class PaymentMethodMeta implements \Magento\Framework\GraphQl\Query\ResolverInte
         }
 
         $cleanCode = str_replace('mollie_methods_', '', $method);
+        $path = 'Mollie_Payment::images/methods/' . $cleanCode . '.svg';
 
         return [
-            'image' => $this->assetRepository->getUrl('Mollie_Payment::images/methods/' . $cleanCode . '.svg'),
+            'image' => $this->assetRepository->getUrlWithParams($path, [
+                'area' => 'frontend',
+            ]),
         ];
     }
 }

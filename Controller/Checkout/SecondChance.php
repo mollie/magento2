@@ -52,14 +52,14 @@ class SecondChance extends Action
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         Reorder $reorder,
         Paymentlink $paymentlink,
-        Generate $generatePaymentToken
+        Generate $paymentTokenPaymentToken
     ) {
         parent::__construct($context);
         $this->orderRepository = $orderRepository;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->reorder = $reorder;
         $this->paymentlink = $paymentlink;
-        $this->generatePaymentToken = $generatePaymentToken;
+        $this->generatePaymentToken = $paymentTokenPaymentToken;
     }
 
     public function execute()
