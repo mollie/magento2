@@ -6,6 +6,6 @@ This document is created in collaboration with the merchants, agencies, the Moll
 
 ## What we're working on / what is on our backlog
 
-* **Direct integration of Apple Pay:** 
-Adding [direct integration of Apple Pay](https://docs.mollie.com/guides/applepay-direct-integration) into Magento 2 right from the product page. 
-Open Issue: https://github.com/mollie/magento2/issues/214
+* **Compatibility with Magento Multishipping**
+* **Direct integration of Mollie Subscriptions**
+* **Direct integration of Paypal Express** 
