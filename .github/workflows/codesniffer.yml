@@ -11,5 +11,5 @@ jobs:
         run:
           docker run
           --volume $(pwd)/:/app/data
-          michielgerritsen/magento-ecg-coding-standard:latest
-          bash -c "vendor/bin/phpcs --standard=EcgM2 /app/data/ --ignore=*/Test/* --severity=6 -p"
+          michielgerritsen/magento-coding-standard:latest
+          --severity=10
