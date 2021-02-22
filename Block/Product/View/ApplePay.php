@@ -67,4 +67,17 @@ class ApplePay extends Template
             $this->config->isMethodActive('mollie_methods_applepay') &&
             $this->config->applePayEnableBuyNowButton();
     }
+
+    public function getButtonClasses()
+    {
+        $classes = [];
+        $classes[] = 'apple-pay-button';
+        $classes[] = 'apple-pay-button-color-' . $this->config->applePayBuyNowColor();
+
+        if ($text = $this->config->applePayBuyNowText()) {
+            $classes[] = 'apple-pay-button-text-' . $this->config->applePayBuyNowText();
+        }
+
+        return implode(' ', $classes);
+    }
 }

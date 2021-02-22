@@ -1,0 +1,30 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+.apple-pay-button {
+  display: inline-block;
+  cursor: pointer;
+  -webkit-appearance: -apple-pay-button;
+  &:extend(.abs-button-l all);
+  box-sizing: border-box;
+
+  > * {
+    visibility: hidden;
+  }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+  .apple-pay-button {
+      margin-bottom: 0;
+      margin-right: 1%;
+      width: 49%;
+  }
+}
+
+& when (@media-common = true) {
+  .apple-pay-button {
+    &:extend(.abs-button-responsive all);
+  }
+}
