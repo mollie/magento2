@@ -174,7 +174,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="heading_advanced" translate="label comment" type="text" sortOrder="170" showInDefault="1"
+        <field id="apple_buy_now_heading" translate="label comment" type="text" sortOrder="170" showInDefault="1"
                showInWebsite="0" showInStore="0">
             <label>Apple Pay Direct</label>
             <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
