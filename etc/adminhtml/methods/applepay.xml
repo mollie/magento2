@@ -179,7 +179,7 @@
             <label>Apple Pay Direct</label>
             <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
             <comment>
-                <![CDATA[In addition to offering a shopping cart, consider putting Apple Pay buttons on product detail pages so people can quickly purchase an item.]]></comment>
+                <![CDATA[Activating this option will allow placing the Apple Pay button directly on the product detail pages for a faster checkout. ]]></comment>
         </field>
         <field id="enable_buy_now_button" translate="label" type="select" sortOrder="180" showInDefault="1"
                showInWebsite="1"
@@ -191,7 +191,7 @@
                 <field id="active">1</field>
             </depends>
             <comment>
-                <![CDATA[Shows the ApplePay button directly on the product detail page for a quick checkout.]]></comment>
+                <![CDATA[Shows the Apple Pay button directly on the product detail page for a quick checkout.]]></comment>
         </field>
         <field id="buy_now_button_color" translate="label" type="select" sortOrder="190" showInDefault="1"
                showInWebsite="1"
@@ -204,7 +204,7 @@
                 <field id="enable_buy_now_button">1</field>
             </depends>
             <comment>
-                <![CDATA[<strong>Black</strong><br>Use on white or light-colored backgrounds that provide sufficient contrast. Don’t use on black or dark backgrounds.<br><br><strong>White</strong><br> Use on dark or colored backgrounds that provide sufficient contrast.<br><br><strong>White with Outline</strong><br>Use on white or light-colored backgrounds that don’t provide sufficient contrast. Don’t place on dark or saturated backgrounds.]]></comment>
+                <![CDATA[<strong>Black</strong><br>Best used on light-colored backgrounds that provide sufficient contrast.<br><br><strong>White</strong><br>Best used on dark or colored backgrounds that provide sufficient contrast.<br><br><strong>White with Outline</strong><br>Use this on white or light-colored backgrounds that don’t provide sufficient contrast. Do not use with dark or saturated backgrounds.]]></comment>
         </field>
         <field id="buy_now_button_text" translate="label" type="select" sortOrder="200" showInDefault="1"
                showInWebsite="1"
@@ -217,7 +217,7 @@
                 <field id="enable_buy_now_button">1</field>
             </depends>
             <comment>
-                <![CDATA[Apple designed several types of buttons so that you can choose the button type that fits best with the terminology and flow of your purchase or payment experience.]]></comment>
+                <![CDATA[Apple provides different styles of buttons to match your customer experience.]]></comment>
         </field>
     </group>
 </include>
