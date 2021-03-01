@@ -5,6 +5,7 @@ namespace Mollie\Payment\Test\Integration\Helper;
 use Magento\Framework\Locale\Resolver;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
+use Magento\Store\Api\StoreRepositoryInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -104,5 +105,22 @@ class GeneralTest extends IntegrationTestCase
         $result = $instance->isPaidUsingMollieOrdersApi($order);
 
         $this->assertFalse($result);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Store/_files/second_store.php
+     * @magentoConfigFixture current_store payment/mollie_general/apikey_test keyA
+     * @magentoConfigFixture fixture_second_store_store payment/mollie_general/apikey_test keyB
+     */
+    public function testGetApiKeyGivesAUniqueKeyPerStore()
+    {
+        $storeA = $this->objectManager->get(StoreRepositoryInterface::class)->get('default')->getId();
+        $storeB = $this->objectManager->get(StoreRepositoryInterface::class)->get('fixture_second_store')->getId();
+
+        /** @var General $instance */
+        $instance = $this->objectManager->create(General::class);
+
+        $this->assertEquals('keyA', $instance->getApiKey($storeA));
+        $this->assertEquals('keyB', $instance->getApiKey($storeB));
     }
 }
