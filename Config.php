@@ -39,6 +39,8 @@ class Config
     const GENERAL_USE_WEBHOOKS = 'payment/mollie_general/use_webhooks';
     const GENERAL_VERSION = 'payment/mollie_general/version';
     const PAYMENT_APPLEPAY_ENABLE_BUY_NOW_BUTTON = 'payment/mollie_methods_applepay/enable_buy_now_button';
+    const PAYMENT_APPLEPAY_BUY_NOW_BUTTON_COLOR = 'payment/mollie_methods_applepay/buy_now_button_color';
+    const PAYMENT_APPLEPAY_BUY_NOW_BUTTON_TEXT = 'payment/mollie_methods_applepay/buy_now_button_text';
     const PAYMENT_APPLEPAY_INTEGRATION_TYPE = 'payment/mollie_methods_applepay/integration_type';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
@@ -279,6 +281,24 @@ class Config
     public function applePayEnableBuyNowButton($storeId = null)
     {
         return $this->isSetFlag(static::PAYMENT_APPLEPAY_ENABLE_BUY_NOW_BUTTON, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function applePayBuyNowColor($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_APPLEPAY_BUY_NOW_BUTTON_COLOR, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function applePayBuyNowText($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_APPLEPAY_BUY_NOW_BUTTON_TEXT, $storeId);
     }
 
     /**
