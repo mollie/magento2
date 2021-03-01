@@ -318,7 +318,7 @@ class Order
         // we will return the base url with the direct url to the controller.
         // Magento bug: https://github.com/magento/magento2/issues/26672
         $url = $product->getProductUrl();
-        if (strpos($url, ' ')) {
+        if (strpos($url, ' ') !== false) {
             $baseUrl = rtrim($this->storeManager->getStore()->getBaseUrl(), '/');
             return $baseUrl . '/catalog/product/view/id/' . $item->getProductId();
         }
