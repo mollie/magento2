@@ -8,25 +8,24 @@ if (!$block->isEnabled()) {
 
 <div id="product-page-mollie-apple-pay-button" data-bind="scope:'mollie-apple-pay-button'">
     <!-- ko if: canUseApplePay() -->
-    <div class="apple-pay-button-with-text apple-pay-button-white-with-text" data-bind="click: payWithApplePay">
-        <span class="text">Buy with</span>
-        <span class="logo"></span>
+    <div class="<?= $block->escapeHtmlAttr($block->getButtonClasses()); ?>" data-bind="click: payWithApplePay">
+        <span>Apple Pay</span>
     </div>
     <!-- /ko -->
 </div>
 <script type="text/x-magento-init">
 {
-    "#product-page-mollie-apple-pay-button": {
+    "*": {
         "Magento_Ui/js/core/app": {
             "components": {
                 "mollie-apple-pay-button": {
                     "component": "Mollie_Payment/js/view/product/apple-pay-button",
                     "config": {
                         "formSelector": "#product_addtocart_form",
-                        "currencyCode": "<?php echo $block->escapeJs($block->getCurrencyCode()); ?>",
-                        "countryCode": "<?php echo $block->escapeJs($block->getCountryCode()); ?>",
-                        "productName": "<?php echo $block->escapeJs($block->getProductName()); ?>",
-                        "storeName": "<?php echo $block->escapeJs($block->getStoreName()); ?>"
+                        "currencyCode": "<?= $block->escapeJs($block->getCurrencyCode()); ?>",
+                        "countryCode": "<?= $block->escapeJs($block->getCountryCode()); ?>",
+                        "productName": "<?= $block->escapeJs($block->getProductName()); ?>",
+                        "storeName": "<?= $block->escapeJs($block->getStoreName()); ?>"
                     }
                 }
             }

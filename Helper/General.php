@@ -116,9 +116,9 @@ class General extends AbstractHelper
      */
     private $logger;
     /**
-     * @var
+     * @var array
      */
-    private $apiKey;
+    private $apiKey = [];
     /**
      * @var Resolver
      */
@@ -264,8 +264,8 @@ class General extends AbstractHelper
      */
     public function getApiKey($storeId = null)
     {
-        if (!empty($this->apiKey)) {
-            return $this->apiKey;
+        if (array_key_exists($storeId, $this->apiKey)) {
+            return $this->apiKey[$storeId];
         }
 
         if (empty($storeId)) {
@@ -282,7 +282,7 @@ class General extends AbstractHelper
             if (!preg_match('/^test_\w+$/', $apiKey)) {
                 $this->addTolog('error', 'Mollie set to test modus, but API key does not start with "test_"');
             }
-            $this->apiKey = $apiKey;
+            $this->apiKey[$storeId] = $apiKey;
         } else {
             $apiKey = trim($this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId));
             if (empty($apiKey)) {
@@ -291,10 +291,10 @@ class General extends AbstractHelper
             if (!preg_match('/^live_\w+$/', $apiKey)) {
                 $this->addTolog('error', 'Mollie set to live modus, but API key does not start with "live_"');
             }
-            $this->apiKey = $apiKey;
+            $this->apiKey[$storeId] = $apiKey;
         }
 
-        return $this->apiKey;
+        return $this->apiKey[$storeId];
     }
 
     /**

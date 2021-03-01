@@ -3,7 +3,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v1.22.0</version>
+                <version>v1.23.0</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -29,6 +29,8 @@
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\ApplePay</model>
                 <enable_buy_now_button>0</enable_buy_now_button>
+                <buy_now_button_color>black</buy_now_button_color>
+                <buy_now_button_text>check-out</buy_now_button_text>
                 <title>Apple Pay</title>
                 <payment_description>{ordernumber}</payment_description>
                 <method>payment</method>

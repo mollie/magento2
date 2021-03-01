@@ -9,7 +9,8 @@
             <label>Enabled</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_applepay/active</config_path>
-            <comment><![CDATA[<strong>Please note:</strong> This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS.]]></comment>
+            <comment>
+                <![CDATA[<strong>Please note:</strong> This payment method is only visible when the device of the user Apple Pay has enabled and the checkout is served over HTTPS.]]></comment>
         </field>
         <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
                showInStore="1">
@@ -19,17 +20,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="enable_buy_now_button" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
-               showInStore="1">
-            <label>Enable Buy Now Button</label>
-            <config_path>payment/mollie_methods_applepay/enable_buy_now_button</config_path>
-            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-            <depends>
-                <field id="active">1</field>
-            </depends>
-            <comment><![CDATA[This button is shown on the product page.]]></comment>
-        </field>
-        <field id="method" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
+        <field id="method" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Method</label>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\Method</source_model>
@@ -41,7 +32,8 @@
             <a href="https://github.com/mollie/magento2/wiki/Differences-Payments-API-&-Orders-API" target="_blank">here</a>
             to read more about the differences between the Payment and Orders API.]]></comment>
         </field>
-        <field id="payment_description" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="payment_description" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
+               showInStore="1">
             <label>Description</label>
             <config_path>payment/mollie_methods_applepay/payment_description</config_path>
             <comment><![CDATA[The description to be used for this transaction. These variables are available:<br><br>
@@ -54,7 +46,8 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="integration_type" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="integration_type" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
+               showInStore="1">
             <label>Integration type</label>
             <config_path>payment/mollie_methods_applepay/integration_type</config_path>
             <comment><![CDATA[What kind of integration should be used?<br><br>
@@ -66,8 +59,8 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="days_before_expire" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1"
-               showInStore="1" >
+        <field id="days_before_expire" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1"
+               showInStore="1">
             <label>Days to expire</label>
             <frontend_class>validate-digits-range digits-range-1-100</frontend_class>
             <config_path>payment/mollie_methods_applepay/days_before_expire</config_path>
@@ -75,9 +68,11 @@
                 <field id="active">1</field>
                 <field id="method">order</field>
             </depends>
-            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
+            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration
+                (28 days)
+            </comment>
         </field>
-        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="80" showInDefault="1"
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
@@ -86,7 +81,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="90" showInDefault="1"
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="80" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
@@ -96,7 +91,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="min_order_total" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
+        <field id="min_order_total" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Minimum Order Total</label>
             <config_path>payment/mollie_methods_applepay/min_order_total</config_path>
@@ -104,7 +99,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="max_order_total" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1"
+        <field id="max_order_total" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Maximum Order Total</label>
             <config_path>payment/mollie_methods_applepay/max_order_total</config_path>
@@ -112,7 +107,8 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_surcharge_type" translate="label" type="select" sortOrder="120" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_type" translate="label" type="select" sortOrder="110" showInDefault="1"
+               showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_type</config_path>
@@ -121,7 +117,8 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="120" showInDefault="1"
+               showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge fixed amount</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_fixed_amount</config_path>
@@ -132,7 +129,8 @@
                 <field id="payment_surcharge_type" separator=",">fixed_fee,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="130" showInDefault="1"
+               showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge percentage</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_percentage</config_path>
@@ -143,11 +141,13 @@
                 <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="140" showInDefault="1"
+               showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge limit</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_limit</config_path>
-            <comment><![CDATA[Enter the maximum amount of payment surchage to should be charged to the customer.]]></comment>
+            <comment>
+                <![CDATA[Enter the maximum amount of payment surchage to should be charged to the customer.]]></comment>
             <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
             <frontend_class>validate-not-negative-number</frontend_class>
             <depends>
@@ -155,7 +155,7 @@
                 <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="160" showInDefault="1"
+        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="150" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment Surcharge Tax Class</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_tax_class</config_path>
@@ -165,7 +165,7 @@
                 <field id="payment_surcharge_type" separator=",">fixed_fee,percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="sort_order" translate="label" type="text" sortOrder="170" showInDefault="1" showInWebsite="1"
+        <field id="sort_order" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>
@@ -173,6 +173,51 @@
             <depends>
                 <field id="active">1</field>
             </depends>
+        </field>
+        <field id="apple_buy_now_heading" translate="label comment" type="text" sortOrder="170" showInDefault="1"
+               showInWebsite="0" showInStore="0">
+            <label>Apple Pay Direct</label>
+            <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
+            <comment>
+                <![CDATA[Activating this option will allow placing the Apple Pay button directly on the product detail pages for a faster checkout. ]]></comment>
+        </field>
+        <field id="enable_buy_now_button" translate="label" type="select" sortOrder="180" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Enable Button on Product Page</label>
+            <config_path>payment/mollie_methods_applepay/enable_buy_now_button</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+            <comment>
+                <![CDATA[Shows the Apple Pay button directly on the product detail page for a quick checkout.]]></comment>
+        </field>
+        <field id="buy_now_button_color" translate="label" type="select" sortOrder="190" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Button Style</label>
+            <config_path>payment/mollie_methods_applepay/buy_now_button_color</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\BuyNowButtonColor</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="enable_buy_now_button">1</field>
+            </depends>
+            <comment>
+                <![CDATA[<strong>Black</strong><br>Best used on light-colored backgrounds that provide sufficient contrast.<br><br><strong>White</strong><br>Best used on dark or colored backgrounds that provide sufficient contrast.<br><br><strong>White with Outline</strong><br>Use this on white or light-colored backgrounds that don’t provide sufficient contrast. Do not use with dark or saturated backgrounds.]]></comment>
+        </field>
+        <field id="buy_now_button_text" translate="label" type="select" sortOrder="200" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Button Type</label>
+            <config_path>payment/mollie_methods_applepay/buy_now_button_text</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayBuyNowButtonText</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="enable_buy_now_button">1</field>
+            </depends>
+            <comment>
+                <![CDATA[Apple provides different styles of buttons to match your customer experience.]]></comment>
         </field>
     </group>
 </include>
