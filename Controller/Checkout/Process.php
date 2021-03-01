@@ -66,7 +66,8 @@ class Process extends Action
      */
     public function execute()
     {
-        if (!$orderId = $this->getRequest()->getParam('order_id')) {
+        $orderIds = $this->getOrderIds();
+        if (!$orderIds) {
             $this->mollieHelper->addTolog('error', __('Invalid return, missing order id.'));
             $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));
             $this->_redirect('checkout/cart');
@@ -74,8 +75,11 @@ class Process extends Action
         }
 
         try {
-            $paymentToken = $this->getRequest()->getParam('payment_token', null);
-            $status = $this->mollieModel->processTransaction($orderId, 'success', $paymentToken);
+            $status = [];
+            $paymentToken = $this->getRequest()->getParam('payment_token');
+            foreach ($orderIds as $orderId) {
+                $status = $this->mollieModel->processTransaction($orderId, 'success', $paymentToken);
+            }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->messageManager->addExceptionMessage($e, __('There was an error checking the transaction status.'));
@@ -104,5 +108,17 @@ class Process extends Action
 
             $this->_redirect('checkout/cart');
         }
+    }
+
+    /**
+     * @return array
+     */
+    protected function getOrderIds(): array
+    {
+        if ($orderId = $this->getRequest()->getParam('order_id')) {
+            return [$orderId];
+        }
+
+        return $this->getRequest()->getParam('order_ids') ?? [];
     }
 }

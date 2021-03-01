@@ -25,6 +25,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Logger\MollieLogger;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
+use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\Uncancel;
@@ -161,25 +162,31 @@ class General extends AbstractHelper
     private $uncancel;
 
     /**
+     * @var TransactionDescription
+     */
+    private $transactionDescription;
+
+    /**
      * General constructor.
      *
-     * @param Context                  $context
-     * @param PaymentHelper            $paymentHelper
-     * @param OrderRepository          $orderRepository
-     * @param StoreManagerInterface    $storeManager
-     * @param ResourceConfig           $resourceConfig
-     * @param ModuleListInterface      $moduleList
+     * @param Context $context
+     * @param PaymentHelper $paymentHelper
+     * @param OrderRepository $orderRepository
+     * @param StoreManagerInterface $storeManager
+     * @param ResourceConfig $resourceConfig
+     * @param ModuleListInterface $moduleList
      * @param ProductMetadataInterface $metadata
-     * @param Resolver                 $resolver
-     * @param MathRandom               $mathRandom
-     * @param MollieLogger             $logger
-     * @param Coupon                   $coupon
-     * @param CouponUsage              $couponUsage
-     * @param OrderCommentHistory      $orderCommentHistory
+     * @param Resolver $resolver
+     * @param MathRandom $mathRandom
+     * @param MollieLogger $logger
+     * @param Coupon $coupon
+     * @param CouponUsage $couponUsage
+     * @param OrderCommentHistory $orderCommentHistory
      * @param OrderManagementInterface $orderManagement
-     * @param Config                   $config
-     * @param Transaction              $transaction
-     * @param Uncancel                 $uncancel
+     * @param Config $config
+     * @param Transaction $transaction
+     * @param Uncancel $uncancel
+     * @param TransactionDescription $transactionDescription
      */
     public function __construct(
         Context $context,
@@ -198,7 +205,8 @@ class General extends AbstractHelper
         OrderManagementInterface $orderManagement,
         Config $config,
         Transaction $transaction,
-        Uncancel $uncancel
+        Uncancel $uncancel,
+        TransactionDescription $transactionDescription
     ) {
         $this->paymentHelper = $paymentHelper;
         $this->storeManager = $storeManager;
@@ -217,6 +225,7 @@ class General extends AbstractHelper
         $this->config = $config;
         $this->transaction = $transaction;
         $this->uncancel = $uncancel;
+        $this->transactionDescription = $transactionDescription;
         parent::__construct($context);
     }
 
@@ -884,31 +893,14 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param $method
-     * @param $orderNumber
+     * @param string $method
+     * @param string $orderNumber
      * @param int $storeId
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getPaymentDescription($method, $orderNumber, $storeId = 0)
+    public function getPaymentDescription(string $method, string $orderNumber, $storeId = 0)
     {
-        $xpath = str_replace('%method%', 'mollie_methods_' . $method, self::XML_PATH_PAYMENT_DESCRIPTION);
-        $description = $this->getStoreConfig($xpath, $storeId);
-
-        if (!trim($description)) {
-            $description = '{ordernumber}';
-        }
-
-        $replacements = [
-            '{ordernumber}' => $orderNumber,
-            '{storename}' => $this->getStoreConfig(Information::XML_PATH_STORE_INFO_NAME, $storeId),
-        ];
-
-        return str_replace(
-            array_keys($replacements),
-            array_values($replacements),
-            $description
-        );
+        return $this->transactionDescription->forRegularTransaction($method, $orderNumber, $storeId);
     }
 
     /**

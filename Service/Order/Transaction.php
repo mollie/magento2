@@ -54,7 +54,7 @@ class Transaction
      * @param string $paymentToken
      * @return string
      */
-    public function getRedirectUrl(OrderInterface $order, $paymentToken)
+    public function getRedirectUrl(OrderInterface $order, string $paymentToken): string
     {
         $storeId = $order->getStoreId();
         $useCustomUrl = $this->config->useCustomRedirectUrl($storeId);
@@ -65,6 +65,35 @@ class Transaction
         }
 
         $parameters = 'order_id=' . intval($order->getId()) . '&payment_token=' . $paymentToken . '&utm_nooverride=1';
+
+        $this->urlBuilder->setScope($storeId);
+        return $this->urlBuilder->getUrl(
+            'mollie/checkout/process/',
+            ['_query' => $parameters]
+        );
+    }
+
+    /**
+     * @param OrderInterface[] $orders
+     * @param string $paymentToken
+     * @throws \Exception
+     * @return string
+     */
+    public function getMultishippingRedirectUrl(array $orders, string $paymentToken): string
+    {
+        if (!$orders) {
+            throw new \Exception('The provided order array is empty');
+        }
+
+        $firstOrder = reset($orders);
+        $storeId = $firstOrder->getStoreId();
+
+        $orderIds = array_map( function (OrderInterface $order) { return $order->getId(); }, $orders);
+        $parameters = http_build_query([
+            'order_ids' => $orderIds,
+            'payment_token' => $paymentToken,
+            'utm_nooverride' => 1,
+        ]);
 
         $this->urlBuilder->setScope($storeId);
         return $this->urlBuilder->getUrl(
