@@ -22,8 +22,7 @@ class CardToken implements TransactionPartInterface
     public function process(OrderInterface $order, $apiMethod, array $transaction)
     {
         $additionalData = $order->getPayment()->getAdditionalInformation();
-
-        if (!isset($additionalData['card_token'])) {
+        if ($order->getPayment()->getMethod() != 'mollie_methods_creditcard' || !isset($additionalData['card_token'])) {
             return $transaction;
         }
 

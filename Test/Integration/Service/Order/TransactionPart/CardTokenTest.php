@@ -20,6 +20,7 @@ class CardTokenTest extends IntegrationTestCase
     {
         $order = $this->loadOrderById('100000001');
         $payment = $order->getPayment();
+        $payment->setMethod('mollie_methods_creditcard');
         $payment->setAdditionalInformation('card_token', 'abc123');
 
         /** @var CardToken $instance */
@@ -36,6 +37,7 @@ class CardTokenTest extends IntegrationTestCase
     public function testAddsDataForOrdersApi()
     {
         $order = $this->loadOrderById('100000001');
+        $order->getPayment()->setMethod('mollie_methods_creditcard');
         $payment = $order->getPayment();
         $payment->setAdditionalInformation('card_token', 'abc123');
 
@@ -53,6 +55,25 @@ class CardTokenTest extends IntegrationTestCase
     public function testDoesNotChangeTheTransactionWhenNoCardTokenIsPresent()
     {
         $order = $this->loadOrderById('100000001');
+        $order->getPayment()->setMethod('mollie_methods_creditcard');
+
+        /** @var CardToken $instance */
+        $instance = $this->objectManager->create(CardToken::class);
+
+        $transaction = $instance->process($order, Orders::CHECKOUT_TYPE, ['method' => 'creditcard']);
+
+        $this->assertEquals(['method' => 'creditcard'], $transaction);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testDoesATheCardFieldWhenThePaymentMethodIsNotCreditcard()
+    {
+        $order = $this->loadOrderById('100000001');
+        $payment = $order->getPayment();
+        $payment->setMethod('checkmo');
+        $payment->setAdditionalInformation('card_token', 'abc123');
 
         /** @var CardToken $instance */
         $instance = $this->objectManager->create(CardToken::class);
