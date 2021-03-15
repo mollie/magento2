@@ -175,4 +175,10 @@
     <type name="Magento\Catalog\Model\Attribute\Config">
         <plugin name="mollie_add_mealvoucher_category_to_loaded_attribute" type="Mollie\Payment\Plugin\Catalog\Model\AddMealVoucherCategoryToLoadedAttributes" />
     </type>
+
+    <type name="Mollie\Payment\Service\Mollie\MethodParameters">
+        <arguments>
+            <argument name="parametersParts" xsi:type="array"></argument>
+        </arguments>
+    </type>
 </config>
