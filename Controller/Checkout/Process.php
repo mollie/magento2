@@ -12,6 +12,7 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
+use Mollie\Payment\Multishipping\CheckoutRedirect;
 
 /**
  * Class Process
@@ -39,25 +40,33 @@ class Process extends Action
     protected $mollieHelper;
 
     /**
+     * @var CheckoutRedirect
+     */
+    private $multishippingRedirect;
+
+    /**
      * Process constructor.
      *
-     * @param Context       $context
-     * @param Session       $checkoutSession
+     * @param Context $context
+     * @param Session $checkoutSession
      * @param PaymentHelper $paymentHelper
-     * @param MollieModel   $mollieModel
-     * @param MollieHelper  $mollieHelper
+     * @param MollieModel $mollieModel
+     * @param MollieHelper $mollieHelper
+     * @param CheckoutRedirect $checkoutRedirect
      */
     public function __construct(
         Context $context,
         Session $checkoutSession,
         PaymentHelper $paymentHelper,
         MollieModel $mollieModel,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        CheckoutRedirect $checkoutRedirect
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->paymentHelper = $paymentHelper;
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
+        $this->multishippingRedirect = $checkoutRedirect;
         parent::__construct($context);
     }
 
@@ -90,7 +99,11 @@ class Process extends Action
         if (!empty($status['success'])) {
             try {
                 $this->checkoutSession->start();
-                $this->_redirect('checkout/onepage/success?utm_nooverride=1');
+                if (count($orderIds) > 1) {
+                    $this->multishippingRedirect->redirect();
+                } else {
+                    $this->_redirect('checkout/onepage/success?utm_nooverride=1');
+                }
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
                 $this->messageManager->addErrorMessage(__('Something went wrong.'));

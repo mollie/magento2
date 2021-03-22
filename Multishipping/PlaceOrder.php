@@ -33,6 +33,9 @@ class PlaceOrder implements PlaceOrderInterface
      */
     private $molliePaymentsApi;
 
+    /**
+     * @var array
+     */
     private $errorList = [];
 
     /**
