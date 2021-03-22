@@ -290,6 +290,7 @@
                     <label>Enable multishipping</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/multishipping_enabled</config_path>
+                    <comment><![CDATA[Set to yes if you want to enable the Mollie Payment methods on multishipping orders.<br>Klarna is not supported on multishipping orders]]></comment>
                 </field>
                 <field id="description" translate="label comment" type="text" sortOrder="20"
                        showInDefault="1" showInWebsite="1" showInStore="1">
@@ -298,6 +299,7 @@
                     <depends>
                         <field id="enabled">1</field>
                     </depends>
+                    <comment><![CDATA[As multiple orders can be in the same transaction, create a new description for these transactions.]]></comment>
                 </field>
             </group>
         </section>

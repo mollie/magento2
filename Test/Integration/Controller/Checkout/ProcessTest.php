@@ -65,6 +65,6 @@ class ProcessTest extends AbstractController
 
         $this->dispatch('mollie/checkout/process?order_ids[]=123&order_ids[]=456');
 
-        $this->assertRedirect($this->stringContains('checkout/onepage/success?utm_nooverride=1'));
+        $this->assertRedirect($this->stringContains('multishipping/checkout/success?utm_nooverride=1'));
     }
 }
