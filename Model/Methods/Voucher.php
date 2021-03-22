@@ -104,7 +104,8 @@ class Voucher extends \Mollie\Payment\Model\Mollie
 
     public function isAvailable(CartInterface $quote = null)
     {
-        $voucherCategory = $this->config->getVoucherCategory($quote->getStoreId());
+        $storeId = $quote ? $quote->getStoreId() : null;
+        $voucherCategory = $this->config->getVoucherCategory($storeId);
         if ($quote && !$voucherCategory) {
             return false;
         }
