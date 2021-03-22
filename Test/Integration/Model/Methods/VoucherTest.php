@@ -48,4 +48,15 @@ class VoucherTest extends IntegrationTestCase
         $instance = $this->objectManager->create(Voucher::class);
         $this->assertTrue($instance->isAvailable($cart));
     }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_methods_voucher/category
+     */
+    public function testIsAvailableWhenNoCategoryIsAvailable()
+    {
+        /** @var Voucher $instance */
+        $instance = $this->objectManager->create(Voucher::class);
+
+        $this->assertFalse($instance->isAvailable(null));
+    }
 }
