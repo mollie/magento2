@@ -25,7 +25,7 @@ class ApplePayTest extends AbstractMethodTest
         $mollieApiClient = $this->createMock(MollieApiClient::class);
         $mollieApiClient->methods = $this->createMock(MethodEndpoint::class);
 
-        $mollieApiClient->methods->expects($this->once())->method('all')->with($this->callback(function ($arguments) {
+        $mollieApiClient->methods->expects($this->once())->method('allActive')->with($this->callback(function ($arguments) {
             $this->assertArrayHasKey('includeWallets', $arguments);
             $this->assertEquals('applepay', $arguments['includeWallets']);
 

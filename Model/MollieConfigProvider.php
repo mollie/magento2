@@ -20,6 +20,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Service\Mollie\GetIssuers;
+use Mollie\Payment\Service\Mollie\MethodParameters;
 
 /**
  * Class MollieConfigProvider
@@ -102,18 +103,24 @@ class MollieConfigProvider implements ConfigProviderInterface
     private $storeManager;
 
     /**
+     * @var MethodParameters
+     */
+    private $methodParameters;
+
+    /**
      * MollieConfigProvider constructor.
      *
-     * @param Mollie                $mollieModel
-     * @param MollieHelper          $mollieHelper
-     * @param PaymentHelper         $paymentHelper
-     * @param CheckoutSession       $checkoutSession
-     * @param AssetRepository       $assetRepository
-     * @param Escaper               $escaper
-     * @param Resolver              $localeResolver
-     * @param Config                $config
-     * @param GetIssuers            $getIssuers
+     * @param Mollie $mollieModel
+     * @param MollieHelper $mollieHelper
+     * @param PaymentHelper $paymentHelper
+     * @param CheckoutSession $checkoutSession
+     * @param AssetRepository $assetRepository
+     * @param Escaper $escaper
+     * @param Resolver $localeResolver
+     * @param Config $config
+     * @param GetIssuers $getIssuers
      * @param StoreManagerInterface $storeManager
+     * @param MethodParameters $methodParameters
      */
     public function __construct(
         MollieModel $mollieModel,
@@ -125,7 +132,8 @@ class MollieConfigProvider implements ConfigProviderInterface
         Resolver $localeResolver,
         Config $config,
         GetIssuers $getIssuers,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        MethodParameters $methodParameters
     ) {
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
@@ -137,6 +145,8 @@ class MollieConfigProvider implements ConfigProviderInterface
         $this->localeResolver = $localeResolver;
         $this->getIssuers = $getIssuers;
         $this->storeManager = $storeManager;
+        $this->methodParameters = $methodParameters;
+
         foreach ($this->methodCodes as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
         }
@@ -230,13 +240,13 @@ class MollieConfigProvider implements ConfigProviderInterface
 
         try {
             $amount = $this->mollieHelper->getOrderAmountByQuote($cart);
-            $params = [
+            $parameters = [
                 'amount[value]' => $amount['value'],
                 'amount[currency]' => $amount['currency'],
                 'resource' => 'orders',
                 'includeWallets' => 'applepay',
             ];
-            $apiMethods = $mollieApi->methods->all($params);
+            $apiMethods = $mollieApi->methods->allActive($this->methodParameters->enhance($parameters, $cart));
 
             foreach ($apiMethods as $method) {
                 $methodId = 'mollie_methods_' . $method->id;

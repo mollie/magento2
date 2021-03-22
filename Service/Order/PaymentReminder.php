@@ -91,7 +91,7 @@ class PaymentReminder
         return $order;
     }
 
-    private function moveReminderFromPendingToSent(OrderInterface $order, PendingPaymentReminderInterface $pendingPaymentReminder): void
+    private function moveReminderFromPendingToSent(OrderInterface $order, PendingPaymentReminderInterface $pendingPaymentReminder)
     {
         if ($this->isAlreadySend($order)) {
             // Already sent, so delete the pending payment reminder.

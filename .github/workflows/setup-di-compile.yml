@@ -6,13 +6,13 @@ jobs:
     build:
         strategy:
             matrix:
-                PHP_VERSION: [php7-fpm, php71-fpm, php72-fpm]
-                MAGENTO_VERSION: [2.2.11, 2.3.5-p1]
-                exclude:
-                    - PHP_VERSION: php7-fpm
-                      MAGENTO_VERSION: 2.3.5-p1
-                    - PHP_VERSION: php72-fpm
-                      MAGENTO_VERSION: 2.2.11
+              include:
+                - PHP_VERSION: php7-fpm
+                  MAGENTO_VERSION: 2.2.11
+                - PHP_VERSION: php72-fpm
+                  MAGENTO_VERSION: 2.3.6-p1
+                - PHP_VERSION: php74-fpm
+                  MAGENTO_VERSION: 2.4.2
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v1
