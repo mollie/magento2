@@ -88,7 +88,7 @@ abstract class AbstractMethodTest extends IntegrationTestCase
 
         $mollieApiClient = $this->createMock(MollieApiClient::class);
         $mollieApiClient->methods = $this->createMock(MethodEndpoint::class);
-        $mollieApiClient->methods->method('all')->willReturn($methodCollection);
+        $mollieApiClient->methods->method('allActive')->willReturn($methodCollection);
 
         /** @var MollieConfigProvider $instance */
         $instance = $this->objectManager->create(MollieConfigProvider::class, [

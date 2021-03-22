@@ -5,6 +5,7 @@ namespace Mollie\Payment\Test\Unit\Model;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\MollieConfigProvider;
 use Mollie\Payment\Test\Unit\UnitTestCase;
+use Magento\Quote\Model\Quote;
 
 class MollieConfigProviderTest extends UnitTestCase
 {
@@ -16,7 +17,7 @@ class MollieConfigProviderTest extends UnitTestCase
         $mollieHelperMock->method('getOrderAmountByQuote')->willReturn(['value' => 100, 'currency' => 'EUR']);
 
         $methodsEndpointMock = $this->createMock(\Mollie\Api\Endpoints\MethodEndpoint::class);
-        $methodsEndpointMock->expects($this->once())->method('all')->willReturn([
+        $methodsEndpointMock->expects($this->once())->method('allActive')->willReturn([
             (object)[
                 'id' => 'ideal',
                 'image' => (object)[
@@ -31,7 +32,7 @@ class MollieConfigProviderTest extends UnitTestCase
             'mollieHelper' => $mollieHelperMock,
         ]);
 
-        $result = $instance->getActiveMethods($client);
+        $result = $instance->getActiveMethods($client, $this->objectManager->getObject(Quote::class));
         $this->assertTrue(is_array($result));
         $this->assertArrayHasKey('mollie_methods_ideal', $result);
         $this->assertEquals('ideal.svg', $result['mollie_methods_ideal']['image']);
