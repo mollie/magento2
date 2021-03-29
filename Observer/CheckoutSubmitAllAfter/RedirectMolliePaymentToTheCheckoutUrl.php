@@ -47,6 +47,8 @@ class RedirectMolliePaymentToTheCheckoutUrl implements ObserverInterface
             $response = $this->responseFactory->create();
             $response->setRedirect($url);
             $response->sendResponse();
+
+            // phpcs:ignore
             exit;
         }
     }
