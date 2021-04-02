@@ -22,6 +22,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Order\BuildTransaction;
+use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\TransactionProcessor;
@@ -87,6 +88,11 @@ class Payments extends AbstractModel
     private $eventManager;
 
     /**
+     * @var CancelOrder
+     */
+    private $cancelOrder;
+
+    /**
      * Payments constructor.
      *
      * @param OrderSender $orderSender
@@ -100,6 +106,7 @@ class Payments extends AbstractModel
      * @param DashboardUrl $dashboardUrl
      * @param Transaction $transaction
      * @param TransactionProcessor $transactionProcessor
+     * @param CancelOrder $cancelOrder
      * @param EventManager $eventManager
      */
     public function __construct(
@@ -114,6 +121,7 @@ class Payments extends AbstractModel
         DashboardUrl $dashboardUrl,
         Transaction $transaction,
         TransactionProcessor $transactionProcessor,
+        CancelOrder $cancelOrder,
         EventManager $eventManager
     ) {
         $this->orderSender = $orderSender;
@@ -128,6 +136,7 @@ class Payments extends AbstractModel
         $this->transaction = $transaction;
         $this->transactionProcessor = $transactionProcessor;
         $this->eventManager = $eventManager;
+        $this->cancelOrder = $cancelOrder;
     }
 
     /**
@@ -377,8 +386,7 @@ class Payments extends AbstractModel
         }
         if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
             if ($type == 'webhook') {
-                $this->mollieHelper->registerCancellation($order, $status);
-                $order->cancel();
+                $this->cancelOrder->execute($order, $status);
                 $this->transactionProcessor->process($order, null, $paymentData);
             }
 
