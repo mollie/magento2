@@ -113,43 +113,4 @@ class GeneralTest extends UnitTestCase
 
         $this->assertFalse($result);
     }
-
-    public function testRegisterCancellationCancelsTheOrder()
-    {
-        $orderManagementMock = $this->createMock(OrderManagementInterface::class);
-        $orderManagementMock->expects($this->once())->method('cancel')->with(999);
-
-        /** @var OrderModel $order */
-        $order = $this->createPartialMock(OrderModel::class, ['cancel']);
-        $order->setId(999);
-        $order->setState(OrderModel::STATE_PROCESSING);
-
-        $payment = $this->objectManager->getObject(OrderModel\Payment::class);
-        $order->setPayment($payment);
-
-        /** @var General $instance */
-        $instance = $this->objectManager->getObject(General::class, [
-            'orderManagement' => $orderManagementMock,
-        ]);
-        $result = $instance->registerCancellation($order, 'payment canceled');
-
-        $this->assertTrue($result);
-    }
-
-    public function testRegisterCancellationSetsTheCorrectMessage()
-    {
-        /** @var OrderModel $order */
-        $order = $this->objectManager->getObject(OrderModel::class);
-        $order->setId(999);
-        $order->setState(OrderModel::STATE_PROCESSING);
-
-        $payment = $this->objectManager->getObject(OrderModel\Payment::class);
-        $order->setPayment($payment);
-
-        /** @var General $instance */
-        $instance = $this->objectManager->getObject(General::class);
-        $instance->registerCancellation($order, 'canceled');
-
-        $this->assertEquals('The order was canceled, reason: payment canceled', $payment->getMessage()->render());
-    }
 }
