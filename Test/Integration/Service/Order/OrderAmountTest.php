@@ -29,6 +29,8 @@ class OrderAmountTest extends IntegrationTestCase
         $repository = $this->objectManager->get(OrderRepositoryInterface::class);
         foreach ($orders as $order) {
             $order->setMollieTransactionId($transactionId);
+            $order->setBaseCurrencyCode('USD');
+            $order->setOrderCurrencyCode('USD');
             $repository->save($order);
         }
 
