@@ -11,7 +11,7 @@ class WebhookTest extends ControllerTestCase
     public function testSetsTheStatusCodeTo503WhenTheOrderProcessFails()
     {
         $mollieModel = $this->createMock(Mollie::class);
-        $mollieModel->method('getOrderIdByTransactionId')->willReturn(123);
+        $mollieModel->method('getOrderIdsByTransactionId')->willReturn([123]);
         $mollieModel->method('processTransaction')->willThrowException(new \Exception('[TEST] Something went wrong'));
 
         $this->_objectManager->addSharedInstance($mollieModel, Mollie::class);
@@ -24,5 +24,36 @@ class WebhookTest extends ControllerTestCase
         $this->dispatch('mollie/checkout/webhook');
 
         $this->assertSame(503, $this->getResponse()->getHttpResponseCode());
+    }
+
+    public function testTheTestByMollieReturnsAnOkResponse()
+    {
+        $this->getRequest()->setParam('testByMollie', true);
+
+        $this->dispatch('mollie/checkout/webhook');
+
+        $this->assertOkResponse();
+    }
+
+    public function testReturns404IfNoTransactionIdProvided()
+    {
+        $this->dispatch('mollie/checkout/webhook');
+
+        $this->assertEquals(404, $this->getResponse()->getStatusCode());
+    }
+
+    public function testReturns404IfAnInvalidTransactionIdIsProvided()
+    {
+        $this->getRequest()->setParam('id', 'NON_EXISTING');
+
+        $this->dispatch('mollie/checkout/webhook');
+
+        $this->assertEquals(404, $this->getResponse()->getStatusCode());
+    }
+
+    private function assertOkResponse()
+    {
+        $this->assertEquals(200, $this->getResponse()->getStatusCode());
+        $this->assertEquals('OK', $this->getResponse()->getContent());
     }
 }

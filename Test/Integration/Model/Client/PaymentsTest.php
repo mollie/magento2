@@ -89,6 +89,7 @@ class PaymentsTest extends IntegrationTestCase
         ]);
 
         $order = $this->loadOrder('100000001');
+        $order->setMollieTransactionId('MOLLIE_TEST_TRANSACTION');
         $order->setBaseCurrencyCode($currency);
         $order->setOrderCurrencyCode($currency);
 

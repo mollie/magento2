@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Controller\Checkout;
 
+use Magento\Framework\Controller\Result\Json;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\App\Action\Action;
@@ -20,7 +21,6 @@ use Magento\Framework\Controller\ResultFactory;
  */
 class Webhook extends Action
 {
-
     /**
      * @var Session
      */
@@ -68,41 +68,51 @@ class Webhook extends Action
             return $this->getOkResponse();
         }
 
-        if ($transactionId = $this->getRequest()->getParam('id')) {
-            $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-            try {
-                if ($orderId = $this->mollieModel->getOrderIdByTransactionId($transactionId)) {
-                    $this->mollieModel->processTransaction($orderId, 'webhook');
+        $transactionId = $this->getRequest()->getParam('id');
+        if (!$transactionId) {
+            return $this->getErrorResponse(404, __('No transaction ID found')->render());
+        }
 
-                    return $this->getOkResponse();
-                }
-
-                $result->setData([
-                    'error' => true,
-                    'message' => __('There is no order found that belongs to "%1"', $transactionId)->render(),
-                ]);
-                $result->setHttpResponseCode(404);
-
-                return $result;
-            } catch (\Exception $e) {
-                $this->mollieHelper->addTolog('error', $e->getMessage());
-
-                $result->setData(['error' => true]);
-                $result->setHttpResponseCode(503);
-
-                return $result;
+        try {
+            $orderIds = $this->mollieModel->getOrderIdsByTransactionId($transactionId);
+            if (!$orderIds) {
+                return $this->getErrorResponse(
+                    404,
+                    __('There is no order found that belongs to "%1"', $transactionId)->render()
+                );
             }
+
+            foreach ($orderIds as $orderId) {
+                $this->mollieModel->processTransaction($orderId, 'webhook');
+            }
+
+            return $this->getOkResponse();
+        } catch (\Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+
+            return $this->getErrorResponse(503);
         }
     }
 
-    /**
-     * @return \Magento\Framework\Controller\ResultInterface|\Magento\Framework\View\Result\Layout
-     */
     private function getOkResponse()
     {
         $result = $this->resultFactory->create(ResultFactory::TYPE_RAW);
         $result->setHeader('content-type', 'text/plain');
-        $result->setContents('OK', true);
+        $result->setContents('OK');
+        return $result;
+    }
+
+    private function getErrorResponse(int $code, string $message = null): Json
+    {
+        $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+        $result->setData(['error' => true]);
+
+        if ($message) {
+            $result->setData(['message' => $message]);
+        }
+
+        $result->setHttpResponseCode($code);
+
         return $result;
     }
 }

@@ -3,7 +3,6 @@
 namespace Mollie\Payment\Test\Unit\Helper;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order as OrderModel;
 use Magento\Store\Model\Information;
@@ -16,43 +15,6 @@ use Mollie\Payment\Test\Unit\UnitTestCase;
 
 class GeneralTest extends UnitTestCase
 {
-    public function returnsTheCorrectDescriptionProvider()
-    {
-        return [
-            ['{ordernumber}', '0000025'],
-            ['', '0000025'],
-            ['{storename}', 'My Test Store'],
-            ['{storename}: {ordernumber}', 'My Test Store: 0000025'],
-            ['Order {ordernumber} from this store', 'Order 0000025 from this store'],
-        ];
-    }
-
-    /**
-     * @dataProvider returnsTheCorrectDescriptionProvider
-     */
-    public function testReturnsTheCorrectDescription($description, $expected)
-    {
-        $storeConfigMock = $this->createMock(ScopeConfigInterface::class);
-        $storeConfigMock->method('getValue')
-            ->withConsecutive(
-                ['payment/mollie_methods_ideal/payment_description', ScopeInterface::SCOPE_STORE, 1],
-                [Information::XML_PATH_STORE_INFO_NAME, ScopeInterface::SCOPE_STORE, 1]
-            )
-            ->willReturnOnConsecutiveCalls($description, 'My Test Store');
-
-        /** @var MollieHelper $instance */
-        $instance = $this->objectManager->getObject(MollieHelper::class);
-
-        // The scopeConfig is burried in the context, use reflection to swap it with our mock
-        $property = (new \ReflectionObject($instance))->getProperty('scopeConfig');
-        $property->setAccessible(true);
-        $property->setValue($instance, $storeConfigMock);
-
-        $result = $instance->getPaymentDescription('ideal', '0000025', 1);
-
-        $this->assertSame($expected, $result);
-    }
-
     public function getLastRelevantStatusProvider()
     {
         return [

@@ -36,4 +36,7 @@
     <event name="sales_order_place_before">
         <observer name="mollie_remove_from_pending_payment_reminders_table" instance="Mollie\Payment\Observer\SalesOrderPlaceBefore\RemovePendingPaymentReminders" />
     </event>
+    <event name="checkout_submit_all_after">
+        <observer name="mollie_redirect_multishipping_order_to_the_checkout_url" instance="Mollie\Payment\Observer\CheckoutSubmitAllAfter\RedirectMolliePaymentToTheCheckoutUrl" />
+    </event>
 </config>

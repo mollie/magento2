@@ -21,7 +21,9 @@ use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
+use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Service\Order\BuildTransaction;
+use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\TransactionProcessor;
@@ -87,6 +89,16 @@ class Payments extends AbstractModel
     private $eventManager;
 
     /**
+     * @var OrderAmount
+     */
+    private $orderAmount;
+
+    /**
+     * @var TransactionDescription
+     */
+    private $transactionDescription;
+
+    /**
      * Payments constructor.
      *
      * @param OrderSender $orderSender
@@ -101,6 +113,8 @@ class Payments extends AbstractModel
      * @param Transaction $transaction
      * @param TransactionProcessor $transactionProcessor
      * @param EventManager $eventManager
+     * @param OrderAmount $orderAmount
+     * @param TransactionDescription $transactionDescription
      */
     public function __construct(
         OrderSender $orderSender,
@@ -114,7 +128,9 @@ class Payments extends AbstractModel
         DashboardUrl $dashboardUrl,
         Transaction $transaction,
         TransactionProcessor $transactionProcessor,
-        EventManager $eventManager
+        EventManager $eventManager,
+        OrderAmount $orderAmount,
+        TransactionDescription $transactionDescription
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -128,6 +144,8 @@ class Payments extends AbstractModel
         $this->transaction = $transaction;
         $this->transactionProcessor = $transactionProcessor;
         $this->eventManager = $eventManager;
+        $this->orderAmount = $orderAmount;
+        $this->transactionDescription = $transactionDescription;
     }
 
     /**
@@ -141,7 +159,6 @@ class Payments extends AbstractModel
     {
         $storeId = $order->getStoreId();
         $orderId = $order->getEntityId();
-        $additionalData = $order->getPayment()->getAdditionalInformation();
 
         $transactionId = $order->getMollieTransactionId();
         if (!empty($transactionId) && !preg_match('/^ord_\w+$/', $transactionId)) {
@@ -153,7 +170,11 @@ class Payments extends AbstractModel
         $method = $this->mollieHelper->getMethodCode($order);
         $paymentData = [
             'amount'         => $this->mollieHelper->getOrderAmountByOrder($order),
-            'description'    => $this->mollieHelper->getPaymentDescription($method, $order->getIncrementId(), $storeId),
+            'description'    => $this->transactionDescription->forRegularTransaction(
+                $method,
+                $order->getIncrementId(),
+                $storeId
+            ),
             'billingAddress' => $this->getAddressLine($order->getBillingAddress()),
             'redirectUrl'    => $this->transaction->getRedirectUrl($order, $paymentToken),
             'webhookUrl'     => $this->transaction->getWebhookUrl($storeId),
@@ -206,10 +227,10 @@ class Payments extends AbstractModel
     }
 
     /**
-     * @param Order $order
+     * @param OrderInterface $order
      * @param MolliePayment $payment
      */
-    public function processResponse(Order $order, $payment)
+    public function processResponse(OrderInterface $order, $payment)
     {
         $eventData = [
             'order' => $order,
@@ -267,7 +288,7 @@ class Payments extends AbstractModel
         if ($status == 'paid' && !$refunded) {
             $amount = $paymentData->amount->value;
             $currency = $paymentData->amount->currency;
-            $orderAmount = $this->mollieHelper->getOrderAmountByOrder($order);
+            $orderAmount = $this->orderAmount->getByTransactionId($transactionId);
             if ($currency != $orderAmount['currency']) {
                 $msg = ['success' => false, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
                 $this->mollieHelper->addTolog('error', __('Currency does not match.'));
