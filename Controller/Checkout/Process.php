@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Controller\Checkout;
 
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -139,11 +140,7 @@ class Process extends Action
 
     protected function handleNonSuccessResult(array $result, array $orderIds)
     {
-        if (!$this->checkoutSession->getLastRealOrder()->getId()) {
-            $order = $this->orderRepository->get(end($orderIds));
-            $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
-        }
-
+        $this->checkIfLastRealOrder($orderIds);
         $this->checkoutSession->restoreQuote();
         $this->addResultMessage($result);
 
@@ -171,5 +168,22 @@ class Process extends Action
         }
 
         $this->messageManager->addErrorMessage(__('Something went wrong.'));
+    }
+
+    /**
+     * @param array $orderIds
+     */
+    protected function checkIfLastRealOrder(array $orderIds)
+    {
+        if ($this->checkoutSession->getLastRealOrder()->getId()) {
+            return;
+        }
+
+        try {
+            $order = $this->orderRepository->get(end($orderIds));
+            $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
+        } catch (NoSuchEntityException $exception) {
+            //
+        }
     }
 }
