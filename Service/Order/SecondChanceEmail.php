@@ -98,7 +98,7 @@ class SecondChanceEmail
 
         $builder = $this->transportBuilder->setTemplateIdentifier($templateId);
         $builder->setTemplateOptions(['area' => 'frontend', 'store' => $storeId]);
-        $builder->setFromByScope($this->identityContainer->getEmailIdentity(), $storeId);
+        $this->setFrom($builder, $storeId);
         $builder->addTo($order->getCustomerEmail(), $customerName);
         $builder->setTemplateVars($this->getTemplateVars($order));
 
@@ -145,5 +145,20 @@ class SecondChanceEmail
             'order_id' => $order->getEntityId(),
             'payment_token' => $token->getToken()
         ]);
+    }
+
+    private function setFrom(TransportBuilder $builder, int $storeId)
+    {
+        $emailIdentity = $this->identityContainer->getEmailIdentity();
+
+        // Only exists in newer versions
+        // @see https://github.com/mollie/magento2/issues/367#issuecomment-805840292
+        if (method_exists($builder, 'setFromByScope')) {
+            $builder->setFromByScope($emailIdentity, $storeId);
+            return;
+        }
+
+        $from = $this->senderResolver->resolve($emailIdentity, $storeId);
+        $builder->setFrom($from);
     }
 }
