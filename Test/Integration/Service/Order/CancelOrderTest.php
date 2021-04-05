@@ -48,6 +48,11 @@ class CancelOrderTest extends IntegrationTestCase
      */
     public function testDoesNothingWhenLocked()
     {
+        $version = $this->objectManager->create(\Magento\Framework\App\ProductMetadata::class)->getVersion();
+        if (version_compare($version, '2.4', 'ge')) {
+            $this->markTestSkipped('This test does not work op 2.4 and higher as we get a DummyLocker');
+        }
+
         $order = $this->loadOrderById('100000001');
 
         $lockKey = sprintf(CancelOrder::LOCK_NAME, $order->getId());
