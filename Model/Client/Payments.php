@@ -6,15 +6,15 @@
 
 namespace Mollie\Payment\Model\Client;
 
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\ManagerInterface as EventManager;
-use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Model\AbstractModel;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
+use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\OrderRepository;
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
@@ -24,6 +24,7 @@ use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderAmount;
+use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\TransactionProcessor;
@@ -99,6 +100,11 @@ class Payments extends AbstractModel
     private $transactionDescription;
 
     /**
+     * @var CancelOrder
+     */
+    private $cancelOrder;
+
+    /**
      * Payments constructor.
      *
      * @param OrderSender $orderSender
@@ -112,6 +118,7 @@ class Payments extends AbstractModel
      * @param DashboardUrl $dashboardUrl
      * @param Transaction $transaction
      * @param TransactionProcessor $transactionProcessor
+     * @param CancelOrder $cancelOrder
      * @param EventManager $eventManager
      * @param OrderAmount $orderAmount
      * @param TransactionDescription $transactionDescription
@@ -128,9 +135,10 @@ class Payments extends AbstractModel
         DashboardUrl $dashboardUrl,
         Transaction $transaction,
         TransactionProcessor $transactionProcessor,
-        EventManager $eventManager,
         OrderAmount $orderAmount,
-        TransactionDescription $transactionDescription
+        TransactionDescription $transactionDescription,
+        CancelOrder $cancelOrder,
+        EventManager $eventManager
     ) {
         $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
@@ -146,6 +154,7 @@ class Payments extends AbstractModel
         $this->eventManager = $eventManager;
         $this->orderAmount = $orderAmount;
         $this->transactionDescription = $transactionDescription;
+        $this->cancelOrder = $cancelOrder;
     }
 
     /**
@@ -398,8 +407,7 @@ class Payments extends AbstractModel
         }
         if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
             if ($type == 'webhook') {
-                $this->mollieHelper->registerCancellation($order, $status);
-                $order->cancel();
+                $this->cancelOrder->execute($order, $status);
                 $this->transactionProcessor->process($order, null, $paymentData);
             }
 

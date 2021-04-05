@@ -35,6 +35,7 @@ use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Service\Order\BuildTransaction;
+use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
@@ -147,31 +148,37 @@ class Orders extends AbstractModel
     private $eventManager;
 
     /**
+     * @var CancelOrder
+     */
+    private $cancelOrder;
+
+    /**
      * Orders constructor.
      *
-     * @param OrderLines            $orderLines
-     * @param OrderSender           $orderSender
-     * @param InvoiceSender         $invoiceSender
-     * @param InvoiceService        $invoiceService
-     * @param OrderRepository       $orderRepository
-     * @param InvoiceRepository     $invoiceRepository
-     * @param CheckoutSession       $checkoutSession
-     * @param ManagerInterface      $messageManager
-     * @param Registry              $registry
-     * @param MollieHelper          $mollieHelper
-     * @param ProcessAdjustmentFee  $adjustmentFee
-     * @param OrderCommentHistory   $orderCommentHistory
-     * @param PartialInvoice        $partialInvoice
-     * @param StoreCredit           $storeCredit
-     * @param RefundUsingPayment    $refundUsingPayment
-     * @param Expires               $expires
-     * @param State                 $orderState
-     * @param Transaction           $transaction
-     * @param BuildTransaction      $buildTransaction
-     * @param Config                $config
-     * @param DashboardUrl          $dashboardUrl
-     * @param TransactionProcessor  $transactionProcessor
-     * @param EventManager          $eventManager
+     * @param OrderLines $orderLines
+     * @param OrderSender $orderSender
+     * @param InvoiceSender $invoiceSender
+     * @param InvoiceService $invoiceService
+     * @param OrderRepository $orderRepository
+     * @param InvoiceRepository $invoiceRepository
+     * @param CheckoutSession $checkoutSession
+     * @param ManagerInterface $messageManager
+     * @param Registry $registry
+     * @param MollieHelper $mollieHelper
+     * @param ProcessAdjustmentFee $adjustmentFee
+     * @param OrderCommentHistory $orderCommentHistory
+     * @param PartialInvoice $partialInvoice
+     * @param StoreCredit $storeCredit
+     * @param RefundUsingPayment $refundUsingPayment
+     * @param Expires $expires
+     * @param State $orderState
+     * @param Transaction $transaction
+     * @param BuildTransaction $buildTransaction
+     * @param Config $config
+     * @param DashboardUrl $dashboardUrl
+     * @param TransactionProcessor $transactionProcessor
+     * @param CancelOrder $cancelOrder
+     * @param EventManager $eventManager
      */
     public function __construct(
         OrderLines $orderLines,
@@ -196,6 +203,7 @@ class Orders extends AbstractModel
         Config $config,
         DashboardUrl $dashboardUrl,
         TransactionProcessor $transactionProcessor,
+        CancelOrder $cancelOrder,
         EventManager $eventManager
     ) {
         $this->orderLines = $orderLines;
@@ -221,6 +229,7 @@ class Orders extends AbstractModel
         $this->dashboardUrl = $dashboardUrl;
         $this->transactionProcessor = $transactionProcessor;
         $this->eventManager = $eventManager;
+        $this->cancelOrder = $cancelOrder;
     }
 
     /**
@@ -383,7 +392,7 @@ class Orders extends AbstractModel
             $method = $order->getPayment()->getMethodInstance()->getTitle();
             $order->getPayment()->setAdditionalInformation('payment_status', $lastPaymentStatus);
             $this->orderRepository->save($order);
-            $this->mollieHelper->registerCancellation($order, $lastPaymentStatus);
+            $this->cancelOrder->execute($order, $lastPaymentStatus);
             $this->transactionProcessor->process($order, $mollieOrder);
             $msg = ['success' => false, 'status' => $lastPaymentStatus, 'order_id' => $orderId, 'type' => $type, 'method' => $method];
             $this->mollieHelper->addTolog('success', $msg);
@@ -529,7 +538,7 @@ class Orders extends AbstractModel
 
         if ($mollieOrder->isCanceled() || $mollieOrder->isExpired()) {
             if ($type == 'webhook') {
-                $this->mollieHelper->registerCancellation($order, $status);
+                $this->cancelOrder->execute($order, $status);
             }
             $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);

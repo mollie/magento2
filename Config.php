@@ -106,7 +106,7 @@ class Config
      * @param string $data
      * @return void
      */
-    private function addToLog(string $type, string $data)
+    public function addToLog(string $type, string $data)
     {
         if (!$this->isDebugMode()) {
             return;

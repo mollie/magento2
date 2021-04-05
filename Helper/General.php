@@ -8,15 +8,14 @@ namespace Mollie\Payment\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\Module\ModuleListInterface;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\Math\Random as MathRandom;
+use Magento\Framework\Module\ModuleListInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
-use Magento\Store\Model\Information;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Payment\Helper\Data as PaymentHelper;
@@ -26,6 +25,7 @@ use Mollie\Payment\Logger\MollieLogger;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
+use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\Uncancel;
@@ -167,6 +167,11 @@ class General extends AbstractHelper
     private $transactionDescription;
 
     /**
+     * @var CancelOrder
+     */
+    private $cancelOrder;
+
+    /**
      * General constructor.
      *
      * @param Context $context
@@ -187,6 +192,7 @@ class General extends AbstractHelper
      * @param Transaction $transaction
      * @param Uncancel $uncancel
      * @param TransactionDescription $transactionDescription
+     * @param CancelOrder $cancelOrder
      */
     public function __construct(
         Context $context,
@@ -206,7 +212,8 @@ class General extends AbstractHelper
         Config $config,
         Transaction $transaction,
         Uncancel $uncancel,
-        TransactionDescription $transactionDescription
+        TransactionDescription $transactionDescription,
+        CancelOrder $cancelOrder
     ) {
         $this->paymentHelper = $paymentHelper;
         $this->storeManager = $storeManager;
@@ -226,6 +233,7 @@ class General extends AbstractHelper
         $this->transaction = $transaction;
         $this->uncancel = $uncancel;
         $this->transactionDescription = $transactionDescription;
+        $this->cancelOrder = $cancelOrder;
         parent::__construct($context);
     }
 
@@ -844,34 +852,11 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param OrderInterface $order
-     * @param null $status
-     *
-     * @return bool
-     * @throws \Exception
+     * @see CancelOrder::execute()
      */
     public function registerCancellation(OrderInterface $order, $status = null)
     {
-        if ($order->getId() && $order->getState() != Order::STATE_CANCELED) {
-            $comment = __('The order was canceled');
-            if ($status !== null) {
-                $comment = __('The order was canceled, reason: payment %1', $status);
-            }
-            $this->addTolog('info', $order->getIncrementId() . ' ' . $comment);
-            $this->orderCommentHistory->add($order, $comment);
-            $order->getPayment()->setMessage($comment);
-            $this->orderManagement->cancel($order->getId());
-
-            if ($order->getCouponCode()) {
-                $this->resetCouponAfterCancellation($order);
-            }
-
-            $this->orderRepository->save($order);
-
-            return true;
-        }
-
-        return false;
+        return $this->cancelOrder->execute($order, $status);
     }
 
     /**
