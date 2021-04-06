@@ -38,9 +38,9 @@ class LockService
     private $resourceConnection;
 
     public function __construct(
-        ResourceConnection $connection
+        ResourceConnection $resourceConnection
     ) {
-        $this->resourceConnection = $connection;
+        $this->resourceConnection = $resourceConnection;
     }
 
     /**
