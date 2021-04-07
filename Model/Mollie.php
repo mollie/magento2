@@ -15,6 +15,7 @@ use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
@@ -22,6 +23,7 @@ use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\Method\AbstractMethod;
 use Magento\Payment\Model\Method\Logger;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
@@ -203,7 +205,7 @@ class Mollie extends AbstractMethod
      *
      * @return bool
      * @throws LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
@@ -212,6 +214,10 @@ class Mollie extends AbstractMethod
         }
 
         if (!$this->mollieHelper->isAvailable($quote->getStoreId())) {
+            return false;
+        }
+
+        if ($quote->getIsMultiShipping() && !$this->config->isMultishippingEnabled($quote->getStoreId())) {
             return false;
         }
 
@@ -569,6 +575,27 @@ class Mollie extends AbstractMethod
             $this->mollieHelper->addTolog('error', __('No order found for transaction id %1', $transactionId));
             return false;
         }
+    }
+
+    /**
+     * Get order(s) by TransactionId
+     *
+     * @param string $transactionId
+     * @return array
+     */
+    public function getOrderIdsByTransactionId(string $transactionId): array
+    {
+        $this->searchCriteriaBuilder->addFilter('mollie_transaction_id', $transactionId);
+        $orders = $this->orderRepository->getList($this->searchCriteriaBuilder->create());
+
+        if (!$orders->getTotalCount()) {
+            $this->mollieHelper->addTolog('error', __('No order(s) found for transaction id %1', $transactionId));
+            return [];
+        }
+
+        return array_map(function (OrderInterface $order) {
+            return $order->getId();
+        }, $orders->getItems());
     }
 
     /**

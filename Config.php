@@ -30,11 +30,14 @@ class Config
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const GENERAL_LOCALE = 'payment/mollie_general/locale';
+    const GENERAL_MULTISHIPPING_ENABLED = 'payment/mollie_general/multishipping_enabled';
+    const GENERAL_MULTISHIPPING_DESCRIPTION = 'payment/mollie_general/multishipping_description';
     const GENERAL_ORDER_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
     const GENERAL_SECOND_CHANCE_DELAY = 'payment/mollie_general/second_chance_email_delay';
     const GENERAL_TYPE = 'payment/mollie_general/type';
+    const GENERAL_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
     const GENERAL_USE_CUSTOM_REDIRECT_URL = 'payment/mollie_general/use_custom_redirect_url';
     const GENERAL_USE_WEBHOOKS = 'payment/mollie_general/use_webhooks';
     const GENERAL_VERSION = 'payment/mollie_general/version';
@@ -46,6 +49,7 @@ class Config
     const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
     const PAYMENT_METHOD_PAYMENT_ACTIVE = 'payment/mollie_methods_%s/active';
+    const PAYMENT_METHOD_PAYMENT_DESCRIPTION = 'payment/mollie_methods_%s/description';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
@@ -89,11 +93,12 @@ class Config
     /**
      * @param $path
      * @param null|int|string $storeId
+     * @param string $scope
      * @return bool
      */
-    private function isSetFlag($path, $storeId)
+    private function isSetFlag($path, $storeId, $scope = ScopeInterface::SCOPE_STORE)
     {
-        return $this->config->isSetFlag($path, ScopeInterface::SCOPE_STORE, $storeId);
+        return $this->config->isSetFlag($path, $scope, $storeId);
     }
 
     /**
@@ -101,7 +106,7 @@ class Config
      * @param string $data
      * @return void
      */
-    private function addToLog(string $type, string $data)
+    public function addToLog(string $type, string $data)
     {
         if (!$this->isDebugMode()) {
             return;
@@ -357,11 +362,21 @@ class Config
     /**
      * @param string $method
      * @param int|null $storeId
-     * @return string
+     * @return bool
      */
-    public function isMethodActive($method, $storeId = null)
+    public function isMethodActive($method, $storeId = null): bool
     {
         return $this->isSetFlag($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_ACTIVE, $method), $storeId);
+    }
+
+    /**
+     * @param string $method
+     * @param int|null $storeId
+     * @return string|null
+     */
+    public function paymentMethodDescription(string $method, $storeId = null)
+    {
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_DESCRIPTION, $method), $storeId);
     }
 
     /**
@@ -485,6 +500,15 @@ class Config
 
     /**
      * @param null|int|string $storeId
+     * @return bool
+     */
+    public function useBaseCurrency($storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_USE_BASE_CURRENCY, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
      * @return string
      */
     public function useCustomRedirectUrl($storeId = null)
@@ -518,6 +542,26 @@ class Config
     public function customRedirectUrl($storeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
         return $this->getPath(static::GENERAL_CUSTOM_REDIRECT_URL, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return bool
+     */
+    public function isMultishippingEnabled($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
+    {
+        return $this->isSetFlag(static::GENERAL_MULTISHIPPING_ENABLED, $storeId, $scope);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @param string $scope
+     * @return string|null
+     */
+    public function getMultishippingDescription($storeId = null, $scope = ScopeInterface::SCOPE_STORE)
+    {
+        return $this->getPath(static::GENERAL_MULTISHIPPING_DESCRIPTION, $storeId, $scope);
     }
 
     /**

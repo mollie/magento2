@@ -6,6 +6,5 @@ This document is created in collaboration with the merchants, agencies, the Moll
 
 ## What we're working on / what is on our backlog
 
-* **Compatibility with Magento Multishipping**
 * **Direct integration of Mollie Subscriptions**
 * **Direct integration of Paypal Express** 
