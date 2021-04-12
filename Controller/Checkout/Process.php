@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Controller\Checkout;
 
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Model\Mollie as MollieModel;
@@ -14,7 +15,6 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
-use Mollie\Payment\Multishipping\CheckoutRedirect;
 
 /**
  * Class Process
@@ -42,14 +42,14 @@ class Process extends Action
     protected $mollieHelper;
 
     /**
-     * @var CheckoutRedirect
-     */
-    private $multishippingRedirect;
-
-    /**
      * @var OrderRepositoryInterface
      */
     private $orderRepository;
+
+    /**
+     * @var ManagerInterface
+     */
+    private $eventManager;
 
     /**
      * Process constructor.
@@ -59,7 +59,6 @@ class Process extends Action
      * @param PaymentHelper $paymentHelper
      * @param MollieModel $mollieModel
      * @param MollieHelper $mollieHelper
-     * @param CheckoutRedirect $checkoutRedirect
      * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
@@ -68,15 +67,15 @@ class Process extends Action
         PaymentHelper $paymentHelper,
         MollieModel $mollieModel,
         MollieHelper $mollieHelper,
-        CheckoutRedirect $checkoutRedirect,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        ManagerInterface $eventManager
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->paymentHelper = $paymentHelper;
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
-        $this->multishippingRedirect = $checkoutRedirect;
         $this->orderRepository = $orderRepository;
+        $this->eventManager = $eventManager;
         parent::__construct($context);
     }
 
@@ -109,11 +108,14 @@ class Process extends Action
         if (!empty($result['success'])) {
             try {
                 $this->checkoutSession->start();
-                if (count($orderIds) > 1) {
-                    $this->multishippingRedirect->redirect();
-                } else {
-                    $this->_redirect('checkout/onepage/success?utm_nooverride=1');
-                }
+
+                $this->_redirect('checkout/onepage/success?utm_nooverride=1');
+
+                $this->eventManager->dispatch('mollie_checkout_success_redirect', [
+                    'order_ids' => $orderIds,
+                    'request' => $this->getRequest(),
+                    'response' => $this->getResponse(),
+                ]);
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
                 $this->messageManager->addErrorMessage(__('Something went wrong.'));

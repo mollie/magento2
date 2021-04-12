@@ -56,29 +56,4 @@ class TransactionDescription
             $description
         );
     }
-
-    public function forMultishippingTransaction($storeId = 0): string
-    {
-        $description = $this->config->getMultishippingDescription($storeId);
-
-        if (!trim($description)) {
-            $description = __('{storename} order');
-        }
-
-        $storeName = $this->scopeConfig->getValue(
-            Information::XML_PATH_STORE_INFO_NAME,
-            ScopeInterface::SCOPE_STORE,
-            $storeId
-        );
-
-        $replacements = [
-            '{storename}' => $storeName,
-        ];
-
-        return str_replace(
-            array_keys($replacements),
-            array_values($replacements),
-            $description
-        );
-    }
 }
