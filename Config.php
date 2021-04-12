@@ -7,6 +7,7 @@
 namespace Mollie\Payment;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Module\Manager;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Logger\MollieLogger;
@@ -30,8 +31,6 @@ class Config
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const GENERAL_LOCALE = 'payment/mollie_general/locale';
-    const GENERAL_MULTISHIPPING_ENABLED = 'payment/mollie_general/multishipping_enabled';
-    const GENERAL_MULTISHIPPING_DESCRIPTION = 'payment/mollie_general/multishipping_description';
     const GENERAL_ORDER_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
@@ -71,12 +70,19 @@ class Config
      */
     private $logger;
 
+    /**
+     * @var Manager
+     */
+    private $moduleManager;
+
     public function __construct(
         ScopeConfigInterface $config,
-        MollieLogger $logger
+        MollieLogger $logger,
+        Manager $moduleManager
     ) {
         $this->config = $config;
         $this->logger = $logger;
+        $this->moduleManager = $moduleManager;
     }
 
     /**
@@ -545,26 +551,6 @@ class Config
     }
 
     /**
-     * @param null|int|string $storeId
-     * @param string $scope
-     * @return bool
-     */
-    public function isMultishippingEnabled($storeId = null, $scope = ScopeInterface::SCOPE_STORE): bool
-    {
-        return $this->isSetFlag(static::GENERAL_MULTISHIPPING_ENABLED, $storeId, $scope);
-    }
-
-    /**
-     * @param null|int|string $storeId
-     * @param string $scope
-     * @return string|null
-     */
-    public function getMultishippingDescription($storeId = null, $scope = ScopeInterface::SCOPE_STORE)
-    {
-        return $this->getPath(static::GENERAL_MULTISHIPPING_DESCRIPTION, $storeId, $scope);
-    }
-
-    /**
      * @see \Mollie\Payment\Model\Adminhtml\Source\Locale for possible values
      * @param null|int|string $storeId
      * @return string
@@ -572,6 +558,11 @@ class Config
     public function getLocale($storeId = null)
     {
         return $this->getPath(static::GENERAL_LOCALE, $storeId);
+    }
+
+    public function isMultishippingEnabled(): bool
+    {
+        return $this->moduleManager->isEnabled('Mollie_Multishipping');
     }
 
     /**

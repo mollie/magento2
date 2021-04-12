@@ -23,16 +23,6 @@ class TransactionDescriptionTest extends IntegrationTestCase
         ];
     }
 
-    public function returnsTheCorrectDescriptionForMultishippingTransactionsProvider()
-    {
-        return [
-            ['', 'My Test Store order'],
-            ['{storename}', 'My Test Store'],
-            ['{storename} order', 'My Test Store order'],
-            ['Thank you for order at {storename}', 'Thank you for order at My Test Store'],
-        ];
-    }
-
     /**
      * @magentoConfigFixture current_store general/store_information/name My Test Store
      * @dataProvider returnsTheCorrectDescriptionForRegularTransactionsProvider
@@ -48,25 +38,6 @@ class TransactionDescriptionTest extends IntegrationTestCase
         ]);
 
         $result = $instance->forRegularTransaction('ideal', '0000025', 1);
-
-        $this->assertSame($expected, $result);
-    }
-
-    /**
-     * @magentoConfigFixture current_store general/store_information/name My Test Store
-     * @dataProvider returnsTheCorrectDescriptionForMultishippingTransactionsProvider
-     */
-    public function testReturnsTheCorrectDescriptionForMultishippingTransactions($description, $expected)
-    {
-        $configMock = $this->createMock(Config::class);
-        $configMock->method('getMultishippingDescription')->willReturn($description);
-
-        /** @var TransactionDescription $instance */
-        $instance = $this->objectManager->create(TransactionDescription::class, [
-            'config' => $configMock,
-        ]);
-
-        $result = $instance->forMultishippingTransaction(1);
 
         $this->assertSame($expected, $result);
     }

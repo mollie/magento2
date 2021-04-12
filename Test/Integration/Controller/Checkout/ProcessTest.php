@@ -79,18 +79,6 @@ class ProcessTest extends AbstractController
         $this->dispatch('mollie/checkout/process?' . implode('&', $queryString));
     }
 
-    public function testRedirectsToSuccessPage()
-    {
-        $mollieModel = $this->createMock(Mollie::class);
-        $mollieModel->method('processTransaction')->willReturn(['success' => true]);
-
-        $this->_objectManager->addSharedInstance($mollieModel, Mollie::class);
-
-        $this->dispatch('mollie/checkout/process?order_ids[]=123&order_ids[]=456');
-
-        $this->assertRedirect($this->stringContains('multishipping/checkout/success?utm_nooverride=1'));
-    }
-
     /**
      * @param $orderId
      * @return OrderInterface

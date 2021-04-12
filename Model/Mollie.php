@@ -217,7 +217,7 @@ class Mollie extends AbstractMethod
             return false;
         }
 
-        if ($quote->getIsMultiShipping() && !$this->config->isMultishippingEnabled($quote->getStoreId())) {
+        if ($quote->getIsMultiShipping() && !$this->config->isMultishippingEnabled()) {
             return false;
         }
 
