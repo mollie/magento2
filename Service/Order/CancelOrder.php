@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Service\Order;
 
+use Magento\Framework\App\ResourceConnection;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -54,6 +55,11 @@ class CancelOrder
      */
     private $couponUsage;
 
+    /**
+     * @var ResourceConnection
+     */
+    private $resource;
+
     public function __construct(
         Config $config,
         LockService $lockService,
@@ -61,7 +67,8 @@ class CancelOrder
         OrderManagementInterface $orderManagement,
         OrderRepositoryInterface $orderRepository,
         Coupon $coupon,
-        Usage $couponUsage
+        Usage $couponUsage,
+        ResourceConnection $resource
     ) {
         $this->config = $config;
         $this->lockService = $lockService;
@@ -70,6 +77,7 @@ class CancelOrder
         $this->orderRepository = $orderRepository;
         $this->coupon = $coupon;
         $this->couponUsage = $couponUsage;
+        $this->resource = $resource;
     }
 
     public function execute(OrderInterface $order, $reason = null): bool
@@ -87,6 +95,11 @@ class CancelOrder
         // Lock for 5 minutes.
         $this->config->addToLog('info', sprintf('Getting lock for key "%s"', $key));
         $this->lockService->lock($key, 5 * 60);
+
+        if ($this->isAlreadyCancelled($order)) {
+            return false;
+        }
+
         try {
             $comment = __('The order was canceled');
             if ($reason !== null) {
@@ -125,5 +138,24 @@ class CancelOrder
         if ($customerId) {
             $this->couponUsage->updateCustomerCouponTimesUsed($customerId, $this->coupon->getId(), false);
         }
+    }
+
+    /**
+     * It is possible that the order is cancelled in process A, and we are checking here in process B. So always check
+     * the latest status in the database so we are sure we have the most recent status available.
+     *
+     * @param OrderInterface $order
+     * @return bool
+     */
+    protected function isAlreadyCancelled(OrderInterface $order): bool
+    {
+        $connection = $this->resource->getConnection();
+        $table = $this->resource->getTableName('sales_order');
+
+        $state = $connection->fetchOne('select `state` from ' . $table . ' where `entity_id` = :entity_id limit 1', [
+            'entity_id' => $order->getEntityId(),
+        ]);
+
+        return $state == Order::STATE_CANCELED;
     }
 }
