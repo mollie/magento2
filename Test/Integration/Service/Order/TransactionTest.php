@@ -144,37 +144,6 @@ class TransactionTest extends IntegrationTestCase
         $this->assertEquals(9999, $encryptor->decrypt($hash));
     }
 
-    public function testGeneratesTheCorrectRedirectUrlWhenMultishipping()
-    {
-        $orders = [
-            $this->objectManager->create(OrderInterface::class)->setId(777),
-            $this->objectManager->create(OrderInterface::class)->setId(888),
-            $this->objectManager->create(OrderInterface::class)->setId(999),
-        ];
-
-        /** @var Transaction $instance */
-        $instance = $this->objectManager->create(Transaction::class);
-        $result = $instance->getMultishippingRedirectUrl($orders, 'PAYMENT_TOKEN_TEST');
-
-        $this->assertStringContainsString('order_ids[0]=777', urldecode($result));
-        $this->assertStringContainsString('order_ids[1]=888', urldecode($result));
-        $this->assertStringContainsString('order_ids[2]=999', urldecode($result));
-        $this->assertStringContainsString('payment_token=PAYMENT_TOKEN_TEST', urldecode($result));
-        $this->assertStringContainsString('utm_nooverride=1', urldecode($result));
-    }
-
-    public function testThrowsAnExceptionWhenTheOrderListIsEmpty()
-    {
-        $orders = [];
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('The provided order array is empty');
-
-        /** @var Transaction $instance */
-        $instance = $this->objectManager->create(Transaction::class);
-        $instance->getMultishippingRedirectUrl($orders, 'PAYMENT_TOKEN_TEST');
-    }
-
     /**
      * @magentoConfigFixture current_store payment/mollie_general/type live
      * @magentoConfigFixture current_store payment/mollie_general/use_webhooks enabled

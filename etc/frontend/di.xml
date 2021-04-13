@@ -11,31 +11,4 @@
     <type name="Magento\Framework\App\Request\CsrfValidator">
         <plugin name="mollie_csrf_validation_disable" type="Mollie\Payment\Plugin\Framework\App\Request\CsrfValidatorSkip" />
     </type>
-
-    <type name="Magento\Multishipping\Model\Checkout\Type\Multishipping\PlaceOrderPool">
-        <arguments>
-            <argument name="services" xsi:type="array">
-                <item name="mollie_methods_applepay" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_bancontact" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_banktransfer" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_belfius" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_creditcard" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_directdebit" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_eps" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_giftcard" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_giropay" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_ideal" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_kbc" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_klarnapaylater" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_klarnasliceit" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_mybank" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_paypal" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_paymentlink" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_paysafecard" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_przelewy24" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_sofort" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-                <item name="mollie_methods_voucher" xsi:type="string">Mollie\Payment\Multishipping\PlaceOrder</item>
-            </argument>
-        </arguments>
-    </type>
 </config>
