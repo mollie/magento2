@@ -290,7 +290,7 @@ class Orders extends AbstractModel
         $orderData = $this->buildTransaction->execute($order, static::CHECKOUT_TYPE, $orderData);
 
         $this->mollieHelper->addTolog('request', $orderData);
-        $mollieOrder = $mollieApi->orders->create($orderData);
+        $mollieOrder = $mollieApi->orders->create($orderData, ['embed' => 'payments']);
         $this->processResponse($order, $mollieOrder);
 
         return $mollieOrder->getCheckoutUrl();
