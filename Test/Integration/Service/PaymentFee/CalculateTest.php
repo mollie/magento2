@@ -72,8 +72,8 @@ class CalculateTest extends IntegrationTestCase
 
         $result = $instance->forCart($cart, $total);
 
-        $this->assertEquals(8.2645, $result->getAmount());
-        $this->assertEquals(1.7355, $result->getTaxAmount());
+        $this->assertEquals(8.26, $result->getAmount());
+        $this->assertEquals(1.74, $result->getTaxAmount());
         $this->assertEquals(10, $result->getAmountIncludingTax());
     }
 
@@ -114,8 +114,8 @@ class CalculateTest extends IntegrationTestCase
 
         $result = $instance->forCart($cart, $total);
 
-        $this->assertEquals(8.2644628099, $result->getAmount());
-        $this->assertEquals(1.7355371901, $result->getTaxAmount());
+        $this->assertEquals(8.27, $result->getAmount());
+        $this->assertEquals(1.74, $result->getTaxAmount());
         $this->assertEquals(10, $result->getAmountIncludingTax());
     }
 }
