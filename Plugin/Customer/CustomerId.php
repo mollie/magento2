@@ -8,6 +8,7 @@ namespace Mollie\Payment\Plugin\Customer;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Framework\Api\SearchResults;
 use Mollie\Payment\Api\Data\MollieCustomerInterface;
 use Mollie\Payment\Api\Data\MollieCustomerInterfaceFactory;
 use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
@@ -72,6 +73,16 @@ class CustomerId
         return $customer;
     }
 
+    public function afterGetList(CustomerRepositoryInterface $subject, SearchResults $result)
+    {
+        /** @var CustomerInterface $customer */
+        foreach ($result->getItems() as $customer) {
+            $this->retrieveForCustomer($customer);
+        }
+
+        return $result;
+    }
+
     /**
      * @param CustomerInterface $customer
      * @return MollieCustomerInterface
@@ -93,7 +104,7 @@ class CustomerId
     {
         $extensionAttributes = $customer->getExtensionAttributes();
         if (!$extensionAttributes) {
-            return $customer;
+            return;
         }
 
         $model = $this->repository->getByCustomer($customer);
