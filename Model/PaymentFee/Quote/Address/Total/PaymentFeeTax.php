@@ -67,10 +67,10 @@ class PaymentFeeTax extends AbstractTotal
         }
 
         $result = $this->calculate->forCart($quote, $total);
-        $amount = $this->priceCurrency->convert($result->getTaxAmount());
+        $amount = $this->priceCurrency->convert($result->getRoundedTaxAmount());
 
         $total->addTotalAmount('tax', $amount);
-        $total->addBaseTotalAmount('tax', $result->getTaxAmount());
+        $total->addBaseTotalAmount('tax', $result->getRoundedTaxAmount());
 
         $this->addAssociatedTaxable($shippingAssignment, $result, $quote);
 
@@ -83,7 +83,7 @@ class PaymentFeeTax extends AbstractTotal
         }
 
         $extensionAttributes->setMolliePaymentFeeTax($amount);
-        $extensionAttributes->setBaseMolliePaymentFeeTax($result->getTaxAmount());
+        $extensionAttributes->setBaseMolliePaymentFeeTax($result->getRoundedTaxAmount());
 
         return $this;
     }
@@ -95,7 +95,7 @@ class PaymentFeeTax extends AbstractTotal
      */
     private function addAssociatedTaxable(ShippingAssignmentInterface $shippingAssignment, Result $result, Quote $quote)
     {
-        $fullAmount = $this->priceCurrency->convert($result->getAmount());
+        $fullAmount = $this->priceCurrency->convert($result->getRoundedAmount());
 
         $address = $shippingAssignment->getShipping()->getAddress();
         $associatedTaxables = $address->getAssociatedTaxables();
@@ -107,7 +107,7 @@ class PaymentFeeTax extends AbstractTotal
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TYPE => 'mollie_payment_fee_tax',
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_CODE => 'mollie_payment_fee_tax',
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_UNIT_PRICE => $fullAmount,
-            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_BASE_UNIT_PRICE => $result->getAmount(),
+            CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_BASE_UNIT_PRICE => $result->getRoundedAmount(),
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_QUANTITY => 1,
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TAX_CLASS_ID => $taxClass,
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_PRICE_INCLUDES_TAX => false,

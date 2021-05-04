@@ -23,6 +23,14 @@ class Result
      */
     public function getAmount()
     {
+        return $this->amount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRoundedAmount()
+    {
         return round($this->amount, 2);
     }
 
@@ -38,6 +46,14 @@ class Result
      * @return float
      */
     public function getTaxAmount()
+    {
+        return $this->taxAmount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getRoundedTaxAmount()
     {
         return round($this->taxAmount, 2);
     }
@@ -55,6 +71,6 @@ class Result
      */
     public function getAmountIncludingTax()
     {
-        return round($this->amount + $this->taxAmount, 2);
+        return $this->amount + $this->taxAmount;
     }
 }
