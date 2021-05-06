@@ -264,7 +264,8 @@
                     <label>Custom return url</label>
                     <config_path>payment/mollie_general/custom_redirect_url</config_path>
                     <comment><![CDATA[
-                        <strong>Note:</strong> You can use the following placeholders:<br>
+                        <strong>Note (1):</strong> The url must include the protocol (http/https).<br>
+                        <strong>Note (2):</strong> You can use the following placeholders:<br>
                         <br>
                         <strong>{{order_id}}</strong>: The entity ID of the order.<br>
                         <strong>{{increment_id}}</strong>: The increment ID of the order.<br>
@@ -274,7 +275,6 @@
                         <strong>{{unsecure_base_url}}</strong>: The store base url.<br>
                         <strong>{{secure_base_url}}</strong>: The secure store base url.
                     ]]></comment>
-                    <validate>validate-url</validate>
                     <depends>
                         <field id="use_custom_redirect_url">1</field>
                     </depends>
