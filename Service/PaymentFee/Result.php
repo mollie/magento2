@@ -6,7 +6,6 @@
 
 namespace Mollie\Payment\Service\PaymentFee;
 
-
 class Result
 {
     /**
@@ -28,6 +27,14 @@ class Result
     }
 
     /**
+     * @return float
+     */
+    public function getRoundedAmount()
+    {
+        return round($this->amount, 2);
+    }
+
+    /**
      * @param float $amount
      */
     public function setAmount($amount)
@@ -44,6 +51,14 @@ class Result
     }
 
     /**
+     * @return float
+     */
+    public function getRoundedTaxAmount()
+    {
+        return round($this->taxAmount, 2);
+    }
+
+    /**
      * @param float $taxAmount
      */
     public function setTaxAmount(float $taxAmount)
@@ -56,6 +71,6 @@ class Result
      */
     public function getAmountIncludingTax()
     {
-        return $this->getAmount() + $this->getTaxAmount();
+        return $this->amount + $this->taxAmount;
     }
 }

@@ -57,10 +57,10 @@ class PaymentFee extends AbstractTotal
         }
 
         $result = $this->calculate->forCart($quote, $total);
-        $amount = $this->priceCurrency->convert($result->getAmount());
+        $amount = $this->priceCurrency->convert($result->getRoundedAmount());
 
         $total->setTotalAmount('mollie_payment_fee', $amount);
-        $total->setBaseTotalAmount('mollie_payment_fee', $result->getAmount());
+        $total->setBaseTotalAmount('mollie_payment_fee', $result->getRoundedAmount());
 
         $attributes = $quote->getExtensionAttributes();
 
@@ -69,7 +69,7 @@ class PaymentFee extends AbstractTotal
         }
 
         $attributes->setMolliePaymentFee($amount);
-        $attributes->setBaseMolliePaymentFee($result->getAmount());
+        $attributes->setBaseMolliePaymentFee($result->getRoundedAmount());
 
         return $this;
     }

@@ -109,10 +109,10 @@ class Config
 
     /**
      * @param string $type
-     * @param string $data
+     * @param string|array $data
      * @return void
      */
-    public function addToLog(string $type, string $data)
+    public function addToLog(string $type, $data)
     {
         if (!$this->isDebugMode()) {
             return;
