@@ -1,8 +1,9 @@
 type Mutation {
-    createMollieTransaction(input: MollieTransactionInput): MollieTransactionOutput @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\CreateMollieTransaction")
+    createMollieTransaction(input: MollieTransactionInput): MollieTransactionOutput @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\CreateMollieTransaction") @deprecated(reason: "Using the Order.mollie_redirect_url attribuut")
 }
 
 type Order {
+    mollie_redirect_url: String @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\PlaceOrderAndReturnRedirectUrl")
     mollie_payment_token: String @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\PaymentToken")
 }
 
@@ -21,6 +22,11 @@ type AvailablePaymentMethod {
 
 type SelectedPaymentMethod {
     mollie_meta: MolliePaymentMethodMeta! @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\PaymentMethodMeta") @doc(description: "Retrieve meta information for this payment method (image)")
+}
+
+input PaymentMethodInput {
+    mollie_selected_issuer: String @doc(description: "Provided the issuer chosen by the end-user")
+    mollie_card_token: String @doc(description: "The card token provided by Mollie Components")
 }
 
 type MollieIssuer {
