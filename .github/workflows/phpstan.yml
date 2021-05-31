@@ -7,9 +7,9 @@ jobs:
         strategy:
             matrix:
               include:
-                - PHP_VERSION: php71-fpm
-                  MAGENTO_VERSION: 2.3.1
                 - PHP_VERSION: php72-fpm
+                  MAGENTO_VERSION: 2.3.3
+                - PHP_VERSION: php73-fpm
                   MAGENTO_VERSION: 2.3.6-p1
                 - PHP_VERSION: php74-fpm
                   MAGENTO_VERSION: 2.4.2
@@ -24,7 +24,7 @@ jobs:
               run: docker cp $(pwd) magento-project-community-edition:/data/extensions/
 
             - name: Install the extensions in Magento
-              run: docker exec magento-project-community-edition composer require mollie/magento2:@dev fooman/phpstan-magento2-magic-methods:0.7.1
+              run: docker exec magento-project-community-edition composer require mollie/magento2:@dev fooman/phpstan-magento2-magic-methods:^0.7
 
             - name: Run PHPStan
               run: docker exec magento-project-community-edition /bin/bash -c "./vendor/bin/phpstan analyse -c /data/extensions/*/phpstan.neon /data/extensions"
