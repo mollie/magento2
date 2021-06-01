@@ -7,10 +7,8 @@ jobs:
     strategy:
       matrix:
         include:
-          - PHP_VERSION: php7-fpm
-            MAGENTO_VERSION: 2.2.11
           - PHP_VERSION: php71-fpm
-            MAGENTO_VERSION: 2.2.11
+            MAGENTO_VERSION: 2.3.3
           - PHP_VERSION: php73-fpm
             MAGENTO_VERSION: 2.3.6-p1
           - PHP_VERSION: php73-fpm
@@ -25,7 +23,7 @@ jobs:
         run: PHP_VERSION=${{ matrix.PHP_VERSION }} MAGENTO_VERSION=magento${{ matrix.MAGENTO_VERSION }} docker-compose -f .github/workflows/templates/docker-compose.yml up -d
 
       - name: Upload the code into the docker container
-        run: docker cp $(pwd)/. magento-project-community-edition:/data/extensions && docker exec magento-project-community-edition composer require mollie/magento2:@dev && docker exec magento-project-community-edition bash -c "rm -rf /data/vendor/mollie/magento2 && ln -s /data/extensions /data/vendor/mollie/magento2"
+        run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition composer require mollie/magento2 @dev
 
       - name: Enable developer mode
         run: docker exec magento-project-community-edition php bin/magento deploy:mode:set developer

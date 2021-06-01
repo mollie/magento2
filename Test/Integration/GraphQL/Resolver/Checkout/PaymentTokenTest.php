@@ -81,6 +81,7 @@ class PaymentTokenTest extends IntegrationTestCase
                 'rootValue' => '',
                 'operation' => null,
                 'variableValues' => [],
+                'values' => [],
             ]),
             $value,
             $args

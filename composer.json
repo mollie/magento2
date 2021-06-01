@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "1.25.2",
+  "version": "1.26.0",
   "keywords": [
     "mollie",
     "payment",
@@ -45,8 +45,8 @@
   ],
   "require": {
     "mollie/mollie-api-php": "^2.1",
-    "magento/framework": ">=101.0.0",
-    "php": ">=7.0",
+    "magento/framework": ">=102.0.3",
+    "php": ">=7.1",
     "ext-json": "*"
   },
   "type": "magento2-module",
@@ -56,10 +56,7 @@
   ],
   "autoload": {
     "files": [
-      "registration.php",
-      "LegacySupport/GraphQl/Field.php",
-      "LegacySupport/GraphQl/ResolveInfo.php",
-      "LegacySupport/GraphQl/ResolverInterface.php"
+      "registration.php"
     ],
     "psr-4": {
       "Mollie\\Payment\\": ""

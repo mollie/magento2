@@ -159,6 +159,21 @@ class MollieCustomerRepository implements MollieCustomerRepositoryInterface
     /**
      * {@inheritDoc}
      */
+    public function getByMollieCustomerId(string $customerId)
+    {
+        $mollieCustomer = $this->mollieCustomerFactory->create();
+        $this->resource->load($mollieCustomer, $customerId, 'mollie_customer_id');
+
+        if (!$mollieCustomer->getId()) {
+            return null;
+        }
+
+        return $mollieCustomer->getDataModel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function getByCustomer(CustomerInterface $customer)
     {
         $mollieCustomer = $this->mollieCustomerFactory->create();
