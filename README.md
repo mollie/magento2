@@ -1,7 +1,7 @@
 <p align="center">
   <img src="https://info.mollie.com/hubfs/github/magento-2/logo.png" width="128" height="128"/>
 </p>
-<h1 align="center">Mollie for Magento 2.2.x and higher</h1>
+<h1 align="center">Mollie for Magento 2.3.3 and higher</h1>
 
 > **Magento 1.x** users check out our [Mollie Magento 1 plugin](https://github.com/mollie/Magento).
 
@@ -60,7 +60,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Apple Pay
 
 ## Configuration, FAQ and Troubleshooting  ##
-If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension in Magento 2.2.x and higher, please see our [WIKI Page](https://github.com/mollie/magento2/wiki) or send an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
+If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension in Magento 2.3.3 and higher, please see our [WIKI Page](https://github.com/mollie/magento2/wiki) or send an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
 
 
 ## License ##
