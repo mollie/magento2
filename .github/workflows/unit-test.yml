@@ -23,4 +23,4 @@ jobs:
         run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition composer require mollie/magento2 @dev
 
       - name: Run tests
-        run: docker exec magento-project-community-edition bash -c "vendor/bin/phpunit extensions/mollie-magento2/Test/Unit"
+        run: docker exec magento-project-community-edition bash -c "vendor/bin/phpunit extensions/*/Test/Unit"
