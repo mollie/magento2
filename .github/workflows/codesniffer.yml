@@ -13,3 +13,4 @@ jobs:
           --volume $(pwd)/:/app/data
           michielgerritsen/magento-coding-standard:latest
           --severity=10
+          --ignore-annotations

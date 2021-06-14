@@ -1,4 +1,5 @@
 <?php
+// phpcs:disable PSR1.Classes.ClassDeclaration.MultipleClasses
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
