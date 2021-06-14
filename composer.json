@@ -56,7 +56,8 @@
   ],
   "autoload": {
     "files": [
-      "registration.php"
+      "registration.php",
+      "GraphQL/Replaces/AdditionalDataProviderInterface.php"
     ],
     "psr-4": {
       "Mollie\\Payment\\": ""
