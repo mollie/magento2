@@ -1,5 +1,4 @@
 name: phpstan
-
 on: [push, pull_request]
 
 jobs:
@@ -20,11 +19,14 @@ jobs:
             - name: Start Docker
               run: docker run --detach --name magento-project-community-edition michielgerritsen/magento-project-community-edition:${{ matrix.PHP_VERSION }}-magento${{ matrix.MAGENTO_VERSION }}
 
+            - name: Create branch for Composer and remove version from composer.json
+              run: git checkout -b continuous-integration-test-branch && sed -i '/version/d' ./composer.json
+
             - name: Upload our code into the docker container
               run: docker cp $(pwd) magento-project-community-edition:/data/extensions/
 
             - name: Install the extensions in Magento
-              run: docker exec magento-project-community-edition composer require mollie/magento2:@dev fooman/phpstan-magento2-magic-methods:^0.7
+              run: docker exec magento-project-community-edition composer require mollie/magento2:dev-continuous-integration-test-branch fooman/phpstan-magento2-magic-methods:^0.7
 
             - name: Run PHPStan
               run: docker exec magento-project-community-edition /bin/bash -c "./vendor/bin/phpstan analyse -c /data/extensions/*/phpstan.neon /data/extensions"
