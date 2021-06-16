@@ -1,6 +1,5 @@
 name: Integration Tests
-
-on: push
+on: [push, pull_request]
 
 jobs:
   build:
@@ -17,13 +16,16 @@ jobs:
             MAGENTO_VERSION: 2.4.2
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
       - name: Start Docker
         run: PHP_VERSION=${{ matrix.PHP_VERSION }} MAGENTO_VERSION=magento${{ matrix.MAGENTO_VERSION }} docker-compose -f .github/workflows/templates/docker-compose.yml up -d
 
+      - name: Create branch for Composer and remove version from composer.json
+        run: git checkout -b continuous-integration-test-branch && sed -i '/version/d' ./composer.json
+
       - name: Upload the code into the docker container
-        run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition composer require mollie/magento2 @dev
+        run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition composer require mollie/magento2:dev-continuous-integration-test-branch
 
       - name: Enable developer mode
         run: docker exec magento-project-community-edition php bin/magento deploy:mode:set developer

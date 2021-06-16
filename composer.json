@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "1.26.0",
+  "version": "1.26.1",
   "keywords": [
     "mollie",
     "payment",
@@ -56,7 +56,8 @@
   ],
   "autoload": {
     "files": [
-      "registration.php"
+      "registration.php",
+      "GraphQL/Replaces/AdditionalDataProviderInterface.php"
     ],
     "psr-4": {
       "Mollie\\Payment\\": ""

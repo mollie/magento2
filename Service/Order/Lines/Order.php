@@ -110,6 +110,10 @@ class Order
             $orderLines[] = $this->paymentFee->getOrderLine($order, $this->forceBaseCurrency);
         }
 
+        if ($adjustment = $this->getAdjustment($order, $orderLines)) {
+            $orderLines[] = $adjustment;
+        }
+
         $this->saveOrderLines($orderLines, $order);
         foreach ($orderLines as &$orderLine) {
             unset($orderLine['item_id']);
@@ -324,5 +328,38 @@ class Order
         }
 
         return $url;
+    }
+
+    private function getAdjustment(OrderInterface $order, array $orderLines)
+    {
+        $orderLinesTotal = 0;
+        foreach ($orderLines as $orderLine) {
+            $orderLinesTotal += $orderLine['totalAmount']['value'];
+        }
+
+        $grandTotal = $order->getGrandTotal();
+        if ($this->forceBaseCurrency) {
+            $grandTotal = $order->getBaseGrandTotal();
+        }
+
+        $max = $orderLinesTotal + 0.05;
+        $min = $orderLinesTotal - 0.05;
+        if (($min <= $grandTotal) && ($grandTotal <= $max)) {
+            $difference = $grandTotal - $orderLinesTotal;
+
+            return [
+                'item_id' => '',
+                'type' => 'discount',
+                'name' => 'Adjustment',
+                'quantity' => 1,
+                'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $difference),
+                'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $difference),
+                'vatRate' => sprintf("%.2f", 0),
+                'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, 0),
+                'sku' => 'adjustment',
+            ];
+        }
+
+        return false;
     }
 }

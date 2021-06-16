@@ -125,4 +125,71 @@ class OrderTest extends IntegrationTestCase
         $line = array_shift($result);
         $this->assertEquals(substr($sku, 0, 64), $line['sku']);
     }
+
+    /**
+     * @dataProvider adjustmentsDataProvider
+     * @magentoDataFixture Magento/Sales/_files/order_with_bundle.php
+     */
+    public function testAddsAdjustmentsWhenTheTotalIsOff($adjustment)
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->setBaseGrandTotal($order->getBaseGrandTotal() + $adjustment);
+
+        foreach ($order->getItems() as $item) {
+            $item->setBaseRowTotal(50);
+        }
+
+        /** @var Subject $instance */
+        $instance = $this->objectManager->get(Subject::class);
+
+        $result = $instance->get($order);
+        $lastLine = end($result);
+
+        $this->assertEquals('discount', $lastLine['type']);
+        $this->assertEquals($adjustment, $lastLine['totalAmount']['value']);
+
+        $total = 0;
+        foreach ($result as $orderLine) {
+            $total += $orderLine['totalAmount']['value'];
+        }
+
+        $this->assertEquals($order->getBaseGrandTotal(), $total);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order_with_bundle.php
+     */
+    public function testDoesNotAddTheAdjustmentsWhenTheTotalIsMoreThanFiveCents()
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->setBaseGrandTotal($order->getBaseGrandTotal() + 0.06);
+
+        foreach ($order->getItems() as $item) {
+            $item->setBaseRowTotal(50);
+        }
+
+        /** @var Subject $instance */
+        $instance = $this->objectManager->get(Subject::class);
+
+        $result = $instance->get($order);
+        $lastLine = end($result);
+
+        $this->assertNotEquals('discount', $lastLine['type']);
+    }
+
+    public function adjustmentsDataProvider(): array
+    {
+        return [
+            [-0.05],
+            [-0.04],
+            [-0.03],
+            [-0.02],
+            [-0.01],
+            [0.01],
+            [0.02],
+            [0.03],
+            [0.04],
+            [0.05],
+        ];
+    }
 }
