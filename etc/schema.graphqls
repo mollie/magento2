@@ -50,6 +50,7 @@ type Query {
     mollieCustomerOrder (
         hash: String @doc(description: "The hash added to your custom URL")
     ): CustomerOrder @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\MollieCustomerOrder")
+    molliePaymentMethods(input: MolliePaymentMethodsInput): MolliePaymentMethodsOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\General\\MolliePaymentMethods")
 }
 
 input MollieResetCartInput {
@@ -58,4 +59,19 @@ input MollieResetCartInput {
 
 type MollieResetCartOutput {
     cart: Cart!
+}
+
+input MolliePaymentMethodsInput {
+    amount: Float! = 10
+    currency: String! = EUR
+}
+
+type MolliePaymentMethodsOutput {
+    methods: [MolliePaymentMethod]
+}
+
+type MolliePaymentMethod {
+    code: String
+    name: String
+    image: String
 }
