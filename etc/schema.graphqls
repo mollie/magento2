@@ -1,5 +1,6 @@
 type Mutation {
     createMollieTransaction(input: MollieTransactionInput): MollieTransactionOutput @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\CreateMollieTransaction") @deprecated(reason: "Using the Order.mollie_redirect_url attribuut")
+    mollieRestoreCart(input: MollieResetCartInput): MollieResetCartOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\ResetCart")
 }
 
 type Order {
@@ -49,4 +50,28 @@ type Query {
     mollieCustomerOrder (
         hash: String @doc(description: "The hash added to your custom URL")
     ): CustomerOrder @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\MollieCustomerOrder")
+    molliePaymentMethods(input: MolliePaymentMethodsInput): MolliePaymentMethodsOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\General\\MolliePaymentMethods")
+}
+
+input MollieResetCartInput {
+    cart_id: String! @doc(description:"The unique ID that identifies the customer's cart")
+}
+
+type MollieResetCartOutput {
+    cart: Cart!
+}
+
+input MolliePaymentMethodsInput {
+    amount: Float! = 10
+    currency: String! = EUR
+}
+
+type MolliePaymentMethodsOutput {
+    methods: [MolliePaymentMethod]
+}
+
+type MolliePaymentMethod {
+    code: String
+    name: String
+    image: String
 }

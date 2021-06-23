@@ -26,6 +26,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order as MollieOrder;
+use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -370,9 +371,14 @@ class Orders extends AbstractModel
         $orderId = $order->getId();
         $storeId = $order->getStoreId();
         $transactionId = $order->getMollieTransactionId();
-        $mollieOrder = $mollieApi->orders->get($transactionId, ["embed" => "payments"]);
+        $mollieOrder = $mollieApi->orders->get($transactionId, ['embed' => 'payments']);
         $this->mollieHelper->addTolog($type, $mollieOrder);
         $status = $mollieOrder->status;
+
+        // This order is refunded, do not process any further.
+        if ($mollieOrder->payments() && $mollieOrder->payments()->offsetGet(0) && isset($mollieOrder->payments()->offsetGet(0)->metadata->refunded)) {
+            return ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
+        }
 
         if ($mollieOrder->isCompleted()) {
             return ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
@@ -933,7 +939,15 @@ class Orders extends AbstractModel
              * Sometimes we don't get the correct state when working with bundles, so manually check it.
              */
             $this->orderState->check($order);
-            $mollieOrder = $mollieApi->orders->get($transactionId);
+            $mollieOrder = $mollieApi->orders->get($transactionId, ['embed' => 'payments']);
+
+            /** @var Payment $payment */
+            $payment = $mollieOrder->payments()->offsetGet(0);
+            $metadata = $payment->metadata ?? new \stdClass();
+            $metadata->refunded = true;
+            $payment->metadata = $metadata;
+            $payment->update();
+
             if ($order->getState() == Order::STATE_CLOSED) {
                 $mollieOrder->refundAll();
             } else {

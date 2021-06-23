@@ -12,14 +12,6 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentMethodMetaTest extends IntegrationTestCase
 {
-    protected function setUpWithoutVoid()
-    {
-        $version = $this->objectManager->get(ProductMetadataInterface::class)->getVersion();
-        if (version_compare($version, '2.3', '<=')) {
-            $this->markTestSkipped('This test only works on Magento 2.3 and higher.');
-        }
-    }
-
     public function testReturnsAnEmptyResponseForNonMollieMethods()
     {
         $instance = $this->objectManager->create(PaymentMethodMeta::class);

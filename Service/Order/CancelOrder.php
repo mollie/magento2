@@ -96,11 +96,11 @@ class CancelOrder
         $this->config->addToLog('info', sprintf('Getting lock for key "%s"', $key));
         $this->lockService->lock($key, 5 * 60);
 
-        if ($this->isAlreadyCancelled($order)) {
-            return false;
-        }
-
         try {
+            if ($this->isAlreadyCancelled($order)) {
+                return false;
+            }
+
             $comment = __('The order was canceled');
             if ($reason !== null) {
                 $comment = __('The order was canceled, reason: payment %1', $reason);
