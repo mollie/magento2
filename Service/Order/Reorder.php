@@ -142,8 +142,8 @@ class Reorder
 
         $order = $this->orderCreate->createOrder();
 
-        $order->setState(Order::STATE_PROCESSING);
-        $order->setStatus(Order::STATE_PROCESSING);
+        $order->setState(Order::STATE_PENDING_PAYMENT);
+        $order->setStatus(Order::STATE_PENDING_PAYMENT);
 
         $this->transaction->addObject($order);
         $this->transaction->addObject($originalOrder);
