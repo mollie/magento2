@@ -223,12 +223,12 @@ class MollieConfigProvider implements ConfigProviderInterface
     }
 
     /**
-     * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param MollieApiClient $mollieApi
      * @param CartInterface|null $cart
      *
      * @return array
      */
-    public function getActiveMethods($mollieApi, CartInterface $cart = null)
+    public function getActiveMethods(MollieApiClient $mollieApi, CartInterface $cart = null): array
     {
         if (!$cart) {
             $cart = $this->checkoutSession->getQuote();
@@ -246,8 +246,9 @@ class MollieConfigProvider implements ConfigProviderInterface
                 'resource' => 'orders',
                 'includeWallets' => 'applepay',
             ];
-            $apiMethods = $mollieApi->methods->allActive($this->methodParameters->enhance($parameters, $cart));
 
+            $this->methodData = [];
+            $apiMethods = $mollieApi->methods->allActive($this->methodParameters->enhance($parameters, $cart));
             foreach ($apiMethods as $method) {
                 $methodId = 'mollie_methods_' . $method->id;
                 $this->methodData[$methodId] = [
