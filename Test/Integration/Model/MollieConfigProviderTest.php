@@ -3,6 +3,8 @@
 namespace Mollie\Payment\Test\Integration\Model;
 
 use Magento\Framework\Locale\Resolver;
+use Mollie\Api\Endpoints\MethodEndpoint;
+use Mollie\Api\Resources\MethodCollection;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\MollieConfigProvider;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -107,5 +109,21 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertArrayHasKey('locale', $result['payment']['mollie']);
 
         $this->assertSame('nl_NL', $result['payment']['mollie']['locale']);
+    }
+
+    public function testWhenNoActiveMethodsAvailableTheResultIsAnEmptyArray()
+    {
+        $methodMock = $this->createMock(MethodEndpoint::class);
+        $methodMock->method('allActive')->willReturn(new MethodCollection(0, new \stdClass));
+
+        $api = new \Mollie\Api\MollieApiClient;
+        $api->methods = $methodMock;
+
+        /** @var MollieConfigProvider $instance */
+        $instance = $this->objectManager->create(MollieConfigProvider::class);
+        $result = $instance->getActiveMethods($api);
+
+        $this->assertTrue(is_array($result), 'We expect an array');
+        $this->assertCount(0, $result);
     }
 }

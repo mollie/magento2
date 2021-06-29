@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\GraphQL\Resolver\Cart;
 
+use Magento\Framework\App\ObjectManager;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
@@ -16,20 +17,13 @@ use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
 class ResetCart implements ResolverInterface
 {
     /**
-     * @var GetCartForUser
-     */
-    private $getCartForUser;
-
-    /**
      * @var CartRepositoryInterface
      */
     private $cartRepository;
 
     public function __construct(
-        GetCartForUser $cartForUser,
         CartRepositoryInterface $cartRepository
     ) {
-        $this->getCartForUser = $cartForUser;
         $this->cartRepository = $cartRepository;
     }
 
@@ -42,7 +36,13 @@ class ResetCart implements ResolverInterface
         $maskedCartId = $args['input']['cart_id'];
 
         $storeId = (int)$context->getExtensionAttributes()->getStore()->getId();
-        $cart = $this->getCartForUser->execute($maskedCartId, $context->getUserId(), $storeId);
+
+        /**
+         * Use the ObjectManager to prevent setup:di:compile errors when people replace the GraphQL modules.
+         */
+        /** @var GetCartForUser $getCartForUser */
+        $getCartForUser = ObjectManager::getInstance()->get(GetCartForUser::class);
+        $cart = $getCartForUser->execute($maskedCartId, $context->getUserId(), $storeId);
 
         $cart->setIsActive(1);
         $this->cartRepository->save($cart);
