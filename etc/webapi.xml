@@ -36,4 +36,11 @@
             <resource ref="anonymous" />
         </resources>
     </route>
+
+    <route url="/V1/mollie/orders/recurring" method="GET">
+        <service class="Mollie\Payment\Api\MagentoOrderRepositoryInterface" method="getRecurringOrders"/>
+        <resources>
+            <resource ref="Magento_Sales::actions_view" />
+        </resources>
+    </route>
 </routes>

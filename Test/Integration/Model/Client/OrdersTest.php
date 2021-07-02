@@ -221,6 +221,7 @@ class OrdersTest extends IntegrationTestCase
 
         $mollieOrder->_embedded = new stdClass;
         $mollieOrder->_embedded->payments = [new stdClass];
+        $mollieOrder->_embedded->payments[0]->id = 'tr_abc1234';
         $mollieOrder->_embedded->payments[0]->status = 'success';
 
         return $mollieOrder;
