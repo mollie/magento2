@@ -33,6 +33,7 @@ class Config
     const GENERAL_LOCALE = 'payment/mollie_general/locale';
     const GENERAL_ORDER_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
+    const GENERAL_REDIRECT_WHEN_TRANSACTION_FAILS_TO = 'payment/mollie_general/redirect_when_transaction_fails_to';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
     const GENERAL_SECOND_CHANCE_DELAY = 'payment/mollie_general/second_chance_email_delay';
     const GENERAL_TYPE = 'payment/mollie_general/type';
@@ -548,6 +549,11 @@ class Config
     public function customRedirectUrl($storeId = null, $scope = ScopeInterface::SCOPE_STORE)
     {
         return $this->getPath(static::GENERAL_CUSTOM_REDIRECT_URL, $storeId, $scope);
+    }
+
+    public function redirectWhenTransactionFailsTo($storeId = null, $scope = ScopeInterface::SCOPE_STORE): ?string
+    {
+        return $this->getPath(static::GENERAL_REDIRECT_WHEN_TRANSACTION_FAILS_TO, $storeId, $scope);
     }
 
     /**
