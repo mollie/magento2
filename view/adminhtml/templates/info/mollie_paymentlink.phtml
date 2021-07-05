@@ -26,7 +26,12 @@ $status = $block->getPaymentStatus();
             <?php if ($block->getCheckoutUrl() && $status == 'created'): ?>
                 <tr>
                     <th><?= __('Checkout Url'); ?></th>
-                    <td><?= $block->getCheckoutUrl(); ?></td>
+                    <td>
+                        <?= $block->getCheckoutUrl(); ?>
+                        <span class="mollie-copy-url" data-url="<?= $block->getCheckoutUrl(); ?>" title="<?php echo __('Copy'); ?>">
+                            &#x2398;
+                        </span>
+                    </td>
                 </tr>
             <?php endif; ?>
             <?php if ($block->getExpiresAt() && $status == 'created'): ?>
@@ -65,6 +70,9 @@ $status = $block->getPaymentStatus();
                 "endpoint": "<?php echo $block->getUrl('mollie/action/fetchOrderStatus'); ?>",
                 "order_id": "<?php echo $block->getOrderId(); ?>"
             }
+        },
+        ".mollie-copy-url": {
+            "Mollie_Payment/js/copy-url": {}
         }
     }
 </script>
