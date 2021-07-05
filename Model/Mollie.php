@@ -317,7 +317,7 @@ class Mollie extends AbstractMethod
             $mollieApiClient = new MollieApiClient();
             $mollieApiClient->setApiKey($apiKey);
             $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
-            $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
+            $mollieApiClient->addVersionString('MollieMagento2/' . $this->config->getVersion());
             return $mollieApiClient;
         } else {
             throw new LocalizedException(__('Class Mollie\Api\MollieApiClient does not exist'));
