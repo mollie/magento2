@@ -39,7 +39,12 @@ $status = $block->getPaymentStatus();
             <?php if ($block->getCheckoutUrl() && $status == 'created'): ?>
                 <tr>
                     <th><?= __('Checkout Url'); ?></th>
-                    <td><?= $block->getCheckoutUrl(); ?></td>
+                    <td>
+                        <?= $block->getCheckoutUrl(); ?>
+                        <span class="mollie-copy-url" data-url="<?= $block->getCheckoutUrl(); ?>" title="<?php echo __('Copy'); ?>">
+                            &#x2398;
+                        </span>
+                    </td>
                 </tr>
             <?php endif; ?>
             <?php if ($block->getExpiresAt() && $status == 'created'): ?>
@@ -68,7 +73,7 @@ $status = $block->getPaymentStatus();
                         <a href="<?php echo $dashboardUrl; ?>" target="_blank">
                             <?php echo $block->getMollieId() ?: __('View in Mollie dashboard'); ?>
                         </a>
-                        <span class="copy-dashboard-url" data-dashboard-url="<?php echo $dashboardUrl; ?>" title="<?php echo __('Copy'); ?>">
+                        <span class="mollie-copy-url" data-url="<?php echo $dashboardUrl; ?>" title="<?php echo __('Copy'); ?>">
                             &#x2398;
                         </span>
                     </td>
@@ -98,50 +103,9 @@ $status = $block->getPaymentStatus();
                 "endpoint": "<?php echo $block->getUrl('mollie/action/fetchOrderStatus'); ?>",
                 "order_id": "<?php echo $block->getOrderId(); ?>"
             }
+        },
+        ".mollie-copy-url": {
+            "Mollie_Payment/js/copy-url": {}
         }
     }
-</script>
-<script>
-    require(['jquery'], function ($) {
-        function fallbackCopyTextToClipboard(text) {
-            var textArea = document.createElement("textarea");
-            textArea.value = text;
-
-            // Avoid scrolling to bottom
-            textArea.style.top = "0";
-            textArea.style.left = "0";
-            textArea.style.position = "fixed";
-
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-
-            var successful = document.execCommand('copy');
-            var msg = successful ? 'successful' : 'unsuccessful';
-
-            document.body.removeChild(textArea);
-        }
-
-        function copyTextToClipboard(text) {
-            if (!navigator.clipboard) {
-                fallbackCopyTextToClipboard(text);
-                return;
-            }
-
-            navigator.clipboard.writeText(text).then(function() {
-                console.log('Async: Copying to clipboard was successful!');
-            }, function(err) {
-                throw err;
-            });
-        }
-
-        $('.copy-dashboard-url').click( function () {
-            try {
-                copyTextToClipboard($(this).data('dashboard-url'));
-                $(this).css('color', 'green');
-            } catch (error) {
-                $(this).css('color', 'red');
-            }
-        });
-    })
 </script>

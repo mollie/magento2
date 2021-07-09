@@ -15,6 +15,7 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
+use Mollie\Payment\Service\Order\RedirectOnError;
 
 /**
  * Class Process
@@ -52,15 +53,10 @@ class Process extends Action
     private $eventManager;
 
     /**
-     * Process constructor.
-     *
-     * @param Context $context
-     * @param Session $checkoutSession
-     * @param PaymentHelper $paymentHelper
-     * @param MollieModel $mollieModel
-     * @param MollieHelper $mollieHelper
-     * @param OrderRepositoryInterface $orderRepository
+     * @var RedirectOnError
      */
+    private $redirectOnError;
+
     public function __construct(
         Context $context,
         Session $checkoutSession,
@@ -68,6 +64,7 @@ class Process extends Action
         MollieModel $mollieModel,
         MollieHelper $mollieHelper,
         OrderRepositoryInterface $orderRepository,
+        RedirectOnError $redirectOnError,
         ManagerInterface $eventManager
     ) {
         $this->checkoutSession = $checkoutSession;
@@ -75,7 +72,9 @@ class Process extends Action
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
         $this->orderRepository = $orderRepository;
+        $this->redirectOnError = $redirectOnError;
         $this->eventManager = $eventManager;
+
         parent::__construct($context);
     }
 
@@ -88,7 +87,7 @@ class Process extends Action
         if (!$orderIds) {
             $this->mollieHelper->addTolog('error', __('Invalid return, missing order id.'));
             $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));
-            $this->_redirect('checkout/cart');
+            $this->_redirect($this->redirectOnError->getUrl());
             return;
         }
 
@@ -101,7 +100,7 @@ class Process extends Action
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->messageManager->addExceptionMessage($e, __('There was an error checking the transaction status.'));
-            $this->_redirect('checkout/cart');
+            $this->_redirect($this->redirectOnError->getUrl());
             return;
         }
 
@@ -119,7 +118,7 @@ class Process extends Action
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
                 $this->messageManager->addErrorMessage(__('Something went wrong.'));
-                $this->_redirect('checkout/cart');
+                $this->_redirect($this->redirectOnError->getUrl());
             }
 
             return;
@@ -146,7 +145,7 @@ class Process extends Action
         $this->checkoutSession->restoreQuote();
         $this->addResultMessage($result);
 
-        $this->_redirect('checkout/cart');
+        $this->_redirect($this->redirectOnError->getUrl());
     }
 
     /**
