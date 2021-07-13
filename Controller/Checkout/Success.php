@@ -21,5 +21,7 @@ class Success extends Action
     public function execute()
     {
         $this->_forward('process');
+
+        return $this->getResponse();
     }
 }

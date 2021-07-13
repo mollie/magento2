@@ -85,14 +85,21 @@
             <group id="settings" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
                    showInStore="1">
                 <label>Settings</label>
-                <field id="payment_images" translate="label" type="select" sortOrder="10" showInDefault="1"
+                <field id="enable_magento_vault" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Magento Vault</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/enable_magento_vault</config_path>
+                    <comment><![CDATA[Magento Vault allows users to save their payment method data for re-use.]]></comment>
+                </field>
+
+                <field id="payment_images" translate="label" type="select" sortOrder="20" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Show Icons</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/payment_images</config_path>
                     <comment><![CDATA[Show Payment Icons on Checkout]]></comment>
                 </field>
-                <field id="default_selected_method" translate="label" type="select" sortOrder="20" showInDefault="1"
+                <field id="default_selected_method" translate="label" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="0" showInStore="1">
                     <label>Default selected method</label>
                     <source_model>Mollie\Payment\Model\Adminhtml\Source\MolliePaymentMethod</source_model>

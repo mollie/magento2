@@ -44,6 +44,6 @@ class Restart extends Action
     {
         $this->messageManager->addNoticeMessage(__('Payment cancelled, please try again.'));
         $this->checkoutSession->restoreQuote();
-        $this->_redirect('checkout/cart');
+        return $this->_redirect('checkout/cart');
     }
 }

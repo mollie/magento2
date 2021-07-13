@@ -184,6 +184,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
         $config['payment']['mollie']['appleypay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
         $config['payment']['mollie']['store']['name'] = $storeName;
+        $config['payment']['mollie']['vault']['enabled'] = $this->config->isMagentoVaultEnabled($storeId);
         $apiKey = $this->mollieHelper->getApiKey();
         $useImage = $this->mollieHelper->useImage();
 
@@ -202,7 +203,6 @@ class MollieConfigProvider implements ConfigProviderInterface
             }
 
             $isAvailable = $this->methods[$code]->isActive();
-            $config['payment']['instructions'][$code] = $this->getInstructions($code);
 
             $config['payment']['image'][$code] = '';
             if ($useImage) {
@@ -261,18 +261,6 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
 
         return $this->methodData;
-    }
-
-    /**
-     * Instruction data
-     *
-     * @param $code
-     *
-     * @return string
-     */
-    protected function getInstructions($code)
-    {
-        return nl2br($this->escaper->escapeHtml($this->methods[$code]->getInstructions()));
     }
 
     /**

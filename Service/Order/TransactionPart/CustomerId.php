@@ -61,7 +61,6 @@ class CustomerId implements TransactionPartInterface
             return $transaction;
         }
 
-
         if (!$order->getCustomerId()) {
             return $transaction;
         }
@@ -109,6 +108,10 @@ class CustomerId implements TransactionPartInterface
     private function shouldCreateCustomerId(OrderInterface $order): bool
     {
         if ($this->orderContainsSubscriptionProduct->check($order)) {
+            return true;
+        }
+
+        if ($this->config->isMagentoVaultEnabled($order->getStoreId())) {
             return true;
         }
 

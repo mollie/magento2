@@ -27,6 +27,7 @@ class Config
     const GENERAL_DEFAULT_SELECTED_METHOD = 'payment/mollie_general/default_selected_method';
     const GENERAL_DASHBOARD_URL_ORDERS_API = 'payment/mollie_general/dashboard_url_orders_api';
     const GENERAL_DASHBOARD_URL_PAYMENTS_API = 'payment/mollie_general/dashboard_url_payments_api';
+    const GENERAL_ENABLE_MAGENTO_VAULT = 'payment/mollie_general/enable_magento_vault';
     const GENERAL_ENABLE_SECOND_CHANCE_EMAIL = 'payment/mollie_general/enable_second_chance_email';
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
@@ -564,6 +565,14 @@ class Config
     public function getLocale($storeId = null)
     {
         return $this->getPath(static::GENERAL_LOCALE, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     */
+    public function isMagentoVaultEnabled($storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_ENABLE_MAGENTO_VAULT, $storeId);
     }
 
     public function isMultishippingEnabled(): bool

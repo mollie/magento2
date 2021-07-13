@@ -9,8 +9,9 @@ namespace Mollie\Payment\Service\Order\TransactionPart;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
+use Mollie\Payment\Service\Order\TransactionPartInterface;
 
-class ApplePayPaymentToken implements \Mollie\Payment\Service\Order\TransactionPartInterface
+class ApplePayPaymentToken implements TransactionPartInterface
 {
     public function process(OrderInterface $order, $apiMethod, array $transaction)
     {

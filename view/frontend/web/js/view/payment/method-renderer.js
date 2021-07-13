@@ -15,7 +15,7 @@ define(
         var kbcComponent = 'Mollie_Payment/js/view/payment/method-renderer/kbc';
         var giftcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/giftcard';
 
-        var creditcardComponent = defaultComponent;
+        var creditcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/creditcard';
         var checkoutConfig = window.checkoutConfig.payment.mollie;
         if (checkoutConfig.profile_id && checkoutConfig.creditcard.use_components) {
             creditcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/creditcard-with-components';

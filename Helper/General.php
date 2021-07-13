@@ -423,6 +423,7 @@ class General extends AbstractHelper
     public function getApiMethod($order)
     {
         $method = $order->getPayment()->getMethodInstance()->getCode();
+        $method = str_replace('_vault', '', $method);
         $methodXpath = str_replace('%method%', $method, self::XML_PATH_API_METHOD);
         return $this->getStoreConfig($methodXpath, $order->getStoreId());
     }
@@ -664,6 +665,8 @@ class General extends AbstractHelper
             $dueDate->modify('+' . $dueDays . ' day');
             return $dueDate->format('Y-m-d');
         }
+
+        return false;
     }
 
     /**

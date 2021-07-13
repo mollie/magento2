@@ -41,7 +41,6 @@ class MollieConfigProviderTest extends IntegrationTestCase
 
         $result = $instance->getConfig();
 
-        $this->assertCount(19, $result['payment']['instructions']);
         $this->assertCount(19, $result['payment']['image']);
 
         $this->assertArrayHasKey('mollie_methods_ideal', $result['payment']['issuersListType']);
