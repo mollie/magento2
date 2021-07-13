@@ -143,7 +143,7 @@ class Redirect extends Action
             }
         } catch (Exception $exception) {
             // @phpstan-ignore-next-line
-            $this->formatExceptionMessage($exception, $methodInstance);
+            $this->formatExceptionMessage($exception, $methodInstance ?? null);
             $this->mollieHelper->addTolog('error', $exception->getMessage());
             $this->checkoutSession->restoreQuote();
             $this->cancelUnprocessedOrder($order, $exception->getMessage());
@@ -179,11 +179,11 @@ class Redirect extends Action
 
     /**
      * @param Exception $exception
-     * @param MethodInterface $methodInstance
+     * @param MethodInterface|null $methodInstance
      */
-    private function formatExceptionMessage(Exception $exception, MethodInterface $methodInstance)
+    private function formatExceptionMessage(Exception $exception, MethodInterface $methodInstance = null)
     {
-        if (stripos($exception->getMessage(), 'cURL error 28') !== false) {
+        if ($methodInstance && stripos($exception->getMessage(), 'cURL error 28') !== false) {
             $this->messageManager->addErrorMessage(
                 __(
                     'A Timeout while connecting to %1 occurred, this could be the result of an outage. ' .
