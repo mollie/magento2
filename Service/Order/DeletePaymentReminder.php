@@ -55,15 +55,30 @@ class DeletePaymentReminder
         $this->paymentReminderRepository = $paymentReminderRepository;
     }
 
-    public function byEmail(string $email)
+    /**
+     * Delete payment reminders by reference
+     * Reference can be a customer ID or Email Address
+     *
+     * @param string|int|null $reference
+     */
+    public function delete($reference)
     {
+        if (empty($reference)) {
+            return;
+        }
+
         // Delay + 1 hour.
         $delay = (int)$this->config->secondChanceEmailDelay() + 1;
         $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT' . $delay . 'H'));
 
         $criteria = $this->criteriaBuilderFactory->create();
-        $criteria->addFilter(Order::CUSTOMER_EMAIL, $email);
         $criteria->addFilter(Order::CREATED_AT, $date, 'gt');
+        if (is_numeric($reference)) {
+            $criteria->addFilter(Order::CUSTOMER_ID, $reference);
+        } else {
+            $criteria->addFilter(Order::CUSTOMER_ID, ['null' => true]);
+            $criteria->addFilter(Order::CUSTOMER_EMAIL, $reference);
+        }
 
         $orders = $this->orderRepository->getList($criteria->create());
         $ids = array_keys($orders->getItems());

@@ -105,7 +105,7 @@ class PaymentReminder
 
         $this->sentPaymentReminderRepository->save($sent);
 
-        $this->deletePaymentReminder->byEmail($order->getCustomerEmail());
+        $this->deletePaymentReminder->delete($order->getCustomerId() ?: $order->getCustomerEmail());
     }
 
     private function isAlreadySend(OrderInterface $order): bool
@@ -113,7 +113,7 @@ class PaymentReminder
         try {
             // The next line throws an exception if the order does not exists
             $this->sentPaymentReminderRepository->getByOrderId($order->getEntityId());
-            $this->deletePaymentReminder->byEmail($order->getCustomerEmail());
+            $this->deletePaymentReminder->delete($order->getCustomerId() ?: $order->getCustomerEmail());
             return true;
         } catch (NoSuchEntityException $exception) {
             return false;
