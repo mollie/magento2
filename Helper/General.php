@@ -400,18 +400,19 @@ class General extends AbstractHelper
     /**
      * Method code for API
      *
-     * @param \Magento\Sales\Model\Order $order
+     * @param OrderInterface $order
      *
-     * @return mixed
+     * @return string
      */
-    public function getMethodCode($order)
+    public function getMethodCode($order): string
     {
         $method = $order->getPayment()->getMethodInstance()->getCode();
 
-        if ($method != 'mollie_methods_paymentlink') {
-            $methodCode = str_replace('mollie_methods_', '', $method);
-            return $methodCode;
+        if ($method == 'mollie_methods_paymentlink' || strstr($method, 'mollie_methods') === false) {
+            return '';
         }
+
+        return str_replace('mollie_methods_', '', $method);
     }
 
     /***
