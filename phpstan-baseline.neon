@@ -3,45 +3,45 @@ parameters:
 		-
 			message: "#^Method Mollie\\\\Payment\\\\Block\\\\Info\\\\Base\\:\\:getOrderId\\(\\) should return string but return statement is missing\\.$#"
 			count: 1
-			path: extensions/mollie-magento2/Block/Info/Base.php
+			path: Block/Info/Base.php
 
 		-
 			message: "#^Method Mollie\\\\Payment\\\\Controller\\\\Checkout\\\\Process\\:\\:execute\\(\\) should return Magento\\\\Framework\\\\App\\\\ResponseInterface\\|Magento\\\\Framework\\\\Controller\\\\ResultInterface but return statement is missing\\.$#"
 			count: 1
-			path: extensions/mollie-magento2/Controller/Checkout/Process.php
+			path: Controller/Checkout/Process.php
 
 		-
 			message: "#^Method Mollie\\\\Payment\\\\Controller\\\\Checkout\\\\Redirect\\:\\:execute\\(\\) should return Magento\\\\Framework\\\\App\\\\ResponseInterface\\|Magento\\\\Framework\\\\Controller\\\\ResultInterface but return statement is missing\\.$#"
 			count: 1
-			path: extensions/mollie-magento2/Controller/Checkout/Redirect.php
+			path: Controller/Checkout/Redirect.php
 
 		-
 			message: "#^Method Mollie\\\\Payment\\\\Controller\\\\Checkout\\\\Restart\\:\\:execute\\(\\) should return Magento\\\\Framework\\\\App\\\\ResponseInterface\\|Magento\\\\Framework\\\\Controller\\\\ResultInterface but return statement is missing\\.$#"
 			count: 1
-			path: extensions/mollie-magento2/Controller/Checkout/Restart.php
+			path: Controller/Checkout/Restart.php
 
 		-
 			message: "#^Method Mollie\\\\Payment\\\\Controller\\\\Checkout\\\\Success\\:\\:execute\\(\\) should return Magento\\\\Framework\\\\App\\\\ResponseInterface\\|Magento\\\\Framework\\\\Controller\\\\ResultInterface but return statement is missing\\.$#"
 			count: 1
-			path: extensions/mollie-magento2/Controller/Checkout/Success.php
+			path: Controller/Checkout/Success.php
 
 		-
 			message: "#^Method Mollie\\\\Payment\\\\Helper\\\\General\\:\\:getBanktransferDueDate\\(\\) should return string\\|false but return statement is missing\\.$#"
 			count: 1
-			path: extensions/mollie-magento2/Helper/General.php
+			path: Helper/General.php
 
 		-
 			message: "#^Method Mollie\\\\Payment\\\\Model\\\\Adminhtml\\\\Backend\\\\VerifiyPaymentFee\\:\\:beforeSave\\(\\) should return \\$this\\(Mollie\\\\Payment\\\\Model\\\\Adminhtml\\\\Backend\\\\VerifiyPaymentFee\\) but return statement is missing\\.$#"
 			count: 1
-			path: extensions/mollie-magento2/Model/Adminhtml/Backend/VerifiyPaymentFee.php
+			path: Model/Adminhtml/Backend/VerifiyPaymentFee.php
 
 		-
 			message: "#^Method Mollie\\\\Payment\\\\Model\\\\Methods\\\\Reorder\\:\\:initialize\\(\\) should return \\$this\\(Mollie\\\\Payment\\\\Model\\\\Methods\\\\Reorder\\) but return statement is missing\\.$#"
 			count: 1
-			path: extensions/mollie-magento2/Model/Methods/Reorder.php
+			path: Model/Methods/Reorder.php
 
 		-
 			message: "#^Method Mollie\\\\Payment\\\\Model\\\\Mollie\\:\\:createOrderRefund\\(\\) should return \\$this\\(Mollie\\\\Payment\\\\Model\\\\Mollie\\) but return statement is missing\\.$#"
 			count: 1
-			path: extensions/mollie-magento2/Model/Mollie.php
+			path: Model/Mollie.php
 
