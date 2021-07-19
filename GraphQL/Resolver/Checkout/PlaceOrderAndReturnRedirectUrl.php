@@ -51,6 +51,10 @@ class PlaceOrderAndReturnRedirectUrl implements ResolverInterface
             return null;
         }
 
+        if (strstr($order->getPayment()->getMethod(), 'mollie_methods') === false) {
+            return null;
+        }
+
         if ($order->getPayment()->getAdditionalInformation('checkout_url')) {
             return $order->getPayment()->getAdditionalInformation('checkout_url');
         }
