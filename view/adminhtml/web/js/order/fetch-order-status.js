@@ -16,7 +16,12 @@ define([
                 method: 'POST',
                 data: {order_id: config.order_id},
                 success: function (result) {
-                    location.reload();
+                    if (result.error) {
+                        row.html('<th>' + $t('Error While Fetching') + '</th><td class="mollie-error">' + result.msg + '</td>');
+                        row.show();
+                    } else {
+                        location.reload();
+                    }
                 },
                 error: function (result) {
                     row.html('<th>' + $t('Error While Fetching') + '</th><td class="mollie-error">' + result.responseJSON.msg + '</td>');
