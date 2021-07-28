@@ -1,15 +1,12 @@
 type Mutation {
     createMollieTransaction(input: MollieTransactionInput): MollieTransactionOutput @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\CreateMollieTransaction") @deprecated(reason: "Using the Order.mollie_redirect_url attribuut")
     mollieRestoreCart(input: MollieResetCartInput): MollieResetCartOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\ResetCart")
+    mollieProcessTransaction(input: MollieProcessTransactionInput): MollieProcessTransactionOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\ProcessTransaction")
 }
 
 type Order {
     mollie_redirect_url: String @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\PlaceOrderAndReturnRedirectUrl")
     mollie_payment_token: String @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\PaymentToken")
-}
-
-type MollieTransactionOutput {
-    checkout_url: String
 }
 
 type Cart {
@@ -25,11 +22,6 @@ type SelectedPaymentMethod {
     mollie_meta: MolliePaymentMethodMeta! @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\PaymentMethodMeta") @doc(description: "Retrieve meta information for this payment method (image)")
 }
 
-input PaymentMethodInput {
-    mollie_selected_issuer: String @doc(description: "Provided the issuer chosen by the end-user")
-    mollie_card_token: String @doc(description: "The card token provided by Mollie Components")
-}
-
 type MollieIssuer {
     name: String
     code: String
@@ -41,9 +33,10 @@ type MolliePaymentMethodMeta {
     image: String
 }
 
-input MollieTransactionInput {
-    payment_token: String!
-    issuer: String
+type MolliePaymentMethod {
+    code: String
+    name: String
+    image: String
 }
 
 type Query {
@@ -53,12 +46,31 @@ type Query {
     molliePaymentMethods(input: MolliePaymentMethodsInput): MolliePaymentMethodsOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\General\\MolliePaymentMethods")
 }
 
-input MollieResetCartInput {
-    cart_id: String! @doc(description:"The unique ID that identifies the customer's cart")
-}
-
 type MollieResetCartOutput {
     cart: Cart!
+}
+
+type MolliePaymentMethodsOutput {
+    methods: [MolliePaymentMethod]
+}
+
+type MollieTransactionOutput {
+    checkout_url: String
+}
+
+type MollieProcessTransactionOutput {
+    paymentStatus: PaymentStatusEnum
+    cart: Cart @doc(description: "The cart is only available when the payment status is failed, canceled or expired.")
+}
+
+input PaymentMethodInput {
+    mollie_selected_issuer: String @doc(description: "Provided the issuer chosen by the end-user")
+    mollie_card_token: String @doc(description: "The card token provided by Mollie Components")
+}
+
+input MollieTransactionInput {
+    payment_token: String!
+    issuer: String
 }
 
 input MolliePaymentMethodsInput {
@@ -66,12 +78,23 @@ input MolliePaymentMethodsInput {
     currency: String! = EUR
 }
 
-type MolliePaymentMethodsOutput {
-    methods: [MolliePaymentMethod]
+input MollieResetCartInput {
+    cart_id: String! @doc(description: "The unique ID that identifies the customer's cart")
 }
 
-type MolliePaymentMethod {
-    code: String
-    name: String
-    image: String
+input MollieProcessTransactionInput {
+    payment_token: String! @doc(description: "The payment token returned from the PlaceOrder call/added to the return URL")
+}
+
+enum PaymentStatusEnum {
+    CREATED
+    PAID
+    AUTHORIZED
+    CANCELED
+    SHIPPING
+    COMPLETED
+    EXPIRED
+    PENDING
+    REFUNDED
+    ERROR
 }

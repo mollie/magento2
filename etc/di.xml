@@ -187,4 +187,10 @@
             <argument name="resourceConnection" xsi:type="object">Magento\Framework\App\ResourceConnection\Proxy</argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Payment\GraphQL\Resolver\Checkout\ProcessTransaction">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 </config>
