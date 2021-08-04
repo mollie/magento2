@@ -123,4 +123,54 @@ class GeneralTest extends IntegrationTestCase
         $this->assertEquals('keyA', $instance->getApiKey($storeA));
         $this->assertEquals('keyB', $instance->getApiKey($storeB));
     }
+
+    public function getMethodCodeDataProvider()
+    {
+        return [
+            'paymentlink' => ['mollie_methods_paymentlink', ''],
+            'checkmo' => ['checkmo', ''],
+            'free' => ['free', ''],
+
+            'applepay' => ['mollie_methods_applepay', 'applepay'],
+            'bancontact' => ['mollie_methods_bancontact', 'bancontact'],
+            'banktransfer' => ['mollie_methods_banktransfer', 'banktransfer'],
+            'belfius' => ['mollie_methods_belfius', 'belfius'],
+            'creditcard' => ['mollie_methods_creditcard', 'creditcard'],
+            'directdebit' => ['mollie_methods_directdebit', 'directdebit'],
+            'eps' => ['mollie_methods_eps', 'eps'],
+            'giftcard' => ['mollie_methods_giftcard', 'giftcard'],
+            'giropay' => ['mollie_methods_giropay', 'giropay'],
+            'ideal' => ['mollie_methods_ideal', 'ideal'],
+            'kbc' => ['mollie_methods_kbc', 'kbc'],
+            'klarnapaylater' => ['mollie_methods_klarnapaylater', 'klarnapaylater'],
+            'klarnasliceit' => ['mollie_methods_klarnasliceit', 'klarnasliceit'],
+            'voucher' => ['mollie_methods_voucher', 'voucher'],
+            'mybank' => ['mollie_methods_mybank', 'mybank'],
+            'paypal' => ['mollie_methods_paypal', 'paypal'],
+            'paysafecard' => ['mollie_methods_paysafecard', 'paysafecard'],
+            'przelewy24' => ['mollie_methods_przelewy24', 'przelewy24'],
+            'sofort' => ['mollie_methods_sofort', 'sofort'],
+        ];
+    }
+
+    /**
+     * @dataProvider getMethodCodeDataProvider
+     */
+    public function testGetMethodCode($input, $expected)
+    {
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+
+        /** @var OrderPaymentInterface $payment */
+        $payment = $this->objectManager->create(OrderPaymentInterface::class);
+        $order->setPayment($payment);
+
+        $payment->setMethod($input);
+
+        /** @var General $instance */
+        $instance = $this->objectManager->create(General::class);
+        $result = $instance->getMethodCode($order);
+
+        $this->assertEquals($expected, $result);
+    }
 }

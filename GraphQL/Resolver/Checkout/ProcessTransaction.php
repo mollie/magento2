@@ -1,0 +1,93 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+namespace Mollie\Payment\GraphQL\Resolver\Checkout;
+
+use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\Framework\GraphQl\Query\ResolverInterface;
+use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Mollie\Api\Types\PaymentStatus;
+use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
+use Mollie\Payment\Model\Mollie;
+
+class ProcessTransaction implements ResolverInterface
+{
+    /**
+     * @var Mollie
+     */
+    private $mollie;
+
+    /**
+     * @var PaymentTokenRepositoryInterface
+     */
+    private $paymentTokenRepository;
+
+    /**
+     * @var CartRepositoryInterface
+     */
+    private $cartRepository;
+
+    /**
+     * @var Session
+     */
+    private $checkoutSession;
+
+    public function __construct(
+        Mollie $mollie,
+        PaymentTokenRepositoryInterface $paymentTokenRepository,
+        CartRepositoryInterface $cartRepository,
+        Session $checkoutSession
+    ) {
+        $this->mollie = $mollie;
+        $this->paymentTokenRepository = $paymentTokenRepository;
+        $this->cartRepository = $cartRepository;
+        $this->checkoutSession = $checkoutSession;
+    }
+
+    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    {
+        if (!isset($args['input']['payment_token'])) {
+            throw new GraphQlInputException(__('Missing "payment_token" input argument'));
+        }
+
+        $token = $args['input']['payment_token'];
+        $tokenModel = $this->paymentTokenRepository->getByToken($token);
+
+        $result = $this->mollie->processTransaction($tokenModel->getOrderId(), 'success', $token);
+
+        if (isset($result['error'])) {
+            return ['paymentStatus' => 'ERROR'];
+        }
+
+        return [
+            'paymentStatus' => strtoupper($result['status']),
+            'cart' => $this->getCart($result['status'], $tokenModel->getCartId()),
+        ];
+    }
+
+    private function getCart(string $status, ?string $cartId): ?array
+    {
+        if (!$cartId || !in_array($status, [
+            PaymentStatus::STATUS_EXPIRED,
+            PaymentStatus::STATUS_CANCELED,
+            PaymentStatus::STATUS_FAILED,
+        ])) {
+            return null;
+        }
+
+        try {
+            $this->checkoutSession->restoreQuote();
+
+            return ['model' => $this->cartRepository->get($cartId)];
+        } catch (NoSuchEntityException $exception) {
+            return null;
+        }
+    }
+}
