@@ -6,4 +6,4 @@ This document is created in collaboration with the merchants, agencies, the Moll
 
 ## What we're working on / what is on our backlog
 
-*   **Magento Payment Gateway upgrade**
+*   [**Magento Payment Gateway upgrade**](https://github.com/mollie/magento2/issues/421)
