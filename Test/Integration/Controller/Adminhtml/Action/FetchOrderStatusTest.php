@@ -18,7 +18,7 @@ class FetchOrderStatusTest extends AbstractBackendController
             ->with('999', 'webhook')
             ->willReturn([
                 'error' => false,
-                'msg' => '[TEST] Test successfull',
+                'msg' => '[TEST] Test successful',
             ])
         ;
 
@@ -32,7 +32,7 @@ class FetchOrderStatusTest extends AbstractBackendController
 
         $this->assertEquals(200, $this->getResponse()->getStatusCode());
         $this->assertFalse($json['error']);
-        $this->assertEquals('[TEST] Test successfull', $json['msg']);
+        $this->assertEquals('[TEST] Test successful', $json['msg']);
     }
 
     public function testReturnsAnErrorWhenSomethingFails()
@@ -66,7 +66,7 @@ class FetchOrderStatusTest extends AbstractBackendController
             ->with('999', 'webhook')
             ->willReturn([
                 'error' => false,
-                'msg' => '[TEST] Test successfull',
+                'msg' => '[TEST] Test successful',
             ])
         ;
 
@@ -81,6 +81,32 @@ class FetchOrderStatusTest extends AbstractBackendController
             $this->equalTo(['The latest status from Mollie has been retrieved']),
             MessageInterface::TYPE_SUCCESS
         );
+    }
+
+    public function testReturnsA503WhenAnErrorIsPresent()
+    {
+        $mollieHelperMock = $this->createMock(MollieHelper::class);
+        $mollieHelperMock->method('orderHasUpdate')->willReturn(true);
+        $mollieHelperMock->expects($this->once())
+            ->method('processTransaction')
+            ->with('999', 'webhook')
+            ->willReturn([
+                'error' => true,
+                'msg' => '[TEST] Test unsuccessful',
+            ])
+        ;
+
+        $this->_objectManager->addSharedInstance($mollieHelperMock, MollieHelper::class);
+
+        $this->getRequest()->setParams(['order_id' => '999']);
+
+        $this->dispatch('backend/mollie/action/fetchOrderStatus');
+
+        $json = \json_decode($this->getResponse()->getContent(), JSON_OBJECT_AS_ARRAY);
+
+        $this->assertEquals(503, $this->getResponse()->getStatusCode());
+        $this->assertTrue($json['error']);
+        $this->assertEquals('[TEST] Test unsuccessful', $json['msg']);
     }
 
     public function testDoesNothingWhenUpdateNotNeeded()
