@@ -14,6 +14,11 @@
         <attribute code="base_mollie_payment_fee_tax" type="float" />
     </extension_attributes>
 
+    <extension_attributes for="Magento\Sales\Api\Data\OrderItemInterface">
+        <attribute code="mollie_recurring_type" type="string" />
+        <attribute code="mollie_recurring_data" type="string[]" />
+    </extension_attributes>
+
     <extension_attributes for="Magento\Customer\Api\Data\CustomerInterface">
         <attribute code="mollie_customer_id" type="string" />
     </extension_attributes>

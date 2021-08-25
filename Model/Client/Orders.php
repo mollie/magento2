@@ -429,7 +429,9 @@ class Orders extends AbstractModel
                 }
 
                 if (abs($amount - $orderAmount['value']) < 0.01) {
-                    $payment->setTransactionId($transactionId);
+                    $payments = $mollieOrder->_embedded->payments;
+                    $paymentId = end($payments)->id;
+                    $payment->setTransactionId($paymentId);
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
 
                     if ($mollieOrder->isPaid()) {
@@ -448,7 +450,7 @@ class Orders extends AbstractModel
                          */
                         $invoice = $this->invoiceService->prepareInvoice($order);
                         $invoice->setRequestedCaptureCase(Invoice::NOT_CAPTURE);
-                        $invoice->setTransactionId($transactionId);
+                        $invoice->setTransactionId($paymentId);
                         $invoice->register();
 
                         $this->invoiceRepository->save($invoice);
@@ -707,7 +709,7 @@ class Orders extends AbstractModel
 
         try {
             $mollieApi = $this->loadMollieApi($apiKey);
-            $mollieOrder = $mollieApi->orders->get($transactionId);
+            $mollieOrder = $mollieApi->orders->get($transactionId, ['embed' => 'payments']);
 
             if ($mollieOrder->status == 'completed') {
                 $this->messageManager->addWarningMessage(
@@ -747,7 +749,10 @@ class Orders extends AbstractModel
 
                 $captureAmount = $this->getCaptureAmount($order, $invoice && $invoice->getId() ? $invoice : null);
 
-                $payment->setTransactionId($transactionId . '-' . $shipment->getMollieShipmentId());
+                $payments = $mollieOrder->_embedded->payments;
+                $paymentId = end($payments)->id;
+
+                $payment->setTransactionId($paymentId . '-' . $shipment->getMollieShipmentId());
                 $payment->registerCaptureNotification($captureAmount, true);
 
                 if ($invoice) {
