@@ -21,7 +21,7 @@ class RemovePendingPaymentRemindersTest extends IntegrationTestCase
     public function testDoesNothingWhenDisabled()
     {
         $deletePaymentReminderMock = $this->createMock(DeletePaymentReminder::class);
-        $deletePaymentReminderMock->expects($this->never())->method('byEmail');
+        $deletePaymentReminderMock->expects($this->never())->method('delete');
 
         /** @var RemovePendingPaymentReminders $instance */
         $instance = $this->objectManager->create(RemovePendingPaymentReminders::class, [
@@ -42,7 +42,7 @@ class RemovePendingPaymentRemindersTest extends IntegrationTestCase
     public function testDoesNothingWhenNoEmailIsAvailable()
     {
         $deletePaymentReminderMock = $this->createMock(DeletePaymentReminder::class);
-        $deletePaymentReminderMock->expects($this->never())->method('byEmail');
+        $deletePaymentReminderMock->expects($this->never())->method('delete');
 
         /** @var RemovePendingPaymentReminders $instance */
         $instance = $this->objectManager->create(RemovePendingPaymentReminders::class, [
