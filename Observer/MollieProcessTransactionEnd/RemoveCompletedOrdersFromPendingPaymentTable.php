@@ -46,7 +46,6 @@ class RemoveCompletedOrdersFromPendingPaymentTable implements ObserverInterface
             return;
         }
 
-        $email = $order->getCustomerEmail();
-        $this->deletePaymentReminder->byEmail($email);
+        $this->deletePaymentReminder->delete($order->getCustomerId() ?: $order->getCustomerEmail());
     }
 }

@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
 
 namespace Mollie\Payment\Plugin\Quote\Api;
@@ -46,10 +46,8 @@ class PaymentMethodManagementPlugin
         $this->cartRepository = $cartRepository;
     }
 
-    public function aroundGetList(PaymentMethodManagementInterface $subject, Callable $proceed, $cartId)
+    public function afterGetList(PaymentMethodManagementInterface $subject, $result, $cartId)
     {
-        $result = $proceed($cartId);
-
         if (!$this->containsMollieMethods($result)) {
             return $result;
         }
