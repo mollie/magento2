@@ -3,6 +3,7 @@
     <preference for="Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface" type="Mollie\Payment\Webapi\PaymentToken" />
     <preference for="Mollie\Payment\Api\Webapi\StartTransactionRequestInterface" type="Mollie\Payment\Webapi\StartTransaction" />
     <preference for="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" type="Mollie\Payment\Webapi\GetCustomerOrder" />
+    <preference for="Mollie\Payment\Api\MagentoOrderRepositoryInterface" type="Mollie\Payment\Model\MagentoOrderRepository" />
 
     <preference for="Mollie\Payment\Api\PaymentTokenRepositoryInterface" type="Mollie\Payment\Model\PaymentTokenRepository"/>
     <preference for="Mollie\Payment\Api\Data\PaymentTokenInterface" type="Mollie\Payment\Model\Data\PaymentToken"/>
@@ -69,10 +70,19 @@
 
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="mollie_payment_fee_order" type="Mollie\Payment\Plugin\Sales\AddPaymentFeeToOrder" />
+        <plugin name="mollie_payment_add_subscription_data" type="Mollie\Payment\Plugin\Sales\AddRecurringData" />
     </type>
 
     <type name="Magento\Quote\Api\CartRepositoryInterface">
         <plugin name="mollie_add_paymentfee_extension_attributes" type="Mollie\Payment\Plugin\Sales\Cart\AddPaymentFeeToCart" />
+    </type>
+
+    <type name="Magento\Quote\Api\Data\CartInterface">
+        <plugin name="mollie_parse_metadata" type="Mollie\Payment\Plugin\Quote\Api\ParseMollieMetadata" />
+    </type>
+
+    <type name="Magento\Quote\Api\Data\CartItemInterface">
+        <plugin name="mollie_make_recurring_products_unique_in_cart" type="Mollie\Payment\Plugin\Quote\Api\Item\MakeRecurringProductsUniqueInCart" />
     </type>
 
     <type name="Mollie\Payment\Service\Order\BuildTransaction">
@@ -82,6 +92,8 @@
                 <item name="customerId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CustomerId</item>
                 <item name="issuer" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\Issuer</item>
                 <item name="applePayPaymentToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\ApplePayPaymentToken</item>
+                <item name="sequenceTypeForVault" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\SequenceType</item>
+                <item name="UseSavedPaymentMethod" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\UseSavedPaymentMethod</item>
             </argument>
         </arguments>
     </type>
@@ -107,6 +119,7 @@
             <argument name="processors" xsi:type="array">
                 <item name="voucherCategory" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\VoucherCategory</item>
                 <item name="bundleWithoutDynamicPrice" xsi:type="object">Mollie\Payment\Service\Order\Lines\Processor\BundleWithoutDynamicPricing</item>
+                <item name="mollie_buyrequest_to_metadata" xsi:type="object">Mollie\Payment\Service\Order\Lines\BuyRequestToMetadata</item>
             </argument>
         </arguments>
     </type>
@@ -152,6 +165,7 @@
 
     <type name="Magento\Quote\Api\PaymentMethodManagementInterface">
         <plugin name="mollie_hide_methods_that_are_not_allowed" type="Mollie\Payment\Plugin\Quote\Api\PaymentMethodManagementPlugin" />
+        <plugin name="mollie_hide_methods_when_cart_contains_recurring_product" type="Mollie\Payment\Plugin\Quote\Api\LimitMethodsForRecurringPayments" />
     </type>
 
     <type name="Mollie\Payment\Service\Order\TransactionProcessor">
@@ -193,4 +207,744 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+
+    <type name="Mollie\Payment\Model\Mollie">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <!-- ApplePay -->
+    <type name="Mollie\Payment\Model\Methods\ApplePay">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieApplePayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieApplePayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieApplePayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieApplePayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieApplePayConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieApplePayConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\ApplePay::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Bancontact -->
+    <type name="Mollie\Payment\Model\Methods\Bancontact">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieBancontactValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieBancontactValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieBancontactConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBancontactConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieBancontactConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBancontactConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Bancontact::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Banktransfer -->
+    <type name="Mollie\Payment\Model\Methods\Banktransfer">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieBanktransferValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieBanktransferValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieBanktransferConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBanktransferConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieBanktransferConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBanktransferConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Banktransfer::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Belfius -->
+    <type name="Mollie\Payment\Model\Methods\Belfius">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Methods\Banktransfer\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieBelfiusValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieBelfiusValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieBelfiusConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBelfiusConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieBelfiusConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBelfiusConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Belfius::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Creditcard -->
+    <type name="Mollie\Payment\Model\Methods\Creditcard">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieCreditcardValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCreditcardCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieCreditcardCommandPool" type="MollieCommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="vault_authorize" xsi:type="string">MollieCreditcardVaultAuthorizeCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieCreditcardValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieCreditcardConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieCreditcardConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieCreditcardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieCreditcardConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Creditcard::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Creditcard Vault -->
+    <type name="Mollie\Payment\Model\Methods\CreditcardVault">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieCreditcardVaultConfig</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieCreditcardVaultValueHandlerPool</argument>
+            <argument name="vaultProvider" xsi:type="object">Mollie\Payment\Model\Methods\Creditcard</argument>
+            <argument name="code" xsi:type="const">Mollie\Payment\Model\Methods\CreditcardVault::CODE</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieCreditcardVaultValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieCreditcardConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieCreditcardVaultConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Creditcard::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieCreditcardVaultAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+    </virtualType>
+
+    <!-- Directdebit -->
+    <type name="Mollie\Payment\Model\Methods\Directdebit">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieDirectdebitValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieDirectdebitValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieDirectdebitConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieDirectdebitConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieDirectdebitConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieDirectdebitConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Directdebit::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Eps -->
+    <type name="Mollie\Payment\Model\Methods\Eps">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieEpsValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieEpsValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieEpsConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieEpsConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieEpsConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieEpsConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Eps::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Giftcard -->
+    <type name="Mollie\Payment\Model\Methods\Giftcard">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieGiftcardValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieGiftcardValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieGiftcardConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGiftcardConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieGiftcardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGiftcardConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Giftcard::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Giropay -->
+    <type name="Mollie\Payment\Model\Methods\Giropay">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieGiropayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieGiropayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieGiropayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGiropayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieGiropayConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGiropayConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Giropay::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Ideal -->
+    <type name="Mollie\Payment\Model\Methods\Ideal">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieIdealValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieIdealValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieIdealConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieIdealConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieIdealConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieIdealConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Ideal::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Kbc -->
+    <type name="Mollie\Payment\Model\Methods\Kbc">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKbcValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieKbcValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieKbcConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKbcConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieKbcConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKbcConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Kbc::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Klarnapaylater -->
+    <type name="Mollie\Payment\Model\Methods\Klarnapaylater">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnapaylaterValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieKlarnapaylaterValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieKlarnapaylaterConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnapaylaterConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieKlarnapaylaterConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnapaylaterConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Klarnapaylater::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Klarnasliceit -->
+    <type name="Mollie\Payment\Model\Methods\Klarnasliceit">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Methods\Klarnapaylater\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnasliceitValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieKlarnasliceitValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieKlarnasliceitConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnasliceitConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieKlarnasliceitConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnasliceitConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Klarnasliceit::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- MyBank -->
+    <type name="Mollie\Payment\Model\Methods\MyBank">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Methods\Klarnasliceit\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieMyBankValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieMyBankValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieMyBankConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMyBankConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieMyBankConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMyBankConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\MyBank::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Paymentlink -->
+    <type name="Mollie\Payment\Model\Methods\Paymentlink">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Mollie\Payment\Block\Form\Paymentlink</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Paymentlink</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MolliePaymentlinkValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MolliePaymentlinkValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MolliePaymentlinkConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaymentlinkConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MolliePaymentlinkConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaymentlinkConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Paymentlink::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Paypal -->
+    <type name="Mollie\Payment\Model\Methods\Paypal">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MolliePaypalValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MolliePaypalValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MolliePaypalConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaypalConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MolliePaypalConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaypalConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Paypal::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Paysafecard -->
+    <type name="Mollie\Payment\Model\Methods\Paysafecard">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MolliePaysafecardValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MolliePaysafecardValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MolliePaysafecardConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaysafecardConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MolliePaysafecardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaysafecardConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Paysafecard::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Przelewy24 -->
+    <type name="Mollie\Payment\Model\Methods\Przelewy24">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MolliePrzelewy24ValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MolliePrzelewy24ValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MolliePrzelewy24ConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePrzelewy24ConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MolliePrzelewy24Config</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePrzelewy24Config" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Przelewy24::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Reorder -->
+    <type name="Mollie\Payment\Model\Methods\Reorder">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieReorderValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieReorderValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieReorderConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieReorderConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieReorderConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieReorderConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Reorder::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Sofort -->
+    <type name="Mollie\Payment\Model\Methods\Sofort">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieSofortValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieSofortValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieSofortConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSofortConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieSofortConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSofortConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Sofort::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Voucher -->
+    <type name="Mollie\Payment\Model\Methods\Voucher">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieVoucherValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieVoucherValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieVoucherConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieVoucherConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieVoucherConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieVoucherConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Voucher::CODE</argument>
+        </arguments>
+    </virtualType>
+
+
+
+
+
+
+
+
+    <virtualType name="MollieValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieGenericConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGenericConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Mollie::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="order" xsi:type="string">MollieInitializeCommand</item>
+                <item name="authorize" xsi:type="string">MollieInitializeCommand</item>
+                <item name="vault_authorize" xsi:type="string">MollieInitializeCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieInitializeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MollieInitializeRequestBuilder</argument>
+            <argument name="transferFactory" xsi:type="object">Mollie\Payment\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Mollie\Payment\Gateway\Http\Client\OrdersApiClient</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieInitializeRequestBuilder" type="Magento\Payment\Gateway\Request\BuilderComposite" />
+
+    <virtualType name="MollieSaleCommand" type="MollieAuthorizeCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">MollieSaleRequest</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Payment\Gateway\Command\CommandManagerPool">
+        <arguments>
+            <argument name="executors" xsi:type="array">
+                <item name="mollie_methods_creditcard" xsi:type="string">MollieCommandManager</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="MollieCommandManager" type="Magento\Payment\Gateway\Command\CommandManager">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </virtualType>
 </config>

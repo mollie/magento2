@@ -164,7 +164,7 @@ class Base extends Info
     {
         try {
             $code = $this->getInfo()->getMethod();
-            if ($code == Klarnapaylater::METHOD_CODE || $code == Klarnasliceit::METHOD_CODE) {
+            if ($code == Klarnapaylater::CODE || $code == Klarnasliceit::CODE) {
                 return true;
             }
         } catch (\Exception $e) {
@@ -189,7 +189,7 @@ class Base extends Info
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getOrderId()
     {
@@ -197,6 +197,7 @@ class Base extends Info
             return $this->getInfo()->getParentId();
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+            return null;
         }
     }
 

@@ -43,6 +43,7 @@ use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\TransactionProcessor;
+use Mollie\Payment\Service\Magento\Vault\AddCardToVault;
 
 /**
  * Class Orders
@@ -154,6 +155,11 @@ class Orders extends AbstractModel
     private $cancelOrder;
 
     /**
+     * @var AddCardToVault
+     */
+    private $addCardToVault;
+
+    /**
      * Orders constructor.
      *
      * @param OrderLines $orderLines
@@ -179,6 +185,7 @@ class Orders extends AbstractModel
      * @param DashboardUrl $dashboardUrl
      * @param TransactionProcessor $transactionProcessor
      * @param CancelOrder $cancelOrder
+     * @param AddCardToVault $addCardToVault
      * @param EventManager $eventManager
      */
     public function __construct(
@@ -205,6 +212,7 @@ class Orders extends AbstractModel
         DashboardUrl $dashboardUrl,
         TransactionProcessor $transactionProcessor,
         CancelOrder $cancelOrder,
+        AddCardToVault $addCardToVault,
         EventManager $eventManager
     ) {
         $this->orderLines = $orderLines;
@@ -231,6 +239,7 @@ class Orders extends AbstractModel
         $this->transactionProcessor = $transactionProcessor;
         $this->eventManager = $eventManager;
         $this->cancelOrder = $cancelOrder;
+        $this->addCardToVault = $addCardToVault;
     }
 
     /**
@@ -255,6 +264,7 @@ class Orders extends AbstractModel
 
         $paymentToken = $this->mollieHelper->getPaymentToken();
         $method = $this->mollieHelper->getMethodCode($order);
+        $method = str_replace('_vault', '', $method);
         $orderData = [
             'amount'              => $this->mollieHelper->getOrderAmountByOrder($order),
             'orderNumber'         => $order->getIncrementId(),
@@ -407,6 +417,7 @@ class Orders extends AbstractModel
 
         $refunded = $mollieOrder->amountRefunded !== null ? true : false;
         $payment = $order->getPayment();
+        $this->addCardToVault->forPayment($payment, $mollieOrder);
         if ($type == 'webhook' && $payment->getAdditionalInformation('payment_status') != $status) {
             $payment->setAdditionalInformation('payment_status', $status);
             $this->orderRepository->save($order);
@@ -429,7 +440,9 @@ class Orders extends AbstractModel
                 }
 
                 if (abs($amount - $orderAmount['value']) < 0.01) {
-                    $payment->setTransactionId($transactionId);
+                    $payments = $mollieOrder->_embedded->payments;
+                    $paymentId = end($payments)->id;
+                    $payment->setTransactionId($paymentId);
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
 
                     if ($mollieOrder->isPaid()) {
@@ -448,7 +461,7 @@ class Orders extends AbstractModel
                          */
                         $invoice = $this->invoiceService->prepareInvoice($order);
                         $invoice->setRequestedCaptureCase(Invoice::NOT_CAPTURE);
-                        $invoice->setTransactionId($transactionId);
+                        $invoice->setTransactionId($paymentId);
                         $invoice->register();
 
                         $this->invoiceRepository->save($invoice);
@@ -707,7 +720,7 @@ class Orders extends AbstractModel
 
         try {
             $mollieApi = $this->loadMollieApi($apiKey);
-            $mollieOrder = $mollieApi->orders->get($transactionId);
+            $mollieOrder = $mollieApi->orders->get($transactionId, ['embed' => 'payments']);
 
             if ($mollieOrder->status == 'completed') {
                 $this->messageManager->addWarningMessage(
@@ -747,7 +760,10 @@ class Orders extends AbstractModel
 
                 $captureAmount = $this->getCaptureAmount($order, $invoice && $invoice->getId() ? $invoice : null);
 
-                $payment->setTransactionId($transactionId . '-' . $shipment->getMollieShipmentId());
+                $payments = $mollieOrder->_embedded->payments;
+                $paymentId = end($payments)->id;
+
+                $payment->setTransactionId($paymentId . '-' . $shipment->getMollieShipmentId());
                 $payment->registerCaptureNotification($captureAmount, true);
 
                 if ($invoice) {

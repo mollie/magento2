@@ -12,6 +12,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Model\Api;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
+use Mollie\Payment\Service\Order\OrderContainsSubscriptionProduct;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class CustomerId implements TransactionPartInterface
@@ -31,14 +32,21 @@ class CustomerId implements TransactionPartInterface
      */
     private $config;
 
+    /**
+     * @var OrderContainsSubscriptionProduct
+     */
+    private $orderContainsSubscriptionProduct;
+
     public function __construct(
         Api $api,
         CustomerRepositoryInterface $customerRepository,
-        Config $config
+        Config $config,
+        OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct
     ) {
         $this->api = $api;
         $this->customerRepository = $customerRepository;
         $this->config = $config;
+        $this->orderContainsSubscriptionProduct = $orderContainsSubscriptionProduct;
     }
 
     /**
@@ -49,9 +57,7 @@ class CustomerId implements TransactionPartInterface
      */
     public function process(OrderInterface $order, $apiMethod, array $transaction)
     {
-        if ($order->getPayment()->getMethod() != 'mollie_methods_creditcard' ||
-            !$this->config->creditcardEnableCustomersApi($order->getStoreId())
-        ) {
+        if (!$this->shouldCreateCustomerId($order)) {
             return $transaction;
         }
 
@@ -97,5 +103,26 @@ class CustomerId implements TransactionPartInterface
         }
 
         return $mollieCustomer->id;
+    }
+
+    private function shouldCreateCustomerId(OrderInterface $order): bool
+    {
+        if ($this->orderContainsSubscriptionProduct->check($order)) {
+            return true;
+        }
+
+        if ($this->config->isMagentoVaultEnabled($order->getStoreId())) {
+            return true;
+        }
+
+        if ($order->getPayment()->getMethod() != 'mollie_methods_creditcard') {
+            return false;
+        }
+
+        if (!$this->config->creditcardEnableCustomersApi($order->getStoreId())) {
+            return false;
+        }
+
+        return true;
     }
 }

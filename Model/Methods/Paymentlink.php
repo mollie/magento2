@@ -16,40 +16,12 @@ use Magento\Framework\DataObject;
  */
 class Paymentlink extends Mollie
 {
-
     /**
      * Payment method code
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_paymentlink';
-
-    /**
-     * Availability option
-     *
-     * @var bool
-     */
-    protected $_canUseCheckout = false;
-
-    /**
-     * Availability option
-     *
-     * @var bool
-     */
-    protected $_canUseInternal = true;
-
-    /**
-     * Info instructions block path
-     *
-     * @var string
-     */
-    protected $_infoBlockType = \Mollie\Payment\Block\Info\Paymentlink::class;
-    /**
-     * Info instructions form path
-     *
-     * @var string
-     */
-    protected $_formBlockType = \Mollie\Payment\Block\Form\Paymentlink::class;
+    const CODE = 'mollie_methods_paymentlink';
 
     /**
      * @param string $paymentAction

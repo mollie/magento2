@@ -172,6 +172,7 @@ class OrdersTest extends IntegrationTestCase
 
         foreach (['cancelled', 'paid', 'expired'] as $status) {
             $payment = new stdClass;
+            $payment->id = 'tr_fakeid';
             $payment->status = $status;
 
             $mollieOrderMock->_embedded->payments[] = $payment;
@@ -221,6 +222,7 @@ class OrdersTest extends IntegrationTestCase
 
         $mollieOrder->_embedded = new stdClass;
         $mollieOrder->_embedded->payments = [new stdClass];
+        $mollieOrder->_embedded->payments[0]->id = 'tr_abc1234';
         $mollieOrder->_embedded->payments[0]->status = 'success';
 
         return $mollieOrder;

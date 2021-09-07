@@ -22,5 +22,7 @@ class VerifiyPaymentFee extends Value
     {
         $value = $this->getValue();
         $this->setValue(str_replace([',', '%'], ['.', ''], $value));
+
+        return $this;
     }
 }

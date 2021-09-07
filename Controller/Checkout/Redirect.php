@@ -22,6 +22,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Result\PageFactory;
 use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\Methods\Creditcard;
+use Mollie\Payment\Model\Methods\CreditcardVault;
 use Mollie\Payment\Model\Methods\Directdebit;
 use Mollie\Payment\Model\Mollie;
 
@@ -32,7 +33,6 @@ use Mollie\Payment\Model\Mollie;
  */
 class Redirect extends Action
 {
-
     /**
      * @var Session
      */
@@ -110,19 +110,17 @@ class Redirect extends Action
             $order = $this->getOrder();
         } catch (LocalizedException $exception) {
             $this->mollieHelper->addTolog('error', $exception->getMessage());
-            $this->_redirect('checkout/cart');
-            return;
+            return $this->_redirect('checkout/cart');
         }
 
         try {
             $payment = $order->getPayment();
             if (!isset($payment)) {
-                $this->_redirect('checkout/cart');
-                return;
+                return $this->_redirect('checkout/cart');
             }
 
             $method = $order->getPayment()->getMethod();
-            $methodInstance = $this->paymentHelper->getMethodInstance($method);
+            $methodInstance = $this->getMethodInstance($method);
             if ($methodInstance instanceof Mollie) {
                 $storeId = $order->getStoreId();
                 $redirectUrl = $this->startTransaction($methodInstance, $order);
@@ -132,14 +130,14 @@ class Redirect extends Action
                     $resultPage->getLayout()->getBlock('mollie_loading')->setMollieRedirect($redirectUrl);
                     return $resultPage;
                 } else {
-                    $this->getResponse()->setRedirect($redirectUrl);
+                    return $this->getResponse()->setRedirect($redirectUrl);
                 }
             } else {
                 $msg = __('Payment Method not found');
                 $this->messageManager->addErrorMessage($msg);
                 $this->mollieHelper->addTolog('error', $msg);
                 $this->checkoutSession->restoreQuote();
-                $this->_redirect('checkout/cart');
+                return $this->_redirect('checkout/cart');
             }
         } catch (Exception $exception) {
             // @phpstan-ignore-next-line
@@ -147,7 +145,7 @@ class Redirect extends Action
             $this->mollieHelper->addTolog('error', $exception->getMessage());
             $this->checkoutSession->restoreQuote();
             $this->cancelUnprocessedOrder($order, $exception->getMessage());
-            $this->_redirect('checkout/cart');
+            return $this->_redirect('checkout/cart');
         }
     }
 
@@ -240,5 +238,16 @@ class Redirect extends Action
         }
 
         return $redirectUrl;
+    }
+
+    private function getMethodInstance(string $method): MethodInterface
+    {
+        $methodInstance = $this->paymentHelper->getMethodInstance($method);
+
+        if ($methodInstance instanceof CreditcardVault) {
+            return $this->paymentHelper->getMethodInstance('mollie_methods_creditcard');
+        }
+
+        return $methodInstance;
     }
 }
