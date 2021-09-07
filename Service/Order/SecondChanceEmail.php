@@ -6,6 +6,8 @@
 
 namespace Mollie\Payment\Service\Order;
 
+use Magento\Framework\DataObject;
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Mail\Template\SenderResolverInterface;
 use Magento\Framework\Mail\Template\TransportBuilder;
 use Magento\Framework\UrlInterface;
@@ -64,6 +66,11 @@ class SecondChanceEmail
      */
     private $logger;
 
+    /**
+     * @var ManagerInterface
+     */
+    private $eventManager;
+
     public function __construct(
         Config $config,
         SenderResolverInterface $senderResolver,
@@ -73,7 +80,8 @@ class SecondChanceEmail
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         Generate $paymentToken,
         UrlInterface $url,
-        MollieLogger $logger
+        MollieLogger $logger,
+        ManagerInterface $eventManager
     ) {
         $this->config = $config;
         $this->senderResolver = $senderResolver;
@@ -84,6 +92,7 @@ class SecondChanceEmail
         $this->paymentToken = $paymentToken;
         $this->url = $url;
         $this->logger = $logger;
+        $this->eventManager = $eventManager;
     }
 
     public function send(OrderInterface $order)
@@ -100,7 +109,9 @@ class SecondChanceEmail
         $builder->setTemplateOptions(['area' => 'frontend', 'store' => $storeId]);
         $this->setFrom($builder, $storeId);
         $builder->addTo($order->getCustomerEmail(), $customerName);
-        $builder->setTemplateVars($this->getTemplateVars($order));
+        $templateVars = new DataObject($this->getTemplateVars($order));
+        $this->eventManager->dispatch('mollie_second_change_email_before_send', ['variables' => $templateVars]);
+        $builder->setTemplateVars($templateVars->toArray());
 
         $this->logger->addInfoLog(
             'info',
@@ -109,6 +120,8 @@ class SecondChanceEmail
 
         $transport = $builder->getTransport();
         $transport->sendMessage();
+
+        $this->eventManager->dispatch('mollie_second_change_email_after_send', ['variables' => $templateVars]);
 
         $this->logger->addInfoLog('info', sprintf('Second chance email for order #%s sent', $order->getIncrementId()));
     }
