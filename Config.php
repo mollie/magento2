@@ -7,6 +7,7 @@
 namespace Mollie\Payment;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Module\Manager;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -77,14 +78,21 @@ class Config
      */
     private $moduleManager;
 
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
     public function __construct(
         ScopeConfigInterface $config,
         MollieLogger $logger,
-        Manager $moduleManager
+        Manager $moduleManager,
+        EncryptorInterface $encryptor
     ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->moduleManager = $moduleManager;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -154,12 +162,13 @@ class Config
             if (empty($apiKey)) {
                 $this->addToLog('error', 'Mollie API key not set (test modus)');
             }
-            if (!preg_match('/^test_\w+$/', $apiKey)) {
+            $decryptedApiKey = $this->encryptor->decrypt($apiKey);
+            if (!preg_match('/^test_\w+$/', $decryptedApiKey)) {
                 $this->addToLog('error', 'Mollie set to test modus, but API key does not start with "test_"');
             }
 
-            $keys[$storeId] = $apiKey;
-            return $apiKey;
+            $keys[$storeId] = $decryptedApiKey;
+            return $decryptedApiKey;
         }
 
         $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId));
@@ -167,12 +176,13 @@ class Config
             $this->addToLog('error', 'Mollie API key not set (live modus)');
         }
 
-        if (!preg_match('/^live_\w+$/', $apiKey)) {
+        $decryptedApiKey = $this->encryptor->decrypt($apiKey);
+        if (!preg_match('/^live_\w+$/', $decryptedApiKey)) {
             $this->addToLog('error', 'Mollie set to live modus, but API key does not start with "live_"');
         }
 
-        $keys[$storeId] = $apiKey;
-        return $apiKey;
+        $keys[$storeId] = $decryptedApiKey;
+        return $decryptedApiKey;
     }
 
     /**

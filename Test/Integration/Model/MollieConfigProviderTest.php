@@ -6,6 +6,7 @@ use Magento\Framework\Locale\Resolver;
 use Mollie\Api\Endpoints\MethodEndpoint;
 use Mollie\Api\Resources\MethodCollection;
 use Mollie\Payment\Config;
+use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\MollieConfigProvider;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -36,8 +37,13 @@ class MollieConfigProviderTest extends IntegrationTestCase
      */
     public function testGetConfig()
     {
+        $mollieHelperMock = $this->createMock(General::class);
+        $mollieHelperMock->method('getApiKey')->willReturn('test_TEST_API_KEY_THAT_IS_LONG_ENOUGH');
+
         /** @var MollieConfigProvider $instance */
-        $instance = $this->objectManager->get(MollieConfigProvider::class);
+        $instance = $this->objectManager->create(MollieConfigProvider::class, [
+            'mollieHelper' => $mollieHelperMock,
+        ]);
 
         $result = $instance->getConfig();
 
