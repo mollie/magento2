@@ -8,7 +8,9 @@ namespace Mollie\Payment\Controller\Adminhtml\Action;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Helper\Tests as TestsHelper;
 
@@ -38,23 +40,40 @@ class Apikey extends Action
     private $mollieHelper;
 
     /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
+
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
      * Apikey constructor.
      *
-     * @param Context      $context
-     * @param JsonFactory  $resultJsonFactory
-     * @param TestsHelper  $testsHelper
+     * @param Context $context
+     * @param JsonFactory $resultJsonFactory
+     * @param TestsHelper $testsHelper
      * @param MollieHelper $mollieHelper
+     * @param ScopeConfigInterface $scopeConfig
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         TestsHelper $testsHelper,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        ScopeConfigInterface $scopeConfig,
+        EncryptorInterface $encryptor
     ) {
         $this->request = $context->getRequest();
         $this->resultJsonFactory = $resultJsonFactory;
         $this->testsHelper = $testsHelper;
         $this->mollieHelper = $mollieHelper;
+        $this->scopeConfig = $scopeConfig;
+        $this->encryptor = $encryptor;
+
         parent::__construct($context);
     }
 
@@ -71,8 +90,8 @@ class Apikey extends Action
             return $result;
         }
 
-        $testKey = $this->request->getParam('test_key');
-        $liveKey = $this->request->getParam('live_key');
+        $testKey = $this->getKey('test');
+        $liveKey = $this->getKey('live');
         $results = $this->testsHelper->getMethods($testKey, $liveKey);
 
         return $result->setData(['success' => true, 'msg' => implode('<br/>', $results)]);
@@ -84,5 +103,16 @@ class Apikey extends Action
     protected function _isAllowed()
     {
         return $this->_authorization->isAllowed('Mollie_Payment::config');
+    }
+
+    private function getKey(string $type): string
+    {
+        if (!$this->request->getParam($type . '_key') || $this->request->getParam($type . '_key') == '******') {
+            $value = $this->scopeConfig->getValue('payment/mollie_general/apikey_' . $type);
+
+            return $this->encryptor->decrypt($value);
+        }
+
+        return $this->request->getParam('test_key');
     }
 }

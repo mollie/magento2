@@ -3,10 +3,12 @@
 namespace Mollie\Payment\Test\Integration\Model;
 
 use Magento\Framework\DataObject;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Mollie;
@@ -34,6 +36,9 @@ class MollieTest extends IntegrationTestCase
         $order->setMollieTransactionId($orderId);
         $this->objectManager->get(OrderRepositoryInterface::class)->save($order);
 
+        $mollieHelperMock = $this->createMock(General::class);
+        $mollieHelperMock->method('getApiKey')->willReturn('test_TEST_API_KEY_THAT_IS_LONG_ENOUGH');
+
         $ordersApiMock = $this->createMock(Orders::class);
         $paymentsApiMock = $this->createMock(Payments::class);
 
@@ -49,6 +54,7 @@ class MollieTest extends IntegrationTestCase
         $instance = $this->objectManager->create(Mollie::class, [
             'ordersApi' => $ordersApiMock,
             'paymentsApi' => $paymentsApiMock,
+            'mollieHelper' => $mollieHelperMock,
         ]);
 
         $instance->processTransaction($order->getEntityId());
@@ -196,6 +202,11 @@ class MollieTest extends IntegrationTestCase
     {
         $this->expectException(LocalizedException::class);
 
+        $encryptorMock = $this->createMock(EncryptorInterface::class);
+        $encryptorMock->method('decrypt')->willReturn('test_dummyapikeywhichmustbe30characterslong');
+
+        $mollieHelper = $this->objectManager->create(General::class, ['encryptor' => $encryptorMock]);
+
         $order = $this->loadOrder('100000001');
         $order->getPayment()->setMethod('mollie_methods_voucher');
 
@@ -211,6 +222,7 @@ class MollieTest extends IntegrationTestCase
         $instance = $this->objectManager->create(Mollie::class, [
             'ordersApi' => $ordersApi,
             'paymentsApi' => $paymentsApi,
+            'mollieHelper' => $mollieHelper,
         ]);
 
         $instance->startTransaction($order);
