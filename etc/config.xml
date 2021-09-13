@@ -217,7 +217,7 @@
                 <title>iDeal</title>
                 <payment_description>{ordernumber}</payment_description>
                 <method>payment</method>
-                <issuer_list_type>dropdown</issuer_list_type>
+                <issuer_list_type>radio</issuer_list_type>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
