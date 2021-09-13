@@ -601,7 +601,7 @@ class Mollie extends AbstractMethod
     /**
      * Get list of Issuers from API
      *
-     * @param $mollieApi
+     * @param MollieApiClient $mollieApi
      * @param $method
      * @param $issuerListType
      *
@@ -618,24 +618,13 @@ class Mollie extends AbstractMethod
         $methodCode = str_replace('mollie_methods_', '', $method);
 
         try {
-            $issuersList = $mollieApi->methods->get($methodCode, ["include" => "issuers"])->issuers;
-            if (!$issuersList) {
+            $issuers = $mollieApi->methods->get($methodCode, ['include' => 'issuers'])->issuers;
+            if (!$issuers) {
                 return null;
             }
 
-            foreach ($issuersList as $issuer) {
-                $issuers[] = $issuer;
-            }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-        }
-
-        if ($issuers && $issuerListType == 'dropdown') {
-            array_unshift($issuers, [
-                'resource' => 'issuer',
-                'id'       => '',
-                'name'     => __('-- Please Select --')
-            ]);
         }
 
         if ($this->mollieHelper->addQrOption() && $methodCode == 'ideal') {
@@ -648,6 +637,21 @@ class Mollie extends AbstractMethod
                     'svg' => $this->assetRepository->getUrl('Mollie_Payment::images/qr-select.svg'),
                 ]
             ];
+        }
+
+        uasort($issuers, function($a, $b) {
+            $a = (array)$a;
+            $b = (array)$b;
+
+            return strcmp(strtolower($a['name']), strtolower($b['name']));
+        });
+
+        if ($issuers && $issuerListType == 'dropdown') {
+            array_unshift($issuers, [
+                'resource' => 'issuer',
+                'id'       => '',
+                'name'     => __('-- Please Select --')
+            ]);
         }
 
         return $issuers;
