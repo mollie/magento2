@@ -66,19 +66,13 @@ class CardRenderer extends AbstractTokenRenderer
         return $asset;
     }
 
-    /**
-     * @return int
-     */
     public function getIconHeight()
     {
-        return $this->getIconForType($this->getTokenDetails()['type'])['height'];
+        return null;
     }
 
-    /**
-     * @return int
-     */
     public function getIconWidth()
     {
-        return $this->getIconForType($this->getTokenDetails()['type'])['width'];
+        return null;
     }
 }

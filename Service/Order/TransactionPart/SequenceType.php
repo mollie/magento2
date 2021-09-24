@@ -65,11 +65,7 @@ class SequenceType implements TransactionPartInterface
             return true;
         }
 
-        if (!$order->getPayment() || !$this->config->creditcardEnableCustomersApi($order->getStoreId())) {
-            return false;
-        }
-
-        if (!$this->customerSession->isLoggedIn()) {
+        if (!$order->getPayment() || !$this->customerSession->isLoggedIn()) {
             return false;
         }
 
