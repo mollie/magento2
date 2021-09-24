@@ -403,6 +403,7 @@
                 <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
+                <can_initialize>1</can_initialize>
                 <can_use_checkout>0</can_use_checkout>
                 <can_order>1</can_order>
                 <can_refund>1</can_refund>
