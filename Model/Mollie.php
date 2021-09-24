@@ -561,22 +561,20 @@ class Mollie extends Adapter
      *
      * @return array|null
      */
-    public function getIssuers($mollieApi, $method, $issuerListType)
+    public function getIssuers($mollieApi, $method, $issuerListType): ?array
     {
         $issuers = [];
-
         if (empty($mollieApi) || $issuerListType == 'none') {
             return $issuers;
         }
 
-        $methodCode = str_replace('mollie_methods_', '', $method);
-
         try {
+            $methodCode = str_replace('mollie_methods_', '', $method);
             $issuers = $mollieApi->methods->get($methodCode, ['include' => 'issuers'])->issuers;
+
             if (!$issuers) {
                 return null;
             }
-
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
         }
@@ -593,6 +591,7 @@ class Mollie extends Adapter
             ];
         }
 
+        // Sort the list by name
         uasort($issuers, function($a, $b) {
             $a = (array)$a;
             $b = (array)$b;
@@ -608,7 +607,7 @@ class Mollie extends Adapter
             ]);
         }
 
-        return $issuers;
+        return array_values($issuers);
     }
 
     /**

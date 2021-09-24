@@ -171,7 +171,7 @@ class MollieConfigProvider implements ConfigProviderInterface
      *
      * @return array
      */
-    public function getConfig()
+    public function getConfig(): array
     {
         $store = $this->storeManager->getStore();
         $storeId = $store->getId();

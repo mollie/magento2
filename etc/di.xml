@@ -923,7 +923,7 @@
         <arguments>
             <argument name="requestBuilder" xsi:type="object">MollieInitializeRequestBuilder</argument>
             <argument name="transferFactory" xsi:type="object">Mollie\Payment\Gateway\Http\TransferFactory</argument>
-            <argument name="client" xsi:type="object">Mollie\Payment\Gateway\Http\Client\OrdersApiClient</argument>
+            <argument name="client" xsi:type="object">Mollie\Payment\Gateway\Http\Client\GenericClient</argument>
         </arguments>
     </virtualType>
 

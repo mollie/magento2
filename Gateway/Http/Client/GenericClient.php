@@ -9,9 +9,9 @@ namespace Mollie\Payment\Gateway\Http\Client;
 use Magento\Payment\Gateway\Http\ClientInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 
-class OrdersApiClient implements ClientInterface
+class GenericClient implements ClientInterface
 {
-    public function placeRequest(TransferInterface $transferObject)
+    public function placeRequest(TransferInterface $transferObject): array
     {
         return [];
     }
