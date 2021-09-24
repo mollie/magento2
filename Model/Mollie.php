@@ -568,8 +568,8 @@ class Mollie extends Adapter
             return $issuers;
         }
 
+        $methodCode = str_replace('mollie_methods_', '', $method);
         try {
-            $methodCode = str_replace('mollie_methods_', '', $method);
             $issuers = $mollieApi->methods->get($methodCode, ['include' => 'issuers'])->issuers;
 
             if (!$issuers) {

@@ -313,6 +313,7 @@
                 <allowspecific>0</allowspecific>
                 <message><![CDATA[Click <a href="%link%">here</a> to pay for your purchase.]]></message>
                 <instructions/>
+                <can_initialize>1</can_initialize>
                 <can_use_checkout>0</can_use_checkout>
                 <can_order>1</can_order>
                 <can_refund>1</can_refund>
