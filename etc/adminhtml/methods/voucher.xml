@@ -21,10 +21,7 @@
         <field id="payment_description" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Description</label>
             <config_path>payment/mollie_methods_voucher/payment_description</config_path>
-            <comment><![CDATA[The description to be used for this transaction. These variables are available:<br><br>
-            <strong>{ordernumber}</strong>: The order number for this transaction<br>
-            <strong>{storename}</strong>: The name of the store<br><br>
-            ]]></comment>
+            <comment model="Mollie\Payment\Model\Adminhtml\Comment\AvailableDescriptionVariables"/>
             <depends>
                 <field id="method">payment</field>
                 <field id="active">1</field>
