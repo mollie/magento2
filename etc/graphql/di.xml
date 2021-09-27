@@ -25,4 +25,8 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\QuoteGraphQl\Model\Resolver\PlaceOrder">
+        <plugin name="mollie_set_the_redirect_url" type="Mollie\Payment\GraphQL\Plugin\PlaceOrder\SetTheRedirectUrl" />
+    </type>
 </config>
