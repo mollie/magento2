@@ -35,6 +35,7 @@ define(
             {type: 'mollie_methods_giropay', component: defaultComponent},
             {type: 'mollie_methods_eps', component: defaultComponent},
             {type: 'mollie_methods_klarnapaylater', component: defaultComponent},
+            {type: 'mollie_methods_klarnapaynow', component: defaultComponent},
             {type: 'mollie_methods_klarnasliceit', component: defaultComponent},
             {type: 'mollie_methods_giftcard', component: giftcardComponent},
             {type: 'mollie_methods_przelewy24', component: defaultComponent},

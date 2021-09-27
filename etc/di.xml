@@ -816,10 +816,55 @@
         </arguments>
     </virtualType>
 
+    <!-- Klarnapaynow -->
+    <type name="Mollie\Payment\Model\Methods\Klarnapaynow">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnapaynowValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieKlarnapaynowValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieKlarnapaynowValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieKlarnapaynowConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnapaynowConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieKlarnapaynowConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnapaynowConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Klarnapaynow::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnapaynowValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieKlarnapaynowCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnapaynowCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieKlarnapaynowConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Klarnasliceit -->
     <type name="Mollie\Payment\Model\Methods\Klarnasliceit">
         <arguments>
-            <argument name="formBlockType" xsi:type="string">Magento\Methods\Klarnapaylater\Block\Form</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Methods\Klarnapaysliceit\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieKlarnasliceitValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>

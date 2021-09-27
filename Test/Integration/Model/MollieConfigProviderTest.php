@@ -17,20 +17,6 @@ class MollieConfigProviderTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_TEST_API_KEY_THAT_IS_LONG_ENOUGH
      * @magentoConfigFixture default_store payment/mollie_general/type test
      *
-     * @magentoConfigFixture default_store payment/mollie_methods_bancontact/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_bancontact/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_banktransfer/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_belfius/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_creditcard/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_paypal/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_paysafecard/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_sofort/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_giropay/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_eps/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_klarnapaylater/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_klarnasliceit/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_przelewy24/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_applepay/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_kbc/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_giftcard/active 1
@@ -47,11 +33,30 @@ class MollieConfigProviderTest extends IntegrationTestCase
 
         $result = $instance->getConfig();
 
-        $this->assertCount(19, $result['payment']['image']);
-
         $this->assertArrayHasKey('mollie_methods_ideal', $result['payment']['issuersListType']);
         $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['issuersListType']);
         $this->assertArrayHasKey('mollie_methods_giftcard', $result['payment']['issuersListType']);
+
+        $this->assertArrayHasKey('mollie_methods_applepay', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_bancontact', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_banktransfer', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_belfius', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_creditcard', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_directdebit', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_eps', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_giftcard', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_giropay', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_ideal', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_klarnapaylater', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_klarnapaynow', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_klarnasliceit', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_mybank', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_paypal', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_paysafecard', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_przelewy24', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_sofort', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_voucher', $result['payment']['image']);
 
         $this->assertEquals([], $result['payment']['issuers']['mollie_methods_ideal']);
         $this->assertEquals([], $result['payment']['issuers']['mollie_methods_kbc']);
