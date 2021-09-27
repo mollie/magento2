@@ -893,17 +893,6 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param string $method
-     * @param string $orderNumber
-     * @param int $storeId
-     * @return string
-     */
-    public function getPaymentDescription(string $method, string $orderNumber, $storeId = 0)
-    {
-        return $this->transactionDescription->forRegularTransaction($method, $orderNumber, $storeId);
-    }
-
-    /**
      * If one of the payments has the status 'paid', return that status. Otherwise return the last status.
      *
      * @param MollieOrder $order
