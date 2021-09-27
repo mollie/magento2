@@ -86,6 +86,10 @@ input MollieProcessTransactionInput {
     payment_token: String! @doc(description: "The payment token returned from the PlaceOrder call/added to the return URL")
 }
 
+input PlaceOrderInput {
+    mollie_return_url: String @doc(description: "Optionally send a URL where the visitor is returned after completing the Mollie order")
+}
+
 enum PaymentStatusEnum {
     CREATED
     PAID

@@ -37,6 +37,11 @@ class Transaction
      */
     private $scopeConfig;
 
+    /**
+     * @var string
+     */
+    private $redirectUrl;
+
     public function __construct(
         Config $config,
         Context $context,
@@ -47,6 +52,11 @@ class Transaction
         $this->urlBuilder = $context->getUrlBuilder();
         $this->encryptor = $encryptor;
         $this->scopeConfig = $scopeConfig;
+    }
+
+    public function setRedirectUrl(string $url): void
+    {
+        $this->redirectUrl = $url;
     }
 
     /**
@@ -60,7 +70,7 @@ class Transaction
         $useCustomUrl = $this->config->useCustomRedirectUrl($storeId);
         $customUrl = $this->config->customRedirectUrl($storeId);
 
-        if ($useCustomUrl && $customUrl) {
+        if ($this->redirectUrl || ($useCustomUrl && $customUrl)) {
             return $this->addParametersToCustomUrl($order, $paymentToken, $storeId);
         }
 
@@ -104,6 +114,10 @@ class Transaction
         ];
 
         $customUrl = $this->config->customRedirectUrl($storeId);
+        if ($this->redirectUrl) {
+            $customUrl = $this->redirectUrl;
+        }
+
         $customUrl = str_ireplace(
             array_keys($replacements),
             array_values($replacements),
