@@ -4,6 +4,7 @@ namespace Mollie\Payment\Test\Integration\Model\Client;
 
 use Magento\Framework\Phrase;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
@@ -227,6 +228,7 @@ class OrdersTest extends IntegrationTestCase
     }
 
     /**
+     * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 5
      *
@@ -235,7 +237,11 @@ class OrdersTest extends IntegrationTestCase
      */
     public function testStartTransactionIncludesTheExpiresAtParameter()
     {
+        $cart = $this->objectManager->create(Quote::class);
+        $cart->load('test01', 'reserved_order_id');
+
         $order = $this->loadOrder('100000001');
+        $order->setQuoteId($cart->getId());
         $order->getPayment()->setMethod('mollie_methods_ideal');
 
         $mollieApiMock = $this->createMock(MollieApiClient::class);

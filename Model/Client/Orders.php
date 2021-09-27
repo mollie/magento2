@@ -43,6 +43,7 @@ use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\TransactionProcessor;
+use Mollie\Payment\Service\PaymentToken\PaymentTokenForOrder;
 
 /**
  * Class Orders
@@ -154,6 +155,11 @@ class Orders extends AbstractModel
     private $cancelOrder;
 
     /**
+     * @var PaymentTokenForOrder
+     */
+    private $paymentTokenForOrder;
+
+    /**
      * Orders constructor.
      *
      * @param OrderLines $orderLines
@@ -205,6 +211,7 @@ class Orders extends AbstractModel
         DashboardUrl $dashboardUrl,
         TransactionProcessor $transactionProcessor,
         CancelOrder $cancelOrder,
+        PaymentTokenForOrder $paymentTokenForOrder,
         EventManager $eventManager
     ) {
         $this->orderLines = $orderLines;
@@ -231,6 +238,7 @@ class Orders extends AbstractModel
         $this->transactionProcessor = $transactionProcessor;
         $this->eventManager = $eventManager;
         $this->cancelOrder = $cancelOrder;
+        $this->paymentTokenForOrder = $paymentTokenForOrder;
     }
 
     /**
@@ -253,7 +261,7 @@ class Orders extends AbstractModel
             return $mollieOrder->getCheckoutUrl();
         }
 
-        $paymentToken = $this->mollieHelper->getPaymentToken();
+        $paymentToken = $this->paymentTokenForOrder->execute($order);
         $method = $this->mollieHelper->getMethodCode($order);
         $orderData = [
             'amount'              => $this->mollieHelper->getOrderAmountByOrder($order),
