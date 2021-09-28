@@ -27,19 +27,12 @@ class SequenceType implements TransactionPartInterface
      */
     private $customerSession;
 
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
         OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
-        Session $customerSession,
-        Config $config
+        Session $customerSession
     ) {
         $this->orderContainsSubscriptionProduct = $orderContainsSubscriptionProduct;
         $this->customerSession = $customerSession;
-        $this->config = $config;
     }
 
     public function process(OrderInterface $order, $apiMethod, array $transaction): array
