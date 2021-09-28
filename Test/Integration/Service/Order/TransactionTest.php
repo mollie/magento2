@@ -197,4 +197,18 @@ class TransactionTest extends IntegrationTestCase
 
         $this->assertEquals('custom_url_for_test', $result);
     }
+
+    public function testAllowsToManuallySetAnUrl()
+    {
+        $order = $this->objectManager->create(OrderInterface::class);
+
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+
+        $instance->setRedirectUrl('http://this-is-a-test.com/');
+
+        $result = $instance->getRedirectUrl($order, 'PAYMENT_TOKEN_TEST');
+
+        $this->assertStringContainsString('http://this-is-a-test.com/', $result);
+    }
 }

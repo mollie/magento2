@@ -15,11 +15,10 @@ use Mollie\Payment\Model\Mollie;
  */
 class General extends Mollie
 {
-
     /**
      * Payment method code
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_general';
+    const CODE = 'mollie_methods_general';
 }

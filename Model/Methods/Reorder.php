@@ -6,53 +6,42 @@
 
 namespace Mollie\Payment\Model\Methods;
 
-use Magento\Framework\Api\AttributeValueFactory;
-use Magento\Framework\Api\ExtensionAttributesFactory;
-use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\Data\Collection\AbstractDb;
-use Magento\Framework\Model\Context;
-use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Registry;
-use Magento\Payment\Helper\Data;
-use Magento\Payment\Model\Method\AbstractMethod;
-use Magento\Payment\Model\Method\Logger;
+use Magento\Framework\View\Asset\Repository as AssetRepository;
+use Magento\Payment\Gateway\Command\CommandManagerInterface;
+use Magento\Payment\Gateway\Command\CommandPoolInterface;
+use Magento\Payment\Gateway\Config\ValueHandlerPoolInterface;
+use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
+use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Sales\Model\OrderRepository;
+use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
+use Mollie\Payment\Config;
+use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\Client\Orders as OrdersApi;
+use Mollie\Payment\Model\Client\Payments as PaymentsApi;
+use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\Timeout;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Reorder
  *
  * @package Mollie\Payment\Model\Methods
  */
-class Reorder extends AbstractMethod
+class Reorder extends Mollie
 {
     /**
      * Payment method code
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_reorder';
-
-    /**
-     * Availability option
-     *
-     * @var bool
-     */
-    protected $_canUseCheckout = false;
-
-    /**
-     * Availability option
-     *
-     * @var bool
-     */
-    protected $_canUseInternal = true;
-
-    /**
-     * Payment Method feature
-     *
-     * @var bool
-     */
-    protected $_canOrder = true;
+    const CODE = 'mollie_methods_reorder';
 
     /**
      * @var RequestInterface
@@ -60,32 +49,54 @@ class Reorder extends AbstractMethod
     private $request;
 
     public function __construct(
-        Context $context,
+        ManagerInterface $eventManager,
+        ValueHandlerPoolInterface $valueHandlerPool,
+        PaymentDataObjectFactory $paymentDataObjectFactory,
         Registry $registry,
-        ExtensionAttributesFactory $extensionFactory,
-        AttributeValueFactory $customAttributeFactory,
-        Data $paymentData,
-        ScopeConfigInterface $scopeConfig,
-        Logger $logger,
+        OrderRepository $orderRepository,
+        OrderFactory $orderFactory,
+        OrdersApi $ordersApi,
+        PaymentsApi $paymentsApi,
+        MollieHelper $mollieHelper,
+        CheckoutSession $checkoutSession,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
+        AssetRepository $assetRepository,
+        ResourceConnection $resourceConnection,
+        Config $config,
+        Timeout $timeout,
         RequestInterface $request,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        $formBlockType,
+        $infoBlockType,
+        CommandPoolInterface $commandPool = null,
+        ValidatorPoolInterface $validatorPool = null,
+        CommandManagerInterface $commandExecutor = null,
+        LoggerInterface $logger = null
     ) {
-        $this->request = $request;
-
         parent::__construct(
-            $context,
+            $eventManager,
+            $valueHandlerPool,
+            $paymentDataObjectFactory,
             $registry,
-            $extensionFactory,
-            $customAttributeFactory,
-            $paymentData,
-            $scopeConfig,
-            $logger,
-            $resource,
-            $resourceCollection,
-            $data
+            $orderRepository,
+            $orderFactory,
+            $ordersApi,
+            $paymentsApi,
+            $mollieHelper,
+            $checkoutSession,
+            $searchCriteriaBuilder,
+            $assetRepository,
+            $resourceConnection,
+            $config,
+            $timeout,
+            $formBlockType,
+            $infoBlockType,
+            $commandPool,
+            $validatorPool,
+            $commandExecutor,
+            $logger
         );
+
+        $this->request = $request;
     }
 
     /**

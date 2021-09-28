@@ -1,6 +1,6 @@
 define([
     'jquery',
-    'Mollie_Payment/js/view/payment/method-renderer/default',
+    'Mollie_Payment/js/view/payment/method-renderer/creditcard',
     'https://js.mollie.com/v1/mollie.js'
 ],
 function ($, Component, Mollie) {
@@ -71,13 +71,18 @@ function ($, Component, Mollie) {
         },
 
         getData: function () {
-            return {
+            var data = {
                 'method': this.item.method,
                 'po_number': null,
                 'additional_data': {
                     'card_token': this.cardToken
                 }
             };
+
+            data['additional_data'] = _.extend(data['additional_data'], this.additionalData);
+            this.vaultEnabler.visitAdditionalData(data);
+
+            return data;
         },
 
         placeOrder: function (data, event) {
@@ -149,6 +154,6 @@ function ($, Component, Mollie) {
          */
         getOptions: function (type) {
             return {};
-        }
+        },
     });
 });

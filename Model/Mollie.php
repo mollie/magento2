@@ -7,22 +7,20 @@
 namespace Mollie\Payment\Model;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\Api\AttributeValueFactory;
-use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\Data\Collection\AbstractDb;
 use Magento\Framework\DataObject;
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Model\Context;
-use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
-use Magento\Payment\Helper\Data;
-use Magento\Payment\Model\Method\AbstractMethod;
-use Magento\Payment\Model\Method\Logger;
+use Magento\Payment\Gateway\Command\CommandManagerInterface;
+use Magento\Payment\Gateway\Command\CommandPoolInterface;
+use Magento\Payment\Gateway\Config\ValueHandlerPoolInterface;
+use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
+use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
+use Magento\Payment\Model\Method\Adapter;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
@@ -33,52 +31,29 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Service\Mollie\Timeout;
+use Psr\Log\LoggerInterface;
 
 /**
  * Class Mollie
  *
  * @package Mollie\Payment\Model
  */
-class Mollie extends AbstractMethod
+class Mollie extends Adapter
 {
+    const CODE = 'mollie';
+
     /**
-     * Enable Initialize
-     *
-     * @var bool
+     * @var Registry
      */
-    protected $_isInitializeNeeded = true;
+    private $registry;
     /**
-     * Enable Gateway
-     *
-     * @var bool
+     * @var ManagerInterface
      */
-    protected $_isGateway = true;
-    /**
-     * Enable Refund
-     *
-     * @var bool
-     */
-    protected $_canRefund = true;
-    /**
-     * Enable Partial Refund
-     *
-     * @var bool
-     */
-    protected $_canRefundInvoicePartial = true;
-    /**
-     * Availability option
-     *
-     * @var bool
-     */
-    protected $_canUseInternal = false;
+    private $eventManager;
     /**
      * @var Config
      */
     protected $config;
-    /**
-     * @var array
-     */
-    private $issuers = [];
     /**
      * @var MollieHelper
      */
@@ -87,10 +62,6 @@ class Mollie extends AbstractMethod
      * @var CheckoutSession
      */
     private $checkoutSession;
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
     /**
      * @var OrderRepository
      */
@@ -124,39 +95,11 @@ class Mollie extends AbstractMethod
      */
     private $timeout;
 
-    /**
-     * Mollie constructor.
-     *
-     * @param Context                    $context
-     * @param Registry                   $registry
-     * @param ExtensionAttributesFactory $extensionFactory
-     * @param AttributeValueFactory      $customAttributeFactory
-     * @param Data                       $paymentData
-     * @param ScopeConfigInterface       $scopeConfig
-     * @param Logger                     $logger
-     * @param OrderRepository            $orderRepository
-     * @param OrderFactory               $orderFactory
-     * @param OrdersApi                  $ordersApi
-     * @param PaymentsApi                $paymentsApi
-     * @param MollieHelper               $mollieHelper
-     * @param CheckoutSession            $checkoutSession
-     * @param SearchCriteriaBuilder      $searchCriteriaBuilder
-     * @param AssetRepository            $assetRepository
-     * @param ResourceConnection         $resourceConnection
-     * @param Config                     $config
-     * @param Timeout                    $timeout
-     * @param AbstractResource|null      $resource
-     * @param AbstractDb|null            $resourceCollection
-     * @param array                      $data
-     */
     public function __construct(
-        Context $context,
+        ManagerInterface $eventManager,
+        ValueHandlerPoolInterface $valueHandlerPool,
+        PaymentDataObjectFactory $paymentDataObjectFactory,
         Registry $registry,
-        ExtensionAttributesFactory $extensionFactory,
-        AttributeValueFactory $customAttributeFactory,
-        Data $paymentData,
-        ScopeConfigInterface $scopeConfig,
-        Logger $logger,
         OrderRepository $orderRepository,
         OrderFactory $orderFactory,
         OrdersApi $ordersApi,
@@ -168,27 +111,32 @@ class Mollie extends AbstractMethod
         ResourceConnection $resourceConnection,
         Config $config,
         Timeout $timeout,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        $formBlockType,
+        $infoBlockType,
+        CommandPoolInterface $commandPool = null,
+        ValidatorPoolInterface $validatorPool = null,
+        CommandManagerInterface $commandExecutor = null,
+        LoggerInterface $logger = null
     ) {
         parent::__construct(
-            $context,
-            $registry,
-            $extensionFactory,
-            $customAttributeFactory,
-            $paymentData,
-            $scopeConfig,
-            $logger,
-            $resource,
-            $resourceCollection,
-            $data
+            $eventManager,
+            $valueHandlerPool,
+            $paymentDataObjectFactory,
+            static::CODE,
+            $formBlockType,
+            $infoBlockType,
+            $commandPool,
+            $validatorPool,
+            $commandExecutor,
+            $logger
         );
+
+        $this->registry = $registry;
+        $this->eventManager = $eventManager;
         $this->paymentsApi = $paymentsApi;
         $this->ordersApi = $ordersApi;
         $this->mollieHelper = $mollieHelper;
         $this->checkoutSession = $checkoutSession;
-        $this->scopeConfig = $scopeConfig;
         $this->orderRepository = $orderRepository;
         $this->orderFactory = $orderFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
@@ -196,6 +144,11 @@ class Mollie extends AbstractMethod
         $this->resourceConnection = $resourceConnection;
         $this->config = $config;
         $this->timeout = $timeout;
+    }
+
+    public function getCode()
+    {
+        return static::CODE;
     }
 
     /**
@@ -222,7 +175,7 @@ class Mollie extends AbstractMethod
         }
 
         $activeMethods = $this->mollieHelper->getAllActiveMethods($quote->getStoreId());
-        if ($this->_code != 'mollie_methods_paymentlink' && !array_key_exists($this->_code, $activeMethods)) {
+        if ($this::CODE != 'mollie_methods_paymentlink' && !array_key_exists($this::CODE, $activeMethods)) {
             return false;
         }
 
@@ -264,7 +217,7 @@ class Mollie extends AbstractMethod
      */
     public function startTransaction(Order $order)
     {
-        $this->_eventManager->dispatch('mollie_start_transaction', ['order' => $order]);
+        $this->eventManager->dispatch('mollie_start_transaction', ['order' => $order]);
 
         $storeId = $order->getStoreId();
         if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
@@ -353,7 +306,7 @@ class Mollie extends AbstractMethod
     {
         /** @var \Magento\Sales\Model\Order $order */
         $order = $this->orderRepository->get($orderId);
-        $this->_eventManager->dispatch('mollie_process_transaction_start', ['order' => $order]);
+        $this->eventManager->dispatch('mollie_process_transaction_start', ['order' => $order]);
         if (empty($order)) {
             $msg = ['error' => true, 'msg' => __('Order not found')];
             $this->mollieHelper->addTolog('error', $msg);
@@ -396,7 +349,7 @@ class Mollie extends AbstractMethod
             $connection->rollBack();
             throw $exception;
         } finally {
-            $this->_eventManager->dispatch('mollie_process_transaction_end', ['order' => $order]);
+            $this->eventManager->dispatch('mollie_process_transaction_end', ['order' => $order]);
         }
     }
 
@@ -499,6 +452,7 @@ class Mollie extends AbstractMethod
     public function createOrderRefund(Order\Creditmemo $creditmemo, Order $order)
     {
         $this->ordersApi->createOrderRefund($creditmemo, $order);
+        return $this;
     }
 
     /**
@@ -520,7 +474,7 @@ class Mollie extends AbstractMethod
          */
         $checkoutType = $this->mollieHelper->getCheckoutType($order);
         if ($checkoutType == 'order') {
-            $this->_registry->register('online_refund', true);
+            $this->registry->register('online_refund', true);
             return $this;
         }
 
@@ -601,41 +555,28 @@ class Mollie extends AbstractMethod
     /**
      * Get list of Issuers from API
      *
-     * @param $mollieApi
+     * @param MollieApiClient $mollieApi
      * @param $method
      * @param $issuerListType
      *
      * @return array|null
      */
-    public function getIssuers($mollieApi, $method, $issuerListType)
+    public function getIssuers($mollieApi, $method, $issuerListType): ?array
     {
         $issuers = [];
-
         if (empty($mollieApi) || $issuerListType == 'none') {
             return $issuers;
         }
 
         $methodCode = str_replace('mollie_methods_', '', $method);
-
         try {
-            $issuersList = $mollieApi->methods->get($methodCode, ["include" => "issuers"])->issuers;
-            if (!$issuersList) {
-                return null;
-            }
+            $issuers = $mollieApi->methods->get($methodCode, ['include' => 'issuers'])->issuers;
 
-            foreach ($issuersList as $issuer) {
-                $issuers[] = $issuer;
+            if (!$issuers) {
+                return null;
             }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-        }
-
-        if ($issuers && $issuerListType == 'dropdown') {
-            array_unshift($issuers, [
-                'resource' => 'issuer',
-                'id'       => '',
-                'name'     => __('-- Please Select --')
-            ]);
         }
 
         if ($this->mollieHelper->addQrOption() && $methodCode == 'ideal') {
@@ -650,7 +591,23 @@ class Mollie extends AbstractMethod
             ];
         }
 
-        return $issuers;
+        // Sort the list by name
+        uasort($issuers, function($a, $b) {
+            $a = (array)$a;
+            $b = (array)$b;
+
+            return strcmp(strtolower($a['name']), strtolower($b['name']));
+        });
+
+        if ($issuers && $issuerListType == 'dropdown') {
+            array_unshift($issuers, [
+                'resource' => 'issuer',
+                'id'       => '',
+                'name'     => __('-- Please Select --')
+            ]);
+        }
+
+        return array_values($issuers);
     }
 
     /**

@@ -53,7 +53,7 @@ class LimitMethodsForRecurringPayments
             return $result;
         }
 
-        return array_filter($result, function (PaymentMethodInterface $method) {
+        return array_filter($result, function ($method) {
             return in_array($method->getCode(), static::ALLOWED_METHODS);
         });
     }

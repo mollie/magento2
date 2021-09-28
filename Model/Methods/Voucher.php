@@ -7,18 +7,16 @@
 namespace Mollie\Payment\Model\Methods;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\Api\AttributeValueFactory;
-use Magento\Framework\Api\ExtensionAttributesFactory;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ResourceConnection;
-use Magento\Framework\Data\Collection\AbstractDb;
-use Magento\Framework\Model\Context;
-use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
-use Magento\Payment\Helper\Data;
-use Magento\Payment\Model\Method\Logger;
+use Magento\Payment\Gateway\Command\CommandManagerInterface;
+use Magento\Payment\Gateway\Command\CommandPoolInterface;
+use Magento\Payment\Gateway\Config\ValueHandlerPoolInterface;
+use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
+use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
@@ -27,24 +25,19 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
+use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Mollie\Payment\Service\Quote\QuoteHasMealVoucherProducts;
+use Psr\Log\LoggerInterface;
 
-class Voucher extends \Mollie\Payment\Model\Mollie
+class Voucher extends Mollie
 {
     /**
      * Payment method code
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_voucher';
-
-    /**
-     * Info instructions block path
-     *
-     * @var string
-     */
-    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
+    const CODE = 'mollie_methods_voucher';
 
     /**
      * @var QuoteHasMealVoucherProducts
@@ -52,13 +45,10 @@ class Voucher extends \Mollie\Payment\Model\Mollie
     private $quoteHasMealVoucherProducts;
 
     public function __construct(
-        Context $context,
+        ManagerInterface $eventManager,
+        ValueHandlerPoolInterface $valueHandlerPool,
+        PaymentDataObjectFactory $paymentDataObjectFactory,
         Registry $registry,
-        ExtensionAttributesFactory $extensionFactory,
-        AttributeValueFactory $customAttributeFactory,
-        Data $paymentData,
-        ScopeConfigInterface $scopeConfig,
-        Logger $logger,
         OrderRepository $orderRepository,
         OrderFactory $orderFactory,
         OrdersApi $ordersApi,
@@ -70,19 +60,19 @@ class Voucher extends \Mollie\Payment\Model\Mollie
         ResourceConnection $resourceConnection,
         Config $config,
         Timeout $timeout,
+        $formBlockType,
+        $infoBlockType,
         QuoteHasMealVoucherProducts $quoteHasMealVoucherProducts,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
-        array $data = []
+        CommandPoolInterface $commandPool = null,
+        ValidatorPoolInterface $validatorPool = null,
+        CommandManagerInterface $commandExecutor = null,
+        LoggerInterface $logger = null
     ) {
         parent::__construct(
-            $context,
+            $eventManager,
+            $valueHandlerPool,
+            $paymentDataObjectFactory,
             $registry,
-            $extensionFactory,
-            $customAttributeFactory,
-            $paymentData,
-            $scopeConfig,
-            $logger,
             $orderRepository,
             $orderFactory,
             $ordersApi,
@@ -94,9 +84,12 @@ class Voucher extends \Mollie\Payment\Model\Mollie
             $resourceConnection,
             $config,
             $timeout,
-            $resource,
-            $resourceCollection,
-            $data
+            $formBlockType,
+            $infoBlockType,
+            $commandPool,
+            $validatorPool,
+            $commandExecutor,
+            $logger
         );
 
         $this->quoteHasMealVoucherProducts = $quoteHasMealVoucherProducts;

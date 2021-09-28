@@ -7,6 +7,7 @@
 namespace Mollie\Payment;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Module\Manager;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Store\Model\ScopeInterface;
@@ -27,6 +28,7 @@ class Config
     const GENERAL_DEFAULT_SELECTED_METHOD = 'payment/mollie_general/default_selected_method';
     const GENERAL_DASHBOARD_URL_ORDERS_API = 'payment/mollie_general/dashboard_url_orders_api';
     const GENERAL_DASHBOARD_URL_PAYMENTS_API = 'payment/mollie_general/dashboard_url_payments_api';
+    const GENERAL_ENABLE_MAGENTO_VAULT = 'payment/mollie_general/enable_magento_vault';
     const GENERAL_ENABLE_SECOND_CHANCE_EMAIL = 'payment/mollie_general/enable_second_chance_email';
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
@@ -49,7 +51,7 @@ class Config
     const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
     const PAYMENT_METHOD_PAYMENT_ACTIVE = 'payment/mollie_methods_%s/active';
-    const PAYMENT_METHOD_PAYMENT_DESCRIPTION = 'payment/mollie_methods_%s/description';
+    const PAYMENT_METHOD_PAYMENT_DESCRIPTION = 'payment/mollie_methods_%s/payment_description';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
@@ -76,14 +78,21 @@ class Config
      */
     private $moduleManager;
 
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
     public function __construct(
         ScopeConfigInterface $config,
         MollieLogger $logger,
-        Manager $moduleManager
+        Manager $moduleManager,
+        EncryptorInterface $encryptor
     ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->moduleManager = $moduleManager;
+        $this->encryptor = $encryptor;
     }
 
     /**
@@ -153,12 +162,13 @@ class Config
             if (empty($apiKey)) {
                 $this->addToLog('error', 'Mollie API key not set (test modus)');
             }
-            if (!preg_match('/^test_\w+$/', $apiKey)) {
+            $decryptedApiKey = $this->encryptor->decrypt($apiKey);
+            if (!preg_match('/^test_\w+$/', $decryptedApiKey)) {
                 $this->addToLog('error', 'Mollie set to test modus, but API key does not start with "test_"');
             }
 
-            $keys[$storeId] = $apiKey;
-            return $apiKey;
+            $keys[$storeId] = $decryptedApiKey;
+            return $decryptedApiKey;
         }
 
         $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId));
@@ -166,12 +176,13 @@ class Config
             $this->addToLog('error', 'Mollie API key not set (live modus)');
         }
 
-        if (!preg_match('/^live_\w+$/', $apiKey)) {
+        $decryptedApiKey = $this->encryptor->decrypt($apiKey);
+        if (!preg_match('/^live_\w+$/', $decryptedApiKey)) {
             $this->addToLog('error', 'Mollie set to live modus, but API key does not start with "live_"');
         }
 
-        $keys[$storeId] = $apiKey;
-        return $apiKey;
+        $keys[$storeId] = $decryptedApiKey;
+        return $decryptedApiKey;
     }
 
     /**
@@ -564,6 +575,14 @@ class Config
     public function getLocale($storeId = null)
     {
         return $this->getPath(static::GENERAL_LOCALE, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     */
+    public function isMagentoVaultEnabled($storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_ENABLE_MAGENTO_VAULT, $storeId);
     }
 
     public function isMultishippingEnabled(): bool

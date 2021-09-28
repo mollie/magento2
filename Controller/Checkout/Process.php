@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Controller\Checkout;
 
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -87,8 +88,7 @@ class Process extends Action
         if (!$orderIds) {
             $this->mollieHelper->addTolog('error', __('Invalid return, missing order id.'));
             $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));
-            $this->_redirect($this->redirectOnError->getUrl());
-            return;
+            return $this->_redirect($this->redirectOnError->getUrl());
         }
 
         try {
@@ -100,31 +100,28 @@ class Process extends Action
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->messageManager->addExceptionMessage($e, __('There was an error checking the transaction status.'));
-            $this->_redirect($this->redirectOnError->getUrl());
-            return;
+            return $this->_redirect($this->redirectOnError->getUrl());
         }
 
         if (!empty($result['success'])) {
             try {
                 $this->checkoutSession->start();
 
-                $this->_redirect('checkout/onepage/success?utm_nooverride=1');
-
                 $this->eventManager->dispatch('mollie_checkout_success_redirect', [
                     'order_ids' => $orderIds,
                     'request' => $this->getRequest(),
                     'response' => $this->getResponse(),
                 ]);
+
+                return $this->_redirect('checkout/onepage/success?utm_nooverride=1');
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
                 $this->messageManager->addErrorMessage(__('Something went wrong.'));
-                $this->_redirect($this->redirectOnError->getUrl());
+                return $this->_redirect($this->redirectOnError->getUrl());
             }
-
-            return;
         }
 
-        $this->handleNonSuccessResult($result, $orderIds);
+        return $this->handleNonSuccessResult($result, $orderIds);
     }
 
     /**
@@ -139,13 +136,13 @@ class Process extends Action
         return $this->getRequest()->getParam('order_ids') ?? [];
     }
 
-    protected function handleNonSuccessResult(array $result, array $orderIds)
+    protected function handleNonSuccessResult(array $result, array $orderIds): ResponseInterface
     {
         $this->checkIfLastRealOrder($orderIds);
         $this->checkoutSession->restoreQuote();
         $this->addResultMessage($result);
 
-        $this->_redirect($this->redirectOnError->getUrl());
+        return $this->_redirect($this->redirectOnError->getUrl());
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Test\Integration\Helper;
 
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Locale\Resolver;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
@@ -117,8 +118,13 @@ class GeneralTest extends IntegrationTestCase
         $storeA = $this->objectManager->get(StoreRepositoryInterface::class)->get('default')->getId();
         $storeB = $this->objectManager->get(StoreRepositoryInterface::class)->get('fixture_second_store')->getId();
 
+        $encryptorMock = $this->createMock(EncryptorInterface::class);
+        $encryptorMock->method('decrypt')->willReturn('keyA', 'keyB');
+
         /** @var General $instance */
-        $instance = $this->objectManager->create(General::class);
+        $instance = $this->objectManager->create(General::class, [
+            'encryptor' => $encryptorMock,
+        ]);
 
         $this->assertEquals('keyA', $instance->getApiKey($storeA));
         $this->assertEquals('keyB', $instance->getApiKey($storeB));

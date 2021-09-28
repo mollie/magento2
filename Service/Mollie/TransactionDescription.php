@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\Information;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Config;
@@ -31,9 +32,10 @@ class TransactionDescription
         $this->scopeConfig = $scopeConfig;
     }
 
-    public function forRegularTransaction(string $method, string $orderNumber, $storeId = 0): string
+    public function forRegularTransaction(OrderInterface $order): string
     {
-        $description = $this->config->paymentMethodDescription($method, $storeId);
+        $storeId = $order->getStoreId();
+        $description = $this->config->paymentMethodDescription($order->getPayment()->getMethod(), $storeId);
 
         if (!trim($description)) {
             $description = '{ordernumber}';
@@ -46,8 +48,9 @@ class TransactionDescription
         );
 
         $replacements = [
-            '{ordernumber}' => $orderNumber,
+            '{ordernumber}' => $order->getIncrementId(),
             '{storename}' => $storeName,
+            '{customerid}' => $order->getCustomerId(),
         ];
 
         return str_replace(

@@ -6,11 +6,14 @@
 
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
+use Magento\Customer\Model\Session;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Vault\Model\Ui\VaultConfigProvider;
+use Mollie\Payment\Config;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
-use Mollie\Payment\Service\Order\TransactionPartInterface;
 use Mollie\Payment\Service\Order\OrderContainsSubscriptionProduct;
+use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class SequenceType implements TransactionPartInterface
 {
@@ -19,15 +22,22 @@ class SequenceType implements TransactionPartInterface
      */
     private $orderContainsSubscriptionProduct;
 
+    /**
+     * @var Session
+     */
+    private $customerSession;
+
     public function __construct(
-        OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct
+        OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
+        Session $customerSession
     ) {
         $this->orderContainsSubscriptionProduct = $orderContainsSubscriptionProduct;
+        $this->customerSession = $customerSession;
     }
 
     public function process(OrderInterface $order, $apiMethod, array $transaction): array
     {
-        if (!$this->orderContainsSubscriptionProduct->check($order)) {
+        if (!$this->shouldAddSequenceType($order)) {
             return $transaction;
         }
 
@@ -40,5 +50,24 @@ class SequenceType implements TransactionPartInterface
         }
 
         return $transaction;
+    }
+
+    private function shouldAddSequenceType(OrderInterface $order): bool
+    {
+        if ($this->orderContainsSubscriptionProduct->check($order)) {
+            return true;
+        }
+
+        if (!$order->getPayment() || !$this->customerSession->isLoggedIn()) {
+            return false;
+        }
+
+        if ($order->getPayment()->getAdditionalInformation(VaultConfigProvider::IS_ACTIVE_CODE) &&
+            $order->getPayment()->getMethod() == 'mollie_methods_creditcard'
+        ) {
+            return true;
+        }
+
+        return false;
     }
 }

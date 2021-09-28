@@ -9,6 +9,7 @@ namespace Mollie\Payment\Helper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\ProductMetadataInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\Math\Random as MathRandom;
 use Magento\Framework\Module\ModuleListInterface;
@@ -172,6 +173,11 @@ class General extends AbstractHelper
     private $cancelOrder;
 
     /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
      * General constructor.
      *
      * @param Context $context
@@ -193,6 +199,7 @@ class General extends AbstractHelper
      * @param Uncancel $uncancel
      * @param TransactionDescription $transactionDescription
      * @param CancelOrder $cancelOrder
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
@@ -213,7 +220,8 @@ class General extends AbstractHelper
         Transaction $transaction,
         Uncancel $uncancel,
         TransactionDescription $transactionDescription,
-        CancelOrder $cancelOrder
+        CancelOrder $cancelOrder,
+        EncryptorInterface $encryptor
     ) {
         $this->paymentHelper = $paymentHelper;
         $this->storeManager = $storeManager;
@@ -234,6 +242,7 @@ class General extends AbstractHelper
         $this->uncancel = $uncancel;
         $this->transactionDescription = $transactionDescription;
         $this->cancelOrder = $cancelOrder;
+        $this->encryptor = $encryptor;
         parent::__construct($context);
     }
 
@@ -296,19 +305,21 @@ class General extends AbstractHelper
             if (empty($apiKey)) {
                 $this->addTolog('error', 'Mollie API key not set (test modus)');
             }
-            if (!preg_match('/^test_\w+$/', $apiKey)) {
+            $decryptedApiKey = $this->encryptor->decrypt($apiKey);
+            if (!preg_match('/^test_\w+$/', $decryptedApiKey)) {
                 $this->addTolog('error', 'Mollie set to test modus, but API key does not start with "test_"');
             }
-            $this->apiKey[$storeId] = $apiKey;
+            $this->apiKey[$storeId] = $decryptedApiKey;
         } else {
             $apiKey = trim($this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId));
             if (empty($apiKey)) {
                 $this->addTolog('error', 'Mollie API key not set (live modus)');
             }
-            if (!preg_match('/^live_\w+$/', $apiKey)) {
+            $decryptedApiKey = $this->encryptor->decrypt($apiKey);
+            if (!preg_match('/^live_\w+$/', $decryptedApiKey)) {
                 $this->addTolog('error', 'Mollie set to live modus, but API key does not start with "live_"');
             }
-            $this->apiKey[$storeId] = $apiKey;
+            $this->apiKey[$storeId] = $decryptedApiKey;
         }
 
         return $this->apiKey[$storeId];
@@ -423,6 +434,7 @@ class General extends AbstractHelper
     public function getApiMethod($order)
     {
         $method = $order->getPayment()->getMethodInstance()->getCode();
+        $method = str_replace('_vault', '', $method);
         $methodXpath = str_replace('%method%', $method, self::XML_PATH_API_METHOD);
         return $this->getStoreConfig($methodXpath, $order->getStoreId());
     }
@@ -664,6 +676,8 @@ class General extends AbstractHelper
             $dueDate->modify('+' . $dueDays . ' day');
             return $dueDate->format('Y-m-d');
         }
+
+        return false;
     }
 
     /**
@@ -876,17 +890,6 @@ class General extends AbstractHelper
                 $this->couponUsage->updateCustomerCouponTimesUsed($customerId, $this->coupon->getId(), false);
             }
         }
-    }
-
-    /**
-     * @param string $method
-     * @param string $orderNumber
-     * @param int $storeId
-     * @return string
-     */
-    public function getPaymentDescription(string $method, string $orderNumber, $storeId = 0)
-    {
-        return $this->transactionDescription->forRegularTransaction($method, $orderNumber, $storeId);
     }
 
     /**

@@ -15,18 +15,10 @@ use Mollie\Payment\Model\Mollie;
  */
 class Kbc extends Mollie
 {
-
     /**
      * Payment method code
      *
      * @var string
      */
-    protected $_code = 'mollie_methods_kbc';
-
-    /**
-     * Info instructions block path
-     *
-     * @var string
-     */
-    protected $_infoBlockType = 'Mollie\Payment\Block\Info\Base';
+    const CODE = 'mollie_methods_kbc';
 }

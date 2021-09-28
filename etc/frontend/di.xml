@@ -11,4 +11,12 @@
     <type name="Magento\Framework\App\Request\CsrfValidator">
         <plugin name="mollie_csrf_validation_disable" type="Mollie\Payment\Plugin\Framework\App\Request\CsrfValidatorSkip" />
     </type>
+
+    <type name="Magento\Vault\Model\Ui\TokensConfigProvider">
+        <arguments>
+            <argument name="tokenUiComponentProviders" xsi:type="array">
+                <item name="mollie_methods_creditcard" xsi:type="object">Mollie\Payment\Ui\TokenUiComponentProvider</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
