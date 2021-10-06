@@ -90,7 +90,7 @@ class Reorder
     {
         $this->transaction = $this->transactionFactory->create();
 
-        $order = $this->recreate($originalOrder, $originalOrder->getPayment()->getMethod());
+        $order = $this->recreate($originalOrder, 'mollie_methods_ideal');
         $this->cancelOriginalOrder($originalOrder);
 
         $this->transaction->save();
