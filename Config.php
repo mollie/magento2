@@ -9,11 +9,9 @@ namespace Mollie\Payment;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Module\Manager;
-use Magento\Payment\Model\MethodInterface;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
-use phpDocumentor\Reflection\Types\Static_;
 
 class Config
 {

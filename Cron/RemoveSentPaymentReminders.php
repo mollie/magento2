@@ -10,6 +10,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\SentPaymentReminderRepositoryInterface;
+use Mollie\Payment\Config;
 
 class RemoveSentPaymentReminders
 {
@@ -28,17 +29,36 @@ class RemoveSentPaymentReminders
      */
     private $dateTime;
 
+    /**
+     * @var Config
+     */
+    private $config;
+
     public function __construct(
         SentPaymentReminderRepositoryInterface $sentPaymentReminderRepository,
         SearchCriteriaBuilder $builder,
-        DateTime $dateTime
+        DateTime $dateTime,
+        Config $config
     ) {
         $this->sentPaymentReminderRepository = $sentPaymentReminderRepository;
         $this->builder = $builder;
         $this->dateTime = $dateTime;
+        $this->config = $config;
     }
 
     public function execute()
+    {
+        try {
+            $this->deletePaymentReminders();
+        } catch (\Throwable $exception) {
+            $this->config->addToLog('error', 'Error while running ' . static::class);
+            $this->config->addToLog('error', (string)$exception);
+
+            throw $exception;
+        }
+    }
+
+    protected function deletePaymentReminders(): void
     {
         do {
             $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('P1W'));
