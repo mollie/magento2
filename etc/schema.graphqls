@@ -101,4 +101,5 @@ enum PaymentStatusEnum {
     PENDING
     REFUNDED
     ERROR
+    FAILED
 }
