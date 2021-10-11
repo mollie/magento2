@@ -41,9 +41,6 @@ class ProcessTransactionTest extends GraphQLTestCase
         $result = $this->graphQlQuery('mutation {
             mollieProcessTransaction(input: { payment_token: "' . $tokenModel->getToken() . '" }) {
                 paymentStatus
-                cart {
-                  id
-                }
             }
         }');
 
