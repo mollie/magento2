@@ -1,19 +1,7 @@
 <?php
-/**
- *    ______            __             __
- *   / ____/___  ____  / /__________  / /
- *  / /   / __ \/ __ \/ __/ ___/ __ \/ /
- * / /___/ /_/ / / / / /_/ /  / /_/ / /
- * \______________/_/\__/_/   \____/_/
- *    /   |  / / /_
- *   / /| | / / __/
- *  / ___ |/ / /_
- * /_/ _|||_/\__/ __     __
- *    / __ \___  / /__  / /____
- *   / / / / _ \/ / _ \/ __/ _ \
- *  / /_/ /  __/ /  __/ /_/  __/
- * /_____/\___/_/\___/\__/\___/
- *
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
  */
 
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Checkout;
@@ -64,5 +52,23 @@ class ProcessTransactionTest extends GraphQLTestCase
         $newCart = $this->objectManager->create(CartRepositoryInterface::class)->get($tokenModel->getCartId());
         $newCart->load('test01', 'reserved_order_id');
         $this->assertTrue((bool)$newCart->getIsActive());
+    }
+
+    /**
+     * @throws \Exception
+     * @magentoAppArea graphql
+     */
+    public function testThrowsANotFoundExceptionWhenTokenDoesNotExists()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('GraphQL response contains errors: No order found with token "non-existing-payment-token"');
+
+        $this->graphQlQuery('mutation {
+          mollieProcessTransaction(input: {
+              payment_token: "non-existing-payment-token"
+          }) {
+            paymentStatus
+          }
+        }');
     }
 }
