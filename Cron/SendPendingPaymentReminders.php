@@ -70,21 +70,28 @@ class SendPendingPaymentReminders
             return;
         }
 
-        /** @var SortOrder $sortOrder */
-        $sortOrder = $this->sortOrderFactory->create();
-        $sortOrder->setField('entity_id');
-        $sortOrder->setDirection(SortOrder::SORT_ASC);
+        try {
+            /** @var SortOrder $sortOrder */
+            $sortOrder = $this->sortOrderFactory->create();
+            $sortOrder->setField('entity_id');
+            $sortOrder->setDirection(SortOrder::SORT_ASC);
 
-        $delay = $this->config->secondChanceEmailDelay();
-        $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT' . $delay . 'H'));
-        $this->builder->addFilter(Order::CREATED_AT, $date, 'lt');
-        $this->builder->addSortOrder($sortOrder);
-        $this->builder->setPageSize(200);
+            $delay = $this->config->secondChanceEmailDelay();
+            $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT' . $delay . 'H'));
+            $this->builder->addFilter(Order::CREATED_AT, $date, 'lt');
+            $this->builder->addSortOrder($sortOrder);
+            $this->builder->setPageSize(200);
 
-        $result = $this->paymentReminderRepository->getList($this->builder->create());
+            $result = $this->paymentReminderRepository->getList($this->builder->create());
 
-        foreach ($result->getItems() as $item) {
-            $this->paymentReminder->send($item);
+            foreach ($result->getItems() as $item) {
+                $this->paymentReminder->send($item);
+            }
+        } catch (\Throwable $exception) {
+            $this->config->addToLog('error', 'Error while running ' . static::class);
+            $this->config->addToLog('error', (string)$exception);
+
+            throw $exception;
         }
     }
 }
