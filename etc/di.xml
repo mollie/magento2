@@ -124,6 +124,14 @@
         </arguments>
     </type>
 
+    <type name="Mollie\Payment\Service\Order\Lines\OrderLinesGenerator">
+        <arguments>
+            <argument name="generators" xsi:type="array">
+                <item name="weee_fee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\WeeeFeeGenerator</item>
+            </argument>
+        </arguments>
+    </type>
+
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
         <arguments>
             <argument name="collections" xsi:type="array">

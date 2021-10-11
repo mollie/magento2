@@ -57,6 +57,11 @@ class Order
     private $orderLinesProcessor;
 
     /**
+     * @var OrderLinesGenerator
+     */
+    private $orderLinesGenerator;
+
+    /**
      * @var StoreManagerInterface
      */
     private $storeManager;
@@ -67,6 +72,7 @@ class Order
         PaymentFee $paymentFee,
         OrderLinesFactory $orderLinesFactory,
         OrderLinesProcessor $orderLinesProcessor,
+        OrderLinesGenerator $orderLinesGenerator,
         StoreManagerInterface $storeManager
     ) {
         $this->mollieHelper = $mollieHelper;
@@ -74,6 +80,7 @@ class Order
         $this->paymentFee = $paymentFee;
         $this->orderLinesFactory = $orderLinesFactory;
         $this->orderLinesProcessor = $orderLinesProcessor;
+        $this->orderLinesGenerator = $orderLinesGenerator;
         $this->storeManager = $storeManager;
     }
 
@@ -113,6 +120,8 @@ class Order
         if ($adjustment = $this->getAdjustment($order, $orderLines)) {
             $orderLines[] = $adjustment;
         }
+
+        $orderLines = $this->orderLinesGenerator->execute($order, $orderLines);
 
         $this->saveOrderLines($orderLines, $order);
         foreach ($orderLines as &$orderLine) {
