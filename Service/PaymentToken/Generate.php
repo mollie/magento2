@@ -70,7 +70,7 @@ class Generate
      * @param OrderInterface $order
      * @return PaymentTokenInterface
      */
-    public function forOrder(OrderInterface $order)
+    public function forOrder(OrderInterface $order): PaymentTokenInterface
     {
         $token = $this->getUniquePaymentToken();
 
