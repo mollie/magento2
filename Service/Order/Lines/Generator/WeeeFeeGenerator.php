@@ -85,6 +85,11 @@ class WeeeFeeGenerator implements GeneratorInterface
         /** @var OrderItemInterface $item */
         foreach ($items as $item) {
             $json = json_decode($item->getWeeeTaxApplied(), true);
+
+            if (!$json) {
+                continue;
+            }
+
             foreach ($json as $applied) {
                 if (isset($applied['title'])) {
                     return $applied['title'];
