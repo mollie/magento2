@@ -30,7 +30,7 @@
             <form class="form" data-bind="attr: {'id': getCode() + '-form'}">
                 <strong><span data-bind="i18n: 'Select Bank'"></span></strong>
                 <div data-bind="foreach: {data: getIssuers(), as :'issuer' }" class="field choice">
-                    <input type="radio" name="issuer" data-bind="attr: {value: issuer.id, id: issuer.id}" class="radio" data-validate="{'validate-one-required-by-name':true}">
+                    <input type="radio" name="issuer" data-bind="attr: {value: issuer.id, id: issuer.id}, checked: $parent.selectedIssuer" class="radio" data-validate="{'validate-one-required-by-name':true}">
                     <label data-bind="attr: {'for': issuer.id}" class="label">
                         <img data-bind="attr: {src: issuer.image.size2x}" class="payment-icon"/>
                         <span data-bind="text: issuer.name"></span>

@@ -10,6 +10,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -60,6 +61,10 @@ class ProcessTransaction implements ResolverInterface
         $token = $args['input']['payment_token'];
         $tokenModel = $this->paymentTokenRepository->getByToken($token);
 
+        if (!$tokenModel) {
+            throw new GraphQlNoSuchEntityException(__('No order found with token "%1"', $token));
+        }
+
         $result = $this->mollie->processTransaction($tokenModel->getOrderId(), 'success', $token);
 
         if (isset($result['error'])) {
@@ -78,14 +83,18 @@ class ProcessTransaction implements ResolverInterface
             PaymentStatus::STATUS_EXPIRED,
             PaymentStatus::STATUS_CANCELED,
             PaymentStatus::STATUS_FAILED,
+            PaymentStatus::STATUS_PENDING,
         ])) {
             return null;
         }
 
         try {
-            $this->checkoutSession->restoreQuote();
+            $cart = $this->cartRepository->get($cartId);
+            $cart->setIsActive(1);
+            $cart->setReservedOrderId(null);
+            $this->cartRepository->save($cart);
 
-            return ['model' => $this->cartRepository->get($cartId)];
+            return ['model' => $cart];
         } catch (NoSuchEntityException $exception) {
             return null;
         }

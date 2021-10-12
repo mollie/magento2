@@ -440,14 +440,6 @@ class General extends AbstractHelper
     }
 
     /**
-     * @return mixed
-     */
-    public function getPaymentToken()
-    {
-        return $this->mathRandom->getUniqueHash();
-    }
-
-    /**
      * Redirect Url Builder /w OrderId & UTM No Override
      *
      * @param $orderId
