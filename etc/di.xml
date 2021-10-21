@@ -225,6 +225,7 @@
         </arguments>
     </type>
 
+    <!-- Payment methods configuration start -->
     <!-- ApplePay -->
     <type name="Mollie\Payment\Model\Methods\ApplePay">
         <arguments>
@@ -232,6 +233,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieApplePayValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieApplePayValidatorPool</argument>
         </arguments>
     </type>
 
@@ -255,6 +257,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieApplePayValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieApplePayCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieApplePayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Bancontact -->
     <type name="Mollie\Payment\Model\Methods\Bancontact">
         <arguments>
@@ -262,6 +278,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieBancontactValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieBancontactValidatorPool</argument>
         </arguments>
     </type>
 
@@ -285,6 +302,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieBancontactValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieBancontactCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBancontactCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Banktransfer -->
     <type name="Mollie\Payment\Model\Methods\Banktransfer">
         <arguments>
@@ -292,6 +323,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieBanktransferValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieBanktransferValidatorPool</argument>
         </arguments>
     </type>
 
@@ -315,6 +347,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieBanktransferValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieBanktransferCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBanktransferCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Belfius -->
     <type name="Mollie\Payment\Model\Methods\Belfius">
         <arguments>
@@ -322,6 +368,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieBelfiusValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieBelfiusValidatorPool</argument>
         </arguments>
     </type>
 
@@ -345,6 +392,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieBelfiusValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieBelfiusCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBelfiusCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Creditcard -->
     <type name="Mollie\Payment\Model\Methods\Creditcard">
         <arguments>
@@ -352,6 +413,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieCreditcardValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCreditcardCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieCreditcardValidatorPool</argument>
         </arguments>
     </type>
 
@@ -383,6 +445,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieCreditcardValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieCreditcardCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieCreditcardCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Creditcard Vault -->
     <type name="Mollie\Payment\Model\Methods\CreditcardVault">
         <arguments>
@@ -390,6 +466,7 @@
             <argument name="valueHandlerPool" xsi:type="object">MollieCreditcardVaultValueHandlerPool</argument>
             <argument name="vaultProvider" xsi:type="object">Mollie\Payment\Model\Methods\Creditcard</argument>
             <argument name="code" xsi:type="const">Mollie\Payment\Model\Methods\CreditcardVault::CODE</argument>
+            <argument name="validatorPool" xsi:type="object">MollieCreditcardVaultValidatorPool</argument>
         </arguments>
     </type>
 
@@ -407,6 +484,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieCreditcardVaultValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieCreditcardVaultCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieCreditcardVaultCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <virtualType name="MollieCreditcardVaultAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
     </virtualType>
 
@@ -417,6 +508,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieDirectdebitValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieDirectdebitValidatorPool</argument>
         </arguments>
     </type>
 
@@ -440,6 +532,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieDirectdebitValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieDirectdebitCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieDirectdebitCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Eps -->
     <type name="Mollie\Payment\Model\Methods\Eps">
         <arguments>
@@ -447,6 +553,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieEpsValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieEpsValidatorPool</argument>
         </arguments>
     </type>
 
@@ -470,6 +577,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieEpsValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieEpsCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieEpsCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Giftcard -->
     <type name="Mollie\Payment\Model\Methods\Giftcard">
         <arguments>
@@ -477,6 +598,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieGiftcardValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieGiftcardValidatorPool</argument>
         </arguments>
     </type>
 
@@ -500,6 +622,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieGiftcardValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieGiftcardCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGiftcardCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Giropay -->
     <type name="Mollie\Payment\Model\Methods\Giropay">
         <arguments>
@@ -507,6 +643,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieGiropayValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieGiropayValidatorPool</argument>
         </arguments>
     </type>
 
@@ -530,6 +667,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieGiropayValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieGiropayCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGiropayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Ideal -->
     <type name="Mollie\Payment\Model\Methods\Ideal">
         <arguments>
@@ -537,6 +688,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieIdealValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieIdealValidatorPool</argument>
         </arguments>
     </type>
 
@@ -560,6 +712,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieIdealValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieIdealCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieIdealCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Kbc -->
     <type name="Mollie\Payment\Model\Methods\Kbc">
         <arguments>
@@ -567,6 +733,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieKbcValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieKbcValidatorPool</argument>
         </arguments>
     </type>
 
@@ -590,6 +757,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieKbcValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieKbcCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKbcCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Klarnapaylater -->
     <type name="Mollie\Payment\Model\Methods\Klarnapaylater">
         <arguments>
@@ -597,6 +778,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieKlarnapaylaterValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieKlarnapaylaterValidatorPool</argument>
         </arguments>
     </type>
 
@@ -620,6 +802,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieKlarnapaylaterValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieKlarnapaylaterCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnapaylaterCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Klarnasliceit -->
     <type name="Mollie\Payment\Model\Methods\Klarnasliceit">
         <arguments>
@@ -627,6 +823,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieKlarnasliceitValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieKlarnasliceitValidatorPool</argument>
         </arguments>
     </type>
 
@@ -650,6 +847,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieKlarnasliceitValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieKlarnasliceitCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnasliceitCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- MyBank -->
     <type name="Mollie\Payment\Model\Methods\MyBank">
         <arguments>
@@ -657,6 +868,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieMyBankValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieMyBankValidatorPool</argument>
         </arguments>
     </type>
 
@@ -680,6 +892,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieMyBankValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieMyBankCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMyBankCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Paymentlink -->
     <type name="Mollie\Payment\Model\Methods\Paymentlink">
         <arguments>
@@ -687,6 +913,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Paymentlink</argument>
             <argument name="valueHandlerPool" xsi:type="object">MolliePaymentlinkValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MolliePaymentlinkValidatorPool</argument>
         </arguments>
     </type>
 
@@ -710,6 +937,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MolliePaymentlinkValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MolliePaymentlinkCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaymentlinkCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Paypal -->
     <type name="Mollie\Payment\Model\Methods\Paypal">
         <arguments>
@@ -717,6 +958,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MolliePaypalValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MolliePaypalValidatorPool</argument>
         </arguments>
     </type>
 
@@ -740,6 +982,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MolliePaypalValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MolliePaypalCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaypalCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Paysafecard -->
     <type name="Mollie\Payment\Model\Methods\Paysafecard">
         <arguments>
@@ -747,6 +1003,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MolliePaysafecardValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MolliePaysafecardValidatorPool</argument>
         </arguments>
     </type>
 
@@ -770,6 +1027,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MolliePaysafecardValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MolliePaysafecardCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaysafecardCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Przelewy24 -->
     <type name="Mollie\Payment\Model\Methods\Przelewy24">
         <arguments>
@@ -777,6 +1048,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MolliePrzelewy24ValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MolliePrzelewy24ValidatorPool</argument>
         </arguments>
     </type>
 
@@ -800,6 +1072,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MolliePrzelewy24ValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MolliePrzelewy24CountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePrzelewy24CountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Reorder -->
     <type name="Mollie\Payment\Model\Methods\Reorder">
         <arguments>
@@ -807,6 +1093,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieReorderValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieReorderValidatorPool</argument>
         </arguments>
     </type>
 
@@ -830,6 +1117,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieReorderValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieReorderCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieReorderCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Sofort -->
     <type name="Mollie\Payment\Model\Methods\Sofort">
         <arguments>
@@ -837,6 +1138,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieSofortValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieSofortValidatorPool</argument>
         </arguments>
     </type>
 
@@ -860,6 +1162,20 @@
         </arguments>
     </virtualType>
 
+    <virtualType name="MollieSofortValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieSofortCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSofortCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Voucher -->
     <type name="Mollie\Payment\Model\Methods\Voucher">
         <arguments>
@@ -867,6 +1183,7 @@
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieVoucherValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieVoucherValidatorPool</argument>
         </arguments>
     </type>
 
@@ -889,6 +1206,22 @@
             <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Voucher::CODE</argument>
         </arguments>
     </virtualType>
+
+    <virtualType name="MollieVoucherValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieVoucherCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieVoucherCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payment methods configuration end -->
 
 
 
@@ -950,6 +1283,7 @@
             </argument>
         </arguments>
     </type>
+
     <virtualType name="MollieCommandManager" type="Magento\Payment\Gateway\Command\CommandManager">
         <arguments>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
