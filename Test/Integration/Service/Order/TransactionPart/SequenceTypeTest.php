@@ -96,6 +96,7 @@ class SequenceTypeTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoConfigFixture default_store payment/mollie_general/enable_magento_vault 1
      * @magentoConfigFixture default_store payment/mollie_methods_creditcard/enable_customers_api 1
      */
     public function testIncludesTheSequenceTypeWhenVaultIsEnabled()
