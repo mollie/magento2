@@ -890,13 +890,6 @@
         </arguments>
     </virtualType>
 
-
-
-
-
-
-
-
     <virtualType name="MollieValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
@@ -920,7 +913,7 @@
     <virtualType name="MollieCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
         <arguments>
             <argument name="commands" xsi:type="array">
-                <item name="order" xsi:type="string">MollieInitializeCommand</item>
+                <item name="order" xsi:type="string">MollieOrderCommand</item>
                 <item name="authorize" xsi:type="string">MollieInitializeCommand</item>
                 <item name="vault_authorize" xsi:type="string">MollieInitializeCommand</item>
             </argument>
@@ -932,6 +925,12 @@
             <argument name="requestBuilder" xsi:type="object">MollieInitializeRequestBuilder</argument>
             <argument name="transferFactory" xsi:type="object">Mollie\Payment\Gateway\Http\TransferFactory</argument>
             <argument name="client" xsi:type="object">Mollie\Payment\Gateway\Http\Client\GenericClient</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieOrderCommand" type="MollieInitializeCommand">
+        <arguments>
+            <argument name="handler" xsi:type="object">Mollie\Payment\Gateway\Handler\OrderHandler</argument>
         </arguments>
     </virtualType>
 
