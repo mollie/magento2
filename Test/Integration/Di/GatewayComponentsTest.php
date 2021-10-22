@@ -50,6 +50,27 @@ class GatewayComponentsTest extends IntegrationTestCase
         }
     }
 
+    public function testCountryValidatorUsesCorrectConfiguration()
+    {
+        $arguments = $this->getObjectManagerArguments();
+
+        /** @var Config $config */
+        $config = $this->objectManager->get(ConfigInterface::class);
+
+        foreach ($this->getMethods() as $method) {
+            $name  = $method['name'];
+
+            $virtualTypes = $config->getVirtualTypes();
+
+            $validatorName = 'Mollie' . $name . 'CountryValidator';
+            $configName = 'Mollie' . $name . 'Config';
+            $this->assertArrayHasKey($validatorName, $virtualTypes);
+
+            $classArguments = $arguments[$validatorName];
+            $this->assertEquals($configName, $classArguments['config']['instance']);
+        }
+    }
+
     private function getObjectManagerArguments(): array
     {
         static $arguments = null;

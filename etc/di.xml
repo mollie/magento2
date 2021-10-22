@@ -267,7 +267,7 @@
 
     <virtualType name="MollieApplePayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieApplePayConfig</argument>
         </arguments>
     </virtualType>
 
@@ -312,7 +312,7 @@
 
     <virtualType name="MollieBancontactCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieBancontactConfig</argument>
         </arguments>
     </virtualType>
 
@@ -357,7 +357,7 @@
 
     <virtualType name="MollieBanktransferCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieBanktransferConfig</argument>
         </arguments>
     </virtualType>
 
@@ -402,7 +402,7 @@
 
     <virtualType name="MollieBelfiusCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieBelfiusConfig</argument>
         </arguments>
     </virtualType>
 
@@ -455,7 +455,7 @@
 
     <virtualType name="MollieCreditcardCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieCreditcardConfig</argument>
         </arguments>
     </virtualType>
 
@@ -494,7 +494,7 @@
 
     <virtualType name="MollieCreditcardVaultCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieCreditcardVaultConfig</argument>
         </arguments>
     </virtualType>
 
@@ -542,7 +542,7 @@
 
     <virtualType name="MollieDirectdebitCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieDirectdebitConfig</argument>
         </arguments>
     </virtualType>
 
@@ -587,7 +587,7 @@
 
     <virtualType name="MollieEpsCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieEpsConfig</argument>
         </arguments>
     </virtualType>
 
@@ -632,7 +632,7 @@
 
     <virtualType name="MollieGiftcardCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieGiftcardConfig</argument>
         </arguments>
     </virtualType>
 
@@ -677,7 +677,7 @@
 
     <virtualType name="MollieGiropayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieGiropayConfig</argument>
         </arguments>
     </virtualType>
 
@@ -722,7 +722,7 @@
 
     <virtualType name="MollieIdealCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieIdealConfig</argument>
         </arguments>
     </virtualType>
 
@@ -767,7 +767,7 @@
 
     <virtualType name="MollieKbcCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieKbcConfig</argument>
         </arguments>
     </virtualType>
 
@@ -812,7 +812,7 @@
 
     <virtualType name="MollieKlarnapaylaterCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieKlarnapaylaterConfig</argument>
         </arguments>
     </virtualType>
 
@@ -857,7 +857,7 @@
 
     <virtualType name="MollieKlarnasliceitCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieKlarnasliceitConfig</argument>
         </arguments>
     </virtualType>
 
@@ -902,7 +902,7 @@
 
     <virtualType name="MollieMyBankCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieMyBankConfig</argument>
         </arguments>
     </virtualType>
 
@@ -947,7 +947,7 @@
 
     <virtualType name="MolliePaymentlinkCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MolliePaymentlinkConfig</argument>
         </arguments>
     </virtualType>
 
@@ -992,7 +992,7 @@
 
     <virtualType name="MolliePaypalCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MolliePaypalConfig</argument>
         </arguments>
     </virtualType>
 
@@ -1037,7 +1037,7 @@
 
     <virtualType name="MolliePaysafecardCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MolliePaysafecardConfig</argument>
         </arguments>
     </virtualType>
 
@@ -1082,7 +1082,7 @@
 
     <virtualType name="MolliePrzelewy24CountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MolliePrzelewy24Config</argument>
         </arguments>
     </virtualType>
 
@@ -1127,7 +1127,7 @@
 
     <virtualType name="MollieReorderCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieReorderConfig</argument>
         </arguments>
     </virtualType>
 
@@ -1172,7 +1172,7 @@
 
     <virtualType name="MollieSofortCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieSofortConfig</argument>
         </arguments>
     </virtualType>
 
@@ -1217,7 +1217,7 @@
 
     <virtualType name="MollieVoucherCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
-            <argument name="config" xsi:type="object">Magento\Payment\Gateway\Config\Config</argument>
+            <argument name="config" xsi:type="object">MollieVoucherConfig</argument>
         </arguments>
     </virtualType>
 
