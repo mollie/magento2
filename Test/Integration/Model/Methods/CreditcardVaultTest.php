@@ -1,21 +1,20 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  * See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
 
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order\Payment;
-use Mollie\Payment\Model\Methods\Creditcard;
+use Magento\Vault\Api\Data\PaymentTokenInterface;
+use Magento\Vault\Api\PaymentTokenManagementInterface;
+use Mollie\Payment\Model\Methods\CreditcardVault;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class CreditcardTest extends AbstractMethodTest
+class CreditcardVaultTest extends IntegrationTestCase
 {
-    protected $instance = Creditcard::class;
-
-    protected $code = 'creditcard';
-
     public function testDoesNotSendEmailsWhenPlacingAnOrder()
     {
         /** @var OrderInterface $order */
@@ -25,8 +24,19 @@ class CreditcardTest extends AbstractMethodTest
         $paymentInfo = $this->objectManager->create(Payment::class);
         $paymentInfo->setOrder($order);
 
-        /** @var Creditcard $instance */
-        $instance = $this->objectManager->create(Creditcard::class);
+        $paymentInfo->setAdditionalInformation([
+            PaymentTokenInterface::PUBLIC_HASH => '123abc',
+        ]);
+
+        $tokenManagementMock = $this->createMock(PaymentTokenManagementInterface::class);
+        $tokenManagementMock->method('getByPublicHash')->willReturn(
+            $this->objectManager->create(PaymentTokenInterface::class)
+        );
+
+        /** @var CreditcardVault $instance */
+        $instance = $this->objectManager->create(CreditcardVault::class, [
+            'tokenManagement' => $tokenManagementMock,
+        ]);
 
         $this->assertFalse($paymentInfo->getIsTransactionPending());
         $this->assertTrue($order->getCanSendNewEmailFlag());
