@@ -18,6 +18,7 @@
     <include path="Mollie_Payment::methods/ideal.xml"/>
     <include path="Mollie_Payment::methods/kbc.xml"/>
     <include path="Mollie_Payment::methods/klarnapaylater.xml"/>
+    <include path="Mollie_Payment::methods/klarnapaynow.xml"/>
     <include path="Mollie_Payment::methods/klarnasliceit.xml"/>
     <include path="Mollie_Payment::methods/mybank.xml"/>
     <include path="Mollie_Payment::methods/paymentlink.xml"/>

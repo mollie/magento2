@@ -37,6 +37,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_giropay', true],
             ['mollie_methods_eps', true],
             ['mollie_methods_klarnapaylater', true],
+            ['mollie_methods_klarnapaynow', true],
             ['mollie_methods_klarnasliceit', true],
             ['mollie_methods_giftcard', true],
             ['mollie_methods_przelewy24', true],
