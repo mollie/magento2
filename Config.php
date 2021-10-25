@@ -545,9 +545,15 @@ class Config
      * @param null|int|string $storeId
      * @return string
      */
-    public function customWebhookUrl($storeId = null)
+    public function customWebhookUrl($storeId = null): string
     {
-        return $this->getPath(static::GENERAL_CUSTOM_WEBHOOK_URL, $storeId);
+        $value = $this->getPath(static::GENERAL_CUSTOM_WEBHOOK_URL, $storeId);
+
+        if (!$value) {
+            return '';
+        }
+
+        return $value;
     }
 
     /**
