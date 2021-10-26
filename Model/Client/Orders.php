@@ -369,6 +369,7 @@ class Orders extends AbstractModel
             $msg = __('Created Mollie Checkout Url');
         }
 
+        $order->setState(Order::STATE_PENDING_PAYMENT);
         $order->addStatusToHistory($status, $msg, false);
         $order->setMollieTransactionId($mollieOrder->id);
         $this->orderRepository->save($order);

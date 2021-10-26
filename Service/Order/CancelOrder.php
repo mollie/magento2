@@ -11,6 +11,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\StatusResolver;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage;
 use Mollie\Payment\Config;
@@ -56,6 +57,11 @@ class CancelOrder
     private $couponUsage;
 
     /**
+     * @var StatusResolver
+     */
+    private $statusResolver;
+
+    /**
      * @var ResourceConnection
      */
     private $resource;
@@ -68,6 +74,7 @@ class CancelOrder
         OrderRepositoryInterface $orderRepository,
         Coupon $coupon,
         Usage $couponUsage,
+        StatusResolver $statusResolver,
         ResourceConnection $resource
     ) {
         $this->config = $config;
@@ -77,6 +84,7 @@ class CancelOrder
         $this->orderRepository = $orderRepository;
         $this->coupon = $coupon;
         $this->couponUsage = $couponUsage;
+        $this->statusResolver = $statusResolver;
         $this->resource = $resource;
     }
 
@@ -106,6 +114,7 @@ class CancelOrder
                 $comment = __('The order was canceled, reason: payment %1', $reason);
             }
 
+            $order->setStatus($this->statusResolver->getOrderStatusByState($order, Order::STATE_CANCELED));
             $this->config->addToLog('info', $order->getIncrementId() . ' ' . $comment);
             $this->orderCommentHistory->add($order, $comment);
             $order->getPayment()->setMessage($comment);
