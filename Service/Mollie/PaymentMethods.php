@@ -39,6 +39,7 @@ class PaymentMethods
         'mollie_methods_giropay',
         'mollie_methods_eps',
         'mollie_methods_klarnapaylater',
+        'mollie_methods_klarnapaynow',
         'mollie_methods_klarnasliceit',
         'mollie_methods_giftcard',
         'mollie_methods_przelewy24',

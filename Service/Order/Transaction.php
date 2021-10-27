@@ -85,20 +85,19 @@ class Transaction
 
     /**
      * @param null|int|string $storeId
-     * @return string
      */
-    public function getWebhookUrl($storeId = null)
+    public function getWebhookUrl($storeId = null): string
     {
-        if ($this->config->isProductionMode($storeId) ||
-            $this->config->useWebhooks($storeId) == WebhookUrlOptions::ENABLED) {
-            return $this->urlBuilder->getUrl('mollie/checkout/webhook/', ['_query' => 'isAjax=1']);
-        }
-
-        if ($this->config->useWebhooks($storeId) == WebhookUrlOptions::DISABLED) {
+        if (!$this->config->isProductionMode($storeId) &&
+            $this->config->useWebhooks($storeId) == WebhookUrlOptions::DISABLED) {
             return '';
         }
 
-        return $this->config->customWebhookUrl($storeId);
+        if ($this->config->useWebhooks($storeId) == WebhookUrlOptions::CUSTOM_URL) {
+            return $this->config->customWebhookUrl($storeId);
+        }
+
+        return $this->urlBuilder->getUrl('mollie/checkout/webhook/', ['_query' => 'isAjax=1']);
     }
 
     private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, int $storeId = null)

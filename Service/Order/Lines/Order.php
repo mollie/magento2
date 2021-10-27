@@ -320,18 +320,20 @@ class Order
      * @param OrderItemInterface $item
      * @return string|null
      */
-    private function getProductUrl(OrderItemInterface $item)
+    private function getProductUrl(OrderItemInterface $item): ?string
     {
         $product = $item->getProduct();
         if (!$product) {
             return null;
         }
 
-        // Magento allows spaces in the product url, but Mollie does not allows this. So if the URL contains spaces then
-        // we will return the base url with the direct url to the controller.
+        // Magento allows some weird characters the product url, but Mollie does not. So if the URL contains invalid
+        // characters we will return the base url with the direct url to the controller.
         // Magento bug: https://github.com/magento/magento2/issues/26672
         $url = $product->getProductUrl();
-        if (strpos($url, ' ') !== false) {
+        $path = parse_url($url, PHP_URL_PATH);
+        // Allow a-z, A-Z, "-", "/" and ".". If anything else is present return the catalog/product/view url.
+        if (preg_match('#[^a-zA-Z-/.]#', $path)) {
             $baseUrl = rtrim($this->storeManager->getStore()->getBaseUrl(), '/');
             return $baseUrl . '/catalog/product/view/id/' . $item->getProductId();
         }

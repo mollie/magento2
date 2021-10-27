@@ -247,7 +247,7 @@ class Mollie extends Adapter
         }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
-        if ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit' || $methodCode == 'voucher') {
+        if (in_array($methodCode, ['klarnapaylater', 'klarnapaynow', 'klarnasliceit', 'voucher'])) {
             throw new LocalizedException(__($exception->getMessage()));
         }
 
@@ -630,7 +630,7 @@ class Mollie extends Adapter
 
         $mollieApi = $this->loadMollieApi($apiKey);
 
-        return $mollieApi->methods->all([
+        return $mollieApi->methods->allActive([
             'resource' => 'orders',
             'includeWallets' => 'applepay',
         ]);

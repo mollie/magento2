@@ -876,7 +876,7 @@ class Orders extends AbstractModel
         }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
-        if (!$order->hasShipments() && ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit')) {
+        if (!$order->hasShipments() && (in_array($methodCode, ['klarnapaylater', 'klarnasliceit', 'klarnapaynow']))) {
             $msg = __('Order can only be refunded after Klarna has been captured (after shipment)');
             throw new LocalizedException($msg);
         }
