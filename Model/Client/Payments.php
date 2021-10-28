@@ -263,6 +263,7 @@ class Payments extends AbstractModel
 
         $status = $this->mollieHelper->getPendingPaymentStatus($order);
 
+        $order->setState(Order::STATE_PENDING_PAYMENT);
         $order->addStatusToHistory($status, __('Customer redirected to Mollie'), false);
         $order->setMollieTransactionId($payment->id);
         $this->orderRepository->save($order);
