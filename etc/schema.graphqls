@@ -102,4 +102,5 @@ enum PaymentStatusEnum {
     REFUNDED
     ERROR
     FAILED
+    OPEN
 }
