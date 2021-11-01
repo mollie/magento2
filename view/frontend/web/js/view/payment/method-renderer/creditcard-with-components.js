@@ -80,7 +80,7 @@ function ($, Component, Mollie) {
             };
 
             data['additional_data'] = _.extend(data['additional_data'], this.additionalData);
-            this.vaultEnabler.visitAdditionalData(data);
+            this.getVaultEnabler().visitAdditionalData(data);
 
             return data;
         },
