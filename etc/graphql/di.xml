@@ -30,4 +30,8 @@
     <type name="Magento\QuoteGraphQl\Model\Resolver\PlaceOrder">
         <plugin name="mollie_set_the_redirect_url" type="Mollie\Payment\GraphQL\Plugin\PlaceOrder\SetTheRedirectUrl" />
     </type>
+
+    <type name="Magento\Quote\Api\PaymentMethodManagementInterface">
+        <plugin name="mollie_hide_non_graphql_methods" type="Mollie\Payment\GraphQL\Plugin\Quote\PaymentMethodManagement\HideNonGrahpQlMethods" />
+    </type>
 </config>
