@@ -225,6 +225,12 @@
         </arguments>
     </type>
 
+    <type name="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPurchaseOrders">
+        <arguments>
+            <argument name="mollie" xsi:type="object">Mollie\Payment\Model\Mollie\Proxy</argument>
+        </arguments>
+    </type>
+
     <!-- Payment methods configuration start -->
     <!-- ApplePay -->
     <type name="Mollie\Payment\Model\Methods\ApplePay">

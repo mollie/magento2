@@ -39,4 +39,7 @@
     <event name="checkout_allow_guest">
         <observer name="mollie_force_customer_login_when_ordering_a_recurring_product" instance="Mollie\Payment\Observer\CheckoutAllowGuest\ForceCustomerLoginWhenSubscriptionItemInCart" />
     </event>
+    <event name="checkout_submit_all_after">
+        <observer name="mollie_startransaction_for_instant_purchase_orders" instance="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPurchaseOrders" />
+    </event>
 </config>

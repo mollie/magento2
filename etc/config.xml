@@ -133,6 +133,10 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>1</can_authorize_vault>
+                <instant_purchase>
+                    <supported>1</supported>
+                    <available>Mollie\Payment\Service\InstantPurchase\AvailabilityCheck</available>
+                </instant_purchase>
             </mollie_methods_creditcard>
             <mollie_methods_creditcard_vault>
                 <title>Stored Card (Mollie)</title>
