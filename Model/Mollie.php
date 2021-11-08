@@ -209,7 +209,7 @@ class Mollie extends Adapter
     }
 
     /**
-     * @param Order $order
+     * @param Order|OrderInterface $order
      *
      * @return bool|void
      * @throws LocalizedException
