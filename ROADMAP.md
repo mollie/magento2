@@ -6,4 +6,8 @@ This document is created in collaboration with the merchants, agencies, the Moll
 
 ## What we're working on / what is on our backlog
 
-*   [**Magento Payment Gateway upgrade**](https://github.com/mollie/magento2/issues/421)
+*   **Refactor the order processing**  
+    Break this code into small parts using Magento's architecture to improve testing, size, and readability.  
+     
+*   **Refactor order lines**  
+    Move to separate classes as well to improve the way of calculation, testing, and readability.
