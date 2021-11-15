@@ -143,7 +143,7 @@ class Order
          * Should Match: (unitPrice × quantity) - discountAmount
          * NOTE: TotalAmount can differ from actutal Total Amount due to rouding in tax or exchange rate
          */
-        $totalAmount = $this->getTotalAmountOrderItem($item);
+        $totalAmount = $this->getTotalAmountOrderItem($item) ?? 0.0;
 
         /**
          * The total discount amount of the line.
@@ -237,7 +237,7 @@ class Order
      *
      * @return float
      */
-    private function getTotalAmountOrderItem(OrderItemInterface $item)
+    private function getTotalAmountOrderItem(OrderItemInterface $item): ?float
     {
         if ($item->getProductType() == ProductType::TYPE_BUNDLE) {
             return $this->forceBaseCurrency ? $item->getBaseRowTotalInclTax() : $item->getRowTotalInclTax();

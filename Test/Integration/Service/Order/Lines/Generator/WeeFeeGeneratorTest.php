@@ -32,6 +32,7 @@ class WeeFeeGeneratorTest extends IntegrationTestCase
     public function testReturnsWeeeItems()
     {
         $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
         $orderItems = $order->getItems();
 
         $item = array_shift($orderItems);
