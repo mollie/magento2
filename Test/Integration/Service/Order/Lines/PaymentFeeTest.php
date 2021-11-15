@@ -30,6 +30,7 @@ class PaymentFeeTest extends IntegrationTestCase
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
+        $order->setBaseCurrencyCode('EUR');
 
         $order->setData('base_mollie_payment_fee', 1);
         $order->setData('base_mollie_payment_fee_tax', 0.21);

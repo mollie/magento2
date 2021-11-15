@@ -555,11 +555,11 @@ class General extends AbstractHelper
     /**
      * Order Currency and Value array for payment request
      *
-     * @param \Magento\Sales\Model\Order $order
+     * @param OrderInterface $order
      *
-     * @return array
+     * @return array{currency: string, value: string}
      */
-    public function getOrderAmountByOrder($order)
+    public function getOrderAmountByOrder(OrderInterface $order): array
     {
         if ($this->useBaseCurrency($order->getStoreId())) {
             return $this->getAmountArray($order->getBaseCurrencyCode(), $order->getBaseGrandTotal());
@@ -579,16 +579,16 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param $currency
-     * @param $value
+     * @param string|null $currency
+     * @param float|null $value
      *
-     * @return array
+     * @return array{currency: string, value: string}
      */
-    public function getAmountArray($currency, $value)
+    public function getAmountArray(?string $currency, ?float $value): array
     {
         return [
-            "currency" => $currency,
-            "value"    => $this->formatCurrencyValue($value, $currency)
+            'currency' => $currency,
+            'value'    => $this->formatCurrencyValue($value, $currency)
         ];
     }
 

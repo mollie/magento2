@@ -64,6 +64,7 @@ class OrderLinesTest extends IntegrationTestCase
 
         /** @var CreditmemoInterface $creditmemo */
         $creditmemo = $this->objectManager->get(CreditmemoInterface::class);
+        $creditmemo->setBaseCurrencyCode('EUR');
         $creditmemo->setOrderId(999);
         $creditmemo->setItems([$creditmemoItem]);
 
@@ -191,6 +192,7 @@ class OrderLinesTest extends IntegrationTestCase
         $orderItem->setBaseDiscountTaxCompensationAmount(-0.01);
 
         $order = $this->loadOrderById('100000001');
+        $order->setBaseCurrencyCode('EUR');
         $order->setItems([$orderItem]);
 
         /** @var OrderLines $instance */

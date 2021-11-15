@@ -30,6 +30,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
+use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Psr\Log\LoggerInterface;
 
@@ -298,7 +299,7 @@ class Mollie extends Adapter
      * @param string $type
      * @param null   $paymentToken
      *
-     * @return array
+     * @return ProcessTransactionResponse
      * @throws LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
      */
