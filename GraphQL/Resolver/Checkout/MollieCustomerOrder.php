@@ -11,6 +11,7 @@ use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\SalesGraphQl\Model\Formatter\Order as OrderFormatter;
 
 class MollieCustomerOrder implements ResolverInterface
 {
@@ -24,12 +25,19 @@ class MollieCustomerOrder implements ResolverInterface
      */
     private $orderRepository;
 
+    /**
+     * @var OrderFormatter
+     */
+    private $orderFormatter;
+
     public function __construct(
         Encryptor $encryptor,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        OrderFormatter $orderFormatter
     ) {
         $this->encryptor = $encryptor;
         $this->orderRepository = $orderRepository;
+        $this->orderFormatter = $orderFormatter;
     }
 
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
@@ -40,12 +48,9 @@ class MollieCustomerOrder implements ResolverInterface
         $orderId = $this->encryptor->decrypt($decodedHash);
         $order = $this->orderRepository->get($orderId);
 
-        return [
-            'id' => $order->getEntityId(),
-            'increment_id' => $order->getIncrementId(),
-            'created_at' => $order->getCreatedAt(),
-            'grand_total' => $order->getGrandTotal(),
-            'status' => $order->getStatus(),
-        ];
+        $result = $this->orderFormatter->format($order);
+        $result['model'] = $order;
+
+        return $result;
     }
 }
