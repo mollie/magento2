@@ -93,7 +93,6 @@
                 <item name="issuer" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\Issuer</item>
                 <item name="applePayPaymentToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\ApplePayPaymentToken</item>
                 <item name="sequenceTypeForVault" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\SequenceType</item>
-                <item name="UseSavedPaymentMethod" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\UseSavedPaymentMethod</item>
             </argument>
         </arguments>
     </type>
@@ -229,6 +228,10 @@
         <arguments>
             <argument name="mollie" xsi:type="object">Mollie\Payment\Model\Mollie\Proxy</argument>
         </arguments>
+    </type>
+
+    <type name="Magento\InstantPurchase\Controller\Button\PlaceOrder">
+        <plugin name="mollie_add_redirect_url" type="Mollie\Payment\Plugin\InstantPurchase\Button\PlaceOrderAddRedirectUrl" />
     </type>
 
     <!-- Payment methods configuration start -->
