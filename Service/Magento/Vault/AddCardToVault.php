@@ -79,7 +79,7 @@ class AddCardToVault
 
         /** @var PaymentTokenInterface $paymentToken */
         $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);
-        $paymentToken->setGatewayToken($molliePayment->mandateId);
+        $paymentToken->setGatewayToken($molliePayment->customerId);
         $paymentToken->setExpiresAt($this->getExpirationDate());
 
         $paymentToken->setTokenDetails(json_encode([
