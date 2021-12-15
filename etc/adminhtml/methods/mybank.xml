@@ -42,7 +42,7 @@
         <field id="days_before_expire" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Days to expire</label>
-            <frontend_class>validate-digits-range digits-range-1-100</frontend_class>
+            <frontend_class>validate-digits-range digits-range-1-365</frontend_class>
             <config_path>payment/mollie_methods_mybank/days_before_expire</config_path>
             <depends>
                 <field id="active">1</field>
