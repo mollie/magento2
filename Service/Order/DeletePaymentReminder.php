@@ -76,7 +76,7 @@ class DeletePaymentReminder
         if (is_numeric($reference)) {
             $criteria->addFilter(Order::CUSTOMER_ID, $reference);
         } else {
-            $criteria->addFilter(Order::CUSTOMER_ID, ['null' => true]);
+            $criteria->addFilter(Order::CUSTOMER_ID, '', 'null');
             $criteria->addFilter(Order::CUSTOMER_EMAIL, $reference);
         }
 
