@@ -6,9 +6,9 @@
 
 namespace Mollie\Payment\Test\Integration;
 
-use Magento\TestFramework\TestCase\AbstractController;
+use Magento\TestFramework\TestCase\AbstractBackendController;
 
-class ControllerTestCase extends AbstractController
+class BackendControllerTestCase extends AbstractBackendController
 {
     protected function setUp()
     {

@@ -11,6 +11,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Helper\Tests as TestsHelper;
 
@@ -108,11 +109,11 @@ class Apikey extends Action
     private function getKey(string $type): string
     {
         if (!$this->request->getParam($type . '_key') || $this->request->getParam($type . '_key') == '******') {
-            $value = $this->scopeConfig->getValue('payment/mollie_general/apikey_' . $type);
+            $value = $this->scopeConfig->getValue('payment/mollie_general/apikey_' . $type, ScopeInterface::SCOPE_STORE);
 
             return $this->encryptor->decrypt($value);
         }
 
-        return $this->request->getParam('test_key');
+        return $this->request->getParam($type . '_key');
     }
 }

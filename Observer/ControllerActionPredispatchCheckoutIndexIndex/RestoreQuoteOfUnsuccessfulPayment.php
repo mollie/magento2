@@ -43,7 +43,7 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
             return;
         }
 
-        if ($order->getState() === Order::STATE_NEW &&
+        if ($order->getState() === Order::STATE_PENDING_PAYMENT &&
             $order->getStatus() === $this->config->orderStatusPending($order->getStoreId())
         ) {
             $this->checkoutSession->restoreQuote();
