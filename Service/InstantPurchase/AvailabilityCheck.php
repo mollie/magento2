@@ -6,9 +6,10 @@
 
 namespace Mollie\Payment\Service\InstantPurchase;
 
+use Magento\InstantPurchase\PaymentMethodIntegration\AvailabilityCheckerInterface;
 use Mollie\Payment\Config;
 
-class AvailabilityCheck implements \Magento\InstantPurchase\PaymentMethodIntegration\AvailabilityCheckerInterface
+class AvailabilityCheck implements AvailabilityCheckerInterface
 {
     /**
      * @var Config
