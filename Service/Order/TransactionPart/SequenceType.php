@@ -69,6 +69,13 @@ class SequenceType implements TransactionPartInterface
             return false;
         }
 
+        if ($this->config->isMagentoVaultEnabled($order->getStoreId()) &&
+            $order->getPayment()->getAdditionalInformation(VaultConfigProvider::IS_ACTIVE_CODE) &&
+            $order->getPayment()->getMethod() == 'mollie_methods_creditcard'
+        ) {
+            return true;
+        }
+
         return false;
     }
 }
