@@ -28,8 +28,12 @@ class StartTransactionForInstantPurchaseOrders implements ObserverInterface
 
     public function execute(Observer $observer)
     {
+        if (!$observer->hasData('order')) {
+            return;
+        }
+
         /** @var OrderInterface $order */
-            $order = $observer->getData('order');
+        $order = $observer->getData('order');
 
         $payment = $order->getPayment();
         $instantPurchase = $payment->getAdditionalInformation(PaymentConfiguration::MARKER);
