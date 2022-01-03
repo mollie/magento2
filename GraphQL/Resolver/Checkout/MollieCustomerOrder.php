@@ -10,7 +10,9 @@ use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Magento\Framework\ObjectManagerInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\SalesGraphQl\Model\Formatter\Order as OrderFormatter;
 
 class MollieCustomerOrder implements ResolverInterface
 {
@@ -24,12 +26,19 @@ class MollieCustomerOrder implements ResolverInterface
      */
     private $orderRepository;
 
+    /**
+     * @var ObjectManagerInterface
+     */
+    private $objectManager;
+
     public function __construct(
         Encryptor $encryptor,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        ObjectManagerInterface $objectManager
     ) {
         $this->encryptor = $encryptor;
         $this->orderRepository = $orderRepository;
+        $this->objectManager = $objectManager;
     }
 
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
@@ -39,6 +48,19 @@ class MollieCustomerOrder implements ResolverInterface
 
         $orderId = $this->encryptor->decrypt($decodedHash);
         $order = $this->orderRepository->get($orderId);
+
+        /**
+         * This class exists from Magento 2.4.2, but we need to support lower versions too so use the Object Manager
+         * to load the class if it exists.
+         */
+        if (class_exists(OrderFormatter::class)) {
+            $orderFormatter = $this->objectManager->get(OrderFormatter::class);
+
+            $result = $orderFormatter->format($order);
+            $result['model'] = $order;
+
+            return $result;
+        }
 
         return [
             'id' => $order->getEntityId(),
