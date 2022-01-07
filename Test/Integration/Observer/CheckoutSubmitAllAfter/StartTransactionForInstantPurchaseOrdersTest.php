@@ -42,4 +42,18 @@ class StartTransactionForInstantPurchaseOrdersTest extends IntegrationTestCase
 
         $instance->execute($observer);
     }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testDoesNothingWhenTheOrderIsNotPresent()
+    {
+        // Create observer but don't add an order.
+        $observer = $this->objectManager->create(Observer::class);
+
+        /** @var StartTransactionForInstantPurchaseOrders $instance */
+        $instance = $this->objectManager->create(StartTransactionForInstantPurchaseOrders::class);
+
+        $instance->execute($observer);
+    }
 }

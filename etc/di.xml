@@ -370,7 +370,7 @@
     <!-- Belfius -->
     <type name="Mollie\Payment\Model\Methods\Belfius">
         <arguments>
-            <argument name="formBlockType" xsi:type="string">Magento\Methods\Banktransfer\Block\Form</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieBelfiusValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
@@ -870,7 +870,7 @@
     <!-- Klarnasliceit -->
     <type name="Mollie\Payment\Model\Methods\Klarnasliceit">
         <arguments>
-            <argument name="formBlockType" xsi:type="string">Magento\Methods\Klarnapaysliceit\Block\Form</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieKlarnasliceitValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
@@ -915,7 +915,7 @@
     <!-- MyBank -->
     <type name="Mollie\Payment\Model\Methods\MyBank">
         <arguments>
-            <argument name="formBlockType" xsi:type="string">Magento\Methods\Klarnasliceit\Block\Form</argument>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieMyBankValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>

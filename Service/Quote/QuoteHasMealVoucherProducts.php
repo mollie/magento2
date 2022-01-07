@@ -26,7 +26,7 @@ class QuoteHasMealVoucherProducts
 
     public function check(CartInterface $cart): bool
     {
-        $itemsWithCategories = array_filter($cart->getItems(), function (CartItemInterface $cartItem) {
+        $itemsWithCategories = array_filter($cart->getItems() ?? [], function (CartItemInterface $cartItem) {
             $category = $this->getProductCategory($cartItem->getProduct());
 
             return $category && $category != 'none';

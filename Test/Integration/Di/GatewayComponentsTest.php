@@ -8,6 +8,7 @@ namespace Mollie\Payment\Test\Integration\Di;
 
 use Magento\Framework\ObjectManager\ConfigInterface;
 use Magento\TestFramework\ObjectManager\Config;
+use Mollie\Payment\Model\Methods\CreditcardVault;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class GatewayComponentsTest extends IntegrationTestCase
@@ -69,6 +70,40 @@ class GatewayComponentsTest extends IntegrationTestCase
             $classArguments = $arguments[$validatorName];
             $this->assertEquals($configName, $classArguments['config']['instance']);
         }
+    }
+
+    public function testMethodHasCorrectFormBlockType(): void
+    {
+        $arguments = $this->getObjectManagerArguments();
+
+        $blocks = [
+            'default' => \Magento\Payment\Block\Form::class,
+            'Paymentlink' => \Mollie\Payment\Block\Form\Paymentlink::class,
+        ];
+
+        foreach ($this->getMethods() as $method) {
+            if ($method['name'] == 'CreditcardVault') {
+                continue;
+            }
+
+            $class = $method['class'];
+            $name  = $method['name'];
+            $classArguments = $arguments[$class];
+
+            $expected = $blocks[$name] ?? $blocks['default'];
+
+            $this->assertArrayHasKey('formBlockType', $classArguments, $name . ' does not have a formBlockType');
+            $this->assertEquals($expected, $classArguments['formBlockType'], $name . ' have an incorrect formBlockType');
+        }
+    }
+
+    public function testCreditcardVaultDoesNotHaveFormBlockType(): void
+    {
+        $arguments = $this->getObjectManagerArguments();
+
+        $classArguments = $arguments[CreditcardVault::class];
+
+        $this->assertArrayNotHasKey('formBlockType', $classArguments, 'CreditcardVault does have a formBlockType');
     }
 
     private function getObjectManagerArguments(): array
