@@ -87,7 +87,12 @@ class GetIssuers
     {
         $mollieApi = $this->mollieModel->getMollieApi($storeId);
 
-        $issuers = $this->execute($mollieApi, $method, 'radio');
+	$issuers = $this->execute(
+            $mollieApi,
+            $method,
+            $this->general->getIssuerListType($method)
+        );
+
         if (!$issuers) {
             return null;
         }
