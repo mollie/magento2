@@ -87,7 +87,7 @@ class GetIssuers
     {
         $mollieApi = $this->mollieModel->getMollieApi($storeId);
 
-	$issuers = $this->execute(
+        $issuers = $this->execute(
             $mollieApi,
             $method,
             $this->general->getIssuerListType($method)
@@ -100,7 +100,13 @@ class GetIssuers
         $output = [];
         foreach ($issuers as $issuer) {
             $issuer = (array)$issuer;
-            $issuer['image'] = (array)$issuer['image'];
+            if (!array_key_exists('image', $issuer)) {
+                $output[] = [
+                    'name' => $issuer['name'],
+                    'code' => $issuer['id']
+                ];
+                continue;
+            }
 
             $output[] = [
                 'name' => $issuer['name'],
