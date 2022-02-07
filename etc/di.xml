@@ -232,6 +232,10 @@
         </arguments>
     </type>
 
+    <type name="Magento\InstantPurchase\Controller\Button\PlaceOrder">
+        <plugin name="mollie_add_redirect_url" type="Mollie\Payment\Plugin\InstantPurchase\Button\PlaceOrderAddRedirectUrl" />
+    </type>
+
     <!-- Payment methods configuration start -->
     <!-- ApplePay -->
     <type name="Mollie\Payment\Model\Methods\ApplePay">

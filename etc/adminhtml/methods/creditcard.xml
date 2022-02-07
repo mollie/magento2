@@ -46,7 +46,6 @@
             <config_path>payment/mollie_methods_creditcard/use_components</config_path>
             <depends>
                 <field id="active">1</field>
-                <field id="enable_customers_api">0</field>
             </depends>
             <comment><![CDATA[With Components the customer can enter their credit card details within your webshop.<br><strong>Note:</strong> You need to enter your Profile ID in the general section of this extension configuration to use Mollie Components.]]></comment>
         </field>

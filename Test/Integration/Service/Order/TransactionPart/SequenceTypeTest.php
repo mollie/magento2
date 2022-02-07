@@ -95,38 +95,6 @@ class SequenceTypeTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @magentoDataFixture Magento/Customer/_files/customer.php
-     * @magentoConfigFixture default_store payment/mollie_general/enable_magento_vault 1
-     * @magentoConfigFixture default_store payment/mollie_methods_creditcard/enable_customers_api 1
-     */
-    public function testIncludesTheSequenceTypeWhenVaultIsEnabled()
-    {
-        /** @var OrderInterface $order */
-        $order = $this->loadOrderById('100000001');
-        $order->getPayment()->setAdditionalInformation(VaultConfigProvider::IS_ACTIVE_CODE, true);
-        $order->getPayment()->setMethod('mollie_methods_creditcard');
-
-        /** @var \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository */
-        $customerRepository = $this->objectManager->create(\Magento\Customer\Api\CustomerRepositoryInterface::class);
-        $customer = $customerRepository->getById(1);
-
-        $this->objectManager->get(Session::class)
-            ->setCustomerId($customer->getId())
-            ->setCustomerGroupId($customer->getGroupId());
-
-        /** @var SequenceType $instance */
-        $instance = $this->objectManager->create(SequenceType::class);
-        $result = $instance->process(
-            $order,
-            Orders::CHECKOUT_TYPE,
-            ['empty' => false, 'payment' => []]
-        );
-
-        $this->assertEquals(['empty' => false, 'payment' => ['sequenceType' => 'first']], $result);
-    }
-
-    /**
-     * @magentoDataFixture Magento/Sales/_files/order.php
      */
     public function testDoesNothingWhenLoggedIn()
     {

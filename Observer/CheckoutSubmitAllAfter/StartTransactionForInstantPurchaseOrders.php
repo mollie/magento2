@@ -20,13 +20,23 @@ class StartTransactionForInstantPurchaseOrders implements ObserverInterface
      */
     private $mollie;
 
+    /**
+     * @var null|string
+     */
+    private $redirectUrl = null;
+
     public function __construct(
         Mollie $mollie
     ) {
         $this->mollie = $mollie;
     }
 
-    public function execute(Observer $observer)
+    public function getRedirectUrl(): ?string
+    {
+        return $this->redirectUrl;
+    }
+
+    public function execute(Observer $observer): void
     {
         if (!$observer->hasData('order')) {
             return;
@@ -46,6 +56,6 @@ class StartTransactionForInstantPurchaseOrders implements ObserverInterface
             return;
         }
 
-        $this->mollie->startTransaction($order);
+        $this->redirectUrl = $this->mollie->startTransaction($order);
     }
 }
