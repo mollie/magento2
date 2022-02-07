@@ -1,0 +1,151 @@
+<?xml version="1.0" ?>
+<!--
+  ~ Copyright © Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="mollie_order_lines" engine="innodb" resource="default" comment="mollie_order_lines Table">
+        <column name="id" xsi:type="int" identity="true" nullable="false" unsigned="true" comment="Entity ID"/>
+        <column name="item_id" xsi:type="bigint" nullable="false" unsigned="true" default="0" comment="Item ID"/>
+        <column name="line_id" xsi:type="varchar" length="255" nullable="false" comment="Line ID"/>
+        <column name="order_id" xsi:type="bigint" nullable="false" unsigned="true" default="0" comment="Order Id"/>
+        <column name="type" xsi:type="varchar" length="255" nullable="false" comment="Type"/>
+        <column name="sku" xsi:type="varchar" length="255" nullable="false" comment="Sku"/>
+        <column name="qty_ordered" xsi:type="int" nullable="false" unsigned="true" default="0" comment="Qty Ordered"/>
+        <column name="qty_paid" xsi:type="int" nullable="false" unsigned="true" default="0" comment="Qty Paid"/>
+        <column name="qty_canceled" xsi:type="int" nullable="false" unsigned="true" default="0" comment="Qty Canceled"/>
+        <column name="qty_shipped" xsi:type="int" nullable="false" unsigned="true" default="0" comment="Qty Shipped"/>
+        <column name="qty_refunded" xsi:type="int" nullable="false" unsigned="true" default="0" comment="Qty Refunded"/>
+        <column name="unit_price" xsi:type="decimal" scale="2" precision="12" nullable="false"/>
+        <column name="discount_amount" xsi:type="decimal" scale="2" precision="12" nullable="false"/>
+        <column name="total_amount" xsi:type="decimal" scale="2" precision="12" nullable="false"/>
+        <column name="vat_rate" xsi:type="decimal" scale="2" precision="12" nullable="false"/>
+        <column name="vat_amount" xsi:type="decimal" scale="2" precision="12" nullable="false"/>
+        <column name="currency" xsi:type="varchar" length="3" nullable="false" comment="Currency"/>
+        <column name="created_at" xsi:type="timestamp" default="CURRENT_TIMESTAMP" nullable="false" comment="Created At"/>
+        <column name="updated_at" xsi:type="timestamp" on_update="true" default="CURRENT_TIMESTAMP" nullable="false" comment="Updated At"/>
+
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="MOLLIE_ORDER_LINES_ITEM_ID" indexType="btree">
+            <column name="item_id" />
+        </index>
+        <index referenceId="MOLLIE_ORDER_LINES_LINE_ID" indexType="btree">
+            <column name="line_id" />
+        </index>
+        <index referenceId="MOLLIE_ORDER_LINES_ORDER_ID" indexType="btree">
+            <column name="order_id" />
+        </index>
+        <index referenceId="MOLLIE_ORDER_LINES_TYPE" indexType="btree">
+            <column name="type" />
+        </index>
+    </table>
+
+    <table name="mollie_payment_paymenttoken" engine="innodb" resource="default" comment="mollie_payment_paymenttoken Table">
+        <column name="entity_id" xsi:type="int" identity="true" nullable="false" unsigned="true" comment="Entity ID"/>
+        <column name="cart_id" xsi:type="int" padding="10" nullable="false" unsigned="true" comment="Cart ID"/>
+        <column name="order_id" xsi:type="int" padding="10" nullable="true" unsigned="true" comment="Order ID"/>
+        <column name="token" xsi:type="varchar" length="32" comment="Token"/>
+
+        <constraint xsi:type="foreign" referenceId="MOLLIE_PAYMENT_TOKEN_CART_ID_QUOTE_ENTITY_ID" table="mollie_payment_paymenttoken" column="cart_id" referenceTable="quote" referenceColumn="entity_id" onDelete="CASCADE" />
+        <constraint xsi:type="foreign" referenceId="MOLLIE_PAYMENT_TOKEN_ORDER_ID_SALES_ORDER_ENTITY_ID" table="mollie_payment_paymenttoken" column="order_id" referenceTable="sales_order" referenceColumn="entity_id" onDelete="CASCADE" />
+
+        <constraint referenceId="MOLLIE_PAYMENT_PAYMENTTOKEN_TOKEN" xsi:type="unique">
+            <column name="token" />
+        </constraint>
+
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="mollie_payment_customer" engine="innodb" resource="default" comment="mollie_payment_customer Table">
+        <column name="entity_id" xsi:type="int" identity="true" nullable="false" unsigned="true" comment="Entity ID"/>
+        <column name="customer_id" xsi:type="int" padding="10" nullable="false" unsigned="true" comment="Customer ID"/>
+        <column name="mollie_customer_id" xsi:type="varchar" nullable="true" comment="Mollie Customer Id"/>
+
+        <constraint xsi:type="foreign" referenceId="MOLLIE_CUSTOMER_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID" table="mollie_customer" column="customer_id" referenceTable="customer_entity" referenceColumn="entity_id" onDelete="CASCADE" />
+
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="mollie_pending_payment_reminder" engine="innodb" resource="default" comment="mollie_pending_payment_reminder Table">
+        <column name="entity_id" xsi:type="int" identity="true" nullable="false" unsigned="true" comment="Entity ID"/>
+        <column name="order_id" xsi:type="bigint" nullable="false" unsigned="true" default="0" comment="Order Id"/>
+        <column name="created_at" xsi:type="timestamp" default="CURRENT_TIMESTAMP" nullable="false" comment="Created At"/>
+
+        <constraint referenceId="MOLLIE_PENDING_PAYMENT_REMINDER_ORDER_ID" xsi:type="unique">
+            <column name="order_id" />
+        </constraint>
+
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="mollie_sent_payment_reminder" engine="innodb" resource="default" comment="mollie_sent_payment_reminder Table">
+        <column name="entity_id" xsi:type="int" identity="true" nullable="false" unsigned="true" comment="Entity ID"/>
+        <column name="order_id" xsi:type="bigint" nullable="false" unsigned="true" default="0" comment="Order Id"/>
+        <column name="created_at" xsi:type="timestamp" default="CURRENT_TIMESTAMP" nullable="false" comment="Created At"/>
+
+        <constraint referenceId="MOLLIE_PENDING_PAYMENT_REMINDER_ORDER_ID" xsi:type="unique">
+            <column name="order_id" />
+        </constraint>
+
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="quote">
+        <column name="mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+    </table>
+
+    <table name="quote_address">
+        <column name="mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+    </table>
+
+    <table name="sales_order">
+        <column name="mollie_transaction_id" xsi:type="varchar" length="255" nullable="true" comment="Mollie Transaction Id" />
+        <column name="mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+
+        <index referenceId="SALES_ORDER_MOLLIE_TRANSACTION_ID" indexType="btree">
+            <column name="mollie_transaction_id"/>
+        </index>
+    </table>
+
+    <table name="sales_shipment">
+        <column name="mollie_shipment_id" xsi:type="varchar" length="255" nullable="true" comment="Mollie Shipment Id" />
+
+        <index referenceId="SALES_SHIPMENT_MOLLIE_SHIPMENT_ID" indexType="btree">
+            <column name="mollie_shipment_id"/>
+        </index>
+    </table>
+
+    <table name="sales_invoice">
+        <column name="mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+    </table>
+
+    <table name="sales_creditmemo">
+        <column name="mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+        <column name="base_mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
+    </table>
+</schema>
