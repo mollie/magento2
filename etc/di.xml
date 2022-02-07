@@ -128,6 +128,7 @@
         <arguments>
             <argument name="generators" xsi:type="array">
                 <item name="weee_fee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\WeeeFeeGenerator</item>
+                <item name="mageworx_rewardpoints" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MageWorxRewardPoints</item>
             </argument>
         </arguments>
     </type>
