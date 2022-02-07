@@ -30,17 +30,20 @@ class ResetCartTest extends GraphQLTestCase
 
         $result = $this->graphQlQuery('
             mutation {
-              mollieRestoreCart(input: {
+                mollieRestoreCart(input: {
                   cart_id: "' . $quoteIdToMaskedQuoteId->execute($cart->getId()) . '"
-              }) {
-                cart {
-                    id
+                }) {
+                    cart {
+                        items {
+                            id
+                        }
+                    }
                 }
-              }
             }
         ');
 
-        $this->assertNotEmpty($result['mollieRestoreCart']['cart']['id']);
+        $this->assertNotEmpty($result['mollieRestoreCart']['cart']['items']);
+        $this->assertCount(1, $result['mollieRestoreCart']['cart']['items']);
     }
     /**
      * @magentoAppIsolation enabled
@@ -49,24 +52,31 @@ class ResetCartTest extends GraphQLTestCase
      */
     public function testChecksTheCustomer(): void
     {
-        $this->expectExceptionMessageMatches('/The current user cannot perform operations on cart/');
-
         /** @var CartInterface $cart */
         $cart = $this->objectManager->create(Quote::class);
         $cart->load('test01', 'reserved_order_id');
 
         $quoteIdToMaskedQuoteId = $this->objectManager->get(QuoteIdToMaskedQuoteIdInterface::class);
 
-        $this->graphQlQuery('
-            mutation {
-              mollieRestoreCart(input: {
-                  cart_id: "' . $quoteIdToMaskedQuoteId->execute($cart->getId()) . '"
-              }) {
-                cart {
-                    id
+        try {
+            $this->graphQlQuery('
+                mutation {
+                    mollieRestoreCart(input: {
+                        cart_id: "' . $quoteIdToMaskedQuoteId->execute($cart->getId()) . '"
+                    }) {
+                        cart {
+                            email
+                        }
+                    }
                 }
-              }
-            }
-        ');
+            ');
+
+            $this->fail('We expect that an exception is thrown.');
+        } catch (\Exception $exception) {
+            $this->assertStringContainsString(
+                'The current user cannot perform operations on cart',
+                $exception->getMessage()
+            );
+        }
     }
 }
