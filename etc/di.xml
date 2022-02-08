@@ -128,6 +128,7 @@
         <arguments>
             <argument name="generators" xsi:type="array">
                 <item name="weee_fee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\WeeeFeeGenerator</item>
+                <item name="mageworx_rewardpoints" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MageWorxRewardPoints</item>
             </argument>
         </arguments>
     </type>
@@ -229,6 +230,10 @@
         <arguments>
             <argument name="mollie" xsi:type="object">Mollie\Payment\Model\Mollie\Proxy</argument>
         </arguments>
+    </type>
+
+    <type name="Magento\InstantPurchase\Controller\Button\PlaceOrder">
+        <plugin name="mollie_add_redirect_url" type="Mollie\Payment\Plugin\InstantPurchase\Button\PlaceOrderAddRedirectUrl" />
     </type>
 
     <!-- Payment methods configuration start -->

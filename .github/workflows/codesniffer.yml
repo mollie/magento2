@@ -10,7 +10,7 @@ jobs:
       - name: Run codesniffer
         run:
           docker run
-          --volume $(pwd)/:/app/data
+          --volume $(pwd)/:/app/workdir
           michielgerritsen/magento-coding-standard:latest
           --severity=10
-          --ignore-annotations
+          -s

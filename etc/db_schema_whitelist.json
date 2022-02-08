@@ -1,0 +1,123 @@
+{
+    "mollie_order_lines": {
+        "column": {
+            "id": true,
+            "item_id": true,
+            "line_id": true,
+            "order_id": true,
+            "type": true,
+            "sku": true,
+            "qty_ordered": true,
+            "qty_paid": true,
+            "qty_canceled": true,
+            "qty_shipped": true,
+            "qty_refunded": true,
+            "unit_price": true,
+            "discount_amount": true,
+            "total_amount": true,
+            "vat_rate": true,
+            "vat_amount": true,
+            "currency": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "MOLLIE_ORDER_LINES_ITEM_ID": true,
+            "MOLLIE_ORDER_LINES_LINE_ID": true,
+            "MOLLIE_ORDER_LINES_ORDER_ID": true,
+            "MOLLIE_ORDER_LINES_TYPE": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "mollie_payment_paymenttoken": {
+        "column": {
+            "entity_id": true,
+            "cart_id": true,
+            "order_id": true,
+            "token": true
+        },
+        "constraint": {
+            "MOLLIE_PAYMENT_PAYMENTTOKEN_CART_ID_QUOTE_ENTITY_ID": true,
+            "MOLLIE_PAYMENT_PAYMENTTOKEN_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
+            "MOLLIE_PAYMENT_PAYMENTTOKEN_TOKEN": true,
+            "PRIMARY": true
+        }
+    },
+    "mollie_payment_customer": {
+        "column": {
+            "entity_id": true,
+            "customer_id": true,
+            "mollie_customer_id": true
+        },
+        "constraint": {
+            "MOLLIE_PAYMENT_CUSTOMER_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "mollie_pending_payment_reminder": {
+        "column": {
+            "entity_id": true,
+            "order_id": true,
+            "created_at": true
+        },
+        "constraint": {
+            "MOLLIE_PENDING_PAYMENT_REMINDER_ORDER_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "mollie_sent_payment_reminder": {
+        "column": {
+            "entity_id": true,
+            "order_id": true,
+            "created_at": true
+        },
+        "constraint": {
+            "MOLLIE_SENT_PAYMENT_REMINDER_ORDER_ID": true,
+            "PRIMARY": true
+        }
+    },
+    "quote": {
+        "column": {
+            "mollie_payment_fee": true,
+            "base_mollie_payment_fee": true
+        }
+    },
+    "quote_address": {
+        "column": {
+            "mollie_payment_fee": true,
+            "base_mollie_payment_fee": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "mollie_payment_fee": true,
+            "base_mollie_payment_fee": true,
+            "mollie_transaction_id": true
+        },
+        "index": {
+            "SALES_ORDER_MOLLIE_TRANSACTION_ID": true
+        }
+    },
+    "sales_invoice": {
+        "column": {
+            "mollie_payment_fee": true,
+            "base_mollie_payment_fee": true
+        }
+    },
+    "sales_creditmemo": {
+        "column": {
+            "mollie_payment_fee": true,
+            "base_mollie_payment_fee": true
+        }
+    },
+    "sales_shipment": {
+        "column": {
+            "mollie_shipment_id": true
+        },
+        "index": {
+            "SALES_SHIPMENT_MOLLIE_SHIPMENT_ID": true
+        }
+    }
+}
