@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Model\Client;
 
 use Magento\Catalog\Model\Product\Type as ProductType;
+use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Exception\LocalizedException;
@@ -305,6 +306,13 @@ class Orders extends AbstractModel
         if ($this->expires->availableForMethod($method, $storeId)) {
             $orderData['expiresAt'] = $this->expires->atDateForMethod($method, $storeId);
         }
+
+        $eventData = [
+            'order' => $order,
+            'order_data' => new DataObject($orderData)
+        ];
+        $this->eventManager->dispatch('mollie_before_build_transaction_orders_api', $eventData);
+        $orderData = $eventData['order_data']->toArray();
 
         $orderData = $this->buildTransaction->execute($order, static::CHECKOUT_TYPE, $orderData);
 
