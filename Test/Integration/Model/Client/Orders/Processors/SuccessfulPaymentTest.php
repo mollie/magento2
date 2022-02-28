@@ -210,7 +210,15 @@ class SuccessfulPaymentTest extends IntegrationTestCase
 
         $freshOrder = $this->objectManager->get(OrderInterface::class)->load($order->getId(), 'entity_id');
 
-        $this->assertEquals(Order::STATE_PROCESSING, $freshOrder->getState());
+        // There is a difference in ~2.3.4 and later, that's why we check both statuses as it is change somewhere in
+        // those versions.
+        $this->assertTrue(in_array(
+            $freshOrder->getState(),
+            [
+                Order::STATE_PROCESSING,
+                Order::STATE_COMPLETE,
+            ]
+        ), 'We expect the order status to be "processing" or "complete".');
     }
 
     private function createResponse(
