@@ -15,35 +15,28 @@ use Magento\Framework\Registry;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\Order\Invoice;
-use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\ResourceModel\Order\Handler\State;
-use Magento\Sales\Model\Service\InvoiceService;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\OrderStatus;
-use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
+use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\OrderLines;
-use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Service\Order\BuildTransaction;
-use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 use Mollie\Payment\Service\Order\Transaction;
-use Mollie\Payment\Service\Order\TransactionProcessor;
-use Mollie\Payment\Service\Magento\Vault\AddCardToVault;
 use Mollie\Payment\Service\PaymentToken\PaymentTokenForOrder;
 
 /**
@@ -69,21 +62,9 @@ class Orders extends AbstractModel
      */
     private $orderRepository;
     /**
-     * @var InvoiceRepository
-     */
-    private $invoiceRepository;
-    /**
-     * @var OrderSender
-     */
-    private $orderSender;
-    /**
      * @var InvoiceSender
      */
     private $invoiceSender;
-    /**
-     * @var InvoiceService
-     */
-    private $invoiceService;
     /**
      * @var CheckoutSession
      */
@@ -132,18 +113,6 @@ class Orders extends AbstractModel
      * @var BuildTransaction
      */
     private $buildTransaction;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var DashboardUrl
-     */
-    private $dashboardUrl;
-    /**
-     * @var TransactionProcessor
-     */
-    private $transactionProcessor;
 
     /**
      * @var EventManager
@@ -151,29 +120,21 @@ class Orders extends AbstractModel
     private $eventManager;
 
     /**
-     * @var CancelOrder
-     */
-    private $cancelOrder;
-
-    /**
-     * @var AddCardToVault
-     */
-    private $addCardToVault;
-
-    /**
      * @var PaymentTokenForOrder
      */
     private $paymentTokenForOrder;
 
     /**
+     * @var ProcessTransaction
+     */
+    private $processTransaction;
+
+    /**
      * Orders constructor.
      *
      * @param OrderLines $orderLines
-     * @param OrderSender $orderSender
      * @param InvoiceSender $invoiceSender
-     * @param InvoiceService $invoiceService
      * @param OrderRepository $orderRepository
-     * @param InvoiceRepository $invoiceRepository
      * @param CheckoutSession $checkoutSession
      * @param ManagerInterface $messageManager
      * @param Registry $registry
@@ -187,20 +148,14 @@ class Orders extends AbstractModel
      * @param State $orderState
      * @param Transaction $transaction
      * @param BuildTransaction $buildTransaction
-     * @param Config $config
-     * @param DashboardUrl $dashboardUrl
-     * @param TransactionProcessor $transactionProcessor
-     * @param CancelOrder $cancelOrder
-     * @param AddCardToVault $addCardToVault
+     * @param PaymentTokenForOrder $paymentTokenForOrder
+     * @param ProcessTransaction $processTransaction
      * @param EventManager $eventManager
      */
     public function __construct(
         OrderLines $orderLines,
-        OrderSender $orderSender,
         InvoiceSender $invoiceSender,
-        InvoiceService $invoiceService,
         OrderRepository $orderRepository,
-        InvoiceRepository $invoiceRepository,
         CheckoutSession $checkoutSession,
         ManagerInterface $messageManager,
         Registry $registry,
@@ -214,20 +169,13 @@ class Orders extends AbstractModel
         State $orderState,
         Transaction $transaction,
         BuildTransaction $buildTransaction,
-        Config $config,
-        DashboardUrl $dashboardUrl,
-        TransactionProcessor $transactionProcessor,
-        CancelOrder $cancelOrder,
-        AddCardToVault $addCardToVault,
         PaymentTokenForOrder $paymentTokenForOrder,
+        ProcessTransaction $processTransaction,
         EventManager $eventManager
     ) {
         $this->orderLines = $orderLines;
-        $this->orderSender = $orderSender;
         $this->invoiceSender = $invoiceSender;
-        $this->invoiceService = $invoiceService;
         $this->orderRepository = $orderRepository;
-        $this->invoiceRepository = $invoiceRepository;
         $this->checkoutSession = $checkoutSession;
         $this->messageManager = $messageManager;
         $this->registry = $registry;
@@ -241,13 +189,9 @@ class Orders extends AbstractModel
         $this->orderState = $orderState;
         $this->transaction = $transaction;
         $this->buildTransaction = $buildTransaction;
-        $this->config = $config;
-        $this->dashboardUrl = $dashboardUrl;
-        $this->transactionProcessor = $transactionProcessor;
         $this->eventManager = $eventManager;
-        $this->cancelOrder = $cancelOrder;
-        $this->addCardToVault = $addCardToVault;
         $this->paymentTokenForOrder = $paymentTokenForOrder;
+        $this->processTransaction = $processTransaction;
     }
 
     /**
@@ -384,204 +328,15 @@ class Orders extends AbstractModel
      * @return array
      * @throws ApiException
      * @throws LocalizedException
+     * @deprecated since 3.0.0
      */
     public function processTransaction(Order $order, $mollieApi, $type = 'webhook', $paymentToken = null)
     {
-        $orderId = $order->getId();
-        $storeId = $order->getStoreId();
-        $transactionId = $order->getMollieTransactionId();
-        $mollieOrder = $mollieApi->orders->get($transactionId, ['embed' => 'payments']);
-        $this->mollieHelper->addTolog($type, $mollieOrder);
-        $status = $mollieOrder->status;
+        $result = $this->processTransaction->execute($order, $type);
 
-        // This order is refunded, do not process any further.
-        if ($mollieOrder->payments() && $mollieOrder->payments()->offsetGet(0) && isset($mollieOrder->payments()->offsetGet(0)->metadata->refunded)) {
-            return ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
-        }
-
-        if ($mollieOrder->isCompleted()) {
-            return ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
-        }
-
-        $dashboardUrl = $this->dashboardUrl->forOrdersApi($order->getStoreId(), $mollieOrder->id);
-        $order->getPayment()->setAdditionalInformation('mollie_id', $mollieOrder->id);
-        $order->getPayment()->setAdditionalInformation('dashboard_url', $dashboardUrl);
-
-        $this->orderLines->updateOrderLinesByWebhook($mollieOrder->lines, $mollieOrder->isPaid());
-
-        /**
-         * Check if last payment was canceled, failed or expired and redirect customer to cart for retry.
-         */
-        $lastPaymentStatus = $this->mollieHelper->getLastRelevantStatus($mollieOrder);
-        if ($lastPaymentStatus == 'canceled' || $lastPaymentStatus == 'failed' || $lastPaymentStatus == 'expired') {
-            $method = $order->getPayment()->getMethodInstance()->getTitle();
-            $order->getPayment()->setAdditionalInformation('payment_status', $lastPaymentStatus);
-            $this->orderRepository->save($order);
-            $this->cancelOrder->execute($order, $lastPaymentStatus);
-            $this->transactionProcessor->process($order, $mollieOrder);
-            $msg = ['success' => false, 'status' => $lastPaymentStatus, 'order_id' => $orderId, 'type' => $type, 'method' => $method];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        $refunded = $mollieOrder->amountRefunded !== null ? true : false;
-        $payment = $order->getPayment();
-        $this->addCardToVault->forPayment($payment, $mollieOrder);
-        if ($type == 'webhook' && $payment->getAdditionalInformation('payment_status') != $status) {
-            $payment->setAdditionalInformation('payment_status', $status);
-            $this->orderRepository->save($order);
-        }
-
-        if (($mollieOrder->isPaid() || $mollieOrder->isAuthorized()) && !$refunded) {
-            $amount = $mollieOrder->amount->value;
-            $currency = $mollieOrder->amount->currency;
-            $orderAmount = $this->mollieHelper->getOrderAmountByOrder($order);
-
-            if ($currency != $orderAmount['currency']) {
-                $msg = ['success' => false, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
-                $this->mollieHelper->addTolog('error', __('Currency does not match.'));
-                return $msg;
-            }
-
-            if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
-                if ($order->isCanceled()) {
-                    $order = $this->mollieHelper->uncancelOrder($order);
-                }
-
-                if (abs($amount - $orderAmount['value']) < 0.01) {
-                    $payments = $mollieOrder->_embedded->payments;
-                    $paymentId = end($payments)->id;
-                    $payment->setTransactionId($paymentId);
-                    $payment->setCurrencyCode($order->getBaseCurrencyCode());
-
-                    if ($mollieOrder->isPaid()) {
-                        $payment->setIsTransactionClosed(true);
-                        $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
-                    }
-
-                    if ($mollieOrder->isAuthorized() &&
-                        $this->mollieHelper->getInvoiceMoment($storeId) == InvoiceMoment::ON_AUTHORIZE
-                    ) {
-                        $payment->setIsTransactionClosed(false);
-                        $payment->registerAuthorizationNotification($order->getBaseGrandTotal(), true);
-
-                        /**
-                         * Create pending invoice, as order has not been paid.
-                         */
-                        $invoice = $this->invoiceService->prepareInvoice($order);
-                        $invoice->setRequestedCaptureCase(Invoice::NOT_CAPTURE);
-                        $invoice->setTransactionId($paymentId);
-                        $invoice->register();
-
-                        $this->invoiceRepository->save($invoice);
-                    }
-
-                    $order->setState(Order::STATE_PROCESSING);
-                    $this->transactionProcessor->process($order, $mollieOrder);
-
-                    if ($mollieOrder->amountCaptured !== null) {
-                        if ($mollieOrder->amount->currency != $mollieOrder->amountCaptured->currency) {
-                            $message = __(
-                                'Mollie: Order Amount %1, Captured Amount %2',
-                                $mollieOrder->amount->currency . ' ' . $mollieOrder->amount->value,
-                                $mollieOrder->amountCaptured->currency . ' ' . $mollieOrder->amountCaptured->value
-                            );
-                            $this->orderCommentHistory->add($order, $message);
-                        }
-                    }
-
-                    if (!$order->getIsVirtual()) {
-                        $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($storeId);
-                        if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
-                            $order->setStatus($defaultStatusProcessing);
-                        }
-                    }
-
-                    $this->orderRepository->save($order);
-                }
-
-                /** @var Order\Invoice $invoice */
-                $invoice = $payment->getCreatedInvoice();
-                $sendInvoice = $this->mollieHelper->sendInvoice($storeId);
-
-                if (!$order->getEmailSent()) {
-                    try {
-                        $this->orderSender->send($order, true);
-                        $message = __('New order email sent');
-                        $this->orderCommentHistory->add($order, $message, true);
-                    } catch (\Throwable $exception) {
-                        $message = __('Unable to send the new order email: %1', $exception->getMessage());
-                        $this->orderCommentHistory->add($order, $message, false);
-                    }
-                }
-
-                if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
-                    try {
-                        $this->invoiceSender->send($invoice);
-                        $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                        $this->orderCommentHistory->add($order, $message, true);
-                    } catch (\Throwable $exception) {
-                        $message = __('Unable to send the invoice: %1', $exception->getMessage());
-                        $this->orderCommentHistory->add($order, $message, true);
-                    }
-                }
-
-            }
-
-            $msg = ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            $this->checkCheckoutSession($order, $paymentToken, $mollieOrder, $type);
-            return $msg;
-        }
-
-        if ($refunded) {
-            $msg = ['success' => true, 'status' => 'refunded', 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        if ($mollieOrder->isCreated()) {
-            if ($mollieOrder->method == 'banktransfer' && !$order->getEmailSent()) {
-                try {
-                    $this->orderSender->send($order);
-                    $message = __('New order email sent');
-                } catch (\Throwable $exception) {
-                    $message = __('Unable to send the new order email: %1', $exception->getMessage());
-                }
-
-                if (!$statusPending = $this->mollieHelper->getStatusPendingBanktransfer($storeId)) {
-                    $statusPending = $order->getStatus();
-                }
-
-                $order->setState(Order::STATE_PENDING_PAYMENT);
-                $this->transactionProcessor->process($order, $mollieOrder);
-                $order->addStatusToHistory($statusPending, $message, true);
-                $this->orderRepository->save($order);
-            }
-            $msg = ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            $this->checkCheckoutSession($order, $paymentToken, $mollieOrder, $type);
-            return $msg;
-        }
-
-        if ($mollieOrder->isCanceled() || $mollieOrder->isExpired()) {
-            if ($type == 'webhook') {
-                $this->cancelOrder->execute($order, $status);
-            }
-            $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        if ($mollieOrder->isCompleted()) {
-            $msg = ['success' => true, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
-            $this->mollieHelper->addTolog('success', $msg);
-            return $msg;
-        }
-
-        $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
-        $this->mollieHelper->addTolog('success', $msg);
-        return $msg;
+        return [
+            'success' => $result->isSuccess(),
+        ];
     }
 
     public function orderHasUpdate(OrderInterface $order, MollieApiClient $mollieApi)
@@ -905,6 +660,7 @@ class Orders extends AbstractModel
             );
         }
 
+        /** @var int|float $remainderAmount */
         $remainderAmount = $order->getPayment()->getAdditionalInformation('remainder_amount');
         $maximumAmountToRefund = $order->getBaseGrandTotal() - $remainderAmount;
         if ($remainderAmount) {

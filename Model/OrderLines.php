@@ -152,10 +152,10 @@ class OrderLines extends AbstractModel
     }
 
     /**
-     * @param      $orderLines
+     * @param array $orderLines
      * @param bool $paid
      */
-    public function updateOrderLinesByWebhook($orderLines, $paid = false)
+    public function updateOrderLinesByWebhook(array $orderLines, bool $paid = false)
     {
         foreach ($orderLines as $line) {
             $orderLineRow = $this->getOrderLineByLineId($line->id);
