@@ -61,6 +61,10 @@ class TestExtensionAttributes implements CompatibilityTestInterface
             $instance = $this->objectManager->get($interface);
             $extensionAttributesInstance = $instance->getExtensionAttributes();
 
+            if ($extensionAttributesInstance === null) {
+                return false;
+            }
+
             if (!$this->allMethodsExists($extensionAttributesInstance, $attributes)) {
                 return false;
             }
