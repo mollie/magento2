@@ -10,6 +10,7 @@ use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Locale\Resolver;
 use Mollie\Api\MollieApiClient;
+use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Mollie as MollieModel;
 
 class GetIssuers
@@ -36,16 +37,23 @@ class GetIssuers
      */
     private $resolver;
 
+    /**
+     * @var General
+     */
+    private $general;
+
     public function __construct(
         CacheInterface $cache,
         SerializerInterface $serializer,
         MollieModel $mollieModel,
-        Resolver $resolver
+        Resolver $resolver,
+        General $general
     ) {
         $this->cache = $cache;
         $this->serializer = $serializer;
         $this->mollieModel = $mollieModel;
         $this->resolver = $resolver;
+        $this->general = $general;
     }
 
     /**
@@ -68,6 +76,9 @@ class GetIssuers
             $type
         );
 
+        // $result will be a nested stdClass, this converts it on all levels to an array.
+        $result = json_decode(json_encode($result), true);
+
         $this->cache->save(
             $this->serializer->serialize($result),
             $identifier,
@@ -83,19 +94,29 @@ class GetIssuers
      * @param $method
      * @return array|null
      */
-    public function getForGraphql($storeId, $method)
+    public function getForGraphql($storeId, $method): ?array
     {
         $mollieApi = $this->mollieModel->getMollieApi($storeId);
 
-        $issuers = $this->execute($mollieApi, $method, 'radio');
+        $issuers = $this->execute(
+            $mollieApi,
+            $method,
+            $this->general->getIssuerListType($method)
+        );
+
         if (!$issuers) {
             return null;
         }
 
         $output = [];
         foreach ($issuers as $issuer) {
-            $issuer = (array)$issuer;
-            $issuer['image'] = (array)$issuer['image'];
+            if (!array_key_exists('image', $issuer)) {
+                $output[] = [
+                    'name' => $issuer['name'],
+                    'code' => $issuer['id']
+                ];
+                continue;
+            }
 
             $output[] = [
                 'name' => $issuer['name'],
