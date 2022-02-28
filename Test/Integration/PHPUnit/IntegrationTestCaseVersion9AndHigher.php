@@ -10,7 +10,9 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\TestFramework\Annotation\DataFixture;
 use Magento\TestFramework\ObjectManager;
+use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 use PHPUnit\Framework\TestCase;
 
 class IntegrationTestCase extends TestCase
@@ -73,6 +75,9 @@ class IntegrationTestCase extends TestCase
         if (!file_exists($fullPath)) {
             throw new \Exception('The path "' . $fullPath . '" does not exists');
         }
+
+        $resolver = Resolver::getInstance();
+        $resolver->setCurrentFixtureType(DataFixture::ANNOTATION);
 
         chdir($this->getRootDirectory() . '/dev/tests/integration/testsuite/');
         require $fullPath;
