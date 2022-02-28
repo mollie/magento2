@@ -25,11 +25,11 @@ class MollieLogger extends Logger
     public function addInfoLog($type, $data)
     {
         if (is_array($data)) {
-            $this->addInfo($type . ': ' . json_encode($data));
+            $this->addRecord(static::INFO, $type . ': ' . json_encode($data));
         } elseif (is_object($data)) {
-            $this->addInfo($type . ': ' . json_encode($data));
+            $this->addRecord(static::INFO, $type . ': ' . json_encode($data));
         } else {
-            $this->addInfo($type . ': ' . $data);
+            $this->addRecord(static::INFO, $type . ': ' . $data);
         }
     }
 
@@ -42,11 +42,11 @@ class MollieLogger extends Logger
     public function addErrorLog($type, $data)
     {
         if (is_array($data)) {
-            $this->addError($type . ': ' . json_encode($data));
+            $this->addRecord(static::ERROR, $type . ': ' . json_encode($data));
         } elseif (is_object($data)) {
-            $this->addError($type . ': ' . json_encode($data));
+            $this->addRecord(static::ERROR, $type . ': ' . json_encode($data));
         } else {
-            $this->addError($type . ': ' . $data);
+            $this->addRecord(static::ERROR, $type . ': ' . $data);
         }
     }
 }
