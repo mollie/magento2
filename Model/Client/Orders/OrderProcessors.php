@@ -46,7 +46,7 @@ class OrderProcessors
         OrderInterface $magentoOrder,
         Order $mollieOrder,
         string $type,
-        ProcessTransactionResponse $response = null
+        ProcessTransactionResponse $response
     ): ?ProcessTransactionResponse {
         if (!isset($this->processors[$event])) {
             $response = $response ?? $this->returnResponse($mollieOrder, $magentoOrder, $type);

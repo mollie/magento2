@@ -46,7 +46,7 @@ class PaymentProcessors
         OrderInterface $magentoOrder,
         Payment $molliePayment,
         string $type,
-        ProcessTransactionResponse $response = null
+        ProcessTransactionResponse $response
     ): ?ProcessTransactionResponse {
         if (!isset($this->processors[$event])) {
             $response = $response ?? $this->returnResponse($molliePayment, $magentoOrder, $type);

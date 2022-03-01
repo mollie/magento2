@@ -57,8 +57,12 @@ class LastPaymentStatusIsFailure implements OrderProcessorInterface
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
     }
 
-    public function process(OrderInterface $magentoOrder, Order $mollieOrder, string $type, ProcessTransactionResponse $response): ?ProcessTransactionResponse
-    {
+    public function process(
+        OrderInterface $magentoOrder,
+        Order $mollieOrder,
+        string $type,
+        ProcessTransactionResponse $response
+    ): ?ProcessTransactionResponse {
         $lastPaymentStatus = $this->mollieHelper->getLastRelevantStatus($mollieOrder);
         $method = $magentoOrder->getPayment()->getMethodInstance()->getTitle();
         $magentoOrder->getPayment()->setAdditionalInformation('payment_status', $lastPaymentStatus);

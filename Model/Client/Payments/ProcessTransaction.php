@@ -64,27 +64,63 @@ class ProcessTransaction
             'type' => $type
         ]);
 
-        $this->paymentProcessors->process('preprocess', $magentoOrder, $molliePayment, $type, $defaultResponse);
+        $this->paymentProcessors->process(
+            'preprocess',
+            $magentoOrder,
+            $molliePayment,
+            $type,
+            $defaultResponse
+        );
 
         $refunded = isset($molliePayment->_links->refunds) ? true : false;
         if ($status == 'paid' && !$refunded) {
-            return $this->paymentProcessors->process('paid', $magentoOrder, $molliePayment, $type);
+            return $this->paymentProcessors->process(
+                'paid',
+                $magentoOrder,
+                $molliePayment,
+                $type,
+                $defaultResponse
+            );
         }
 
         if ($refunded) {
-            return $this->paymentProcessors->process('refunded', $magentoOrder, $molliePayment, $type);
+            return $this->paymentProcessors->process(
+                'refunded',
+                $magentoOrder,
+                $molliePayment,
+                $type,
+                $defaultResponse
+            );
         }
 
         if ($status == 'open') {
-            return $this->paymentProcessors->process('open', $magentoOrder, $molliePayment, $type);
+            return $this->paymentProcessors->process(
+                'open',
+                $magentoOrder,
+                $molliePayment,
+                $type,
+                $defaultResponse
+            );
         }
 
         if ($status == 'pending') {
-            return $this->paymentProcessors->process('pending', $magentoOrder, $molliePayment, $type);
+            return $this->paymentProcessors->process(
+                'pending',
+                $magentoOrder,
+                $molliePayment,
+                $type,
+                $defaultResponse
+            );
         }
 
         if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
-            return $this->paymentProcessors->process('failed', $magentoOrder, $molliePayment, $type);
+            return $this->paymentProcessors->process(
+                'failed',
+                $magentoOrder,
+                $molliePayment,
+                $type,
+                $defaultResponse
+            );
         }
 
         throw new \Exception('Unknown status');

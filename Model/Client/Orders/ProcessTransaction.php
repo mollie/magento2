@@ -106,12 +106,24 @@ class ProcessTransaction
          */
         $lastPaymentStatus = $this->mollieHelper->getLastRelevantStatus($mollieOrder);
         if ($lastPaymentStatus == 'canceled' || $lastPaymentStatus == 'failed' || $lastPaymentStatus == 'expired') {
-            return $this->orderProcessors->process('last_payment_status_is_failure', $order, $mollieOrder, $type);
+            return $this->orderProcessors->process(
+                'last_payment_status_is_failure',
+                $order,
+                $mollieOrder,
+                $type,
+                $defaultResponse
+            );
         }
 
         $refunded = $mollieOrder->amountRefunded !== null;
         if (($mollieOrder->isPaid() || $mollieOrder->isAuthorized()) && !$refunded) {
-            return $this->orderProcessors->process('is_successful', $order, $mollieOrder, $type, $defaultResponse);
+            return $this->orderProcessors->process(
+                'is_successful',
+                $order,
+                $mollieOrder,
+                $type,
+                $defaultResponse
+            );
         }
 
         if ($refunded) {
@@ -130,15 +142,15 @@ class ProcessTransaction
         }
 
         if ($mollieOrder->isCreated()) {
-            return $this->orderProcessors->process('created', $order, $mollieOrder, $type);
+            return $this->orderProcessors->process('created', $order, $mollieOrder, $type, $defaultResponse);
         }
 
         if ($mollieOrder->isCanceled()) {
-            return $this->orderProcessors->process('cancelled', $order, $mollieOrder, $type);
+            return $this->orderProcessors->process('cancelled', $order, $mollieOrder, $type, $defaultResponse);
         }
 
         if ($mollieOrder->isExpired()) {
-            return $this->orderProcessors->process('expired', $order, $mollieOrder, $type);
+            return $this->orderProcessors->process('expired', $order, $mollieOrder, $type, $defaultResponse);
         }
 
         throw new LocalizedException(__('Unable to process order %s', $order->getIncrementId()));
