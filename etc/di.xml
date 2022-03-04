@@ -7,11 +7,9 @@
 
     <preference for="Mollie\Payment\Api\PaymentTokenRepositoryInterface" type="Mollie\Payment\Model\PaymentTokenRepository"/>
     <preference for="Mollie\Payment\Api\Data\PaymentTokenInterface" type="Mollie\Payment\Model\Data\PaymentToken"/>
-    <preference for="Mollie\Payment\Api\Data\PaymentTokenSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
     <preference for="Mollie\Payment\Api\MollieCustomerRepositoryInterface" type="Mollie\Payment\Model\MollieCustomerRepository"/>
     <preference for="Mollie\Payment\Api\Data\MollieCustomerInterface" type="Mollie\Payment\Model\Data\MollieCustomer"/>
-    <preference for="Mollie\Payment\Api\Data\CustomerSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
     <preference for="Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface" type="Mollie\Payment\Model\PendingPaymentReminderRepository"/>
     <preference for="Mollie\Payment\Api\Data\PendingPaymentReminderInterface" type="Mollie\Payment\Model\Data\PendingPaymentReminder"/>
@@ -21,9 +19,9 @@
     <preference for="Mollie\Payment\Api\Data\SentPaymentReminderInterface" type="Mollie\Payment\Model\Data\SentPaymentReminder"/>
     <preference for="Mollie\Payment\Api\Data\SentPaymentReminderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
-    <type name="Mollie\Payment\Logger\Handler">
+    <type name="Mollie\Payment\Config">
         <arguments>
-            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+            <argument name="productMetadata" xsi:type="object">Magento\Framework\App\ProductMetadataInterface\Proxy</argument>
         </arguments>
     </type>
 
@@ -129,6 +127,7 @@
             <argument name="generators" xsi:type="array">
                 <item name="weee_fee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\WeeeFeeGenerator</item>
                 <item name="mageworx_rewardpoints" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MageWorxRewardPoints</item>
+                <item name="amasty_extrafee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\AmastyExtraFee</item>
             </argument>
         </arguments>
     </type>
@@ -234,6 +233,62 @@
 
     <type name="Magento\InstantPurchase\Controller\Button\PlaceOrder">
         <plugin name="mollie_add_redirect_url" type="Mollie\Payment\Plugin\InstantPurchase\Button\PlaceOrderAddRedirectUrl" />
+    </type>
+
+    <type name="Mollie\Payment\Model\Client\Orders\ProcessTransaction">
+        <arguments>
+            <argument name="orderProcessors" xsi:type="object">Mollie\Payment\Model\Client\Orders\OrderProcessors</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Model\Client\Payments\ProcessTransaction">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Model\Client\Orders\OrderProcessors">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="preprocess" xsi:type="array">
+                    <item name="add_additional_data" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\AddAdditionalInformation</item>
+                </item>
+                <item name="last_payment_status_is_failure" xsi:type="array">
+                    <item name="last_payment_status_is_failure" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\LastPaymentStatusIsFailure</item>
+                </item>
+                <item name="created" xsi:type="array">
+                    <item name="send_confirmation_email_for_banktransfer" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\SendConfirmationEmailForBanktransfer</item>
+                </item>
+                <item name="cancelled" xsi:type="array">
+                    <item name="cancelled" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\CancelledProcessor</item>
+                </item>
+                <item name="expired" xsi:type="array">
+                    <item name="expired" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\CancelledProcessor</item>
+                </item>
+                <item name="is_successful" xsi:type="array">
+                    <item name="is_successful" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\SuccessfulPayment</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Model\Client\Payments\PaymentProcessors">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="preprocess" xsi:type="array">
+                    <item name="add_additional_data" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\AddAdditionalInformation</item>
+                </item>
+                <item name="failed" xsi:type="array">
+                    <item name="failed" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\FailedStatusProcessor</item>
+                </item>
+                <item name="open" xsi:type="array">
+                    <item name="open" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SendEmailForBanktransfer</item>
+                </item>
+                <item name="paid" xsi:type="array">
+                    <item name="paid" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SuccessfulPayment</item>
+                </item>
+            </argument>
+        </arguments>
     </type>
 
     <!-- Payment methods configuration start -->

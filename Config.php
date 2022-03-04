@@ -7,6 +7,7 @@
 namespace Mollie\Payment;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Module\Manager;
 use Magento\Store\Model\ScopeInterface;
@@ -81,16 +82,23 @@ class Config
      */
     private $encryptor;
 
+    /**
+     * @var ProductMetadataInterface
+     */
+    private $productMetadata;
+
     public function __construct(
         ScopeConfigInterface $config,
         MollieLogger $logger,
         Manager $moduleManager,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        ProductMetadataInterface $productMetadata
     ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->moduleManager = $moduleManager;
         $this->encryptor = $encryptor;
+        $this->productMetadata = $productMetadata;
     }
 
     /**
@@ -139,6 +147,14 @@ class Config
     public function getVersion()
     {
         return $this->getPath(static::GENERAL_VERSION, null);
+    }
+
+    /**
+     * Returns current version of Magento
+     */
+    public function getMagentoVersion(): string
+    {
+        return $this->productMetadata->getVersion();
     }
 
     /**
