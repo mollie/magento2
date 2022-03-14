@@ -6,10 +6,10 @@
 
 namespace Mollie\Payment\Service\Order;
 
+use Magento\Catalog\Helper\Product;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\DB\TransactionFactory;
-use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\AdminOrder\Create;
@@ -18,6 +18,7 @@ use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Service\InvoiceService;
 use Mollie\Payment\Config;
+use Mollie\Payment\Plugin\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition\DisableCheckForAdminOrders;
 
 class Reorder
 {
@@ -57,14 +58,19 @@ class Reorder
     private $transaction;
 
     /**
-     * @var CartInterface
-     */
-    private $cart;
-
-    /**
      * @var Session
      */
     private $checkoutSession;
+
+    /**
+     * @var Product
+     */
+    private $productHelper;
+
+    /**
+     * @var DisableCheckForAdminOrders
+     */
+    private $disableCheckForAdminOrders;
 
     public function __construct(
         Config $config,
@@ -73,8 +79,9 @@ class Reorder
         InvoiceSender $invoiceSender,
         OrderCommentHistory $orderCommentHistory,
         TransactionFactory $transactionFactory,
-        CartInterface $cart,
-        Session $checkoutSession
+        Session $checkoutSession,
+        Product $productHelper,
+        DisableCheckForAdminOrders $disableCheckForAdminOrders
     ) {
         $this->config = $config;
         $this->orderCreate = $orderCreate;
@@ -82,8 +89,9 @@ class Reorder
         $this->invoiceSender = $invoiceSender;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->transactionFactory = $transactionFactory;
-        $this->cart = $cart;
         $this->checkoutSession = $checkoutSession;
+        $this->productHelper = $productHelper;
+        $this->disableCheckForAdminOrders = $disableCheckForAdminOrders;
     }
 
     public function create(OrderInterface $originalOrder)
@@ -138,6 +146,9 @@ class Reorder
         $cart = $this->orderCreate->getQuote();
         $cart->setCustomerId($originalOrder->getCustomerId());
         $cart->setCustomerIsGuest($originalOrder->getCustomerIsGuest());
+
+        $this->disableCheckForAdminOrders->disable();
+        $this->productHelper->setSkipSaleableCheck(true);
         $this->orderCreate->initFromOrder($originalOrder);
 
         $order = $this->orderCreate->createOrder();

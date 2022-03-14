@@ -291,6 +291,10 @@
         </arguments>
     </type>
 
+    <type name="Magento\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition">
+        <plugin name="mollie_disable_stock_check_for_admin_orders" type="Mollie\Payment\Plugin\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition\DisableCheckForAdminOrders" />
+    </type>
+
     <!-- Payment methods configuration start -->
     <!-- ApplePay -->
     <type name="Mollie\Payment\Model\Methods\ApplePay">
