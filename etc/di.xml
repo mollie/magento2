@@ -128,6 +128,7 @@
                 <item name="weee_fee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\WeeeFeeGenerator</item>
                 <item name="mageworx_rewardpoints" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MageWorxRewardPoints</item>
                 <item name="amasty_extrafee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\AmastyExtraFee</item>
+                <item name="magento_giftcard" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftCard</item>
             </argument>
         </arguments>
     </type>
