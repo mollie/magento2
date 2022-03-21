@@ -21,6 +21,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     public function testReturnsErrorWhenTheCurrenciesDontMatch(): void
     {
         $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
 
         /** @var MollieOrderBuilder $orderBuilder */
         $orderBuilder = $this->objectManager->create(MollieOrderBuilder::class);
@@ -46,6 +47,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     public function testTheTransactionIdIsSetOnThePayment()
     {
         $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
 
         /** @var MollieOrderBuilder $orderBuilder */
         $orderBuilder = $this->objectManager->create(MollieOrderBuilder::class);
@@ -74,6 +76,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     public function testACaptureNotificationIsRegistered()
     {
         $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
 
         $this->assertNull($order->getTotalPaid());
 
@@ -102,6 +105,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     public function testGeneratesInvoice()
     {
         $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
 
         $this->assertNull($order->getPayment()->getCreatedInvoice());
 
@@ -130,6 +134,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     public function testGeneratesInvoiceAndSendsEmail()
     {
         $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
 
         $this->assertNull($order->getPayment()->getCreatedInvoice());
 
@@ -160,6 +165,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     public function testSendsConfirmationEmail()
     {
         $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
 
         $this->assertNull($order->getEmailSent());
 

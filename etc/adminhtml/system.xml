@@ -91,7 +91,7 @@
                     <label>Enable Magento Vault</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/enable_magento_vault</config_path>
-                    <comment><![CDATA[Magento Vault allows users to save their payment method data for re-use.]]></comment>
+                    <comment><![CDATA[Magento Vault allows users to save their payment method data for re-use.<br><strong>Warning:</strong> This will only work when the CreditCard <strong>method</strong> setting is set to <strong>Orders API</strong>]]></comment>
                 </field>
 
                 <field id="payment_images" translate="label" type="select" sortOrder="20" showInDefault="1"
@@ -245,9 +245,7 @@
                     <label>Use webhooks</label>
                     <source_model>Mollie\Payment\Model\Adminhtml\Source\WebhookUrlOptions</source_model>
                     <config_path>payment/mollie_general/use_webhooks</config_path>
-                    <comment><![CDATA[
-                            <strong>Note:</strong> This setting has only effect when the store deploy mode is in <u>development</u>. When the store deploy mode is in production, this setting is ignored and the webhooks are always <u>enabled</u>.
-                        ]]></comment>
+                    <comment><![CDATA[<strong>Note:</strong> This URL will be called from the Mollie servers when an order has an update (paid, canceled, etc.). Only alter this setting when you have a headless webshop or working in a local environment.]]></comment>
                 </field>
                 <field id="custom_webhook_url" translate="label" type="text" sortOrder="110" showInDefault="1"
                        showInWebsite="0" showInStore="1">
@@ -345,6 +343,16 @@
                     <label>Second Chance Email Delay</label>
                     <source_model>Mollie\Payment\Model\Adminhtml\Source\SecondChanceEmailDelay</source_model>
                     <config_path>payment/mollie_general/second_chance_email_delay</config_path>
+                    <depends>
+                        <field id="enable_second_chance_email">1</field>
+                    </depends>
+                    <comment><![CDATA[Configure the delay in hours when the "second chance email" should be sent.]]></comment>
+                </field>
+                <field id="second_chance_use_payment_method" translate="label" type="select" sortOrder="50" showInDefault="1"
+                       showInWebsite="0" showInStore="1" canRestore="1">
+                    <label>Payment Method To Use For Second Change Payments</label>
+                    <source_model>Mollie\Payment\Model\Adminhtml\Source\EnabledMolliePaymentMethod</source_model>
+                    <config_path>payment/mollie_general/second_chance_use_payment_method</config_path>
                     <depends>
                         <field id="enable_second_chance_email">1</field>
                     </depends>

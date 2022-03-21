@@ -3,7 +3,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v2.7.0</version>
+                <version>v2.8.0</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -24,6 +24,7 @@
                 <use_webhooks>enabled</use_webhooks>
                 <automatically_send_second_chance_emails>0</automatically_send_second_chance_emails>
                 <second_chance_email_delay>1</second_chance_email_delay>
+                <second_chance_use_payment_method>mollie_methods_ideal</second_chance_use_payment_method>
                 <redirect_when_transaction_fails_to>redirect_to_cart</redirect_when_transaction_fails_to>
                 <enable_magento_vault>0</enable_magento_vault>
             </mollie_general>

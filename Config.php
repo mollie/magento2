@@ -37,6 +37,7 @@ class Config
     const GENERAL_REDIRECT_WHEN_TRANSACTION_FAILS_TO = 'payment/mollie_general/redirect_when_transaction_fails_to';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
     const GENERAL_SECOND_CHANCE_DELAY = 'payment/mollie_general/second_chance_email_delay';
+    const GENERAL_SECOND_CHANCE_USE_PAYMENT_METHOD = 'payment/mollie_general/second_chance_use_payment_method';
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
     const GENERAL_USE_CUSTOM_REDIRECT_URL = 'payment/mollie_general/use_custom_redirect_url';
@@ -277,6 +278,15 @@ class Config
 
     /**
      * @param null|int|string $storeId
+     * @return string|null
+     */
+    public function secondChanceUsePaymentMethod(int $storeId = null): ?string
+    {
+        return $this->getPath(static::GENERAL_SECOND_CHANCE_USE_PAYMENT_METHOD, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
      * @return bool
      */
     public function isProductionMode($storeId = null)
@@ -396,7 +406,7 @@ class Config
      * @param int|null $storeId
      * @return bool
      */
-    public function isMethodActive($method, $storeId = null): bool
+    public function isMethodActive(string $method, int $storeId = null): bool
     {
         return $this->isSetFlag($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_ACTIVE, $method), $storeId);
     }
