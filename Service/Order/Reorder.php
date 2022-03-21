@@ -86,11 +86,15 @@ class Reorder
         $this->checkoutSession = $checkoutSession;
     }
 
-    public function create(OrderInterface $originalOrder)
+    public function create(OrderInterface $originalOrder): OrderInterface
     {
         $this->transaction = $this->transactionFactory->create();
 
-        $order = $this->recreate($originalOrder, 'mollie_methods_ideal');
+        $order = $this->recreate(
+            $originalOrder,
+            $this->config->secondChanceUsePaymentMethod($originalOrder->getStoreId())
+        );
+
         $this->cancelOriginalOrder($originalOrder);
 
         $this->transaction->save();
@@ -127,8 +131,10 @@ class Reorder
      * @return OrderInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function recreate(OrderInterface $originalOrder, string $method = 'mollie_methods_reorder')
-    {
+    private function recreate(
+        OrderInterface $originalOrder,
+        string $method = 'mollie_methods_reorder'
+    ): OrderInterface {
         $originalOrder->setReordered(true);
         $session = $this->orderCreate->getSession();
         $session->clearStorage();
