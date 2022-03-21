@@ -91,7 +91,7 @@
                     <label>Enable Magento Vault</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/enable_magento_vault</config_path>
-                    <comment><![CDATA[Magento Vault allows users to save their payment method data for re-use.]]></comment>
+                    <comment><![CDATA[Magento Vault allows users to save their payment method data for re-use.<br><strong>Warning:</strong> This will only work when the CreditCard <strong>method</strong> setting is set to <strong>Orders API</strong>]]></comment>
                 </field>
 
                 <field id="payment_images" translate="label" type="select" sortOrder="20" showInDefault="1"
