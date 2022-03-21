@@ -179,6 +179,22 @@ class Redirect extends Action
      */
     private function formatExceptionMessage(Exception $exception, MethodInterface $methodInstance = null)
     {
+        if (stripos(
+                $exception->getMessage(),
+                'The webhook URL is invalid because it is unreachable from Mollie\'s point of view'
+            ) !== false
+        ) {
+            $this->messageManager->addErrorMessage(
+                __(
+                    'The webhook URL is invalid because it is unreachable from Mollie\'s point of view. ' .
+                    'View this article for more information: ' .
+                    'https://github.com/mollie/magento2/wiki/Webhook-Communication-between-your-Magento-webshop-and-Mollie'
+                )
+            );
+
+            return;
+        }
+
         if ($methodInstance && stripos($exception->getMessage(), 'cURL error 28') !== false) {
             $this->messageManager->addErrorMessage(
                 __(
