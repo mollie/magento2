@@ -130,6 +130,7 @@
                 <item name="amasty_extrafee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\AmastyExtraFee</item>
                 <item name="mirasvit_rewards" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MirasvitRewards</item>
                 <item name="aheadworks_addfreegift" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\AheadworksAddFreeGift</item>
+                <item name="magento_giftcard" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftCard</item>
             </argument>
         </arguments>
     </type>
