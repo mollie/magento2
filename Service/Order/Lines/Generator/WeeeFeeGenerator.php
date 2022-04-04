@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Service\Order\Lines\Generator;
 
+use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Mollie\Payment\Helper\General;
@@ -27,9 +28,17 @@ class WeeeFeeGenerator implements GeneratorInterface
      */
     private $currency;
 
-    public function __construct(General $mollieHelper)
-    {
+    /**
+     * @var SerializerInterface
+     */
+    private $serializer;
+
+    public function __construct(
+        General $mollieHelper,
+        SerializerInterface $serializer
+    ) {
         $this->mollieHelper = $mollieHelper;
+        $this->serializer = $serializer;
     }
 
     public function process(OrderInterface $order, array $orderLines): array
@@ -54,12 +63,7 @@ class WeeeFeeGenerator implements GeneratorInterface
 
         /** @var OrderItemInterface $item */
         foreach ($weeeItems as $item) {
-            $amount = $item->getWeeeTaxAppliedAmount();
-            if ($this->forceBaseCurrency) {
-                $amount = $item->getBaseWeeeTaxAppliedAmount();
-            }
-
-            $total += $amount;
+            $total += $this->getWeeeAmountForItem($item);
         }
 
         return [
@@ -84,7 +88,7 @@ class WeeeFeeGenerator implements GeneratorInterface
     {
         /** @var OrderItemInterface $item */
         foreach ($items as $item) {
-            $json = json_decode($item->getWeeeTaxApplied(), true);
+            $json = $this->serializer->unserialize($item->getWeeeTaxApplied());
 
             if (!$json) {
                 continue;
@@ -98,5 +102,21 @@ class WeeeFeeGenerator implements GeneratorInterface
         }
 
         return 'FPT';
+    }
+
+    private function getWeeeAmountForItem(OrderItemInterface $item): float
+    {
+        $total = 0.0;
+        $json = $this->serializer->unserialize($item->getWeeeTaxApplied());
+        foreach ($json as $item) {
+            $amount = $item['row_amount_incl_tax'];
+            if ($this->forceBaseCurrency) {
+                $amount = $item['base_row_amount_incl_tax'];
+            }
+
+            $total += $amount;
+        }
+
+        return $total;
     }
 }
