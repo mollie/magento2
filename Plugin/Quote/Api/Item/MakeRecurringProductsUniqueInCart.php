@@ -26,7 +26,6 @@ class MakeRecurringProductsUniqueInCart
     /**
      * @param CartItemInterface $item
      * @param bool $result
-     * @param ProductInterface $product
      * @return bool
      */
     public function afterRepresentProduct(CartItemInterface $item, bool $result): bool
