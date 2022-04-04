@@ -36,8 +36,8 @@ class WeeFeeGeneratorTest extends IntegrationTestCase
         $orderItems = $order->getItems();
 
         $item = array_shift($orderItems);
+        $item->setWeeeTaxApplied('[{"row_amount_incl_tax": "10", "base_row_amount_incl_tax": "10"}]');
         $item->setWeeeTaxAppliedAmount(10);
-        $item->setBaseWeeeTaxAppliedAmount(10);
 
         /** @var WeeeFeeGenerator $instance */
         $instance = $this->objectManager->create(WeeeFeeGenerator::class);

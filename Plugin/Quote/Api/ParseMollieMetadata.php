@@ -44,7 +44,7 @@ class ParseMollieMetadata
             'recurring_metadata' => $request->getData('recurring_metadata'),
         ]);
 
-        return [$product, $requestInfo, $processMode];
+        return [$product, $request, $processMode];
     }
 
     private function getRequest($request)
