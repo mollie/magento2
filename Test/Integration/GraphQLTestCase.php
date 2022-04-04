@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Test\Integration;
 
 use Magento\Framework\GraphQl\Query\Fields as QueryFields;
+use Magento\Framework\Module\Manager;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\GraphQl\Controller\GraphQl;
 use Magento\GraphQl\Service\GraphQlRequest;
@@ -25,6 +26,12 @@ class GraphQLTestCase extends IntegrationTestCase
 
     protected function setUpWithoutVoid()
     {
+        /** @var Manager $moduleManager */
+        $moduleManager = $this->objectManager->get(Manager::class);
+        if (!$moduleManager->isEnabled('Magento_GraphQl')) {
+            $this->markTestSkipped('Module Magento_GraphQl is not enabled');
+        }
+
         $this->json = $this->objectManager->get(SerializerInterface::class);
         $this->graphQlRequest = $this->objectManager->create(GraphQlRequest::class);
     }

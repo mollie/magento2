@@ -7,11 +7,10 @@
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Cart;
 
 use GraphQL\Type\Definition\FieldDefinition;
-use Magento\Framework\App\ProductMetadataInterface;
 use Mollie\Payment\GraphQL\Resolver\Cart\PaymentMethodMeta;
-use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use Mollie\Payment\Test\Integration\GraphQLTestCase;
 
-class PaymentMethodMetaTest extends IntegrationTestCase
+class PaymentMethodMetaTest extends GraphQLTestCase
 {
     /**
      * @magentoAppArea graphql
