@@ -76,8 +76,9 @@ class Calculate
      */
     public function forCart(CartInterface $cart, Total $total)
     {
-        if (isset($this->cache[$cart->getId()])) {
-            return $this->cache[$cart->getId()];
+        $key = $cart->getId() . '-' . $cart->getPayment()->getMethod();
+        if (isset($this->cache[$key])) {
+            return $this->cache[$key];
         }
 
         if (!$this->config->isAvailableForMethod($cart)) {
@@ -87,7 +88,7 @@ class Calculate
         $result = $this->calculatePaymentFee($cart, $total);
         $this->maximumSurcharge->calculate($cart, $result);
 
-        $this->cache[$cart->getId()] = $result;
+        $this->cache[$key] = $result;
         return $result;
     }
 
