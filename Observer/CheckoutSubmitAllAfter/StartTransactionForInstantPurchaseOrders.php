@@ -8,6 +8,7 @@ namespace Mollie\Payment\Observer\CheckoutSubmitAllAfter;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Module\Manager;
 use Magento\InstantPurchase\Model\QuoteManagement\PaymentConfiguration;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Methods\CreditcardVault;
@@ -15,6 +16,11 @@ use Mollie\Payment\Model\Mollie;
 
 class StartTransactionForInstantPurchaseOrders implements ObserverInterface
 {
+    /**
+     * @var Manager
+     */
+    private $moduleManager;
+
     /**
      * @var Mollie
      */
@@ -26,8 +32,10 @@ class StartTransactionForInstantPurchaseOrders implements ObserverInterface
     private $redirectUrl = null;
 
     public function __construct(
+        Manager $moduleManager,
         Mollie $mollie
     ) {
+        $this->moduleManager = $moduleManager;
         $this->mollie = $mollie;
     }
 
@@ -38,6 +46,10 @@ class StartTransactionForInstantPurchaseOrders implements ObserverInterface
 
     public function execute(Observer $observer): void
     {
+        if (!$this->moduleManager->isEnabled('Magento_InstantPurchase')) {
+            return;
+        }
+
         if (!$observer->hasData('order')) {
             return;
         }
