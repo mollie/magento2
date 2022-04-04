@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Test\Integration\Observer\CheckoutSubmitAllAfter;
 
 use Magento\Framework\Event\Observer;
+use Magento\Framework\Module\Manager;
 use Magento\InstantPurchase\Model\QuoteManagement\PaymentConfiguration;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Methods\CreditcardVault;
@@ -16,6 +17,17 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class StartTransactionForInstantPurchaseOrdersTest extends IntegrationTestCase
 {
+    protected function setUpWithoutVoid()
+    {
+        parent::setUpWithoutVoid();
+
+        /** @var Manager $moduleManager */
+        $moduleManager = $this->objectManager->get(Manager::class);
+        if (!$moduleManager->isEnabled('Magento_InstantPurchase')) {
+            $this->markTestSkipped('Module Magento_InstantPurchase is not enabled');
+        }
+    }
+
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
