@@ -33,9 +33,11 @@ class AmastyExtraFee implements GeneratorInterface
         $forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
 
-        $amount = $order->getExtensionAttributes()->getAmextrafeeFeeAmount();
+        $extensionAttributes = $order->getExtensionAttributes();
+        $amount = $extensionAttributes->getAmextrafeeFeeAmount() + $extensionAttributes->getAmextrafeeTaxAmount();
         if ($forceBaseCurrency) {
-            $amount = $order->getExtensionAttributes()->getAmextrafeeBaseFeeAmount();
+            $amount = $extensionAttributes->getAmextrafeeBaseFeeAmount() +
+                $extensionAttributes->getAmextrafeeBaseTaxAmount();
         }
 
         $orderLines[] = [
