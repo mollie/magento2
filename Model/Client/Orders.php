@@ -334,9 +334,7 @@ class Orders extends AbstractModel
     {
         $result = $this->processTransaction->execute($order, $type);
 
-        return [
-            'success' => $result->isSuccess(),
-        ];
+        return $result->toArray();
     }
 
     public function orderHasUpdate(OrderInterface $order, MollieApiClient $mollieApi)
