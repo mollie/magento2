@@ -628,7 +628,7 @@ class Config
     {
         return sprintf(
             $path,
-            str_replace('mollie_methods_', '', $method)
+            str_replace('mollie_methods_', '', $method ?? '')
         );
     }
 }
