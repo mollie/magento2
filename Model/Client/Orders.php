@@ -268,7 +268,7 @@ class Orders extends AbstractModel
     {
         return [
             'organizationName' => $address->getCompany(),
-            'title'            => trim($address->getPrefix()),
+            'title'            => trim($address->getPrefix() ?? ''),
             'givenName'        => $address->getFirstname(),
             'familyName'       => $address->getLastname(),
             'email'            => $address->getEmail(),
@@ -334,9 +334,7 @@ class Orders extends AbstractModel
     {
         $result = $this->processTransaction->execute($order, $type);
 
-        return [
-            'success' => $result->isSuccess(),
-        ];
+        return $result->toArray();
     }
 
     public function orderHasUpdate(OrderInterface $order, MollieApiClient $mollieApi)

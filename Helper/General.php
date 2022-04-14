@@ -301,7 +301,7 @@ class General extends AbstractHelper
         $modus = $this->getModus($storeId);
 
         if ($modus == 'test') {
-            $apiKey = trim($this->getStoreConfig(self::XML_PATH_TEST_APIKEY, $storeId));
+            $apiKey = trim($this->getStoreConfig(self::XML_PATH_TEST_APIKEY, $storeId) ?? '');
             if (empty($apiKey)) {
                 $this->addTolog('error', 'Mollie API key not set (test modus)');
             }
@@ -311,7 +311,7 @@ class General extends AbstractHelper
             }
             $this->apiKey[$storeId] = $decryptedApiKey;
         } else {
-            $apiKey = trim($this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId));
+            $apiKey = trim($this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId) ?? '');
             if (empty($apiKey)) {
                 $this->addTolog('error', 'Mollie API key not set (live modus)');
             }

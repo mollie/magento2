@@ -24,6 +24,10 @@ class AheadworksAddFreeGift implements GeneratorInterface
 
     public function process(OrderInterface $order, array $orderLines): array
     {
+        if (!$this->hasAheadworksFreeGiftItems($order)) {
+            return $orderLines;
+        }
+
         $discount = 0;
         foreach ($order->getItems() as $item) {
             $discount += abs($item->getAwAfptcAmount());
@@ -47,5 +51,16 @@ class AheadworksAddFreeGift implements GeneratorInterface
         ];
 
         return $orderLines;
+    }
+
+    private function hasAheadworksFreeGiftItems(OrderInterface $order): bool
+    {
+        foreach ($order->getItems() as $item) {
+            if ($item->getAwAfptcAmount() !== null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
