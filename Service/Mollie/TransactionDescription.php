@@ -37,7 +37,7 @@ class TransactionDescription
         $storeId = $order->getStoreId();
         $description = $this->config->paymentMethodDescription($order->getPayment()->getMethod(), $storeId);
 
-        if (!trim($description)) {
+        if (!trim($description ?? '')) {
             $description = '{ordernumber}';
         }
 

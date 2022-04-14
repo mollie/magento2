@@ -173,7 +173,7 @@ class Config
         }
 
         if (!$this->isProductionMode($storeId)) {
-            $apiKey = trim($this->getPath(static::GENERAL_APIKEY_TEST, $storeId));
+            $apiKey = trim($this->getPath(static::GENERAL_APIKEY_TEST, $storeId) ?? '');
             if (empty($apiKey)) {
                 $this->addToLog('error', 'Mollie API key not set (test modus)');
             }
@@ -186,7 +186,7 @@ class Config
             return $decryptedApiKey;
         }
 
-        $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId));
+        $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId) ?? '');
         if (empty($apiKey)) {
             $this->addToLog('error', 'Mollie API key not set (live modus)');
         }
