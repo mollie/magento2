@@ -64,7 +64,7 @@ class EncryptApiKeys implements DataPatchInterface
         $value = $configItem->getData('value');
 
         // Same check as in \Magento\Config\Model\Config\Backend\Encrypted::beforeSave
-        if (!preg_match('/^\*+$/', $value) && !empty($value)) {
+        if (!empty($value) && !preg_match('/^\*+$/', $value)) {
             $this->configResource->saveConfig(
                 $configItem->getData('path'),
                 $this->encryptor->encrypt($value),
