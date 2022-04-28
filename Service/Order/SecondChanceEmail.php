@@ -143,6 +143,7 @@ class SecondChanceEmail
                 'email' => $order->getCustomerEmail(),
             ],
             'order' => $order,
+            'order_id' => $order->getEntityId(),
             'store' => $this->storeManager->getStore($order->getStoreId()),
             'payment_token' => $token->getToken(),
         ];
