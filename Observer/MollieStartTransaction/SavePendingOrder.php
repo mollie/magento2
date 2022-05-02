@@ -14,6 +14,7 @@ use Mollie\Payment\Api\Data\PendingPaymentReminderInterfaceFactory;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
+use Mollie\Payment\Model\Methods\Banktransfer;
 
 class SavePendingOrder implements ObserverInterface
 {
@@ -54,7 +55,8 @@ class SavePendingOrder implements ObserverInterface
         /** @var OrderInterface $order */
         $order = $observer->getData('order');
 
-        if (!$this->config->automaticallySendSecondChanceEmails($order->getStoreId())) {
+        if (!$this->config->automaticallySendSecondChanceEmails($order->getStoreId()) ||
+            $order->getPayment()->getMethod() == Banktransfer::CODE) {
             return;
         }
 
