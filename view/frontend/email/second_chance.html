@@ -16,7 +16,7 @@
 
 <p>{{trans "<strong>Description:</strong> Order #%order_id from %store_name" store_name=$store.frontend_name order_id=$order.increment_id |raw}}</p>
 
-{{layout handle="sales_email_order_items" order=$order area="frontend"}}
+{{layout handle="sales_email_order_items" order_id=$order_id area="frontend"}}
 
 <br>
 
