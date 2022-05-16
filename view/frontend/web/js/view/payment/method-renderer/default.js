@@ -74,7 +74,7 @@ define(
 
                     var promise = storage.get(serviceUrl);
 
-                    promise.success( function (result) {
+                    promise.done( function (result) {
                         this.paymentToken(result);
                     }.bind(this));
 
