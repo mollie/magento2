@@ -61,7 +61,7 @@ class EncryptApiKeys implements DataPatchInterface
 
     private function updateRecord(Value $configItem): void
     {
-        $value = $configItem->getData('value');
+        $value = (string)$configItem->getData('value');
 
         // Same check as in \Magento\Config\Model\Config\Backend\Encrypted::beforeSave
         if (!preg_match('/^\*+$/', $value) && !empty($value)) {
