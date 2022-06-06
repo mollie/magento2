@@ -31,6 +31,9 @@
         <method name="mollie_methods_ideal">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="mollie_methods_in3">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="mollie_methods_kbc">
             <allow_multiple_address>0</allow_multiple_address>
         </method>

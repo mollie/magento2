@@ -147,6 +147,7 @@ class GeneralTest extends IntegrationTestCase
             'giftcard' => ['mollie_methods_giftcard', 'giftcard'],
             'giropay' => ['mollie_methods_giropay', 'giropay'],
             'ideal' => ['mollie_methods_ideal', 'ideal'],
+            'in3' => ['mollie_methods_in3', 'in3'],
             'kbc' => ['mollie_methods_kbc', 'kbc'],
             'klarnapaylater' => ['mollie_methods_klarnapaylater', 'klarnapaylater'],
             'klarnapaynow' => ['mollie_methods_klarnapaynow', 'klarnapaynow'],

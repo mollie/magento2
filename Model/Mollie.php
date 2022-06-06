@@ -248,7 +248,7 @@ class Mollie extends Adapter
         }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
-        if (in_array($methodCode, ['klarnapaylater', 'klarnapaynow', 'klarnasliceit', 'voucher'])) {
+        if (in_array($methodCode, ['klarnapaylater', 'klarnapaynow', 'klarnasliceit', 'voucher', 'in3'])) {
             throw new LocalizedException(__($exception->getMessage()));
         }
 
