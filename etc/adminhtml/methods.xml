@@ -16,6 +16,7 @@
     <include path="Mollie_Payment::methods/giftcard.xml"/>
     <include path="Mollie_Payment::methods/giropay.xml"/>
     <include path="Mollie_Payment::methods/ideal.xml"/>
+    <include path="Mollie_Payment::methods/in3.xml"/>
     <include path="Mollie_Payment::methods/kbc.xml"/>
     <include path="Mollie_Payment::methods/klarnapaylater.xml"/>
     <include path="Mollie_Payment::methods/klarnapaynow.xml"/>
