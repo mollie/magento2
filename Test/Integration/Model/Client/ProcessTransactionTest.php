@@ -179,6 +179,7 @@ class ProcessTransactionTest extends IntegrationTestCase
     protected function mollieClientMock(string $status, string $currency): MockObject
     {
         $mollieOrder = new \Mollie\Api\Resources\Order($this->createMock(MollieApiClient::class));
+        $mollieOrder->id = 'tr_test_transaction';
         $mollieOrder->lines = [];
         $mollieOrder->status = $status;
         $mollieOrder->amountCaptured = new \stdClass();

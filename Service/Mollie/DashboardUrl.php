@@ -21,7 +21,7 @@ class DashboardUrl
         $this->config = $config;
     }
 
-    public function forOrdersApi($storeId, $id)
+    public function forOrdersApi($storeId, string $id): string
     {
         return str_replace(
             '{id}',
@@ -30,7 +30,7 @@ class DashboardUrl
         );
     }
 
-    public function forPaymentsApi($storeId, $id)
+    public function forPaymentsApi($storeId, string $id): string
     {
         return str_replace(
             '{id}',

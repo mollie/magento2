@@ -10,7 +10,7 @@ use Magento\Quote\Api\Data\CartInterface;
 use Mollie\Payment\Service\Mollie\Parameters\ParameterPartInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class MethodParametersTest extends IntegrationTestCase
+class MethodParameterPartTest extends IntegrationTestCase
 {
     const DEFAULT_INPUT = [
         'amount[value]' => 10,

@@ -58,6 +58,7 @@ class OrdersTest extends IntegrationTestCase
         $address = $this->objectManager->get(OrderAddressInterface::class);
 
         $address->setPrefix('     ');
+        $address->setStreet('');
 
         $result = $instance->getAddressLine($address);
 
@@ -75,6 +76,7 @@ class OrdersTest extends IntegrationTestCase
         $this->loadFakeEncryptor()->addReturnValue('', 'test_dummyapikeythatisvalidandislongenough');
 
         $mollieOrderMock = $this->mollieOrderMock('N/A', 'EUR');
+        $mollieOrderMock->id = 'trx_test_123';
         $mollieOrderMock->lines = [];
         $mollieOrderMock->status = OrderStatus::STATUS_PAID;
         $mollieOrderMock->_embedded->payments = [];
