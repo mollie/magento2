@@ -174,13 +174,13 @@ class Order
         $orderLine = [
             'item_id' => $item->getId(),
             'type' => $item->getProductType() != 'downloadable' ? 'physical' : 'digital',
-            'name' => preg_replace("/[^A-Za-z0-9 -]/", "", $item->getName()),
+            'name' => preg_replace('/[^A-Za-z0-9 -]/', '', $item->getName() ?? ''),
             'quantity' => round($item->getQtyOrdered()),
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $unitPrice),
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
             'vatRate' => sprintf("%.2f", $item->getTaxPercent()),
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
-            'sku' => substr($item->getSku(), 0, 64),
+            'sku' => substr($item->getSku() ?? '', 0, 64),
             'productUrl' => $this->getProductUrl($item),
         ];
 
@@ -212,7 +212,7 @@ class Order
          */
         $vatAmount = round($totalAmount * ($vatRate / (100 + $vatRate)), 2);
 
-        $name = preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription());
+        $name = preg_replace('/[^A-Za-z0-9 -]/', '', $order->getShippingDescription() ?? '');
         if (!$name) {
             $name = $order->getShippingMethod();
         }

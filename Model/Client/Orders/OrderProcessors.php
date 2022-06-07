@@ -49,7 +49,6 @@ class OrderProcessors
         ProcessTransactionResponse $response
     ): ?ProcessTransactionResponse {
         if (!isset($this->processors[$event])) {
-            $response = $response ?? $this->returnResponse($mollieOrder, $magentoOrder, $type);
             $this->config->addToLog('success', $response->toArray());
             return $response;
         }
