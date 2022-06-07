@@ -50,6 +50,7 @@ class PartialInvoice
                 'mollie_methods_klarnapaylater',
                 'mollie_methods_klarnapaynow',
                 'mollie_methods_klarnasliceit',
+                'mollie_methods_in3',
             ]
         ) ||
             $this->mollieHelper->getInvoiceMoment($order->getStoreId()) != InvoiceMoment::ON_SHIPMENT
