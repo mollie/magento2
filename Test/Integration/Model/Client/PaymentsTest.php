@@ -104,6 +104,7 @@ class PaymentsTest extends IntegrationTestCase
     protected function getMolliePayment($status, $currency)
     {
         $payment = new \Mollie\Api\Resources\Payment($this->createMock(MollieApiClient::class));
+        $payment->id = 'tr_test_transaction';
         $payment->status = $status;
         $payment->settlementAmount = new \stdClass;
         $payment->settlementAmount->value = 50;
