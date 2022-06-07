@@ -15,10 +15,10 @@ use Mollie\Payment\Helper\General as MollieHelper;
  * Class Loading
  *
  * @package Mollie\Payment\Block
+ * @method string getMollieRedirect()
  */
 class Loading extends Template
 {
-
     /**
      * @var Session
      */

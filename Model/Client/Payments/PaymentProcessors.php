@@ -49,7 +49,6 @@ class PaymentProcessors
         ProcessTransactionResponse $response
     ): ?ProcessTransactionResponse {
         if (!isset($this->processors[$event])) {
-            $response = $response ?? $this->returnResponse($molliePayment, $magentoOrder, $type);
             $this->config->addToLog('success', $response->toArray());
             return $response;
         }

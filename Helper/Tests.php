@@ -56,8 +56,8 @@ class Tests extends AbstractHelper
     }
 
     /**
-     * @param null $testKey
-     * @param null $liveKey
+     * @param string|null $testKey
+     * @param string|null $liveKey
      *
      * @return array
      */

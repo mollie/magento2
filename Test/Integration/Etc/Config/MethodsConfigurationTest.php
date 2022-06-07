@@ -24,6 +24,7 @@ class MethodsConfigurationTest extends IntegrationTestCase
             ['mollie_methods_giftcard'],
             ['mollie_methods_giropay'],
             ['mollie_methods_ideal'],
+            ['mollie_methods_in3'],
             ['mollie_methods_kbc'],
             ['mollie_methods_klarnapaylater'],
             ['mollie_methods_klarnapaynow'],

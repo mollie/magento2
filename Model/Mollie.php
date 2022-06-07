@@ -248,7 +248,7 @@ class Mollie extends Adapter
         }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
-        if (in_array($methodCode, ['klarnapaylater', 'klarnapaynow', 'klarnasliceit', 'voucher'])) {
+        if (in_array($methodCode, ['klarnapaylater', 'klarnapaynow', 'klarnasliceit', 'voucher', 'in3'])) {
             throw new LocalizedException(__($exception->getMessage()));
         }
 
@@ -308,11 +308,6 @@ class Mollie extends Adapter
         /** @var \Magento\Sales\Model\Order $order */
         $order = $this->orderRepository->get($orderId);
         $this->eventManager->dispatch('mollie_process_transaction_start', ['order' => $order]);
-        if (empty($order)) {
-            $msg = ['error' => true, 'msg' => __('Order not found')];
-            $this->mollieHelper->addTolog('error', $msg);
-            return $msg;
-        }
 
         $transactionId = $order->getMollieTransactionId();
         if (empty($transactionId)) {
@@ -556,13 +551,13 @@ class Mollie extends Adapter
     /**
      * Get list of Issuers from API
      *
-     * @param MollieApiClient $mollieApi
+     * @param MollieApiClient|null $mollieApi
      * @param $method
      * @param $issuerListType
      *
      * @return array|null
      */
-    public function getIssuers($mollieApi, $method, $issuerListType): ?array
+    public function getIssuers(MollieApiClient $mollieApi = null, $method, $issuerListType): ?array
     {
         $issuers = [];
         if (empty($mollieApi) || $issuerListType == 'none') {
