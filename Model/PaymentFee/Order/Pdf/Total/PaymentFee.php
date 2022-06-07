@@ -12,6 +12,10 @@ use Magento\Tax\Helper\Data;
 use Magento\Tax\Model\Calculation;
 use Magento\Tax\Model\ResourceModel\Sales\Order\Tax\CollectionFactory;
 
+/**
+ * @method getSource();
+ * @method int|null getFontSize();
+ */
 class PaymentFee extends DefaultTotal
 {
     /**

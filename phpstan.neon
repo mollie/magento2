@@ -12,8 +12,7 @@ parameters:
     fileExtensions:
         - php
         - phtml
-    excludes_analyse:
+    excludePaths:
         - Test/*
         # These fail on Magento 2.2 and that's expected, these are only applicable on Magento 2.3 and higher.
-        - Plugin/Framework/App/Request/CsrfValidatorSkip.php
         - Service/Order/Uncancel/OrderReservation.php
