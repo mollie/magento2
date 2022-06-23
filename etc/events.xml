@@ -42,4 +42,7 @@
     <event name="checkout_submit_all_after">
         <observer name="mollie_startransaction_for_instant_purchase_orders" instance="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPurchaseOrders" />
     </event>
+    <event name="sales_quote_item_set_product">
+        <observer name="mollie_add_subscription_product_type_options" instance="Mollie\Payment\Observer\SalesQuoteItemSetProduct\SetSubscriptionDataOnBuyRequest" />
+    </event>
 </config>
