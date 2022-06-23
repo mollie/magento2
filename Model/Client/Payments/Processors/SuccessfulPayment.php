@@ -127,12 +127,14 @@ class SuccessfulPayment implements PaymentProcessorInterface
             $this->handlePayment($magentoOrder, $molliePayment);
         }
 
-        /** @var Order\Invoice $invoice */
+        /** @var Order\Invoice|null $invoice */
         $invoice = $payment->getCreatedInvoice();
         $sendInvoice = $this->mollieHelper->sendInvoice($magentoOrder->getStoreId());
 
         $this->sendOrderConfirmationEmail($magentoOrder);
-        $this->sendInvoiceEmail($invoice, $sendInvoice, $magentoOrder);
+        if ($invoice) {
+            $this->sendInvoiceEmail($invoice, $sendInvoice, $magentoOrder);
+        }
 
         return $this->processTransactionResponseFactory->create([
             'success' => true,
