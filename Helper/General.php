@@ -605,7 +605,7 @@ class General extends AbstractHelper
             $decimalPrecision = 0;
         }
 
-        return number_format($value, $decimalPrecision, '.', '');
+        return number_format($value ?? 0.0, $decimalPrecision, '.', '');
     }
 
     /**
