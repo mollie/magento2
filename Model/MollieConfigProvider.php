@@ -258,7 +258,7 @@ class MollieConfigProvider implements ConfigProviderInterface
                 ];
             }
         } catch (\Exception $e) {
-            $this->mollieHelper->addTolog('error', 'Function: getActiveMethods: ' . $e->getMessage());
+            $this->mollieHelper->addTolog('info', 'Function: getActiveMethods: ' . $e->getMessage());
             $this->methodData = [];
         }
 
