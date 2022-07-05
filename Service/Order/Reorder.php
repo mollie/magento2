@@ -18,6 +18,7 @@ use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Service\InvoiceService;
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Adminhtml\Source\SecondChancePaymentMethod;
 use Mollie\Payment\Plugin\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition\DisableCheckForAdminOrders;
 
 class Reorder
@@ -100,7 +101,7 @@ class Reorder
 
         $order = $this->recreate(
             $originalOrder,
-            $this->config->secondChanceUsePaymentMethod($originalOrder->getStoreId())
+            $this->getPaymentMethod($originalOrder)
         );
 
         $this->cancelOriginalOrder($originalOrder);
@@ -212,5 +213,20 @@ class Reorder
     {
         $comment = __('We created a new order with increment ID: %1', $newIncrementId);
         $this->orderCommentHistory->add($originalOrder, $comment, false);
+    }
+
+    /**
+     * @param OrderInterface $originalOrder
+     * @return string|null
+     */
+    public function getPaymentMethod(OrderInterface $originalOrder): ?string
+    {
+        $value = $this->config->secondChanceUsePaymentMethod($originalOrder->getStoreId());
+
+        if ($value == SecondChancePaymentMethod::USE_PREVIOUS_METHOD) {
+            return $originalOrder->getPayment()->getMethod();
+        }
+
+        return $value;
     }
 }
