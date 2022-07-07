@@ -87,7 +87,7 @@ define([
             ).done( function () {
                 reloadTotals([]);
                 totals.isLoading(false);
-            }).error( function () {
+            }).fail( function () {
                 totals.isLoading(false);
             });
         }
