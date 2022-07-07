@@ -3,7 +3,7 @@
 namespace Mollie\Payment\Service\Order\Uncancel;
 
 use Magento\Catalog\Model\Indexer\Product\Price\Processor;
-use Magento\Framework\App\ObjectManager;
+use Magento\Framework\ObjectManagerInterface;
 use Magento\InventorySales\Model\SalesEvent;
 use Magento\InventorySalesApi\Api\Data\ItemToSellInterface;
 use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
@@ -45,7 +45,7 @@ class OrderReservation
     public function __construct(
         WebsiteRepositoryInterface $websiteRepository,
         Processor $priceIndexer,
-        ObjectManager $objectManager
+        ObjectManagerInterface $objectManager
     ) {
         $this->websiteRepository = $websiteRepository;
         $this->priceIndexer = $priceIndexer;
