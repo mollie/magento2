@@ -205,7 +205,7 @@ class OrderLines extends AbstractModel
 
         /** @var OrderInterface $order */
         $order = $shipment->getOrder();
-        $orderHasDiscount = abs($order->getDiscountAmount()) > 0;
+        $orderHasDiscount = abs($order->getDiscountAmount() ?? 0) > 0;
 
         /** @var \Magento\Sales\Model\Order\Shipment\Item $item */
         foreach ($shipment->getItemsCollection() as $item) {
