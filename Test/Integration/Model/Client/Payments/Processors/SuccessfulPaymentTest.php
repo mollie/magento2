@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Test\Integration\Model\Client\Payments\Processors;
 
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Model\Client\Payments\Processors\SuccessfulPayment;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
@@ -21,7 +22,20 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     public function testCanceledOrderGetsUncanceled(): void
     {
         $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
         $order->setMollieTransactionId('abc123');
+
+        $items = $order->getItems();
+        foreach ($items as $item) {
+            if (!$item->getSku()) {
+                $item->setSku($item->getProduct()->getSku());
+            }
+        }
+
+        $item = array_shift($items);
+        $item->setCurrencyCode('EUR');
+
+        $this->objectManager->get(OrderRepositoryInterface::class)->save($order);
         $order->cancel();
 
         $this->assertEquals(Order::STATE_CANCELED, $order->getState());
@@ -54,6 +68,9 @@ class SuccessfulPaymentTest extends IntegrationTestCase
                 Order::STATE_PROCESSING,
                 Order::STATE_COMPLETE,
             ]
-        ), 'We expect the order status to be "processing" or "complete".');
+        ), sprintf(
+            'We expect the order status to be "processing" or "complete". Instead we got %s',
+            $freshOrder->getState()
+        ));
     }
 }
