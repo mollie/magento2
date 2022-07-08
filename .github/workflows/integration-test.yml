@@ -9,11 +9,11 @@ jobs:
           - PHP_VERSION: php71-fpm
             MAGENTO_VERSION: 2.3.3
           - PHP_VERSION: php73-fpm
-            MAGENTO_VERSION: 2.3.6-p1
+            MAGENTO_VERSION: 2.3.7-p3
           - PHP_VERSION: php73-fpm
-            MAGENTO_VERSION: 2.4.2
+            MAGENTO_VERSION: 2.4.0
           - PHP_VERSION: php74-fpm
-            MAGENTO_VERSION: 2.4.2
+            MAGENTO_VERSION: 2.4.0
           - PHP_VERSION: php74-fpm
             MAGENTO_VERSION: 2.4.3-with-replacements
           - PHP_VERSION: php81-fpm

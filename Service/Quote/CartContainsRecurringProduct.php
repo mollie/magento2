@@ -27,7 +27,7 @@ class CartContainsRecurringProduct
         $items = $cart->getItemsCollection()->getItems();
         foreach ($items as $item) {
             $buyRequest = $item->getOptionByCode('info_buyRequest');
-            if (strstr($buyRequest->getValue(), 'is_recurring') !== false &&
+            if ($buyRequest && strstr($buyRequest->getValue(), 'is_recurring') !== false &&
                 $this->jsonContainsRecurringValue($buyRequest->getValue())) {
                 return true;
             }
