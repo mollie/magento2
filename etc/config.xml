@@ -45,6 +45,8 @@
                 <enable_buy_now_button>0</enable_buy_now_button>
                 <buy_now_button_color>black</buy_now_button_color>
                 <buy_now_button_text>check-out</buy_now_button_text>
+                <minicart_button_color>black</minicart_button_color>
+                <minicart_button_text>check-out</minicart_button_text>
                 <title>Apple Pay</title>
                 <payment_description>{ordernumber}</payment_description>
                 <method>payment</method>

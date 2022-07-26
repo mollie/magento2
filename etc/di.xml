@@ -146,6 +146,12 @@
         </arguments>
     </type>
 
+    <type name="Mollie\Payment\Controller\ApplePay\PlaceOrder">
+        <arguments>
+            <argument xsi:type="object" name="checkoutSession">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
     <type name="Mollie\Payment\Controller\ApplePay\BuyNowPlaceOrder">
         <arguments>
             <argument xsi:type="object" name="checkoutSession">Magento\Checkout\Model\Session\Proxy</argument>
@@ -298,6 +304,18 @@
 
     <type name="Magento\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition">
         <plugin name="mollie_disable_stock_check_for_admin_orders" type="Mollie\Payment\Plugin\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition\DisableCheckForAdminOrders" />
+    </type>
+
+    <type name="Mollie\Payment\Block\Applepay\Shortcut\Button">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Controller\ApplePay\ShippingMethods">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
     </type>
 
     <!-- Payment methods configuration start -->
