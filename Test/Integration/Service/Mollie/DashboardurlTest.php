@@ -17,7 +17,7 @@ class DashboardurlTest extends IntegrationTestCase
         $instance = $this->objectManager->create(DashboardUrl::class);
 
         $this->assertEquals(
-            'https://www.mollie.com/dashboard/orders/ord_123abc',
+            'https://my.mollie.com/dashboard/orders/ord_123abc',
             $instance->forOrdersApi('default', 'ord_123abc')
         );
     }
@@ -41,7 +41,7 @@ class DashboardurlTest extends IntegrationTestCase
         $instance = $this->objectManager->create(DashboardUrl::class);
 
         $this->assertEquals(
-            'https://www.mollie.com/dashboard/payments/ord_123abc',
+            'https://my.mollie.com/dashboard/payments/ord_123abc',
             $instance->forPaymentsApi('default', 'ord_123abc')
         );
     }
