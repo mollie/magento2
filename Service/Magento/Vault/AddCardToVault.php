@@ -73,7 +73,7 @@ class AddCardToVault
         $molliePayment = $mollieOrder->payments()->offsetGet(0);
         $details = $molliePayment->details;
 
-        if (!$details) {
+        if (!$details || !isset($details->cardLabel) || !isset($details->cardNumber)) {
             return null;
         }
 
