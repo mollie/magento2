@@ -10,7 +10,6 @@ use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Quote\Api\Data\CartInterface;
-use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 
