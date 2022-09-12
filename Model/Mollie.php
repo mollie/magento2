@@ -581,8 +581,14 @@ class Mollie extends Adapter
                 'id'       => '',
                 'name'     => __('QR Code'),
                 'image'    => [
-                    'size2x' => $this->assetRepository->getUrl('Mollie_Payment::images/qr-select.svg'),
-                    'svg' => $this->assetRepository->getUrl('Mollie_Payment::images/qr-select.svg'),
+                    'size2x' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area'=>'frontend']
+                    ),
+                    'svg' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area'=>'frontend']
+                    ),
                 ]
             ];
         }
