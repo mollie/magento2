@@ -2,20 +2,6 @@ name: Lint PHP files
 on: [push, pull_request]
 
 jobs:
-  php-70:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: StephaneBour/actions-php-lint@7.0
-        with:
-          dir: './'
-
-  php-71:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: StephaneBour/actions-php-lint@7.1
-        with:
-          dir: './'
-
   php-72:
     runs-on: ubuntu-latest
     steps:
@@ -34,5 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: StephaneBour/actions-php-lint@7.4
+        with:
+          dir: './'
+
+  php-81:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: StephaneBour/actions-php-lint@8.1
         with:
           dir: './'
