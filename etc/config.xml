@@ -38,6 +38,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_general>
             <mollie_methods_applepay>
                 <active>0</active>
@@ -62,6 +63,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_applepay>
             <mollie_methods_bancontact>
                 <active>1</active>
@@ -80,6 +82,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_bancontact>
             <mollie_methods_banktransfer>
                 <active>1</active>
@@ -100,6 +103,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_banktransfer>
             <mollie_methods_belfius>
                 <active>1</active>
@@ -118,6 +122,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_belfius>
             <mollie_methods_creditcard>
                 <active>1</active>
@@ -162,6 +167,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_directdebit>
             <mollie_methods_eps>
                 <active>1</active>
@@ -180,6 +186,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_eps>
             <mollie_methods_giftcard>
                 <active>1</active>
@@ -199,6 +206,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_giftcard>
             <mollie_methods_giropay>
                 <active>1</active>
@@ -217,6 +225,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_giropay>
             <mollie_methods_ideal>
                 <active>1</active>
@@ -236,6 +245,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_ideal>
             <mollie_methods_in3>
                 <active>1</active>
@@ -254,6 +264,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_in3>
             <mollie_methods_kbc>
                 <active>1</active>
@@ -273,6 +284,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_kbc>
             <mollie_methods_klarnapaylater>
                 <active>1</active>
@@ -291,6 +303,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_klarnapaylater>
             <mollie_methods_klarnapaynow>
                 <active>1</active>
@@ -310,6 +323,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_klarnapaynow>
             <mollie_methods_klarnasliceit>
                 <active>1</active>
@@ -328,6 +342,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_klarnasliceit>
             <mollie_methods_mybank>
                 <active>1</active>
@@ -346,6 +361,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_mybank>
             <mollie_methods_paymentlink>
                 <active>1</active>
@@ -366,6 +382,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_paymentlink>
             <mollie_methods_paypal>
                 <active>1</active>
@@ -384,6 +401,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_paypal>
             <mollie_methods_paysafecard>
                 <active>1</active>
@@ -402,6 +420,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_paysafecard>
             <mollie_methods_przelewy24>
                 <active>1</active>
@@ -420,6 +439,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_przelewy24>
             <mollie_methods_sofort>
                 <active>1</active>
@@ -438,6 +458,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_sofort>
             <mollie_methods_reorder>
                 <active>1</active>
@@ -456,6 +477,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_reorder>
             <mollie_methods_voucher>
                 <active>0</active>
@@ -475,6 +497,7 @@
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
             </mollie_methods_voucher>
         </payment>
         <sales>
