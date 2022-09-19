@@ -299,8 +299,7 @@
                 <payment_description>{ordernumber}</payment_description>
                 <method>order</method>
                 <payment_action>order</payment_action>
-                <allowspecific>1</allowspecific>
-                <specificcountry>AT,BE,DE,FI,NL</specificcountry>
+                <allowspecific>0</allowspecific>
                 <instructions/>
                 <can_use_checkout>1</can_use_checkout>
                 <can_order>1</can_order>
