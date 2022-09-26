@@ -25,6 +25,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\OrderStatus;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
@@ -130,6 +131,11 @@ class Orders extends AbstractModel
     private $processTransaction;
 
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * Orders constructor.
      *
      * @param OrderLines $orderLines
@@ -171,6 +177,7 @@ class Orders extends AbstractModel
         BuildTransaction $buildTransaction,
         PaymentTokenForOrder $paymentTokenForOrder,
         ProcessTransaction $processTransaction,
+        Config $config,
         EventManager $eventManager
     ) {
         $this->orderLines = $orderLines;
@@ -192,6 +199,7 @@ class Orders extends AbstractModel
         $this->eventManager = $eventManager;
         $this->paymentTokenForOrder = $paymentTokenForOrder;
         $this->processTransaction = $processTransaction;
+        $this->config = $config;
     }
 
     /**
@@ -433,7 +441,8 @@ class Orders extends AbstractModel
         if (class_exists('Mollie\Api\MollieApiClient')) {
             $mollieApiClient = new MollieApiClient();
             $mollieApiClient->setApiKey($apiKey);
-            $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
+            $mollieApiClient->addVersionString('Magento/' . $this->config->getMagentoVersion());
+            $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
             $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
             return $mollieApiClient;
         } else {

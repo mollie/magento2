@@ -155,10 +155,20 @@ class Config
 
     /**
      * Returns current version of Magento
+     *
+     * @return string
      */
     public function getMagentoVersion(): string
     {
         return $this->productMetadata->getVersion();
+    }
+
+    /**
+     * @return string
+     */
+    public function getMagentoEdition(): string
+    {
+        return $this->productMetadata->getEdition();
     }
 
     /**

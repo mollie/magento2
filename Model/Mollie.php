@@ -271,6 +271,7 @@ class Mollie extends Adapter
             $mollieApiClient = new MollieApiClient();
             $mollieApiClient->setApiKey($apiKey);
             $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
+            $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
             $mollieApiClient->addVersionString('MollieMagento2/' . $this->config->getVersion());
             return $mollieApiClient;
         } else {

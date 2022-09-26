@@ -38,7 +38,8 @@ class Api extends MollieApiClient
     public function load($storeId = null)
     {
         $this->setApiKey($this->mollieHelper->getApiKey($storeId));
-        $this->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
+        $this->addVersionString('Magento/' . $this->config->getMagentoVersion());
+        $this->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
         $this->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
     }
 }
