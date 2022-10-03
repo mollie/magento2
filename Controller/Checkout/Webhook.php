@@ -87,7 +87,7 @@ class Webhook extends Action
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
 
-            return $this->getErrorResponse(503);
+            return $this->getErrorResponse(200);
         }
     }
 
