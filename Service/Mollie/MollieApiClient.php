@@ -53,6 +53,7 @@ class MollieApiClient
         $mollieApiClient = $this->mollieApiClientFactory->create();
         $mollieApiClient->setApiKey($apiKey);
         $mollieApiClient->addVersionString('Magento/' . $this->config->getMagentoVersion());
+        $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
         $mollieApiClient->addVersionString('MollieMagento2/' . $this->config->getVersion());
         $this->instances[$apiKey] = $mollieApiClient;
 

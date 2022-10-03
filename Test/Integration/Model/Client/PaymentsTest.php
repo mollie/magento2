@@ -2,7 +2,6 @@
 
 namespace Mollie\Payment\Test\Integration\Model\Client;
 
-use Magento\Framework\Phrase;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
@@ -18,16 +17,28 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentsTest extends IntegrationTestCase
 {
-    public function processTransactionProvider()
+    public function processTransactionProvider(): array
     {
         return [
             [
                 'USD',
                 OrderStatus::STATUS_PAID,
                 [
-                    'Mollie: Captured %1, Settlement Amount %2',
-                    'New order email sent',
-                    'Notified customer about invoice #%1'
+                    [
+                        $this->isInstanceOf(OrderInterface::class),
+                        __('Mollie: Captured %1, Settlement Amount %2', ['USD 100', 'EUR 50']),
+                        false
+                    ],
+                    [
+                        $this->isInstanceOf(OrderInterface::class),
+                        __('New order email sent'),
+                        true
+                    ],
+                    [
+                        $this->isInstanceOf(OrderInterface::class),
+                        __('Notified customer about invoice #%1'),
+                        false
+                    ],
                 ]
             ],
         ];
@@ -37,15 +48,18 @@ class PaymentsTest extends IntegrationTestCase
      * @dataProvider processTransactionProvider
      * @magentoDataFixture Magento/Sales/_files/order.php
      *
-     * @param $currency
-     * @param $mollieOrderStatus
-     * @param $orderCommentHistoryMessages
+     * @param string $currency
+     * @param string $mollieOrderStatus
+     * @param array $orderCommentHistoryMessages
      *
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function testProcessTransaction($currency, $mollieOrderStatus, $orderCommentHistoryMessages)
-    {
+    public function testProcessTransaction(
+        string $currency,
+        string $mollieOrderStatus,
+        array $orderCommentHistoryMessages
+    ): void {
         $paymentEndpointMock = $this->createMock(PaymentEndpoint::class);
         $paymentEndpointMock->method('get')->willReturn($this->getMolliePayment($mollieOrderStatus, $currency));
 
@@ -61,24 +75,8 @@ class PaymentsTest extends IntegrationTestCase
         $invoiceSenderMock->method('send')->willReturn(true);
 
         $orderCommentHistoryMock = $this->createMock(OrderCommentHistory::class);
-        foreach ($orderCommentHistoryMessages as $index => $currentMessage) {
-            $orderCommentHistoryMock
-                ->expects($this->at($index))
-                ->method('add')
-                ->with(
-                    $this->isInstanceOf(OrderInterface::class),
-                    $this->callback(function (Phrase $message) use ($currentMessage) {
-                        $messageText = $message->getText();
-                        $expectedText = __($currentMessage)->getText();
 
-                        if ($messageText != $expectedText) {
-                            $this->fail('We expected "' . $messageText . '" but got "' . $expectedText . '"');
-                        }
-
-                        return $messageText == $expectedText;
-                    })
-                );
-        }
+        $orderCommentHistoryMock->method('add')->withConsecutive(...$orderCommentHistoryMessages);
 
         /** @var Orders $instance */
         $instance = $this->objectManager->create(Payments::class, [

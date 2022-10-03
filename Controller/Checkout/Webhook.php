@@ -70,16 +70,13 @@ class Webhook extends Action
 
         $transactionId = $this->getRequest()->getParam('id');
         if (!$transactionId) {
-            return $this->getErrorResponse(404, __('No transaction ID found')->render());
+            return $this->getOkResponse();
         }
 
         try {
             $orderIds = $this->mollieModel->getOrderIdsByTransactionId($transactionId);
             if (!$orderIds) {
-                return $this->getErrorResponse(
-                    404,
-                    __('There is no order found that belongs to "%1"', $transactionId)->render()
-                );
+                return $this->getOkResponse();
             }
 
             foreach ($orderIds as $orderId) {
@@ -90,7 +87,7 @@ class Webhook extends Action
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
 
-            return $this->getErrorResponse(503);
+            return $this->getErrorResponse(200);
         }
     }
 

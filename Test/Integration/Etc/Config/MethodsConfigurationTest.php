@@ -11,7 +11,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MethodsConfigurationTest extends IntegrationTestCase
 {
-    public function methods()
+    public function methods(): array
     {
         return [
             ['mollie_methods_applepay'],

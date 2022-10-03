@@ -84,7 +84,6 @@ class ProcessTransaction implements ResolverInterface
             PaymentStatus::STATUS_EXPIRED,
             PaymentStatus::STATUS_CANCELED,
             PaymentStatus::STATUS_FAILED,
-            PaymentStatus::STATUS_PENDING,
         ]);
 
         try {

@@ -180,10 +180,6 @@ class Mollie extends Adapter
             return false;
         }
 
-        if (!$this->canUseForCountry($quote->getShippingAddress()->getCountryId())) {
-            return false;
-        }
-
         return parent::isAvailable($quote);
     }
 
@@ -271,6 +267,7 @@ class Mollie extends Adapter
             $mollieApiClient = new MollieApiClient();
             $mollieApiClient->setApiKey($apiKey);
             $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
+            $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
             $mollieApiClient->addVersionString('MollieMagento2/' . $this->config->getVersion());
             return $mollieApiClient;
         } else {
@@ -581,8 +578,14 @@ class Mollie extends Adapter
                 'id'       => '',
                 'name'     => __('QR Code'),
                 'image'    => [
-                    'size2x' => $this->assetRepository->getUrl('Mollie_Payment::images/qr-select.svg'),
-                    'svg' => $this->assetRepository->getUrl('Mollie_Payment::images/qr-select.svg'),
+                    'size2x' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area'=>'frontend']
+                    ),
+                    'svg' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area'=>'frontend']
+                    ),
                 ]
             ];
         }
