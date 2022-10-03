@@ -180,10 +180,6 @@ class Mollie extends Adapter
             return false;
         }
 
-        if (!$this->canUseForCountry($quote->getShippingAddress()->getCountryId())) {
-            return false;
-        }
-
         return parent::isAvailable($quote);
     }
 
