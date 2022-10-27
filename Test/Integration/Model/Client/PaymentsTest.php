@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Test\Integration\Model\Client;
 
+use Magento\Framework\Phrase;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
@@ -36,8 +37,10 @@ class PaymentsTest extends IntegrationTestCase
                     ],
                     [
                         $this->isInstanceOf(OrderInterface::class),
-                        __('Notified customer about invoice #%1'),
-                        false
+                        $this->callback( function (Phrase $input) {
+                            return $input->getText() == 'Notified customer about invoice #%1';
+                        }),
+                        true
                     ],
                 ]
             ],
