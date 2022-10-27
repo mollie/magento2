@@ -60,7 +60,7 @@
     "magento/module-tax": ">=100.3.3",
     "magento/module-ui": ">=100.3.3",
     "magento/module-vault": ">=100.3.3",
-    "php": ">=7.2",
+    "php": ">=7.3",
     "ext-json": "*"
   },
   "type": "magento2-module",
