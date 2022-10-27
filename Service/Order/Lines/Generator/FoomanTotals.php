@@ -59,7 +59,7 @@ class FoomanTotals implements GeneratorInterface
             $taxAmount = $forceBaseCurrency ? $total->getBaseTaxAmount() : $total->getTaxAmount();
 
             $vatRate = 0;
-            if ($taxAmount) {
+            if ($taxAmount && $amount != 0) {
                 $vatRate = round(($taxAmount / $amount) * 100, 2);
             }
             $orderLines[] = [
