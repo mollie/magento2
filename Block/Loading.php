@@ -16,6 +16,7 @@ use Mollie\Payment\Helper\General as MollieHelper;
  *
  * @package Mollie\Payment\Block
  * @method string getMollieRedirect()
+ * @deprecated since version 2.18.0
  */
 class Loading extends Template
 {
