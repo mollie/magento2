@@ -29,6 +29,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
+use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Service\Mollie\Timeout;
@@ -95,6 +96,10 @@ class Mollie extends Adapter
      * @var Timeout
      */
     private $timeout;
+    /**
+     * @var ProcessTransaction
+     */
+    private $ordersProcessTraction;
 
     public function __construct(
         ManagerInterface $eventManager,
@@ -112,6 +117,7 @@ class Mollie extends Adapter
         ResourceConnection $resourceConnection,
         Config $config,
         Timeout $timeout,
+        ProcessTransaction $ordersProcessTraction,
         $formBlockType,
         $infoBlockType,
         CommandPoolInterface $commandPool = null,
@@ -145,6 +151,7 @@ class Mollie extends Adapter
         $this->resourceConnection = $resourceConnection;
         $this->config = $config;
         $this->timeout = $timeout;
+        $this->ordersProcessTraction = $ordersProcessTraction;
     }
 
     public function getCode()
@@ -331,7 +338,7 @@ class Mollie extends Adapter
             $connection->beginTransaction();
 
             if (preg_match('/^ord_\w+$/', $transactionId)) {
-                $result = $this->ordersApi->processTransaction($order, $mollieApi, $type, $paymentToken);
+                $result = $this->ordersProcessTraction->execute($order, $type)->toArray();
             } else {
                 $result = $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
             }

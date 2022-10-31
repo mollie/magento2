@@ -24,6 +24,7 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
+use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\Timeout;
@@ -64,6 +65,7 @@ class Reorder extends Mollie
         ResourceConnection $resourceConnection,
         Config $config,
         Timeout $timeout,
+        ProcessTransaction $ordersProcessTraction,
         RequestInterface $request,
         $formBlockType,
         $infoBlockType,
@@ -88,6 +90,7 @@ class Reorder extends Mollie
             $resourceConnection,
             $config,
             $timeout,
+            $ordersProcessTraction,
             $formBlockType,
             $infoBlockType,
             $commandPool,
