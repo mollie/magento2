@@ -71,6 +71,7 @@ class General extends AbstractHelper
     const XML_PATH_LIVE_APIKEY = 'payment/mollie_general/apikey_live';
     const XML_PATH_TEST_APIKEY = 'payment/mollie_general/apikey_test';
     const XML_PATH_DEBUG = 'payment/mollie_general/debug';
+    // Deprecated option
     const XML_PATH_LOADING_SCREEN = 'payment/mollie_general/loading_screen';
     const XML_PATH_STATUS_PROCESSING = 'payment/mollie_general/order_status_processing';
     const XML_PATH_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
@@ -357,6 +358,7 @@ class General extends AbstractHelper
      * @param $storeId
      *
      * @return mixed
+     * @deprecated since 2.18.0
      */
     public function useLoadingScreen($storeId)
     {
