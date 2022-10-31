@@ -51,7 +51,7 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
             return;
         }
 
-        $createdAt = $this->timezone->date($order->getCreatedAt());
+        $createdAt = $this->timezone->date(new \DateTime($order->getCreatedAt()));
         $now = $this->timezone->date();
         $diff = $now->diff($createdAt);
         if ($diff->i > 5) {
