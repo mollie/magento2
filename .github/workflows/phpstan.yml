@@ -6,8 +6,6 @@ jobs:
         strategy:
           matrix:
             include:
-              - PHP_VERSION: php72-fpm
-                MAGENTO_VERSION: 2.3.4
               - PHP_VERSION: php73-fpm
                 MAGENTO_VERSION: 2.3.7-p3
               - PHP_VERSION: php74-fpm

@@ -1,6 +1,7 @@
 define(
     [
         'jquery',
+        'underscore',
         'mage/url',
         'mage/storage',
         'Magento_Checkout/js/view/payment/default',
@@ -8,10 +9,12 @@ define(
         'Magento_Checkout/js/checkout-data',
         'Magento_Customer/js/model/customer',
         'Magento_Checkout/js/model/url-builder',
-        'Mollie_Payment/js/model/checkout-config'
+        'Mollie_Payment/js/model/checkout-config',
+        'jquery/jquery-storageapi'
     ],
     function (
         $,
+        _,
         url,
         storage,
         Component,
@@ -30,6 +33,23 @@ define(
                 redirectAfterPlaceOrder: false,
                 defaults: {
                     template: 'Mollie_Payment/payment/default'
+                },
+                initialize: function () {
+                    this._super();
+
+                    this.isChecked.subscribe( function () {
+                        if (this.getCode() !== this.isChecked()) {
+                            return;
+                        }
+
+                        this.renderMessages();
+                    }.bind(this));
+
+                    if (this.getCode() === this.isChecked()) {
+                        this.renderMessages();
+                    }
+
+                    return this;
                 },
                 initObservable: function () {
                     this._super().observe([
@@ -83,6 +103,24 @@ define(
                 afterPlaceOrder: function () {
                     this._super();
                     window.location = url.build('mollie/checkout/redirect/paymentToken/' + this.paymentToken());
+                },
+                renderMessages: function () {
+                    // Copied from Magento_Theme/js/view/messages
+                    var messages = _.unique($.cookieStorage.get('mage-messages'), 'text');
+
+                    $.each(messages, function (index, row) {
+                        if (row.type === 'success') {
+                            this.messageContainer.addSuccessMessage({message: row.text});
+                        } else {
+                            this.messageContainer.addErrorMessage({message: row.text});
+                        }
+                    }.bind(this));
+
+                    // Copied from Magento_Theme/js/view/messages
+                    $.mage.cookies.set('mage-messages', '', {
+                        samesite: 'strict',
+                        domain: ''
+                    });
                 }
             }
         );

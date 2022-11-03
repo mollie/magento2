@@ -14,6 +14,7 @@ use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Test\Fakes\Model\Client\Orders\ProcessTransactionFake;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieTest extends IntegrationTestCase
@@ -41,11 +42,11 @@ class MollieTest extends IntegrationTestCase
         $mollieHelperMock = $this->createMock(General::class);
         $mollieHelperMock->method('getApiKey')->willReturn('test_TEST_API_KEY_THAT_IS_LONG_ENOUGH');
 
-        $ordersApiMock = $this->createMock(Orders::class);
         $paymentsApiMock = $this->createMock(Payments::class);
+        $orderProcessTransactionFake = $this->objectManager->create(ProcessTransactionFake::class);
 
         if ($type == 'orders') {
-            $ordersApiMock->expects($this->once())->method('processTransaction');
+            $orderProcessTransactionFake->disableParentCall();
         }
 
         if ($type == 'payments') {
@@ -54,12 +55,16 @@ class MollieTest extends IntegrationTestCase
 
         /** @var Mollie $instance */
         $instance = $this->objectManager->create(Mollie::class, [
-            'ordersApi' => $ordersApiMock,
             'paymentsApi' => $paymentsApiMock,
             'mollieHelper' => $mollieHelperMock,
+            'ordersProcessTraction' => $orderProcessTransactionFake,
         ]);
 
         $instance->processTransaction($order->getEntityId());
+
+        if ($type == 'orders') {
+            $this->assertEquals(1, $orderProcessTransactionFake->getTimesCalled());
+        }
     }
 
     public function testStartTransactionWithMethodOrder()

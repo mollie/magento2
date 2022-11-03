@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "2.17.0",
+  "version": "2.18.0",
   "keywords": [
     "mollie",
     "payment",
@@ -60,7 +60,7 @@
     "magento/module-tax": ">=100.3.3",
     "magento/module-ui": ">=100.3.3",
     "magento/module-vault": ">=100.3.3",
-    "php": ">=7.2",
+    "php": ">=7.3",
     "ext-json": "*"
   },
   "type": "magento2-module",
