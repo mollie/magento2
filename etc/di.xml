@@ -318,6 +318,14 @@
         </arguments>
     </type>
 
+    <virtualType name="ScandiPWA\Router\Controller\ConfigurableRouter" type="ScandiPWA\Router\Controller\Router">
+        <arguments>
+            <argument name="ignoredURLs" xsi:type="array">
+                <item name="mollieWebhooks" xsi:type="string">^/mollie/checkout/webhook.*</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
     <!-- Payment methods configuration start -->
     <!-- ApplePay -->
     <type name="Mollie\Payment\Model\Methods\ApplePay">
