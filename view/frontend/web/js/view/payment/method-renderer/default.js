@@ -42,23 +42,12 @@ define(
                             return;
                         }
 
-                        // Copied from Magento_Theme/js/view/messages
-                        var messages = _.unique($.cookieStorage.get('mage-messages'), 'text');
-
-                        $.each(messages, function (index, row) {
-                            if (row.type == 'success') {
-                                this.messageContainer.addSuccessMessage({message: row.text});
-                            } else {
-                                this.messageContainer.addErrorMessage({message: row.text});
-                            }
-                        }.bind(this));
-
-                        // Copied from Magento_Theme/js/view/messages
-                        $.mage.cookies.set('mage-messages', '', {
-                            samesite: 'strict',
-                            domain: ''
-                        });
+                        this.renderMessages();
                     }.bind(this));
+
+                    if (this.getCode() === this.isChecked()) {
+                        this.renderMessages();
+                    }
 
                     return this;
                 },
@@ -114,6 +103,24 @@ define(
                 afterPlaceOrder: function () {
                     this._super();
                     window.location = url.build('mollie/checkout/redirect/paymentToken/' + this.paymentToken());
+                },
+                renderMessages: function () {
+                    // Copied from Magento_Theme/js/view/messages
+                    var messages = _.unique($.cookieStorage.get('mage-messages'), 'text');
+
+                    $.each(messages, function (index, row) {
+                        if (row.type === 'success') {
+                            this.messageContainer.addSuccessMessage({message: row.text});
+                        } else {
+                            this.messageContainer.addErrorMessage({message: row.text});
+                        }
+                    }.bind(this));
+
+                    // Copied from Magento_Theme/js/view/messages
+                    $.mage.cookies.set('mage-messages', '', {
+                        samesite: 'strict',
+                        domain: ''
+                    });
                 }
             }
         );

@@ -319,6 +319,12 @@
         </arguments>
     </type>
 
+    <type name="Mollie\Payment\Block\Checkout\CheckoutConfig">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
     <!-- Payment methods configuration start -->
     <!-- ApplePay -->
     <type name="Mollie\Payment\Model\Methods\ApplePay">
