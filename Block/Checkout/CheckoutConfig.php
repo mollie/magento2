@@ -33,7 +33,7 @@ class CheckoutConfig extends Template
         $this->checkoutSession = $checkoutSession;
     }
 
-    public function getDefaultSelectedMethod(): string
+    public function getDefaultSelectedMethod(): ?string
     {
         $method = $this->checkoutSession->getQuote()->getPayment()->getMethod();
         if ($method) {
