@@ -70,6 +70,8 @@ type MollieTransactionOutput {
 type MollieProcessTransactionOutput {
     paymentStatus: PaymentStatusEnum
     cart: Cart @doc(description: "The cart is only available when the payment status is failed, canceled or expired.")
+    redirect_to_cart: Boolean @doc(description: "Indicates if the customer should be redirected to the cart.")
+    redirect_to_success_page: Boolean @doc(description: "Indicates if the customer should be redirected to the success page.")
 }
 
 type MolliePaymentFee {

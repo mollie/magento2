@@ -221,12 +221,6 @@
         </arguments>
     </type>
 
-    <type name="Mollie\Payment\GraphQL\Resolver\Checkout\ProcessTransaction">
-        <arguments>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-
     <type name="Mollie\Payment\Model\Mollie">
         <arguments>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>

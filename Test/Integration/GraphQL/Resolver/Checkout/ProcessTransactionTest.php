@@ -68,7 +68,7 @@ class ProcessTransactionTest extends GraphQLTestCase
 
         $tokenModel = $this->objectManager->get(Generate::class)->forOrder($order);
         $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('processTransaction')->willReturn(['status' => 'pending']);
+        $mollieMock->method('processTransaction')->willReturn(['status' => 'pending', 'success' => true]);
         $this->objectManager->addSharedInstance($mollieMock, Mollie::class);
 
         $result = $this->graphQlQuery('mutation {
