@@ -143,7 +143,6 @@ define(
 
                         clearInterval(interval);
                         if (!this.isInViewport(element.get(0))) {
-                            debugger;
                             $([document.documentElement, document.body]).animate({
                                 scrollTop: element.offset().top - 100
                             }, 500);
