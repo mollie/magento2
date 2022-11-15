@@ -24,6 +24,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
+use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\Timeout;
@@ -60,6 +61,7 @@ class Voucher extends Mollie
         ResourceConnection $resourceConnection,
         Config $config,
         Timeout $timeout,
+        ProcessTransaction $ordersProcessTraction,
         $formBlockType,
         $infoBlockType,
         QuoteHasMealVoucherProducts $quoteHasMealVoucherProducts,
@@ -84,6 +86,7 @@ class Voucher extends Mollie
             $resourceConnection,
             $config,
             $timeout,
+            $ordersProcessTraction,
             $formBlockType,
             $infoBlockType,
             $commandPool,

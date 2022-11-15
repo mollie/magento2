@@ -125,6 +125,7 @@ class Redirect extends Action
             if ($methodInstance instanceof Mollie) {
                 $storeId = $order->getStoreId();
                 $redirectUrl = $this->startTransaction($methodInstance, $order);
+                // This is deprecated since 2.18.0 and will be removed in a future version.
                 if ($this->mollieHelper->useLoadingScreen($storeId)) {
                     $resultPage = $this->resultPageFactory->create();
                     $resultPage->getLayout()->initMessages();

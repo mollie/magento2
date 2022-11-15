@@ -3,7 +3,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v2.17.0</version>
+                <version>v2.18.0</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -12,6 +12,7 @@
                 <order_status_processing>processing</order_status_processing>
                 <invoice_moment>authorize</invoice_moment>
                 <invoice_notify>1</invoice_notify>
+                <!-- Deprecated option -->
                 <loading_screen>0</loading_screen>
                 <debug>1</debug>
                 <model>Mollie\Payment\Model\Methods\General</model>

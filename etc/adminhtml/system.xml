@@ -233,13 +233,6 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <comment>Display Transaction Details like e.g. IBAN, BIC, Paypal Reference, Card Holder etc.</comment>
                 </field>
-                <field id="loading_screen" translate="label" type="select" sortOrder="90" showInDefault="1"
-                       showInWebsite="1" showInStore="1">
-                    <label>Use Loading Screen</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>payment/mollie_general/loading_screen</config_path>
-                    <comment><![CDATA[Use loading screen before redirect. This will enable mobile users to use the back button.]]></comment>
-                </field>
                 <field id="use_webhooks" translate="label" type="select" sortOrder="100" showInDefault="1"
                        showInWebsite="0" showInStore="1">
                     <label>Use webhooks</label>

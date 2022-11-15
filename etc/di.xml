@@ -221,12 +221,6 @@
         </arguments>
     </type>
 
-    <type name="Mollie\Payment\GraphQL\Resolver\Checkout\ProcessTransaction">
-        <arguments>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-
     <type name="Mollie\Payment\Model\Mollie">
         <arguments>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
@@ -263,6 +257,7 @@
             <argument name="processors" xsi:type="array">
                 <item name="preprocess" xsi:type="array">
                     <item name="add_additional_data" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\AddAdditionalInformation</item>
+                    <item name="save_card_label" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\SaveCardDetails</item>
                 </item>
                 <item name="last_payment_status_is_failure" xsi:type="array">
                     <item name="last_payment_status_is_failure" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\LastPaymentStatusIsFailure</item>
@@ -325,6 +320,12 @@
             </argument>
         </arguments>
     </virtualType>
+
+    <type name="Mollie\Payment\Block\Checkout\CheckoutConfig">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
 
     <!-- Payment methods configuration start -->
     <!-- ApplePay -->
