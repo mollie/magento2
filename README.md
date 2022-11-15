@@ -61,6 +61,7 @@ These modules are tested and known to be working with the Mollie Payment extensi
 - MageWorx Reward Points
 - Mirasvit Rewards
 - Weee Fee
+- Geissweb EU Vat
 
 ## License
 [BSD (Berkeley Software Distribution) License](http://www.opensource.org/licenses/bsd-license.php).

@@ -133,6 +133,7 @@
                 <item name="aheadworks_addfreegift" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\AheadworksAddFreeGift</item>
                 <item name="magento_giftcard" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftCard</item>
                 <item name="magento_giftwrapping" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftWrapping</item>
+                <item name="geissweb_euvat" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\GeisswebEuvat</item>
             </argument>
         </arguments>
     </type>
