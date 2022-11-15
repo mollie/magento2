@@ -18,15 +18,24 @@ type AvailablePaymentMethod {
     mollie_meta: MolliePaymentMethodMeta! @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\PaymentMethodMeta") @doc(description: "Retrieve meta information for this payment method (image)")
 }
 
+type PaymentMethod {
+    mollie_available_issuers: [MollieIssuer!] @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\AvailableIssuersForMethod") @doc(description: "Available issuers for this payment method")
+    mollie_meta: MolliePaymentMethodMeta! @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\PaymentMethodMeta") @doc(description: "Retrieve meta information for this payment method (image)")
+}
+
 type SelectedPaymentMethod {
     mollie_meta: MolliePaymentMethodMeta! @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\PaymentMethodMeta") @doc(description: "Retrieve meta information for this payment method (image)")
+}
+
+type CartPrices  @doc(description: "Contains details about the final price of items in the cart, including discount and tax information.") {
+    mollie_payment_fee: MolliePaymentFee @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\Prices\\PaymentFee")
 }
 
 type MollieIssuer {
     name: String
     code: String
-    image: String!
-    svg: String!
+    image: String
+    svg: String
 }
 
 type MolliePaymentMethodMeta {
@@ -61,6 +70,13 @@ type MollieTransactionOutput {
 type MollieProcessTransactionOutput {
     paymentStatus: PaymentStatusEnum
     cart: Cart @doc(description: "The cart is only available when the payment status is failed, canceled or expired.")
+}
+
+type MolliePaymentFee {
+    fee: Money  @doc(description: "Mollie payment fee")
+    base_fee: Money  @doc(description: "Base mollie payment fee")
+    fee_tax: Money  @doc(description: "Mollie payment fee tax")
+    base_fee_tax: Money  @doc(description: "Base mollie payment fee tax")
 }
 
 input PaymentMethodInput {
@@ -101,4 +117,6 @@ enum PaymentStatusEnum {
     PENDING
     REFUNDED
     ERROR
+    FAILED
+    OPEN
 }

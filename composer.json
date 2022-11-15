@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "1.29.0",
+  "version": "2.17.0",
   "keywords": [
     "mollie",
     "payment",
@@ -46,7 +46,21 @@
   "require": {
     "mollie/mollie-api-php": "^2.1",
     "magento/framework": ">=102.0.3",
-    "php": ">=7.1",
+    "magento/module-backend": ">=100.3.3",
+    "magento/module-catalog": ">=100.3.3",
+    "magento/module-checkout": ">=100.3.3",
+    "magento/module-config": ">=100.3.3",
+    "magento/module-customer": ">=100.3.3",
+    "magento/module-eav": ">=100.3.3",
+    "magento/module-payment": ">=100.3.3",
+    "magento/module-quote": ">=100.3.3",
+    "magento/module-sales": ">=100.3.3",
+    "magento/module-sales-rule": ">=100.3.3",
+    "magento/module-store": ">=100.3.3",
+    "magento/module-tax": ">=100.3.3",
+    "magento/module-ui": ">=100.3.3",
+    "magento/module-vault": ">=100.3.3",
+    "php": ">=7.2",
     "ext-json": "*"
   },
   "type": "magento2-module",
@@ -57,7 +71,8 @@
   "autoload": {
     "files": [
       "registration.php",
-      "GraphQL/Replaces/AdditionalDataProviderInterface.php"
+      "GraphQL/Replaces/AdditionalDataProviderInterface.php",
+      "Service/InstantPurchase/AvailabilityCheckerInterface.php"
     ],
     "psr-4": {
       "Mollie\\Payment\\": ""

@@ -11,22 +11,13 @@ function ($, Component, VaultEnabler) {
             template: 'Mollie_Payment/payment/creditcard',
         },
 
-        initialize: function () {
-            this._super();
-
-            this.vaultEnabler = new VaultEnabler();
-            this.vaultEnabler.setPaymentCode('mollie_methods_creditcard_vault');
-
-            return this;
-        },
-
         getData: function () {
             var data = {
                 'method': this.item.method,
             };
 
             data['additional_data'] = _.extend({}, this.additionalData);
-            this.vaultEnabler.visitAdditionalData(data);
+            this.getVaultEnabler().visitAdditionalData(data);
 
             return data;
         },
@@ -39,7 +30,18 @@ function ($, Component, VaultEnabler) {
                 return false;
             }
 
-            return this.vaultEnabler.isVaultEnabled();
+            return this.getVaultEnabler().isVaultEnabled();
         },
+
+        getVaultEnabler: function () {
+            if (this.vaultEnabler) {
+                return this.vaultEnabler;
+            }
+
+            this.vaultEnabler = new VaultEnabler();
+            this.vaultEnabler.setPaymentCode('mollie_methods_creditcard_vault');
+
+            return this.vaultEnabler;
+        }
     });
 });

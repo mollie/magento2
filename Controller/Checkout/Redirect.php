@@ -13,6 +13,7 @@ use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -151,10 +152,6 @@ class Redirect extends Action
 
     private function cancelUnprocessedOrder(OrderInterface $order, $message)
     {
-        if (!empty($order->getMollieTransactionId())) {
-            return;
-        }
-
         if (!$this->config->cancelFailedOrders()) {
             return;
         }
@@ -165,6 +162,7 @@ class Redirect extends Action
                 $historyMessage .= ':<br>' . PHP_EOL . $message;
             }
 
+            $order->setState(Order::STATE_PENDING_PAYMENT);
             $this->orderManagement->cancel($order->getEntityId());
             $order->addCommentToStatusHistory($order->getEntityId(), $historyMessage);
 
@@ -181,6 +179,22 @@ class Redirect extends Action
      */
     private function formatExceptionMessage(Exception $exception, MethodInterface $methodInstance = null)
     {
+        if (stripos(
+                $exception->getMessage(),
+                'The webhook URL is invalid because it is unreachable from Mollie\'s point of view'
+            ) !== false
+        ) {
+            $this->messageManager->addErrorMessage(
+                __(
+                    'The webhook URL is invalid because it is unreachable from Mollie\'s point of view. ' .
+                    'View this article for more information: ' .
+                    'https://github.com/mollie/magento2/wiki/Webhook-Communication-between-your-Magento-webshop-and-Mollie'
+                )
+            );
+
+            return;
+        }
+
         if ($methodInstance && stripos($exception->getMessage(), 'cURL error 28') !== false) {
             $this->messageManager->addErrorMessage(
                 __(

@@ -7,9 +7,11 @@
 namespace Mollie\Payment\Test\Integration;
 
 use Magento\Framework\GraphQl\Query\Fields as QueryFields;
+use Magento\Framework\Module\Manager;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\GraphQl\Controller\GraphQl;
 use Magento\GraphQl\Service\GraphQlRequest;
+use Magento\Integration\Api\CustomerTokenServiceInterface;
 
 class GraphQLTestCase extends IntegrationTestCase
 {
@@ -25,6 +27,12 @@ class GraphQLTestCase extends IntegrationTestCase
 
     protected function setUpWithoutVoid()
     {
+        /** @var Manager $moduleManager */
+        $moduleManager = $this->objectManager->get(Manager::class);
+        if (!$moduleManager->isEnabled('Magento_GraphQl')) {
+            $this->markTestSkipped('Module Magento_GraphQl is not enabled');
+        }
+
         $this->json = $this->objectManager->get(SerializerInterface::class);
         $this->graphQlRequest = $this->objectManager->create(GraphQlRequest::class);
     }
@@ -73,5 +81,149 @@ class GraphQLTestCase extends IntegrationTestCase
         $this->objectManager->removeSharedInstance(GraphQl::class);
         $this->objectManager->removeSharedInstance(QueryFields::class);
         $this->graphQlRequest = $this->objectManager->create(GraphQlRequest::class);
+    }
+
+    protected function prepareCustomerCart(string $paymentMethod = 'mollie_methods_ideal'): string
+    {
+        $cartId = $this->graphQlQuery(
+            'mutation {createEmptyCart}'
+        )['createEmptyCart'];
+
+        $this->graphQlQuery('
+            mutation {
+                addSimpleProductsToCart(
+                    input: {
+                        cart_id: "' . $cartId . '"
+                        cart_items: [
+                            {
+                                data: {
+                                    quantity: 1
+                                    sku: "simple"
+                                }
+                            }
+                        ]
+                    }
+                ) {
+                    cart {
+                        items {
+                            id
+                        }
+                    }
+                }
+            }
+        ');
+
+        $this->graphQlQuery('
+            mutation {
+                setBillingAddressOnCart(
+                    input: {
+                        cart_id: "' . $cartId . '"
+                        billing_address: {
+                            address: {
+                                firstname: "John"
+                                lastname: "Doe"
+                                company: "Acme"
+                                street: ["Main St", "123"]
+                                city: "Anytown"
+                                postcode: "1234AB"
+                                country_code: "NL"
+                                telephone: "123-456-0000"
+                                save_in_address_book: false
+                            }
+                            use_for_shipping: true
+                        }
+                    }
+                ) {
+                    cart {
+                        billing_address {
+                            firstname
+                            lastname
+                            company
+                            street
+                            city
+                            postcode
+                            telephone
+                            country {
+                                code
+                                label
+                            }
+                        }
+                        shipping_addresses {
+                            firstname
+                            lastname
+                            company
+                            street
+                            city
+                            postcode
+                            telephone
+                            country {
+                                code
+                                label
+                            }
+                        }
+                    }
+                }
+            }
+        ');
+
+        $token = $this->graphQlQuery('
+            query {
+                cart(cart_id: "' . $cartId . '") {
+                    shipping_addresses {
+                        available_shipping_methods {
+                            error_message
+                            method_code
+                            method_title
+                        }
+                    }
+                }
+            }
+        ');
+
+        $method = $token['cart']['shipping_addresses'][0]['available_shipping_methods'][0];
+
+        $this->graphQlQuery('
+            mutation {
+                setShippingMethodsOnCart(input: {
+                    cart_id: "' . $cartId . '"
+                    shipping_methods: [
+                        {
+                            carrier_code: "' . $method['method_code'] . '"
+                            method_code: "' . $method['method_code'] . '"
+                        }
+                    ]
+                }) {
+                    cart {
+                        shipping_addresses {
+                            selected_shipping_method {
+                                carrier_code
+                                method_code
+                                carrier_title
+                                method_title
+                            }
+                        }
+                    }
+                }
+            }
+        ');
+
+        $this->graphQlQuery('
+            mutation {
+                setPaymentMethodOnCart(input: {
+                    cart_id: "' . $cartId . '"
+                    payment_method: {
+                        code: "' . $paymentMethod . '"
+                    }
+                }) {
+                    cart {
+                        selected_payment_method {
+                            code
+                        }
+                    }
+                }
+            }
+        ');
+
+        return $cartId;
     }
 }

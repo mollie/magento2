@@ -13,8 +13,10 @@
                 <item name="mollie_methods_giftcard" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_giropay" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_ideal" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
+                <item name="mollie_methods_in3" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_kbc" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_klarnapaylater" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
+                <item name="mollie_methods_klarnapaynow" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_klarnasliceit" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_voucher" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_mybank" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
@@ -28,5 +30,9 @@
 
     <type name="Magento\QuoteGraphQl\Model\Resolver\PlaceOrder">
         <plugin name="mollie_set_the_redirect_url" type="Mollie\Payment\GraphQL\Plugin\PlaceOrder\SetTheRedirectUrl" />
+    </type>
+
+    <type name="Magento\Quote\Api\PaymentMethodManagementInterface">
+        <plugin name="mollie_hide_non_graphql_methods" type="Mollie\Payment\GraphQL\Plugin\Quote\PaymentMethodManagement\HideNonGrahpQlMethods" />
     </type>
 </config>

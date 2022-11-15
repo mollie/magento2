@@ -6,10 +6,10 @@
 
 namespace Mollie\Payment\Service\Order;
 
+use Magento\Catalog\Helper\Product;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\DB\Transaction;
 use Magento\Framework\DB\TransactionFactory;
-use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\AdminOrder\Create;
@@ -18,6 +18,8 @@ use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Service\InvoiceService;
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Adminhtml\Source\SecondChancePaymentMethod;
+use Mollie\Payment\Plugin\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition\DisableCheckForAdminOrders;
 
 class Reorder
 {
@@ -57,14 +59,19 @@ class Reorder
     private $transaction;
 
     /**
-     * @var CartInterface
-     */
-    private $cart;
-
-    /**
      * @var Session
      */
     private $checkoutSession;
+
+    /**
+     * @var Product
+     */
+    private $productHelper;
+
+    /**
+     * @var DisableCheckForAdminOrders
+     */
+    private $disableCheckForAdminOrders;
 
     public function __construct(
         Config $config,
@@ -73,8 +80,9 @@ class Reorder
         InvoiceSender $invoiceSender,
         OrderCommentHistory $orderCommentHistory,
         TransactionFactory $transactionFactory,
-        CartInterface $cart,
-        Session $checkoutSession
+        Session $checkoutSession,
+        Product $productHelper,
+        DisableCheckForAdminOrders $disableCheckForAdminOrders
     ) {
         $this->config = $config;
         $this->orderCreate = $orderCreate;
@@ -82,15 +90,20 @@ class Reorder
         $this->invoiceSender = $invoiceSender;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->transactionFactory = $transactionFactory;
-        $this->cart = $cart;
         $this->checkoutSession = $checkoutSession;
+        $this->productHelper = $productHelper;
+        $this->disableCheckForAdminOrders = $disableCheckForAdminOrders;
     }
 
-    public function create(OrderInterface $originalOrder)
+    public function create(OrderInterface $originalOrder): OrderInterface
     {
         $this->transaction = $this->transactionFactory->create();
 
-        $order = $this->recreate($originalOrder, $originalOrder->getPayment()->getMethod());
+        $order = $this->recreate(
+            $originalOrder,
+            $this->getPaymentMethod($originalOrder)
+        );
+
         $this->cancelOriginalOrder($originalOrder);
 
         $this->transaction->save();
@@ -127,8 +140,10 @@ class Reorder
      * @return OrderInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    private function recreate(OrderInterface $originalOrder, string $method = 'mollie_methods_reorder')
-    {
+    private function recreate(
+        OrderInterface $originalOrder,
+        string $method = 'mollie_methods_reorder'
+    ): OrderInterface {
         $originalOrder->setReordered(true);
         $session = $this->orderCreate->getSession();
         $session->clearStorage();
@@ -138,6 +153,9 @@ class Reorder
         $cart = $this->orderCreate->getQuote();
         $cart->setCustomerId($originalOrder->getCustomerId());
         $cart->setCustomerIsGuest($originalOrder->getCustomerIsGuest());
+
+        $this->disableCheckForAdminOrders->disable();
+        $this->productHelper->setSkipSaleableCheck(true);
         $this->orderCreate->initFromOrder($originalOrder);
 
         $order = $this->orderCreate->createOrder();
@@ -195,5 +213,20 @@ class Reorder
     {
         $comment = __('We created a new order with increment ID: %1', $newIncrementId);
         $this->orderCommentHistory->add($originalOrder, $comment, false);
+    }
+
+    /**
+     * @param OrderInterface $originalOrder
+     * @return string|null
+     */
+    public function getPaymentMethod(OrderInterface $originalOrder): ?string
+    {
+        $value = $this->config->secondChanceUsePaymentMethod($originalOrder->getStoreId());
+
+        if ($value == SecondChancePaymentMethod::USE_PREVIOUS_METHOD) {
+            return $originalOrder->getPayment()->getMethod();
+        }
+
+        return $value;
     }
 }

@@ -16,6 +16,7 @@ use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
+use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Handler\State;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -23,9 +24,23 @@ use Mollie\Payment\Model\ResourceModel\OrderLines\Collection as OrderLinesCollec
 use Mollie\Payment\Model\ResourceModel\OrderLines\CollectionFactory as OrderLinesCollectionFactory;
 use Mollie\Payment\Service\Order\Creditmemo as CreditmemoService;
 use Mollie\Payment\Service\Order\Lines\Order as OrderOrderLines;
-use Mollie\Payment\Service\Order\Lines\PaymentFee;
-use Mollie\Payment\Service\Order\Lines\StoreCredit;
 
+/**
+ * @method int getId()
+ * @method int getItemId()
+ * @method string getLineId()
+ * @method int getOrderId()
+ * @method string getType()
+ * @method string getSku()
+ * @method int getQtyOrdered()
+ * @method int getQtyPaid()
+ * @method int getQtyCanceled()
+ * @method int getQtyShipped()
+ * @method int getQtyRefunded()
+ * @method float getUnitPrice()
+ * @method float getDiscountAmount()
+ * @method float getTotalAmount()
+ */
 class OrderLines extends AbstractModel
 {
     /**
@@ -40,14 +55,6 @@ class OrderLines extends AbstractModel
      * @var OrderLinesCollectionFactory
      */
     private $orderLinesCollection;
-    /**
-     * @var StoreCredit
-     */
-    private $storeCredit;
-    /**
-     * @var PaymentFee
-     */
-    private $paymentFee;
     /**
      * @var CreditmemoService
      */
@@ -69,8 +76,6 @@ class OrderLines extends AbstractModel
      * @param OrderLinesCollectionFactory $orderLinesCollection
      * @param Context                     $context
      * @param Registry                    $registry
-     * @param StoreCredit                 $storeCredit
-     * @param PaymentFee                  $paymentFee
      * @param CreditmemoService           $creditmemoService
      * @param OrderOrderLines             $orderOrderLines
      * @param AbstractResource|null       $resource
@@ -83,8 +88,6 @@ class OrderLines extends AbstractModel
         OrderLinesCollectionFactory $orderLinesCollection,
         Context $context,
         Registry $registry,
-        StoreCredit $storeCredit,
-        PaymentFee $paymentFee,
         CreditmemoService $creditmemoService,
         OrderOrderLines $orderOrderLines,
         AbstractResource $resource = null,
@@ -94,8 +97,6 @@ class OrderLines extends AbstractModel
         $this->mollieHelper = $mollieHelper;
         $this->orderLinesFactory = $orderLinesFactory;
         $this->orderLinesCollection = $orderLinesCollection;
-        $this->storeCredit = $storeCredit;
-        $this->paymentFee = $paymentFee;
         $this->creditmemoService = $creditmemoService;
         $this->orderOrderLines = $orderOrderLines;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
@@ -152,10 +153,10 @@ class OrderLines extends AbstractModel
     }
 
     /**
-     * @param      $orderLines
+     * @param array $orderLines
      * @param bool $paid
      */
-    public function updateOrderLinesByWebhook($orderLines, $paid = false)
+    public function updateOrderLinesByWebhook(array $orderLines, bool $paid = false)
     {
         foreach ($orderLines as $line) {
             $orderLineRow = $this->getOrderLineByLineId($line->id);
@@ -198,13 +199,13 @@ class OrderLines extends AbstractModel
      * @param ShipmentInterface $shipment
      * @return array
      */
-    public function getShipmentOrderLines(ShipmentInterface $shipment)
+    public function getShipmentOrderLines(ShipmentInterface $shipment): array
     {
         $orderLines = [];
 
         /** @var OrderInterface $order */
         $order = $shipment->getOrder();
-        $orderHasDiscount = abs($order->getDiscountAmount()) > 0;
+        $orderHasDiscount = abs($order->getDiscountAmount() ?? 0) > 0;
 
         /** @var \Magento\Sales\Model\Order\Shipment\Item $item */
         foreach ($shipment->getItemsCollection() as $item) {
@@ -229,7 +230,26 @@ class OrderLines extends AbstractModel
             $orderLines[] = $line;
         }
 
+        if ($order->getShipmentsCollection()->count() === 0) {
+            $this->addNonProductItems($order, $orderLines);
+        }
+
         return ['lines' => $orderLines];
+    }
+
+    private function addNonProductItems(OrderInterface $order, array &$orderLines): void
+    {
+        $collection = $this->orderLinesCollection->create()
+            ->addFieldToFilter('order_id', ['eq' => $order->getEntityId()])
+            ->addFieldToFilter('type', ['nin' => ['physical', 'digital']]);
+
+        /** @var OrderLines $item */
+        foreach ($collection as $item) {
+            $orderLines[] = [
+                'id' => $item->getLineId(),
+                'quantity' => 1,
+            ];
+        }
     }
 
     /**
@@ -239,12 +259,10 @@ class OrderLines extends AbstractModel
      */
     public function getOrderLineByItemId($itemId)
     {
-        $orderLine = $this->orderLinesCollection->create()
+        return $this->orderLinesCollection->create()
             ->addFieldToFilter('item_id', ['eq' => $itemId])
             ->addFieldToFilter('line_id', ['notnull' => true])
             ->getLastItem();
-
-        return $orderLine;
     }
 
     /**

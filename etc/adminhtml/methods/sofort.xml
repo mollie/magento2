@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
-    <group id="mollie_methods_sofort" translate="label" type="text" sortOrder="210" showInDefault="1" showInWebsite="1"
+    <group id="mollie_methods_sofort" translate="label" type="text" sortOrder="220" showInDefault="1" showInWebsite="1"
            showInStore="1">
         <label>Sofort</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
@@ -42,7 +42,7 @@
         <field id="days_before_expire" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Days to expire</label>
-            <frontend_class>validate-digits-range digits-range-1-100</frontend_class>
+            <frontend_class>validate-digits-range digits-range-1-365</frontend_class>
             <config_path>payment/mollie_methods_sofort/days_before_expire</config_path>
             <depends>
                 <field id="active">1</field>

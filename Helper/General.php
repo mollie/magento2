@@ -44,26 +44,26 @@ class General extends AbstractHelper
     const CURRENCIES_WITHOUT_DECIMAL = ['JPY'];
     const SUPPORTED_LOCAL = [
         'en_US',
-        'nl_NL',
-        'nl_BE',
-        'fr_FR',
-        'fr_BE',
-        'de_DE',
+        'ca_ES',
+        'da_DK',
         'de_AT',
         'de_CH',
+        'de_DE',
         'es_ES',
-        'ca_ES',
-        'pt_PT',
-        'it_IT',
-        'nb_NO',
-        'sv_SE',
         'fi_FI',
-        'da_DK',
-        'is_IS',
+        'fr_BE',
+        'fr_FR',
         'hu_HU',
-        'pl_PL',
+        'it_IT',
+        'is_IS',
         'lv_LV',
-        'lt_LT'
+        'lt_LT',
+        'nb_NO',
+        'nl_NL',
+        'nl_BE',
+        'pl_PL',
+        'pt_PT',
+        'sv_SE',
     ];
 
     const XML_PATH_MODULE_ACTIVE = 'payment/mollie_general/enabled';
@@ -301,7 +301,7 @@ class General extends AbstractHelper
         $modus = $this->getModus($storeId);
 
         if ($modus == 'test') {
-            $apiKey = trim($this->getStoreConfig(self::XML_PATH_TEST_APIKEY, $storeId));
+            $apiKey = trim($this->getStoreConfig(self::XML_PATH_TEST_APIKEY, $storeId) ?? '');
             if (empty($apiKey)) {
                 $this->addTolog('error', 'Mollie API key not set (test modus)');
             }
@@ -311,7 +311,7 @@ class General extends AbstractHelper
             }
             $this->apiKey[$storeId] = $decryptedApiKey;
         } else {
-            $apiKey = trim($this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId));
+            $apiKey = trim($this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId) ?? '');
             if (empty($apiKey)) {
                 $this->addTolog('error', 'Mollie API key not set (live modus)');
             }
@@ -440,14 +440,6 @@ class General extends AbstractHelper
     }
 
     /**
-     * @return mixed
-     */
-    public function getPaymentToken()
-    {
-        return $this->mathRandom->getUniqueHash();
-    }
-
-    /**
      * Redirect Url Builder /w OrderId & UTM No Override
      *
      * @param $orderId
@@ -563,11 +555,11 @@ class General extends AbstractHelper
     /**
      * Order Currency and Value array for payment request
      *
-     * @param \Magento\Sales\Model\Order $order
+     * @param OrderInterface $order
      *
-     * @return array
+     * @return array{currency: string, value: string}
      */
-    public function getOrderAmountByOrder($order)
+    public function getOrderAmountByOrder(OrderInterface $order): array
     {
         if ($this->useBaseCurrency($order->getStoreId())) {
             return $this->getAmountArray($order->getBaseCurrencyCode(), $order->getBaseGrandTotal());
@@ -587,16 +579,16 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param $currency
-     * @param $value
+     * @param string|null $currency
+     * @param float|null $value
      *
-     * @return array
+     * @return array{currency: string, value: string}
      */
-    public function getAmountArray($currency, $value)
+    public function getAmountArray(?string $currency, ?float $value): array
     {
         return [
-            "currency" => $currency,
-            "value"    => $this->formatCurrencyValue($value, $currency)
+            'currency' => $currency,
+            'value'    => $this->formatCurrencyValue($value, $currency)
         ];
     }
 
@@ -613,7 +605,7 @@ class General extends AbstractHelper
             $decimalPrecision = 0;
         }
 
-        return number_format($value, $decimalPrecision, '.', '');
+        return number_format($value ?? 0.0, $decimalPrecision, '.', '');
     }
 
     /**
@@ -701,8 +693,10 @@ class General extends AbstractHelper
             'mollie_methods_giftcard',
             'mollie_methods_giropay',
             'mollie_methods_ideal',
+            'mollie_methods_in3',
             'mollie_methods_kbc',
             'mollie_methods_klarnapaylater',
+            'mollie_methods_klarnapaynow',
             'mollie_methods_klarnasliceit',
             'mollie_methods_voucher',
             'mollie_methods_mybank',

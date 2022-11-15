@@ -6,17 +6,24 @@
 
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Checkout;
 
+use GraphQL\Type\Definition\FieldDefinition;
 use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Quote\Model\Quote;
 use Mollie\Payment\Api\Data\PaymentTokenInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\GraphQL\Resolver\Checkout\PaymentToken;
+use Mollie\Payment\Test\Integration\GraphQLTestCase;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class PaymentTokenTest extends IntegrationTestCase
+/**
+ * @magentoAppArea graphql
+ */
+class PaymentTokenTest extends GraphQLTestCase
 {
     protected function setUpWithoutVoid()
     {
+        parent::setUpWithoutVoid();
+
         $version = $this->objectManager->get(ProductMetadataInterface::class)->getVersion();
         if (version_compare($version, '2.3', '<=')) {
             $this->markTestSkipped('This test only works on Magento 2.3 and higher.');
@@ -71,6 +78,10 @@ class PaymentTokenTest extends IntegrationTestCase
             ]),
             $this->objectManager->create(\Magento\Framework\GraphQl\Query\Resolver\ContextInterface::class),
             $this->objectManager->create(\Magento\Framework\GraphQl\Schema\Type\ResolveInfo::class, [
+                'fieldDefinition' => FieldDefinition::create([
+                    'name' => 'test',
+                    'type' => $this->objectManager->create(\Magento\Framework\GraphQl\Schema\Type\BooleanType::class),
+                ]),
                 'fieldName' => 'testfield',
                 'fieldNodes' => [],
                 'returnType' => 'string',
@@ -79,7 +90,11 @@ class PaymentTokenTest extends IntegrationTestCase
                 'schema' => $this->objectManager->create(\GraphQL\Type\Schema::class, ['config' => []]),
                 'fragments' => [],
                 'rootValue' => '',
-                'operation' => null,
+                'operation' => $this->objectManager->create(\GraphQL\Language\AST\OperationDefinitionNode::class, [
+                    'vars' => [
+                        'operation' => 'query',
+                    ]
+                ]),
                 'variableValues' => [],
                 'values' => [],
             ]),

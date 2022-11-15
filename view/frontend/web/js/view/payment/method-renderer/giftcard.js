@@ -11,7 +11,23 @@ define(
             {
                 defaults: {
                     template: 'Mollie_Payment/payment/giftcard',
-                    selectedIssuer: null
+                    selectedIssuer: ko.observable()
+                },
+                initialize: function () {
+                    this._super();
+
+                    if (!window.sessionStorage) {
+                        return;
+                    }
+
+                    var key = this.getCode() + '_issuer';
+                    if (window.sessionStorage.getItem(key)) {
+                        this.selectedIssuer(window.sessionStorage.getItem(key));
+                    }
+
+                    this.selectedIssuer.subscribe( function (value) {
+                        window.sessionStorage.setItem(key, value);
+                    }.bind(this));
                 },
                 getForm: function () {
                     return $('#' + this.item.method + '-form');
@@ -23,12 +39,12 @@ define(
                     return checkoutConfig.issuersListType ? checkoutConfig.issuersListType[this.item.method] : 'dropdown';
                 },
                 getSelectedIssuer: function () {
-                    if (this.getIssuerListType() === 'radio') {
-                        return $('input[name=issuer]:checked', this.getForm()).val();
+                    if (this.getIssuerListType() !== 'radio' &&
+                        this.getIssuerListType() !== 'dropdown') {
+                        return;
                     }
-                    if (this.getIssuerListType() === 'dropdown') {
-                        return this.selectedIssuer;
-                    }
+
+                    return this.selectedIssuer();
                 },
                 getData: function () {
                     return {

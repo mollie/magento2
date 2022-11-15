@@ -57,6 +57,11 @@ class Order
     private $orderLinesProcessor;
 
     /**
+     * @var OrderLinesGenerator
+     */
+    private $orderLinesGenerator;
+
+    /**
      * @var StoreManagerInterface
      */
     private $storeManager;
@@ -67,6 +72,7 @@ class Order
         PaymentFee $paymentFee,
         OrderLinesFactory $orderLinesFactory,
         OrderLinesProcessor $orderLinesProcessor,
+        OrderLinesGenerator $orderLinesGenerator,
         StoreManagerInterface $storeManager
     ) {
         $this->mollieHelper = $mollieHelper;
@@ -74,6 +80,7 @@ class Order
         $this->paymentFee = $paymentFee;
         $this->orderLinesFactory = $orderLinesFactory;
         $this->orderLinesProcessor = $orderLinesProcessor;
+        $this->orderLinesGenerator = $orderLinesGenerator;
         $this->storeManager = $storeManager;
     }
 
@@ -114,6 +121,8 @@ class Order
             $orderLines[] = $adjustment;
         }
 
+        $orderLines = $this->orderLinesGenerator->execute($order, $orderLines);
+
         $this->saveOrderLines($orderLines, $order);
         foreach ($orderLines as &$orderLine) {
             unset($orderLine['item_id']);
@@ -134,7 +143,7 @@ class Order
          * Should Match: (unitPrice × quantity) - discountAmount
          * NOTE: TotalAmount can differ from actutal Total Amount due to rouding in tax or exchange rate
          */
-        $totalAmount = $this->getTotalAmountOrderItem($item);
+        $totalAmount = $this->getTotalAmountOrderItem($item) ?? 0.0;
 
         /**
          * The total discount amount of the line.
@@ -165,13 +174,13 @@ class Order
         $orderLine = [
             'item_id' => $item->getId(),
             'type' => $item->getProductType() != 'downloadable' ? 'physical' : 'digital',
-            'name' => preg_replace("/[^A-Za-z0-9 -]/", "", $item->getName()),
+            'name' => preg_replace('/[^A-Za-z0-9 -]/', '', $item->getName() ?? ''),
             'quantity' => round($item->getQtyOrdered()),
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $unitPrice),
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
             'vatRate' => sprintf("%.2f", $item->getTaxPercent()),
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
-            'sku' => substr($item->getSku(), 0, 64),
+            'sku' => substr($item->getSku() ?? '', 0, 64),
             'productUrl' => $this->getProductUrl($item),
         ];
 
@@ -203,7 +212,7 @@ class Order
          */
         $vatAmount = round($totalAmount * ($vatRate / (100 + $vatRate)), 2);
 
-        $name = preg_replace("/[^A-Za-z0-9 -]/", "", $order->getShippingDescription());
+        $name = preg_replace('/[^A-Za-z0-9 -]/', '', $order->getShippingDescription() ?? '');
         if (!$name) {
             $name = $order->getShippingMethod();
         }
@@ -228,7 +237,7 @@ class Order
      *
      * @return float
      */
-    private function getTotalAmountOrderItem(OrderItemInterface $item)
+    private function getTotalAmountOrderItem(OrderItemInterface $item): ?float
     {
         if ($item->getProductType() == ProductType::TYPE_BUNDLE) {
             return $this->forceBaseCurrency ? $item->getBaseRowTotalInclTax() : $item->getRowTotalInclTax();
@@ -311,18 +320,20 @@ class Order
      * @param OrderItemInterface $item
      * @return string|null
      */
-    private function getProductUrl(OrderItemInterface $item)
+    private function getProductUrl(OrderItemInterface $item): ?string
     {
         $product = $item->getProduct();
         if (!$product) {
             return null;
         }
 
-        // Magento allows spaces in the product url, but Mollie does not allows this. So if the URL contains spaces then
-        // we will return the base url with the direct url to the controller.
+        // Magento allows some weird characters the product url, but Mollie does not. So if the URL contains invalid
+        // characters we will return the base url with the direct url to the controller.
         // Magento bug: https://github.com/magento/magento2/issues/26672
         $url = $product->getProductUrl();
-        if (strpos($url, ' ') !== false) {
+        $path = parse_url($url, PHP_URL_PATH);
+        // Allow a-z, A-Z, "-", "/" and ".". If anything else is present return the catalog/product/view url.
+        if (preg_match('#[^a-zA-Z-/.]#', $path)) {
             $baseUrl = rtrim($this->storeManager->getStore()->getBaseUrl(), '/');
             return $baseUrl . '/catalog/product/view/id/' . $item->getProductId();
         }

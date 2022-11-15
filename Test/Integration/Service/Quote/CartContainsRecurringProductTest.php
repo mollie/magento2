@@ -16,7 +16,7 @@ class CartContainsRecurringProductTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_simple_product.php
      */
-    public function testReturnsFalseWhenNoItemAvailable()
+    public function testReturnsFalseWhenNoItemAvailable(): void
     {
         /** @var \Magento\Quote\Model\Quote $cart */
         $cart = $this->objectManager->create(Session::class)->getQuote();
@@ -30,7 +30,7 @@ class CartContainsRecurringProductTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_simple_product_and_custom_option.php
      */
-    public function testReturnsTrueWhenOneOfTheItemsIsASubscriptionProduct()
+    public function testReturnsTrueWhenOneOfTheItemsIsASubscriptionProduct(): void
     {
         /** @var SerializerInterface $serializer */
         $serializer = $this->objectManager->create(SerializerInterface::class);
@@ -54,5 +54,24 @@ class CartContainsRecurringProductTest extends IntegrationTestCase
         $instance = $this->objectManager->create(CartContainsRecurringProduct::class);
 
         $this->assertTrue($instance->execute($cart), 'The cart should contain a subscription product');
+    }
+
+    /**
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_simple_product_and_custom_option.php
+     */
+    public function testHandlesCasesWhereNoBuyRequestIsAvailable(): void
+    {
+        /** @var \Magento\Quote\Model\Quote $cart */
+        $cart = $this->objectManager->create(Session::class)->getQuote();
+
+        /** @var CartContainsRecurringProduct $instance */
+        $instance = $this->objectManager->create(CartContainsRecurringProduct::class);
+
+        $items = $cart->getItemsCollection()->getItems();
+        foreach ($items as $item) {
+            $item->getOptionByCode('info_buyRequest')->delete();
+        }
+
+        $this->assertFalse($instance->execute($cart));
     }
 }

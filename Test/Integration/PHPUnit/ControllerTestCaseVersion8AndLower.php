@@ -20,4 +20,9 @@ class ControllerTestCase extends AbstractController
     protected function setUpWithoutVoid()
     {
     }
+
+    public function assertStringContainsString($expected, $actual, $message = null)
+    {
+        $this->assertContains($expected, $actual, $message);
+    }
 }

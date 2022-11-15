@@ -28,6 +28,7 @@ use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\TransactionProcessor;
+use Mollie\Payment\Service\PaymentToken\PaymentTokenForOrder;
 
 /**
  * Class Payments
@@ -105,6 +106,11 @@ class Payments extends AbstractModel
     private $cancelOrder;
 
     /**
+     * @var PaymentTokenForOrder
+     */
+    private $paymentTokenForOrder;
+
+    /**
      * Payments constructor.
      *
      * @param OrderSender $orderSender
@@ -138,6 +144,7 @@ class Payments extends AbstractModel
         OrderAmount $orderAmount,
         TransactionDescription $transactionDescription,
         CancelOrder $cancelOrder,
+        PaymentTokenForOrder $paymentTokenForOrder,
         EventManager $eventManager
     ) {
         $this->orderSender = $orderSender;
@@ -155,6 +162,7 @@ class Payments extends AbstractModel
         $this->orderAmount = $orderAmount;
         $this->transactionDescription = $transactionDescription;
         $this->cancelOrder = $cancelOrder;
+        $this->paymentTokenForOrder = $paymentTokenForOrder;
     }
 
     /**
@@ -175,7 +183,7 @@ class Payments extends AbstractModel
             return $payment->getCheckoutUrl();
         }
 
-        $paymentToken = $this->mollieHelper->getPaymentToken();
+        $paymentToken = $this->paymentTokenForOrder->execute($order);
         $method = $this->mollieHelper->getMethodCode($order);
         $paymentData = [
             'amount'         => $this->mollieHelper->getOrderAmountByOrder($order),
@@ -255,6 +263,7 @@ class Payments extends AbstractModel
 
         $status = $this->mollieHelper->getPendingPaymentStatus($order);
 
+        $order->setState(Order::STATE_PENDING_PAYMENT);
         $order->addStatusToHistory($status, __('Customer redirected to Mollie'), false);
         $order->setMollieTransactionId($payment->id);
         $this->orderRepository->save($order);

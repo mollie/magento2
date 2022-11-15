@@ -18,6 +18,11 @@ use Mollie\Payment\Service\Order\TransactionPartInterface;
 class SequenceType implements TransactionPartInterface
 {
     /**
+     * @var Config
+     */
+    private $config;
+
+    /**
      * @var OrderContainsSubscriptionProduct
      */
     private $orderContainsSubscriptionProduct;
@@ -27,19 +32,14 @@ class SequenceType implements TransactionPartInterface
      */
     private $customerSession;
 
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
+        Config $config,
         OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
-        Session $customerSession,
-        Config $config
+        Session $customerSession
     ) {
+        $this->config = $config;
         $this->orderContainsSubscriptionProduct = $orderContainsSubscriptionProduct;
         $this->customerSession = $customerSession;
-        $this->config = $config;
     }
 
     public function process(OrderInterface $order, $apiMethod, array $transaction): array
@@ -69,7 +69,8 @@ class SequenceType implements TransactionPartInterface
             return false;
         }
 
-        if ($order->getPayment()->getAdditionalInformation(VaultConfigProvider::IS_ACTIVE_CODE) &&
+        if ($this->config->isMagentoVaultEnabled($order->getStoreId()) &&
+            $order->getPayment()->getAdditionalInformation(VaultConfigProvider::IS_ACTIVE_CODE) &&
             $order->getPayment()->getMethod() == 'mollie_methods_creditcard'
         ) {
             return true;

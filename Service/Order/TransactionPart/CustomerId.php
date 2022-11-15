@@ -61,6 +61,7 @@ class CustomerId implements TransactionPartInterface
             return $transaction;
         }
 
+
         if (!$order->getCustomerId()) {
             return $transaction;
         }

@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Controller\Checkout;
 
 use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -107,13 +108,18 @@ class Process extends Action
             try {
                 $this->checkoutSession->start();
 
+                $redirect = new DataObject([
+                    'path' => 'checkout/onepage/success?utm_nooverride=1',
+                ]);
+
                 $this->eventManager->dispatch('mollie_checkout_success_redirect', [
+                    'redirect' => $redirect,
                     'order_ids' => $orderIds,
                     'request' => $this->getRequest(),
                     'response' => $this->getResponse(),
                 ]);
 
-                return $this->_redirect('checkout/onepage/success?utm_nooverride=1');
+                return $this->_redirect($redirect->getData('path'));
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
                 $this->messageManager->addErrorMessage(__('Something went wrong.'));

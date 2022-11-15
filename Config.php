@@ -7,13 +7,12 @@
 namespace Mollie\Payment;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\App\ProductMetadataInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Module\Manager;
-use Magento\Payment\Model\MethodInterface;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
-use phpDocumentor\Reflection\Types\Static_;
 
 class Config
 {
@@ -38,6 +37,7 @@ class Config
     const GENERAL_REDIRECT_WHEN_TRANSACTION_FAILS_TO = 'payment/mollie_general/redirect_when_transaction_fails_to';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
     const GENERAL_SECOND_CHANCE_DELAY = 'payment/mollie_general/second_chance_email_delay';
+    const GENERAL_SECOND_CHANCE_USE_PAYMENT_METHOD = 'payment/mollie_general/second_chance_use_payment_method';
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
     const GENERAL_USE_CUSTOM_REDIRECT_URL = 'payment/mollie_general/use_custom_redirect_url';
@@ -47,6 +47,9 @@ class Config
     const PAYMENT_APPLEPAY_BUY_NOW_BUTTON_COLOR = 'payment/mollie_methods_applepay/buy_now_button_color';
     const PAYMENT_APPLEPAY_BUY_NOW_BUTTON_TEXT = 'payment/mollie_methods_applepay/buy_now_button_text';
     const PAYMENT_APPLEPAY_INTEGRATION_TYPE = 'payment/mollie_methods_applepay/integration_type';
+    const PAYMENT_APPLEPAY_ENABLE_MINICART_BUTTON = 'payment/mollie_methods_applepay/enable_minicart_button';
+    const PAYMENT_APPLEPAY_MINICART_BUTTON_COLOR = 'payment/mollie_methods_applepay/minicart_button_color';
+    const PAYMENT_APPLEPAY_MINICART_BUTTON_TEXT = 'payment/mollie_methods_applepay/minicart_button_text';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
@@ -83,16 +86,23 @@ class Config
      */
     private $encryptor;
 
+    /**
+     * @var ProductMetadataInterface
+     */
+    private $productMetadata;
+
     public function __construct(
         ScopeConfigInterface $config,
         MollieLogger $logger,
         Manager $moduleManager,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        ProductMetadataInterface $productMetadata
     ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->moduleManager = $moduleManager;
         $this->encryptor = $encryptor;
+        $this->productMetadata = $productMetadata;
     }
 
     /**
@@ -144,6 +154,24 @@ class Config
     }
 
     /**
+     * Returns current version of Magento
+     *
+     * @return string
+     */
+    public function getMagentoVersion(): string
+    {
+        return $this->productMetadata->getVersion();
+    }
+
+    /**
+     * @return string
+     */
+    public function getMagentoEdition(): string
+    {
+        return $this->productMetadata->getEdition();
+    }
+
+    /**
      * Returns API key
      *
      * @param null|int|string $storeId
@@ -158,7 +186,7 @@ class Config
         }
 
         if (!$this->isProductionMode($storeId)) {
-            $apiKey = trim($this->getPath(static::GENERAL_APIKEY_TEST, $storeId));
+            $apiKey = trim($this->getPath(static::GENERAL_APIKEY_TEST, $storeId) ?? '');
             if (empty($apiKey)) {
                 $this->addToLog('error', 'Mollie API key not set (test modus)');
             }
@@ -171,7 +199,7 @@ class Config
             return $decryptedApiKey;
         }
 
-        $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId));
+        $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId) ?? '');
         if (empty($apiKey)) {
             $this->addToLog('error', 'Mollie API key not set (live modus)');
         }
@@ -263,6 +291,15 @@ class Config
 
     /**
      * @param null|int|string $storeId
+     * @return string|null
+     */
+    public function secondChanceUsePaymentMethod(int $storeId = null): ?string
+    {
+        return $this->getPath(static::GENERAL_SECOND_CHANCE_USE_PAYMENT_METHOD, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
      * @return bool
      */
     public function isProductionMode($storeId = null)
@@ -328,6 +365,33 @@ class Config
      * @param null|int|string $storeId
      * @return bool
      */
+    public function applePayEnableMinicartButton($storeId = null)
+    {
+        return $this->isSetFlag(static::PAYMENT_APPLEPAY_ENABLE_MINICART_BUTTON, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function applePayMinicartColor($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_APPLEPAY_MINICART_BUTTON_COLOR, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function applePayMinicartText($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_APPLEPAY_MINICART_BUTTON_TEXT, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
     public function applePayIntegrationType($storeId = null)
     {
         return $this->getPath(static::PAYMENT_APPLEPAY_INTEGRATION_TYPE, $storeId);
@@ -382,7 +446,7 @@ class Config
      * @param int|null $storeId
      * @return bool
      */
-    public function isMethodActive($method, $storeId = null): bool
+    public function isMethodActive(string $method, int $storeId = null): bool
     {
         return $this->isSetFlag($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_ACTIVE, $method), $storeId);
     }
@@ -547,9 +611,15 @@ class Config
      * @param null|int|string $storeId
      * @return string
      */
-    public function customWebhookUrl($storeId = null)
+    public function customWebhookUrl($storeId = null): string
     {
-        return $this->getPath(static::GENERAL_CUSTOM_WEBHOOK_URL, $storeId);
+        $value = $this->getPath(static::GENERAL_CUSTOM_WEBHOOK_URL, $storeId);
+
+        if (!$value) {
+            return '';
+        }
+
+        return $value;
     }
 
     /**
@@ -598,7 +668,7 @@ class Config
     {
         return sprintf(
             $path,
-            str_replace('mollie_methods_', '', $method)
+            str_replace('mollie_methods_', '', $method ?? '')
         );
     }
 }

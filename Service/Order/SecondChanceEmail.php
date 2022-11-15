@@ -21,6 +21,8 @@ use Mollie\Payment\Service\PaymentToken\Generate;
 
 class SecondChanceEmail
 {
+    const UTM_TAG = '?utm_source=second_chance_email&utm_medium=mollie_second_chance&utm_campaign=second_chance_order';
+
     /**
      * @var Config
      */
@@ -141,6 +143,7 @@ class SecondChanceEmail
                 'email' => $order->getCustomerEmail(),
             ],
             'order' => $order,
+            'order_id' => $order->getEntityId(),
             'store' => $this->storeManager->getStore($order->getStoreId()),
             'payment_token' => $token->getToken(),
         ];
@@ -157,7 +160,7 @@ class SecondChanceEmail
             '_scope' => $order->getStoreId(),
             'order_id' => $order->getEntityId(),
             'payment_token' => $token->getToken()
-        ]);
+        ]) . static::UTM_TAG;
     }
 
     private function setFrom(TransportBuilder $builder, int $storeId)

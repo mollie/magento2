@@ -60,18 +60,22 @@ class AddCardToVault
         $paymentToken = $this->getPaymentToken($mollieOrder);
         $extensionAttributes = $this->getExtensionAttributes($payment);
 
-        if ($extensionAttributes->getVaultPaymentToken() !== null) {
+        if ($paymentToken === null || $extensionAttributes->getVaultPaymentToken() !== null) {
             return;
         }
 
         $extensionAttributes->setVaultPaymentToken($paymentToken);
     }
 
-    private function getPaymentToken(Order $mollieOrder)
+    private function getPaymentToken(Order $mollieOrder): ?PaymentTokenInterface
     {
         /** @var Payment $molliePayment */
         $molliePayment = $mollieOrder->payments()->offsetGet(0);
         $details = $molliePayment->details;
+
+        if (!$details || !isset($details->cardLabel) || !isset($details->cardNumber)) {
+            return null;
+        }
 
         /** @var PaymentTokenInterface $paymentToken */
         $paymentToken = $this->paymentTokenFactory->create(PaymentTokenFactoryInterface::TOKEN_TYPE_CREDIT_CARD);

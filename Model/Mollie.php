@@ -30,6 +30,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
+use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Psr\Log\LoggerInterface;
 
@@ -179,10 +180,6 @@ class Mollie extends Adapter
             return false;
         }
 
-        if (!$this->canUseForCountry($quote->getShippingAddress()->getCountryId())) {
-            return false;
-        }
-
         return parent::isAvailable($quote);
     }
 
@@ -209,7 +206,7 @@ class Mollie extends Adapter
     }
 
     /**
-     * @param Order $order
+     * @param Order|OrderInterface $order
      *
      * @return bool|void
      * @throws LocalizedException
@@ -247,7 +244,7 @@ class Mollie extends Adapter
         }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
-        if ($methodCode == 'klarnapaylater' || $methodCode == 'klarnasliceit' || $methodCode == 'voucher') {
+        if (in_array($methodCode, ['klarnapaylater', 'klarnapaynow', 'klarnasliceit', 'voucher', 'in3'])) {
             throw new LocalizedException(__($exception->getMessage()));
         }
 
@@ -270,6 +267,7 @@ class Mollie extends Adapter
             $mollieApiClient = new MollieApiClient();
             $mollieApiClient->setApiKey($apiKey);
             $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
+            $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
             $mollieApiClient->addVersionString('MollieMagento2/' . $this->config->getVersion());
             return $mollieApiClient;
         } else {
@@ -298,7 +296,7 @@ class Mollie extends Adapter
      * @param string $type
      * @param null   $paymentToken
      *
-     * @return array
+     * @return ProcessTransactionResponse
      * @throws LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
      */
@@ -307,11 +305,6 @@ class Mollie extends Adapter
         /** @var \Magento\Sales\Model\Order $order */
         $order = $this->orderRepository->get($orderId);
         $this->eventManager->dispatch('mollie_process_transaction_start', ['order' => $order]);
-        if (empty($order)) {
-            $msg = ['error' => true, 'msg' => __('Order not found')];
-            $this->mollieHelper->addTolog('error', $msg);
-            return $msg;
-        }
 
         $transactionId = $order->getMollieTransactionId();
         if (empty($transactionId)) {
@@ -555,13 +548,13 @@ class Mollie extends Adapter
     /**
      * Get list of Issuers from API
      *
-     * @param MollieApiClient $mollieApi
+     * @param MollieApiClient|null $mollieApi
      * @param $method
      * @param $issuerListType
      *
      * @return array|null
      */
-    public function getIssuers($mollieApi, $method, $issuerListType): ?array
+    public function getIssuers(MollieApiClient $mollieApi = null, $method, $issuerListType): ?array
     {
         $issuers = [];
         if (empty($mollieApi) || $issuerListType == 'none') {
@@ -585,8 +578,14 @@ class Mollie extends Adapter
                 'id'       => '',
                 'name'     => __('QR Code'),
                 'image'    => [
-                    'size2x' => $this->assetRepository->getUrl('Mollie_Payment::images/qr-select.svg'),
-                    'svg' => $this->assetRepository->getUrl('Mollie_Payment::images/qr-select.svg'),
+                    'size2x' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area'=>'frontend']
+                    ),
+                    'svg' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area'=>'frontend']
+                    ),
                 ]
             ];
         }
@@ -630,7 +629,7 @@ class Mollie extends Adapter
 
         $mollieApi = $this->loadMollieApi($apiKey);
 
-        return $mollieApi->methods->all([
+        return $mollieApi->methods->allActive([
             'resource' => 'orders',
             'includeWallets' => 'applepay',
         ]);

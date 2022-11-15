@@ -48,7 +48,7 @@ class PaymentFee
      * @param $forceBaseCurrency
      * @return array
      */
-    public function getOrderLine(OrderInterface $order, $forceBaseCurrency)
+    public function getOrderLine(OrderInterface $order, $forceBaseCurrency): array
     {
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $amount = $order->getData('base_mollie_payment_fee');

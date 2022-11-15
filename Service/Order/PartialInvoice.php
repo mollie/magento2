@@ -44,7 +44,15 @@ class PartialInvoice
         $order = $shipment->getOrder();
         $payment = $order->getPayment();
 
-        if (!in_array($payment->getMethod(), ['mollie_methods_klarnapaylater', 'mollie_methods_klarnasliceit']) ||
+        if (!in_array(
+            $payment->getMethod(),
+            [
+                'mollie_methods_klarnapaylater',
+                'mollie_methods_klarnapaynow',
+                'mollie_methods_klarnasliceit',
+                'mollie_methods_in3',
+            ]
+        ) ||
             $this->mollieHelper->getInvoiceMoment($order->getStoreId()) != InvoiceMoment::ON_SHIPMENT
         ) {
             return null;

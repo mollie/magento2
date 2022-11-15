@@ -6,12 +6,15 @@
 
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Cart;
 
-use Magento\Framework\App\ProductMetadataInterface;
+use GraphQL\Type\Definition\FieldDefinition;
 use Mollie\Payment\GraphQL\Resolver\Cart\PaymentMethodMeta;
-use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use Mollie\Payment\Test\Integration\GraphQLTestCase;
 
-class PaymentMethodMetaTest extends IntegrationTestCase
+class PaymentMethodMetaTest extends GraphQLTestCase
 {
+    /**
+     * @magentoAppArea graphql
+     */
     public function testReturnsAnEmptyResponseForNonMollieMethods()
     {
         $instance = $this->objectManager->create(PaymentMethodMeta::class);
@@ -50,6 +53,10 @@ class PaymentMethodMetaTest extends IntegrationTestCase
             ]),
             $this->objectManager->create(\Magento\Framework\GraphQl\Query\Resolver\ContextInterface::class),
             $this->objectManager->create(\Magento\Framework\GraphQl\Schema\Type\ResolveInfo::class, [
+                'fieldDefinition' => FieldDefinition::create([
+                    'name' => 'test',
+                    'type' => $this->objectManager->create(\Magento\Framework\GraphQl\Schema\Type\BooleanType::class),
+                ]),
                 'values' => [],
                 'fieldName' => 'testfield',
                 'fieldNodes' => [],
@@ -59,7 +66,11 @@ class PaymentMethodMetaTest extends IntegrationTestCase
                 'schema' => $this->objectManager->create(\GraphQL\Type\Schema::class, ['config' => []]),
                 'fragments' => [],
                 'rootValue' => '',
-                'operation' => null,
+                'operation' => $this->objectManager->create(\GraphQL\Language\AST\OperationDefinitionNode::class, [
+                    'vars' => [
+                        'operation' => 'query',
+                    ]
+                ]),
                 'variableValues' => [],
             ]),
             $value,
