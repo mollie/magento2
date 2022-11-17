@@ -21,11 +21,10 @@ use Magento\Framework\UrlInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\GuestCartManagementInterface;
 use Magento\Quote\Api\GuestCartRepositoryInterface;
-use Magento\Quote\Model\QuoteIdMaskFactory;
 use Magento\Store\Model\StoreManagerInterface;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Mollie;
-use Psr\Log\LoggerInterface;
 
 class BuyNowValidation extends Action
 {
@@ -75,20 +74,21 @@ class BuyNowValidation extends Action
     private $url;
 
     /**
-     * @var QuoteIdMaskFactory
-     */
-    private $quoteIdMaskFactory;
-
-    /**
      * @var ResolverInterface
      */
     private $resolver;
+
+    /**
+     * @var Config
+     */
+    private $config;
 
     public function __construct(
         Context $context,
         Session $customerSession,
         CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $accountManagement,
+        Config $config,
         ResolverInterface $resolver,
         Validator $formKeyValidator,
         GuestCartManagementInterface $cartManagement,
@@ -98,11 +98,11 @@ class BuyNowValidation extends Action
         ProductRepositoryInterface $productRepository,
         MollieHelper $mollieHelper,
         Mollie $mollie,
-        UrlInterface $url,
-        QuoteIdMaskFactory $quoteIdMaskFactory
+        UrlInterface $url
     ) {
         parent::__construct($context, $customerSession, $customerRepository, $accountManagement);
 
+        $this->config = $config;
         $this->resolver = $resolver;
         $this->formKeyValidator = $formKeyValidator;
         $this->cartManagement = $cartManagement;
@@ -113,7 +113,6 @@ class BuyNowValidation extends Action
         $this->mollieHelper = $mollieHelper;
         $this->mollie = $mollie;
         $this->url = $url;
-        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
     }
 
     /**
@@ -182,7 +181,8 @@ class BuyNowValidation extends Action
                 $e,
                 __('We can\'t add this item to your shopping cart right now.')
             );
-            $this->_objectManager->get(LoggerInterface::class)->critical($e);
+
+            $this->config->addToLog('error', $e);
 
             $response->setHttpResponseCode(403);
             return $response->setData([

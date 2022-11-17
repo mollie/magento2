@@ -9,7 +9,6 @@ namespace Mollie\Payment\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Framework\ObjectManagerInterface;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
 
@@ -33,27 +32,20 @@ class ConfigObserver implements ObserverInterface
      * @var MollieHelper
      */
     private $mollieHelper;
-    /**
-     * @var ObjectManagerInterface
-     */
-    private $objectManager;
 
     /**
      * ConfigObserver constructor.
      *
      * @param ManagerInterface       $messageManager
-     * @param ObjectManagerInterface $objectManager
      * @param MollieModel            $mollieModel
      * @param MollieHelper           $mollieHelper
      */
     public function __construct(
         ManagerInterface $messageManager,
-        ObjectManagerInterface $objectManager,
         MollieModel $mollieModel,
         MollieHelper $mollieHelper
     ) {
         $this->messageManager = $messageManager;
-        $this->objectManager = $objectManager;
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
     }
