@@ -3,13 +3,15 @@ define(
         'jquery',
         'Mollie_Payment/js/view/payment/method-renderer/default',
         'Magento_Checkout/js/model/totals',
-        'mage/url'
+        'mage/url',
+        'mage/translate'
     ],
     function (
         $,
         Component,
         totals,
-        url
+        url,
+        __
     ) {
         'use strict';
 
@@ -90,6 +92,14 @@ define(
                         },
                         success: function (result) {
                             this.session.completeMerchantValidation(result);
+                        }.bind(this),
+                        error: function (result) {
+                            console.error('Received error', result);
+                            this.messageContainer.addErrorMessage({
+                                message: __('Something went wrong, please check the logs for more information.')
+                            });
+                            this.session.abort();
+                            this.session = null;
                         }.bind(this)
                     })
                 }.bind(this);
