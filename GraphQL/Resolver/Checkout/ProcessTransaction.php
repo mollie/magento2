@@ -6,7 +6,6 @@
 
 namespace Mollie\Payment\GraphQL\Resolver\Checkout;
 
-use Magento\Checkout\Model\Session;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
@@ -17,6 +16,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\ShouldRedirectToSuccessPage;
 
 class ProcessTransaction implements ResolverInterface
 {
@@ -36,20 +36,20 @@ class ProcessTransaction implements ResolverInterface
     private $cartRepository;
 
     /**
-     * @var Session
+     * @var ShouldRedirectToSuccessPage
      */
-    private $checkoutSession;
+    private $shouldRedirectToSuccessPage;
 
     public function __construct(
         Mollie $mollie,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         CartRepositoryInterface $cartRepository,
-        Session $checkoutSession
+        ShouldRedirectToSuccessPage $shouldRedirectToSuccessPage
     ) {
         $this->mollie = $mollie;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->cartRepository = $cartRepository;
-        $this->checkoutSession = $checkoutSession;
+        $this->shouldRedirectToSuccessPage = $shouldRedirectToSuccessPage;
     }
 
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
@@ -66,26 +66,23 @@ class ProcessTransaction implements ResolverInterface
         }
 
         $result = $this->mollie->processTransaction($tokenModel->getOrderId(), 'success', $token);
+        $redirectToSuccessPage = $this->shouldRedirectToSuccessPage->execute($result);
 
         $cart = null;
         if ($tokenModel->getCartId()) {
-            $cart = $this->getCart($result['status'], $tokenModel->getCartId());
+            $cart = $this->getCart(!$redirectToSuccessPage, $tokenModel->getCartId());
         }
 
         return [
             'paymentStatus' => strtoupper($result['status']),
             'cart' => $cart,
+            'redirect_to_cart' => !$redirectToSuccessPage,
+            'redirect_to_success_page' => $redirectToSuccessPage,
         ];
     }
 
-    private function getCart(string $status, string $cartId): ?array
+    private function getCart(bool $restoreCart, string $cartId): ?array
     {
-        $restoreCart = in_array($status, [
-            PaymentStatus::STATUS_EXPIRED,
-            PaymentStatus::STATUS_CANCELED,
-            PaymentStatus::STATUS_FAILED,
-        ]);
-
         try {
             $cart = $this->cartRepository->get($cartId);
 

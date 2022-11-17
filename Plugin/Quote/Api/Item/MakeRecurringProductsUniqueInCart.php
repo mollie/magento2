@@ -31,7 +31,12 @@ class MakeRecurringProductsUniqueInCart
     public function afterRepresentProduct(CartItemInterface $item, bool $result): bool
     {
         $buyRequest = $item->getOptionByCode('info_buyRequest');
-        if ((
+        if (!$buyRequest) {
+            return $result;
+        }
+
+        if (
+            (
                 strstr($buyRequest->getValue(), 'is_recurring') !== false &&
                 $this->jsonContainsRecurringValue($buyRequest->getValue())
             ) ||

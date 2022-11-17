@@ -133,6 +133,7 @@
                 <item name="aheadworks_addfreegift" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\AheadworksAddFreeGift</item>
                 <item name="magento_giftcard" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftCard</item>
                 <item name="magento_giftwrapping" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftWrapping</item>
+                <item name="geissweb_euvat" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\GeisswebEuvat</item>
             </argument>
         </arguments>
     </type>
@@ -218,12 +219,6 @@
     <type name="Mollie\Payment\Service\LockService">
         <arguments>
             <argument name="resourceConnection" xsi:type="object">Magento\Framework\App\ResourceConnection\Proxy</argument>
-        </arguments>
-    </type>
-
-    <type name="Mollie\Payment\GraphQL\Resolver\Checkout\ProcessTransaction">
-        <arguments>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
 
@@ -318,6 +313,14 @@
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
+
+    <virtualType name="ScandiPWA\Router\Controller\ConfigurableRouter" type="ScandiPWA\Router\Controller\Router">
+        <arguments>
+            <argument name="ignoredURLs" xsi:type="array">
+                <item name="mollieWebhooks" xsi:type="string">^/mollie/checkout/webhook.*</item>
+            </argument>
+        </arguments>
+    </virtualType>
 
     <type name="Mollie\Payment\Block\Checkout\CheckoutConfig">
         <arguments>
