@@ -41,9 +41,6 @@ define([
     }
 
     return function (config, elements) {
-        console.log('config', config);
-        console.log('elements', elements);
-
         $(elements).click( function () {
             try {
                 copyTextToClipboard($(this).data('url'));
