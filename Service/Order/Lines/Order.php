@@ -182,6 +182,9 @@ class Order
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
             'sku' => substr($item->getSku() ?? '', 0, 64),
             'productUrl' => $this->getProductUrl($item),
+            'metadata' => [
+                'item_id' => $item->getId(),
+            ]
         ];
 
         if ($discountAmount) {
