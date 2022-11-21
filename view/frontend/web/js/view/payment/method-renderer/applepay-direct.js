@@ -48,8 +48,8 @@ define(
                 var amount = totals.getSegment('grand_total').value;
 
                 var request = {
-                    countryCode: 'NL',
-                    currencyCode: 'EUR',
+                    countryCode: window.checkoutConfig.defaultCountryId,
+                    currencyCode: window.checkoutConfig.payment.mollie.store.currency,
                     supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
                     merchantCapabilities: ['supports3DS'],
                     total: {
