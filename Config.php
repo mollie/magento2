@@ -65,6 +65,7 @@ class Config
     const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
     const PAYMENT_VOUCHER_CATEGORY = 'payment/mollie_methods_voucher/category';
     const PAYMENT_VOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_voucher/custom_attribute';
+    const CURRENCY_OPTIONS_DEFAULT = 'currency/options/default';
 
     /**
      * @var ScopeConfigInterface
@@ -169,6 +170,15 @@ class Config
     public function getMagentoEdition(): string
     {
         return $this->productMetadata->getEdition();
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return string
+     */
+    public function getStoreCurrency($storeId = null): ?string
+    {
+        return $this->getPath(static::CURRENCY_OPTIONS_DEFAULT, null);
     }
 
     /**
