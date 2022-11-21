@@ -58,14 +58,14 @@
                 <field id="apikey_test" translate="label" type="obscure" sortOrder="30" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Test API Key</label>
-                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCacheEncrypted</backend_model>
+                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\SaveApiKey</backend_model>
                     <config_path>payment/mollie_general/apikey_test</config_path>
                     <comment model="Mollie\Payment\Model\Adminhtml\Comment\CurrentApiKeyMeta" />
                 </field>
                 <field id="apikey_live" translate="label" type="obscure" sortOrder="40" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Live API Key</label>
-                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCacheEncrypted</backend_model>
+                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\SaveApiKey</backend_model>
                     <config_path>payment/mollie_general/apikey_live</config_path>
                     <comment model="Mollie\Payment\Model\Adminhtml\Comment\CurrentApiKeyMeta" />
                 </field>

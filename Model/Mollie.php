@@ -33,6 +33,7 @@ use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Service\Mollie\Timeout;
+use Mollie\Payment\Service\Mollie\Wrapper\MollieApiClientFallbackWrapper;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -101,6 +102,11 @@ class Mollie extends Adapter
      */
     private $ordersProcessTraction;
 
+    /**
+     * @var \Mollie\Payment\Service\Mollie\MollieApiClient
+     */
+    private $mollieApiClient;
+
     public function __construct(
         ManagerInterface $eventManager,
         ValueHandlerPoolInterface $valueHandlerPool,
@@ -118,6 +124,7 @@ class Mollie extends Adapter
         Config $config,
         Timeout $timeout,
         ProcessTransaction $ordersProcessTraction,
+        \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
         $formBlockType,
         $infoBlockType,
         CommandPoolInterface $commandPool = null,
@@ -152,6 +159,7 @@ class Mollie extends Adapter
         $this->config = $config;
         $this->timeout = $timeout;
         $this->ordersProcessTraction = $ordersProcessTraction;
+        $this->mollieApiClient = $mollieApiClient;
     }
 
     public function getCode()
@@ -270,16 +278,12 @@ class Mollie extends Adapter
      */
     public function loadMollieApi($apiKey)
     {
-        if (class_exists('Mollie\Api\MollieApiClient')) {
-            $mollieApiClient = new MollieApiClient();
-            $mollieApiClient->setApiKey($apiKey);
-            $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
-            $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
-            $mollieApiClient->addVersionString('MollieMagento2/' . $this->config->getVersion());
-            return $mollieApiClient;
-        } else {
-            throw new LocalizedException(__('Class Mollie\Api\MollieApiClient does not exist'));
-        }
+        return $this->mollieApiClient->loadByApiKey($apiKey);
+    }
+
+    public function loadMollieApiWithFallbackWrapper($apiKey): MollieApiClientFallbackWrapper
+    {
+        return new MollieApiClientFallbackWrapper($this->loadMollieApi($apiKey));
     }
 
     /**
@@ -320,15 +324,6 @@ class Mollie extends Adapter
             return $msg;
         }
 
-        $storeId = $order->getStoreId();
-        if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
-            $msg = ['error' => true, 'msg' => __('API Key not found')];
-            $this->mollieHelper->addTolog('error', $msg);
-            return $msg;
-        }
-
-        $mollieApi = $this->loadMollieApi($apiKey);
-
         // Defaults to the "default" connection when there is not connection available named "sales".
         // This is required for stores with a split database (Enterprise only):
         // https://devdocs.magento.com/guides/v2.3/config-guide/multi-master/multi-master.html
@@ -340,6 +335,7 @@ class Mollie extends Adapter
             if (preg_match('/^ord_\w+$/', $transactionId)) {
                 $result = $this->ordersProcessTraction->execute($order, $type)->toArray();
             } else {
+                $mollieApi = $this->mollieApiClient->loadByStore($order->getStoreId());
                 $result = $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
             }
 
@@ -364,14 +360,7 @@ class Mollie extends Adapter
             return $msg;
         }
 
-        $storeId = $order->getStoreId();
-        if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
-            $msg = ['error' => true, 'msg' => __('API Key not found')];
-            $this->mollieHelper->addTolog('error', $msg);
-            return $msg;
-        }
-
-        $mollieApi = $this->loadMollieApi($apiKey);
+        $mollieApi = $this->mollieApiClient->loadByStore($order->getStoreId());
 
         if (preg_match('/^ord_\w+$/', $transactionId)) {
             return $this->ordersApi->orderHasUpdate($order, $mollieApi);

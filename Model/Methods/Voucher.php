@@ -27,6 +27,7 @@ use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Mollie\Payment\Service\Quote\QuoteHasMealVoucherProducts;
 use Psr\Log\LoggerInterface;
@@ -62,6 +63,7 @@ class Voucher extends Mollie
         Config $config,
         Timeout $timeout,
         ProcessTransaction $ordersProcessTraction,
+        MollieApiClient $mollieApiClient,
         $formBlockType,
         $infoBlockType,
         QuoteHasMealVoucherProducts $quoteHasMealVoucherProducts,
@@ -87,6 +89,7 @@ class Voucher extends Mollie
             $config,
             $timeout,
             $ordersProcessTraction,
+            $mollieApiClient,
             $formBlockType,
             $infoBlockType,
             $commandPool,
