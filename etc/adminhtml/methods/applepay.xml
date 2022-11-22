@@ -50,7 +50,7 @@
             <strong>External</strong>: The user is redirected to a Mollie page. No extra configuration required.<br>
             <strong>Direct</strong>: The user can use Apple Pay in your checkout. You need to upload a certificate to your server for this to work. <a target="_BLANK" href="https://docs.mollie.com/wallets/applepay-direct-integration#prepare-your-server">View instructions</a>.
             ]]></comment>
-            <source_model>Mollie\Payment\Model\Adminhtml\Source\AppleyPayIntegrationType</source_model>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayIntegrationType</source_model>
             <depends>
                 <field id="active">1</field>
             </depends>
