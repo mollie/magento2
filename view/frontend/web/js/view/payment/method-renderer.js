@@ -59,7 +59,7 @@ define(
          */
         if (canUseApplePay()) {
             var applePayComponent = defaultComponent;
-            if (checkoutConfig.appleypay.integration_type === 'direct') {
+            if (checkoutConfig.applepay.integration_type === 'direct') {
                 applePayComponent = 'Mollie_Payment/js/view/payment/method-renderer/applepay-direct';
             }
 

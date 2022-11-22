@@ -8,7 +8,7 @@ namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 
-class AppleyPayIntegrationType implements OptionSourceInterface
+class ApplePayIntegrationType implements OptionSourceInterface
 {
     const EXTERNAL = 'external';
     const DIRECT = 'direct';

@@ -184,7 +184,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['mollie']['profile_id'] = $this->config->getProfileId($storeId);
         $config['payment']['mollie']['locale'] = $this->getLocale($storeId);
         $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
-        $config['payment']['mollie']['appleypay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
+        $config['payment']['mollie']['applepay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
         $config['payment']['mollie']['store']['name'] = $storeName;
         $config['payment']['mollie']['store']['currency'] = $this->config->getStoreCurrency($storeId);
         $config['payment']['mollie']['vault']['enabled'] = $this->config->isMagentoVaultEnabled($storeId);
