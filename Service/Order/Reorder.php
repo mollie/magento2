@@ -156,7 +156,12 @@ class Reorder
 
         $this->disableCheckForAdminOrders->disable();
         $this->productHelper->setSkipSaleableCheck(true);
+        $this->orderCreate->setData('account', ['email' => $originalOrder->getCustomerEmail()]);
         $this->orderCreate->initFromOrder($originalOrder);
+
+        if ($originalOrder->getCustomerGroupId() === null) {
+            $this->orderCreate->getQuote()->getCustomer()->setGroupId(0);
+        }
 
         $order = $this->orderCreate->createOrder();
 
