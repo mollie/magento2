@@ -15,6 +15,7 @@ class DataProvider implements AdditionalDataProviderInterface
         return [
             'selected_issuer' => $data['mollie_selected_issuer'] ?? null,
             'card_token' => $data['mollie_card_token'] ?? null,
+            'applepay_payment_token' => $data['mollie_applepay_payment_token'] ?? null,
         ];
     }
 }
