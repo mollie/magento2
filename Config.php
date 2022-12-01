@@ -17,6 +17,7 @@ use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 class Config
 {
     const EXTENSION_CODE = 'Mollie_Payment';
+    const GENERAL_ENABLED = 'payment/mollie_general/enabled';
     const GENERAL_APIKEY_LIVE = 'payment/mollie_general/apikey_live';
     const GENERAL_APIKEY_TEST = 'payment/mollie_general/apikey_test';
     const GENERAL_AUTOMATICALLY_SEND_SECOND_CHANCE_EMAILS = 'payment/mollie_general/automatically_send_second_chance_emails';
@@ -169,6 +170,15 @@ class Config
     public function getMagentoEdition(): string
     {
         return $this->productMetadata->getEdition();
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function isModuleEnabled($storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_ENABLED, $storeId);
     }
 
     /**

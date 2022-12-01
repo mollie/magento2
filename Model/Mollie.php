@@ -187,6 +187,15 @@ class Mollie extends Adapter
             return false;
         }
 
+        // The street can be a maximum of 100 characters. Disable if it's longer.
+        if ($quote && $quote->getShippingAddress()) {
+            $street = $quote->getShippingAddress()->getStreetFull();
+
+            if (mb_strlen($street) > 100) {
+                return false;
+            }
+        }
+
         return parent::isAvailable($quote);
     }
 

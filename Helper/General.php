@@ -256,7 +256,7 @@ class General extends AbstractHelper
      */
     public function isAvailable($storeId)
     {
-        $active = $this->getStoreConfig(self::XML_PATH_MODULE_ACTIVE, $storeId);
+        $active = $this->config->isModuleEnabled($storeId);
         if (!$active) {
             return false;
         }
