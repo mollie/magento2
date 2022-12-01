@@ -8,12 +8,12 @@ namespace Mollie\Payment\Model\Client\Payments\Processors;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\PaymentProcessorInterface;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
+use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\TransactionProcessor;
 
 class SendEmailForBanktransfer implements PaymentProcessorInterface
@@ -22,11 +22,6 @@ class SendEmailForBanktransfer implements PaymentProcessorInterface
      * @var ProcessTransactionResponseFactory
      */
     private $processTransactionResponseFactory;
-
-    /**
-     * @var OrderSender
-     */
-    private $orderSender;
 
     /**
      * @var TransactionProcessor
@@ -38,16 +33,21 @@ class SendEmailForBanktransfer implements PaymentProcessorInterface
      */
     private $mollieHelper;
 
+    /**
+     * @var SendOrderEmails
+     */
+    private $sendOrderEmails;
+
     public function __construct(
         ProcessTransactionResponseFactory $processTransactionResponseFactory,
-        OrderSender $orderSender,
         TransactionProcessor $transactionProcessor,
-        General $mollieHelper
+        General $mollieHelper,
+        SendOrderEmails $sendOrderEmails
     ) {
-        $this->orderSender = $orderSender;
         $this->transactionProcessor = $transactionProcessor;
         $this->mollieHelper = $mollieHelper;
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
+        $this->sendOrderEmails = $sendOrderEmails;
     }
 
     public function process(
@@ -60,19 +60,15 @@ class SendEmailForBanktransfer implements PaymentProcessorInterface
             return $response;
         }
 
-        try {
-            $this->orderSender->send($magentoOrder);
-            $message = __('New order email sent');
-        } catch (\Throwable $exception) {
-            $message = __('Unable to send the new order email: %1', $exception->getMessage());
-        }
-
         if (!$statusPending = $this->mollieHelper->getStatusPendingBanktransfer($magentoOrder->getStoreId())) {
             $statusPending = $magentoOrder->getStatus();
         }
+
+        $magentoOrder->setStatus($statusPending);
         $magentoOrder->setState(Order::STATE_PENDING_PAYMENT);
+        $this->sendOrderEmails->sendOrderConfirmation($magentoOrder);
+
         $this->transactionProcessor->process($magentoOrder, null, $molliePayment);
-        $magentoOrder->addStatusToHistory($statusPending, $message, true);
 
         return $this->processTransactionResponseFactory->create([
             'success' => true,

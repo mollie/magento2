@@ -11,6 +11,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Model\Client\Orders\Processors\SendConfirmationEmailForBanktransfer;
+use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class SendConfirmationEmailForBanktransferTest extends IntegrationTestCase
@@ -20,12 +21,12 @@ class SendConfirmationEmailForBanktransferTest extends IntegrationTestCase
      */
     public function testSendsTheConfirmationEmail()
     {
-        $orderSendMock = $this->createMock(OrderSender::class);
-        $orderSendMock->expects($this->once())->method('send');
+        $sendOrderMailsMock = $this->createMock(SendOrderEmails::class);
+        $sendOrderMailsMock->expects($this->once())->method('sendOrderConfirmation');
 
         /** @var SendConfirmationEmailForBanktransfer $instance */
         $instance = $this->objectManager->create(SendConfirmationEmailForBanktransfer::class, [
-            'orderSender' => $orderSendMock,
+            'sendOrderEmails' => $sendOrderMailsMock,
         ]);
 
         $order = $this->loadOrder('100000001');
