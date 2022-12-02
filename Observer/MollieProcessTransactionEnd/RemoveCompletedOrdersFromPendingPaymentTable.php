@@ -42,7 +42,7 @@ class RemoveCompletedOrdersFromPendingPaymentTable implements ObserverInterface
             return;
         }
 
-        if ($order->getState() != Order::STATE_PROCESSING) {
+        if (!in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE])) {
             return;
         }
 
