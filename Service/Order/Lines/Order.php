@@ -173,7 +173,7 @@ class Order
 
         $orderLine = [
             'item_id' => $item->getId(),
-            'type' => !$item->getIsVirtual() ? 'physical' : 'digital',
+            'type' => $item->getIsVirtual() !== null && (int) $item->getIsVirtual() !== 1 ? 'physical' : 'digital',
             'name' => preg_replace('/[^A-Za-z0-9 -]/', '', $item->getName() ?? ''),
             'quantity' => round($item->getQtyOrdered()),
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $unitPrice),
