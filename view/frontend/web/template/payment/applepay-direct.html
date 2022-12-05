@@ -32,10 +32,21 @@
         <div class="actions-toolbar">
             <div class="primary">
                 <!-- ko if: isPlaceOrderActionAllowed() && !totalsLoading() -->
-                <div class="apple-pay-button-with-text apple-pay-button-white-with-text" data-bind="click: placeApplePayOrder">
-                    <span class="text">Buy with</span>
-                    <span class="logo"></span>
-                </div>
+                    <!-- ko ifnot: isIosc -->
+                    <div class="apple-pay-button-with-text apple-pay-button-white-with-text" data-bind="click: placeApplePayOrder">
+                        <span class="text">Buy with</span>
+                        <span class="logo"></span>
+                    </div>
+                    <!--/ko-->
+
+                    <!-- ko if: isIosc -->
+                    <!-- The One Step Checkout requires some extra classes, but these mess up the regulare checkout,
+                        that's why we render this button different if we detect the One Step Checkout -->
+                    <button class="apple-pay-button action primary checkout apple-pay-button-with-text apple-pay-button-white-with-text" data-bind="click: placeApplePayOrder">
+                        <span class="text">Buy with</span>
+                        <span class="logo"></span>
+                    </button>
+                    <!--/ko-->
                 <!-- /ko -->
             </div>
         </div>
