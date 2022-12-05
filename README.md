@@ -46,6 +46,19 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - SEPA Direct Debit
 - SOFORT Banking
 
+## Additional modules
+
+To extend the functionality of the Mollie Magento 2 plugin, we have developed a number of additional modules.
+
+- [Subscriptions](https://github.com/mollie/magento2-subscriptions) - Create and manage subscriptions in your Magento 2 webshop.
+- [Multi shipping](https://github.com/mollie/magento2-multishipping) - Enable multi shipping in your Magento 2 webshop.
+- [Analytics](https://github.com/mollie/magento2-analytics) - Track your Mollie payments in Google Analytics.
+
+### Support for other alternative frontends
+
+- [Hyva React Checkout](https://github.com/mollie/magento2-hyva-react-checkout)
+- [Scandi PWA](https://github.com/mollie/magento2-scandipwa)
+
 ## Configuration, FAQ and Troubleshooting
 If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension in Magento 2.3.3 and higher, please see our [WIKI Page](https://github.com/mollie/magento2/wiki) or send an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
 
