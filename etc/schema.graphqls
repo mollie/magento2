@@ -1,7 +1,13 @@
+# For more information on how to use these, see this wiki page:
+# https://github.com/mollie/magento2/wiki/GraphQL-integration
 type Mutation {
     createMollieTransaction(input: MollieTransactionInput): MollieTransactionOutput @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\CreateMollieTransaction") @deprecated(reason: "Using the Order.mollie_redirect_url attribuut")
     mollieRestoreCart(input: MollieResetCartInput): MollieResetCartOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\ResetCart")
     mollieProcessTransaction(input: MollieProcessTransactionInput): MollieProcessTransactionOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\ProcessTransaction")
+    mollieApplePayValidation(
+        domain: String @doc(description: "The domain to validate. If this is omitted, the base url of the store is used.")
+        validationUrl: String! @doc(description: "The validation URL provided by Apple Pay.")
+    ): MollieApplePayValidationOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\ApplePay\\ApplePayValidation")
 }
 
 type Order {
@@ -81,9 +87,14 @@ type MolliePaymentFee {
     base_fee_tax: Money  @doc(description: "Base mollie payment fee tax")
 }
 
+type MollieApplePayValidationOutput {
+    response: String!
+}
+
 input PaymentMethodInput {
     mollie_selected_issuer: String @doc(description: "Provided the issuer chosen by the end-user")
     mollie_card_token: String @doc(description: "The card token provided by Mollie Components")
+    mollie_applepay_payment_token: String @doc(description: "The Apple Pay payment token")
 }
 
 input MollieTransactionInput {

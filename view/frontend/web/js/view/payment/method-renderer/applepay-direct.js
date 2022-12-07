@@ -1,6 +1,7 @@
 define(
     [
         'jquery',
+        'uiRegistry',
         'Mollie_Payment/js/view/payment/method-renderer/default',
         'Magento_Checkout/js/model/totals',
         'mage/url',
@@ -8,6 +9,7 @@ define(
     ],
     function (
         $,
+        uiRegistry,
         Component,
         totals,
         url,
@@ -22,7 +24,8 @@ define(
             redirectAfterPlaceOrder: false,
             totalsLoading: totals.isLoading,
             defaults: {
-                template: 'Mollie_Payment/payment/applepay-direct'
+                template: 'Mollie_Payment/payment/applepay-direct',
+                isIosc: uiRegistry.has("checkout.iosc.ajax"),
             },
 
             initObservable: function () {
@@ -50,8 +53,8 @@ define(
                 var amount = totals.getSegment('grand_total').value;
 
                 var request = {
-                    countryCode: 'NL',
-                    currencyCode: 'EUR',
+                    countryCode: window.checkoutConfig.defaultCountryId,
+                    currencyCode: window.checkoutConfig.payment.mollie.store.currency,
                     supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
                     merchantCapabilities: ['supports3DS'],
                     total: {

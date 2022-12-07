@@ -227,12 +227,6 @@
                     <comment><![CDATA[<strong>Autodetect:</strong> Let Mollie detect the locale depending on the user. However, the locale from the current store view is used when using the Orders API for the used payment method.<br>
 <strong>Store Locale</strong>: Use the locale active in the current store or fall back to English if this can't be determined.]]></comment>
                 </field>
-                <field id="transaction_details" translate="label" type="select" sortOrder="80" showInDefault="1"
-                       showInWebsite="0" showInStore="0">
-                    <label>Show Transaction Details</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Display Transaction Details like e.g. IBAN, BIC, Paypal Reference, Card Holder etc.</comment>
-                </field>
                 <field id="use_webhooks" translate="label" type="select" sortOrder="100" showInDefault="1"
                        showInWebsite="0" showInStore="1">
                     <label>Use webhooks</label>

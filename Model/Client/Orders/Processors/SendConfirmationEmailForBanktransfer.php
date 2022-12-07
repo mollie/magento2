@@ -7,12 +7,12 @@
 namespace Mollie\Payment\Model\Client\Orders\Processors;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Mollie\Api\Resources\Order;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Client\OrderProcessorInterface;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
+use Mollie\Payment\Service\Order\SendOrderEmails;
 
 class SendConfirmationEmailForBanktransfer implements OrderProcessorInterface
 {
@@ -27,18 +27,18 @@ class SendConfirmationEmailForBanktransfer implements OrderProcessorInterface
     private $processTransactionResponseFactory;
 
     /**
-     * @var OrderSender
+     * @var SendOrderEmails
      */
-    private $orderSender;
+    private $sendOrderEmails;
 
     public function __construct(
         Config $config,
         ProcessTransactionResponseFactory $processTransactionResponseFactory,
-        OrderSender $orderSender
+        SendOrderEmails $sendOrderEmails
     ) {
         $this->config = $config;
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
-        $this->orderSender = $orderSender;
+        $this->sendOrderEmails = $sendOrderEmails;
     }
 
     public function process(
@@ -58,19 +58,14 @@ class SendConfirmationEmailForBanktransfer implements OrderProcessorInterface
             return $response;
         }
 
-        try {
-            $this->orderSender->send($order);
-            $message = __('New order email sent');
-        } catch (\Throwable $exception) {
-            $message = __('Unable to send the new order email: %1', $exception->getMessage());
-        }
-
         if (!$statusPending = $this->config->statusPendingBanktransfer($order->getStoreId())) {
             $statusPending = $order->getStatus();
         }
 
+        $order->setStatus($statusPending);
         $order->setState(\Magento\Sales\Model\Order::STATE_PENDING_PAYMENT);
-        $order->addStatusToHistory($statusPending, $message, true);
+
+        $this->sendOrderEmails->sendOrderConfirmation($order);
 
         return $response;
     }

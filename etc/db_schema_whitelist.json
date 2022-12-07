@@ -81,20 +81,26 @@
     "quote": {
         "column": {
             "mollie_payment_fee": true,
-            "base_mollie_payment_fee": true
+            "base_mollie_payment_fee": true,
+            "mollie_payment_fee_tax": true,
+            "base_mollie_payment_fee_tax": true
         }
     },
     "quote_address": {
         "column": {
             "mollie_payment_fee": true,
-            "base_mollie_payment_fee": true
+            "base_mollie_payment_fee": true,
+            "mollie_payment_fee_tax": true,
+            "base_mollie_payment_fee_tax": true
         }
     },
     "sales_order": {
         "column": {
             "mollie_payment_fee": true,
             "base_mollie_payment_fee": true,
-            "mollie_transaction_id": true
+            "mollie_transaction_id": true,
+            "mollie_payment_fee_tax": true,
+            "base_mollie_payment_fee_tax": true
         },
         "index": {
             "SALES_ORDER_MOLLIE_TRANSACTION_ID": true
@@ -103,13 +109,17 @@
     "sales_invoice": {
         "column": {
             "mollie_payment_fee": true,
-            "base_mollie_payment_fee": true
+            "base_mollie_payment_fee": true,
+            "mollie_payment_fee_tax": true,
+            "base_mollie_payment_fee_tax": true
         }
     },
     "sales_creditmemo": {
         "column": {
             "mollie_payment_fee": true,
-            "base_mollie_payment_fee": true
+            "base_mollie_payment_fee": true,
+            "mollie_payment_fee_tax": true,
+            "base_mollie_payment_fee_tax": true
         }
     },
     "sales_shipment": {

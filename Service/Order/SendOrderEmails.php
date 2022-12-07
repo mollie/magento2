@@ -16,6 +16,16 @@ use Mollie\Payment\Helper\General;
 class SendOrderEmails
 {
     /**
+     * @var bool
+     */
+    private $disableOrderConfirmationSending = false;
+
+    /**
+     * @var bool
+     */
+    private $disableInvoiceSending = false;
+
+    /**
      * @var General
      */
     private $mollieHelper;
@@ -47,12 +57,17 @@ class SendOrderEmails
         $this->invoiceSender = $invoiceSender;
     }
 
+    public function disableOrderConfirmationSending(): void
+    {
+        $this->disableOrderConfirmationSending = true;;
+    }
+
     /**
      * @param OrderInterface|Order $order
      */
     public function sendOrderConfirmation(OrderInterface $order): void
     {
-        if ($order->getEmailSent()) {
+        if ($order->getEmailSent() || $this->disableOrderConfirmationSending) {
             return;
         }
 
@@ -66,10 +81,16 @@ class SendOrderEmails
         }
     }
 
+    public function disableInvoiceSending(): void
+    {
+        $this->disableInvoiceSending = true;
+    }
+
     public function sendInvoiceEmail(InvoiceInterface $invoice): void
     {
         if ($invoice->getEmailSent() ||
-            !$this->mollieHelper->sendInvoice($invoice->getStoreId())
+            !$this->mollieHelper->sendInvoice($invoice->getStoreId()) ||
+            $this->disableInvoiceSending
         ) {
             return;
         }

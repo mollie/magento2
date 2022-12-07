@@ -82,7 +82,6 @@ class General extends AbstractHelper
     const XML_PATH_LOCALE = 'payment/mollie_general/locale';
     const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
     const XML_PATH_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
-    const XML_PATH_SHOW_TRANSACTION_DETAILS = 'payment/mollie_general/transaction_details';
     const XML_PATH_ADD_QR = 'payment/mollie_methods_ideal/add_qr';
     const XML_PATH_PAYMENTLINK_ADD_MESSAGE = 'payment/mollie_methods_paymentlink/add_message';
     const XML_PATH_PAYMENTLINK_MESSAGE = 'payment/mollie_methods_paymentlink/message';
@@ -256,7 +255,7 @@ class General extends AbstractHelper
      */
     public function isAvailable($storeId)
     {
-        $active = $this->getStoreConfig(self::XML_PATH_MODULE_ACTIVE, $storeId);
+        $active = $this->config->isModuleEnabled($storeId);
         if (!$active) {
             return false;
         }

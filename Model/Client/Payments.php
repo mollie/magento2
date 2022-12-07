@@ -12,13 +12,10 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Sales\Model\OrderRepository;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
-use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
@@ -26,6 +23,7 @@ use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\TransactionProcessor;
 use Mollie\Payment\Service\PaymentToken\PaymentTokenForOrder;
@@ -49,14 +47,6 @@ class Payments extends AbstractModel
      */
     private $orderRepository;
     /**
-     * @var OrderSender
-     */
-    private $orderSender;
-    /**
-     * @var InvoiceSender
-     */
-    private $invoiceSender;
-    /**
      * @var CheckoutSession
      */
     private $checkoutSession;
@@ -68,10 +58,6 @@ class Payments extends AbstractModel
      * @var BuildTransaction
      */
     private $buildTransaction;
-    /**
-     * @var Config
-     */
-    private $config;
     /**
      * @var DashboardUrl
      */
@@ -111,33 +97,34 @@ class Payments extends AbstractModel
     private $paymentTokenForOrder;
 
     /**
+     * @var SendOrderEmails
+     */
+    private $sendOrderEmails;
+
+    /**
      * Payments constructor.
      *
-     * @param OrderSender $orderSender
-     * @param InvoiceSender $invoiceSender
      * @param OrderRepository $orderRepository
      * @param CheckoutSession $checkoutSession
      * @param MollieHelper $mollieHelper
      * @param OrderCommentHistory $orderCommentHistory
      * @param BuildTransaction $buildTransaction
-     * @param Config $config
      * @param DashboardUrl $dashboardUrl
      * @param Transaction $transaction
      * @param TransactionProcessor $transactionProcessor
-     * @param CancelOrder $cancelOrder
-     * @param EventManager $eventManager
      * @param OrderAmount $orderAmount
      * @param TransactionDescription $transactionDescription
+     * @param CancelOrder $cancelOrder
+     * @param PaymentTokenForOrder $paymentTokenForOrder
+     * @param SendOrderEmails $sendOrderEmails
+     * @param EventManager $eventManager
      */
     public function __construct(
-        OrderSender $orderSender,
-        InvoiceSender $invoiceSender,
         OrderRepository $orderRepository,
         CheckoutSession $checkoutSession,
         MollieHelper $mollieHelper,
         OrderCommentHistory $orderCommentHistory,
         BuildTransaction $buildTransaction,
-        Config $config,
         DashboardUrl $dashboardUrl,
         Transaction $transaction,
         TransactionProcessor $transactionProcessor,
@@ -145,16 +132,14 @@ class Payments extends AbstractModel
         TransactionDescription $transactionDescription,
         CancelOrder $cancelOrder,
         PaymentTokenForOrder $paymentTokenForOrder,
+        SendOrderEmails $sendOrderEmails,
         EventManager $eventManager
     ) {
-        $this->orderSender = $orderSender;
-        $this->invoiceSender = $invoiceSender;
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
         $this->mollieHelper = $mollieHelper;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->buildTransaction = $buildTransaction;
-        $this->config = $config;
         $this->dashboardUrl = $dashboardUrl;
         $this->transaction = $transaction;
         $this->transactionProcessor = $transactionProcessor;
@@ -163,6 +148,7 @@ class Payments extends AbstractModel
         $this->transactionDescription = $transactionDescription;
         $this->cancelOrder = $cancelOrder;
         $this->paymentTokenForOrder = $paymentTokenForOrder;
+        $this->sendOrderEmails = $sendOrderEmails;
     }
 
     /**
@@ -351,25 +337,11 @@ class Payments extends AbstractModel
                 $sendInvoice = $this->mollieHelper->sendInvoice($storeId);
 
                 if (!$order->getEmailSent()) {
-                    try {
-                        $this->orderSender->send($order);
-                        $message = __('New order email sent');
-                        $this->orderCommentHistory->add($order, $message, true);
-                    } catch (\Throwable $exception) {
-                        $message = __('Unable to send the new order email: %1', $exception->getMessage());
-                        $this->orderCommentHistory->add($order, $message, false);
-                    }
+                    $this->sendOrderEmails->sendOrderConfirmation($order);
                 }
 
                 if ($invoice && !$invoice->getEmailSent() && $sendInvoice) {
-                    try {
-                        $this->invoiceSender->send($invoice);
-                        $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-                        $this->orderCommentHistory->add($order, $message, true);
-                    } catch (\Throwable $exception) {
-                        $message = __('Unable to send the invoice: %1', $exception->getMessage());
-                        $this->orderCommentHistory->add($order, $message, true);
-                    }
+                    $this->sendOrderEmails->sendInvoiceEmail($invoice);
                 }
             }
 
@@ -385,19 +357,15 @@ class Payments extends AbstractModel
         }
         if ($status == 'open') {
             if ($paymentData->method == 'banktransfer' && !$order->getEmailSent()) {
-                try {
-                    $this->orderSender->send($order);
-                    $message = __('New order email sent');
-                } catch (\Throwable $exception) {
-                    $message = __('Unable to send the new order email: %1', $exception->getMessage());
-                }
-
                 if (!$statusPending = $this->mollieHelper->getStatusPendingBanktransfer($storeId)) {
                     $statusPending = $order->getStatus();
                 }
+
+                $order->setStatus($statusPending);
                 $order->setState(Order::STATE_PENDING_PAYMENT);
+                $this->sendOrderEmails->sendOrderConfirmation($order);
+
                 $this->transactionProcessor->process($order, null, $paymentData);
-                $order->addStatusToHistory($statusPending, $message, true);
                 $this->orderRepository->save($order);
             }
             $msg = ['success' => true, 'status' => 'open', 'order_id' => $orderId, 'type' => $type];

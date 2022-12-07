@@ -18,6 +18,10 @@ class OrderTest extends IntegrationTestCase
         $order = $this->loadOrderById('100000001');
         $order->setBaseCurrencyCode('EUR');
 
+        foreach ($order->getItems() as $item) {
+            $item->setIsVirtual(false);
+        }
+
         /** @var Subject $instance */
         $instance = $this->objectManager->get(Subject::class);
 
@@ -183,6 +187,28 @@ class OrderTest extends IntegrationTestCase
         $lastLine = end($result);
 
         $this->assertNotEquals('discount', $lastLine['type']);
+    }
+
+    public function testAddsTheItemIdToTheMetadata(): void
+    {
+        $this->loadFixture('Magento/Sales/order_item_list.php');
+
+        $order = $this->loadOrderById('100000001');
+        $order->setBaseCurrencyCode('EUR');
+
+        /** @var Subject $instance */
+        $instance = $this->objectManager->get(Subject::class);
+
+        $result = $instance->get($order);
+
+        foreach ($result as $line) {
+            if (!in_array($line['type'], ['physical', 'digital'])) {
+                continue;
+            }
+
+            $this->assertArrayHasKey('metadata', $line);
+            $this->assertArrayHasKey('item_id', $line['metadata']);
+        }
     }
 
     public function adjustmentsDataProvider(): array

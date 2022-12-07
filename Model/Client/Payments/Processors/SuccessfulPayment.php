@@ -17,6 +17,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\TransactionProcessor;
 use Mollie\Payment\Service\Order\Uncancel;
 
@@ -58,14 +59,9 @@ class SuccessfulPayment implements PaymentProcessorInterface
     private $orderRepository;
 
     /**
-     * @var Order\Email\Sender\OrderSender
+     * @var SendOrderEmails
      */
-    private $orderSender;
-
-    /**
-     * @var Order\Email\Sender\InvoiceSender
-     */
-    private $invoiceSender;
+    private $sendOrderEmails;
 
     public function __construct(
         ProcessTransactionResponseFactory $processTransactionResponseFactory,
@@ -75,8 +71,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         OrderCommentHistory $orderCommentHistory,
         General $mollieHelper,
         OrderRepositoryInterface $orderRepository,
-        Order\Email\Sender\OrderSender $orderSender,
-        Order\Email\Sender\InvoiceSender $invoiceSender
+        SendOrderEmails $sendOrderEmails
     ) {
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
         $this->orderAmount = $orderAmount;
@@ -85,8 +80,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $this->orderCommentHistory = $orderCommentHistory;
         $this->mollieHelper = $mollieHelper;
         $this->orderRepository = $orderRepository;
-        $this->orderSender = $orderSender;
-        $this->invoiceSender = $invoiceSender;
+        $this->sendOrderEmails = $sendOrderEmails;
     }
 
     public function process(
@@ -185,14 +179,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
             return;
         }
 
-        try {
-            $this->orderSender->send($order);
-            $message = __('New order email sent');
-            $this->orderCommentHistory->add($order, $message, true);
-        } catch (\Throwable $exception) {
-            $message = __('Unable to send the new order email: %1', $exception->getMessage());
-            $this->orderCommentHistory->add($order, $message, false);
-        }
+        $this->sendOrderEmails->sendOrderConfirmation($order);
     }
 
     private function sendInvoiceEmail(Order\Invoice $invoice, bool $sendInvoice, OrderInterface $order): void
@@ -201,13 +188,6 @@ class SuccessfulPayment implements PaymentProcessorInterface
             return;
         }
 
-        try {
-            $this->invoiceSender->send($invoice);
-            $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-            $this->orderCommentHistory->add($order, $message, true);
-        } catch (\Throwable $exception) {
-            $message = __('Unable to send the invoice: %1', $exception->getMessage());
-            $this->orderCommentHistory->add($order, $message, true);
-        }
+        $this->sendOrderEmails->sendInvoiceEmail($invoice);
     }
 }
