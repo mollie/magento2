@@ -18,6 +18,10 @@ class OrderTest extends IntegrationTestCase
         $order = $this->loadOrderById('100000001');
         $order->setBaseCurrencyCode('EUR');
 
+        foreach ($order->getItems() as $item) {
+            $item->setIsVirtual(false);
+        }
+
         /** @var Subject $instance */
         $instance = $this->objectManager->get(Subject::class);
 
