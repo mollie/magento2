@@ -338,7 +338,7 @@ class Mollie extends Adapter
 
         $mollieApi = $this->loadMollieApi($apiKey);
 
-        // Defaults to the "default" connection when there is not connection available named "sales".
+        // Defaults to the "default" connection when there is no connection available named "sales".
         // This is required for stores with a split database (Enterprise only):
         // https://devdocs.magento.com/guides/v2.3/config-guide/multi-master/multi-master.html
         $connection = $this->resourceConnection->getConnection('sales');
@@ -351,6 +351,9 @@ class Mollie extends Adapter
             } else {
                 $result = $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
             }
+
+            $order->getPayment()->setAdditionalInformation('mollie_success', $result['success']);
+            $this->orderRepository->save($order);
 
             $connection->commit();
             return $result;
