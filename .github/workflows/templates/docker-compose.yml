@@ -1,18 +1,40 @@
 version: '3'
 
 services:
-  db:
-    image: mysql:5.7
-    environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: magento-test
-      MYSQL_USER: magento
-      MYSQL_PASSWORD: magento
-      MYSQL_SQL_TO_RUN: 'GRANT ALL ON *.* TO "root"@"%";'
-  web:
-    image: michielgerritsen/magento-project-community-edition:${PHP_VERSION}-${MAGENTO_VERSION}
+  magento:
+    image: michielgerritsen/magento-project-community-edition:${PHP_VERSION}-magento${MAGENTO_VERSION}-sample-data
     container_name: magento-project-community-edition
-    depends_on:
-      - db
+    environment:
+      - VIRTUAL_HOST=magento.test
+      - URL=https://magento.test/
+      - MOLLIE_API_KEY_TEST
     volumes:
-      - ./:/data/extensions/workdir
+      - ../../../magento-logs:/data/var/log
+      - ./magento/configure-mollie.sh:/data/configure-mollie.sh
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    volumes:
+      - ./nginx-proxy/proxy.conf:/etc/nginx/proxy.conf
+      - ./nginx-proxy/magento.test.crt:/etc/nginx/certs/magento.test.crt
+      - ./nginx-proxy/magento.test.key:/etc/nginx/certs/magento.test.key
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  e2e:
+    build: ./e2e
+    container_name: e2e
+    links:
+      - "nginx-proxy:magento.test"
+    environment:
+      - CYPRESS_TESTRAIL_DOMAIN
+      - CYPRESS_TESTRAIL_USERNAME
+      - CYPRESS_TESTRAIL_PASSWORD
+      - CYPRESS_TESTRAIL_PROJECT_ID
+      - CYPRESS_TESTRAIL_MILESTONE_ID
+      - CYPRESS_TESTRAIL_RUN_NAME
+      - CYPRESS_TESTRAIL_RUN_CLOSE
+      - CYPRESS_baseUrl=https://magento.test
+    volumes:
+      - ./../../../Test/End-2-end/cypress:/e2e/cypress
+      - ./../../../Test/End-2-end/cypress.config.js:/e2e/cypress.config.js
+      - ./../../../Test/End-2-end/webpack.config.js:/e2e/webpack.config.js
