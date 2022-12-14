@@ -51,4 +51,7 @@
     <event name="sales_order_payment_place_end">
         <observer name="mollie_set_order_state_to_pending_payment" instance="Mollie\Payment\Observer\SalesOrderPaymentPlaceEnd\SetOrderStateToPendingPayment" />
     </event>
+    <event name="sales_order_invoice_pay">
+        <observer name="mollie_mark_virtual_items_as_shipped" instance="Mollie\Payment\Observer\SalesOrderInvoicePay\MarkVirtualItemsAsShipped" />
+    </event>
 </config>
