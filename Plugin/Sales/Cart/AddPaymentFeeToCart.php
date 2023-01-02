@@ -34,6 +34,8 @@ class AddPaymentFeeToCart
     public function afterGetList(CartRepositoryInterface $subject, SearchResultsInterface $result)
     {
         $items = $result->getItems();
+        $items = array_filter($items, fn($item) => $item);
+
         foreach ($items as $id => $item) {
             $items[$id] = $this->processCart($item);
         }
