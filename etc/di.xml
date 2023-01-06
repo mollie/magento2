@@ -133,6 +133,7 @@
                 <item name="aheadworks_addfreegift" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\AheadworksAddFreeGift</item>
                 <item name="magento_giftcard" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftCard</item>
                 <item name="magento_giftwrapping" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftWrapping</item>
+                <item name="geissweb_euvat" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\GeisswebEuvat</item>
             </argument>
         </arguments>
     </type>
@@ -143,6 +144,12 @@
                 <item name="mollie_pending_payment_reminders_data_source" xsi:type="string">PendingPaymentReminderCollection</item>
                 <item name="mollie_sent_payment_reminders_data_source" xsi:type="string">SentPaymentReminderCollection</item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Controller\ApplePay\PlaceOrder">
+        <arguments>
+            <argument xsi:type="object" name="checkoutSession">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
 
@@ -215,12 +222,6 @@
         </arguments>
     </type>
 
-    <type name="Mollie\Payment\GraphQL\Resolver\Checkout\ProcessTransaction">
-        <arguments>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-
     <type name="Mollie\Payment\Model\Mollie">
         <arguments>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
@@ -257,6 +258,7 @@
             <argument name="processors" xsi:type="array">
                 <item name="preprocess" xsi:type="array">
                     <item name="add_additional_data" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\AddAdditionalInformation</item>
+                    <item name="save_card_label" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\SaveCardDetails</item>
                 </item>
                 <item name="last_payment_status_is_failure" xsi:type="array">
                     <item name="last_payment_status_is_failure" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\LastPaymentStatusIsFailure</item>
@@ -298,6 +300,32 @@
 
     <type name="Magento\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition">
         <plugin name="mollie_disable_stock_check_for_admin_orders" type="Mollie\Payment\Plugin\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition\DisableCheckForAdminOrders" />
+    </type>
+
+    <type name="Mollie\Payment\Block\Applepay\Shortcut\Button">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Controller\ApplePay\ShippingMethods">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="ScandiPWA\Router\Controller\ConfigurableRouter" type="ScandiPWA\Router\Controller\Router">
+        <arguments>
+            <argument name="ignoredURLs" xsi:type="array">
+                <item name="mollieWebhooks" xsi:type="string">^/mollie/checkout/webhook.*</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Mollie\Payment\Block\Checkout\CheckoutConfig">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
     </type>
 
     <!-- Payment methods configuration start -->

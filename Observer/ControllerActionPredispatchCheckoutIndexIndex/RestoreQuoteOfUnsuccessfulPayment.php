@@ -9,6 +9,7 @@ namespace Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Config;
@@ -26,12 +27,19 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
      */
     private $config;
 
+    /**
+     * @var TimezoneInterface
+     */
+    private $timezone;
+
     public function __construct(
         Session $checkoutSession,
+        TimezoneInterface $timezone,
         Config $config
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->config = $config;
+        $this->timezone = $timezone;
     }
 
     public function execute(Observer $observer)
@@ -43,10 +51,18 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
             return;
         }
 
+        $createdAt = $this->timezone->date(new \DateTime($order->getCreatedAt()));
+        $now = $this->timezone->date();
+        $diff = $now->diff($createdAt);
+        if ($diff->i > 5) {
+            return;
+        }
+
         if ($order->getState() === Order::STATE_PENDING_PAYMENT &&
             $order->getStatus() === $this->config->orderStatusPending($order->getStoreId())
         ) {
             $this->checkoutSession->restoreQuote();
+            $this->config->addToLog('info', 'Restored quote of order ' . $order->getIncrementId());
         }
     }
 }

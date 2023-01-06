@@ -35,7 +35,40 @@ class ProcessTransactionTest extends GraphQLTestCase
 
         $tokenModel = $this->objectManager->get(Generate::class)->forOrder($order);
         $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('processTransaction')->willReturn(['status' => 'pending']);
+        $mollieMock->method('processTransaction')->willReturn(['status' => 'failed']);
+        $this->objectManager->addSharedInstance($mollieMock, Mollie::class);
+
+        $result = $this->graphQlQuery('mutation {
+            mollieProcessTransaction(input: { payment_token: "' . $tokenModel->getToken() . '" }) {
+                paymentStatus
+            }
+        }');
+
+        $this->assertEquals('FAILED', $result['mollieProcessTransaction']['paymentStatus']);
+
+        $newCart = $this->objectManager->create(CartRepositoryInterface::class)->get($tokenModel->getCartId());
+        $newCart->load('test01', 'reserved_order_id');
+        $this->assertTrue((bool)$newCart->getIsActive());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testDoesNotReactivateTheCartWhenTheStatusIsPending()
+    {
+        /** @var CartInterface $cart */
+        $cart = $this->objectManager->create(Quote::class);
+        $cart->load('test01', 'reserved_order_id');
+        $cart->setIsActive(0);
+        $cart->save();
+
+        $order = $this->loadOrder('100000001');
+        $order->setQuoteId($cart->getId());
+
+        $tokenModel = $this->objectManager->get(Generate::class)->forOrder($order);
+        $mollieMock = $this->createMock(Mollie::class);
+        $mollieMock->method('processTransaction')->willReturn(['status' => 'pending', 'success' => true]);
         $this->objectManager->addSharedInstance($mollieMock, Mollie::class);
 
         $result = $this->graphQlQuery('mutation {
@@ -48,7 +81,7 @@ class ProcessTransactionTest extends GraphQLTestCase
 
         $newCart = $this->objectManager->create(CartRepositoryInterface::class)->get($tokenModel->getCartId());
         $newCart->load('test01', 'reserved_order_id');
-        $this->assertTrue((bool)$newCart->getIsActive());
+        $this->assertFalse((bool)$newCart->getIsActive());
     }
 
     /**

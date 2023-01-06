@@ -1,15 +1,19 @@
 define(
     [
         'jquery',
+        'uiRegistry',
         'Mollie_Payment/js/view/payment/method-renderer/default',
         'Magento_Checkout/js/model/totals',
-        'mage/url'
+        'mage/url',
+        'mage/translate'
     ],
     function (
         $,
+        uiRegistry,
         Component,
         totals,
-        url
+        url,
+        __
     ) {
         'use strict';
 
@@ -20,7 +24,8 @@ define(
             redirectAfterPlaceOrder: false,
             totalsLoading: totals.isLoading,
             defaults: {
-                template: 'Mollie_Payment/payment/applepay-direct'
+                template: 'Mollie_Payment/payment/applepay-direct',
+                isIosc: uiRegistry.has("checkout.iosc.ajax"),
             },
 
             initObservable: function () {
@@ -48,8 +53,8 @@ define(
                 var amount = totals.getSegment('grand_total').value;
 
                 var request = {
-                    countryCode: 'NL',
-                    currencyCode: 'EUR',
+                    countryCode: window.checkoutConfig.defaultCountryId,
+                    currencyCode: window.checkoutConfig.payment.mollie.store.currency,
                     supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
                     merchantCapabilities: ['supports3DS'],
                     total: {
@@ -90,6 +95,14 @@ define(
                         },
                         success: function (result) {
                             this.session.completeMerchantValidation(result);
+                        }.bind(this),
+                        error: function (result) {
+                            console.error('Received error', result);
+                            this.messageContainer.addErrorMessage({
+                                message: __('Something went wrong, please check the logs for more information.')
+                            });
+                            this.session.abort();
+                            this.session = null;
                         }.bind(this)
                     })
                 }.bind(this);

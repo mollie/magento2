@@ -71,6 +71,7 @@ class General extends AbstractHelper
     const XML_PATH_LIVE_APIKEY = 'payment/mollie_general/apikey_live';
     const XML_PATH_TEST_APIKEY = 'payment/mollie_general/apikey_test';
     const XML_PATH_DEBUG = 'payment/mollie_general/debug';
+    // Deprecated option
     const XML_PATH_LOADING_SCREEN = 'payment/mollie_general/loading_screen';
     const XML_PATH_STATUS_PROCESSING = 'payment/mollie_general/order_status_processing';
     const XML_PATH_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
@@ -81,7 +82,6 @@ class General extends AbstractHelper
     const XML_PATH_LOCALE = 'payment/mollie_general/locale';
     const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
     const XML_PATH_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
-    const XML_PATH_SHOW_TRANSACTION_DETAILS = 'payment/mollie_general/transaction_details';
     const XML_PATH_ADD_QR = 'payment/mollie_methods_ideal/add_qr';
     const XML_PATH_PAYMENTLINK_ADD_MESSAGE = 'payment/mollie_methods_paymentlink/add_message';
     const XML_PATH_PAYMENTLINK_MESSAGE = 'payment/mollie_methods_paymentlink/message';
@@ -255,7 +255,7 @@ class General extends AbstractHelper
      */
     public function isAvailable($storeId)
     {
-        $active = $this->getStoreConfig(self::XML_PATH_MODULE_ACTIVE, $storeId);
+        $active = $this->config->isModuleEnabled($storeId);
         if (!$active) {
             return false;
         }
@@ -357,6 +357,7 @@ class General extends AbstractHelper
      * @param $storeId
      *
      * @return mixed
+     * @deprecated since 2.18.0
      */
     public function useLoadingScreen($storeId)
     {

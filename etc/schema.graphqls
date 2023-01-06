@@ -1,7 +1,13 @@
+# For more information on how to use these, see this wiki page:
+# https://github.com/mollie/magento2/wiki/GraphQL-integration
 type Mutation {
     createMollieTransaction(input: MollieTransactionInput): MollieTransactionOutput @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\CreateMollieTransaction") @deprecated(reason: "Using the Order.mollie_redirect_url attribuut")
     mollieRestoreCart(input: MollieResetCartInput): MollieResetCartOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\ResetCart")
     mollieProcessTransaction(input: MollieProcessTransactionInput): MollieProcessTransactionOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\ProcessTransaction")
+    mollieApplePayValidation(
+        domain: String @doc(description: "The domain to validate. If this is omitted, the base url of the store is used.")
+        validationUrl: String! @doc(description: "The validation URL provided by Apple Pay.")
+    ): MollieApplePayValidationOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\ApplePay\\ApplePayValidation")
 }
 
 type Order {
@@ -25,6 +31,10 @@ type PaymentMethod {
 
 type SelectedPaymentMethod {
     mollie_meta: MolliePaymentMethodMeta! @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\PaymentMethodMeta") @doc(description: "Retrieve meta information for this payment method (image)")
+}
+
+type CartPrices  @doc(description: "Contains details about the final price of items in the cart, including discount and tax information.") {
+    mollie_payment_fee: MolliePaymentFee @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\Prices\\PaymentFee")
 }
 
 type MollieIssuer {
@@ -66,11 +76,25 @@ type MollieTransactionOutput {
 type MollieProcessTransactionOutput {
     paymentStatus: PaymentStatusEnum
     cart: Cart @doc(description: "The cart is only available when the payment status is failed, canceled or expired.")
+    redirect_to_cart: Boolean @doc(description: "Indicates if the customer should be redirected to the cart.")
+    redirect_to_success_page: Boolean @doc(description: "Indicates if the customer should be redirected to the success page.")
+}
+
+type MolliePaymentFee {
+    fee: Money  @doc(description: "Mollie payment fee")
+    base_fee: Money  @doc(description: "Base mollie payment fee")
+    fee_tax: Money  @doc(description: "Mollie payment fee tax")
+    base_fee_tax: Money  @doc(description: "Base mollie payment fee tax")
+}
+
+type MollieApplePayValidationOutput {
+    response: String!
 }
 
 input PaymentMethodInput {
     mollie_selected_issuer: String @doc(description: "Provided the issuer chosen by the end-user")
     mollie_card_token: String @doc(description: "The card token provided by Mollie Components")
+    mollie_applepay_payment_token: String @doc(description: "The Apple Pay payment token")
 }
 
 input MollieTransactionInput {

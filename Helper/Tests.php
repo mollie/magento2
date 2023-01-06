@@ -8,7 +8,6 @@ namespace Mollie\Payment\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
-use Magento\Framework\ObjectManagerInterface;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Service\Mollie\Compatibility\CompatibilityTestInterface;
 
@@ -23,10 +22,6 @@ class Tests extends AbstractHelper
     const XML_PATH_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
 
     /**
-     * @var ObjectManagerInterface
-     */
-    private $objectManager;
-    /**
      * @var MollieModel
      */
     private $mollieModel;
@@ -39,17 +34,14 @@ class Tests extends AbstractHelper
      * Tests constructor.
      *
      * @param Context                 $context
-     * @param ObjectManagerInterface  $objectManager
      * @param MollieModel             $mollieModel
      * @param array                   $tests
      */
     public function __construct(
         Context $context,
-        ObjectManagerInterface $objectManager,
         MollieModel $mollieModel,
         array $tests
     ) {
-        $this->objectManager = $objectManager;
         $this->mollieModel = $mollieModel;
         $this->tests = $tests;
         parent::__construct($context);

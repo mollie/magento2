@@ -5,6 +5,7 @@ namespace Mollie\Payment\Test\Integration\Model;
 use Magento\Framework\DataObject;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Endpoints\MethodEndpoint;
@@ -13,7 +14,9 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
+use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Test\Fakes\Model\Client\Orders\ProcessTransactionFake;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieTest extends IntegrationTestCase
@@ -41,11 +44,11 @@ class MollieTest extends IntegrationTestCase
         $mollieHelperMock = $this->createMock(General::class);
         $mollieHelperMock->method('getApiKey')->willReturn('test_TEST_API_KEY_THAT_IS_LONG_ENOUGH');
 
-        $ordersApiMock = $this->createMock(Orders::class);
         $paymentsApiMock = $this->createMock(Payments::class);
+        $orderProcessTransactionFake = $this->objectManager->create(ProcessTransactionFake::class);
 
         if ($type == 'orders') {
-            $ordersApiMock->expects($this->once())->method('processTransaction');
+            $orderProcessTransactionFake->disableParentCall();
         }
 
         if ($type == 'payments') {
@@ -54,12 +57,16 @@ class MollieTest extends IntegrationTestCase
 
         /** @var Mollie $instance */
         $instance = $this->objectManager->create(Mollie::class, [
-            'ordersApi' => $ordersApiMock,
             'paymentsApi' => $paymentsApiMock,
             'mollieHelper' => $mollieHelperMock,
+            'ordersProcessTraction' => $orderProcessTransactionFake,
         ]);
 
         $instance->processTransaction($order->getEntityId());
+
+        if ($type == 'orders') {
+            $this->assertEquals(1, $orderProcessTransactionFake->getTimesCalled());
+        }
     }
 
     public function testStartTransactionWithMethodOrder()
@@ -250,5 +257,49 @@ class MollieTest extends IntegrationTestCase
         $result = $instance->getIssuers($mollieApi, 'mollie_methods_ideal', 'radio');
 
         $this->assertSame(array_values($result), $result);
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
+     * @magentoConfigFixture default_store payment/mollie_general/type test
+     */
+    public function testIsNotAvailableForLongSteetnames(): void
+    {
+        $this->loadFakeEncryptor()->addReturnValue(
+            'test_dummyapikeywhichmustbe30characterslong',
+            'test_dummyapikeywhichmustbe30characterslong'
+        );
+
+        /** @var Ideal $instance */
+        $instance = $this->objectManager->create(Ideal::class);
+
+        $quote = $this->objectManager->create(Quote::class);
+        $quote->getShippingAddress()->setStreetFull(str_repeat('tenletters', 10) . 'a');
+
+        $this->assertFalse($instance->isAvailable($quote));
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
+     * @magentoConfigFixture default_store payment/mollie_general/type test
+     */
+    public function testIsAvailableForValidStreetnames(): void
+    {
+        $this->loadFakeEncryptor()->addReturnValue(
+            'test_dummyapikeywhichmustbe30characterslong',
+            'test_dummyapikeywhichmustbe30characterslong'
+        );
+
+        /** @var Ideal $instance */
+        $instance = $this->objectManager->create(Ideal::class);
+
+        $quote = $this->objectManager->create(Quote::class);
+        $quote->getShippingAddress()->setStreetFull(str_repeat('tenletters', 10));
+
+        $this->assertTrue($instance->isAvailable($quote));
     }
 }

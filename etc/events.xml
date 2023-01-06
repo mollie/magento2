@@ -45,4 +45,10 @@
     <event name="sales_quote_item_set_product">
         <observer name="mollie_add_subscription_product_type_options" instance="Mollie\Payment\Observer\SalesQuoteItemSetProduct\SetSubscriptionDataOnBuyRequest" />
     </event>
+    <event name="shortcut_buttons_container">
+        <observer name="mollie_add_applepay_button_to_minicart" instance="Mollie\Payment\Observer\ShortcutButtonsContainer\AddApplePayShortcutButton" />
+    </event>
+    <event name="sales_order_payment_place_end">
+        <observer name="mollie_set_order_state_to_pending_payment" instance="Mollie\Payment\Observer\SalesOrderPaymentPlaceEnd\SetOrderStateToPendingPayment" />
+    </event>
 </config>

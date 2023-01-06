@@ -8,7 +8,7 @@ namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 
-class ApplePayBuyNowButtonText implements OptionSourceInterface
+class ApplePayButtonText implements OptionSourceInterface
 {
     const BUY = 'buy';
     const DONATE = 'donate';

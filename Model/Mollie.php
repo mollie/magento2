@@ -29,6 +29,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
+use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Service\Mollie\Timeout;
@@ -95,6 +96,10 @@ class Mollie extends Adapter
      * @var Timeout
      */
     private $timeout;
+    /**
+     * @var ProcessTransaction
+     */
+    private $ordersProcessTraction;
 
     public function __construct(
         ManagerInterface $eventManager,
@@ -112,6 +117,7 @@ class Mollie extends Adapter
         ResourceConnection $resourceConnection,
         Config $config,
         Timeout $timeout,
+        ProcessTransaction $ordersProcessTraction,
         $formBlockType,
         $infoBlockType,
         CommandPoolInterface $commandPool = null,
@@ -145,6 +151,7 @@ class Mollie extends Adapter
         $this->resourceConnection = $resourceConnection;
         $this->config = $config;
         $this->timeout = $timeout;
+        $this->ordersProcessTraction = $ordersProcessTraction;
     }
 
     public function getCode()
@@ -180,8 +187,13 @@ class Mollie extends Adapter
             return false;
         }
 
-        if (!$this->canUseForCountry($quote->getShippingAddress()->getCountryId())) {
-            return false;
+        // The street can be a maximum of 100 characters. Disable if it's longer.
+        if ($quote && $quote->getShippingAddress()) {
+            $street = $quote->getShippingAddress()->getStreetFull();
+
+            if (mb_strlen($street) > 100) {
+                return false;
+            }
         }
 
         return parent::isAvailable($quote);
@@ -271,6 +283,7 @@ class Mollie extends Adapter
             $mollieApiClient = new MollieApiClient();
             $mollieApiClient->setApiKey($apiKey);
             $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
+            $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
             $mollieApiClient->addVersionString('MollieMagento2/' . $this->config->getVersion());
             return $mollieApiClient;
         } else {
@@ -334,7 +347,7 @@ class Mollie extends Adapter
             $connection->beginTransaction();
 
             if (preg_match('/^ord_\w+$/', $transactionId)) {
-                $result = $this->ordersApi->processTransaction($order, $mollieApi, $type, $paymentToken);
+                $result = $this->ordersProcessTraction->execute($order, $type)->toArray();
             } else {
                 $result = $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
             }
@@ -581,8 +594,14 @@ class Mollie extends Adapter
                 'id'       => '',
                 'name'     => __('QR Code'),
                 'image'    => [
-                    'size2x' => $this->assetRepository->getUrl('Mollie_Payment::images/qr-select.svg'),
-                    'svg' => $this->assetRepository->getUrl('Mollie_Payment::images/qr-select.svg'),
+                    'size2x' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area'=>'frontend']
+                    ),
+                    'svg' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area'=>'frontend']
+                    ),
                 ]
             ];
         }

@@ -6,21 +6,19 @@
 
 namespace Mollie\Payment\Controller\ApplePay;
 
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\AddressInterfaceFactory;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\PaymentInterface;
 use Magento\Quote\Api\Data\PaymentInterfaceFactory;
 use Magento\Quote\Api\GuestCartRepositoryInterface;
-use Magento\Quote\Api\GuestShippingMethodManagementInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
-use Magento\Quote\Model\Quote\Address\Rate;
+use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote\Address\Total as AddressTotal;
-use Magento\Quote\Model\Quote\TotalsCollector;
 
 class ShippingMethods extends Action
 {
@@ -33,11 +31,6 @@ class ShippingMethods extends Action
      * @var GuestCartRepositoryInterface
      */
     private $guestCartRepository;
-
-    /**
-     * @var GuestShippingMethodManagementInterface
-     */
-    private $guestShippingMethodManagement;
 
     /**
      * @var AddressInterfaceFactory
@@ -55,35 +48,39 @@ class ShippingMethods extends Action
     private $paymentInterfaceFactory;
 
     /**
-     * @var TotalsCollector
+     * @var CheckoutSession
      */
-    private $totalsCollector;
+    private $checkoutSession;
+
+    /**
+     * @var ShippingMethodManagementInterface
+     */
+    private $shippingMethodManagement;
 
     public function __construct(
         Context $context,
         CartRepositoryInterface $cartRepository,
         GuestCartRepositoryInterface $guestCartRepository,
-        GuestShippingMethodManagementInterface $guestShippingMethodManagement,
+        ShippingMethodManagementInterface $shippingMethodManagement,
         AddressInterfaceFactory $addressFactory,
         PaymentMethodManagementInterface $paymentMethodManagement,
         PaymentInterfaceFactory $paymentInterfaceFactory,
-        TotalsCollector $totalsCollector
+        CheckoutSession $checkoutSession
     ) {
         parent::__construct($context);
 
         $this->guestCartRepository = $guestCartRepository;
-        $this->guestShippingMethodManagement = $guestShippingMethodManagement;
+        $this->shippingMethodManagement = $shippingMethodManagement;
         $this->addressFactory = $addressFactory;
         $this->paymentMethodManagement = $paymentMethodManagement;
         $this->paymentInterfaceFactory = $paymentInterfaceFactory;
-        $this->totalsCollector = $totalsCollector;
         $this->cartRepository = $cartRepository;
+        $this->checkoutSession = $checkoutSession;
     }
 
     public function execute()
     {
-        $cartId = $this->getRequest()->getParam('cartId');
-        $cart = $this->guestCartRepository->get($cartId);
+        $cart = $this->getCart();
 
         $address = $this->addressFactory->create();
         $address->setCountryId($this->getRequest()->getParam('countryCode'));
@@ -98,7 +95,7 @@ class ShippingMethods extends Action
             $this->addShippingMethod($cart, $this->getRequest()->getParam('shippingMethod')['identifier']);
         }
 
-        $methods = $this->guestShippingMethodManagement->getList($cartId);
+        $methods = $this->shippingMethodManagement->getList($cart->getId());
         $this->setDefaultShippingMethod($cart, $methods);
 
         /** @var PaymentInterface $payment */
@@ -156,5 +153,18 @@ class ShippingMethods extends Action
         $address->save();
 
         $address->collectShippingRates();
+    }
+
+    /**
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @return CartInterface
+     */
+    public function getCart(): CartInterface
+    {
+        if ($cartId = $this->getRequest()->getParam('cartId')) {
+            return $this->guestCartRepository->get($cartId);
+        }
+
+        return $this->checkoutSession->getQuote();
     }
 }

@@ -8,7 +8,7 @@ namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 
-class BuyNowButtonColor implements OptionSourceInterface
+class ApplePayButtonColor implements OptionSourceInterface
 {
     const BLACK = 'black';
     const WHITE = 'white';

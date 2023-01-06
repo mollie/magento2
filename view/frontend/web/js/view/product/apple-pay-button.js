@@ -193,7 +193,7 @@ define([
                 })
 
                 try {
-                    // this.placeOrder(this);
+                    this.placeOrder(this);
                 } catch {
                     this.session.completePayment(ApplePaySession.STATUS_ERROR);
                 }

@@ -17,6 +17,7 @@ use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 class Config
 {
     const EXTENSION_CODE = 'Mollie_Payment';
+    const GENERAL_ENABLED = 'payment/mollie_general/enabled';
     const GENERAL_APIKEY_LIVE = 'payment/mollie_general/apikey_live';
     const GENERAL_APIKEY_TEST = 'payment/mollie_general/apikey_test';
     const GENERAL_AUTOMATICALLY_SEND_SECOND_CHANCE_EMAILS = 'payment/mollie_general/automatically_send_second_chance_emails';
@@ -47,6 +48,9 @@ class Config
     const PAYMENT_APPLEPAY_BUY_NOW_BUTTON_COLOR = 'payment/mollie_methods_applepay/buy_now_button_color';
     const PAYMENT_APPLEPAY_BUY_NOW_BUTTON_TEXT = 'payment/mollie_methods_applepay/buy_now_button_text';
     const PAYMENT_APPLEPAY_INTEGRATION_TYPE = 'payment/mollie_methods_applepay/integration_type';
+    const PAYMENT_APPLEPAY_ENABLE_MINICART_BUTTON = 'payment/mollie_methods_applepay/enable_minicart_button';
+    const PAYMENT_APPLEPAY_MINICART_BUTTON_COLOR = 'payment/mollie_methods_applepay/minicart_button_color';
+    const PAYMENT_APPLEPAY_MINICART_BUTTON_TEXT = 'payment/mollie_methods_applepay/minicart_button_text';
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
@@ -62,6 +66,7 @@ class Config
     const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
     const PAYMENT_VOUCHER_CATEGORY = 'payment/mollie_methods_voucher/category';
     const PAYMENT_VOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_voucher/custom_attribute';
+    const CURRENCY_OPTIONS_DEFAULT = 'currency/options/default';
 
     /**
      * @var ScopeConfigInterface
@@ -152,10 +157,37 @@ class Config
 
     /**
      * Returns current version of Magento
+     *
+     * @return string
      */
     public function getMagentoVersion(): string
     {
         return $this->productMetadata->getVersion();
+    }
+
+    /**
+     * @return string
+     */
+    public function getMagentoEdition(): string
+    {
+        return $this->productMetadata->getEdition();
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return string
+     */
+    public function getStoreCurrency($storeId = null): ?string
+    {
+        return $this->getPath(static::CURRENCY_OPTIONS_DEFAULT, null);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isModuleEnabled($storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_ENABLED, $storeId);
     }
 
     /**
@@ -346,6 +378,33 @@ class Config
     public function applePayBuyNowText($storeId = null)
     {
         return $this->getPath(static::PAYMENT_APPLEPAY_BUY_NOW_BUTTON_TEXT, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function applePayEnableMinicartButton($storeId = null)
+    {
+        return $this->isSetFlag(static::PAYMENT_APPLEPAY_ENABLE_MINICART_BUTTON, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function applePayMinicartColor($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_APPLEPAY_MINICART_BUTTON_COLOR, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function applePayMinicartText($storeId = null)
+    {
+        return $this->getPath(static::PAYMENT_APPLEPAY_MINICART_BUTTON_TEXT, $storeId);
     }
 
     /**
