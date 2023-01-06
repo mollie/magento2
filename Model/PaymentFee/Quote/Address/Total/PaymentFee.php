@@ -71,6 +71,9 @@ class PaymentFee extends AbstractTotal
         $attributes->setMolliePaymentFee($amount);
         $attributes->setBaseMolliePaymentFee($result->getRoundedAmount());
 
+        $quote->setData('mollie_payment_fee', $amount);
+        $quote->setData('base_mollie_payment_fee', $result->getRoundedAmount());
+
         return $this;
     }
 

@@ -85,6 +85,9 @@ class PaymentFeeTax extends AbstractTotal
         $extensionAttributes->setMolliePaymentFeeTax($amount);
         $extensionAttributes->setBaseMolliePaymentFeeTax($result->getRoundedTaxAmount());
 
+        $quote->setData('mollie_payment_fee_tax', $amount);
+        $quote->setData('base_mollie_payment_fee_tax', $result->getRoundedAmount());
+
         return $this;
     }
 
