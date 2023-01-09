@@ -32,6 +32,7 @@ use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
+use Mollie\Payment\Service\LockService;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Psr\Log\LoggerInterface;
 
@@ -101,6 +102,11 @@ class Mollie extends Adapter
      */
     private $ordersProcessTraction;
 
+    /**
+     * @var LockService
+     */
+    private $lockService;
+
     public function __construct(
         ManagerInterface $eventManager,
         ValueHandlerPoolInterface $valueHandlerPool,
@@ -118,6 +124,7 @@ class Mollie extends Adapter
         Config $config,
         Timeout $timeout,
         ProcessTransaction $ordersProcessTraction,
+        LockService $lockService,
         $formBlockType,
         $infoBlockType,
         CommandPoolInterface $commandPool = null,
@@ -152,6 +159,7 @@ class Mollie extends Adapter
         $this->config = $config;
         $this->timeout = $timeout;
         $this->ordersProcessTraction = $ordersProcessTraction;
+        $this->lockService = $lockService;
     }
 
     public function getCode()
@@ -338,12 +346,21 @@ class Mollie extends Adapter
 
         $mollieApi = $this->loadMollieApi($apiKey);
 
-        // Defaults to the "default" connection when there is no connection available named "sales".
+        $key = 'mollie.order.' . $order->getEntityId();
+        if ($this->lockService->checkIfIsLockedWithWait($key)) {
+            $msg = ['error' => true, 'msg' => sprintf('Key "%s" is locked', $key)];
+            $this->mollieHelper->addTolog('error', $msg);
+            return $msg;
+        }
+
+        // Defaults to the "default" connection when there is not connection available named "sales".
         // This is required for stores with a split database (Enterprise only):
         // https://devdocs.magento.com/guides/v2.3/config-guide/multi-master/multi-master.html
         $connection = $this->resourceConnection->getConnection('sales');
 
         try {
+            $this->config->addToLog('info', sprintf('Getting lock for key "%s"', $key));
+            $this->lockService->lock($key, 5 * 60);
             $connection->beginTransaction();
 
             if (preg_match('/^ord_\w+$/', $transactionId)) {
@@ -356,6 +373,8 @@ class Mollie extends Adapter
             $this->orderRepository->save($order);
 
             $connection->commit();
+            $this->config->addToLog('info', sprintf('Unlocking key "%s"', $key));
+            $this->lockService->unlock($key);
             return $result;
         } catch (\Exception $exception) {
             $connection->rollBack();
