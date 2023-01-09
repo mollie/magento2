@@ -1,4 +1,4 @@
-name: Integration Tests
+name: End-2-end
 on: [push, pull_request]
 
 jobs:

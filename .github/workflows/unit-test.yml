@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v1
 
       - name: Start Docker
-        run: PHP_VERSION=${{ matrix.PHP_VERSION }} MAGENTO_VERSION=magento${{ matrix.MAGENTO_VERSION }} docker-compose -f .github/workflows/templates/docker-compose.yml up -d
+        run: docker run --detach --name magento-project-community-edition michielgerritsen/magento-project-community-edition:${{ matrix.PHP_VERSION }}-magento${{ matrix.MAGENTO_VERSION }}
 
       - name: Create branch for Composer and remove version from composer.json
         run: git checkout -b continuous-integration-test-branch && sed -i '/version/d' ./composer.json
