@@ -10,6 +10,7 @@ use Magento\Framework\App\ObjectManager;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Lock\LockManagerInterface;
+use Mollie\Payment\Config;
 
 /**
  * This class is meant as an alternative implantation of:
@@ -22,6 +23,11 @@ use Magento\Framework\Lock\LockManagerInterface;
  */
 class LockService
 {
+    /**
+     * @var Config
+     */
+    private $config;
+
     /**
      * @var LockManagerInterface
      */
@@ -38,8 +44,10 @@ class LockService
     private $resourceConnection;
 
     public function __construct(
+        Config $config,
         ResourceConnection $resourceConnection
     ) {
+        $this->config = $config;
         $this->resourceConnection = $resourceConnection;
     }
 
@@ -100,6 +108,32 @@ class LockService
             "SELECT IS_USED_LOCK(?);",
             [$name]
         )->fetchColumn();
+    }
+
+    /**
+     * Try to get a lock, and if not, try $attempts times to get it.
+     *
+     * @param string $name
+     * @return bool
+     */
+    public function checkIfIsLockedWithWait(string $name, int $attempts = 5): bool
+    {
+        $count = 0;
+        while ($this->isLocked($name)) {
+            $this->config->addToLog(
+                'info',
+                sprintf('Lock for "%s" is already active, attempt %d', $name, $count)
+            );
+
+            usleep(500000);
+            $count++;
+
+            if ($count > $attempts) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function isLockManagerAvailable(): bool
