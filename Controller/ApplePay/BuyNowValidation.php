@@ -16,6 +16,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Filter\LocalizedToNormalized;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -152,7 +153,7 @@ class BuyNowValidation extends Action
 
         try {
             if (isset($params['qty'])) {
-                $filter = new \Zend_Filter_LocalizedToNormalized(['locale' => $this->resolver->getLocale()]);
+                $filter = new LocalizedToNormalized(['locale' => $this->resolver->getLocale()]);
                 $params['qty'] = $filter->filter($params['qty']);
             }
 
