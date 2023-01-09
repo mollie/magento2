@@ -1,0 +1,14 @@
+{
+  "type": {
+    "username": "janjanssen@mollie.com",
+    "firstname": "Jan",
+    "lastname": "Janssen",
+    "street[0]": "Doorzonwoning 34A",
+    "city": "VinexStad",
+    "postcode": "1234AB",
+    "telephone": "0201234567"
+  },
+  "select": {
+    "country_id": "NL"
+  }
+}
