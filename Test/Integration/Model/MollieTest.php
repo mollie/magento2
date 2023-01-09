@@ -52,7 +52,7 @@ class MollieTest extends IntegrationTestCase
         }
 
         if ($type == 'payments') {
-            $paymentsApiMock->expects($this->once())->method('processTransaction');
+            $paymentsApiMock->expects($this->once())->method('processTransaction')->willReturn(['success' => true]);
         }
 
         /** @var Mollie $instance */

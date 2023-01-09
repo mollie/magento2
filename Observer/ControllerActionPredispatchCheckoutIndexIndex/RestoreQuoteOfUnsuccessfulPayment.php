@@ -11,7 +11,6 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
 
@@ -51,18 +50,12 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
             return;
         }
 
-        $createdAt = $this->timezone->date(new \DateTime($order->getCreatedAt()));
-        $now = $this->timezone->date();
-        $diff = $now->diff($createdAt);
-        if ($diff->i > 5) {
+        $mollieSucces = $payment->getAdditionalInformation('mollie_success');
+        if ($mollieSucces === null || $mollieSucces === true) {
             return;
         }
 
-        if ($order->getState() === Order::STATE_PENDING_PAYMENT &&
-            $order->getStatus() === $this->config->orderStatusPending($order->getStoreId())
-        ) {
-            $this->checkoutSession->restoreQuote();
-            $this->config->addToLog('info', 'Restored quote of order ' . $order->getIncrementId());
-        }
+        $this->checkoutSession->restoreQuote();
+        $this->config->addToLog('info', 'Restored quote of order ' . $order->getIncrementId());
     }
 }
