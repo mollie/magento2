@@ -106,6 +106,7 @@
                     <label>Default selected method</label>
                     <source_model>Mollie\Payment\Model\Adminhtml\Source\MolliePaymentMethod</source_model>
                     <config_path>payment/mollie_general/default_selected_method</config_path>
+                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\PreventSavingWhenIoscOneStepCheckoutIsActive</backend_model>
                 </field>
             </group>
 
