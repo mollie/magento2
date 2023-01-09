@@ -581,7 +581,7 @@
         </arguments>
     </virtualType>
 
-    <virtualType name="MollieCreditcardVaultConfig" type="Magento\Payment\Gateway\Config\Config">
+    <virtualType name="MollieCreditcardVaultConfig" type="Mollie\Payment\Model\Data\CreditcardVaultConfig">
         <arguments>
             <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Creditcard::CODE</argument>
         </arguments>
