@@ -5,7 +5,8 @@ define(
         'Mollie_Payment/js/view/payment/method-renderer/default',
         'Magento_Checkout/js/model/totals',
         'mage/url',
-        'mage/translate'
+        'mage/translate',
+        'Magento_Checkout/js/model/payment/additional-validators',
     ],
     function (
         $,
@@ -13,7 +14,8 @@ define(
         Component,
         totals,
         url,
-        __
+        __,
+        additionalValidators
     ) {
         'use strict';
 
@@ -50,6 +52,14 @@ define(
             },
 
             placeApplePayOrder(event) {
+                if (!this.validate() ||
+                    !additionalValidators.validate() ||
+                    !this.isPlaceOrderActionAllowed()
+                ) {
+                    return;
+                }
+
+
                 var amount = totals.getSegment('grand_total').value;
 
                 var request = {
