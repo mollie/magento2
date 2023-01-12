@@ -1,0 +1,95 @@
+name: End-2-end
+on: [push, pull_request]
+
+jobs:
+  secrets-gate:
+    runs-on: ubuntu-latest
+    outputs:
+      is-secret-set: ${{ steps.is-secret-set.outputs.is_mollie_api_key_test_set }}
+    steps:
+      - id: is-secret-set
+        env:
+          MOLLIE_API_KEY_TEST: ${{ secrets.MOLLIE_API_KEY_TEST }}
+        if: "${{ env.MOLLIE_API_KEY_TEST != '' }}"
+        run: echo "is_mollie_api_key_test_set=true" >> $GITHUB_OUTPUT
+
+  build:
+    needs:
+      - secrets-gate
+    # Only run this job if the secret is set
+    if: needs.secrets-gate.outputs.is-secret-set == 'true'
+    strategy:
+      matrix:
+        include:
+          - PHP_VERSION: php74-fpm
+            MAGENTO_VERSION: 2.3.7-p3
+          - PHP_VERSION: php81-fpm
+            MAGENTO_VERSION: 2.4.4
+    runs-on: ubuntu-latest
+    env:
+      PHP_VERSION: ${{ matrix.PHP_VERSION }}
+      MAGENTO_VERSION: ${{ matrix.MAGENTO_VERSION }}
+      MOLLIE_API_KEY_TEST: ${{ secrets.MOLLIE_API_KEY_TEST }}
+      CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+      CYPRESS_TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
+      CYPRESS_TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
+      CYPRESS_TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
+      CYPRESS_TESTRAIL_PROJECT_ID: 5
+      CYPRESS_TESTRAIL_MILESTONE_ID: 37
+      CYPRESS_TESTRAIL_RUN_NAME: "Github Workflow __datetime__, ${{ github.event.head_commit.message }}, PHP version: ${{ matrix.PHP_VERSION }}, Magento version: ${{ matrix.MAGENTO_VERSION }}"
+      CYPRESS_TESTRAIL_RUN_CLOSE: true
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Start the Magento container
+        run: |
+          openssl req -x509 -newkey rsa:4096 -keyout .github/workflows/templates/nginx-proxy/magento.test.key -out .github/workflows/templates/nginx-proxy/magento.test.crt -days 365 -nodes -subj "/CN=magento.test" && \
+          docker-compose -f .github/workflows/templates/docker-compose.yml up -d magento
+
+      - name: Upload the code into the docker container
+        run: |
+          sed -i '/version/d' ./composer.json && \
+          docker cp $(pwd) magento-project-community-edition:/data/extensions/ && \
+          docker exec magento-project-community-edition composer require mollie/magento2:@dev
+
+      - name: Activate the extension
+        run: |
+          docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment" && \
+          docker exec magento-project-community-edition ./retry "php bin/magento setup:upgrade" && \
+          docker exec magento-project-community-edition /bin/bash /data/configure-mollie.sh
+
+      - name: Prepare Magento
+        run: |
+          docker exec magento-project-community-edition /bin/bash ./change-base-url https://magento.test/ && \
+          docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile" && \
+          docker exec magento-project-community-edition ./retry "php bin/magento setup:static-content:deploy -f" && \
+          docker exec magento-project-community-edition ./retry "php bin/magento indexer:reindex"
+
+      - name: Start all containers and check if we can reach Magento (and warmup cache)
+        run: |
+          docker-compose -f .github/workflows/templates/docker-compose.yml up -d && \
+          docker exec e2e curl -k -s -o /dev/null -w "%{http_code}" https://magento.test/
+
+      - name: Run Cypress
+        run: |
+          docker cp .git e2e:/e2e/.git && \
+          docker exec e2e cypress run --browser chrome --record --key $CYPRESS_RECORD_KEY --config defaultCommandTimeout=20000
+
+      - name: Dump docker-compose logs
+        if: always()
+        run: |
+          docker-compose -f .github/workflows/templates/docker-compose.yml logs magento > magento.log && \
+          docker-compose -f .github/workflows/templates/docker-compose.yml logs nginx-proxy > nginx-proxy.log && \
+          docker-compose -f .github/workflows/templates/docker-compose.yml logs e2e > e2e.log
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: E2E logs
+          path: |
+            Test/End-2-end/cypress/videos
+            magento-logs
+            magento.log
+            nginx-proxy.log
+            e2e.log

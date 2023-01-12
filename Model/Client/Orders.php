@@ -459,7 +459,6 @@ class Orders extends AbstractModel
      */
     public function createShipment(Order\Shipment $shipment, Order $order)
     {
-        $shipAll = false;
         $transactionId = $order->getMollieTransactionId();
         if (empty($transactionId)) {
             $msg = ['error' => true, 'msg' => __('Transaction ID not found')];
@@ -481,14 +480,6 @@ class Orders extends AbstractModel
             return $this;
         }
 
-        /**
-         * If products ordered qty equals shipping qty,
-         * complete order can be shipped incl. shipping & discount itemLines.
-         */
-        if ($this->isShippingAllItems($order, $shipment)) {
-            $shipAll = true;
-        }
-
         try {
             $mollieApi = $this->loadMollieApi($apiKey);
             $mollieOrder = $mollieApi->orders->get($transactionId, ['embed' => 'payments']);
@@ -500,7 +491,7 @@ class Orders extends AbstractModel
                 return $this;
             }
 
-            if ($shipAll) {
+            if ($this->isShippingAllItems($order, $shipment)) {
                 $mollieShipment = $mollieOrder->shipAll();
             } else {
                 $orderLines = $this->orderLines->getShipmentOrderLines($shipment);
@@ -810,7 +801,10 @@ class Orders extends AbstractModel
         $shippableOrderItems = [];
         /** @var Order\Item $item */
         foreach ($order->getAllVisibleItems() as $item) {
-            if ($item->getProducttype() != ProductType::TYPE_BUNDLE || !$item->isShipSeparately()) {
+            if (($item->getProducttype() != ProductType::TYPE_BUNDLE ||
+                !$item->isShipSeparately()) &&
+                !$item->getIsVirtual()
+            ) {
                 $quantity = $item->getQtyOrdered() - $item->getOrigData('qty_shipped');
                 $shippableOrderItems[$item->getId()] = $quantity;
                 continue;
