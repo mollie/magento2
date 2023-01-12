@@ -43,7 +43,7 @@ jobs:
 
       - name: Start the Magento container
         run: |
-          echo "${{ secrets.MAGENTO_TEST_PRIVATE_KEY }}" > .github/workflows/templates/nginx-proxy/magento.test.key && \
+          openssl req -x509 -newkey rsa:4096 -keyout .github/workflows/templates/nginx-proxy/magento.test.key -out .github/workflows/templates/nginx-proxy/magento.test.crt -days 365 -nodes -subj "/CN=magento.test" && \
           docker-compose -f .github/workflows/templates/docker-compose.yml up -d magento
 
       - name: Upload the code into the docker container
@@ -79,6 +79,7 @@ jobs:
         if: always()
         run: |
           docker-compose -f .github/workflows/templates/docker-compose.yml logs magento > magento.log && \
+          docker-compose -f .github/workflows/templates/docker-compose.yml logs nginx-proxy > nginx-proxy.log && \
           docker-compose -f .github/workflows/templates/docker-compose.yml logs e2e > e2e.log
 
       - name: Upload artifacts
@@ -90,4 +91,5 @@ jobs:
             Test/End-2-end/cypress/videos
             magento-logs
             magento.log
+            nginx-proxy.log
             e2e.log
