@@ -30,7 +30,7 @@ jobs:
               run: docker exec magento-project-community-edition composer require mollie/magento2:dev-continuous-integration-test-branch
 
             - name: Activate the extension
-              run: docker exec magento-project-community-edition bash -c "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade && php bin/magento setup:di:compile"
+              run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade && php bin/magento setup:di:compile"
 
             - name: Run PHPStan
               run: docker exec magento-project-community-edition /bin/bash -c "./vendor/bin/phpstan analyse --no-progress -c /data/extensions/*/phpstan.neon /data/extensions"

@@ -2,7 +2,22 @@ name: End-2-end
 on: [push, pull_request]
 
 jobs:
+  secrets-gate:
+    runs-on: ubuntu-latest
+    outputs:
+      is-secret-set: ${{ steps.is-secret-set.outputs.is_mollie_api_key_test_set }}
+    steps:
+      - id: is-secret-set
+        env:
+          MOLLIE_API_KEY_TEST: ${{ secrets.MOLLIE_API_KEY_TEST }}
+        if: "${{ env.MOLLIE_API_KEY_TEST != '' }}"
+        run: echo "is_mollie_api_key_test_set=true" >> $GITHUB_OUTPUT
+
   build:
+    needs:
+      - secrets-gate
+    # Only run this job if the secret is set
+    if: needs.secrets-gate.outputs.is-secret-set == 'true'
     strategy:
       matrix:
         include:
