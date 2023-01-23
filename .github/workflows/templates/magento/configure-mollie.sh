@@ -23,6 +23,7 @@ bin/magento config:set payment/mollie_methods_belfius/active 1 &
 bin/magento config:set payment/mollie_methods_eps/active 1 &
 bin/magento config:set payment/mollie_methods_giropay/active 1 &
 bin/magento config:set payment/mollie_methods_klarnapaylater/active 1 &
+bin/magento config:set payment/mollie_methods_billie/active 1 &
 bin/magento config:set payment/mollie_methods_paymentlink/active 1 &
 bin/magento config:set payment/mollie_methods_paysafecard/active 1 &
 bin/magento config:set payment/mollie_methods_sofort/active 1 &

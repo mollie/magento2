@@ -27,6 +27,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_bancontact', true],
             ['mollie_methods_banktransfer', true],
             ['mollie_methods_belfius', true],
+            ['mollie_methods_billie', true],
             ['mollie_methods_creditcard', true],
             ['mollie_methods_directdebit', true],
             ['mollie_methods_eps', true],

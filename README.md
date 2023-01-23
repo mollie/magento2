@@ -29,6 +29,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Bancontact
 - Bank transfer
 - Belfius Pay Button
+- Billie
 - Credit card (VISA, MasterCard, Maestro and American Express)
 - EPS
 - Gift cards (Webshop Giftcard, Podium Cadeaukaart, VVV Cadeaukaart, YourGift etc.)
