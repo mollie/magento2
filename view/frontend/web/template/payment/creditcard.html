@@ -1,4 +1,4 @@
-<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}, class: 'payment-method-' + getCode()">
+<div class="payment-method" data-bind="css: getClassNames()">
     <div class="payment-method-title field choice">
         <input type="radio"
                name="payment[method]"
