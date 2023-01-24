@@ -19,6 +19,10 @@
     <preference for="Mollie\Payment\Api\Data\SentPaymentReminderInterface" type="Mollie\Payment\Model\Data\SentPaymentReminder"/>
     <preference for="Mollie\Payment\Api\Data\SentPaymentReminderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
+    <preference for="Mollie\Payment\Api\ApiKeyFallbackRepositoryInterface" type="Mollie\Payment\Model\ApiKeyFallbackRepository" />
+    <preference for="Mollie\Payment\Api\Data\ApiKeyFallbackInterface" type="Mollie\Payment\Model\Data\ApiKeyFallback"/>
+    <preference for="Mollie\Payment\Api\Data\ApiKeyFallbackSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
     <type name="Mollie\Payment\Config">
         <arguments>
             <argument name="productMetadata" xsi:type="object">Magento\Framework\App\ProductMetadataInterface\Proxy</argument>
@@ -325,6 +329,12 @@
     <type name="Mollie\Payment\Block\Checkout\CheckoutConfig">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Service\Mollie\MollieApiClient">
+        <arguments>
+            <argument name="fetchFallbackApiKeys" xsi:type="object">Mollie\Payment\Service\Mollie\Wrapper\FetchFallbackApiKeys\Proxy</argument>
         </arguments>
     </type>
 

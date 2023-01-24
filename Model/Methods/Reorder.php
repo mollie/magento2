@@ -28,6 +28,7 @@ use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\LockService;
+use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Psr\Log\LoggerInterface;
 
@@ -68,6 +69,7 @@ class Reorder extends Mollie
         Timeout $timeout,
         ProcessTransaction $ordersProcessTraction,
         LockService $lockService,
+        MollieApiClient $mollieApiClient,
         RequestInterface $request,
         $formBlockType,
         $infoBlockType,
@@ -94,6 +96,7 @@ class Reorder extends Mollie
             $timeout,
             $ordersProcessTraction,
             $lockService,
+            $mollieApiClient,
             $formBlockType,
             $infoBlockType,
             $commandPool,
