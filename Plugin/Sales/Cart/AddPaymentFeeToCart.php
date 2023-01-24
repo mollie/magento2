@@ -18,6 +18,11 @@ class AddPaymentFeeToCart
      */
     private $factory;
 
+    /**
+     * @var int[]
+     */
+    private $cartsProcessed = [];
+
     public function __construct(
         CartExtensionInterfaceFactory $factory
     ) {
@@ -49,6 +54,12 @@ class AddPaymentFeeToCart
      */
     private function processCart(CartInterface $cart)
     {
+        // This code sometimes collides with other extensions. When the cart is loaded during the totals processing,
+        // it will overwrite the calculated values with the values from the database. This code will prevent this.
+        if (in_array($cart->getId(), $this->cartsProcessed)) {
+            return $cart;
+        }
+
         $extensionAttributes = $cart->getExtensionAttributes() ? $cart->getExtensionAttributes() : $this->factory->create();
 
         $extensionAttributes->setMolliePaymentFee($cart->getData('mollie_payment_fee'));
@@ -58,6 +69,7 @@ class AddPaymentFeeToCart
 
         $cart->setExtensionAttributes($extensionAttributes);
 
+        $this->cartsProcessed[] = $cart->getId();
         return $cart;
     }
 }
