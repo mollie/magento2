@@ -226,12 +226,12 @@ class SuccessfulPayment implements OrderProcessorInterface
     }
 
     /**
-     * @param $order
+     * @param OrderInterface $order
      * @param $paymentId
      * @throws \Magento\Framework\Exception\LocalizedException
      * @return void
      */
-    private function createPendingInvoice($order, $paymentId): void
+    private function createPendingInvoice(OrderInterface $order, $paymentId): void
     {
         /**
          * Create pending invoice, as order has not been paid.
@@ -242,6 +242,7 @@ class SuccessfulPayment implements OrderProcessorInterface
         $invoice->register();
 
         $this->invoiceRepository->save($invoice);
+        $order->getPayment()->setCreatedInvoice($invoice);
     }
 
     /**
