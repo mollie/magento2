@@ -14,7 +14,7 @@ class OrdersEndpointWrapper extends OrderEndpoint
         try {
             return parent::get($orderId, $parameters);
         } catch (ApiException $exception) {
-            if ($exception->getCode() !== 401 || !$this->fallbackApiKeysInstance) {
+            if (!in_array($exception->getCode(), [401, 404]) || !$this->fallbackApiKeysInstance) {
                 throw $exception;
             }
 
