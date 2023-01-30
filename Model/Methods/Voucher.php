@@ -20,6 +20,7 @@ use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
+use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
@@ -66,6 +67,7 @@ class Voucher extends Mollie
         ProcessTransaction $ordersProcessTraction,
         LockService $lockService,
         MollieApiClient $mollieApiClient,
+        TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         $formBlockType,
         $infoBlockType,
         QuoteHasMealVoucherProducts $quoteHasMealVoucherProducts,
@@ -93,6 +95,7 @@ class Voucher extends Mollie
             $ordersProcessTraction,
             $lockService,
             $mollieApiClient,
+            $transactionToOrderRepository,
             $formBlockType,
             $infoBlockType,
             $commandPool,

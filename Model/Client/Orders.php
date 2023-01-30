@@ -30,6 +30,7 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Service\Order\BuildTransaction;
@@ -141,6 +142,11 @@ class Orders extends AbstractModel
     private $config;
 
     /**
+     * @var LinkTransactionToOrder
+     */
+    private $linkTransactionToOrder;
+
+    /**
      * Orders constructor.
      *
      * @param OrderLines $orderLines
@@ -164,6 +170,7 @@ class Orders extends AbstractModel
      * @param \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient
      * @param Config $config
      * @param EventManager $eventManager
+     * @param LinkTransactionToOrder $linkTransactionToOrder
      */
     public function __construct(
         OrderLines $orderLines,
@@ -186,7 +193,8 @@ class Orders extends AbstractModel
         ProcessTransaction $processTransaction,
         \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
         Config $config,
-        EventManager $eventManager
+        EventManager $eventManager,
+        LinkTransactionToOrder $linkTransactionToOrder
     ) {
         $this->orderLines = $orderLines;
         $this->invoiceSender = $invoiceSender;
@@ -209,6 +217,7 @@ class Orders extends AbstractModel
         $this->processTransaction = $processTransaction;
         $this->mollieApiClient = $mollieApiClient;
         $this->config = $config;
+        $this->linkTransactionToOrder = $linkTransactionToOrder;
     }
 
     /**
@@ -332,7 +341,7 @@ class Orders extends AbstractModel
 
         $order->setState(Order::STATE_PENDING_PAYMENT);
         $order->addStatusToHistory($status, $msg, false);
-        $order->setMollieTransactionId($mollieOrder->id);
+        $this->linkTransactionToOrder->execute($mollieOrder->id, $order);
         $this->orderRepository->save($order);
     }
 
