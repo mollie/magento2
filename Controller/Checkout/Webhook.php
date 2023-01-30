@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Controller\Checkout;
 
 use Magento\Framework\Controller\Result\Json;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Magento\Framework\App\Action\Action;
@@ -39,23 +40,31 @@ class Webhook extends Action
     protected $mollieHelper;
 
     /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
+
+    /**
      * Webhook constructor.
      *
      * @param Context       $context
      * @param Session       $checkoutSession
      * @param MollieModel   $mollieModel
      * @param MollieHelper  $mollieHelper
+     * @param OrderRepositoryInterface $orderRepository
      */
     public function __construct(
         Context $context,
         Session $checkoutSession,
         MollieModel $mollieModel,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        OrderRepositoryInterface $orderRepository
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->resultFactory = $context->getResultFactory();
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
+        $this->orderRepository = $orderRepository;
         parent::__construct($context);
     }
 
@@ -80,7 +89,9 @@ class Webhook extends Action
             }
 
             foreach ($orderIds as $orderId) {
-                $this->mollieModel->processTransaction($orderId, 'webhook');
+                $order = $this->orderRepository->get($orderId);
+                $order->setMollieTransactionId($transactionId);
+                $this->mollieModel->processTransactionForOrder($order, 'webhook');
             }
 
             return $this->getOkResponse();

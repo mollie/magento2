@@ -19,6 +19,10 @@
     <preference for="Mollie\Payment\Api\Data\SentPaymentReminderInterface" type="Mollie\Payment\Model\Data\SentPaymentReminder"/>
     <preference for="Mollie\Payment\Api\Data\SentPaymentReminderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
 
+    <preference for="Mollie\Payment\Api\TransactionToOrderRepositoryInterface" type="Mollie\Payment\Model\TransactionToOrderRepository" />
+    <preference for="Mollie\Payment\Api\Data\TransactionToOrderInterface" type="Mollie\Payment\Model\TransactionToOrder"/>
+    <preference for="Mollie\Payment\Api\Data\TransactionToOrderSearchResultsInterface" type="Mollie\Payment\Model\TransactionToOrderSearchResults"/>
+
     <type name="Mollie\Payment\Config">
         <arguments>
             <argument name="productMetadata" xsi:type="object">Magento\Framework\App\ProductMetadataInterface\Proxy</argument>

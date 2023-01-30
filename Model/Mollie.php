@@ -26,6 +26,8 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
 use Mollie\Api\MollieApiClient;
+use Mollie\Payment\Api\Data\TransactionToOrderInterface;
+use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
@@ -107,6 +109,11 @@ class Mollie extends Adapter
      */
     private $lockService;
 
+    /**
+     * @var TransactionToOrderRepositoryInterface
+     */
+    private $transactionToOrderRepository;
+
     public function __construct(
         ManagerInterface $eventManager,
         ValueHandlerPoolInterface $valueHandlerPool,
@@ -125,6 +132,7 @@ class Mollie extends Adapter
         Timeout $timeout,
         ProcessTransaction $ordersProcessTraction,
         LockService $lockService,
+        TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         $formBlockType,
         $infoBlockType,
         CommandPoolInterface $commandPool = null,
@@ -160,6 +168,7 @@ class Mollie extends Adapter
         $this->timeout = $timeout;
         $this->ordersProcessTraction = $ordersProcessTraction;
         $this->lockService = $lockService;
+        $this->transactionToOrderRepository = $transactionToOrderRepository;
     }
 
     public function getCode()
@@ -328,6 +337,12 @@ class Mollie extends Adapter
     {
         /** @var \Magento\Sales\Model\Order $order */
         $order = $this->orderRepository->get($orderId);
+
+        return $this->processTransactionForOrder($order, $type, $paymentToken);
+    }
+
+    public function processTransactionForOrder(OrderInterface $order, $type = 'webhook', $paymentToken = null)
+    {
         $this->eventManager->dispatch('mollie_process_transaction_start', ['order' => $order]);
 
         $transactionId = $order->getMollieTransactionId();
@@ -570,16 +585,16 @@ class Mollie extends Adapter
      */
     public function getOrderIdsByTransactionId(string $transactionId): array
     {
-        $this->searchCriteriaBuilder->addFilter('mollie_transaction_id', $transactionId);
-        $orders = $this->orderRepository->getList($this->searchCriteriaBuilder->create());
+        $this->searchCriteriaBuilder->addFilter('transaction_id', $transactionId);
+        $orders = $this->transactionToOrderRepository->getList($this->searchCriteriaBuilder->create());
 
         if (!$orders->getTotalCount()) {
             $this->mollieHelper->addTolog('error', __('No order(s) found for transaction id %1', $transactionId));
             return [];
         }
 
-        return array_map(function (OrderInterface $order) {
-            return $order->getId();
+        return array_map(function (TransactionToOrderInterface $transactionToOrder) {
+            return $transactionToOrder->getOrderId();
         }, $orders->getItems());
     }
 
