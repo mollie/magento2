@@ -26,6 +26,8 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
 use Mollie\Api\MollieApiClient;
+use Mollie\Payment\Api\Data\TransactionToOrderInterface;
+use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
@@ -34,6 +36,7 @@ use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Service\LockService;
 use Mollie\Payment\Service\Mollie\Timeout;
+use Mollie\Payment\Service\Mollie\Wrapper\MollieApiClientFallbackWrapper;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -107,6 +110,16 @@ class Mollie extends Adapter
      */
     private $lockService;
 
+    /**
+     * @var \Mollie\Payment\Service\Mollie\MollieApiClient
+     */
+    private $mollieApiClient;
+
+    /**
+     * @var TransactionToOrderRepositoryInterface
+     */
+    private $transactionToOrderRepository;
+
     public function __construct(
         ManagerInterface $eventManager,
         ValueHandlerPoolInterface $valueHandlerPool,
@@ -125,6 +138,8 @@ class Mollie extends Adapter
         Timeout $timeout,
         ProcessTransaction $ordersProcessTraction,
         LockService $lockService,
+        \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
+        TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         $formBlockType,
         $infoBlockType,
         CommandPoolInterface $commandPool = null,
@@ -160,6 +175,8 @@ class Mollie extends Adapter
         $this->timeout = $timeout;
         $this->ordersProcessTraction = $ordersProcessTraction;
         $this->lockService = $lockService;
+        $this->mollieApiClient = $mollieApiClient;
+        $this->transactionToOrderRepository = $transactionToOrderRepository;
     }
 
     public function getCode()
@@ -287,16 +304,12 @@ class Mollie extends Adapter
      */
     public function loadMollieApi($apiKey)
     {
-        if (class_exists('Mollie\Api\MollieApiClient')) {
-            $mollieApiClient = new MollieApiClient();
-            $mollieApiClient->setApiKey($apiKey);
-            $mollieApiClient->addVersionString('Magento/' . $this->mollieHelper->getMagentoVersion());
-            $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
-            $mollieApiClient->addVersionString('MollieMagento2/' . $this->config->getVersion());
-            return $mollieApiClient;
-        } else {
-            throw new LocalizedException(__('Class Mollie\Api\MollieApiClient does not exist'));
-        }
+        return $this->mollieApiClient->loadByApiKey($apiKey);
+    }
+
+    public function loadMollieApiWithFallbackWrapper($apiKey): MollieApiClientFallbackWrapper
+    {
+        return new MollieApiClientFallbackWrapper($this->loadMollieApi($apiKey));
     }
 
     /**
@@ -328,6 +341,12 @@ class Mollie extends Adapter
     {
         /** @var \Magento\Sales\Model\Order $order */
         $order = $this->orderRepository->get($orderId);
+
+        return $this->processTransactionForOrder($order, $type, $paymentToken);
+    }
+
+    public function processTransactionForOrder(OrderInterface $order, $type = 'webhook', $paymentToken = null)
+    {
         $this->eventManager->dispatch('mollie_process_transaction_start', ['order' => $order]);
 
         $transactionId = $order->getMollieTransactionId();
@@ -343,8 +362,6 @@ class Mollie extends Adapter
             $this->mollieHelper->addTolog('error', $msg);
             return $msg;
         }
-
-        $mollieApi = $this->loadMollieApi($apiKey);
 
         $key = 'mollie.order.' . $order->getEntityId();
         if ($this->lockService->checkIfIsLockedWithWait($key)) {
@@ -366,6 +383,7 @@ class Mollie extends Adapter
             if (preg_match('/^ord_\w+$/', $transactionId)) {
                 $result = $this->ordersProcessTraction->execute($order, $type)->toArray();
             } else {
+                $mollieApi = $this->mollieApiClient->loadByStore($order->getStoreId());
                 $result = $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
             }
 
@@ -395,14 +413,7 @@ class Mollie extends Adapter
             return $msg;
         }
 
-        $storeId = $order->getStoreId();
-        if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
-            $msg = ['error' => true, 'msg' => __('API Key not found')];
-            $this->mollieHelper->addTolog('error', $msg);
-            return $msg;
-        }
-
-        $mollieApi = $this->loadMollieApi($apiKey);
+        $mollieApi = $this->mollieApiClient->loadByStore($order->getStoreId());
 
         if (preg_match('/^ord_\w+$/', $transactionId)) {
             return $this->ordersApi->orderHasUpdate($order, $mollieApi);
@@ -570,16 +581,16 @@ class Mollie extends Adapter
      */
     public function getOrderIdsByTransactionId(string $transactionId): array
     {
-        $this->searchCriteriaBuilder->addFilter('mollie_transaction_id', $transactionId);
-        $orders = $this->orderRepository->getList($this->searchCriteriaBuilder->create());
+        $this->searchCriteriaBuilder->addFilter('transaction_id', $transactionId);
+        $orders = $this->transactionToOrderRepository->getList($this->searchCriteriaBuilder->create());
 
         if (!$orders->getTotalCount()) {
             $this->mollieHelper->addTolog('error', __('No order(s) found for transaction id %1', $transactionId));
             return [];
         }
 
-        return array_map(function (OrderInterface $order) {
-            return $order->getId();
+        return array_map(function (TransactionToOrderInterface $transactionToOrder) {
+            return $transactionToOrder->getOrderId();
         }, $orders->getItems());
     }
 

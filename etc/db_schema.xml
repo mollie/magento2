@@ -101,6 +101,28 @@
         </constraint>
     </table>
 
+    <table name="mollie_apikey_fallback" engine="innodb" resource="default" comment="Save previous API keys for fallback reasons">
+        <column name="entity_id" xsi:type="int" identity="true" nullable="false" unsigned="true" comment="Entity ID"/>
+        <column name="apikey" xsi:type="varchar" length="255" nullable="false" comment="API Key"/>
+        <column name="mode" xsi:type="varchar" length="255" nullable="false" comment="Mode"/>
+        <column name="created_at" xsi:type="timestamp" on_update="false" default="CURRENT_TIMESTAMP" nullable="false" comment="Created At"/>
+
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="mollie_payment_transaction_to_order" engine="innodb" comment="TRANSACTIONTOORDERs">
+        <column name="entity_id" xsi:type="int" comment="entity_id" nullable="true" identity="true" unsigned="true" padding="10"/>
+        <column name="transaction_id" xsi:type="varchar" comment="transaction_id" nullable="true"/>
+        <column name="order_id" xsi:type="int" comment="order_id" nullable="true"/>
+        <column name="created_at" xsi:type="timestamp" default="CURRENT_TIMESTAMP" nullable="false" comment="Created At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
     <table name="quote">
         <column name="mollie_payment_fee" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />
         <column name="mollie_payment_fee_tax" xsi:type="decimal" scale="4" precision="12" nullable="true" comment="Mollie Payment Fee" default="0.0000" />

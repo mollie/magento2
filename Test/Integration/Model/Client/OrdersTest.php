@@ -163,6 +163,9 @@ class OrdersTest extends IntegrationTestCase
         $order->setQuoteId($cart->getId());
         $order->getPayment()->setMethod('mollie_methods_ideal');
 
+        $mollieOrderMock = $this->createMock(\Mollie\Api\Resources\Order::class);
+        $mollieOrderMock->id = 'abc123';
+
         $mollieApiMock = $this->createMock(MollieApiClient::class);
         $orderEndpointMock = $this->createMock(OrderEndpoint::class);
         $orderEndpointMock->method('create')->with( $this->callback(function ($orderData) {
@@ -175,7 +178,7 @@ class OrdersTest extends IntegrationTestCase
             $this->assertEquals($expected->format('Y-m-d'), $orderData['expiresAt']);
 
             return true;
-        }))->willReturn($this->createMock(\Mollie\Api\Resources\Order::class));
+        }))->willReturn($mollieOrderMock);
 
         $mollieApiMock->orders = $orderEndpointMock;
 

@@ -7,8 +7,10 @@
 namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\Exception\LocalizedException;
-use Mollie\Api\MollieApiClientFactory;
 use Mollie\Payment\Config;
+use Mollie\Payment\Service\Mollie\Wrapper\FetchFallbackApiKeys;
+use Mollie\Payment\Service\Mollie\Wrapper\MollieApiClientFallbackWrapper;
+use Mollie\Payment\Service\Mollie\Wrapper\MollieApiClientFallbackWrapperFactory;
 
 class MollieApiClient
 {
@@ -23,16 +25,23 @@ class MollieApiClient
     private $instances = [];
 
     /**
-     * @var MollieApiClientFactory
+     * @var MollieApiClientFallbackWrapperFactory
      */
-    private $mollieApiClientFactory;
+    private $mollieApiClientWrapperFactory;
+
+    /**
+     * @var FetchFallbackApiKeys
+     */
+    private $fetchFallbackApiKeys;
 
     public function __construct(
         Config $config,
-        MollieApiClientFactory $mollieApiClientFactory
+        MollieApiClientFallbackWrapperFactory $mollieApiClientWrapperFactory,
+        FetchFallbackApiKeys $fetchFallbackApiKeys
     ) {
         $this->config = $config;
-        $this->mollieApiClientFactory = $mollieApiClientFactory;
+        $this->mollieApiClientWrapperFactory = $mollieApiClientWrapperFactory;
+        $this->fetchFallbackApiKeys = $fetchFallbackApiKeys;
     }
 
     public function loadByStore(int $storeId = null): \Mollie\Api\MollieApiClient
@@ -50,7 +59,11 @@ class MollieApiClient
             return $this->instances[$apiKey];
         }
 
-        $mollieApiClient = $this->mollieApiClientFactory->create();
+        /** @var MollieApiClientFallbackWrapper $mollieApiClientWrapper */
+        $mollieApiClient = $this->mollieApiClientWrapperFactory->create();
+        $mollieApiClient->orders->setFallbackApiKeysInstance($this->fetchFallbackApiKeys);
+        $mollieApiClient->payments->setFallbackApiKeysInstance($this->fetchFallbackApiKeys);
+
         $mollieApiClient->setApiKey($apiKey);
         $mollieApiClient->addVersionString('Magento/' . $this->config->getMagentoVersion());
         $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());

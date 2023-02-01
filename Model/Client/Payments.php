@@ -18,6 +18,7 @@ use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
+use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderAmount;
@@ -102,6 +103,11 @@ class Payments extends AbstractModel
     private $sendOrderEmails;
 
     /**
+     * @var LinkTransactionToOrder
+     */
+    private $linkTransactionToOrder;
+
+    /**
      * Payments constructor.
      *
      * @param OrderRepository $orderRepository
@@ -118,6 +124,7 @@ class Payments extends AbstractModel
      * @param PaymentTokenForOrder $paymentTokenForOrder
      * @param SendOrderEmails $sendOrderEmails
      * @param EventManager $eventManager
+     * @param LinkTransactionToOrder $linkTransactionToOrder
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -133,7 +140,8 @@ class Payments extends AbstractModel
         CancelOrder $cancelOrder,
         PaymentTokenForOrder $paymentTokenForOrder,
         SendOrderEmails $sendOrderEmails,
-        EventManager $eventManager
+        EventManager $eventManager,
+        LinkTransactionToOrder $linkTransactionToOrder
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -149,6 +157,7 @@ class Payments extends AbstractModel
         $this->cancelOrder = $cancelOrder;
         $this->paymentTokenForOrder = $paymentTokenForOrder;
         $this->sendOrderEmails = $sendOrderEmails;
+        $this->linkTransactionToOrder = $linkTransactionToOrder;
     }
 
     /**
@@ -251,7 +260,7 @@ class Payments extends AbstractModel
 
         $order->setState(Order::STATE_PENDING_PAYMENT);
         $order->addStatusToHistory($status, __('Customer redirected to Mollie'), false);
-        $order->setMollieTransactionId($payment->id);
+        $this->linkTransactionToOrder->execute($payment->id, $order);
         $this->orderRepository->save($order);
     }
 

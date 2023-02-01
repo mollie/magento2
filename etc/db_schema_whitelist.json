@@ -78,6 +78,17 @@
             "PRIMARY": true
         }
     },
+    "mollie_payment_transaction_to_order": {
+        "column": {
+            "entity_id": true,
+            "transaction_id": true,
+            "order_id": true,
+            "created_at": true
+        },
+        "constaint": {
+            "PRIMARY": true
+        }
+    },
     "quote": {
         "column": {
             "mollie_payment_fee": true,
@@ -128,6 +139,17 @@
         },
         "index": {
             "SALES_SHIPMENT_MOLLIE_SHIPMENT_ID": true
+        }
+    },
+    "mollie_apikey_fallback": {
+        "column": {
+            "entity_id": true,
+            "apikey": true,
+            "mode": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
         }
     }
 }

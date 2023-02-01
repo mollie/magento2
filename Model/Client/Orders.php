@@ -30,6 +30,7 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Service\Order\BuildTransaction;
@@ -131,9 +132,19 @@ class Orders extends AbstractModel
     private $processTransaction;
 
     /**
+     * @var \Mollie\Payment\Service\Mollie\MollieApiClient
+     */
+    private $mollieApiClient;
+
+    /**
      * @var Config
      */
     private $config;
+
+    /**
+     * @var LinkTransactionToOrder
+     */
+    private $linkTransactionToOrder;
 
     /**
      * Orders constructor.
@@ -156,7 +167,10 @@ class Orders extends AbstractModel
      * @param BuildTransaction $buildTransaction
      * @param PaymentTokenForOrder $paymentTokenForOrder
      * @param ProcessTransaction $processTransaction
+     * @param \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient
+     * @param Config $config
      * @param EventManager $eventManager
+     * @param LinkTransactionToOrder $linkTransactionToOrder
      */
     public function __construct(
         OrderLines $orderLines,
@@ -177,8 +191,10 @@ class Orders extends AbstractModel
         BuildTransaction $buildTransaction,
         PaymentTokenForOrder $paymentTokenForOrder,
         ProcessTransaction $processTransaction,
+        \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
         Config $config,
-        EventManager $eventManager
+        EventManager $eventManager,
+        LinkTransactionToOrder $linkTransactionToOrder
     ) {
         $this->orderLines = $orderLines;
         $this->invoiceSender = $invoiceSender;
@@ -199,7 +215,9 @@ class Orders extends AbstractModel
         $this->eventManager = $eventManager;
         $this->paymentTokenForOrder = $paymentTokenForOrder;
         $this->processTransaction = $processTransaction;
+        $this->mollieApiClient = $mollieApiClient;
         $this->config = $config;
+        $this->linkTransactionToOrder = $linkTransactionToOrder;
     }
 
     /**
@@ -323,7 +341,7 @@ class Orders extends AbstractModel
 
         $order->setState(Order::STATE_PENDING_PAYMENT);
         $order->addStatusToHistory($status, $msg, false);
-        $order->setMollieTransactionId($mollieOrder->id);
+        $this->linkTransactionToOrder->execute($mollieOrder->id, $order);
         $this->orderRepository->save($order);
     }
 
@@ -438,16 +456,7 @@ class Orders extends AbstractModel
      */
     public function loadMollieApi($apiKey)
     {
-        if (class_exists('Mollie\Api\MollieApiClient')) {
-            $mollieApiClient = new MollieApiClient();
-            $mollieApiClient->setApiKey($apiKey);
-            $mollieApiClient->addVersionString('Magento/' . $this->config->getMagentoVersion());
-            $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
-            $mollieApiClient->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
-            return $mollieApiClient;
-        } else {
-            throw new LocalizedException(__('Class Mollie\Api\MollieApiClient does not exist'));
-        }
+        return $this->mollieApiClient->loadByApiKey($apiKey);
     }
 
     /**

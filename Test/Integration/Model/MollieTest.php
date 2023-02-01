@@ -47,6 +47,9 @@ class MollieTest extends IntegrationTestCase
         $paymentsApiMock = $this->createMock(Payments::class);
         $orderProcessTransactionFake = $this->objectManager->create(ProcessTransactionFake::class);
 
+        $mollieApiMock = $this->createMock(\Mollie\Payment\Service\Mollie\MollieApiClient::class);
+        $mollieApiMock->method('loadByStore')->willReturn(new \Mollie\Api\MollieApiClient);
+
         if ($type == 'orders') {
             $orderProcessTransactionFake->disableParentCall();
         }
@@ -60,6 +63,7 @@ class MollieTest extends IntegrationTestCase
             'paymentsApi' => $paymentsApiMock,
             'mollieHelper' => $mollieHelperMock,
             'ordersProcessTraction' => $orderProcessTransactionFake,
+            'mollieApiClient' => $mollieApiMock,
         ]);
 
         $instance->processTransaction($order->getEntityId());

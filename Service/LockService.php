@@ -119,13 +119,20 @@ class LockService
     public function checkIfIsLockedWithWait(string $name, int $attempts = 5): bool
     {
         $count = 0;
+        $waitTime = 0;
         while ($this->isLocked($name)) {
+            $waitTime += 500000;
             $this->config->addToLog(
                 'info',
-                sprintf('Lock for "%s" is already active, attempt %d', $name, $count)
+                sprintf(
+                    'Lock for "%s" is already active, attempt %d (sleep for: %01.1F)',
+                    $name,
+                    $count,
+                    $waitTime / 1000000
+                )
             );
 
-            usleep(500000);
+            usleep($waitTime);
             $count++;
 
             if ($count > $attempts) {

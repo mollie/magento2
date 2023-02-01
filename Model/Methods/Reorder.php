@@ -21,6 +21,7 @@ use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
+use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
@@ -28,6 +29,7 @@ use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\LockService;
+use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Psr\Log\LoggerInterface;
 
@@ -68,6 +70,8 @@ class Reorder extends Mollie
         Timeout $timeout,
         ProcessTransaction $ordersProcessTraction,
         LockService $lockService,
+        MollieApiClient $mollieApiClient,
+        TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         RequestInterface $request,
         $formBlockType,
         $infoBlockType,
@@ -94,6 +98,8 @@ class Reorder extends Mollie
             $timeout,
             $ordersProcessTraction,
             $lockService,
+            $mollieApiClient,
+            $transactionToOrderRepository,
             $formBlockType,
             $infoBlockType,
             $commandPool,

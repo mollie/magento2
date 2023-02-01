@@ -2,6 +2,7 @@ define(
     [
         'jquery',
         'underscore',
+        'ko',
         'mage/url',
         'mage/storage',
         'Magento_Checkout/js/view/payment/default',
@@ -15,6 +16,7 @@ define(
     function (
         $,
         _,
+        ko,
         url,
         storage,
         Component,
@@ -158,6 +160,16 @@ define(
                         bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
                         bounding.right <= (window.innerWidth || document.documentElement.clientWidth)
                     );
+                },
+                getClassNames: function () {
+                    return ko.computed( function () {
+                        var output = 'payment-method-' + this.getCode();
+                        if (this.getCode() === this.isChecked()) {
+                            output += ' _active';
+                        }
+
+                        return output;
+                    }.bind(this));
                 }
             }
         );
