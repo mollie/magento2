@@ -114,7 +114,7 @@ class PlaceOrder extends Action
         $this->checkoutSession
             ->setLastQuoteId($cart->getId())
             ->setLastSuccessQuoteId($cart->getId())
-            ->setLastRealOrderId($order->getId())
+            ->setLastRealOrderId($order->getIncrementId())
             ->setLastOrderId($order->getId());
 
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
