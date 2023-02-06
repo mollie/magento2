@@ -4,6 +4,7 @@ if [ -z "$MOLLIE_API_KEY_TEST" ]; then
 fi
 
 # General configuration
+bin/magento config:set payment/mollie_general/profileid pfl_8yCABHRz37 &
 magerun2 config:store:set payment/mollie_general/apikey_test $MOLLIE_API_KEY_TEST --encrypt &
 bin/magento config:set payment/mollie_general/enabled 1 &
 bin/magento config:set payment/mollie_general/type test &
@@ -26,6 +27,9 @@ bin/magento config:set payment/mollie_methods_klarnapaylater/active 1 &
 bin/magento config:set payment/mollie_methods_paymentlink/active 1 &
 bin/magento config:set payment/mollie_methods_paysafecard/active 1 &
 bin/magento config:set payment/mollie_methods_sofort/active 1 &
+
+# Enable Components
+bin/magento config:set payment/mollie_methods_creditcard/use_components 1 &
 
 # Enable QR
 bin/magento config:set payment/mollie_methods_ideal/add_qr 1 &
