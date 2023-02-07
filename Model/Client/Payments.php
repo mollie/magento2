@@ -17,6 +17,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\Client\Payments\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
@@ -108,6 +109,11 @@ class Payments extends AbstractModel
     private $linkTransactionToOrder;
 
     /**
+     * @var Payments\ProcessTransaction
+     */
+    private $processTransaction;
+
+    /**
      * Payments constructor.
      *
      * @param OrderRepository $orderRepository
@@ -125,6 +131,7 @@ class Payments extends AbstractModel
      * @param SendOrderEmails $sendOrderEmails
      * @param EventManager $eventManager
      * @param LinkTransactionToOrder $linkTransactionToOrder
+     * @param ProcessTransaction $processTransaction
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -141,7 +148,8 @@ class Payments extends AbstractModel
         PaymentTokenForOrder $paymentTokenForOrder,
         SendOrderEmails $sendOrderEmails,
         EventManager $eventManager,
-        LinkTransactionToOrder $linkTransactionToOrder
+        LinkTransactionToOrder $linkTransactionToOrder,
+        ProcessTransaction $processTransaction
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -158,6 +166,7 @@ class Payments extends AbstractModel
         $this->paymentTokenForOrder = $paymentTokenForOrder;
         $this->sendOrderEmails = $sendOrderEmails;
         $this->linkTransactionToOrder = $linkTransactionToOrder;
+        $this->processTransaction = $processTransaction;
     }
 
     /**
@@ -214,6 +223,11 @@ class Payments extends AbstractModel
         $this->mollieHelper->addTolog('request', $paymentData);
         $payment = $mollieApi->payments->create($paymentData);
         $this->processResponse($order, $payment);
+
+        // Order is paid immediately (eg. Credit Card with Components, Apple Pay), process transaction
+        if ($payment->isPaid()) {
+            $this->processTransaction->execute($order, 'webhook');
+        }
 
         return $payment->getCheckoutUrl();
     }
