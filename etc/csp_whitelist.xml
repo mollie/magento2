@@ -11,5 +11,10 @@
                 <value id="mollie-images" type="host">https://www.mollie.com</value>
             </values>
         </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="mollie-components" type="host">js.mollie.com</value>
+            </values>
+        </policy>
     </policies>
 </csp_whitelist>

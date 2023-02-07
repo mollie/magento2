@@ -7,7 +7,11 @@
 namespace Mollie\Payment\Controller\Checkout;
 
 use Exception;
+use Magento\Checkout\Model\Session;
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\View\Result\PageFactory;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -17,10 +21,6 @@ use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
-use Magento\Framework\App\Action\Action;
-use Magento\Framework\App\Action\Context;
-use Magento\Checkout\Model\Session;
-use Magento\Framework\View\Result\PageFactory;
 use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\Methods\Creditcard;
 use Mollie\Payment\Model\Methods\CreditcardVault;
@@ -126,7 +126,9 @@ class Redirect extends Action
                 $storeId = $order->getStoreId();
                 $redirectUrl = $this->startTransaction($methodInstance, $order);
                 // This is deprecated since 2.18.0 and will be removed in a future version.
-                if ($this->mollieHelper->useLoadingScreen($storeId)) {
+                if (!($methodInstance instanceof ApplePay) &&
+                    $this->mollieHelper->useLoadingScreen($storeId)
+                ) {
                     $resultPage = $this->resultPageFactory->create();
                     $resultPage->getLayout()->initMessages();
                     $resultPage->getLayout()->getBlock('mollie_loading')->setMollieRedirect($redirectUrl);

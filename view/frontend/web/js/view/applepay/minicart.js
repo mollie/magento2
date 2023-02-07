@@ -1,9 +1,11 @@
 define([
     'jquery',
+    'Magento_Customer/js/customer-data',
     '../product/apple-pay-button',
     'mage/url'
 ], function (
     $,
+    customerData,
     Component,
     url
 ) {
@@ -143,6 +145,8 @@ define([
                         }
 
                         this.session.completePayment(ApplePaySession.STATUS_SUCCESS);
+
+                        customerData.invalidate(['cart']);
 
                         setTimeout( function () {
                             location.href = result.url

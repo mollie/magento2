@@ -282,6 +282,11 @@ class Orders extends AbstractModel
         $mollieOrder = $mollieApi->orders->create($orderData, ['embed' => 'payments']);
         $this->processResponse($order, $mollieOrder);
 
+        // Order is paid immediately (eg. Credit Card with Components, Apple Pay), process transaction
+        if ($mollieOrder->isPaid()) {
+            $this->processTransaction->execute($order, 'webhook');
+        }
+
         return $mollieOrder->getCheckoutUrl();
     }
 
