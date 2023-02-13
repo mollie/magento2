@@ -7,7 +7,12 @@
         <observer name="mollie_cancel_order" instance="Mollie\Payment\Observer\OrderCancelAfter"/>
     </event>
     <event name="sales_order_shipment_save_before">
-        <observer name="mollie_create_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentSaveBefore"/>
+        <!-- Order of execution is important -->
+        <observer name="mollie_aaaa_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
+        <observer name="mollie_create_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentSaveBefore\CreateMollieShipment"/>
+    </event>
+    <event name="sales_order_shipment_save_after">
+        <observer name="mollie_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
     </event>
     <event name="sales_order_shipment_track_save_after">
         <observer name="mollie_create_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentTrackSaveAfter"/>
