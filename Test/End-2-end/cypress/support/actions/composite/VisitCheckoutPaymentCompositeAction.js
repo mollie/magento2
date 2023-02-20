@@ -8,7 +8,7 @@ const checkoutShippingPage = new CheckoutShippingPage();
 
 export default class VisitCheckoutPaymentCompositeAction {
   visit() {
-    productPage.openProduct(2);
+    productPage.openProduct(3);
     productPage.addSimpleProductToCart();
 
     checkoutPage.visit();

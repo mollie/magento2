@@ -38,5 +38,10 @@ bin/magento config:set payment/mollie_general/use_webhooks disabled &
 
 wait
 
+if grep -q Magento_TwoFactorAuth "app/etc/config.php"; then
+    ./retry "php bin/magento module:disable Magento_TwoFactorAuth"
+fi
+
+
 # Flush config
 bin/magento cache:flush config

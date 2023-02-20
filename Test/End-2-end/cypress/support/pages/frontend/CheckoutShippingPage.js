@@ -7,11 +7,12 @@ export default class CheckoutShippingPage {
 
   fillShippingAddress(address) {
     Object.keys(address.type).forEach((field) => {
-      cy.get('.opc-wrapper [name="' + field + '"]').type(address.type[field]);
+      cy.log('Filling field: ' + field);
+      cy.get('#checkout-step-shipping [name="' + field + '"]').type(address.type[field]);
     });
 
     Object.keys(address.select).forEach((field) => {
-      cy.get('.opc-wrapper [name="' + field + '"]').select(address.select[field]);
+      cy.get('#checkout-step-shipping [name="' + field + '"]').select(address.select[field]);
     });
 
     cy.get('.loader').should('not.exist');
