@@ -60,6 +60,7 @@ class LockService
      */
     public function lock(string $name, int $timeout = -1): bool
     {
+        $this->config->addToLog('info', 'Locking: ' . $name);
         if ($this->isLockManagerAvailable()) {
             return $this->lockManager->lock($name, $timeout);
         }
@@ -80,6 +81,7 @@ class LockService
      */
     public function unlock(string $name): bool
     {
+        $this->config->addToLog('info', 'Unlocking: ' . $name);
         if ($this->isLockManagerAvailable()) {
             return $this->lockManager->unlock($name);
         }
