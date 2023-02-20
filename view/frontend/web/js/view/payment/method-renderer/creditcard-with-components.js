@@ -33,11 +33,6 @@ function ($, Component, Mollie) {
 
             try {
                 this.mollie = Mollie(checkoutConfig.mollie.profile_id, this.getMollieOptions());
-
-                this.components.cardHolder = this.mollie.createComponent('cardHolder', this.getOptions('cardHolder'));
-                this.components.cardNumber = this.mollie.createComponent('cardNumber', this.getOptions('cardNumber'));
-                this.components.expiryDate = this.mollie.createComponent('expiryDate', this.getOptions('expiryDate'));
-                this.components.verificationCode = this.mollie.createComponent('verificationCode', this.getOptions('verificationCode'));
             } catch (error) {
                 console.error(error);
                 return this;
@@ -59,14 +54,14 @@ function ($, Component, Mollie) {
         },
 
         checkIfVisible: function () {
-            if (!this.rendered()) {
+            if (!this.rendered() && !this.mounted()) {
                 return;
             }
 
             if (this.isChecked() === this.getCode()) {
-                this.mount();
-            } else {
-                this.unmount();
+                setTimeout(function () {
+                    this.mount();
+                }.bind(this));
             }
         },
 
@@ -110,10 +105,15 @@ function ($, Component, Mollie) {
                 return;
             }
 
-            this.mountElement(this.components.cardHolder, '#card-holder');
-            this.mountElement(this.components.cardNumber, '#card-number');
-            this.mountElement(this.components.expiryDate, '#expiry-date');
-            this.mountElement(this.components.verificationCode, '#verification-code');
+            let cardHolder = this.mollie.createComponent('cardHolder', this.getOptions('cardHolder'));
+            let cardNumber = this.mollie.createComponent('cardNumber', this.getOptions('cardNumber'));
+            let expiryDate = this.mollie.createComponent('expiryDate', this.getOptions('expiryDate'));
+            let verificationCode = this.mollie.createComponent('verificationCode', this.getOptions('verificationCode'));
+
+            this.mountElement(cardHolder, '#card-holder');
+            this.mountElement(cardNumber, '#card-number');
+            this.mountElement(expiryDate, '#expiry-date');
+            this.mountElement(verificationCode, '#verification-code');
 
             this.mounted(true);
         },
@@ -131,19 +131,6 @@ function ($, Component, Mollie) {
                     errorElement.style.display = 'none';
                 }
             });
-        },
-
-        unmount: function () {
-            if (!this.mounted()) {
-                return;
-            }
-
-            this.components.cardHolder.unmount('#card-holder');
-            this.components.cardNumber.unmount('#card-number');
-            this.components.expiryDate.unmount('#expiry-date');
-            this.components.verificationCode.unmount('#verification-code');
-
-            this.mounted(false);
         },
 
         /**
