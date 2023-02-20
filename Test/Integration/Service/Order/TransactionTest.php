@@ -8,6 +8,7 @@ namespace Mollie\Payment\Test\Integration\Service\Order;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\Encryptor;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -152,7 +153,7 @@ class TransactionTest extends IntegrationTestCase
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
-        $result = $instance->getWebhookUrl();
+        $result = $instance->getWebhookUrl([$this->objectManager->get(OrderInterface::class)]);
 
         $this->assertStringContainsString('mollie/checkout/webhook/', $result);
     }
@@ -165,7 +166,7 @@ class TransactionTest extends IntegrationTestCase
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
-        $result = $instance->getWebhookUrl();
+        $result = $instance->getWebhookUrl([$this->objectManager->get(OrderInterface::class)]);
 
         $this->assertStringContainsString('mollie/checkout/webhook/', $result);
     }
@@ -179,7 +180,7 @@ class TransactionTest extends IntegrationTestCase
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
-        $result = $instance->getWebhookUrl();
+        $result = $instance->getWebhookUrl([$this->objectManager->get(OrderInterface::class)]);
 
         $this->assertEmpty($result);
     }
@@ -193,9 +194,18 @@ class TransactionTest extends IntegrationTestCase
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
-        $result = $instance->getWebhookUrl();
+        $order = $this->objectManager->get(OrderInterface::class);
+        $order->setEntityId(99999);
+        $result = $instance->getWebhookUrl([$order]);
 
-        $this->assertEquals('custom_url_for_test', $result);
+        $this->assertStringContainsString('custom_url_for_test?orderId[]=', $result);
+
+        [, $encryptedId] = explode('orderId[]=', $result);
+
+        $encryptedId = base64_decode($encryptedId);
+        $id = $this->objectManager->get(EncryptorInterface::class)->decrypt($encryptedId);
+
+        $this->assertEquals(99999, $id);
     }
 
     public function testAllowsToManuallySetAnUrl()

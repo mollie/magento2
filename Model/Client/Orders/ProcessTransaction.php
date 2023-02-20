@@ -15,6 +15,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Mollie\ValidateMetadata;
 
 class ProcessTransaction
 {
@@ -43,18 +44,25 @@ class ProcessTransaction
      */
     private $orderLines;
 
+    /**
+     * @var ValidateMetadata
+     */
+    private $validateMetadata;
+
     public function __construct(
         ProcessTransactionResponseFactory $processTransactionResponseFactory,
         OrderProcessors $orderProcessors,
         MollieApiClient $mollieApiClient,
         MollieHelper $mollieHelper,
-        OrderLines $orderLines
+        OrderLines $orderLines,
+        ValidateMetadata $validateMetadata
     ) {
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
         $this->mollieApiClient = $mollieApiClient;
         $this->mollieHelper = $mollieHelper;
         $this->orderLines = $orderLines;
         $this->orderProcessors = $orderProcessors;
+        $this->validateMetadata = $validateMetadata;
     }
 
     public function execute(
@@ -65,6 +73,8 @@ class ProcessTransaction
         $mollieOrder = $mollieApi->orders->get($order->getMollieTransactionId(), ['embed' => 'payments']);
         $this->mollieHelper->addTolog($type, $mollieOrder);
         $status = $mollieOrder->status;
+
+        $this->validateMetadata->execute($mollieOrder->metadata, $order);
 
         $defaultResponse = $this->processTransactionResponseFactory->create([
             'success' => true,

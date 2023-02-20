@@ -23,7 +23,7 @@ class WebhookTest extends ControllerTestCase
 
         $this->dispatch('mollie/checkout/webhook');
 
-        $this->assertSame(200, $this->getResponse()->getHttpResponseCode());
+        $this->assertSame(503, $this->getResponse()->getHttpResponseCode());
     }
 
     public function testTheTestByMollieReturnsAnOkResponse()
@@ -35,14 +35,14 @@ class WebhookTest extends ControllerTestCase
         $this->assertOkResponse();
     }
 
-    public function testReturns404IfNoTransactionIdProvided()
+    public function testReturns200IfNoTransactionIdProvided()
     {
         $this->dispatch('mollie/checkout/webhook');
 
         $this->assertEquals(200, $this->getResponse()->getStatusCode());
     }
 
-    public function testReturns404IfAnInvalidTransactionIdIsProvided()
+    public function testReturns200IfAnInvalidTransactionIdIsProvided()
     {
         $this->getRequest()->setParam('id', 'NON_EXISTING');
 
