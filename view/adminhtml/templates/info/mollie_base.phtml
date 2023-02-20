@@ -58,7 +58,7 @@ $status = $block->getPaymentStatus();
                     <th><?= __('Payment Status'); ?></th>
                     <td>
                         <span class="mollie-payment-status"><?= ucfirst($status); ?></span>
-                        <?php if ($block->isKlarnaMethod() && $status == 'authorized'): ?>
+                        <?php if ($block->isBuyNowPayLaterMethod() && $status == 'authorized'): ?>
                             <a href="#" class="mollie-tooltip">(i)
                                 <span><?= __('Please ship order to capture Klarna payment'); ?></span>
                             </a>

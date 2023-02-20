@@ -29,6 +29,7 @@ class PaymentMethods
         'mollie_methods_bancontact',
         'mollie_methods_banktransfer',
         'mollie_methods_belfius',
+        'mollie_methods_billie',
         'mollie_methods_creditcard',
         'mollie_methods_directdebit',
         'mollie_methods_eps',
