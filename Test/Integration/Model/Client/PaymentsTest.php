@@ -14,6 +14,7 @@ use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentsTest extends IntegrationTestCase
@@ -69,6 +70,12 @@ class PaymentsTest extends IntegrationTestCase
         $mollieApiMock = $this->createMock(MollieApiClient::class);
         $mollieApiMock->payments = $paymentEndpointMock;
 
+        /** @var FakeMollieApiClient $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
+        $fakeMollieApiClient->setInstance($mollieApiMock);
+
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
+
         $orderLinesMock = $this->createMock(\Mollie\Payment\Model\OrderLines::class);
 
         $orderSenderMock = $this->createMock(OrderSender::class);
@@ -81,8 +88,8 @@ class PaymentsTest extends IntegrationTestCase
 
         $orderCommentHistoryMock->method('add')->withConsecutive(...$orderCommentHistoryMessages);
 
-        /** @var Orders $instance */
-        $instance = $this->objectManager->create(Payments::class, [
+        /** @var Payments\ProcessTransaction $instance */
+        $instance = $this->objectManager->create(Payments\ProcessTransaction::class, [
             'orderLines' => $orderLinesMock,
             'orderSender' => $orderSenderMock,
             'invoiceSender' => $invoiceSenderMock,
@@ -94,7 +101,7 @@ class PaymentsTest extends IntegrationTestCase
         $order->setBaseCurrencyCode($currency);
         $order->setOrderCurrencyCode($currency);
 
-        $instance->processTransaction($order, $mollieApiMock);
+        $instance->execute($order)->toArray();
 
         $this->assertEquals(Order::STATE_PROCESSING, $order->getState());
     }

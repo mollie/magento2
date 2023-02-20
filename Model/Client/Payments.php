@@ -21,6 +21,7 @@ use Mollie\Payment\Model\Client\Payments\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
+use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\CancelOrder;
@@ -114,6 +115,11 @@ class Payments extends AbstractModel
     private $processTransaction;
 
     /**
+     * @var ValidateMetadata
+     */
+    private $validateMetadata;
+
+    /**
      * Payments constructor.
      *
      * @param OrderRepository $orderRepository
@@ -132,6 +138,7 @@ class Payments extends AbstractModel
      * @param EventManager $eventManager
      * @param LinkTransactionToOrder $linkTransactionToOrder
      * @param ProcessTransaction $processTransaction
+     * @param ValidateMetadata $validateMetadata
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -149,7 +156,8 @@ class Payments extends AbstractModel
         SendOrderEmails $sendOrderEmails,
         EventManager $eventManager,
         LinkTransactionToOrder $linkTransactionToOrder,
-        ProcessTransaction $processTransaction
+        ProcessTransaction $processTransaction,
+        ValidateMetadata $validateMetadata
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -167,6 +175,7 @@ class Payments extends AbstractModel
         $this->sendOrderEmails = $sendOrderEmails;
         $this->linkTransactionToOrder = $linkTransactionToOrder;
         $this->processTransaction = $processTransaction;
+        $this->validateMetadata = $validateMetadata;
     }
 
     /**
@@ -194,7 +203,7 @@ class Payments extends AbstractModel
             'description'    => $this->transactionDescription->forRegularTransaction($order),
             'billingAddress' => $this->getAddressLine($order->getBillingAddress()),
             'redirectUrl'    => $this->transaction->getRedirectUrl($order, $paymentToken),
-            'webhookUrl'     => $this->transaction->getWebhookUrl($storeId),
+            'webhookUrl'     => $this->transaction->getWebhookUrl([$order]),
             'method'         => $method,
             'metadata'       => [
                 'order_id'      => $orderId,
@@ -294,6 +303,9 @@ class Payments extends AbstractModel
         $storeId = $order->getStoreId();
         $transactionId = $order->getMollieTransactionId();
         $paymentData = $mollieApi->payments->get($transactionId);
+
+        $this->validateMetadata->execute($paymentData->metadata, $order);
+
         $this->mollieHelper->addTolog($type, $paymentData);
         $dashboardUrl = $this->dashboardUrl->forPaymentsApi($order->getStoreId(), $paymentData->id);
         $order->getPayment()->setAdditionalInformation('dashboard_url', $dashboardUrl);

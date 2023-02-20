@@ -10,6 +10,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Mollie\ValidateMetadata;
 
 class ProcessTransactionFake extends ProcessTransaction
 {
@@ -38,14 +39,16 @@ class ProcessTransactionFake extends ProcessTransaction
         OrderProcessors $orderProcessors,
         MollieApiClient $mollieApiClient,
         MollieHelper $mollieHelper,
-        OrderLines $orderLines
+        OrderLines $orderLines,
+        ValidateMetadata $validateMetadata
     ) {
         parent::__construct(
             $processTransactionResponseFactory,
             $orderProcessors,
             $mollieApiClient,
             $mollieHelper,
-            $orderLines
+            $orderLines,
+            $validateMetadata
         );
 
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;

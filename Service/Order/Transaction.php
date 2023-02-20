@@ -83,21 +83,35 @@ class Transaction
         );
     }
 
-    /**
-     * @param null|int|string $storeId
-     */
-    public function getWebhookUrl($storeId = null): string
+    public function getWebhookUrl(array $orders): string
     {
+        foreach ($orders as $order) {
+            if (!$order instanceof OrderInterface) {
+                throw new \InvalidArgumentException('Invalid order');
+            }
+        }
+
+        $firstOrder = reset($orders);
+        $storeId = $firstOrder->getStoreId();
         if (!$this->config->isProductionMode($storeId) &&
             $this->config->useWebhooks($storeId) == WebhookUrlOptions::DISABLED) {
             return '';
         }
 
+        $orderIds = array_map(function (OrderInterface $order) {
+            return 'orderId[]=' . base64_encode($this->encryptor->encrypt((string)$order->getId()));
+        }, $orders);
+
         if ($this->config->useWebhooks($storeId) == WebhookUrlOptions::CUSTOM_URL) {
-            return $this->config->customWebhookUrl($storeId);
+            $url = $this->config->customWebhookUrl($storeId);
+            $url .= (strpos($url, '?') === false ? '?' : '&') . implode('&', $orderIds);
+
+            return $url;
         }
 
-        return $this->urlBuilder->getUrl('mollie/checkout/webhook/', ['_query' => 'isAjax=1']);
+        return $this->urlBuilder->getUrl('mollie/checkout/webhook/', [
+            '_query' => 'isAjax=1&' . implode('&', $orderIds),
+        ]);
     }
 
     private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, int $storeId = null)

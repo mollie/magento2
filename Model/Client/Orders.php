@@ -250,7 +250,7 @@ class Orders extends AbstractModel
             'consumerDateOfBirth' => null,
             'lines'               => $this->orderLines->getOrderLines($order),
             'redirectUrl'         => $this->transaction->getRedirectUrl($order, $paymentToken),
-            'webhookUrl'          => $this->transaction->getWebhookUrl($storeId),
+            'webhookUrl'          => $this->transaction->getWebhookUrl([$order]),
             'locale'              => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE),
             'method'              => $method,
             'metadata'            => [

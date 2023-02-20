@@ -17,6 +17,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Test\Fakes\Model\Client\Orders\OrderProcessorsFake;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -72,12 +73,16 @@ class ProcessTransactionTest extends IntegrationTestCase
         $invoiceSenderMock = $this->createMock(InvoiceSender::class);
         $invoiceSenderMock->method('send')->willReturn(true);
 
+        $validateMetadataMock = $this->createMock(ValidateMetadata::class);
+        $validateMetadataMock->method('execute');
+
         /** @var Orders\ProcessTransaction $instance */
         $instance = $this->objectManager->create(Orders\ProcessTransaction::class, [
             'orderLines' => $orderLinesMock,
             'orderSender' => $orderSenderMock,
             'invoiceSender' => $invoiceSenderMock,
             'mollieApiClient' => $this->mollieClientMock($mollieOrderStatus, $currency),
+            'validateMetadata' => $validateMetadataMock,
         ]);
 
         $order = $this->loadOrder('100000001');
@@ -125,10 +130,14 @@ class ProcessTransactionTest extends IntegrationTestCase
     {
         $apiClient = $this->mollieClientMock($state, 'EUR');
 
+        $validateMetadataMock = $this->createMock(ValidateMetadata::class);
+        $validateMetadataMock->method('execute');
+
         /** @var Orders\ProcessTransaction $instance */
         $instance = $this->objectManager->create(Orders\ProcessTransaction::class, [
             'orderLines' => $this->createMock(OrderLines::class),
             'mollieApiClient' => $apiClient,
+            'validateMetadata' => $validateMetadataMock,
         ]);
 
         $order = $this->loadOrder('100000001');
@@ -159,11 +168,15 @@ class ProcessTransactionTest extends IntegrationTestCase
         $orderProcessorsFake = $this->objectManager->create(OrderProcessorsFake::class);
         $orderProcessorsFake->disableParentCall();
 
+        $validateMetadataMock = $this->createMock(ValidateMetadata::class);
+        $validateMetadataMock->method('execute');
+
         /** @var Orders\ProcessTransaction $instance */
         $instance = $this->objectManager->create(Orders\ProcessTransaction::class, [
             'orderLines' => $this->createMock(OrderLines::class),
             'mollieApiClient' => $apiClient,
             'orderProcessors' => $orderProcessorsFake,
+            'validateMetadata' => $validateMetadataMock,
         ]);
 
         $order = $this->loadOrder('100000001');
@@ -194,6 +207,8 @@ class ProcessTransactionTest extends IntegrationTestCase
         $mollieOrder->_embedded->payments = [new \stdClass];
         $mollieOrder->_embedded->payments[0]->id = 'tr_abc1234';
         $mollieOrder->_embedded->payments[0]->status = 'success';
+
+        $mollieOrder->metadata = new \stdClass();
 
         $orderEndpointMock = $this->createMock(OrderEndpoint::class);
         $orderEndpointMock->method('get')->willReturn($mollieOrder);
