@@ -1,8 +1,7 @@
-import Cookies from "Services/Cookies";
+
 import CheckoutPaymentPage from "Pages/frontend/CheckoutPaymentPage";
 import VisitCheckoutPaymentCompositeAction from "CompositeActions/VisitCheckoutPaymentCompositeAction";
 
-const cookies = new Cookies();
 const checkoutPaymentPage = new CheckoutPaymentPage();
 const visitCheckoutPayment = new VisitCheckoutPaymentCompositeAction();
 

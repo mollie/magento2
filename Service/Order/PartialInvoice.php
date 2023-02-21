@@ -47,6 +47,7 @@ class PartialInvoice
         if (!in_array(
             $payment->getMethod(),
             [
+                'mollie_methods_billie',
                 'mollie_methods_klarnapaylater',
                 'mollie_methods_klarnapaynow',
                 'mollie_methods_klarnasliceit',

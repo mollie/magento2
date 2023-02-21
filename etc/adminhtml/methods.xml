@@ -10,6 +10,7 @@
     <include path="Mollie_Payment::methods/bancontact.xml"/>
     <include path="Mollie_Payment::methods/banktransfer.xml"/>
     <include path="Mollie_Payment::methods/belfius.xml"/>
+    <include path="Mollie_Payment::methods/billie.xml"/>
     <include path="Mollie_Payment::methods/creditcard.xml"/>
     <include path="Mollie_Payment::methods/directdebit.xml"/>
     <include path="Mollie_Payment::methods/eps.xml"/>

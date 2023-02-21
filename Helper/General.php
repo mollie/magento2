@@ -459,19 +459,6 @@ class General extends AbstractHelper
     }
 
     /**
-     * Webhook Url Builder
-     *
-     * @return string
-     *
-     * @deprecated since 1.8.1
-     * @see Transaction::getWebhookUrl()
-     */
-    public function getWebhookUrl()
-    {
-        return $this->transaction->getWebhookUrl();
-    }
-
-    /**
      * Checkout Url Builder
      *
      * @return string
@@ -688,6 +675,7 @@ class General extends AbstractHelper
             'mollie_methods_bancontact',
             'mollie_methods_banktransfer',
             'mollie_methods_belfius',
+            'mollie_methods_billie',
             'mollie_methods_creditcard',
             'mollie_methods_directdebit',
             'mollie_methods_eps',

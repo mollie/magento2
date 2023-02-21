@@ -2,20 +2,19 @@
 
 namespace Mollie\Payment\Test\Integration\Model\Client;
 
-use Magento\Framework\Phrase;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
-use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Mollie\Api\Endpoints\OrderEndpoint;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Model\Client\Orders;
+use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\OrderLines;
-use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use stdClass;
@@ -81,6 +80,8 @@ class OrdersTest extends IntegrationTestCase
         $mollieOrderMock->status = OrderStatus::STATUS_PAID;
         $mollieOrderMock->_embedded->payments = [];
 
+        $mollieOrderMock->metadata = new stdClass;
+
         foreach (['cancelled', 'paid', 'expired'] as $status) {
             $payment = new stdClass;
             $payment->id = 'tr_fakeid';
@@ -106,10 +107,14 @@ class OrdersTest extends IntegrationTestCase
 
         $orderLinesMock = $this->createMock(OrderLines::class);
 
-        /** @var Orders $instance */
-        $instance = $this->objectManager->create(Orders::class, [
+        $validateMetadataMock = $this->createMock(ValidateMetadata::class);
+        $validateMetadataMock->method('execute');
+
+        /** @var ProcessTransaction $instance */
+        $instance = $this->objectManager->create(ProcessTransaction::class, [
             'invoiceSender' => $invoiceSenderMock,
             'orderLines' => $orderLinesMock,
+            'validateMetadata' => $validateMetadataMock,
         ]);
 
         $order = $this->loadOrder('100000001');
@@ -117,7 +122,7 @@ class OrdersTest extends IntegrationTestCase
         $order->setBaseCurrencyCode('EUR');
         $order->setOrderCurrencyCode('EUR');
 
-        $result = $instance->processTransaction($order, $mollieApiMock);
+        $result = $instance->execute($order)->toArray();
 
         $this->assertTrue($result['success']);
     }
@@ -190,7 +195,7 @@ class OrdersTest extends IntegrationTestCase
         $instance->startTransaction($order, $mollieApiMock);
     }
 
-    public function checksIfTheOrderHasAnUpdateProvider()
+    public function checksIfTheOrderHasAnUpdateProvider(): array
     {
         return [
             [OrderStatus::STATUS_CREATED, Order::STATE_NEW],

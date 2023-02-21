@@ -32,4 +32,4 @@ jobs:
               run: docker exec magento-project-community-edition composer require mollie/magento2:dev-continuous-integration-test-branch
 
             - name: Run setup:di:compile
-              run: docker exec magento-project-community-edition php bin/magento setup:di:compile
+              run: docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"

@@ -8,7 +8,6 @@ namespace Mollie\Payment\Model;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -34,7 +33,7 @@ use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
-use Mollie\Payment\Service\LockService;
+use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Mollie\Payment\Service\Mollie\Wrapper\MollieApiClientFallbackWrapper;
 use Psr\Log\LoggerInterface;
@@ -93,10 +92,6 @@ class Mollie extends Adapter
      */
     private $assetRepository;
     /**
-     * @var ResourceConnection
-     */
-    private $resourceConnection;
-    /**
      * @var Timeout
      */
     private $timeout;
@@ -106,9 +101,9 @@ class Mollie extends Adapter
     private $ordersProcessTraction;
 
     /**
-     * @var LockService
+     * @var OrderLockService
      */
-    private $lockService;
+    private $orderLockService;
 
     /**
      * @var \Mollie\Payment\Service\Mollie\MollieApiClient
@@ -133,11 +128,10 @@ class Mollie extends Adapter
         CheckoutSession $checkoutSession,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AssetRepository $assetRepository,
-        ResourceConnection $resourceConnection,
         Config $config,
         Timeout $timeout,
         ProcessTransaction $ordersProcessTraction,
-        LockService $lockService,
+        OrderLockService $orderLockService,
         \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
         TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         $formBlockType,
@@ -170,11 +164,10 @@ class Mollie extends Adapter
         $this->orderFactory = $orderFactory;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->assetRepository = $assetRepository;
-        $this->resourceConnection = $resourceConnection;
         $this->config = $config;
         $this->timeout = $timeout;
         $this->ordersProcessTraction = $ordersProcessTraction;
-        $this->lockService = $lockService;
+        $this->orderLockService = $orderLockService;
         $this->mollieApiClient = $mollieApiClient;
         $this->transactionToOrderRepository = $transactionToOrderRepository;
     }
@@ -285,7 +278,7 @@ class Mollie extends Adapter
         }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
-        if (in_array($methodCode, ['klarnapaylater', 'klarnapaynow', 'klarnasliceit', 'voucher', 'in3'])) {
+        if (in_array($methodCode, ['billie', 'klarnapaylater', 'klarnapaynow', 'klarnasliceit', 'voucher', 'in3'])) {
             throw new LocalizedException(__($exception->getMessage()));
         }
 
@@ -356,30 +349,11 @@ class Mollie extends Adapter
             return $msg;
         }
 
-        $storeId = $order->getStoreId();
-        if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
-            $msg = ['error' => true, 'msg' => __('API Key not found')];
-            $this->mollieHelper->addTolog('error', $msg);
-            return $msg;
-        }
-
-        $key = 'mollie.order.' . $order->getEntityId();
-        if ($this->lockService->checkIfIsLockedWithWait($key)) {
-            $msg = ['error' => true, 'msg' => sprintf('Key "%s" is locked', $key)];
-            $this->mollieHelper->addTolog('error', $msg);
-            return $msg;
-        }
-
-        // Defaults to the "default" connection when there is not connection available named "sales".
-        // This is required for stores with a split database (Enterprise only):
-        // https://devdocs.magento.com/guides/v2.3/config-guide/multi-master/multi-master.html
-        $connection = $this->resourceConnection->getConnection('sales');
-
-        try {
-            $this->config->addToLog('info', sprintf('Getting lock for key "%s"', $key));
-            $this->lockService->lock($key, 5 * 60);
-            $connection->beginTransaction();
-
+        $result = $this->orderLockService->execute($order, function (OrderInterface $order) use (
+            $transactionId,
+            $type,
+            $paymentToken
+        ) {
             if (preg_match('/^ord_\w+$/', $transactionId)) {
                 $result = $this->ordersProcessTraction->execute($order, $type)->toArray();
             } else {
@@ -388,18 +362,13 @@ class Mollie extends Adapter
             }
 
             $order->getPayment()->setAdditionalInformation('mollie_success', $result['success']);
-            $this->orderRepository->save($order);
 
-            $connection->commit();
-            $this->config->addToLog('info', sprintf('Unlocking key "%s"', $key));
-            $this->lockService->unlock($key);
             return $result;
-        } catch (\Exception $exception) {
-            $connection->rollBack();
-            throw $exception;
-        } finally {
-            $this->eventManager->dispatch('mollie_process_transaction_end', ['order' => $order]);
-        }
+        });
+
+        $this->eventManager->dispatch('mollie_process_transaction_end', ['order' => $order]);
+
+        return $result;
     }
 
     public function orderHasUpdate($orderId)

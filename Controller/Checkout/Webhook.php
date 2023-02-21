@@ -6,14 +6,16 @@
 
 namespace Mollie\Payment\Controller\Checkout;
 
-use Magento\Framework\Controller\Result\Json;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use Mollie\Payment\Model\Mollie as MollieModel;
-use Mollie\Payment\Helper\General as MollieHelper;
+use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Checkout\Model\Session;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
+use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\Mollie as MollieModel;
 
 /**
  * Class Webhook
@@ -45,6 +47,11 @@ class Webhook extends Action
     private $orderRepository;
 
     /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
+
+    /**
      * Webhook constructor.
      *
      * @param Context       $context
@@ -52,19 +59,22 @@ class Webhook extends Action
      * @param MollieModel   $mollieModel
      * @param MollieHelper  $mollieHelper
      * @param OrderRepositoryInterface $orderRepository
+     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
         Session $checkoutSession,
         MollieModel $mollieModel,
         MollieHelper $mollieHelper,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        EncryptorInterface $encryptor
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->resultFactory = $context->getResultFactory();
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
         $this->orderRepository = $orderRepository;
+        $this->encryptor = $encryptor;
         parent::__construct($context);
     }
 
@@ -83,13 +93,12 @@ class Webhook extends Action
         }
 
         try {
-            $orderIds = $this->mollieModel->getOrderIdsByTransactionId($transactionId);
-            if (!$orderIds) {
-                return $this->getOkResponse();
+            $orders = $this->getOrders();
+            if (empty($orders)) {
+                return $this->getErrorResponse(200, 'No orders found');
             }
 
-            foreach ($orderIds as $orderId) {
-                $order = $this->orderRepository->get($orderId);
+            foreach ($orders as $order) {
                 $order->setMollieTransactionId($transactionId);
                 $this->mollieModel->processTransactionForOrder($order, 'webhook');
             }
@@ -98,7 +107,7 @@ class Webhook extends Action
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
 
-            return $this->getErrorResponse(200);
+            return $this->getErrorResponse(503);
         }
     }
 
@@ -122,5 +131,32 @@ class Webhook extends Action
         $result->setHttpResponseCode($code);
 
         return $result;
+    }
+
+    /**
+     * @return OrderInterface[]
+     */
+    private function getOrders(): array
+    {
+        $orders = [];
+        $transactionId = $this->getRequest()->getParam('id');
+        $orderIds = $this->mollieModel->getOrderIdsByTransactionId($transactionId);
+
+        foreach ($orderIds as $id) {
+            $orders[] = $this->orderRepository->get($id);
+        }
+
+        if ($orders) {
+            return $orders;
+        }
+
+        // Fallback to order ids from the URL.
+        $orderIds = $this->getRequest()->getParam('orderId', []);
+        foreach ($orderIds as $id) {
+            $id = $this->encryptor->decrypt(base64_decode($id));
+            $orders[] = $this->orderRepository->get($id);
+        }
+
+        return $orders;
     }
 }

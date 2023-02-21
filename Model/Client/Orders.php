@@ -39,6 +39,7 @@ use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 use Mollie\Payment\Service\Order\Transaction;
+use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Service\PaymentToken\PaymentTokenForOrder;
 
 /**
@@ -147,6 +148,11 @@ class Orders extends AbstractModel
     private $linkTransactionToOrder;
 
     /**
+     * @var OrderLockService
+     */
+    private $orderLockService;
+
+    /**
      * Orders constructor.
      *
      * @param OrderLines $orderLines
@@ -171,6 +177,7 @@ class Orders extends AbstractModel
      * @param Config $config
      * @param EventManager $eventManager
      * @param LinkTransactionToOrder $linkTransactionToOrder
+     * @param OrderLockService $orderLockService
      */
     public function __construct(
         OrderLines $orderLines,
@@ -194,7 +201,8 @@ class Orders extends AbstractModel
         \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
         Config $config,
         EventManager $eventManager,
-        LinkTransactionToOrder $linkTransactionToOrder
+        LinkTransactionToOrder $linkTransactionToOrder,
+        OrderLockService $orderLockService
     ) {
         $this->orderLines = $orderLines;
         $this->invoiceSender = $invoiceSender;
@@ -218,6 +226,7 @@ class Orders extends AbstractModel
         $this->mollieApiClient = $mollieApiClient;
         $this->config = $config;
         $this->linkTransactionToOrder = $linkTransactionToOrder;
+        $this->orderLockService = $orderLockService;
     }
 
     /**
@@ -250,7 +259,7 @@ class Orders extends AbstractModel
             'consumerDateOfBirth' => null,
             'lines'               => $this->orderLines->getOrderLines($order),
             'redirectUrl'         => $this->transaction->getRedirectUrl($order, $paymentToken),
-            'webhookUrl'          => $this->transaction->getWebhookUrl($storeId),
+            'webhookUrl'          => $this->transaction->getWebhookUrl([$order]),
             'locale'              => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE),
             'method'              => $method,
             'metadata'            => [
@@ -466,12 +475,12 @@ class Orders extends AbstractModel
 
     /**
      * @param Order\Shipment $shipment
-     * @param Order          $order
+     * @param OrderInterface $order
      *
      * @return $this
      * @throws LocalizedException
      */
-    public function createShipment(Order\Shipment $shipment, Order $order)
+    public function createShipment(Order\Shipment $shipment, OrderInterface $order)
     {
         $transactionId = $order->getMollieTransactionId();
         if (empty($transactionId)) {

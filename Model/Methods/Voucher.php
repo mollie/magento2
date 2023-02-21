@@ -8,7 +8,6 @@ namespace Mollie\Payment\Model\Methods;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
@@ -28,7 +27,7 @@ use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Mollie;
-use Mollie\Payment\Service\LockService;
+use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Mollie\Payment\Service\Quote\QuoteHasMealVoucherProducts;
@@ -61,11 +60,10 @@ class Voucher extends Mollie
         CheckoutSession $checkoutSession,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AssetRepository $assetRepository,
-        ResourceConnection $resourceConnection,
         Config $config,
         Timeout $timeout,
         ProcessTransaction $ordersProcessTraction,
-        LockService $lockService,
+        OrderLockService $orderLockService,
         MollieApiClient $mollieApiClient,
         TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         $formBlockType,
@@ -89,11 +87,10 @@ class Voucher extends Mollie
             $checkoutSession,
             $searchCriteriaBuilder,
             $assetRepository,
-            $resourceConnection,
             $config,
             $timeout,
             $ordersProcessTraction,
-            $lockService,
+            $orderLockService,
             $mollieApiClient,
             $transactionToOrderRepository,
             $formBlockType,

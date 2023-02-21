@@ -523,6 +523,51 @@
         </arguments>
     </virtualType>
 
+    <!-- Billie -->
+    <type name="Mollie\Payment\Model\Methods\Billie">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieBillieValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieBillieValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieBillieValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieBillieConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBillieConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieBillieConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBillieConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Billie::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBillieValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieBillieCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieBillieCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieBillieConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Creditcard -->
     <type name="Mollie\Payment\Model\Methods\Creditcard">
         <arguments>
