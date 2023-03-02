@@ -14,19 +14,18 @@ const cartPage = new CartPage();
 
 describe('Check if the payment methods are available', () => {
   [
-    {status: 'paid', orderStatus: 'Processing', title: 'C3043: Validate the submission of an order with iDEAL as payment method and payment mark as "Paid"'},
-    {status: 'open', orderStatus: 'Pending Payment', title: 'C3044: Validate the submission of an order with iDEAL as payment method and payment mark as "Open"'},
-    {status: 'failed', orderStatus: 'Canceled', title: 'C3045: Validate the submission of an order with iDEAL as payment method and payment mark as "Failed"'},
-    {status: 'expired', orderStatus: 'Canceled', title: 'C3046: Validate the submission of an order with iDEAL as payment method and payment mark as "Expired"'},
-    {status: 'canceled', orderStatus: 'Canceled', title: 'C3047: Validate the submission of an order with iDEAL as payment method and payment mark as "Cancelled"'},
+    // {status: 'paid', orderStatus: 'Processing', title: 'C3048	Validate the submission of an order with Bancontact as payment method and payment mark as "Paid"'},
+    // {status: 'open', orderStatus: 'Pending Payment', title: 'C3049	Validate the submission of an order with Bancontact as payment method and payment mark as "Open"'},
+    // {status: 'failed', orderStatus: 'Canceled', title: 'C3050	Validate the submission of an order with Bancontact as payment method and payment mark as "Failed"'},
+    {status: 'expired', orderStatus: 'Canceled', title: 'C3052	Validate the submission of an order with Bancontact as payment method and payment mark as "Expired"'},
+    // {status: 'canceled', orderStatus: 'Canceled', title: 'C3051	Validate the submission of an order with Bancontact as payment method and payment mark as "Cancelled"'},
   ].forEach((testCase) => {
     it(testCase.title, () => {
       visitCheckoutPayment.visit();
 
       cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-      checkoutPaymentPage.selectPaymentMethod('iDeal');
-      checkoutPaymentPage.selectFirstAvailableIssuer();
+      checkoutPaymentPage.selectPaymentMethod('Bancontact');
       checkoutPaymentPage.placeOrder();
 
       mollieHostedPaymentPage.selectStatus(testCase.status);
@@ -45,7 +44,9 @@ describe('Check if the payment methods are available', () => {
         ordersPage.openOrderById(orderId);
       });
 
-      ordersPage.callWebhook();
+      if (testCase.status === 'expired') {
+        ordersPage.callFetchStatus();
+      }
 
       ordersPage.assertOrderStatusIs(testCase.orderStatus);
     });

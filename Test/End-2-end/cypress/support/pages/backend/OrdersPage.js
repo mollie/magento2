@@ -26,6 +26,16 @@ export default class OrdersPage {
         });
     }
 
+    callFetchStatus() {
+        cy.get('.fetch-mollie-payment-status').click();
+
+        cy.wait(1000);
+
+        cy.get('.fetch-mollie-payment-status').click();
+
+        cy.wait(1000);
+    }
+
     assertOrderStatusIs(status) {
         cy.get('#order_status').contains(status);
     }
