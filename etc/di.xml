@@ -79,6 +79,10 @@
         <plugin name="mollie_payment_add_subscription_data" type="Mollie\Payment\Plugin\Sales\AddRecurringData" />
     </type>
 
+    <type name="Magento\Sales\Api\OrderManagementInterface">
+        <plugin name="mollie_order_management-plugin" type="Mollie\Payment\Plugin\Sales\Api\OrderManagementPlugin" />
+    </type>
+
     <type name="Magento\Quote\Api\CartRepositoryInterface">
         <plugin name="mollie_add_paymentfee_extension_attributes" type="Mollie\Payment\Plugin\Sales\Cart\AddPaymentFeeToCart" />
     </type>
