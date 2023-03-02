@@ -1,8 +1,14 @@
 name: End-2-end
-on: [push, pull_request]
+on:
+  pull_request:
+    types:
+      - opened
+      - labeled
 
 jobs:
   secrets-gate:
+    # Only run tests if the pull request is opened or labeled with run_e2e_tests
+    if: ${{ github.event.label.name == 'run_e2e_tests' || github.event.action != 'labeled' }}
     runs-on: ubuntu-latest
     outputs:
       is-secret-set: ${{ steps.is-secret-set.outputs.is_mollie_api_key_test_set }}
