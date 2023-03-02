@@ -19,6 +19,21 @@ jobs:
         if: "${{ env.MOLLIE_API_KEY_TEST != '' }}"
         run: echo "is_mollie_api_key_test_set=true" >> $GITHUB_OUTPUT
 
+  remove_flag:
+    if: ${{ contains(github.event.*.labels.*.name, 'run_e2e_tests') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove run E2E tests label
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: ${{ github.event.issue.number || github.event.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: "run_e2e_tests"
+            })
+
   build:
     needs:
       - secrets-gate
