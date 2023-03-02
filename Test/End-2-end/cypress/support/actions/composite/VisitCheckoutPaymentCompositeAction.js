@@ -7,15 +7,24 @@ const checkoutPage = new CheckoutPage();
 const checkoutShippingPage = new CheckoutShippingPage();
 
 export default class VisitCheckoutPaymentCompositeAction {
-  visit() {
-    productPage.openProduct(3);
+  visit(country = 'NL') {
+    productPage.openProduct(2);
     productPage.addSimpleProductToCart();
 
     checkoutPage.visit();
 
-    checkoutShippingPage.fillDutchShippingAddress();
+    this.fillAddress(country);
 
     checkoutShippingPage.selectFirstAvailableShippingMethod();
     checkoutPage.continue();
+  }
+
+  fillAddress(country) {
+    if (country === 'DE') {
+      checkoutShippingPage.fillGermanShippingAddress();
+      return;
+    }
+
+    checkoutShippingPage.fillDutchShippingAddress();
   }
 }
