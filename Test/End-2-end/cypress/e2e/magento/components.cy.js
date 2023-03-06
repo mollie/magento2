@@ -37,8 +37,6 @@ describe('Test the Components in the checkout', () => {
       ordersPage.openOrderById(orderId);
     });
 
-    ordersPage.callWebhook();
-
     ordersPage.assertOrderStatusIs('Processing');
   });
 })

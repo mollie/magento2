@@ -45,8 +45,6 @@ describe('Check if the payment methods are available', () => {
         ordersPage.openOrderById(orderId);
       });
 
-      ordersPage.callWebhook();
-
       ordersPage.assertOrderStatusIs(testCase.orderStatus);
     });
   });
