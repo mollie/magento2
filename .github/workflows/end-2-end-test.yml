@@ -107,7 +107,7 @@ jobs:
         run: |
           # Copy the .git folder for Cypress
           docker cp .git e2e:/e2e/.git
-          docker exec e2e cypress run --browser chrome --record --key $CYPRESS_RECORD_KEY --config defaultCommandTimeout=20000
+          docker exec e2e cypress run --browser chrome --config defaultCommandTimeout=20000
 
       - name: Dump docker-compose logs
         if: always()
