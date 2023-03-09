@@ -37,6 +37,15 @@ type CartPrices  @doc(description: "Contains details about the final price of it
     mollie_payment_fee: MolliePaymentFee @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\Prices\\PaymentFee")
 }
 
+type StoreConfig {
+    mollie: MollieStoreConfig @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\General\\MollieStoreConfig") @doc(description: "Mollie store config")
+}
+
+type MollieStoreConfig {
+    profile_id: String @doc(description: "The profile ID used for this store")
+    live_mode: Boolean @doc(description: "Is Mollie running in live mode?")
+}
+
 type MollieIssuer {
     name: String
     code: String
