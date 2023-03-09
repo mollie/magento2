@@ -29,7 +29,7 @@ jobs:
               run: docker cp $(pwd) magento-project-community-edition:/data/extensions/
 
             - name: Install the extension in Magento
-              run: docker exec magento-project-community-edition composer require mollie/magento2:dev-continuous-integration-test-branch
+              run: docker exec magento-project-community-edition composer require mollie/magento2:dev-continuous-integration-test-branch --no-plugins
 
             - name: Run setup:di:compile
               run: docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
