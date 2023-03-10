@@ -11,19 +11,14 @@ export default class OrdersPage {
         cy.visit('/admin/sales/order/view/order_id/' + id);
     }
 
-    callWebhook() {
-        cy.url().as('currentUrl');
+    callFetchStatus() {
+        cy.get('.fetch-mollie-payment-status').click();
 
-        cy.get('.mollie-order-id').then((element) => {
-            cy.request('/mollie/checkout/webhook?id=' + element.text().trim())
-                .then((response) => {
-                expect(response.status).to.eq(200)
-            });
-        });
+        cy.wait(1000);
 
-        cy.get('@currentUrl').then((url) => {
-            cy.visit(url);
-        });
+        cy.get('.fetch-mollie-payment-status').click();
+
+        cy.wait(1000);
     }
 
     assertOrderStatusIs(status) {

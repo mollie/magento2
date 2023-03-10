@@ -1,0 +1,15 @@
+{
+  "type": {
+    "username": "annaschmidt@mollie.com",
+    "firstname": "Anna",
+    "company": "Acme Firma GmbH",
+    "lastname": "Schmidt",
+    "street[0]": "Musterstraße 1",
+    "city": "Berlin",
+    "postcode": "10115",
+    "telephone": "+49 30 XXXXXXXX"
+  },
+  "select": {
+    "country_id": "DE"
+  }
+}

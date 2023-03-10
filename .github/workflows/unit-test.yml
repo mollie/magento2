@@ -21,11 +21,11 @@ jobs:
       - name: Start Docker
         run: docker run --detach --name magento-project-community-edition michielgerritsen/magento-project-community-edition:${{ matrix.PHP_VERSION }}-magento${{ matrix.MAGENTO_VERSION }}
 
-      - name: Create branch for Composer and remove version from composer.json
-        run: git checkout -b continuous-integration-test-branch && sed -i '/version/d' ./composer.json
+      - name: Remove version from composer.json
+        run: sed -i '/version/d' ./composer.json
 
       - name: Upload the code into the docker container
-        run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition composer require mollie/magento2:dev-continuous-integration-test-branch
+        run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition composer require mollie/magento2:@dev --no-plugins
 
       - name: Activate the extension
         run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade && php bin/magento setup:di:compile"

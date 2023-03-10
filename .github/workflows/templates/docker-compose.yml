@@ -6,11 +6,12 @@ services:
     container_name: magento-project-community-edition
     environment:
       - VIRTUAL_HOST=magento.test
-      - URL=https://magento.test/
       - MOLLIE_API_KEY_TEST
     volumes:
       - ../../../magento-logs:/data/var/log
       - ./magento/configure-mollie.sh:/data/configure-mollie.sh
+    depends_on:
+      - ngrok
 
   nginx-proxy:
     image: jwilder/nginx-proxy
@@ -19,6 +20,12 @@ services:
       - ./nginx-proxy/magento.test.crt:/etc/nginx/certs/magento.test.crt
       - ./nginx-proxy/magento.test.key:/etc/nginx/certs/magento.test.key
       - /var/run/docker.sock:/tmp/docker.sock:ro
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    command: http http://magento
+    environment:
+      - NGROK_AUTHTOKEN
 
   e2e:
     build: ./e2e
