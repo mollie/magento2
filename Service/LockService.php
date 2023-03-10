@@ -43,6 +43,11 @@ class LockService
      */
     private $resourceConnection;
 
+    /**
+     * @var bool
+     */
+    private $alreadyLocked = false;
+
     public function __construct(
         Config $config,
         ResourceConnection $resourceConnection
@@ -60,15 +65,24 @@ class LockService
      */
     public function lock(string $name, int $timeout = -1): bool
     {
+        // Make sure we only lock once per request.
+        if ($this->alreadyLocked) {
+            return true;
+        }
+
         $this->config->addToLog('info', 'Locking: ' . $name);
         if ($this->isLockManagerAvailable()) {
-            return $this->lockManager->lock($name, $timeout);
+            return $this->alreadyLocked = $this->lockManager->lock($name, $timeout);
         }
 
         $result = (bool)$this->getConnection()->query(
             "SELECT GET_LOCK(?, ?);",
             [$name, $timeout < 0 ? 60 * 60 * 24 * 7 : $timeout]
         )->fetchColumn();
+
+        if ($result) {
+            $this->alreadyLocked = true;
+        }
 
         return $result;
     }
@@ -83,13 +97,19 @@ class LockService
     {
         $this->config->addToLog('info', 'Unlocking: ' . $name);
         if ($this->isLockManagerAvailable()) {
-            return $this->lockManager->unlock($name);
+            $result = $this->lockManager->unlock($name);
+            $this->alreadyLocked = !$result;
+            return $result;
         }
 
         $result = (bool)$this->getConnection()->query(
             "SELECT RELEASE_LOCK(?);",
             [(string)$name]
         )->fetchColumn();
+
+        if ($result) {
+            $this->alreadyLocked = false;
+        }
 
         return $result;
     }
