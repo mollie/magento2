@@ -27,7 +27,7 @@ jobs:
         run: sed -i '/version/d' ./composer.json
 
       - name: Upload the code into the docker container
-        run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition composer require mollie/magento2:@dev --no-plugins
+        run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition ./install-composer-package mollie/magento2:@dev
 
       - name: Activate the extension
         run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade"
