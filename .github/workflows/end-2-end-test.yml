@@ -36,6 +36,8 @@ jobs:
             })
 
   e2e-tests:
+    concurrency: e2e-tests
+
     needs:
       - secrets-gate
     # Only run this job if the secret is set
