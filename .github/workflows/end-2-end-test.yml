@@ -50,7 +50,7 @@ jobs:
           - PHP_VERSION: php74-fpm
             MAGENTO_VERSION: 2.3.7-p3
           - PHP_VERSION: php81-fpm
-            MAGENTO_VERSION: 2.4.5-p1
+            MAGENTO_VERSION: 2.4.6
     runs-on: ubuntu-latest
     env:
       PHP_VERSION: ${{ matrix.PHP_VERSION }}
