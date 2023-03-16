@@ -6,75 +6,81 @@
 
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Cart;
 
-use GraphQL\Type\Definition\FieldDefinition;
-use Mollie\Payment\GraphQL\Resolver\Cart\PaymentMethodMeta;
 use Mollie\Payment\Test\Integration\GraphQLTestCase;
 
+/**
+ * @magentoAppArea graphql
+ */
 class PaymentMethodMetaTest extends GraphQLTestCase
 {
     /**
-     * @magentoAppArea graphql
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture Magento/Sales/_files/quote_with_customer.php
      */
     public function testReturnsAnEmptyResponseForNonMollieMethods()
     {
-        $instance = $this->objectManager->create(PaymentMethodMeta::class);
+        $result = $this->getMethodFromCart('checkmo');
 
-        $result = $this->callResolve($instance, ['code' => 'checkmo']);
-
-        $this->assertNull($result['image']);
+        $this->assertNull($result['mollie_meta']['image']);
     }
 
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture Magento/Sales/_files/quote_with_customer.php
+     * @magentoConfigFixture default_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
+     */
     public function testReturnsTheImageForMollieMethods()
     {
-        $instance = $this->objectManager->create(PaymentMethodMeta::class);
+        $result = $this->getMethodFromCart('mollie_methods_ideal');
 
-        $result = $this->callResolve($instance, ['code' => 'mollie_methods_ideal']);
-
-        $this->assertStringContainsString('Mollie_Payment/images/methods/ideal.svg', $result['image']);
+        $this->assertStringContainsString(
+            'Mollie_Payment/images/methods/ideal.svg',
+            $result['mollie_meta']['image']
+        );
     }
 
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture Magento/Sales/_files/quote_with_customer.php
+     * @magentoConfigFixture default_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
+     */
     public function testTheImagesIsAFrontendPath()
     {
-        $instance = $this->objectManager->create(PaymentMethodMeta::class);
+        $result = $this->getMethodFromCart('mollie_methods_ideal');
 
-        $result = $this->callResolve($instance, ['code' => 'mollie_methods_ideal']);
-
-        $this->assertStringContainsString('frontend/Magento/luma', $result['image']);
+        $this->assertStringContainsString('frontend/Magento/luma', $result['mollie_meta']['image']);
     }
 
-    public function callResolve(PaymentMethodMeta $instance, $value = null, $args = null)
+    /**
+     * @throws \Exception
+     * @return array
+     */
+    public function getMethodFromCart(string $method): array
     {
-        return $instance->resolve(
-            $this->objectManager->create(\Magento\Framework\GraphQl\Config\Element\Field::class, [
-                'name' => 'testfield',
-                'type' => 'string',
-                'required' => false,
-                'isList' => false,
-            ]),
-            $this->objectManager->create(\Magento\Framework\GraphQl\Query\Resolver\ContextInterface::class),
-            $this->objectManager->create(\Magento\Framework\GraphQl\Schema\Type\ResolveInfo::class, [
-                'fieldDefinition' => FieldDefinition::create([
-                    'name' => 'test',
-                    'type' => $this->objectManager->create(\Magento\Framework\GraphQl\Schema\Type\BooleanType::class),
-                ]),
-                'values' => [],
-                'fieldName' => 'testfield',
-                'fieldNodes' => [],
-                'returnType' => 'string',
-                'parentType' => new \GraphQL\Type\Definition\ObjectType(['name' => 'testfield']),
-                'path' => [],
-                'schema' => $this->objectManager->create(\GraphQL\Type\Schema::class, ['config' => []]),
-                'fragments' => [],
-                'rootValue' => '',
-                'operation' => $this->objectManager->create(\GraphQL\Language\AST\OperationDefinitionNode::class, [
-                    'vars' => [
-                        'operation' => 'query',
-                    ]
-                ]),
-                'variableValues' => [],
-            ]),
-            $value,
-            $args
-        );
+        $this->loadFakeEncryptor()->addReturnValue('', 'test_dummyapikeythatisvalidandislongenough');
+        $this->loadPaymentMethodManagementPluginFake()->returnAll();
+
+        $cartId = $this->prepareCustomerCartWithoutPayment();
+
+        $result = $this->graphQlQuery('query {
+            cart(cart_id: "' . $cartId . '") {
+                available_payment_methods {
+                    code
+                    mollie_meta {
+                        image
+                    }
+                }
+            }
+        }');
+
+        foreach ($result['cart']['available_payment_methods'] as $paymentMethod) {
+            if ($paymentMethod['code'] == $method) {
+                return $paymentMethod;
+            }
+        }
+
+        $this->fail(sprintf('Method %s not found in available_payment_methods', $method));
     }
 }

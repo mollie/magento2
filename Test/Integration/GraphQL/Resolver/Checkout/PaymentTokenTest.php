@@ -6,100 +6,57 @@
 
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Checkout;
 
-use GraphQL\Type\Definition\FieldDefinition;
-use Magento\Framework\App\ProductMetadataInterface;
-use Magento\Quote\Model\Quote;
-use Mollie\Payment\Api\Data\PaymentTokenInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
-use Mollie\Payment\GraphQL\Resolver\Checkout\PaymentToken;
 use Mollie\Payment\Test\Integration\GraphQLTestCase;
-use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 /**
  * @magentoAppArea graphql
  */
 class PaymentTokenTest extends GraphQLTestCase
 {
-    protected function setUpWithoutVoid()
+    /**
+     * @magentoAppIsolation enabled
+     * @magentoDataFixture Magento/Sales/_files/quote_with_customer.php
+     * @magentoConfigFixture default_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
+     */
+    public function testGeneratesAPaymentTokenWhenAnOrderIsPlaced(): void
     {
-        parent::setUpWithoutVoid();
+        $result = $this->placeOrder();
 
-        $version = $this->objectManager->get(ProductMetadataInterface::class)->getVersion();
-        if (version_compare($version, '2.3', '<=')) {
-            $this->markTestSkipped('This test only works on Magento 2.3 and higher.');
-        }
-    }
+        $token = $result['placeOrder']['order']['mollie_payment_token'];
+        $this->assertNotEmpty($token);
 
-    public function testDoesNothingWhenTheOrderDoesNotExists()
-    {
-        /** @var PaymentToken $instance */
-        $instance = $this->objectManager->create(PaymentToken::class);
+        $tokenRepository = $this->objectManager->get(PaymentTokenRepositoryInterface::class);
+        $model = $tokenRepository->getByToken($token);
 
-        $result = $this->callResolve($instance, ['order_id' => 123]);
+        $orderRepository = $this->objectManager->get(OrderRepositoryInterface::class);
+        $order = $orderRepository->get($model->getOrderId());
 
-        $this->assertNull($result);
+        $this->assertEquals($result['placeOrder']['order']['order_number'], $order->getIncrementId());
     }
 
     /**
-     * @magentoDataFixture Magento/Sales/_files/quote.php
-     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @throws \Exception
+     * @return array
      */
-    public function testReturnsTheExistingToken()
+    public function placeOrder(): array
     {
-        $order = $this->loadOrder('100000001');
+        $this->loadFakeEncryptor()->addReturnValue('', 'test_dummyapikeythatisvalidandislongenough');
+        $this->loadPaymentMethodManagementPluginFake()->returnAll();
 
-        /** @var Quote $quote */
-        $quote = $this->objectManager->create(Quote::class);
-        $quote->load('test01', 'reserved_order_id');
+        $cartId = $this->prepareCustomerCart();
 
-        /** @var PaymentTokenInterface $tokenModel */
-        $tokenModel = $this->objectManager->create(PaymentTokenInterface::class);
-        $tokenModel->setToken('randomstring');
-        $tokenModel->setOrderId($order->getId());
-        $tokenModel->setCartId($quote->getId());
-        $this->objectManager->get(PaymentTokenRepositoryInterface::class)->save($tokenModel);
-
-        /** @var PaymentToken $instance */
-        $instance = $this->objectManager->create(PaymentToken::class);
-
-        $result = $this->callResolve($instance, ['order_id' => '100000001']);
-
-        $this->assertEquals('randomstring', $result);
-    }
-
-    public function callResolve(PaymentToken $instance, $value = null, $args = null)
-    {
-        return $instance->resolve(
-            $this->objectManager->create(\Magento\Framework\GraphQl\Config\Element\Field::class, [
-                'name' => 'testfield',
-                'type' => 'string',
-                'required' => false,
-                'isList' => false,
-            ]),
-            $this->objectManager->create(\Magento\Framework\GraphQl\Query\Resolver\ContextInterface::class),
-            $this->objectManager->create(\Magento\Framework\GraphQl\Schema\Type\ResolveInfo::class, [
-                'fieldDefinition' => FieldDefinition::create([
-                    'name' => 'test',
-                    'type' => $this->objectManager->create(\Magento\Framework\GraphQl\Schema\Type\BooleanType::class),
-                ]),
-                'fieldName' => 'testfield',
-                'fieldNodes' => [],
-                'returnType' => 'string',
-                'parentType' => new \GraphQL\Type\Definition\ObjectType(['name' => 'testfield']),
-                'path' => [],
-                'schema' => $this->objectManager->create(\GraphQL\Type\Schema::class, ['config' => []]),
-                'fragments' => [],
-                'rootValue' => '',
-                'operation' => $this->objectManager->create(\GraphQL\Language\AST\OperationDefinitionNode::class, [
-                    'vars' => [
-                        'operation' => 'query',
-                    ]
-                ]),
-                'variableValues' => [],
-                'values' => [],
-            ]),
-            $value,
-            $args
-        );
+        return $this->graphQlQuery('mutation cart {
+            placeOrder(input: {
+                cart_id:"' . $cartId . '"
+            }) {
+                order {
+                    mollie_payment_token
+                    order_number
+                }
+            }
+        }');
     }
 }
