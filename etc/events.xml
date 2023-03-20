@@ -45,7 +45,8 @@
         <observer name="mollie_force_customer_login_when_ordering_a_recurring_product" instance="Mollie\Payment\Observer\CheckoutAllowGuest\ForceCustomerLoginWhenSubscriptionItemInCart" />
     </event>
     <event name="checkout_submit_all_after">
-        <observer name="mollie_startransaction_for_instant_purchase_orders" instance="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPurchaseOrders" />
+        <observer name="mollie_starttransaction_for_instant_purchase_orders" instance="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPurchaseOrders" />
+        <observer name="mollie_starttransaction_for_paymentlink_orders" instance="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForPaymentLinkOrders" />
     </event>
     <event name="sales_quote_item_set_product">
         <observer name="mollie_add_subscription_product_type_options" instance="Mollie\Payment\Observer\SalesQuoteItemSetProduct\SetSubscriptionDataOnBuyRequest" />

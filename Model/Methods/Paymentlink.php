@@ -38,13 +38,10 @@ class Paymentlink extends Mollie
         /** @var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
         $order->setCanSendNewEmailFlag(false);
-        $order->save();
 
         if ($status = $this->config->statusNewPaymentLink($order->getStoreId())) {
             $stateObject->setStatus($status);
         }
-
-        $this->startTransaction($order);
     }
 
     /**
