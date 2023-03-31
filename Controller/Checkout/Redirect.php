@@ -22,10 +22,9 @@ use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\ApplePay;
-use Mollie\Payment\Model\Methods\Creditcard;
 use Mollie\Payment\Model\Methods\CreditcardVault;
-use Mollie\Payment\Model\Methods\Directdebit;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\Order\RedirectUrl;
 
 /**
  * Class Redirect
@@ -68,6 +67,11 @@ class Redirect extends Action
     private $orderRepository;
 
     /**
+     * @var RedirectUrl
+     */
+    private $redirectUrl;
+
+    /**
      * Redirect constructor.
      *
      * @param Context                           $context
@@ -79,6 +83,7 @@ class Redirect extends Action
      * @param Config                            $config
      * @param PaymentTokenRepositoryInterface   $paymentTokenRepository,
      * @param OrderRepositoryInterface          $orderRepository
+     * @param RedirectUrl                       $redirectUrl
      */
     public function __construct(
         Context $context,
@@ -89,7 +94,8 @@ class Redirect extends Action
         OrderManagementInterface $orderManagement,
         Config $config,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
-        OrderRepositoryInterface $orderRepository
+        OrderRepositoryInterface $orderRepository,
+        RedirectUrl $redirectUrl
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->resultPageFactory = $resultPageFactory;
@@ -99,6 +105,7 @@ class Redirect extends Action
         $this->config = $config;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->orderRepository = $orderRepository;
+        $this->redirectUrl = $redirectUrl;
         parent::__construct($context);
     }
 
@@ -124,7 +131,7 @@ class Redirect extends Action
             $methodInstance = $this->getMethodInstance($method);
             if ($methodInstance instanceof Mollie) {
                 $storeId = $order->getStoreId();
-                $redirectUrl = $this->startTransaction($methodInstance, $order);
+                $redirectUrl = $this->redirectUrl->execute($methodInstance, $order);
                 // This is deprecated since 2.18.0 and will be removed in a future version.
                 if (!($methodInstance instanceof ApplePay) &&
                     $this->mollieHelper->useLoadingScreen($storeId)
@@ -231,30 +238,6 @@ class Redirect extends Action
         }
 
         return $this->orderRepository->get($model->getOrderId());
-    }
-
-    /**
-     * @param Mollie $methodInstance
-     * @param OrderInterface $order
-     * @return mixed
-     */
-    private function startTransaction(Mollie $methodInstance, OrderInterface $order)
-    {
-        $redirectUrl = $methodInstance->startTransaction($order);
-
-        /**
-         * Directdebit does not return an url when in test mode.
-         */
-        if (!$redirectUrl && $methodInstance instanceof Directdebit && $this->config->isTestMode()) {
-            $redirectUrl = $this->_url->getUrl('checkout/onepage/success/');
-        }
-
-        $emptyUrlAllowed = $methodInstance instanceof ApplePay || $methodInstance instanceof Creditcard;
-        if (!$redirectUrl && $emptyUrlAllowed) {
-            $redirectUrl = $this->_url->getUrl('checkout/onepage/success/');
-        }
-
-        return $redirectUrl;
     }
 
     private function getMethodInstance(string $method): MethodInterface
