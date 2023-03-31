@@ -48,11 +48,29 @@ trait IntegrationTestCaseTrait
      * @param $path
      * @throws \Exception
      */
-    public function loadFixture($path)
+    public function loadFixture($path): void
     {
         $cwd = getcwd();
 
         $fullPath = __DIR__ . '/../../Fixtures/' . $path;
+        if (!file_exists($fullPath)) {
+            throw new \Exception('The path "' . $fullPath . '" does not exists');
+        }
+
+        chdir($this->getRootDirectory() . '/dev/tests/integration/testsuite/');
+        require $fullPath;
+        chdir($cwd);
+    }
+
+    /**
+     * @param $path
+     * @throws \Exception
+     */
+    public function loadMagentoFixture($path): void
+    {
+        $cwd = getcwd();
+
+        $fullPath = $this->getRootDirectory() . '/dev/tests/integration/testsuite/' . $path;
         if (!file_exists($fullPath)) {
             throw new \Exception('The path "' . $fullPath . '" does not exists');
         }
