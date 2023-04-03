@@ -44,13 +44,12 @@ jobs:
     if: needs.secrets-gate.outputs.is-secret-set == 'true'
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
         include:
           - PHP_VERSION: php74-fpm
             MAGENTO_VERSION: 2.3.7-p3
           - PHP_VERSION: php81-fpm
-            MAGENTO_VERSION: 2.4.5-p1
+            MAGENTO_VERSION: 2.4.6
     runs-on: ubuntu-latest
     env:
       PHP_VERSION: ${{ matrix.PHP_VERSION }}
@@ -81,7 +80,7 @@ jobs:
         run: |
           sed -i '/version/d' ./composer.json && \
           docker cp $(pwd) magento-project-community-edition:/data/extensions/ && \
-          docker exec magento-project-community-edition composer require mollie/magento2:@dev --no-plugins
+          docker exec magento-project-community-edition ./install-composer-package mollie/magento2:@dev
 
       - name: Activate the extension
         run: |
