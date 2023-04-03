@@ -10,7 +10,6 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Helper\Tests as TestsHelper;
@@ -46,11 +45,6 @@ class Apikey extends Action
     private $scopeConfig;
 
     /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
-    /**
      * Apikey constructor.
      *
      * @param Context $context
@@ -58,22 +52,19 @@ class Apikey extends Action
      * @param TestsHelper $testsHelper
      * @param MollieHelper $mollieHelper
      * @param ScopeConfigInterface $scopeConfig
-     * @param EncryptorInterface $encryptor
      */
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         TestsHelper $testsHelper,
         MollieHelper $mollieHelper,
-        ScopeConfigInterface $scopeConfig,
-        EncryptorInterface $encryptor
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->request = $context->getRequest();
         $this->resultJsonFactory = $resultJsonFactory;
         $this->testsHelper = $testsHelper;
         $this->mollieHelper = $mollieHelper;
         $this->scopeConfig = $scopeConfig;
-        $this->encryptor = $encryptor;
 
         parent::__construct($context);
     }
@@ -109,9 +100,7 @@ class Apikey extends Action
     private function getKey(string $type): string
     {
         if (!$this->request->getParam($type . '_key') || $this->request->getParam($type . '_key') == '******') {
-            $value = $this->scopeConfig->getValue('payment/mollie_general/apikey_' . $type, ScopeInterface::SCOPE_STORE);
-
-            return $this->encryptor->decrypt($value);
+            return $this->scopeConfig->getValue('payment/mollie_general/apikey_' . $type, ScopeInterface::SCOPE_STORE);
         }
 
         return $this->request->getParam($type . '_key');

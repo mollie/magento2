@@ -11,7 +11,6 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\GraphQl\Controller\GraphQl;
 use Magento\GraphQl\Service\GraphQlRequest;
-use Magento\Integration\Api\CustomerTokenServiceInterface;
 
 class GraphQLTestCase extends IntegrationTestCase
 {

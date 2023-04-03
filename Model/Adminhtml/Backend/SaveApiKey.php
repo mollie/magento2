@@ -61,7 +61,7 @@ class SaveApiKey extends Encrypted
 
         parent::beforeSave();
 
-        if ($this->getValue() !== '******' && $this->getOldValue() != $this->getValue()) {
+        if ($this->getValue() !== '******' && $this->getOldValue() != $value) {
             // Validate the new API key before saving.
             (new MollieApiClient())->setApiKey($value);
 
