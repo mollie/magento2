@@ -20,6 +20,8 @@ class PaymentTokenTest extends GraphQLTestCase
      * @magentoDataFixture Magento/Sales/_files/quote_with_customer.php
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
+     * @magentoConfigFixture default_store payment/mollie_general/mode test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      */
     public function testGeneratesAPaymentTokenWhenAnOrderIsPlaced(): void
     {

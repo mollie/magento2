@@ -17,7 +17,7 @@ class PaymentMethodMetaTest extends GraphQLTestCase
      * @magentoAppIsolation enabled
      * @magentoDataFixture Magento/Sales/_files/quote_with_customer.php
      */
-    public function testReturnsAnEmptyResponseForNonMollieMethods()
+    public function testReturnsAnEmptyResponseForNonMollieMethods(): void
     {
         $result = $this->getMethodFromCart('checkmo');
 
@@ -29,8 +29,10 @@ class PaymentMethodMetaTest extends GraphQLTestCase
      * @magentoDataFixture Magento/Sales/_files/quote_with_customer.php
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
+     * @magentoConfigFixture default_store payment/mollie_general/mode test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      */
-    public function testReturnsTheImageForMollieMethods()
+    public function testReturnsTheImageForMollieMethods(): void
     {
         $result = $this->getMethodFromCart('mollie_methods_ideal');
 
@@ -45,8 +47,10 @@ class PaymentMethodMetaTest extends GraphQLTestCase
      * @magentoDataFixture Magento/Sales/_files/quote_with_customer.php
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
+     * @magentoConfigFixture default_store payment/mollie_general/mode test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      */
-    public function testTheImagesIsAFrontendPath()
+    public function testTheImagesIsAFrontendPath(): void
     {
         $result = $this->getMethodFromCart('mollie_methods_ideal');
 
