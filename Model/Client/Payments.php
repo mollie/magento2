@@ -26,6 +26,7 @@ use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\SaveAdditionalInformationDetails;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\TransactionProcessor;
@@ -120,6 +121,11 @@ class Payments extends AbstractModel
     private $validateMetadata;
 
     /**
+     * @var SaveAdditionalInformationDetails
+     */
+    private $saveAdditionalInformationDetails;
+
+    /**
      * Payments constructor.
      *
      * @param OrderRepository $orderRepository
@@ -139,6 +145,7 @@ class Payments extends AbstractModel
      * @param LinkTransactionToOrder $linkTransactionToOrder
      * @param ProcessTransaction $processTransaction
      * @param ValidateMetadata $validateMetadata
+     * @param SaveAdditionalInformationDetails $saveAdditionalInformationDetails
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -157,7 +164,8 @@ class Payments extends AbstractModel
         EventManager $eventManager,
         LinkTransactionToOrder $linkTransactionToOrder,
         ProcessTransaction $processTransaction,
-        ValidateMetadata $validateMetadata
+        ValidateMetadata $validateMetadata,
+        SaveAdditionalInformationDetails $saveAdditionalInformationDetails
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -176,6 +184,7 @@ class Payments extends AbstractModel
         $this->linkTransactionToOrder = $linkTransactionToOrder;
         $this->processTransaction = $processTransaction;
         $this->validateMetadata = $validateMetadata;
+        $this->saveAdditionalInformationDetails = $saveAdditionalInformationDetails;
     }
 
     /**
@@ -330,7 +339,7 @@ class Payments extends AbstractModel
                 return $msg;
             }
             if ($paymentData->details !== null) {
-                $payment->setAdditionalInformation('details', json_encode($paymentData->details));
+                $this->saveAdditionalInformationDetails->execute($payment, $paymentData->details);
             }
 
             if (!$payment->getIsTransactionClosed() && $type == 'webhook') {

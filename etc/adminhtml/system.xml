@@ -243,6 +243,13 @@
                         <field id="use_webhooks">custom_url</field>
                     </depends>
                 </field>
+                <field id="encrypt_payment_details" translate="label" type="select" sortOrder="120" showInDefault="1"
+                       showInWebsite="0" showInStore="1">
+                    <label>Encrypt payment details</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/encrypt_payment_details</config_path>
+                    <comment><![CDATA[Each order has extra information, name of the card, etc. When setting this option to Yes, this information will be encrypted before it is being saved.]]></comment>
+                </field>
             </group>
 
             <group id="pwa_storefront_integration" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"

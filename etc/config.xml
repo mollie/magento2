@@ -30,6 +30,7 @@
                 <enable_magento_vault>0</enable_magento_vault>
                 <apikey_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <apikey_live backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <encrypt_payment_details>0</encrypt_payment_details>
             </mollie_general>
             <mollie_methods_general>
                 <model>Mollie\Payment\Model\Methods\General</model>
