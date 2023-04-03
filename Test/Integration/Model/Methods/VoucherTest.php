@@ -36,13 +36,13 @@ class VoucherTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_methods_voucher/category meal
      * @magentoConfigFixture default_store payment/mollie_methods_voucher/active 1
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture default_store payment/mollie_general/mode test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function testIsAvailableWhenTheCategoryIsSet()
+    public function testIsAvailableWhenTheCategoryIsSet(): void
     {
-        $this->loadFakeEncryptor()->addReturnValue('', 'test_dummyapikeywhichmustbe30characterslong');
-
         /** @var CartInterface $cart */
         $cart = $this->objectManager->create(CartInterface::class);
 

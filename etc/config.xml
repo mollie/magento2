@@ -28,6 +28,8 @@
                 <second_chance_use_payment_method>use_method_of_original_order</second_chance_use_payment_method>
                 <redirect_when_transaction_fails_to>redirect_to_cart</redirect_when_transaction_fails_to>
                 <enable_magento_vault>0</enable_magento_vault>
+                <apikey_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
+                <apikey_live backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
             </mollie_general>
             <mollie_methods_general>
                 <model>Mollie\Payment\Model\Methods\General</model>

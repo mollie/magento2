@@ -11,6 +11,12 @@ use Mollie\Payment\Test\Integration\GraphQLTestCase;
  */
 class ApplePayValidationTest extends GraphQLTestCase
 {
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/mode test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
+     * @throws \Exception
+     * @return void
+     */
     public function testValidates(): void
     {
         $this->objectManager->addSharedInstance(

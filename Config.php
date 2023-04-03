@@ -209,13 +209,13 @@ class Config
             if (empty($apiKey)) {
                 $this->addToLog('error', 'Mollie API key not set (test modus)');
             }
-            $decryptedApiKey = $this->encryptor->decrypt($apiKey);
-            if (!preg_match('/^test_\w+$/', $decryptedApiKey)) {
+
+            if (!preg_match('/^test_\w+$/', $apiKey)) {
                 $this->addToLog('error', 'Mollie set to test modus, but API key does not start with "test_"');
             }
 
-            $keys[$storeId] = $decryptedApiKey;
-            return $decryptedApiKey;
+            $keys[$storeId] = $apiKey;
+            return $apiKey;
         }
 
         $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId) ?? '');
@@ -223,13 +223,12 @@ class Config
             $this->addToLog('error', 'Mollie API key not set (live modus)');
         }
 
-        $decryptedApiKey = $this->encryptor->decrypt($apiKey);
-        if (!preg_match('/^live_\w+$/', $decryptedApiKey)) {
+        if (!preg_match('/^live_\w+$/', $apiKey)) {
             $this->addToLog('error', 'Mollie set to live modus, but API key does not start with "live_"');
         }
 
-        $keys[$storeId] = $decryptedApiKey;
-        return $decryptedApiKey;
+        $keys[$storeId] = $apiKey;
+        return $apiKey;
     }
 
     /**

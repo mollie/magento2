@@ -305,21 +305,22 @@ class General extends AbstractHelper
             if (empty($apiKey)) {
                 $this->addTolog('error', 'Mollie API key not set (test modus)');
             }
-            $decryptedApiKey = $this->encryptor->decrypt($apiKey);
-            if (!preg_match('/^test_\w+$/', $decryptedApiKey)) {
+
+            if (!preg_match('/^test_\w+$/', $apiKey)) {
                 $this->addTolog('error', 'Mollie set to test modus, but API key does not start with "test_"');
             }
-            $this->apiKey[$storeId] = $decryptedApiKey;
+
+            $this->apiKey[$storeId] = $apiKey;
         } else {
             $apiKey = trim($this->getStoreConfig(self::XML_PATH_LIVE_APIKEY, $storeId) ?? '');
             if (empty($apiKey)) {
                 $this->addTolog('error', 'Mollie API key not set (live modus)');
             }
-            $decryptedApiKey = $this->encryptor->decrypt($apiKey);
-            if (!preg_match('/^live_\w+$/', $decryptedApiKey)) {
+
+            if (!preg_match('/^live_\w+$/', $apiKey)) {
                 $this->addTolog('error', 'Mollie set to live modus, but API key does not start with "live_"');
             }
-            $this->apiKey[$storeId] = $decryptedApiKey;
+            $this->apiKey[$storeId] = $apiKey;
         }
 
         return $this->apiKey[$storeId];
