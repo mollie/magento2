@@ -28,6 +28,7 @@
                 <second_chance_use_payment_method>use_method_of_original_order</second_chance_use_payment_method>
                 <redirect_when_transaction_fails_to>redirect_to_cart</redirect_when_transaction_fails_to>
                 <enable_magento_vault>0</enable_magento_vault>
+                <encrypt_payment_details>0</encrypt_payment_details>
             </mollie_general>
             <mollie_methods_general>
                 <model>Mollie\Payment\Model\Methods\General</model>
