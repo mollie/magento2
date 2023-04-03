@@ -5,6 +5,8 @@ on:
       - opened
       - labeled
 
+concurrency: e2e-tests
+
 jobs:
   secrets-gate:
     # Only run tests if the pull request is opened or labeled with run_e2e_tests
@@ -36,8 +38,6 @@ jobs:
             })
 
   e2e-tests:
-    concurrency: e2e-tests
-
     needs:
       - secrets-gate
     # Only run this job if the secret is set
