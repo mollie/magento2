@@ -49,10 +49,14 @@ class BundleWithoutDynamicPricing implements ProcessorInterface
 
         $taxPercent = $orderItem->getTaxPercent();
         $unitPrice = $orderLine['totalAmount']['value'] / $orderItem->getQtyOrdered();
-        $newVatAmount = (($unitPrice - $discountAmount) / (100 + $taxPercent)) * $taxPercent;
+        $quantity = (float) $orderItem->getQtyOrdered();
+        $newVatAmount = ((($quantity * $unitPrice) - $discountAmount) / (100 + $taxPercent)) * $taxPercent;
 
         $orderLine['unitPrice'] = $this->mollieHelper->getAmountArray($currency, $unitPrice);
-        $orderLine['totalAmount'] = $this->mollieHelper->getAmountArray($currency, $unitPrice - $discountAmount);
+        $orderLine['totalAmount'] = $this->mollieHelper->getAmountArray(
+            $currency,
+            ($quantity * $unitPrice) - $discountAmount
+        );
         $orderLine['vatAmount'] = $this->mollieHelper->getAmountArray($currency, $newVatAmount);
         $orderLine['discountAmount'] = $this->mollieHelper->getAmountArray($currency, $discountAmount);
 
