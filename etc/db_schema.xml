@@ -121,6 +121,10 @@
         <constraint xsi:type="primary" referenceId="PRIMARY">
             <column name="entity_id"/>
         </constraint>
+
+        <index referenceId="MOLLIE_PAYMENT_TRANSACTION_TO_ORDER_TRANSACTION_ID" indexType="btree">
+            <column name="transaction_id"/>
+        </index>
     </table>
 
     <table name="quote">
