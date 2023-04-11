@@ -11,6 +11,7 @@ use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Model\Client\PaymentProcessorInterface;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
+use Mollie\Payment\Service\Order\SaveAdditionalInformationDetails;
 
 class AddAdditionalInformation implements PaymentProcessorInterface
 {
@@ -19,10 +20,17 @@ class AddAdditionalInformation implements PaymentProcessorInterface
      */
     private $dashboardUrl;
 
+    /**
+     * @var SaveAdditionalInformationDetails
+     */
+    private $saveAdditionalInformationDetails;
+
     public function __construct(
-        DashboardUrl $dashboardUrl
+        DashboardUrl $dashboardUrl,
+        SaveAdditionalInformationDetails $saveAdditionalInformationDetails
     ) {
         $this->dashboardUrl = $dashboardUrl;
+        $this->saveAdditionalInformationDetails = $saveAdditionalInformationDetails;
     }
 
     public function process(
@@ -42,7 +50,7 @@ class AddAdditionalInformation implements PaymentProcessorInterface
         }
 
         if ($molliePayment->details !== null) {
-            $magentoPayment->setAdditionalInformation('details', json_encode($molliePayment->details));
+            $this->saveAdditionalInformationDetails->execute($magentoPayment, $molliePayment->details);
         }
 
         return $response;

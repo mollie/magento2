@@ -6,9 +6,21 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Api\Resources\Order;
 use Mollie\Payment\Model\Client\OrderProcessorInterface;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
+use Mollie\Payment\Service\Order\SaveAdditionalInformationDetails;
 
 class SaveCardDetails implements OrderProcessorInterface
 {
+    /**
+     * @var SaveAdditionalInformationDetails
+     */
+    private $saveAdditionalInformationDetails;
+
+    public function __construct(
+        SaveAdditionalInformationDetails $saveAdditionalInformationDetails
+    ) {
+        $this->saveAdditionalInformationDetails = $saveAdditionalInformationDetails;
+    }
+
     public function process(
         OrderInterface $magentoOrder,
         Order $mollieOrder,
@@ -26,7 +38,7 @@ class SaveCardDetails implements OrderProcessorInterface
             return $response;
         }
 
-        $magentoOrder->getPayment()->setAdditionalInformation('details', json_encode($details));
+        $this->saveAdditionalInformationDetails->execute($magentoOrder->getPayment(), $details);
 
         return $response;
     }

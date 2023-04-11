@@ -30,6 +30,7 @@ class Config
     const GENERAL_DASHBOARD_URL_PAYMENTS_API = 'payment/mollie_general/dashboard_url_payments_api';
     const GENERAL_ENABLE_MAGENTO_VAULT = 'payment/mollie_general/enable_magento_vault';
     const GENERAL_ENABLE_SECOND_CHANCE_EMAIL = 'payment/mollie_general/enable_second_chance_email';
+    const GENERAL_ENCRYPT_PAYMENT_DETAILS = 'payment/mollie_general/encrypt_payment_details';
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const GENERAL_LOCALE = 'payment/mollie_general/locale';
@@ -209,13 +210,13 @@ class Config
             if (empty($apiKey)) {
                 $this->addToLog('error', 'Mollie API key not set (test modus)');
             }
-            $decryptedApiKey = $this->encryptor->decrypt($apiKey);
-            if (!preg_match('/^test_\w+$/', $decryptedApiKey)) {
+
+            if (!preg_match('/^test_\w+$/', $apiKey)) {
                 $this->addToLog('error', 'Mollie set to test modus, but API key does not start with "test_"');
             }
 
-            $keys[$storeId] = $decryptedApiKey;
-            return $decryptedApiKey;
+            $keys[$storeId] = $apiKey;
+            return $apiKey;
         }
 
         $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId) ?? '');
@@ -223,13 +224,12 @@ class Config
             $this->addToLog('error', 'Mollie API key not set (live modus)');
         }
 
-        $decryptedApiKey = $this->encryptor->decrypt($apiKey);
-        if (!preg_match('/^live_\w+$/', $decryptedApiKey)) {
+        if (!preg_match('/^live_\w+$/', $apiKey)) {
             $this->addToLog('error', 'Mollie set to live modus, but API key does not start with "live_"');
         }
 
-        $keys[$storeId] = $decryptedApiKey;
-        return $decryptedApiKey;
+        $keys[$storeId] = $apiKey;
+        return $apiKey;
     }
 
     /**
@@ -677,6 +677,11 @@ class Config
     public function isMultishippingEnabled(): bool
     {
         return $this->moduleManager->isEnabled('Mollie_Multishipping');
+    }
+
+    public function encryptPaymentDetails($storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_ENCRYPT_PAYMENT_DETAILS, $storeId);
     }
 
     /**

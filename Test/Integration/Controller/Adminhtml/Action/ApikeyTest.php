@@ -14,7 +14,7 @@ use Mollie\Payment\Test\Integration\BackendControllerTestCase;
 
 class ApikeyTest extends BackendControllerTestCase
 {
-    public function testValidatesTheTestKey()
+    public function testValidatesTheTestKey(): void
     {
         $this->mockMollieMethodsEndpointForRequestKeys('test_apikey123456789101112131415161718', '');
 
@@ -27,7 +27,7 @@ class ApikeyTest extends BackendControllerTestCase
         $this->assertTrue($result['success']);
     }
 
-    public function testValidatesTheLiveKey()
+    public function testValidatesTheLiveKey(): void
     {
         $this->mockMollieMethodsEndpointForRequestKeys('', 'live_apikey123456789101112131415161718');
 
@@ -40,26 +40,13 @@ class ApikeyTest extends BackendControllerTestCase
         $this->assertTrue($result['success']);
     }
 
-    public function testFallsBackOnTheConfigurationForTest()
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_apikey123456789101112131415161718
+     * @return void
+     */
+    public function testFallsBackOnTheConfigurationForTest(): void
     {
-        $encryptorMock = $this->createMock(Encryptor::class);
-
-        $encryptorMock->method('decrypt')->willReturnCallback(function ($input) use (&$count) {
-            $count++;
-            if ($count == 2) {
-                return 'test_apikey123456789101112131415161718';
-            }
-
-            if ($count === 3) {
-                return '';
-            }
-
-            return $input;
-        });
-
         $this->mockMollieMethodsEndpointForConfigurationKeys('test_apikey123456789101112131415161718', '');
-
-        $this->_objectManager->addSharedInstance($encryptorMock, Encryptor::class);
 
         $this->dispatch('backend/mollie/action/apikey');
 
@@ -70,26 +57,15 @@ class ApikeyTest extends BackendControllerTestCase
         $this->assertTrue($result['success']);
     }
 
-    public function testFallsBackOnTheConfigurationForLive()
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_live live_apikey123456789101112131415161718
+     * @return void
+     */
+    public function testFallsBackOnTheConfigurationForLive(): void
     {
         $count = 0;
-        $encryptorMock = $this->createMock(Encryptor::class);
-        $encryptorMock->method('decrypt')->willReturnCallback(function ($input) use (&$count) {
-            $count++;
-            if ($count == 2) {
-                return '';
-            }
-
-            if ($count === 3) {
-                return 'live_apikey123456789101112131415161718';
-            }
-
-            return $input;
-        });
 
         $this->mockMollieMethodsEndpointForConfigurationKeys('', 'live_apikey123456789101112131415161718');
-
-        $this->_objectManager->addSharedInstance($encryptorMock, Encryptor::class);
 
         $this->dispatch('backend/mollie/action/apikey');
 

@@ -11,7 +11,6 @@ use Magento\Framework\Module\Manager;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\GraphQl\Controller\GraphQl;
 use Magento\GraphQl\Service\GraphQlRequest;
-use Magento\Integration\Api\CustomerTokenServiceInterface;
 
 class GraphQLTestCase extends IntegrationTestCase
 {
@@ -83,11 +82,26 @@ class GraphQLTestCase extends IntegrationTestCase
         $this->graphQlRequest = $this->objectManager->create(GraphQlRequest::class);
     }
 
-    protected function prepareCustomerCart(string $paymentMethod = 'mollie_methods_ideal'): string
+    protected function prepareCustomerCart(?string $paymentMethod = 'mollie_methods_ideal'): string
     {
         $cartId = $this->graphQlQuery(
             'mutation {createEmptyCart}'
         )['createEmptyCart'];
+
+        $this->graphQlQuery('
+            mutation {
+                setGuestEmailOnCart(
+                    input: {
+                        cart_id: "' . $cartId . '"
+                        email: "example@mollie.com"
+                    }
+                ) {
+                    cart {
+                        email
+                    }
+                }
+            }
+        ');
 
         $this->graphQlQuery('
             mutation {
@@ -207,23 +221,30 @@ class GraphQLTestCase extends IntegrationTestCase
             }
         ');
 
-        $this->graphQlQuery('
-            mutation {
-                setPaymentMethodOnCart(input: {
-                    cart_id: "' . $cartId . '"
-                    payment_method: {
-                        code: "' . $paymentMethod . '"
-                    }
-                }) {
-                    cart {
-                        selected_payment_method {
-                            code
+        if ($paymentMethod) {
+            $this->graphQlQuery('
+                mutation {
+                    setPaymentMethodOnCart(input: {
+                        cart_id: "' . $cartId . '"
+                        payment_method: {
+                            code: "' . $paymentMethod . '"
+                        }
+                    }) {
+                        cart {
+                            selected_payment_method {
+                                code
+                            }
                         }
                     }
                 }
-            }
-        ');
+            ');
+        }
 
         return $cartId;
+    }
+
+    protected function prepareCustomerCartWithoutPayment(): string
+    {
+        return $this->prepareCustomerCart(null);
     }
 }

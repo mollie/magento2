@@ -12,7 +12,9 @@ use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\ObjectManager;
+use Mollie\Payment\Plugin\Quote\Api\PaymentMethodManagementPlugin;
 use Mollie\Payment\Test\Fakes\FakeEncryptor;
+use Mollie\Payment\Test\Fakes\Plugin\Quote\Api\PaymentMethodManagementPluginFake;
 
 trait IntegrationTestCaseTrait
 {
@@ -48,11 +50,29 @@ trait IntegrationTestCaseTrait
      * @param $path
      * @throws \Exception
      */
-    public function loadFixture($path)
+    public function loadFixture($path): void
     {
         $cwd = getcwd();
 
         $fullPath = __DIR__ . '/../../Fixtures/' . $path;
+        if (!file_exists($fullPath)) {
+            throw new \Exception('The path "' . $fullPath . '" does not exists');
+        }
+
+        chdir($this->getRootDirectory() . '/dev/tests/integration/testsuite/');
+        require $fullPath;
+        chdir($cwd);
+    }
+
+    /**
+     * @param $path
+     * @throws \Exception
+     */
+    public function loadMagentoFixture($path): void
+    {
+        $cwd = getcwd();
+
+        $fullPath = $this->getRootDirectory() . '/dev/tests/integration/testsuite/' . $path;
         if (!file_exists($fullPath)) {
             throw new \Exception('The path "' . $fullPath . '" does not exists');
         }
@@ -79,6 +99,15 @@ trait IntegrationTestCaseTrait
         $instance = $this->objectManager->get(FakeEncryptor::class);
 
         $this->objectManager->addSharedInstance($instance, Encryptor::class);
+
+        return $instance;
+    }
+
+    public function loadPaymentMethodManagementPluginFake(): PaymentMethodManagementPluginFake
+    {
+        $instance = $this->objectManager->get(PaymentMethodManagementPluginFake::class);
+
+        $this->objectManager->addSharedInstance($instance, PaymentMethodManagementPlugin::class);
 
         return $instance;
     }

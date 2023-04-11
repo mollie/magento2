@@ -13,6 +13,8 @@ class PaymentFeeTest extends GraphQLTestCase
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/payment_surcharge_type fixed_fee
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/payment_surcharge_fixed_amount 5
+     * @magentoConfigFixture default_store payment/mollie_general/mode test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      * @magentoAppArea graphql
      */
     public function testReturnsPaymentFeePricesForMollieMethod(): void
@@ -29,6 +31,8 @@ class PaymentFeeTest extends GraphQLTestCase
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/payment_surcharge_type
+     * @magentoConfigFixture default_store payment/mollie_general/mode test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      * @magentoAppArea graphql
      */
     public function testDoesNotReturnPricesWhenNoPaymentFeeAvailable(): void
@@ -45,8 +49,6 @@ class PaymentFeeTest extends GraphQLTestCase
      */
     public function callGraphQlQuery(): array
     {
-        $this->loadFakeEncryptor()->addReturnValue('', 'test_dummyapikeythatisvalidandislongenough');
-
         $cartId = $this->prepareCustomerCart();
 
         return $this->graphQlQuery('

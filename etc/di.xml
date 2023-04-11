@@ -104,6 +104,8 @@
                 <item name="applePayPaymentToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\ApplePayPaymentToken</item>
                 <item name="sequenceTypeForVault" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\SequenceType</item>
                 <item name="UseSavedPaymentMethod" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\UseSavedPaymentMethod</item>
+                <item name="PhoneNumber" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\PhoneNumber</item>
+                <item name="DateOfBirth" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\DateOfBirth</item>
             </argument>
         </arguments>
     </type>

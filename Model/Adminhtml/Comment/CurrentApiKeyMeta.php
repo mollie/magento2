@@ -34,8 +34,8 @@ class CurrentApiKeyMeta extends AbstractBlock implements CommentInterface
             return '';
         }
 
-        $start = substr($this->encryptor->decrypt($elementValue), 0, 5);
-        $end = substr($this->encryptor->decrypt($elementValue), -4);
+        $start = substr($elementValue, 0, 5);
+        $end = substr($elementValue, -4);
 
         return __('The current value starts with <strong>%1</strong> and ends on <strong>%2</strong>', $start, $end);
     }
