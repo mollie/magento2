@@ -58,14 +58,13 @@ class VersionCheck extends Action
         $changeLog = [];
         if ($result) {
             $data = $this->json->unserialize($result);
-            $versions = array_keys($data);
-            $latest = reset($versions);
-            foreach ($data as $version => $changes) {
-                if ('v' . $version == $this->config->getVersion()) {
+            $latest = $data[0]['tag_name'];
+            foreach ($data as $release) {
+                if ($release['tag_name'] == $this->config->getVersion()) {
                     break;
                 }
                 $changeLog[] = [
-                    $version => $changes['changelog']
+                    $release['tag_name'] => $release['body']
                 ];
             }
         }
@@ -82,11 +81,20 @@ class VersionCheck extends Action
     private function getVersions()
     {
         try {
+            // Github required a User-Agent
+            $options = [
+                'http' => [
+                    'method' => 'GET',
+                    'header' => [
+                        'User-Agent: PHP'
+                    ]
+                ]
+            ];
+
             return $this->file->fileGetContents(
-                sprintf(
-                    'http://version.magmodules.eu/%s.json',
-                    Config::EXTENSION_CODE
-                )
+                'https://api.github.com/repos/mollie/magento2/releases',
+                null,
+                stream_context_create($options)
             );
         } catch (\Exception $exception) {
             return '';
