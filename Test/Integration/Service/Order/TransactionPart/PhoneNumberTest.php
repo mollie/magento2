@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Test\Integration\Service\Order\TransactionPart;
 
+use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
@@ -54,6 +55,52 @@ class PhoneNumberTest extends IntegrationTestCase
         );
 
         $this->assertSame($expected, $transaction['billingAddress']['phone']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @return void
+     */
+    public function testDoesNotAddThePhoneNumberWhenItsEmpty(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $billingAddress = $order->getBillingAddress();
+        $billingAddress->setCountryId('NL');
+        $billingAddress->setTelephone('');
+
+        /** @var PhoneNumber $instance */
+        $instance = $this->objectManager->create(PhoneNumber::class);
+
+        $transaction = $instance->process(
+            $order,
+            Orders::CHECKOUT_TYPE,
+            ['billingAddress' => []]
+        );
+
+        $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @return void
+     */
+    public function testHandlesNullAsPhonenumber(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $billingAddress = $order->getBillingAddress();
+        $billingAddress->setCountryId('NL');
+        $billingAddress->setData(OrderAddressInterface::TELEPHONE, null);
+
+        /** @var PhoneNumber $instance */
+        $instance = $this->objectManager->create(PhoneNumber::class);
+
+        $transaction = $instance->process(
+            $order,
+            Orders::CHECKOUT_TYPE,
+            ['billingAddress' => []]
+        );
+
+        $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
     }
 
     public function convertsPhoneNumbersToTheCorrectFormatDataProvider(): array
