@@ -308,3 +308,88 @@
 "CVC/CVV","CVC/CVV"
 "Save for later use.","Bewaar voor later gebruik."
 "Place Order","Plaats bestelling"
+
+"Warning: This order is (partially) paid using a voucher. You can refund a maximum of %1.","Waarschuwing: Deze bestelling is (gedeeltelijk) betaald met een tegoedbon. U kunt maximaal %1 terugbetalen."
+Unknown,Unknown
+"Failed to initialize product","Product initialisatie mislukt"
+"Your session has expired","Uw sessie is verlopen"
+"Product not found","Product niet gevonden"
+"We can't add this item to your shopping cart right now.","We kunnen dit artikel momenteel niet aan uw winkelwagen toevoegen."
+"The webhook URL is invalid because it is unreachable from Mollie's point of view. View this article for more information: https://github.com/mollie/magento2/wiki/Webhook-Communication-between-your-Magento-webshop-and-Mollie","De webhook-URL is ongeldig omdat deze vanuit het oogpunt van Mollie onbereikbaar is. Bekijk dit artikel voor meer informatie: https://github.com/mollie/magento2/wiki/Webhook-Communication-between-your-Magento-webshop-and-Mollie"
+"Required parameter ""cart_id"" is missing","Verplichte parameter ""cart_id"" ontbreekt"
+"The current user cannot perform operations on cart ""%masked_cart_id""","De huidige gebruiker kan geen acties uitvoeren op winkelwagen ""%masked_cart_id"""
+"Missing ""payment_token"" input argument","Ontbrekend ""payment_token"" invoerargument"
+"No order found with token ""%1""","Geen bestelling gevonden met token ""%1"""
+"Setting the default method does not work when the One Step Checkout extension is enabled. Please see Sales -> OneStepCheckout -> Payment method defaults for the same effect.","Het instellen van de standaardmethode werkt niet wanneer de One Step Checkout-extensie is ingeschakeld. Ga naar Verkoop -> OneStepCheckout -> Standaard betaalmethode voor hetzelfde effect."
+"The description to be used for this transaction. These variables are available:<br><br><strong>{ordernumber}</strong>: The order number for this transaction.<br><strong>{storename}</strong>: The name of the store.<br><strong>{customerid}</strong>: The ID of the customer. Is empty when the customer is a guest.<br><br>(Note: This only works when the method is set to Payments API)","De beschrijving die voor deze transactie moet worden gebruikt. Deze variabelen zijn beschikbaar:<br><br><strong>{ordernumber}</strong>: Het bestelnummer voor deze transactie.<br><strong>{storename}</strong>: De naam van de winkel.<br><strong>{customerid}</strong>: Het ID van de klant. Is leeg wanneer de klant een gast is.<br><br>(Opmerking: Dit werkt alleen als de methode is ingesteld op Payments API)"
+"The current value starts with <strong>%1</strong> and ends on <strong>%2</strong>","De huidige waarde begint met <strong>%1</strong> en eindigt op <strong>%2</strong>"
+Black,Zwart
+White,Wit
+"White Outline","Wit Contour"
+Buy,Koop
+Donate,Doneer
+Plain,Effen
+Book,Boek
+"Check out","Afrekenen"
+Subscribe,Abonneren
+"Add money","Geld toevoegen"
+Contribute,Bijdragen
+Order,Bestellen
+Reload,Herladen
+Rent,Huren
+Support,Ondersteuning
+Tip,Fooi
+"Top up","Opwaarderen"
+"Redirect to cart","Doorsturen naar winkelwagen"
+"Redirect to checkout (shipping)","Doorsturen naar afrekenen (verzending)"
+"Redirect to checkout (payment)","Doorsturen naar afrekenen (betaling)"
+"Use the method of the original order","Gebruik de methode van de oorspronkelijke bestelling"
+"Could not save the apiKeyFallback: %1","Kon de apiKeyFallback niet opslaan: %1"
+"ApiKeyFallback with id ""%1"" does not exist.","ApiKeyFallback met id ""%1"" bestaat niet."
+"Could not delete the ApiKeyFallback: %1","Kon de ApiKeyFallback niet verwijderen: %1"
+"Unable to create online refund, as shipping costs do not match","Kan geen online terugbetaling aanmaken, omdat verzendkosten niet overeenkomen"
+"""%1"" does not implement %1","""%1"" implementeert %1 niet"
+"Unable to process order %s","Kan bestelling %s niet verwerken"
+"No order(s) found for transaction id %1","Geen bestelling(en) gevonden voor transactie-id %1"
+"Could not save the transactionToOrder: %1","Kon de transactionToOrder niet opslaan: %1"
+"TransactionToOrder with id ""%1"" does not exist.","TransactionToOrder met id ""%1"" bestaat niet."
+"Could not delete the TransactionToOrder: %1","Kon de TransactionToOrder niet verwijderen: %1"
+"Unable to get lock for %1","Kan geen vergrendeling krijgen voor %1"
+"No info_buyRequest option found","Geen info_buyRequest optie gevonden"
+"No metadata found for order %1","Geen metadata gevonden voor bestelling %1"
+"Order ID does not match","Bestel-ID komt niet overeen"
+"Magento Gift Card","Magento Cadeaukaart"
+"Magento Gift Wrapping","Magento Cadeauverpakking"
+"We were unable to find the store credit for order #%1","We konden het winkelkrediet voor bestelling #%1 niet vinden"
+"The orders have different currencies (%1)","De bestellingen hebben verschillende valuta (%1)"
+"If only one method is chosen, the selection screen is skipped and the customer is sent directly to the payment method.","Als slechts één methode wordt gekozen, wordt het selectiescherm overgeslagen en wordt de klant rechtstreeks naar de betaalmethode gestuurd."
+"It is not possible to use Klarna Slice it or Klarna Pay later as method when your expiry date is more than 28 days, unless another maximum is agreed between the merchant and Klarna.","Het is niet mogelijk om Klarna Slice it of Klarna Pay later te gebruiken als methode wanneer uw vervaldatum langer is dan 28 dagen, tenzij een andere maximum is overeengekomen tussen de handelaar en Klarna."
+"%1 using Voucher, %2 direct.","%1 met Voucher, %2 direct."
+"Name on card","Naam op kaart"
+CVC/CVV,CVC/CVV
+"Save for later use.","Bewaren voor later gebruik."
+"Place Order","Plaats bestelling"
+ending,eindigend
+"Last 100 debug log lines","Laatste 100 debug-logregels"
+"Download as .txt file","Downloaden als .txt-bestand"
+"Last 100 error log records","Laatste 100 foutenlogboekrecords"
+"Mollie Configuration","Mollie Configuratie"
+"Sort Order","Sorteervolgorde"
+"Apple Pay Direct","Apple Pay Direct"
+"Activating this option will allow placing the Apple Pay button directly on the product detail pages for a faster checkout.","Door deze optie te activeren, kunt u de Apple Pay-knop direct op de productdetailpagina's plaatsen voor een snellere afhandeling."
+"Enable Button on Product Page","Knop inschakelen op productpagina"
+"Buy Now Button Style","Koop nu knopstijl"
+"Buy Now Button Type","Koop nu knoptype"
+"Enable Button in minicart","Knop inschakelen in minicart"
+"Minicart Button Style","Minicart knopstijl"
+"Minicart Button Type","Minicart knoptype"
+"Enable Magento Vault","Magento Vault inschakelen"
+"When do you want to create the invoice for <strong>Klarna</strong> or <strong>Billie</strong> payments?<br><strong>On Authorize</strong>: Create a full invoice when the order is authorized.<br><strong>On Shipment</strong>: Create a (partial) invoice when a shipment is created.","Wanneer wilt u de factuur aanmaken voor <strong>Klarna</strong> of <strong>Billie</strong> betalingen?<br><strong>Bij autorisatie</strong>: Maak een volledige factuur aan wanneer de bestelling is geautoriseerd.<br><strong>Bij verzending</strong>: Maak een (gedeeltelijke) factuur aan wanneer een verzending wordt aangemaakt."
+"Set to yes to send the invoice email to the customer after the invoice is created.","Stel in op 'ja' om de factuur e-mail naar de klant te sturen nadat de factuur is aangemaakt."
+"Redirect user when redirect fails","Gebruiker doorsturen wanneer doorsturen mislukt"
+"<strong>Autodetect:</strong> Let Mollie detect the locale depending on the user. However, the locale from the current store view is used when using the Orders API for the used payment method.<br> <strong>Store Locale</strong>: Use the locale active in the current store or fall back to English if this can't be determined.","<strong>Autodetecteren:</strong> Laat Mollie de landinstelling detecteren afhankelijk van de gebruiker. Echter, de landinstelling van de huidige winkelweergave wordt gebruikt bij het gebruik van de Orders API voor de gebruikte betaalmethode.<br> <strong>Winkel Locale</strong>: Gebruik de actieve landinstelling in de huidige winkel of val terug op Engels als dit niet kan worden bepaald."
+"Use webhooks","Webhooks gebruiken"
+"Custom webhook url","Aangepaste webhook-url"
+"Encrypt payment details","Betaalgegevens versleutelen"
+"Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated.","Stuur een e-mail naar klanten met een mislukte of onvoltooide betaling om hen een tweede kans te geven de betaling te voltooien via de PaymentLink en hun bestelling te herstellen.<br>U kunt deze betalingsherinneringen handmatig verzenden of de e-mail volledig geautomatiseerd activeren."
+"Payment Method To Use For Second Change Payments","Betaalmethode te gebruiken voor tweede kans betalingen"
