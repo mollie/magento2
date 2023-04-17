@@ -268,7 +268,15 @@ class PhoneNumber implements TransactionPartInterface
         $countryCode = $address->getCountryId();
         $phoneNumber = $address->getTelephone();
 
-        $transaction['billingAddress']['phone'] = $this->formatInE164($countryCode, $phoneNumber);
+        if (empty($phoneNumber)) {
+            return $transaction;
+        }
+
+        try {
+            $transaction['billingAddress']['phone'] = $this->formatInE164($countryCode, $phoneNumber);
+        } catch (\InvalidArgumentException $exception) {
+            // Silently ignore the exception
+        }
 
         return $transaction;
     }
@@ -281,8 +289,8 @@ class PhoneNumber implements TransactionPartInterface
 
         $countryCode = self::COUNTRY_CODE_MAPPING[$countryCodeIso2];
 
-        $phoneNumber = preg_replace( '/^\+' . $countryCode . '/', '', $phoneNumber);
-        $phoneNumber = preg_replace( '/^00' . $countryCode . '/', '', $phoneNumber);
+        $phoneNumber = preg_replace('/^\+' . $countryCode . '/', '', $phoneNumber);
+        $phoneNumber = preg_replace('/^00' . $countryCode . '/', '', $phoneNumber);
 
         $formattedNumber = preg_replace('/\D/', '', $phoneNumber);
 
@@ -291,6 +299,10 @@ class PhoneNumber implements TransactionPartInterface
 
         // Add the '+' sign and the country code to the beginning of the formatted number
         $formattedNumber = '+' . $countryCode . $formattedNumber;
+
+        if (strlen($formattedNumber) <= 3 || !preg_match('/^\+[1-9]\d{1,14}$/', $formattedNumber)) {
+            throw new \InvalidArgumentException(__('Phone number "%s" is not valid', $formattedNumber));
+        }
 
         return $formattedNumber;
     }
