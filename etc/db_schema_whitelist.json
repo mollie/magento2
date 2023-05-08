@@ -83,6 +83,7 @@
             "entity_id": true,
             "transaction_id": true,
             "order_id": true,
+            "skipped": true,
             "created_at": true
         },
         "constaint": {

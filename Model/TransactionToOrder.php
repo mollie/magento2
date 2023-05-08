@@ -74,6 +74,25 @@ class TransactionToOrder extends AbstractExtensibleModel implements TransactionT
     }
 
     /**
+     * Get skipped
+     * @return int|null
+     */
+    public function getSkipped(): ?int
+    {
+        return (int)$this->getData(self::SKIPPED);
+    }
+
+    /**
+     * Set skipped
+     * @param int $skipped
+     * @return TransactionToOrderInterface
+     */
+    public function setSkipped(int $skipped): TransactionToOrderInterface
+    {
+        return $this->setData(self::SKIPPED, $skipped);
+    }
+
+    /**
      * Retrieve existing extension attributes object or create a new one.
      * @return TransactionToOrderExtensionInterface|null
      */
