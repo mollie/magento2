@@ -13,17 +13,31 @@ class ValidateMetadata
      */
     private $config;
 
+    /**
+     * @var bool
+     */
+    private $skipValidation = false;
+
     public function __construct(
         Config $config
     ) {
         $this->config = $config;
     }
 
+    public function skipValidation(): void
+    {
+        $this->skipValidation = true;
+    }
+
     /**
      * @throws LocalizedException
      */
-    public function execute(\stdClass $metadata, OrderInterface $order): void
+    public function execute(\stdClass $metadata = null, OrderInterface $order): void
     {
+        if ($this->skipValidation) {
+            return;
+        }
+
         if (isset($metadata->order_id)) {
             $this->validateSingleOrder($metadata, $order);
             return;
