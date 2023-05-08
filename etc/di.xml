@@ -284,7 +284,7 @@
                     <item name="cancelled" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\CancelledProcessor</item>
                 </item>
                 <item name="expired" xsi:type="array">
-                    <item name="expired" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\CancelledProcessor</item>
+                    <item name="expired" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\ExpiredProcessor</item>
                 </item>
                 <item name="is_successful" xsi:type="array">
                     <item name="is_successful" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\SuccessfulPayment</item>
@@ -301,6 +301,9 @@
                 </item>
                 <item name="failed" xsi:type="array">
                     <item name="failed" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\FailedStatusProcessor</item>
+                </item>
+                <item name="expired" xsi:type="array">
+                    <item name="failed" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\ExpiredStatusProcessor</item>
                 </item>
                 <item name="open" xsi:type="array">
                     <item name="open" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SendEmailForBanktransfer</item>

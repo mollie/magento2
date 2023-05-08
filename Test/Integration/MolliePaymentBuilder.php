@@ -34,6 +34,11 @@ class MolliePaymentBuilder
         $this->payment->amount->currency = $currency;
     }
 
+    public function setStatus(string $status): void
+    {
+        $this->payment->status = $status;
+    }
+
     public function build(): Payment
     {
         return $this->payment;
