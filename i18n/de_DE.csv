@@ -18,7 +18,7 @@
 "Invalid return, missing order id.","Ungültige Ausgabe, fehlende Bestellnummer."
 "Invalid return from Mollie.","Ungültige Ausgabe von Mollie."
 "There was an error checking the transaction status.","Bei der Überprüfung des Transaktionsstatus ist ein Fehler aufgetreten."
-"Something went wrong.","Etwas ist schiefgegangen."
+"Transaction failed. Please verify your billing information and payment method, and try again.","Transaktion fehlgeschlagen. Bitte überprüfen Sie Ihre Rechnungsinformationen und Zahlungsmethode, und versuchen Sie es erneut."
 "Payment canceled, please try again.","Zahlung abgebrochen. Bitte versuchen Sie es noch einmal."
 "Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Die Zahlung vom Typ %1 wurde abgelehnt. Die Entscheidung basiert auf der Bestellung und dem Ergebnis der Risikobewertung."
 "Payment Method not found","Zahlungsmethode nicht gefunden"
