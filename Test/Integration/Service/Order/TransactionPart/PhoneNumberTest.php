@@ -4,6 +4,7 @@ namespace Mollie\Payment\Test\Integration\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\TransactionPart\PhoneNumber;
@@ -11,6 +12,24 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PhoneNumberTest extends IntegrationTestCase
 {
+    public function testDoesNothingWhenPaymentMethodIsNotIn3(): void
+    {
+        /** @var PhoneNumber $instance */
+        $instance = $this->objectManager->create(PhoneNumber::class);
+
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+        $order->getPayment()->setMethod('mollie_methods_ideal');
+
+        $transaction = $instance->process(
+            $order,
+            Payments::CHECKOUT_TYPE,
+            ['billingAddress' => []]
+        );
+
+        $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
+    }
+
     public function testDoesNothingWhenPaymentsApiIsUsed(): void
     {
         $transaction = [];
@@ -18,8 +37,12 @@ class PhoneNumberTest extends IntegrationTestCase
         /** @var PhoneNumber $instance */
         $instance = $this->objectManager->create(PhoneNumber::class);
 
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+        $order->getPayment()->setMethod('mollie_methods_in3');
+
         $newTransaction = $instance->process(
-            $this->objectManager->create(OrderInterface::class),
+            $order,
             Payments::CHECKOUT_TYPE,
             $transaction
         );
@@ -41,6 +64,9 @@ class PhoneNumberTest extends IntegrationTestCase
         string $expected
     ): void {
         $order = $this->loadOrder('100000001');
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+        $order->getPayment()->setMethod('mollie_methods_in3');
+
         $billingAddress = $order->getBillingAddress();
         $billingAddress->setCountryId($countryCode);
         $billingAddress->setTelephone($phoneNumber);
@@ -64,6 +90,9 @@ class PhoneNumberTest extends IntegrationTestCase
     public function testDoesNotAddThePhoneNumberWhenItsEmpty(): void
     {
         $order = $this->loadOrder('100000001');
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+        $order->getPayment()->setMethod('mollie_methods_in3');
+
         $billingAddress = $order->getBillingAddress();
         $billingAddress->setCountryId('NL');
         $billingAddress->setTelephone('');
@@ -87,6 +116,9 @@ class PhoneNumberTest extends IntegrationTestCase
     public function testHandlesNullAsPhonenumber(): void
     {
         $order = $this->loadOrder('100000001');
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+        $order->getPayment()->setMethod('mollie_methods_in3');
+
         $billingAddress = $order->getBillingAddress();
         $billingAddress->setCountryId('NL');
         $billingAddress->setData(OrderAddressInterface::TELEPHONE, null);

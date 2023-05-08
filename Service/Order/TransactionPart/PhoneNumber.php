@@ -4,6 +4,7 @@ namespace Mollie\Payment\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Client\Payments;
+use Mollie\Payment\Model\Methods\In3;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class PhoneNumber implements TransactionPartInterface
@@ -260,6 +261,10 @@ class PhoneNumber implements TransactionPartInterface
 
     public function process(OrderInterface $order, $apiMethod, array $transaction)
     {
+        if ($order->getPayment()->getMethod() != In3::CODE) {
+            return $transaction;
+        }
+
         if ($apiMethod == Payments::CHECKOUT_TYPE) {
             return $transaction;
         }
