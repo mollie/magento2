@@ -111,6 +111,11 @@ class SecondChanceEmail
         $builder->setTemplateOptions(['area' => 'frontend', 'store' => $storeId]);
         $this->setFrom($builder, $storeId);
         $builder->addTo($order->getCustomerEmail(), $customerName);
+
+        if ($bcc = $this->config->secondChanceSendBccTo($storeId)) {
+            $builder->addBcc(explode(',', $bcc));
+        }
+
         $templateVars = new DataObject($this->getTemplateVars($order));
         $this->eventManager->dispatch('mollie_second_change_email_before_send', ['variables' => $templateVars]);
         $builder->setTemplateVars($templateVars->toArray());

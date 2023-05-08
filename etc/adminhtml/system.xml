@@ -353,6 +353,15 @@
                     </depends>
                     <comment><![CDATA[If the original order is canceled, a new order is created when the customer clicks the "second chance email". The payment method here is used in that case.]]></comment>
                 </field>
+                <field id="second_chance_send_bcc_to" translate="label comment" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Send BCC to</label>
+                    <config_path>payment/mollie_general/second_chance_send_bcc_to</config_path>
+                    <comment><![CDATA[<strong>Optional</strong> Comma separated list of emailaddresses. Leave empty to disable.]]></comment>
+                    <validate>validate-emails</validate>
+                    <depends>
+                        <field id="enabled">1</field>
+                    </depends>
+                </field>
             </group>
         </section>
 
