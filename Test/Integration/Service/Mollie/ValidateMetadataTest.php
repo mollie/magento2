@@ -49,6 +49,18 @@ class ValidateMetadataTest extends IntegrationTestCase
         $instance->execute($metadata, $this->getOrder());
     }
 
+    public function testValidationCanBeSkipped(): void
+    {
+        /** @var ValidateMetadata $instance */
+        $instance = $this->objectManager->create(ValidateMetadata::class);
+
+        $instance->skipValidation();
+
+        $instance->execute(null, $this->getOrder());
+
+        $this->expectNotToPerformAssertions();
+    }
+
     public function getOrder(): OrderInterface
     {
         /** @var OrderInterface $order */
