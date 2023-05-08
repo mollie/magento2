@@ -18,7 +18,7 @@
 "Invalid return, missing order id.","Devolución no válida, falta la ID del pedido."
 "Invalid return from Mollie.","Devolución no válida de Mollie."
 "There was an error checking the transaction status.","Se ha producido un error al comprobar el estado de la transacción."
-"Something went wrong.","Algo ha salido mal."
+"Transaction failed. Please verify your billing information and payment method, and try again.","Transacción fallida. Por favor, verifica tu información de facturación y método de pago, e inténtalo de nuevo."
 "Payment canceled, please try again.","Pago cancelado, inténtelo de nuevo."
 "Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","El pago del tipo %1 ha sido rechazado. La decisión se basa en el pedido y el resultado de la evaluación de riesgos."
 "Payment Method not found","Método de pago no encontrado"
