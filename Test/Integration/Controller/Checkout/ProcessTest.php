@@ -26,7 +26,7 @@ class ProcessTest extends AbstractController
     public function testRedirectsToCartOnException()
     {
         $mollieModel = $this->createMock(Mollie::class);
-        $mollieModel->method('processTransaction')->willThrowException(new \Exception('[TEST] Something went wrong'));
+        $mollieModel->method('processTransaction')->willThrowException(new \Exception('[TEST] Transaction failed. Please verify your billing information and payment method, and try again.'));
 
         $this->_objectManager->addSharedInstance($mollieModel, Mollie::class);
 

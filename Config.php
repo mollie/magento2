@@ -39,6 +39,7 @@ class Config
     const GENERAL_REDIRECT_WHEN_TRANSACTION_FAILS_TO = 'payment/mollie_general/redirect_when_transaction_fails_to';
     const GENERAL_SECOND_CHANCE_EMAIL_TEMPLATE = 'payment/mollie_general/second_chance_email_template';
     const GENERAL_SECOND_CHANCE_DELAY = 'payment/mollie_general/second_chance_email_delay';
+    const GENERAL_SECOND_CHANCE_SEND_BCC_TO = 'payment/mollie_general/second_chance_send_bcc_to';
     const GENERAL_SECOND_CHANCE_USE_PAYMENT_METHOD = 'payment/mollie_general/second_chance_use_payment_method';
     const GENERAL_TYPE = 'payment/mollie_general/type';
     const GENERAL_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
@@ -306,6 +307,15 @@ class Config
     public function secondChanceEmailDelay($storeId = null)
     {
         return $this->getPath(static::GENERAL_SECOND_CHANCE_DELAY, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return string|null
+     */
+    public function secondChanceSendBccTo(int $storeId = null): ?string
+    {
+        return $this->getPath(static::GENERAL_SECOND_CHANCE_SEND_BCC_TO, $storeId);
     }
 
     /**

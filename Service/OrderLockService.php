@@ -58,11 +58,18 @@ class OrderLockService
         $connection = $this->resourceConnection->getConnection('sales');
         $connection->beginTransaction();
 
+        // Save this value, so we can restore it after the order has been saved.
+        $mollieTransactionId = $order->getMollieTransactionId();
+
         // The order repository uses caching to make sure it only loads the order once, but in this case we want
         // the latest version of the order, so we need to make sure we get a new instance of the repository.
         /** @var OrderRepositoryInterface $orderRepository */
         $orderRepository = $this->orderRepositoryFactory->create();
         $order = $orderRepository->get($order->getEntityId());
+
+        // Restore the transaction ID as it might not be set on the saved order yet.
+        // This is required further down the process.
+        $order->setMollieTransactionId($mollieTransactionId);
 
         try {
             $result = $callback($order);

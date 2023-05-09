@@ -18,7 +18,7 @@
 "Invalid return, missing order id.","Invalid return, missing order id."
 "Invalid return from Mollie.","Invalid return from Mollie."
 "There was an error checking the transaction status.","There was an error checking the transaction status."
-"Something went wrong.","Something went wrong."
+"Transaction failed. Please verify your billing information and payment method, and try again.","Transaction failed. Please verify your billing information and payment method, and try again."
 "Payment canceled, please try again.","Payment canceled, please try again."
 "Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment."
 "Payment Method not found","Payment Method not found"

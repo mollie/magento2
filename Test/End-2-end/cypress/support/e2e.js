@@ -18,3 +18,10 @@ import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+Cypress.on('uncaught:exception', (error, runnable) => {
+    // This is often thrown in Magento 2.4.6, but it doesn't seem to affect the test
+    if (error.message.indexOf('Cannot read properties of undefined (reading \'remove\')') !== -1) {
+        return false
+    }
+})

@@ -122,7 +122,7 @@ class Process extends Action
                 return $this->_redirect($redirect->getData('path'));
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
-                $this->messageManager->addErrorMessage(__('Something went wrong.'));
+                $this->messageManager->addErrorMessage(__('Transaction failed. Please verify your billing information and payment method, and try again.'));
                 return $this->_redirect($this->redirectOnError->getUrl());
             }
         }
@@ -157,7 +157,7 @@ class Process extends Action
     protected function addResultMessage(array $result)
     {
         if (!isset($result['status'])) {
-            $this->messageManager->addErrorMessage(__('Something went wrong.'));
+            $this->messageManager->addErrorMessage(__('Transaction failed. Please verify your billing information and payment method, and try again.'));
             return;
         }
 
@@ -171,7 +171,7 @@ class Process extends Action
             return;
         }
 
-        $this->messageManager->addErrorMessage(__('Something went wrong.'));
+        $this->messageManager->addErrorMessage(__('Transaction failed. Please verify your billing information and payment method, and try again.'));
     }
 
     /**

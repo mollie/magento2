@@ -26,6 +26,7 @@ use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\ExpiredOrderToTransaction;
 use Mollie\Payment\Service\Order\SaveAdditionalInformationDetails;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\Transaction;
@@ -126,6 +127,11 @@ class Payments extends AbstractModel
     private $saveAdditionalInformationDetails;
 
     /**
+     * @var ExpiredOrderToTransaction
+     */
+    private $expiredOrderToTransaction;
+
+    /**
      * Payments constructor.
      *
      * @param OrderRepository $orderRepository
@@ -146,6 +152,7 @@ class Payments extends AbstractModel
      * @param ProcessTransaction $processTransaction
      * @param ValidateMetadata $validateMetadata
      * @param SaveAdditionalInformationDetails $saveAdditionalInformationDetails
+     * @param ExpiredOrderToTransaction $expiredOrderToTransaction
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -165,7 +172,8 @@ class Payments extends AbstractModel
         LinkTransactionToOrder $linkTransactionToOrder,
         ProcessTransaction $processTransaction,
         ValidateMetadata $validateMetadata,
-        SaveAdditionalInformationDetails $saveAdditionalInformationDetails
+        SaveAdditionalInformationDetails $saveAdditionalInformationDetails,
+        ExpiredOrderToTransaction $expiredOrderToTransaction
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -185,6 +193,7 @@ class Payments extends AbstractModel
         $this->processTransaction = $processTransaction;
         $this->validateMetadata = $validateMetadata;
         $this->saveAdditionalInformationDetails = $saveAdditionalInformationDetails;
+        $this->expiredOrderToTransaction = $expiredOrderToTransaction;
     }
 
     /**
@@ -421,6 +430,14 @@ class Payments extends AbstractModel
             $msg = ['success' => true, 'status' => 'pending', 'order_id' => $orderId, 'type' => $type];
             $this->mollieHelper->addTolog('success', $msg);
             return $msg;
+        }
+        if ($status == 'expired') {
+            if ($this->expiredOrderToTransaction->hasMultipleTransactions($order)) {
+                $this->expiredOrderToTransaction->markTransactionAsSkipped($transactionId);
+                $msg = ['success' => false, 'status' => $status, 'order_id' => $orderId, 'type' => $type];
+                $this->mollieHelper->addTolog('success', $msg);
+                return $msg;
+            }
         }
         if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
             if ($type == 'webhook') {

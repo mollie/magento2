@@ -113,6 +113,16 @@ class ProcessTransaction
             );
         }
 
+        if ($status == 'expired') {
+            return $this->paymentProcessors->process(
+                'expired',
+                $magentoOrder,
+                $molliePayment,
+                $type,
+                $defaultResponse
+            );
+        }
+
         if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
             return $this->paymentProcessors->process(
                 'failed',

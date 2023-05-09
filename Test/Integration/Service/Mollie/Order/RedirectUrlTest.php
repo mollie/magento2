@@ -2,6 +2,7 @@
 
 namespace Mollie\Payment\Test\Integration\Service\Mollie\Order;
 
+use Magento\Framework\Message\ManagerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\Methods\Creditcard;
@@ -63,5 +64,26 @@ class RedirectUrlTest extends IntegrationTestCase
         $result = $instance->execute($mollieMock, $this->objectManager->create(OrderInterface::class));
 
         $this->assertStringContainsString('checkout/onepage/success', $result);
+    }
+
+    public function testRedirectsToTheCartWhenNoUrlIsAvailable(): void
+    {
+        $mollieMock = $this->createMock(Ideal::class);
+        $mollieMock->method('startTransaction')->willReturn(null); // Should be empty
+
+        /** @var ManagerInterface $messageManager */
+        $messageManager = $this->objectManager->get(ManagerInterface::class);
+
+        /** @var RedirectUrl $instance */
+        $instance = $this->objectManager->get(RedirectUrl::class);
+        $result = $instance->execute($mollieMock, $this->objectManager->create(OrderInterface::class));
+
+        $this->assertSame(1, $messageManager->getMessages()->getCount());
+        $this->assertEquals(
+            'Something went wrong while trying to redirect you to Mollie. Please try again later.',
+            $messageManager->getMessages()->getItemsByType('error')[0]->getText()
+        );
+
+        $this->assertStringContainsString('checkout/cart', $result);
     }
 }
