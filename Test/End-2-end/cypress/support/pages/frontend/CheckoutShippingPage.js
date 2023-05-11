@@ -11,6 +11,12 @@ export default class CheckoutShippingPage {
     });
   }
 
+  fillShippingAddressUsingFixture(fixture) {
+    cy.fixture(fixture).then((address) => {
+      this.fillShippingAddress(address);
+    });
+  }
+
   fillShippingAddress(address) {
     Object.keys(address.type).forEach((field) => {
       cy.log('Filling field: ' + field);
