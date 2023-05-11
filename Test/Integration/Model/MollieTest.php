@@ -7,6 +7,7 @@ use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Endpoints\MethodEndpoint;
 use Mollie\Api\Exceptions\ApiException;
@@ -78,6 +79,7 @@ class MollieTest extends IntegrationTestCase
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
         $order->setEntityId(1);
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
 
         $helperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
         $helperMock->method('getApiKey')->willReturn('test_dummyapikeywhichmustbe30characterslong');
@@ -106,6 +108,7 @@ class MollieTest extends IntegrationTestCase
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
         $order->setEntityId(1);
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
 
         $helperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
         $helperMock->method('getApiKey')->willReturn('test_dummyapikeywhichmustbe30characterslong');
@@ -139,6 +142,7 @@ class MollieTest extends IntegrationTestCase
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
         $order->setEntityId(1);
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
 
         $helperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
         $helperMock->method('getApiKey')->willReturn('test_dummyapikeywhichmustbe30characterslong');

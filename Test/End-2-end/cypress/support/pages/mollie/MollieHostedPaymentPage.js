@@ -21,4 +21,10 @@ export default class MollieHostedPaymentPage {
             cy.get('.button').click();
         });
     }
+
+    assertIsVisible() {
+        cy.origin('https://www.mollie.com', {args: {status}}, ({status}) => {
+            cy.url().should('include', 'https://www.mollie.com/checkout/');
+        });
+    }
 }

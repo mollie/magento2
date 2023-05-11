@@ -9,7 +9,6 @@ namespace Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
@@ -26,19 +25,12 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
      */
     private $config;
 
-    /**
-     * @var TimezoneInterface
-     */
-    private $timezone;
-
     public function __construct(
         Session $checkoutSession,
-        TimezoneInterface $timezone,
         Config $config
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->config = $config;
-        $this->timezone = $timezone;
     }
 
     public function execute(Observer $observer)

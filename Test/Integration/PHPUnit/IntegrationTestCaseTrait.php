@@ -10,6 +10,7 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\ObjectManager;
 use Mollie\Payment\Plugin\Quote\Api\PaymentMethodManagementPlugin;
@@ -25,7 +26,10 @@ trait IntegrationTestCaseTrait
 
     protected function loadOrder(string $incrementId): OrderInterface
     {
-        return $this->loadOrderById($incrementId);
+        $order = $this->loadOrderById($incrementId);
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+
+        return $order;
     }
 
     public function loadOrderById(string $orderId): OrderInterface
