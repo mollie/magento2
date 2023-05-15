@@ -9,6 +9,7 @@ namespace Mollie\Payment\Service\Order;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\Data\PendingPaymentReminderInterface;
 use Mollie\Payment\Api\Data\SentPaymentReminderInterface;
 use Mollie\Payment\Api\Data\SentPaymentReminderInterfaceFactory;
@@ -74,6 +75,18 @@ class PaymentReminder
     public function send(PendingPaymentReminderInterface $pendingPaymentReminder): OrderInterface
     {
         $order = $this->orderRepository->get($pendingPaymentReminder->getOrderId());
+
+        if (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE])) {
+            $this->logger->addInfoLog(
+                'info',
+                sprintf('Order #%s is already completed, not sending payment reminder', $order->getIncrementId())
+            );
+
+            $this->pendingPaymentReminderRepository->delete($pendingPaymentReminder);
+
+            return $order;
+        }
+
         $this->logger->addInfoLog(
             'info',
             sprintf('Preparing to send the payment reminder for order #%s', $order->getIncrementId())
