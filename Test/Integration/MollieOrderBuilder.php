@@ -63,6 +63,11 @@ class MollieOrderBuilder
         $this->order->status = $status;
     }
 
+    public function setMethod(string $method): void
+    {
+        $this->order->method = $method;
+    }
+
     public function build(): Order
     {
         return $this->order;

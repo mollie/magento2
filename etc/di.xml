@@ -273,6 +273,7 @@
                 <item name="preprocess" xsi:type="array">
                     <item name="add_additional_data" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\AddAdditionalInformation</item>
                     <item name="save_card_label" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\SaveCardDetails</item>
+                    <item name="payment_link_save_payment_method" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\PaymentLinkPaymentMethod</item>
                 </item>
                 <item name="last_payment_status_is_failure" xsi:type="array">
                     <item name="last_payment_status_is_failure" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\LastPaymentStatusIsFailure</item>

@@ -39,6 +39,11 @@ class MolliePaymentBuilder
         $this->payment->status = $status;
     }
 
+    public function setMethod(string $string): void
+    {
+        $this->payment->method = $string;
+    }
+
     public function build(): Payment
     {
         return $this->payment;
