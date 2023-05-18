@@ -122,6 +122,7 @@ jobs:
           name: E2E logs - ${{ matrix.PHP_VERSION }} - ${{ matrix.MAGENTO_VERSION }}
           path: |
             Test/End-2-end/cypress/videos
+            Test/End-2-end/cypress/screenshots
             magento-logs
             magento.log
             nginx-proxy.log

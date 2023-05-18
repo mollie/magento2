@@ -5,3 +5,4 @@ view/adminhtml/web/css/styles.css
 view/frontend/web/css/styles.css
 Test/End-2-end/node_modules
 Test/End-2-end/cypress/videos
+Test/End-2-end/cypress/screenshots
