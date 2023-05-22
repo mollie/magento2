@@ -1,5 +1,5 @@
 export default class MollieHostedPaymentPage {
-    selectStatus(status) {
+    setCookie() {
         cy.setCookie(
             'SESSIONID',
             "cypress-dummy-value",
@@ -12,6 +12,10 @@ export default class MollieHostedPaymentPage {
         );
 
         cy.reload();
+    }
+
+    selectStatus(status) {
+        this.setCookie();
 
         cy.origin('https://www.mollie.com', {args: {status}}, ({status}) => {
             cy.url().should('include', 'https://www.mollie.com/checkout/');
@@ -25,6 +29,22 @@ export default class MollieHostedPaymentPage {
     assertIsVisible() {
         cy.origin('https://www.mollie.com', {args: {status}}, ({status}) => {
             cy.url().should('include', 'https://www.mollie.com/checkout/');
+        });
+    }
+
+    selectPaymentMethod(method) {
+        this.setCookie();
+
+        cy.origin('https://www.mollie.com', {args: {method}}, ({method}) => {
+            cy.get('.payment-method-list').contains(method).click();
+        });
+    }
+
+    selectFirstIssuer() {
+        this.setCookie();
+
+        cy.origin('https://www.mollie.com', () => {
+            cy.get('.payment-method-list').find('[name="issuer"]').first().click();
         });
     }
 }
