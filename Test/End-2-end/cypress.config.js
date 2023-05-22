@@ -5,6 +5,9 @@ const defaultProductId = process.env.DEFAULT_PRODUCT_ID || 2;
 module.exports = defineConfig({
   projectId: "44bnds",
   chromeWebSecurity: false,
+  retries: {
+    runMode: 2,
+  },
   env: {
     defaultProductId: defaultProductId,
   },
@@ -13,13 +16,13 @@ module.exports = defineConfig({
     setupNodeEvents(on, config) {
       require('./cypress/plugins/index.js')(on, config);
 
-      const mollie_available_methods = new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
           var https = require('follow-redirects').https;
           var fs = require('fs');
 
           const query = `
           query {
-             molliePaymentMethods(input:{amount:10, currency:"EUR"}) {
+             molliePaymentMethods(input:{amount:100, currency:"EUR"}) {
                methods {
                  code
                  image
@@ -35,7 +38,7 @@ module.exports = defineConfig({
               'path': '/graphql?query=' + encodeURIComponent(query),
               'headers': {
                   'Content-Type': 'application/json',
-                  'Cookie': 'XDEBUG_SESSION=PHPSTORMx'
+                  // 'Cookie': 'XDEBUG_SESSION=PHPSTORM'
               },
               'maxRedirects': 20
           };
@@ -73,8 +76,6 @@ module.exports = defineConfig({
 
           req.end();
       });
-
-      return mollie_available_methods;
     },
   },
 });

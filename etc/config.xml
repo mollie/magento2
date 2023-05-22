@@ -409,7 +409,7 @@
             <mollie_methods_paypal>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Paypal</model>
-                <title>Paypal</title>
+                <title>PayPal</title>
                 <payment_description>{ordernumber}</payment_description>
                 <method>payment</method>
                 <payment_action>order</payment_action>
