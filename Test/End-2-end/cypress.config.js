@@ -20,6 +20,10 @@ module.exports = defineConfig({
           var https = require('follow-redirects').https;
           var fs = require('fs');
 
+          const baseUrl = config.baseUrl;
+          const urlObj = new URL(baseUrl);
+          const hostname = urlObj.hostname;
+
           const query = `
           query {
              molliePaymentMethods(input:{amount:100, currency:"EUR"}) {
@@ -34,7 +38,7 @@ module.exports = defineConfig({
 
           var options = {
               'method': 'GET',
-              'hostname': 'mollie-opensource-237.controlaltdelete.dev',
+              'hostname': hostname,
               'path': '/graphql?query=' + encodeURIComponent(query),
               'headers': {
                   'Content-Type': 'application/json',
