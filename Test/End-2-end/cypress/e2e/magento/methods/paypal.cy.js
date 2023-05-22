@@ -12,22 +12,21 @@ const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
-if (Cypress.env('mollie_available_methods').includes('ideal')) {
-  describe('CCheck that ideal behaves as expected', () => {
+if (Cypress.env('mollie_available_methods').includes('paypal')) {
+  describe('Check that paypal behaves as expected', () => {
     [
-      {status: 'paid', orderStatus: 'Processing', title: 'C3043: Validate the submission of an order with iDEAL as payment method and payment mark as "Paid"'},
-      {status: 'open', orderStatus: 'Pending Payment', title: 'C3044: Validate the submission of an order with iDEAL as payment method and payment mark as "Open"'},
-      {status: 'failed', orderStatus: 'Canceled', title: 'C3045: Validate the submission of an order with iDEAL as payment method and payment mark as "Failed"'},
-      {status: 'expired', orderStatus: 'Canceled', title: 'C3046: Validate the submission of an order with iDEAL as payment method and payment mark as "Expired"'},
-      {status: 'canceled', orderStatus: 'Canceled', title: 'C3047: Validate the submission of an order with iDEAL as payment method and payment mark as "Cancelled"'},
+      {status: 'paid', orderStatus: 'Processing', title: 'C3053: Validate the submission of an order with Paypal as payment method and payment mark as "Paid"'},
+      {status: 'pending', orderStatus: 'Pending Payment', title: 'C3054: Validate the submission of an order with Paypal as payment method and payment mark as "Pending"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C3055: Validate the submission of an order with Paypal as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C3057: Validate the submission of an order with Paypal as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C3056: Validate the submission of an order with Paypal as payment method and payment mark as "Cancelled"'},
     ].forEach((testCase) => {
       it(testCase.title, () => {
         visitCheckoutPayment.visit();
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-        checkoutPaymentPage.selectPaymentMethod('iDeal');
-        checkoutPaymentPage.selectFirstAvailableIssuer();
+        checkoutPaymentPage.selectPaymentMethod('PayPal');
         checkoutPaymentPage.placeOrder();
 
         mollieHostedPaymentPage.selectStatus(testCase.status);
@@ -45,6 +44,10 @@ if (Cypress.env('mollie_available_methods').includes('ideal')) {
         cy.get('@order-id').then((orderId) => {
           ordersPage.openOrderById(orderId);
         });
+
+        if (testCase.status === 'expired') {
+          ordersPage.callFetchStatus();
+        }
 
         ordersPage.assertOrderStatusIs(testCase.orderStatus);
       });

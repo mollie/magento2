@@ -8,7 +8,8 @@ const checkoutShippingPage = new CheckoutShippingPage();
 
 export default class VisitCheckoutPaymentCompositeAction {
   visit(fixture = 'NL') {
-    productPage.openProduct(2);
+    productPage.openProduct(Cypress.env('defaultProductId'));
+
     productPage.addSimpleProductToCart();
 
     checkoutPage.visit();
