@@ -13,7 +13,7 @@ const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
 if (Cypress.env('mollie_available_methods').includes('kbc')) {
-  describe('Check if the KBC/CBC payment method behaves as expected', () => {
+  describe('Check that kbc behaves as expected', () => {
     [
       {
         status: 'paid',

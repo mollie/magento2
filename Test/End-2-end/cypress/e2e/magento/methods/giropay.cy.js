@@ -12,42 +12,44 @@ const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
-describe('Check if the Giropay payment method is behaving as expected', () => {
-  [
-    {status: 'paid', orderStatus: 'Processing', title: 'C3081: Validate the submission of an order with Giropay as payment method and payment mark as "Paid"'},
-    {status: 'failed', orderStatus: 'Canceled', title: 'C3082: Validate the submission of an order with Giropay as payment method and payment mark as "Failed"'},
-    {status: 'expired', orderStatus: 'Canceled', title: 'C3084: Validate the submission of an order with Giropay as payment method and payment mark as "Expired"'},
-    {status: 'canceled', orderStatus: 'Canceled', title: 'C3083: Validate the submission of an order with Giropay as payment method and payment mark as "Cancelled"'},
-  ].forEach((testCase) => {
-    it(testCase.title, () => {
-      visitCheckoutPayment.visit();
+if (Cypress.env('mollie_available_methods').includes('giropay')) {
+  describe('Check that giropay behaves as expected', () => {
+    [
+      {status: 'paid', orderStatus: 'Processing', title: 'C3081: Validate the submission of an order with Giropay as payment method and payment mark as "Paid"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C3082: Validate the submission of an order with Giropay as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C3084: Validate the submission of an order with Giropay as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C3083: Validate the submission of an order with Giropay as payment method and payment mark as "Cancelled"'},
+    ].forEach((testCase) => {
+      it(testCase.title, () => {
+        visitCheckoutPayment.visit();
 
-      cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
+        cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-      checkoutPaymentPage.selectPaymentMethod('Giropay');
-      checkoutPaymentPage.placeOrder();
+        checkoutPaymentPage.selectPaymentMethod('Giropay');
+        checkoutPaymentPage.placeOrder();
 
-      mollieHostedPaymentPage.selectStatus(testCase.status);
+        mollieHostedPaymentPage.selectStatus(testCase.status);
 
-      if (testCase.status === 'paid') {
-        checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
-      }
+        if (testCase.status === 'paid') {
+          checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
+        }
 
-      if (testCase.status === 'canceled') {
-        cartPage.assertCartPageIsShown();
-      }
+        if (testCase.status === 'canceled') {
+          cartPage.assertCartPageIsShown();
+        }
 
-      cy.backendLogin();
+        cy.backendLogin();
 
-      cy.get('@order-id').then((orderId) => {
-        ordersPage.openOrderById(orderId);
+        cy.get('@order-id').then((orderId) => {
+          ordersPage.openOrderById(orderId);
+        });
+
+        if (testCase.status === 'expired') {
+          ordersPage.callFetchStatus();
+        }
+
+        ordersPage.assertOrderStatusIs(testCase.orderStatus);
       });
-
-      if (testCase.status === 'expired') {
-        ordersPage.callFetchStatus();
-      }
-
-      ordersPage.assertOrderStatusIs(testCase.orderStatus);
     });
-  });
-})
+  })
+}

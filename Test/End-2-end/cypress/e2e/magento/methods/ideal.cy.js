@@ -13,33 +13,13 @@ const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
 if (Cypress.env('mollie_available_methods').includes('ideal')) {
-  describe('Check if the payment methods are available', () => {
+  describe('CCheck that ideal behaves as expected', () => {
     [
-      {
-        status: 'paid',
-        orderStatus: 'Processing',
-        title: 'C3043: Validate the submission of an order with iDEAL as payment method and payment mark as "Paid"'
-      },
-      {
-        status: 'open',
-        orderStatus: 'Pending Payment',
-        title: 'C3044: Validate the submission of an order with iDEAL as payment method and payment mark as "Open"'
-      },
-      {
-        status: 'failed',
-        orderStatus: 'Canceled',
-        title: 'C3045: Validate the submission of an order with iDEAL as payment method and payment mark as "Failed"'
-      },
-      {
-        status: 'expired',
-        orderStatus: 'Canceled',
-        title: 'C3046: Validate the submission of an order with iDEAL as payment method and payment mark as "Expired"'
-      },
-      {
-        status: 'canceled',
-        orderStatus: 'Canceled',
-        title: 'C3047: Validate the submission of an order with iDEAL as payment method and payment mark as "Cancelled"'
-      },
+      {status: 'paid', orderStatus: 'Processing', title: 'C3043: Validate the submission of an order with iDEAL as payment method and payment mark as "Paid"'},
+      {status: 'open', orderStatus: 'Pending Payment', title: 'C3044: Validate the submission of an order with iDEAL as payment method and payment mark as "Open"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C3045: Validate the submission of an order with iDEAL as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C3046: Validate the submission of an order with iDEAL as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C3047: Validate the submission of an order with iDEAL as payment method and payment mark as "Cancelled"'},
     ].forEach((testCase) => {
       it(testCase.title, () => {
         visitCheckoutPayment.visit();

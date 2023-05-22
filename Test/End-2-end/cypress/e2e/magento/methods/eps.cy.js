@@ -12,42 +12,44 @@ const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
-describe('Check if the EPS payment methods works as expected', () => {
-  [
-    {status: 'paid', orderStatus: 'Processing', title: 'C3073: Validate the submission of an order with EPS as payment method and payment mark as "Paid"'},
-    {status: 'failed', orderStatus: 'Canceled', title: 'C3074: Validate the submission of an order with EPS as payment method and payment mark as "Failed"'},
-    {status: 'expired', orderStatus: 'Canceled', title: 'C3076: Validate the submission of an order with EPS as payment method and payment mark as "Expired"'},
-    {status: 'canceled', orderStatus: 'Canceled', title: 'C3075: Validate the submission of an order with EPS as payment method and payment mark as "Cancelled"'},
-  ].forEach((testCase) => {
-    it(testCase.title, () => {
-      visitCheckoutPayment.visit();
+if (Cypress.env('mollie_available_methods').includes('eps')) {
+  describe('Check that eps behaves as expected', () => {
+    [
+      {status: 'paid', orderStatus: 'Processing', title: 'C3073: Validate the submission of an order with EPS as payment method and payment mark as "Paid"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C3074: Validate the submission of an order with EPS as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C3076: Validate the submission of an order with EPS as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C3075: Validate the submission of an order with EPS as payment method and payment mark as "Cancelled"'},
+    ].forEach((testCase) => {
+      it(testCase.title, () => {
+        visitCheckoutPayment.visit();
 
-      cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
+        cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-      checkoutPaymentPage.selectPaymentMethod('EPS');
-      checkoutPaymentPage.placeOrder();
+        checkoutPaymentPage.selectPaymentMethod('EPS');
+        checkoutPaymentPage.placeOrder();
 
-      mollieHostedPaymentPage.selectStatus(testCase.status);
+        mollieHostedPaymentPage.selectStatus(testCase.status);
 
-      if (testCase.status === 'paid') {
-        checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
-      }
+        if (testCase.status === 'paid') {
+          checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
+        }
 
-      if (testCase.status === 'canceled') {
-        cartPage.assertCartPageIsShown();
-      }
+        if (testCase.status === 'canceled') {
+          cartPage.assertCartPageIsShown();
+        }
 
-      cy.backendLogin();
+        cy.backendLogin();
 
-      cy.get('@order-id').then((orderId) => {
-        ordersPage.openOrderById(orderId);
+        cy.get('@order-id').then((orderId) => {
+          ordersPage.openOrderById(orderId);
+        });
+
+        if (testCase.status === 'expired') {
+          ordersPage.callFetchStatus();
+        }
+
+        ordersPage.assertOrderStatusIs(testCase.orderStatus);
       });
-
-      if (testCase.status === 'expired') {
-        ordersPage.callFetchStatus();
-      }
-
-      ordersPage.assertOrderStatusIs(testCase.orderStatus);
     });
-  });
-})
+  })
+}
