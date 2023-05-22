@@ -15,12 +15,16 @@ export default class CheckoutPaymentPage {
     cy.get('.payment-method._active [name="issuer"]').first().should('be.visible').check();
   }
 
+  pressPlaceOrderButton() {
+    cy.get('.payment-method._active .action.primary.checkout').click();
+  }
+
   placeOrder() {
     cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
     cy.intercept('POST', 'rest/default/V1/guest-carts/*/payment-information').as('placeOrderAction');
 
-    cy.get('.payment-method._active .action.primary.checkout').click();
+    this.pressPlaceOrderButton();
 
     cy.wait('@placeOrderAction').then((interception) => {
       cy.expect(interception.response.statusCode).to.eq(200);

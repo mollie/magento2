@@ -11,9 +11,10 @@ define(
     ) {
         'use strict';
         var defaultComponent = 'Mollie_Payment/js/view/payment/method-renderer/default';
+        var billieComponent = 'Mollie_Payment/js/view/payment/method-renderer/billie';
         var idealComponent = 'Mollie_Payment/js/view/payment/method-renderer/ideal';
-        var kbcComponent = 'Mollie_Payment/js/view/payment/method-renderer/kbc';
         var giftcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/giftcard';
+        var kbcComponent = 'Mollie_Payment/js/view/payment/method-renderer/kbc';
 
         var creditcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/creditcard';
         var checkoutConfig = window.checkoutConfig.payment.mollie;
@@ -25,7 +26,7 @@ define(
             {type: 'mollie_methods_bancontact', component: defaultComponent},
             {type: 'mollie_methods_banktransfer', component: defaultComponent},
             {type: 'mollie_methods_belfius', component: defaultComponent},
-            {type: 'mollie_methods_billie', component: defaultComponent},
+            {type: 'mollie_methods_billie', component: billieComponent},
             {type: 'mollie_methods_creditcard', component: creditcardComponent},
             {type: 'mollie_methods_directdebit', component: defaultComponent},
             {type: 'mollie_methods_eps', component: defaultComponent},

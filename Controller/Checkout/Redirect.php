@@ -24,6 +24,7 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\Methods\CreditcardVault;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\FormatExceptionMessages;
 use Mollie\Payment\Service\Mollie\Order\RedirectUrl;
 
 /**
@@ -70,20 +71,25 @@ class Redirect extends Action
      * @var RedirectUrl
      */
     private $redirectUrl;
+    /**
+     * @var FormatExceptionMessages
+     */
+    private $formatExceptionMessages;
 
     /**
      * Redirect constructor.
      *
-     * @param Context                           $context
-     * @param Session                           $checkoutSession
-     * @param PageFactory                       $resultPageFactory
-     * @param PaymentHelper                     $paymentHelper
-     * @param MollieHelper                      $mollieHelper
-     * @param OrderManagementInterface          $orderManagement
-     * @param Config                            $config
-     * @param PaymentTokenRepositoryInterface   $paymentTokenRepository,
-     * @param OrderRepositoryInterface          $orderRepository
-     * @param RedirectUrl                       $redirectUrl
+     * @param Context $context
+     * @param Session $checkoutSession
+     * @param PageFactory $resultPageFactory
+     * @param PaymentHelper $paymentHelper
+     * @param MollieHelper $mollieHelper
+     * @param OrderManagementInterface $orderManagement
+     * @param Config $config
+     * @param PaymentTokenRepositoryInterface $paymentTokenRepository ,
+     * @param OrderRepositoryInterface $orderRepository
+     * @param RedirectUrl $redirectUrl
+     * @param FormatExceptionMessages $formatExceptionMessages
      */
     public function __construct(
         Context $context,
@@ -95,7 +101,8 @@ class Redirect extends Action
         Config $config,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         OrderRepositoryInterface $orderRepository,
-        RedirectUrl $redirectUrl
+        RedirectUrl $redirectUrl,
+        FormatExceptionMessages $formatExceptionMessages
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->resultPageFactory = $resultPageFactory;
@@ -106,6 +113,7 @@ class Redirect extends Action
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->orderRepository = $orderRepository;
         $this->redirectUrl = $redirectUrl;
+        $this->formatExceptionMessages = $formatExceptionMessages;
         parent::__construct($context);
     }
 
@@ -151,8 +159,8 @@ class Redirect extends Action
                 return $this->_redirect('checkout/cart');
             }
         } catch (Exception $exception) {
-            // @phpstan-ignore-next-line
-            $this->formatExceptionMessage($exception, $methodInstance ?? null);
+            $errorMessage = $this->formatExceptionMessages->execute($exception, $methodInstance ?? null);
+            $this->messageManager->addErrorMessage($errorMessage);
             $this->mollieHelper->addTolog('error', $exception->getMessage());
             $this->checkoutSession->restoreQuote();
             $this->cancelUnprocessedOrder($order, $exception->getMessage());
@@ -181,43 +189,6 @@ class Redirect extends Action
             $message = sprintf('Cannot cancel order %s: %s', $order->getIncrementId(), $e->getMessage());
             $this->mollieHelper->addToLog('error', $message);
         }
-    }
-
-    /**
-     * @param Exception $exception
-     * @param MethodInterface|null $methodInstance
-     */
-    private function formatExceptionMessage(Exception $exception, MethodInterface $methodInstance = null)
-    {
-        if (stripos(
-                $exception->getMessage(),
-                'The webhook URL is invalid because it is unreachable from Mollie\'s point of view'
-            ) !== false
-        ) {
-            $this->messageManager->addErrorMessage(
-                __(
-                    'The webhook URL is invalid because it is unreachable from Mollie\'s point of view. ' .
-                    'View this article for more information: ' .
-                    'https://github.com/mollie/magento2/wiki/Webhook-Communication-between-your-Magento-webshop-and-Mollie'
-                )
-            );
-
-            return;
-        }
-
-        if ($methodInstance && stripos($exception->getMessage(), 'cURL error 28') !== false) {
-            $this->messageManager->addErrorMessage(
-                __(
-                    'A Timeout while connecting to %1 occurred, this could be the result of an outage. ' .
-                    'Please try again or select another payment method.',
-                    $methodInstance->getTitle()
-                )
-            );
-
-            return;
-        }
-
-        $this->messageManager->addExceptionMessage($exception, __($exception->getMessage()));
     }
 
     /**
