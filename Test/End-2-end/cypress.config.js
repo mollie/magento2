@@ -51,7 +51,10 @@ module.exports = defineConfig({
               });
 
               res.on("end", function (chunk) {
-                  var body = Buffer.concat(chunks);
+                  const body = Buffer.concat(chunks);
+
+                  console.info('Received body', body.toString());
+
                   const methods = JSON.parse(body.toString()).data.molliePaymentMethods.methods.map(data => {
                       return data.code
                   })

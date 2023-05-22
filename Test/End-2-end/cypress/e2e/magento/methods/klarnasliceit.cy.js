@@ -12,7 +12,7 @@ const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
-// if (Cypress.env('mollie_available_methods').includes('klarnasliceit')) {
+if (Cypress.env('mollie_available_methods').includes('klarnasliceit')) {
   describe('Check that klarnasliceit behaves as expected', () => {
     [
       {status: 'authorized', orderStatus: 'Processing', title: 'C3069: Validate the submission of an order with Klarna Slice It as payment method and payment mark as "Authorized"'},
@@ -52,4 +52,4 @@ const cartPage = new CartPage();
       });
     });
   })
-// }
+}
