@@ -36,7 +36,7 @@ if (Cypress.env('mollie_available_methods').includes('kbc')) {
         title: 'C3078: Validate the submission of an order with KBC/CBC as payment method and payment mark as "Cancelled"'
       },
     ].forEach((testCase) => {
-      it.only(testCase.title, () => {
+      it(testCase.title, () => {
         visitCheckoutPayment.visit();
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
@@ -44,6 +44,10 @@ if (Cypress.env('mollie_available_methods').includes('kbc')) {
         checkoutPaymentPage.selectPaymentMethod('KBC/CBC');
         checkoutPaymentPage.placeOrder();
 
+        const values = ['CBC', 'KBC'];
+        const randomIndex = Math.floor(Math.random() * values.length);
+
+        mollieHostedPaymentPage.selectPaymentMethod(values[randomIndex]);
         mollieHostedPaymentPage.selectStatus(testCase.status);
 
         if (testCase.status === 'paid') {
