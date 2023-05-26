@@ -3,7 +3,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v2.25.0</version>
+                <version>v2.26.0</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -409,7 +409,7 @@
             <mollie_methods_paypal>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Paypal</model>
-                <title>Paypal</title>
+                <title>PayPal</title>
                 <payment_description>{ordernumber}</payment_description>
                 <method>payment</method>
                 <payment_action>order</payment_action>

@@ -109,7 +109,8 @@ class Process extends Action
                 $this->checkoutSession->start();
 
                 $redirect = new DataObject([
-                    'path' => 'checkout/onepage/success?utm_nooverride=1',
+                    'path' => 'checkout/onepage/success',
+                    'query' => ['utm_nooverride' => 1],
                 ]);
 
                 $this->eventManager->dispatch('mollie_checkout_success_redirect', [
@@ -119,7 +120,10 @@ class Process extends Action
                     'response' => $this->getResponse(),
                 ]);
 
-                return $this->_redirect($redirect->getData('path'));
+                return $this->_redirect($redirect->getData('path'), [
+                    '_query' => $redirect->getData('query'),
+                    '_use_rewrite' => false,
+                ]);
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
                 $this->messageManager->addErrorMessage(__('Transaction failed. Please verify your billing information and payment method, and try again.'));

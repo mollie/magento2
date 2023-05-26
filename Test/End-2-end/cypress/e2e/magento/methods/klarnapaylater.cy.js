@@ -12,22 +12,20 @@ const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
-if (Cypress.env('mollie_available_methods').includes('ideal')) {
-  describe('CCheck that ideal behaves as expected', () => {
+if (Cypress.env('mollie_available_methods').includes('klarnapaylater')) {
+  describe('Check that klarnapaylater behaves as expected', () => {
     [
-      {status: 'paid', orderStatus: 'Processing', title: 'C3043: Validate the submission of an order with iDEAL as payment method and payment mark as "Paid"'},
-      {status: 'open', orderStatus: 'Pending Payment', title: 'C3044: Validate the submission of an order with iDEAL as payment method and payment mark as "Open"'},
-      {status: 'failed', orderStatus: 'Canceled', title: 'C3045: Validate the submission of an order with iDEAL as payment method and payment mark as "Failed"'},
-      {status: 'expired', orderStatus: 'Canceled', title: 'C3046: Validate the submission of an order with iDEAL as payment method and payment mark as "Expired"'},
-      {status: 'canceled', orderStatus: 'Canceled', title: 'C3047: Validate the submission of an order with iDEAL as payment method and payment mark as "Cancelled"'},
+      {status: 'authorized', orderStatus: 'Processing', title: 'C3062: Validate the submission of an order with Klarna Pay Later as payment method and payment mark as "Authorized"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C3063: Validate the submission of an order with Klarna Pay Later as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C3065: Validate the submission of an order with Klarna Pay Later as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C3064: Validate the submission of an order with Klarna Pay Later as payment method and payment mark as "Cancelled"'},
     ].forEach((testCase) => {
       it(testCase.title, () => {
         visitCheckoutPayment.visit();
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-        checkoutPaymentPage.selectPaymentMethod('iDeal');
-        checkoutPaymentPage.selectFirstAvailableIssuer();
+        checkoutPaymentPage.selectPaymentMethod('Klarna Pay Later');
         checkoutPaymentPage.placeOrder();
 
         mollieHostedPaymentPage.selectStatus(testCase.status);
@@ -45,6 +43,10 @@ if (Cypress.env('mollie_available_methods').includes('ideal')) {
         cy.get('@order-id').then((orderId) => {
           ordersPage.openOrderById(orderId);
         });
+
+        if (testCase.status === 'expired') {
+          ordersPage.callFetchStatus();
+        }
 
         ordersPage.assertOrderStatusIs(testCase.orderStatus);
       });

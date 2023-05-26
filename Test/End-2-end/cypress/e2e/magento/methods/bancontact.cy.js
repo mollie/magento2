@@ -12,43 +12,45 @@ const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
-describe('Check if the payment methods are available', () => {
-  [
-    {status: 'paid', orderStatus: 'Processing', title: 'C3048: Validate the submission of an order with Bancontact as payment method and payment mark as "Paid"'},
-    {status: 'open', orderStatus: 'Pending Payment', title: 'C3049: Validate the submission of an order with Bancontact as payment method and payment mark as "Open"'},
-    {status: 'failed', orderStatus: 'Canceled', title: 'C3050: Validate the submission of an order with Bancontact as payment method and payment mark as "Failed"'},
-    {status: 'expired', orderStatus: 'Canceled', title: 'C3052: Validate the submission of an order with Bancontact as payment method and payment mark as "Expired"'},
-    {status: 'canceled', orderStatus: 'Canceled', title: 'C3051: Validate the submission of an order with Bancontact as payment method and payment mark as "Cancelled"'},
-  ].forEach((testCase) => {
-    it(testCase.title, () => {
-      visitCheckoutPayment.visit();
+if (Cypress.env('mollie_available_methods').includes('bancontact')) {
+  describe('Check that bancontact behaves as expected', () => {
+    [
+      {status: 'paid', orderStatus: 'Processing', title: 'C3048: Validate the submission of an order with Bancontact as payment method and payment mark as "Paid"'},
+      {status: 'open', orderStatus: 'Pending Payment', title: 'C3049: Validate the submission of an order with Bancontact as payment method and payment mark as "Open"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C3050: Validate the submission of an order with Bancontact as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C3052: Validate the submission of an order with Bancontact as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C3051: Validate the submission of an order with Bancontact as payment method and payment mark as "Cancelled"'},
+    ].forEach((testCase) => {
+      it(testCase.title, () => {
+        visitCheckoutPayment.visit();
 
-      cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
+        cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-      checkoutPaymentPage.selectPaymentMethod('Bancontact');
-      checkoutPaymentPage.placeOrder();
+        checkoutPaymentPage.selectPaymentMethod('Bancontact');
+        checkoutPaymentPage.placeOrder();
 
-      mollieHostedPaymentPage.selectStatus(testCase.status);
+        mollieHostedPaymentPage.selectStatus(testCase.status);
 
-      if (testCase.status === 'paid') {
-        checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
-      }
+        if (testCase.status === 'paid') {
+          checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
+        }
 
-      if (testCase.status === 'canceled') {
-        cartPage.assertCartPageIsShown();
-      }
+        if (testCase.status === 'canceled') {
+          cartPage.assertCartPageIsShown();
+        }
 
-      cy.backendLogin();
+        cy.backendLogin();
 
-      cy.get('@order-id').then((orderId) => {
-        ordersPage.openOrderById(orderId);
+        cy.get('@order-id').then((orderId) => {
+          ordersPage.openOrderById(orderId);
+        });
+
+        if (testCase.status === 'expired') {
+          ordersPage.callFetchStatus();
+        }
+
+        ordersPage.assertOrderStatusIs(testCase.orderStatus);
       });
-
-      if (testCase.status === 'expired') {
-        ordersPage.callFetchStatus();
-      }
-
-      ordersPage.assertOrderStatusIs(testCase.orderStatus);
     });
-  });
-})
+  })
+}
