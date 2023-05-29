@@ -57,7 +57,8 @@ To extend the functionality of the Mollie Magento 2 plugin, we have developed a 
 
 ### Support for other alternative frontends
 
-- [Hyva React Checkout](https://github.com/mollie/magento2-hyva-react-checkout)
+- [Hyvä Checkout](https://github.com/mollie/magento2-hyva-compatibility)
+- [Hyvä React Checkout](https://github.com/mollie/magento2-hyva-react-checkout)
 - [Scandi PWA](https://github.com/mollie/magento2-scandipwa)
 
 ## Configuration, FAQ and Troubleshooting
