@@ -62,7 +62,7 @@ jobs:
       CYPRESS_TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
       CYPRESS_TESTRAIL_PROJECT_ID: 5
       CYPRESS_TESTRAIL_MILESTONE_ID: 37
-      CYPRESS_TESTRAIL_RUN_NAME: "Github Workflow __datetime__, ${{ github.event.head_commit.message }}, PHP version: ${{ matrix.PHP_VERSION }}, Magento version: ${{ matrix.MAGENTO_VERSION }}"
+      CYPRESS_TESTRAIL_RUN_NAME: "Github Workflow, ${{ github.head_ref || github.ref_name }}, PHP version: ${{ matrix.PHP_VERSION }}, Magento version: ${{ matrix.MAGENTO_VERSION }}"
       CYPRESS_TESTRAIL_RUN_CLOSE: true
     steps:
       - uses: actions/checkout@v2

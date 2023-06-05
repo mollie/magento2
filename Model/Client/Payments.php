@@ -12,13 +12,16 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\OrderRepository;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\Client\Payments\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
+use Mollie\Payment\Service\Mollie\Order\CanRegisterCaptureNotification;
 use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
@@ -133,6 +136,11 @@ class Payments extends AbstractModel
     private $expiredOrderToTransaction;
 
     /**
+     * @var CanRegisterCaptureNotification
+     */
+    private $canRegisterCaptureNotification;
+
+    /**
      * Payments constructor.
      *
      * @param OrderRepository $orderRepository
@@ -154,6 +162,7 @@ class Payments extends AbstractModel
      * @param ValidateMetadata $validateMetadata
      * @param SaveAdditionalInformationDetails $saveAdditionalInformationDetails
      * @param ExpiredOrderToTransaction $expiredOrderToTransaction
+     * @param CanRegisterCaptureNotification $canRegisterCaptureNotification
      */
     public function __construct(
         OrderRepository $orderRepository,
@@ -174,7 +183,8 @@ class Payments extends AbstractModel
         ProcessTransaction $processTransaction,
         ValidateMetadata $validateMetadata,
         SaveAdditionalInformationDetails $saveAdditionalInformationDetails,
-        ExpiredOrderToTransaction $expiredOrderToTransaction
+        ExpiredOrderToTransaction $expiredOrderToTransaction,
+        CanRegisterCaptureNotification $canRegisterCaptureNotification
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -195,6 +205,7 @@ class Payments extends AbstractModel
         $this->validateMetadata = $validateMetadata;
         $this->saveAdditionalInformationDetails = $saveAdditionalInformationDetails;
         $this->expiredOrderToTransaction = $expiredOrderToTransaction;
+        $this->canRegisterCaptureNotification = $canRegisterCaptureNotification;
     }
 
     /**
@@ -341,7 +352,7 @@ class Payments extends AbstractModel
 
         $refunded = isset($paymentData->_links->refunds) ? true : false;
 
-        if ($status == 'paid' && !$refunded) {
+        if (in_array($status, ['paid', 'authorized']) && !$refunded) {
             $amount = $paymentData->amount->value;
             $currency = $paymentData->amount->currency;
             $orderAmount = $this->orderAmount->getByTransactionId($transactionId);
@@ -367,7 +378,13 @@ class Payments extends AbstractModel
                     $payment->setTransactionId($transactionId);
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
                     $payment->setIsTransactionClosed(true);
-                    $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
+
+                    if ($this->canRegisterCaptureNotification->execute($order) ||
+                        $type != static::TRANSACTION_TYPE_WEBHOOK
+                    ) {
+                        $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
+                    }
+
                     $order->setState(Order::STATE_PROCESSING);
                     $this->transactionProcessor->process($order, null, $paymentData);
 

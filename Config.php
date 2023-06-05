@@ -8,7 +8,6 @@ namespace Mollie\Payment;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\ProductMetadataInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Module\Manager;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Logger\MollieLogger;
@@ -17,6 +16,8 @@ use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 class Config
 {
     const EXTENSION_CODE = 'Mollie_Payment';
+    const ADVANCED_INVOICE_MOMENT = 'payment/mollie_general/invoice_moment';
+    const ADVANCED_ENABLE_MANUAL_CAPTURE = 'payment/mollie_general/enable_manual_capture';
     const GENERAL_ENABLED = 'payment/mollie_general/enabled';
     const GENERAL_APIKEY_LIVE = 'payment/mollie_general/apikey_live';
     const GENERAL_APIKEY_TEST = 'payment/mollie_general/apikey_test';
@@ -86,11 +87,6 @@ class Config
     private $moduleManager;
 
     /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
-    /**
      * @var ProductMetadataInterface
      */
     private $productMetadata;
@@ -99,13 +95,11 @@ class Config
         ScopeConfigInterface $config,
         MollieLogger $logger,
         Manager $moduleManager,
-        EncryptorInterface $encryptor,
         ProductMetadataInterface $productMetadata
     ) {
         $this->config = $config;
         $this->logger = $logger;
         $this->moduleManager = $moduleManager;
-        $this->encryptor = $encryptor;
         $this->productMetadata = $productMetadata;
     }
 
@@ -126,7 +120,7 @@ class Config
      * @param string $scope
      * @return bool
      */
-    private function isSetFlag($path, $storeId, $scope = ScopeInterface::SCOPE_STORE)
+    private function isSetFlag($path, $storeId, string $scope = ScopeInterface::SCOPE_STORE): bool
     {
         return $this->config->isSetFlag($path, $scope, $storeId);
     }
@@ -240,6 +234,24 @@ class Config
     public function isDebugMode($storeId = null)
     {
         return $this->isSetFlag(static::GENERAL_DEBUG, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return string|null
+     */
+    public function getInvoiceMoment($storeId = null): ?string
+    {
+        return $this->getPath(static::ADVANCED_INVOICE_MOMENT, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function useManualCapture($storeId): bool
+    {
+        return $this->isSetFlag(static::ADVANCED_ENABLE_MANUAL_CAPTURE, $storeId);
     }
 
     /**

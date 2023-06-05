@@ -422,18 +422,6 @@ class Mollie extends Adapter
     }
 
     /**
-     * @param Order\Shipment $shipment
-     * @param Order          $order
-     *
-     * @return OrdersApi
-     * @throws LocalizedException
-     */
-    public function createShipment(Order\Shipment $shipment, Order $order)
-    {
-        return $this->ordersApi->createShipment($shipment, $order);
-    }
-
-    /**
      * @param Order\Shipment       $shipment
      * @param Order\Shipment\Track $track
      * @param Order                $order

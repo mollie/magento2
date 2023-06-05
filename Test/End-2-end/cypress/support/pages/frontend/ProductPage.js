@@ -6,10 +6,13 @@ export default class ProductPage {
         cy.visit('/catalog/product/view/id/' + productId);
     }
 
-    addSimpleProductToCart() {
+    addSimpleProductToCart(quantity = 1) {
+      cy.get('#qty').clear().type(quantity);
+
+      cy.get('#search').focus();
+
       cy.get('.action.tocart.primary').should('be.enabled').click();
 
-      // TODO: Make this dynamic
-      cy.get('.counter.qty').should('contain', 1);
+      cy.get('.counter.qty').should('contain', quantity);
     }
 }

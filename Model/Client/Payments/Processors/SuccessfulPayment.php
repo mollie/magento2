@@ -13,8 +13,10 @@ use Magento\Sales\Model\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\PaymentProcessorInterface;
+use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
+use Mollie\Payment\Service\Mollie\Order\CanRegisterCaptureNotification;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\SendOrderEmails;
@@ -63,6 +65,11 @@ class SuccessfulPayment implements PaymentProcessorInterface
      */
     private $sendOrderEmails;
 
+    /**
+     * @var CanRegisterCaptureNotification
+     */
+    private $canRegisterCaptureNotification;
+
     public function __construct(
         ProcessTransactionResponseFactory $processTransactionResponseFactory,
         OrderAmount $orderAmount,
@@ -71,7 +78,8 @@ class SuccessfulPayment implements PaymentProcessorInterface
         OrderCommentHistory $orderCommentHistory,
         General $mollieHelper,
         OrderRepositoryInterface $orderRepository,
-        SendOrderEmails $sendOrderEmails
+        SendOrderEmails $sendOrderEmails,
+        CanRegisterCaptureNotification $canRegisterCaptureNotification
     ) {
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
         $this->orderAmount = $orderAmount;
@@ -81,6 +89,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $this->mollieHelper = $mollieHelper;
         $this->orderRepository = $orderRepository;
         $this->sendOrderEmails = $sendOrderEmails;
+        $this->canRegisterCaptureNotification = $canRegisterCaptureNotification;
     }
 
     public function process(
@@ -118,7 +127,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         }
 
         if (abs($amount - $orderAmount['value']) < 0.01) {
-            $this->handlePayment($magentoOrder, $molliePayment);
+            $this->handlePayment($magentoOrder, $molliePayment, $type);
         }
 
         /** @var Order\Invoice|null $invoice */
@@ -138,14 +147,20 @@ class SuccessfulPayment implements PaymentProcessorInterface
         ]);
     }
 
-    private function handlePayment(OrderInterface $magentoOrder, Payment $molliePayment): void
+    private function handlePayment(OrderInterface $magentoOrder, Payment $molliePayment, string $type): void
     {
         /** @var PaymentInterface|Order\Payment $payment */
         $payment = $magentoOrder->getPayment();
         $payment->setCurrencyCode($magentoOrder->getBaseCurrencyCode());
         $payment->setTransactionId($magentoOrder->getMollieTransactionId());
         $payment->setIsTransactionClosed(true);
-        $payment->registerCaptureNotification($magentoOrder->getBaseGrandTotal(), true);
+
+        if ($this->canRegisterCaptureNotification->execute($magentoOrder) ||
+            $type != Payments::TRANSACTION_TYPE_SUBSCRIPTION
+        ) {
+            $payment->registerCaptureNotification($magentoOrder->getBaseGrandTotal(), true);
+        }
+
         $magentoOrder->setState(Order::STATE_PROCESSING);
         $this->transactionProcessor->process($magentoOrder, null, $molliePayment);
 

@@ -20,7 +20,10 @@ class PartialInvoiceTest extends IntegrationTestCase
         /** @var PartialInvoice $instance */
         $instance = $this->objectManager->get(PartialInvoice::class);
 
-        $this->assertNull($instance->createFromShipment($shipments->getFirstItem()));
+        $shipment = $shipments->getFirstItem();
+        $shipment->getOrder()->setMollieTransactionId('ord_abc123')->save();
+
+        $this->assertNull($instance->createFromShipment($shipment));
     }
 
     /**
