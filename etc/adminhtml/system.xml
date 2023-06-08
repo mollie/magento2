@@ -359,7 +359,7 @@
                     <comment><![CDATA[<strong>Optional</strong> Comma separated list of emailaddresses. Leave empty to disable.]]></comment>
                     <validate>validate-emails</validate>
                     <depends>
-                        <field id="enabled">1</field>
+                        <field id="enable_second_chance_email">1</field>
                     </depends>
                 </field>
             </group>
