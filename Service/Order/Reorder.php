@@ -159,9 +159,8 @@ class Reorder
         $this->orderCreate->setData('account', ['email' => $originalOrder->getCustomerEmail()]);
         $this->orderCreate->initFromOrder($originalOrder);
 
-        if ($originalOrder->getCustomerGroupId() === null) {
-            $this->orderCreate->getQuote()->getCustomer()->setGroupId(0);
-        }
+        $customerGroupId = $originalOrder->getCustomerGroupId() ?? 0;
+        $this->orderCreate->getQuote()->getCustomer()->setGroupId($customerGroupId);
 
         $order = $this->orderCreate->createOrder();
 
