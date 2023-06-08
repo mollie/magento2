@@ -40,8 +40,9 @@ use Mollie\Payment\Service\PaymentToken\PaymentTokenForOrder;
  */
 class Payments extends AbstractModel
 {
-
     const CHECKOUT_TYPE = 'payment';
+    const TRANSACTION_TYPE_WEBHOOK = 'webhook';
+    const TRANSACTION_TYPE_SUBSCRIPTION = 'subscription';
 
     /**
      * @var MollieHelper
@@ -253,7 +254,7 @@ class Payments extends AbstractModel
 
         // Order is paid immediately (eg. Credit Card with Components, Apple Pay), process transaction
         if ($payment->isPaid()) {
-            $this->processTransaction->execute($order, 'webhook');
+            $this->processTransaction->execute($order, static::TRANSACTION_TYPE_WEBHOOK);
         }
 
         return $payment->getCheckoutUrl();
@@ -331,7 +332,9 @@ class Payments extends AbstractModel
 
         $status = $paymentData->status;
         $payment = $order->getPayment();
-        if ($type == 'webhook' && $payment->getAdditionalInformation('payment_status') != $status) {
+        if (in_array($type, [static::TRANSACTION_TYPE_WEBHOOK, static::TRANSACTION_TYPE_SUBSCRIPTION]) &&
+            $payment->getAdditionalInformation('payment_status') != $status
+        ) {
             $payment->setAdditionalInformation('payment_status', $status);
             $this->orderRepository->save($order);
         }
@@ -351,12 +354,16 @@ class Payments extends AbstractModel
                 $this->saveAdditionalInformationDetails->execute($payment, $paymentData->details);
             }
 
-            if (!$payment->getIsTransactionClosed() && $type == 'webhook') {
+            if (!$payment->getIsTransactionClosed() &&
+                in_array($type, [static::TRANSACTION_TYPE_WEBHOOK, static::TRANSACTION_TYPE_SUBSCRIPTION])
+            ) {
                 if ($order->isCanceled()) {
                     $order = $this->mollieHelper->uncancelOrder($order);
                 }
 
-                if (abs($amount - $orderAmount['value']) < 0.01) {
+                if (abs($amount - $orderAmount['value']) < 0.01 ||
+                    $type == static::TRANSACTION_TYPE_SUBSCRIPTION
+                ) {
                     $payment->setTransactionId($transactionId);
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
                     $payment->setIsTransactionClosed(true);
@@ -440,7 +447,7 @@ class Payments extends AbstractModel
             }
         }
         if ($status == 'canceled' || $status == 'failed' || $status == 'expired') {
-            if ($type == 'webhook') {
+            if (in_array($type, [static::TRANSACTION_TYPE_WEBHOOK, static::TRANSACTION_TYPE_SUBSCRIPTION])) {
                 $this->cancelOrder->execute($order, $status);
                 $this->transactionProcessor->process($order, null, $paymentData);
             }
@@ -482,9 +489,10 @@ class Payments extends AbstractModel
      */
     public function checkCheckoutSession(Order $order, $paymentToken, $paymentData, $type)
     {
-        if ($type == 'webhook') {
+        if (in_array($type, [static::TRANSACTION_TYPE_WEBHOOK, static::TRANSACTION_TYPE_SUBSCRIPTION])) {
             return;
         }
+
         if ($this->checkoutSession->getLastOrderId() != $order->getId()) {
             if ($paymentToken && isset($paymentData->metadata->payment_token)) {
                 if ($paymentToken == $paymentData->metadata->payment_token) {
