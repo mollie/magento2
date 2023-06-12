@@ -565,9 +565,15 @@ class Orders extends AbstractModel
                 }
             }
         } catch (\Exception $e) {
-            $this->mollieHelper->addTolog('error', $e->getMessage());
+            $message = __(
+                'Unable to ship order "%1" due to error: %2',
+                $order->getIncrementId(),
+                $e->getMessage()
+            );
+
+            $this->mollieHelper->addTolog('error', $message);
             throw new LocalizedException(
-                __('Mollie API: %1', $e->getMessage())
+                $message
             );
         }
 
