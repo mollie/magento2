@@ -8,7 +8,7 @@ namespace Mollie\Payment\Test\Integration\Observer\CheckoutSubmitAllAfter;
 
 use Magento\Framework\Event\Observer;
 use Mollie\Payment\Model\Mollie;
-use Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForPaymentLinkOrders;
+use Mollie\Payment\Observer\SalesModelServiceQuoteSubmitSuccess\StartTransactionForPaymentLinkOrders;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class StartTransactionForPaymentLinkOrdersTest extends IntegrationTestCase
