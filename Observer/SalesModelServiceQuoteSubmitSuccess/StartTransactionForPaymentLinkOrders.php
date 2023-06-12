@@ -4,7 +4,7 @@
  *  See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Observer\CheckoutSubmitAllAfter;
+namespace Mollie\Payment\Observer\SalesModelServiceQuoteSubmitSuccess;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
