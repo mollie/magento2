@@ -28,6 +28,7 @@
     </event>
     <event name="sales_model_service_quote_submit_success">
         <observer name="mollie_attach_payment_token_to_order" instance="Mollie\Payment\Observer\SalesModelServiceQuoteSubmitSuccess\AttachPaymentTokenToOrder" />
+        <observer name="mollie_starttransaction_for_paymentlink_orders" instance="Mollie\Payment\Observer\SalesModelServiceQuoteSubmitSuccess\StartTransactionForPaymentLinkOrders" />
     </event>
     <event name="mollie_start_transaction">
         <observer name="mollie_save_pending_payment_reminder" instance="Mollie\Payment\Observer\MollieStartTransaction\SavePendingOrder" />
@@ -46,7 +47,6 @@
     </event>
     <event name="checkout_submit_all_after">
         <observer name="mollie_starttransaction_for_instant_purchase_orders" instance="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPurchaseOrders" />
-        <observer name="mollie_starttransaction_for_paymentlink_orders" instance="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForPaymentLinkOrders" />
     </event>
     <event name="sales_quote_item_set_product">
         <observer name="mollie_add_subscription_product_type_options" instance="Mollie\Payment\Observer\SalesQuoteItemSetProduct\SetSubscriptionDataOnBuyRequest" />
