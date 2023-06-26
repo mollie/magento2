@@ -163,6 +163,10 @@ class ProcessTransaction
             return $this->orderProcessors->process('expired', $order, $mollieOrder, $type, $defaultResponse);
         }
 
+        if ($mollieOrder->isShipping()) {
+            return $this->orderProcessors->process('shipping', $order, $mollieOrder, $type, $defaultResponse);
+        }
+
         throw new LocalizedException(__('Unable to process order %s', $order->getIncrementId()));
     }
 }
