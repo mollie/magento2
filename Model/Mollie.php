@@ -354,7 +354,7 @@ class Mollie extends Adapter
             return $msg;
         }
 
-        $result = $this->orderLockService->execute($order, function (OrderInterface $order) use (
+        $output = $this->orderLockService->execute($order, function (OrderInterface $order) use (
             $transactionId,
             $type,
             $paymentToken
@@ -368,8 +368,15 @@ class Mollie extends Adapter
 
             $order->getPayment()->setAdditionalInformation('mollie_success', $result['success']);
 
-            return $result;
+            // Return the order and the result so we can use this outside this closure.
+            return [
+                'order' => $order,
+                'result' => $result,
+            ];
         });
+
+        // Extract the contents of the closure.
+        [$order, $result] = $output;
 
         $this->eventManager->dispatch('mollie_process_transaction_end', ['order' => $order]);
 
