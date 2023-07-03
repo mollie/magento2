@@ -153,6 +153,7 @@ class ProcessTransactionTest extends IntegrationTestCase
     {
         return [
             [OrderStatus::STATUS_CREATED, 'created'],
+            [OrderStatus::STATUS_SHIPPING, 'shipping'],
         ];
     }
 
