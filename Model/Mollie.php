@@ -375,7 +375,8 @@ class Mollie extends Adapter
         });
 
         // Extract the contents of the closure.
-        [$order, $result] = $output;
+        $order = $output['order'];
+        $result = $output['result'];
 
         $this->eventManager->dispatch('mollie_process_transaction_end', ['order' => $order]);
 
