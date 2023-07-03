@@ -1,0 +1,31 @@
+<?php
+
+declare(strict_types=1);
+?>
+
+<div class="mollie-manual-capture-warning message message-warning">
+    Please note: You are creating a partial shipment, but it's only possible to capture the payment once.
+    Please double-check you are shipping the correct items.
+</div>
+
+<script>
+    (() => {
+        let warningElement = document.querySelector('.mollie-manual-capture-warning');
+        let fields = Array.from(document.querySelectorAll('.qty-item'));
+        fields.forEach(function (item) {
+            item.addEventListener('change', function (event) {
+                checkFields();
+            });
+        });
+
+        function checkFields() {
+            const alteredFields = fields.filter(element => {
+                return element.value != element.defaultValue;
+            })
+
+            warningElement.style.display = alteredFields.length ? 'block' : 'none';
+        }
+
+        checkFields();
+    })();
+</script>

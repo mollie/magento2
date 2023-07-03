@@ -106,6 +106,7 @@
                 <item name="UseSavedPaymentMethod" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\UseSavedPaymentMethod</item>
                 <item name="PhoneNumber" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\PhoneNumber</item>
                 <item name="DateOfBirth" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\DateOfBirth</item>
+                <item name="CaptureMode" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureMode</item>
             </argument>
         </arguments>
     </type>
