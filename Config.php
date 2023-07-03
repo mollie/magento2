@@ -34,6 +34,7 @@ class Config
     const GENERAL_ENCRYPT_PAYMENT_DETAILS = 'payment/mollie_general/encrypt_payment_details';
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
+    const GENERAL_INVOICE_NOTIFY_KLARNA = 'payment/mollie_general/invoice_notify_klarna';
     const GENERAL_LOCALE = 'payment/mollie_general/locale';
     const GENERAL_ORDER_STATUS_PENDING = 'payment/mollie_general/order_status_pending';
     const GENERAL_PROFILEID = 'payment/mollie_general/profileid';
@@ -261,6 +262,15 @@ class Config
     public function sendInvoiceEmail($storeId = null)
     {
         return $this->isSetFlag(static::GENERAL_INVOICE_NOTIFY, $storeId);
+    }
+
+    /**
+     * @param null|int|string $storeId
+     * @return bool
+     */
+    public function sendInvoiceEmailForKlarna($storeId = null)
+    {
+        return $this->isSetFlag(static::GENERAL_INVOICE_NOTIFY_KLARNA, $storeId);
     }
 
     /**
