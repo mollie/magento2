@@ -47,8 +47,8 @@ class Percentage implements TypeInterface
     {
         $percentage = $this->config->getPercentage($cart->getPayment()->getMethod(), $cart->getStoreId());
 
-        $shipping = $total->getShippingInclTax();
-        $subtotal = $total->getData('subtotal_incl_tax');
+        $shipping = $total->getBaseShippingInclTax();
+        $subtotal = $total->getData('base_subtotal_incl_tax');
         if (!$subtotal) {
             $subtotal = $total->getTotalAmount('subtotal');
         }
