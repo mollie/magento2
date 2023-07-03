@@ -689,9 +689,12 @@ class Orders extends AbstractModel
 
         /** @var int|float $remainderAmount */
         $remainderAmount = $order->getPayment()->getAdditionalInformation('remainder_amount');
+        $grandTotal = $this->config->useBaseCurrency($storeId) ?
+            $creditmemo->getBaseGrandTotal() :
+            $creditmemo->getGrandTotal();
         $maximumAmountToRefund = $order->getBaseGrandTotal() - $remainderAmount;
         if ($remainderAmount) {
-            $amount = $creditmemo->getBaseGrandTotal() > $maximumAmountToRefund ? $maximumAmountToRefund : $creditmemo->getBaseGrandTotal();
+            $amount = $grandTotal > $maximumAmountToRefund ? $maximumAmountToRefund : $grandTotal;
 
             $this->refundUsingPayment->execute(
                 $mollieApi,
@@ -710,7 +713,7 @@ class Orders extends AbstractModel
                 $mollieApi,
                 $transactionId,
                 $creditmemo->getOrderCurrencyCode(),
-                $creditmemo->getBaseGrandTotal()
+                $grandTotal
             );
 
             return $this;

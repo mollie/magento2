@@ -6,6 +6,8 @@
 
 namespace Mollie\Payment\Test\Fakes\Service\Mollie;
 
+use Magento\TestFramework\ObjectManager;
+use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class FakeMollieApiClient extends MollieApiClient
@@ -20,6 +22,13 @@ class FakeMollieApiClient extends MollieApiClient
         $this->instance = $instance;
     }
 
+    private function loadInstance(): void
+    {
+        if (!$this->instance) {
+            $this->instance = parent::loadByStore();
+        }
+    }
+
     public function loadByStore(int $storeId = null): \Mollie\Api\MollieApiClient
     {
         if ($this->instance) {
@@ -27,5 +36,21 @@ class FakeMollieApiClient extends MollieApiClient
         }
 
         return parent::loadByStore($storeId);
+    }
+
+    public function returnFakePayment(Payment $payment = null): ?Payment
+    {
+        $this->loadInstance();
+
+        $endpoint = ObjectManager::getInstance()->create(FakeMolliePaymentApiEndpoint::class);
+
+        $this->instance->payments = $endpoint;
+
+        if ($payment) {
+            $endpoint->setFakePayment($payment);
+            return $payment;
+        }
+
+        return null;
     }
 }
