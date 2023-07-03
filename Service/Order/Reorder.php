@@ -20,6 +20,7 @@ use Magento\Sales\Model\Service\InvoiceService;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Adminhtml\Source\SecondChancePaymentMethod;
 use Mollie\Payment\Plugin\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition\DisableCheckForAdminOrders;
+use Mollie\Payment\Service\Order\Invoice\ShouldEmailInvoice;
 
 class Reorder
 {
@@ -73,6 +74,11 @@ class Reorder
      */
     private $disableCheckForAdminOrders;
 
+    /**
+     * @var ShouldEmailInvoice
+     */
+    private $shouldEmailInvoice;
+
     public function __construct(
         Config $config,
         Create $orderCreate,
@@ -82,7 +88,8 @@ class Reorder
         TransactionFactory $transactionFactory,
         Session $checkoutSession,
         Product $productHelper,
-        DisableCheckForAdminOrders $disableCheckForAdminOrders
+        DisableCheckForAdminOrders $disableCheckForAdminOrders,
+        ShouldEmailInvoice $shouldEmailInvoice
     ) {
         $this->config = $config;
         $this->orderCreate = $orderCreate;
@@ -93,6 +100,7 @@ class Reorder
         $this->checkoutSession = $checkoutSession;
         $this->productHelper = $productHelper;
         $this->disableCheckForAdminOrders = $disableCheckForAdminOrders;
+        $this->shouldEmailInvoice = $shouldEmailInvoice;
     }
 
     public function create(OrderInterface $originalOrder): OrderInterface
@@ -195,7 +203,9 @@ class Reorder
     private function sendInvoice(InvoiceInterface $invoice, OrderInterface $order)
     {
         /** @var Order\Invoice $invoice */
-        if ($invoice->getEmailSent() || !$this->config->sendInvoiceEmail($invoice->getStoreId())) {
+        if ($invoice->getEmailSent() ||
+            !$this->shouldEmailInvoice->execute((int)$order->getStoreId(), $order->getPayment()->getMethod())
+        ) {
             return;
         }
 

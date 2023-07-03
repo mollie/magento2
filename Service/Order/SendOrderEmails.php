@@ -11,7 +11,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
-use Mollie\Payment\Helper\General;
+use Mollie\Payment\Service\Order\Invoice\ShouldEmailInvoice;
 
 class SendOrderEmails
 {
@@ -24,11 +24,6 @@ class SendOrderEmails
      * @var bool
      */
     private $disableInvoiceSending = false;
-
-    /**
-     * @var General
-     */
-    private $mollieHelper;
 
     /**
      * @var OrderSender
@@ -45,16 +40,21 @@ class SendOrderEmails
      */
     private $invoiceSender;
 
+    /**
+     * @var ShouldEmailInvoice
+     */
+    private $shouldEmailInvoice;
+
     public function __construct(
-        General $mollieHelper,
         OrderSender $orderSender,
         OrderCommentHistory $orderCommentHistory,
-        InvoiceSender $invoiceSender
+        InvoiceSender $invoiceSender,
+        ShouldEmailInvoice $shouldEmailInvoice
     ) {
-        $this->mollieHelper = $mollieHelper;
         $this->orderSender = $orderSender;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->invoiceSender = $invoiceSender;
+        $this->shouldEmailInvoice = $shouldEmailInvoice;
     }
 
     public function disableOrderConfirmationSending(): void
@@ -88,8 +88,11 @@ class SendOrderEmails
 
     public function sendInvoiceEmail(InvoiceInterface $invoice): void
     {
+        $order = $invoice->getOrder();
+        $paymentMethod = $order->getPayment()->getMethod();
+
         if ($invoice->getEmailSent() ||
-            !$this->mollieHelper->sendInvoice($invoice->getStoreId()) ||
+            !$this->shouldEmailInvoice->execute((int)$invoice->getStoreId(), $paymentMethod) ||
             $this->disableInvoiceSending
         ) {
             return;
@@ -98,10 +101,10 @@ class SendOrderEmails
         try {
             $this->invoiceSender->send($invoice);
             $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-            $this->orderCommentHistory->add($invoice->getOrder(), $message, true);
+            $this->orderCommentHistory->add($order, $message, true);
         } catch (\Throwable $exception) {
             $message = __('Unable to send the invoice: %1', $exception->getMessage());
-            $this->orderCommentHistory->add($invoice->getOrder(), $message, true);
+            $this->orderCommentHistory->add($order, $message, true);
         }
     }
 }

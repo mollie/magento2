@@ -34,6 +34,7 @@ use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Service\Order\BuildTransaction;
+use Mollie\Payment\Service\Order\Invoice\ShouldEmailInvoice;
 use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
@@ -151,6 +152,10 @@ class Orders extends AbstractModel
      * @var OrderLockService
      */
     private $orderLockService;
+    /**
+     * @var ShouldEmailInvoice
+     */
+    private $shouldEmailInvoice;
 
     /**
      * Orders constructor.
@@ -178,6 +183,7 @@ class Orders extends AbstractModel
      * @param EventManager $eventManager
      * @param LinkTransactionToOrder $linkTransactionToOrder
      * @param OrderLockService $orderLockService
+     * @param ShouldEmailInvoice $shouldEmailInvoice
      */
     public function __construct(
         OrderLines $orderLines,
@@ -202,7 +208,8 @@ class Orders extends AbstractModel
         Config $config,
         EventManager $eventManager,
         LinkTransactionToOrder $linkTransactionToOrder,
-        OrderLockService $orderLockService
+        OrderLockService $orderLockService,
+        ShouldEmailInvoice $shouldEmailInvoice
     ) {
         $this->orderLines = $orderLines;
         $this->invoiceSender = $invoiceSender;
@@ -227,6 +234,7 @@ class Orders extends AbstractModel
         $this->config = $config;
         $this->linkTransactionToOrder = $linkTransactionToOrder;
         $this->orderLockService = $orderLockService;
+        $this->shouldEmailInvoice = $shouldEmailInvoice;
     }
 
     /**
@@ -557,7 +565,7 @@ class Orders extends AbstractModel
 
                 $this->orderRepository->save($order);
 
-                $sendInvoice = $this->mollieHelper->sendInvoice($order->getStoreId());
+                $sendInvoice = $this->shouldEmailInvoice->execute((int)$order->getStoreId(), $payment->getMethod());
                 if ($invoice && $invoice->getId() && !$invoice->getEmailSent() && $sendInvoice) {
                     $this->invoiceSender->send($invoice);
                     $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());

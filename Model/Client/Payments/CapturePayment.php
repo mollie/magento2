@@ -6,9 +6,9 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
-use Magento\Sales\Model\Order\Invoice;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Order\Invoice\ShouldEmailInvoice;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
 
@@ -43,6 +43,10 @@ class CapturePayment
      * @var OrderCommentHistory
      */
     private $orderCommentHistory;
+    /**
+     * @var ShouldEmailInvoice
+     */
+    private $shouldEmailInvoice;
 
     public function __construct(
         MollieApiClient $mollieApiClient,
@@ -50,7 +54,8 @@ class CapturePayment
         General $mollieHelper,
         OrderRepositoryInterface $orderRepository,
         InvoiceSender $invoiceSender,
-        OrderCommentHistory $orderCommentHistory
+        OrderCommentHistory $orderCommentHistory,
+        ShouldEmailInvoice $shouldEmailInvoice
     ) {
         $this->mollieApiClient = $mollieApiClient;
         $this->partialInvoice = $partialInvoice;
@@ -58,6 +63,7 @@ class CapturePayment
         $this->orderRepository = $orderRepository;
         $this->invoiceSender = $invoiceSender;
         $this->orderCommentHistory = $orderCommentHistory;
+        $this->shouldEmailInvoice = $shouldEmailInvoice;
     }
 
     public function execute(ShipmentInterface $shipment, OrderInterface $order): void
@@ -88,7 +94,7 @@ class CapturePayment
 
         $this->orderRepository->save($order);
 
-        $sendInvoice = $this->mollieHelper->sendInvoice($order->getStoreId());
+        $sendInvoice = $this->shouldEmailInvoice->execute($order->getStoreId(), $payment->getMethod());
         if ($invoice && $invoice->getId() && !$invoice->getEmailSent() && $sendInvoice) {
             $this->invoiceSender->send($invoice);
             $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
