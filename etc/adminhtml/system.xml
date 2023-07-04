@@ -187,7 +187,7 @@
                     <label>Manual Capture</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/enable_manual_capture</config_path>
-                    <comment><![CDATA[This option allows you to temporarily secure payment from your customer without collecting the funds immediately. The amount is captured when the shipment is created.<br><strong>Note:</strong> This only works with creditcards when the Payments API is enabled.]]></comment>
+                    <comment><![CDATA[This option allows you to temporarily secure payment from your customer without collecting the funds immediately. The amount is captured when the shipment is created.<br><strong>Note:</strong> This only works with creditcards when the Payments API is enabled and is currently only available for specified merchants.]]></comment>
                 </field>
                 <field id="invoice_notify" translate="label comment" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1" showInStore="1">
