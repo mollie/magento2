@@ -1,0 +1,14 @@
+{
+  "type": {
+    "username": "johnsmith@mollie.com",
+    "firstname": "John",
+    "lastname": "Smith",
+    "street[0]": "Baker Street 221B",
+    "city": "London",
+    "postcode": "NW1 6XE",
+    "telephone": "0201234567"
+  },
+  "select": {
+    "country_id": "GB"
+  }
+}

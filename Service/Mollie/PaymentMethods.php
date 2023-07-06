@@ -38,6 +38,7 @@ class PaymentMethods
         'mollie_methods_giropay',
         'mollie_methods_giftcard',
         'mollie_methods_kbc',
+        'mollie_methods_klarna',
         'mollie_methods_klarnapaylater',
         'mollie_methods_klarnapaynow',
         'mollie_methods_klarnasliceit',

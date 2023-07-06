@@ -150,6 +150,7 @@ class GeneralTest extends IntegrationTestCase
             'ideal' => ['mollie_methods_ideal', 'ideal'],
             'in3' => ['mollie_methods_in3', 'in3'],
             'kbc' => ['mollie_methods_kbc', 'kbc'],
+            'klarna' => ['mollie_methods_klarna', 'klarna'],
             'klarnapaylater' => ['mollie_methods_klarnapaylater', 'klarnapaylater'],
             'klarnapaynow' => ['mollie_methods_klarnapaynow', 'klarnapaynow'],
             'klarnasliceit' => ['mollie_methods_klarnasliceit', 'klarnasliceit'],

@@ -14,6 +14,7 @@ use Magento\Framework\Stdlib\DateTime;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Billie;
+use Mollie\Payment\Model\Methods\Klarna;
 use Mollie\Payment\Model\Methods\Klarnapaylater;
 use Mollie\Payment\Model\Methods\Klarnapaynow;
 use Mollie\Payment\Model\Methods\Klarnasliceit;
@@ -166,7 +167,9 @@ class Base extends Info
     {
         try {
             $code = $this->getInfo()->getMethod();
-            if (in_array($code, [Billie::CODE, Klarnapaylater::CODE, Klarnasliceit::CODE, Klarnapaynow::CODE])) {
+            $methods = [Billie::CODE, Klarna::CODE, Klarnapaylater::CODE, Klarnasliceit::CODE, Klarnapaynow::CODE];
+
+            if (in_array($code, $methods)) {
                 return true;
             }
         } catch (\Exception $e) {
