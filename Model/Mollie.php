@@ -19,6 +19,7 @@ use Magento\Payment\Gateway\Command\CommandPoolInterface;
 use Magento\Payment\Gateway\Config\ValueHandlerPoolInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
+use Magento\Payment\Model\InfoInterface;
 use Magento\Payment\Model\Method\Adapter;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
@@ -353,7 +354,7 @@ class Mollie extends Adapter
             return $msg;
         }
 
-        $result = $this->orderLockService->execute($order, function (OrderInterface $order) use (
+        $output = $this->orderLockService->execute($order, function (OrderInterface $order) use (
             $transactionId,
             $type,
             $paymentToken
@@ -367,8 +368,16 @@ class Mollie extends Adapter
 
             $order->getPayment()->setAdditionalInformation('mollie_success', $result['success']);
 
-            return $result;
+            // Return the order and the result so we can use this outside this closure.
+            return [
+                'order' => $order,
+                'result' => $result,
+            ];
         });
+
+        // Extract the contents of the closure.
+        $order = $output['order'];
+        $result = $output['result'];
 
         $this->eventManager->dispatch('mollie_process_transaction_end', ['order' => $order]);
 
@@ -422,18 +431,6 @@ class Mollie extends Adapter
     }
 
     /**
-     * @param Order\Shipment $shipment
-     * @param Order          $order
-     *
-     * @return OrdersApi
-     * @throws LocalizedException
-     */
-    public function createShipment(Order\Shipment $shipment, Order $order)
-    {
-        return $this->ordersApi->createShipment($shipment, $order);
-    }
-
-    /**
      * @param Order\Shipment       $shipment
      * @param Order\Shipment\Track $track
      * @param Order                $order
@@ -471,13 +468,13 @@ class Mollie extends Adapter
     }
 
     /**
-     * @param \Magento\Payment\Model\InfoInterface $payment
+     * @param InfoInterface $payment
      * @param float                                $amount
      *
      * @return $this
      * @throws LocalizedException
      */
-    public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount)
+    public function refund(InfoInterface $payment, $amount): self
     {
         /** @var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
@@ -508,12 +505,18 @@ class Mollie extends Adapter
         }
 
         try {
+            // The provided $amount is in the currency of the default store. If we are not using the base currency,
+            // Get the order amount in the currency of the order.
+            if (!$this->config->useBaseCurrency($order->getStoreId())) {
+                $amount = $payment->getCreditMemo()->getGrandTotal();
+            }
+
             $mollieApi = $this->loadMollieApi($apiKey);
             $payment = $mollieApi->payments->get($transactionId);
             $payment->refund([
-                "amount" => [
-                    "currency" => $order->getOrderCurrencyCode(),
-                    "value"    => $this->mollieHelper->formatCurrencyValue($amount, $order->getOrderCurrencyCode())
+                'amount' => [
+                    'currency' => $order->getOrderCurrencyCode(),
+                    'value'    => $this->mollieHelper->formatCurrencyValue($amount, $order->getOrderCurrencyCode())
                 ]
             ]);
         } catch (\Exception $e) {

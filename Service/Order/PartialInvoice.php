@@ -10,6 +10,7 @@ use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\Service\InvoiceService;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
+use Mollie\Payment\Service\Mollie\Order\CreateInvoiceOnShipment;
 
 class PartialInvoice
 {
@@ -17,6 +18,11 @@ class PartialInvoice
      * @var MollieHelper
      */
     private $mollieHelper;
+
+    /**
+     * @var CreateInvoiceOnShipment
+     */
+    private $createInvoiceOnShipment;
 
     /**
      * @var InvoiceService
@@ -30,32 +36,22 @@ class PartialInvoice
 
     public function __construct(
         MollieHelper $mollieHelper,
+        CreateInvoiceOnShipment $createInvoiceOnShipment,
         InvoiceService $invoiceService,
         InvoiceRepository $invoiceRepository
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->invoiceService = $invoiceService;
         $this->invoiceRepository = $invoiceRepository;
+        $this->createInvoiceOnShipment = $createInvoiceOnShipment;
     }
 
     public function createFromShipment(ShipmentInterface $shipment)
     {
         /** @var OrderInterface $order */
         $order = $shipment->getOrder();
-        $payment = $order->getPayment();
 
-        if (!in_array(
-            $payment->getMethod(),
-            [
-                'mollie_methods_billie',
-                'mollie_methods_klarnapaylater',
-                'mollie_methods_klarnapaynow',
-                'mollie_methods_klarnasliceit',
-                'mollie_methods_in3',
-            ]
-        ) ||
-            $this->mollieHelper->getInvoiceMoment($order->getStoreId()) != InvoiceMoment::ON_SHIPMENT
-        ) {
+        if (!$this->createInvoiceOnShipment->execute($order)) {
             return null;
         }
 

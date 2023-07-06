@@ -8,6 +8,8 @@ namespace Mollie\Payment\Observer\SalesOrderShipmentSaveBefore;
 
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
+use Mollie\Payment\Model\Client\Orders;
+use Mollie\Payment\Model\Client\Payments\CapturePayment;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
 
@@ -19,26 +21,28 @@ use Mollie\Payment\Helper\General as MollieHelper;
 class CreateMollieShipment implements ObserverInterface
 {
     /**
-     * @var MollieModel
-     */
-    private $mollieModel;
-    /**
      * @var MollieHelper
      */
     private $mollieHelper;
 
     /**
-     * SalesOrderShipmentAfter constructor.
-     *
-     * @param MollieModel  $mollieModel
-     * @param MollieHelper $mollieHelper
+     * @var Orders
      */
+    private $ordersApi;
+
+    /**
+     * @var CapturePayment
+     */
+    private $capturePayment;
+
     public function __construct(
-        MollieModel $mollieModel,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        Orders $ordersApi,
+        CapturePayment $capturePayment
     ) {
-        $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
+        $this->ordersApi = $ordersApi;
+        $this->capturePayment = $capturePayment;
     }
 
     /**
@@ -54,8 +58,14 @@ class CreateMollieShipment implements ObserverInterface
         /** @var \Magento\Sales\Model\Order $order */
         $order = $shipment->getOrder();
 
-        if ($this->mollieHelper->isPaidUsingMollieOrdersApi($order)) {
-            $this->mollieModel->createShipment($shipment, $order);
+        $transactionId = $order->getMollieTransactionId() ?? '';
+        $useOrdersApi = preg_match('/^ord_\w+$/', $transactionId);
+        if ($useOrdersApi) {
+            $this->ordersApi->createShipment($shipment, $order);
+        }
+
+        if (!$useOrdersApi) {
+            $this->capturePayment->execute($shipment, $order);
         }
     }
 }

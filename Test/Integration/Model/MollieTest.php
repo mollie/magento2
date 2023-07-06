@@ -6,18 +6,21 @@ use Magento\Framework\DataObject;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
+use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Endpoints\MethodEndpoint;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Test\Fakes\Model\Client\Orders\ProcessTransactionFake;
+use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieTest extends IntegrationTestCase
@@ -287,6 +290,45 @@ class MollieTest extends IntegrationTestCase
         $quote->getShippingAddress()->setStreetFull(str_repeat('tenletters', 10) . 'a');
 
         $this->assertFalse($instance->isAvailable($quote));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_general/currency 0
+     * @magentoConfigFixture default_store payment/mollie_general/type test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
+     *
+     * @return void
+     * @throws LocalizedException
+     */
+    public function testRefundsInTheCorrectAmount(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setMollieTransactionId('tr_12345');
+
+        $paymentMock = $this->createMock(Payment::class);
+        $paymentMock->method('refund')->with($this->callback(function ($parameters) {
+            $this->assertEquals(56.78, $parameters['amount']['value']);
+
+            return true;
+        }));
+
+        $client = $this->loadFakeMollieApiClient();
+        $client->returnFakePayment($paymentMock);
+
+        /** @var Mollie $instance */
+        $instance = $this->objectManager->create(Mollie::class);
+
+        /** @var $infoPayment $infoPayment */
+        $infoPayment = $this->objectManager->get(\Magento\Sales\Model\Order\Payment::class);
+        $infoPayment->setOrder($order);
+
+        $creditmemo = $this->objectManager->create(CreditmemoInterface::class);
+        $creditmemo->setBaseGrandTotal(12.34);
+        $creditmemo->setGrandTotal(56.78);
+        $infoPayment->setCreditmemo($creditmemo);
+
+        $instance->refund($infoPayment, 12.34);
     }
 
     /**

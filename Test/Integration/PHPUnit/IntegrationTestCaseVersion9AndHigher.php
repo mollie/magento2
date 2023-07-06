@@ -12,6 +12,8 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\Annotation\DataFixture;
 use Magento\TestFramework\ObjectManager;
+use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\PHPUnit\IntegrationTestCaseTrait;
 use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 use PHPUnit\Framework\TestCase;
@@ -111,5 +113,14 @@ class IntegrationTestCase extends TestCase
         $orderList = $orderRepository->getList($searchCriteria)->getItems();
 
         return array_shift($orderList);
+    }
+
+    public function loadFakeMollieApiClient(): FakeMollieApiClient
+    {
+        $client = $this->objectManager->create(FakeMollieApiClient::class);
+
+        $this->objectManager->addSharedInstance($client, MollieApiClient::class);
+
+        return $client;
     }
 }

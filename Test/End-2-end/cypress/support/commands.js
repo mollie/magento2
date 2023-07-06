@@ -19,6 +19,8 @@ Cypress.Commands.add('backendLogin', () => {
 
     cy.url().should('include', '/admin/admin/dashboard');
   });
+
+  cy.visit('/admin/admin/dashboard');
 });
 
 Cypress.Commands.add('getIframeBody', (selector) => {

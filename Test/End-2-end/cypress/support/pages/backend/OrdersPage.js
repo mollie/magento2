@@ -28,4 +28,28 @@ export default class OrdersPage {
     assertMolliePaymentStatusIs(status) {
         cy.get('.mollie-payment-status').contains(status);
     }
+
+    assertOrderHasInvoice() {
+        cy.get('#sales_order_view_tabs_order_invoices').click();
+
+        // Can be really slow
+        cy.get('.spinner').should('not.be.visible', {timeout: 30000});
+
+        cy.get('#sales_order_view_tabs_order_invoices_content tbody').should('be.visible');
+        cy.get('#sales_order_view_tabs_order_invoices_content').should('contain', '1 records found');
+    }
+
+    assertOrderHasNoInvoices() {
+        cy.get('#sales_order_view_tabs_order_invoices').click();
+
+        // Can be really slow
+        cy.get('.spinner').should('not.be.visible', {timeout: 30000});
+
+        cy.get('#sales_order_view_tabs_order_invoices_content tbody').should('be.visible');
+        cy.get('#sales_order_view_tabs_order_invoices_content').should('contain', '0 records found');
+    }
+
+    ship() {
+        cy.get('#order_ship').should('be.enabled').click();
+    }
 }

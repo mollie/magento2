@@ -182,28 +182,42 @@
                     <config_path>payment/mollie_general/invoice_moment</config_path>
                     <comment><![CDATA[When do you want to create the invoice for <strong>Klarna</strong> or <strong>Billie</strong> payments?<br><strong>On Authorize</strong>: Create a full invoice when the order is authorized.<br><strong>On Shipment</strong>: Create a (partial) invoice when a shipment is created.]]></comment>
                 </field>
-                <field id="invoice_notify" translate="label comment" type="select" sortOrder="20" showInDefault="1"
+                <field id="enable_manual_capture" translate="label comment" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Manual Capture</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/enable_manual_capture</config_path>
+                    <comment><![CDATA[This option allows you to temporarily secure payment from your customer without collecting the funds immediately. The amount is captured when the shipment is created.<br><strong>Note:</strong> This only works with creditcards when the Payments API is enabled and is currently only available for specified merchants.]]></comment>
+                </field>
+                <field id="invoice_notify" translate="label comment" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Send Invoice Email</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/invoice_notify</config_path>
-                    <comment><![CDATA[Set to yes to send the invoice email to the customer after the invoice is created.]]></comment>
+                    <comment><![CDATA[Set to yes to send the invoice email to the customer after the invoice is created.<br><strong>Note:</strong> Klarna has an extra option for this.]]></comment>
                 </field>
-                <field id="cancel_failed_orders" translate="label" type="select" sortOrder="30" showInDefault="1"
+                <field id="invoice_notify_klarna" translate="label comment" type="select" sortOrder="40" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Send Invoice Email For Klarna Orders</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/invoice_notify_klarna</config_path>
+                    <comment><![CDATA[Set to yes to send the invoice email to the customer after the invoice is created, when paid with Klarna.]]></comment>
+                </field>
+                <field id="cancel_failed_orders" translate="label" type="select" sortOrder="50" showInDefault="1"
                        showInWebsite="0" showInStore="1">
                     <label>Cancel order when connection Fails</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/cancel_failed_orders</config_path>
                     <comment><![CDATA[When the order can't be created due to various reasons (connection failure or data verification errors), the just created order will be canceled.]]></comment>
                 </field>
-                <field id="redirect_when_transaction_fails_to" translate="label" type="select" sortOrder="40" showInDefault="1"
+                <field id="redirect_when_transaction_fails_to" translate="label" type="select" sortOrder="60" showInDefault="1"
                        showInWebsite="0" showInStore="1">
                     <label>Redirect user when redirect fails</label>
                     <source_model>Mollie\Payment\Model\Adminhtml\Source\RedirectUserWhenTransactionFails</source_model>
                     <config_path>payment/mollie_general/redirect_when_transaction_fails_to</config_path>
                     <comment><![CDATA[When the transaction fails due to various reasons (i.e., Cancelled, insufficient funds, etc.), where do we need to redirect the user? Please be cautious: Depending on the used checkout, error messages may not be displayed.]]></comment>
                 </field>
-                <field id="include_shipping_in_surcharge" translate="label" type="select" sortOrder="50" showInDefault="1"
+                <field id="include_shipping_in_surcharge" translate="label" type="select" sortOrder="70" showInDefault="1"
                        showInWebsite="0" showInStore="1">
                     <label>Include shipping in Surcharge calculation</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -213,14 +227,14 @@
                         <strong>Yes</strong>: The surcharge is calculated on the total of subtotal + shipping.
                     ]]></comment>
                 </field>
-                <field id="currency" translate="label" type="select" sortOrder="60" showInDefault="1"
+                <field id="currency" translate="label" type="select" sortOrder="80" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Use Base Currency</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/currency</config_path>
                     <comment>Force use of base currency for the payment request. Is set to no the selected currency of the storeview will be used for request.</comment>
                 </field>
-                <field id="locale" translate="label comment" type="select" sortOrder="70" showInDefault="1"
+                <field id="locale" translate="label comment" type="select" sortOrder="90" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Language Payment Page</label>
                     <source_model>Mollie\Payment\Model\Adminhtml\Source\Locale</source_model>

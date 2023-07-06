@@ -7,10 +7,10 @@ const checkoutPage = new CheckoutPage();
 const checkoutShippingPage = new CheckoutShippingPage();
 
 export default class VisitCheckoutPaymentCompositeAction {
-  visit(fixture = 'NL') {
+  visit(fixture = 'NL', quantity = 1) {
     productPage.openProduct(Cypress.env('defaultProductId'));
 
-    productPage.addSimpleProductToCart();
+    productPage.addSimpleProductToCart(quantity);
 
     checkoutPage.visit();
 

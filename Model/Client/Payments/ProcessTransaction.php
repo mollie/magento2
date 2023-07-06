@@ -73,7 +73,7 @@ class ProcessTransaction
         );
 
         $refunded = isset($molliePayment->_links->refunds) ? true : false;
-        if ($status == 'paid' && !$refunded) {
+        if (in_array($status, ['paid', 'authorized']) && !$refunded) {
             return $this->paymentProcessors->process(
                 'paid',
                 $magentoOrder,
