@@ -42,7 +42,8 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Klarna Slice it
 - Meal vouchers, eco vouchers, and various other gift vouchers (Appetiz, Cadeau Pass, Chèque Déjeuner, Eco Pass, Lunch Pass, Monizze, PassRestaurant, Swile)
 - PayPal
-- paysafecard
+- Paysafecard
+- Point Of Sale (POS)
 - Przelewy24
 - SEPA Direct Debit
 - SOFORT Banking

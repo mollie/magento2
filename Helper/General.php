@@ -693,6 +693,7 @@ class General extends AbstractHelper
             'mollie_methods_mybank',
             'mollie_methods_paypal',
             'mollie_methods_paysafecard',
+            'mollie_methods_pointofsale',
             'mollie_methods_przelewy24',
             'mollie_methods_sofort',
         ];

@@ -309,6 +309,13 @@ class Payments extends AbstractModel
             $order->getPayment()->setAdditionalInformation('expires_at', $payment->expiresAt);
         }
 
+        if (isset($payment->_links->changePaymentState->href)) {
+            $order->getPayment()->setAdditionalInformation(
+                'mollie_change_payment_state_url',
+                $payment->_links->changePaymentState->href
+            );
+        }
+
         $status = $this->mollieHelper->getPendingPaymentStatus($order);
 
         $order->setState(Order::STATE_PENDING_PAYMENT);

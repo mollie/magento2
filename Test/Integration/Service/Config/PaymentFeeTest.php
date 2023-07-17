@@ -43,6 +43,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_mybank', true],
             ['mollie_methods_paypal', true],
             ['mollie_methods_paysafecard', true],
+            ['mollie_methods_pointofsale', true],
             ['mollie_methods_przelewy24', true],
             ['mollie_methods_sofort', true],
             ['mollie_methods_voucher', true],

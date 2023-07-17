@@ -198,6 +198,26 @@ class MollieTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @throws \Magento\Framework\Exception\LocalizedException
      */
+    public function testAssignsTerminalId()
+    {
+        $data = new DataObject;
+        $data->setAdditionalData(['selected_terminal' => 'term_randomstringid']);
+
+        $order = $this->loadOrder('100000001');
+        $payment = $order->getPayment();
+
+        /** @var Mollie $instance */
+        $instance = $this->objectManager->create(\Mollie\Payment\Model\Methods\Pointofsale::class);
+        $instance->setInfoInstance($payment);
+        $instance->assignData($data);
+
+        $this->assertEquals('term_randomstringid', $payment->getAdditionalInformation()['selected_terminal']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function testAssignsCardToken()
     {
         $data = new DataObject;

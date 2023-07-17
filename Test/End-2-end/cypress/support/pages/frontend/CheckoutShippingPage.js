@@ -1,4 +1,10 @@
 export default class CheckoutShippingPage {
+  shouldSkipUsername = false
+
+  skipUsername() {
+      this.shouldSkipUsername = true
+  }
+
   fillDutchShippingAddress() {
     cy.fixture('dutch-shipping-address').then((address) => {
       this.fillShippingAddress(address);
@@ -19,6 +25,10 @@ export default class CheckoutShippingPage {
 
   fillShippingAddress(address) {
     Object.keys(address.type).forEach((field) => {
+      if (['username', 'password'].includes(field) && this.shouldSkipUsername) {
+          return;
+      }
+
       cy.log('Filling field: ' + field);
       cy.get('#checkout-step-shipping [name="' + field + '"]').type(address.type[field]);
     });

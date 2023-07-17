@@ -4,6 +4,7 @@
         <arguments>
             <argument name="configProviders" xsi:type="array">
                 <item name="mollie_payment_config_provider" xsi:type="object">Mollie\Payment\Model\MollieConfigProvider</item>
+                <item name="mollie_payment_terminal_config_provider" xsi:type="object">Mollie\Payment\Model\MollieTerminalConfigProvider</item>
             </argument>
         </arguments>
     </type>
@@ -17,6 +18,12 @@
             <argument name="tokenUiComponentProviders" xsi:type="array">
                 <item name="mollie_methods_creditcard" xsi:type="object">Mollie\Payment\Ui\TokenUiComponentProvider</item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Model\MollieTerminalConfigProvider">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
 </config>

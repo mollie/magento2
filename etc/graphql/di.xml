@@ -24,6 +24,7 @@
                 <item name="mollie_methods_mybank" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_paypal" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_paysafecard" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
+                <item name="mollie_methods_pointofsale" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_przelewy24" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_sofort" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
             </argument>

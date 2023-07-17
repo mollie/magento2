@@ -147,6 +147,15 @@ class Base extends Info
         }
     }
 
+    public function getChangePaymentStatusUrl(): string
+    {
+        try {
+            return (string)$this->getInfo()->getAdditionalInformation('mollie_change_payment_state_url');
+        } catch (\Exception $exception) {
+            return '';
+        }
+    }
+
     /**
      * @return bool|string
      */

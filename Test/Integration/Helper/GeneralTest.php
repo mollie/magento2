@@ -158,6 +158,7 @@ class GeneralTest extends IntegrationTestCase
             'mybank' => ['mollie_methods_mybank', 'mybank'],
             'paypal' => ['mollie_methods_paypal', 'paypal'],
             'paysafecard' => ['mollie_methods_paysafecard', 'paysafecard'],
+            'pointofsale' => ['mollie_methods_pointofsale', 'pointofsale'],
             'przelewy24' => ['mollie_methods_przelewy24', 'przelewy24'],
             'sofort' => ['mollie_methods_sofort', 'sofort'],
         ];

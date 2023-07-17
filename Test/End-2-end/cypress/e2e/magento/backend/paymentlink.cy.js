@@ -33,7 +33,7 @@ describe('Placing orders from the backend', () => {
 
     ordersCreatePage.submitOrder();
 
-    cy.get('.mollie-copy-url')
+    cy.get('.mollie-checkout-url .mollie-copy-url')
       .invoke('attr', 'data-url')
       .then(href => {
         cy.visit(href);

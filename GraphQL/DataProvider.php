@@ -13,9 +13,10 @@ class DataProvider implements AdditionalDataProviderInterface
     public function getData(array $data): array
     {
         return [
-            'selected_issuer' => $data['mollie_selected_issuer'] ?? null,
-            'card_token' => $data['mollie_card_token'] ?? null,
             'applepay_payment_token' => $data['mollie_applepay_payment_token'] ?? null,
+            'card_token' => $data['mollie_card_token'] ?? null,
+            'selected_issuer' => $data['mollie_selected_issuer'] ?? null,
+            'selected_terminal' => $data['mollie_selected_terminal'] ?? null,
         ];
     }
 }

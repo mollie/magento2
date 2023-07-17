@@ -79,6 +79,7 @@ class GatewayComponentsTest extends IntegrationTestCase
         $blocks = [
             'default' => \Magento\Payment\Block\Form::class,
             'Paymentlink' => \Mollie\Payment\Block\Form\Paymentlink::class,
+            'Pointofsale' => \Mollie\Payment\Block\Form\Pointofsale::class,
         ];
 
         foreach ($this->getMethods() as $method) {
