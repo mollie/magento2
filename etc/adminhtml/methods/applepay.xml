@@ -55,7 +55,94 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="days_before_expire" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1"
+        <field id="apple_buy_now_heading" translate="label comment" type="text" sortOrder="60" showInDefault="1"
+               showInWebsite="0" showInStore="0">
+            <label>Apple Pay Direct</label>
+            <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
+            <comment><![CDATA[Activating this option will allow placing the Apple Pay button directly on the product detail pages for a faster checkout. ]]></comment>
+            <depends>
+                <field id="integration_type">direct</field>
+            </depends>
+        </field>
+        <field id="enable_buy_now_button" translate="label" type="select" sortOrder="70" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Enable Button on Product Page</label>
+            <config_path>payment/mollie_methods_applepay/enable_buy_now_button</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="integration_type">direct</field>
+            </depends>
+            <comment>
+                <![CDATA[Shows the Apple Pay button directly on the product detail page for a quick checkout.]]></comment>
+        </field>
+        <field id="buy_now_button_color" translate="label" type="select" sortOrder="80" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Buy Now Button Style</label>
+            <config_path>payment/mollie_methods_applepay/buy_now_button_color</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonColor</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="enable_buy_now_button">1</field>
+            </depends>
+            <comment>
+                <![CDATA[<strong>Black</strong><br>Best used on light-colored backgrounds that provide sufficient contrast.<br><br><strong>White</strong><br>Best used on dark or colored backgrounds that provide sufficient contrast.<br><br><strong>White with Outline</strong><br>Use this on white or light-colored backgrounds that don’t provide sufficient contrast. Do not use with dark or saturated backgrounds.]]></comment>
+        </field>
+        <field id="buy_now_button_text" translate="label" type="select" sortOrder="90" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Buy Now Button Type</label>
+            <config_path>payment/mollie_methods_applepay/buy_now_button_text</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonText</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="enable_buy_now_button">1</field>
+            </depends>
+            <comment>
+                <![CDATA[Apple provides different styles of buttons to match your customer experience.]]></comment>
+        </field>
+        <field id="enable_minicart_button" translate="label" type="select" sortOrder="100" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Enable Button in minicart</label>
+            <config_path>payment/mollie_methods_applepay/enable_minicart_button</config_path>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="integration_type">direct</field>
+            </depends>
+            <comment>
+                <![CDATA[Shows the Apple Pay button in the minicart for a quick checkout.]]></comment>
+        </field>
+        <field id="minicart_button_color" translate="label" type="select" sortOrder="110" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Minicart Button Style</label>
+            <config_path>payment/mollie_methods_applepay/minicart_button_color</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonColor</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="enable_minicart_button">1</field>
+            </depends>
+            <comment>
+                <![CDATA[<strong>Black</strong><br>Best used on light-colored backgrounds that provide sufficient contrast.<br><br><strong>White</strong><br>Best used on dark or colored backgrounds that provide sufficient contrast.<br><br><strong>White with Outline</strong><br>Use this on white or light-colored backgrounds that don’t provide sufficient contrast. Do not use with dark or saturated backgrounds.]]></comment>
+        </field>
+        <field id="minicart_button_text" translate="label" type="select" sortOrder="120" showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Minicart Button Type</label>
+            <config_path>payment/mollie_methods_applepay/minicart_button_text</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonText</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="enable_minicart_button">1</field>
+            </depends>
+            <comment>
+                <![CDATA[Apple provides different styles of buttons to match your customer experience.]]></comment>
+        </field>
+        <field id="days_before_expire" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Days to expire</label>
             <frontend_class>validate-digits-range digits-range-1-365</frontend_class>
@@ -68,7 +155,7 @@
                 (28 days)
             </comment>
         </field>
-        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="1"
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="140" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
@@ -77,7 +164,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="80" showInDefault="1"
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="150" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
@@ -87,7 +174,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="min_order_total" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
+        <field id="min_order_total" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Minimum Order Total</label>
             <config_path>payment/mollie_methods_applepay/min_order_total</config_path>
@@ -95,7 +182,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="max_order_total" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
+        <field id="max_order_total" translate="label" type="text" sortOrder="170" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Maximum Order Total</label>
             <config_path>payment/mollie_methods_applepay/max_order_total</config_path>
@@ -103,7 +190,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_surcharge_type" translate="label" type="select" sortOrder="110" showInDefault="1"
+        <field id="payment_surcharge_type" translate="label" type="select" sortOrder="180" showInDefault="1"
                showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge</label>
@@ -113,7 +200,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="120" showInDefault="1"
+        <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="190" showInDefault="1"
                showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge fixed amount</label>
@@ -125,7 +212,7 @@
                 <field id="payment_surcharge_type" separator=",">fixed_fee,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="130" showInDefault="1"
+        <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="200" showInDefault="1"
                showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge percentage</label>
@@ -137,7 +224,7 @@
                 <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="140" showInDefault="1"
+        <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="210" showInDefault="1"
                showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge limit</label>
@@ -151,7 +238,7 @@
                 <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="150" showInDefault="1"
+        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="220" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment Surcharge Tax Class</label>
             <config_path>payment/mollie_methods_applepay/payment_surcharge_tax_class</config_path>
@@ -161,7 +248,7 @@
                 <field id="payment_surcharge_type" separator=",">fixed_fee,percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="sort_order" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1"
+        <field id="sort_order" translate="label" type="text" sortOrder="230" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>
@@ -169,89 +256,6 @@
             <depends>
                 <field id="active">1</field>
             </depends>
-        </field>
-        <field id="apple_buy_now_heading" translate="label comment" type="text" sortOrder="170" showInDefault="1"
-               showInWebsite="0" showInStore="0">
-            <label>Apple Pay Direct</label>
-            <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-            <comment>
-                <![CDATA[Activating this option will allow placing the Apple Pay button directly on the product detail pages for a faster checkout. ]]></comment>
-        </field>
-        <field id="enable_buy_now_button" translate="label" type="select" sortOrder="180" showInDefault="1"
-               showInWebsite="1"
-               showInStore="1">
-            <label>Enable Button on Product Page</label>
-            <config_path>payment/mollie_methods_applepay/enable_buy_now_button</config_path>
-            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-            <depends>
-                <field id="active">1</field>
-            </depends>
-            <comment>
-                <![CDATA[Shows the Apple Pay button directly on the product detail page for a quick checkout.]]></comment>
-        </field>
-        <field id="buy_now_button_color" translate="label" type="select" sortOrder="190" showInDefault="1"
-               showInWebsite="1"
-               showInStore="1">
-            <label>Buy Now Button Style</label>
-            <config_path>payment/mollie_methods_applepay/buy_now_button_color</config_path>
-            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonColor</source_model>
-            <depends>
-                <field id="active">1</field>
-                <field id="enable_buy_now_button">1</field>
-            </depends>
-            <comment>
-                <![CDATA[<strong>Black</strong><br>Best used on light-colored backgrounds that provide sufficient contrast.<br><br><strong>White</strong><br>Best used on dark or colored backgrounds that provide sufficient contrast.<br><br><strong>White with Outline</strong><br>Use this on white or light-colored backgrounds that don’t provide sufficient contrast. Do not use with dark or saturated backgrounds.]]></comment>
-        </field>
-        <field id="buy_now_button_text" translate="label" type="select" sortOrder="200" showInDefault="1"
-               showInWebsite="1"
-               showInStore="1">
-            <label>Buy Now Button Type</label>
-            <config_path>payment/mollie_methods_applepay/buy_now_button_text</config_path>
-            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonText</source_model>
-            <depends>
-                <field id="active">1</field>
-                <field id="enable_buy_now_button">1</field>
-            </depends>
-            <comment>
-                <![CDATA[Apple provides different styles of buttons to match your customer experience.]]></comment>
-        </field>
-        <field id="enable_minicart_button" translate="label" type="select" sortOrder="210" showInDefault="1"
-               showInWebsite="1"
-               showInStore="1">
-            <label>Enable Button in minicart</label>
-            <config_path>payment/mollie_methods_applepay/enable_minicart_button</config_path>
-            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-            <depends>
-                <field id="active">1</field>
-            </depends>
-            <comment>
-                <![CDATA[Shows the Apple Pay button in the minicart for a quick checkout.]]></comment>
-        </field>
-        <field id="minicart_button_color" translate="label" type="select" sortOrder="220" showInDefault="1"
-               showInWebsite="1"
-               showInStore="1">
-            <label>Minicart Button Style</label>
-            <config_path>payment/mollie_methods_applepay/minicart_button_color</config_path>
-            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonColor</source_model>
-            <depends>
-                <field id="active">1</field>
-                <field id="enable_minicart_button">1</field>
-            </depends>
-            <comment>
-                <![CDATA[<strong>Black</strong><br>Best used on light-colored backgrounds that provide sufficient contrast.<br><br><strong>White</strong><br>Best used on dark or colored backgrounds that provide sufficient contrast.<br><br><strong>White with Outline</strong><br>Use this on white or light-colored backgrounds that don’t provide sufficient contrast. Do not use with dark or saturated backgrounds.]]></comment>
-        </field>
-        <field id="minicart_button_text" translate="label" type="select" sortOrder="230" showInDefault="1"
-               showInWebsite="1"
-               showInStore="1">
-            <label>Minicart Button Type</label>
-            <config_path>payment/mollie_methods_applepay/minicart_button_text</config_path>
-            <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonText</source_model>
-            <depends>
-                <field id="active">1</field>
-                <field id="enable_minicart_button">1</field>
-            </depends>
-            <comment>
-                <![CDATA[Apple provides different styles of buttons to match your customer experience.]]></comment>
         </field>
     </group>
 </include>
