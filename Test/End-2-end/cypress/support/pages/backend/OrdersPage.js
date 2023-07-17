@@ -33,7 +33,7 @@ export default class OrdersPage {
         cy.get('#sales_order_view_tabs_order_invoices').click();
 
         // Can be really slow
-        cy.get('.spinner').should('not.be.visible', {timeout: 30000});
+        cy.get('.spinner', {timeout: 30000}).should('not.be.visible');
 
         cy.get('#sales_order_view_tabs_order_invoices_content tbody').should('be.visible');
         cy.get('#sales_order_view_tabs_order_invoices_content').should('contain', '1 records found');
@@ -43,7 +43,7 @@ export default class OrdersPage {
         cy.get('#sales_order_view_tabs_order_invoices').click();
 
         // Can be really slow
-        cy.get('.spinner').should('not.be.visible', {timeout: 30000});
+        cy.get('.spinner', {timeout: 30000}).should('not.be.visible');
 
         cy.get('#sales_order_view_tabs_order_invoices_content tbody').should('be.visible');
         cy.get('#sales_order_view_tabs_order_invoices_content').should('contain', '0 records found');
