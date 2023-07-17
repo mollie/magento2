@@ -10,8 +10,6 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer;
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments\CapturePayment;
-use Mollie\Payment\Model\Mollie as MollieModel;
-use Mollie\Payment\Helper\General as MollieHelper;
 
 /**
  * Class SalesOrderShipmentSaveBefore
@@ -21,26 +19,24 @@ use Mollie\Payment\Helper\General as MollieHelper;
 class CreateMollieShipment implements ObserverInterface
 {
     /**
-     * @var MollieHelper
+     * @var \Mollie\Payment\Config
      */
-    private $mollieHelper;
-
+    private $config;
     /**
      * @var Orders
      */
     private $ordersApi;
-
     /**
      * @var CapturePayment
      */
     private $capturePayment;
 
     public function __construct(
-        MollieHelper $mollieHelper,
+        \Mollie\Payment\Config $config,
         Orders $ordersApi,
         CapturePayment $capturePayment
     ) {
-        $this->mollieHelper = $mollieHelper;
+        $this->config = $config;
         $this->ordersApi = $ordersApi;
         $this->capturePayment = $capturePayment;
     }
@@ -64,7 +60,7 @@ class CreateMollieShipment implements ObserverInterface
             $this->ordersApi->createShipment($shipment, $order);
         }
 
-        if (!$useOrdersApi) {
+        if (!$useOrdersApi && $this->config->useManualCapture((int)$order->getStoreId())) {
             $this->capturePayment->execute($shipment, $order);
         }
     }
