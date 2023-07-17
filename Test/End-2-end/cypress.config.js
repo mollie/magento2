@@ -15,6 +15,7 @@ module.exports = defineConfig({
     experimentalWebKitSupport: true,
     setupNodeEvents(on, config) {
       require('./cypress/plugins/index.js')(on, config);
+      require('./cypress/plugins/disable-successful-videos.js')(on, config);
 
       return new Promise((resolve, reject) => {
           var https = require('follow-redirects').https;
@@ -47,6 +48,7 @@ module.exports = defineConfig({
               'maxRedirects': 20
           };
 
+          console.log('Requesting Mollie payment methods from "' + baseUrl + '". One moment please...');
           var req = https.request(options, function (res) {
               var chunks = [];
 
@@ -56,8 +58,6 @@ module.exports = defineConfig({
 
               res.on("end", function (chunk) {
                   const body = Buffer.concat(chunks);
-
-                  console.info('Received body', body.toString());
 
                   const methods = JSON.parse(body.toString()).data.molliePaymentMethods.methods.map(data => {
                       return data.code
