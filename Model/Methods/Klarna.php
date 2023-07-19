@@ -9,16 +9,16 @@ namespace Mollie\Payment\Model\Methods;
 use Mollie\Payment\Model\Mollie;
 
 /**
- * Class Klarnapaynow
+ * Class Klarna
  *
  * @package Mollie\Payment\Model\Methods
  */
-class Klarnapaynow extends Mollie
+class Klarna extends Mollie
 {
     /**
      * Payment method code
      *
      * @var string
      */
-    const CODE = 'mollie_methods_klarnapaynow';
+    const CODE = 'mollie_methods_klarna';
 }

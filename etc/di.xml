@@ -990,6 +990,51 @@
         </arguments>
     </virtualType>
 
+    <!-- Klarna -->
+    <type name="Mollie\Payment\Model\Methods\Klarna">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnaValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieKlarnaValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieKlarnaValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieKlarnaConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnaConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieKlarnaConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnaConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Klarna::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnaValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieKlarnaCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieKlarnaCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieKlarnaConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Klarnapaylater -->
     <type name="Mollie\Payment\Model\Methods\Klarnapaylater">
         <arguments>
