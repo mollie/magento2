@@ -20,6 +20,7 @@ describe('Checkout usage', () => {
     cy.get('.payment-method-mollie_methods_belfius').should('not.have.class', '_active');
     cy.get('.payment-method-mollie_methods_creditcard').should('not.have.class', '_active');
     cy.get('.payment-method-mollie_methods_kbc').should('not.have.class', '_active');
+    cy.get('.payment-method-mollie_methods_klarna').should('not.have.class', '_active');
     cy.get('.payment-method-mollie_methods_klarnapaylater').should('not.have.class', '_active');
     cy.get('.payment-method-mollie_methods_klarnapaynow').should('not.have.class', '_active');
     cy.get('.payment-method-mollie_methods_paypal').should('not.have.class', '_active');

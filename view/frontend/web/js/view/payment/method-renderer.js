@@ -35,6 +35,7 @@ define(
             {type: 'mollie_methods_in3', component: defaultComponent},
             {type: 'mollie_methods_giropay', component: defaultComponent},
             {type: 'mollie_methods_kbc', component: kbcComponent},
+            {type: 'mollie_methods_klarna', component: defaultComponent},
             {type: 'mollie_methods_klarnapaylater', component: defaultComponent},
             {type: 'mollie_methods_klarnapaynow', component: defaultComponent},
             {type: 'mollie_methods_klarnasliceit', component: defaultComponent},
