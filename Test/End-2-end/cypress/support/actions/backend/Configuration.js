@@ -6,15 +6,14 @@ export default class Configuration {
             cy.visit(element.attr('href'));
         });
 
-        cy.contains('Currency Setup').should('be.visible');
+        cy.get('.mollie-tab').contains(section).click({force: true});
 
-        // When this is not visible, the page is not loaded yet.
-        cy.get('#system_config_tabs .mollie-tab').click();
+        cy.url().should('include', 'admin/system_config/edit/section/mollie_');
 
-        cy.get('.mollie-tab').contains(section).click();
+        cy.wait(1000);
 
         // Wait for JS to load
-        cy.get('.mollie-tab').should('have.class', '_show');
+        cy.get('.mollie-tab._show', {timeout: 60000}).should('be.visible');
 
         cy.get('.entry-edit').contains(group).then(element => {
             if (!element.hasClass('open')) {
@@ -22,7 +21,7 @@ export default class Configuration {
             }
         });
 
-        cy.get('label').contains(field).parents('tr').find(':input').select(value);
+        cy.get('label').contains(field).parents('tr').find(':input').select(value, {force: true});
 
         cy.get('#save').click();
 

@@ -52,7 +52,9 @@ describe('Manual capture works as expected', () => {
 
         ordersPage.assertOrderStatusIs('Processing');
 
-        ordersPage.assertOrderHasInvoice();
+      cy.get('@order-id').then((orderId) => {
+        ordersPage.assertOrderHasInvoice(orderId);
+      });
     });
 
     it('C1064182: Validate that with manual capture enabled the invoice is created when a shipment is created', () => {
@@ -83,12 +85,16 @@ describe('Manual capture works as expected', () => {
 
         ordersPage.assertOrderStatusIs('Processing');
 
-        ordersPage.assertOrderHasNoInvoices();
+        cy.get('@order-id').then((orderId) => {
+            ordersPage.assertOrderHasNoInvoices(orderId);
+        });
 
         ordersPage.ship();
 
         shipmentPage.ship();
 
-        ordersPage.assertOrderHasInvoice();
+        cy.get('@order-id').then((orderId) => {
+            ordersPage.assertOrderHasInvoice(orderId);
+        });
     });
 });
