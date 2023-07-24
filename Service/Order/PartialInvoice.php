@@ -51,9 +51,7 @@ class PartialInvoice
         /** @var OrderInterface $order */
         $order = $shipment->getOrder();
 
-        if (!$this->createInvoiceOnShipment->execute($order) ||
-            $this->mollieHelper->getInvoiceMoment($order->getStoreId()) != InvoiceMoment::ON_SHIPMENT
-        ) {
+        if (!$this->createInvoiceOnShipment->execute($order)) {
             return null;
         }
 
