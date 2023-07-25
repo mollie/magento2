@@ -52,6 +52,8 @@ class AddPaymentFeeToOrder
         $extensionAttributes = $this->getExtensionAttributes($entity);
         $extensionAttributes->setMolliePaymentFee($entity->getData('mollie_payment_fee'));
         $extensionAttributes->setMolliePaymentFeeTax($entity->getData('mollie_payment_fee_tax'));
+        $extensionAttributes->setBaseMolliePaymentFee($entity->getData('base_mollie_payment_fee'));
+        $extensionAttributes->setBaseMolliePaymentFeeTax($entity->getData('base_mollie_payment_fee_tax'));
         $entity->setExtensionAttributes($extensionAttributes);
     }
 

@@ -9,7 +9,7 @@ namespace Mollie\Payment\Model\Methods;
 use Mollie\Payment\Model\Mollie;
 
 /**
- * Class Klarna
+ * Class Klarnapaylater
  *
  * @package Mollie\Payment\Model\Methods
  */
