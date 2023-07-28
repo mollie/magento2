@@ -360,7 +360,7 @@ class Mollie extends Adapter
             $type,
             $paymentToken
         ) {
-            if (preg_match('/^ord_\w+$/', $transactionId)) {
+            if (preg_match('/^ord_(\d\.)?\w+$/', $transactionId)) {
                 $result = $this->ordersProcessTraction->execute($order, $type)->toArray();
             } else {
                 $mollieApi = $this->mollieApiClient->loadByStore($order->getStoreId());
@@ -398,7 +398,7 @@ class Mollie extends Adapter
 
         $mollieApi = $this->mollieApiClient->loadByStore($order->getStoreId());
 
-        if (preg_match('/^ord_\w+$/', $transactionId)) {
+        if (preg_match('/^ord_(\d\.)?\w+$/', $transactionId)) {
             return $this->ordersApi->orderHasUpdate($order, $mollieApi);
         } else {
             return $this->paymentsApi->orderHasUpdate($order, $mollieApi);
