@@ -55,7 +55,7 @@ class CreateMollieShipment implements ObserverInterface
         $order = $shipment->getOrder();
 
         $transactionId = $order->getMollieTransactionId() ?? '';
-        $useOrdersApi = preg_match('/^ord_\w+$/', $transactionId);
+        $useOrdersApi = substr($transactionId, 0, 4) == 'ord_';
         if ($useOrdersApi) {
             $this->ordersApi->createShipment($shipment, $order);
         }
