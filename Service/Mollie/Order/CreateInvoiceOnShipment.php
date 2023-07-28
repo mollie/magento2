@@ -33,7 +33,7 @@ class CreateInvoiceOnShipment
         }
 
         $transactionId = $order->getMollieTransactionId() ?? '';
-        $api = preg_match('/^ord_\w+$/', $transactionId) ? 'orders' : 'payments';
+        $api = substr($transactionId, 0, 4) == 'ord_' ? 'orders' : 'payments';
         if ($methodCode == 'mollie_methods_creditcard' &&
             $this->config->useManualCapture($order->getStoreId()) &&
             $api == 'payments'
