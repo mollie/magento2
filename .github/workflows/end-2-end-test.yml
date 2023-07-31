@@ -19,8 +19,7 @@ jobs:
         env:
           MOLLIE_API_KEY_TEST: ${{ secrets.MOLLIE_API_KEY_TEST }}
         if: "${{ env.MOLLIE_API_KEY_TEST != '' }}"
-        # Disabled for now. Change to =true to re-enable.
-        run: echo "is_mollie_api_key_test_set=false" >> $GITHUB_OUTPUT
+        run: echo "is_mollie_api_key_test_set=true" >> $GITHUB_OUTPUT
 
   # Remove flag used to trigger the e2e tests
   remove_flag:
