@@ -126,13 +126,21 @@ class Reorder
         return $order;
     }
 
-    public function createAndInvoice(OrderInterface $originalOrder)
-    {
+    public function createAndInvoice(
+        OrderInterface $originalOrder,
+        string $state = null,
+        string $status = null
+    ): OrderInterface {
         $this->transaction = $this->transactionFactory->create();
 
         $order = $this->recreate($originalOrder);
         $invoice = $this->createInvoiceFor($order);
         $this->cancelOriginalOrder($originalOrder);
+
+        if ($state && $status) {
+            $order->setState($state);
+            $order->setStatus($status);
+        }
 
         $this->transaction->save();
 

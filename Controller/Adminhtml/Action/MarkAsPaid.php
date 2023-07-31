@@ -9,6 +9,7 @@ namespace Mollie\Payment\Controller\Adminhtml\Action;
 use Magento\Backend\App\Action;
 use Magento\Backend\Model\Session\Quote;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Mollie\Payment\Service\Order\Reorder;
 
 class MarkAsPaid extends Action
@@ -56,7 +57,11 @@ class MarkAsPaid extends Action
 
         $resultRedirect = $this->resultRedirectFactory->create();
         try {
-            $order = $this->reorder->createAndInvoice($originalOrder);
+            $order = $this->reorder->createAndInvoice(
+                $originalOrder,
+                Order::STATE_PROCESSING,
+                Order::STATE_PROCESSING
+            );
 
             $this->messageManager->addSuccessMessage(
                 __(
