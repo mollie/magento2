@@ -25,6 +25,12 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieTest extends IntegrationTestCase
 {
+    protected function setUpWithoutVoid()
+    {
+        // The OrderLockService interferes with the tests, so we replace it with a fake.
+        $this->loadFakeOrderLockService();
+    }
+
     public function processTransactionUsesTheCorrectApiProvider()
     {
         return [

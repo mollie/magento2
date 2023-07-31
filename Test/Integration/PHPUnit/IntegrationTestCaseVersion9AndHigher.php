@@ -13,7 +13,9 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\Annotation\DataFixture;
 use Magento\TestFramework\ObjectManager;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
+use Mollie\Payment\Test\Fakes\Service\OrderLockServiceFake;
 use Mollie\Payment\Test\Integration\PHPUnit\IntegrationTestCaseTrait;
 use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 use PHPUnit\Framework\TestCase;
@@ -122,5 +124,12 @@ class IntegrationTestCase extends TestCase
         $this->objectManager->addSharedInstance($client, MollieApiClient::class);
 
         return $client;
+    }
+
+    public function loadFakeOrderLockService(): void
+    {
+        $service = $this->objectManager->create(OrderLockServiceFake::class);
+
+        $this->objectManager->addSharedInstance($service, OrderLockService::class);
     }
 }
