@@ -14,7 +14,7 @@ describe('Placing orders using Point Of Sale from the backend', () => {
 
     ordersCreatePage.createNewOrderFor('Veronica Costello');
 
-    ordersCreatePage.addProduct('Erika Running Short-32-Red');
+    ordersCreatePage.addFirstSimpleProduct();
 
     ordersCreatePage.selectShippingMethod('Fixed');
 

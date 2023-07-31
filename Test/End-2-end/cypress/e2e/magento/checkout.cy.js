@@ -15,17 +15,25 @@ describe('Checkout usage', () => {
 
     cy.get('.payment-method._active').should('have.class', 'payment-method-mollie_methods_ideal');
 
-    cy.get('.payment-method-mollie_methods_bancontact').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_banktransfer').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_belfius').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_creditcard').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_kbc').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_klarna').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_klarnapaylater').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_klarnapaynow').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_paypal').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_przelewy24').should('not.have.class', '_active');
-    cy.get('.payment-method-mollie_methods_sofort').should('not.have.class', '_active');
+    const availableMethods = Cypress.env('mollie_available_methods');
+    [
+      'bancontact',
+      'banktransfer',
+      'belfius',
+      'creditcard',
+      'kbc',
+      'klarnapaylater',
+      'klarnapaynow',
+      'paypal',
+      'przelewy24',
+      'sofort',
+    ].forEach((method) => {
+      if (!availableMethods.includes(method)) {
+        return;
+      }
+
+      cy.get('.payment-method-mollie_methods_' + method).should('not.have.class', '_active');
+    });
   });
 
   it('C849729: Validate that it renders Mollie Components when selecting the Credit Card method ', () => {
@@ -38,11 +46,12 @@ describe('Checkout usage', () => {
     cy.get('#card-holder .mollie-component').should('be.visible');
   });
 
-  it.only('C849662: Restores the cart when using the back button from the HPP', () => {
+  it('C849662: Validate that the quote is restored when using the back button ', () => {
     visitCheckoutPayment.visit();
 
     checkoutPaymentPage.selectPaymentMethod('iDeal');
     checkoutPaymentPage.selectFirstAvailableIssuer();
+
     checkoutPaymentPage.placeOrder();
 
     mollieHostedPaymentPage.assertIsVisible();

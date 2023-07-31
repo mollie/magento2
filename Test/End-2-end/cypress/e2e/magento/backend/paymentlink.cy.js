@@ -11,12 +11,12 @@ const ordersCreatePage = new OrdersCreatePage();
 const cookies = new Cookies();
 
 describe('Placing orders from the backend', () => {
-  it('C895380: Validate that the ecommerce admin can submis an order in the backend and mark as "Paid" ', () => {
+  it('C895380: Validate that the ecommerce admin can submit an order in the backend and mark as "Paid" ', () => {
     cy.backendLogin();
 
     ordersCreatePage.createNewOrderFor('Veronica Costello');
 
-    ordersCreatePage.addProduct('Erika Running Short-32-Red');
+    ordersCreatePage.addFirstSimpleProduct();
 
     ordersCreatePage.selectShippingMethod('Fixed');
 

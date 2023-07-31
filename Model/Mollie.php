@@ -251,10 +251,6 @@ class Mollie extends Adapter
     {
         $this->eventManager->dispatch('mollie_start_transaction', ['order' => $order]);
 
-        // When clicking the back button from the hosted payment we need a way to verify if the order was paid or not.
-        // If this is not the case, we restore the quote. This flag is used to determine if it was paid or not.
-        $order->getPayment()->setAdditionalInformation('mollie_success', false);
-
         $storeId = $order->getStoreId();
         if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
             return false;
@@ -263,6 +259,10 @@ class Mollie extends Adapter
         return $this->orderLockService->execute($order, function (OrderInterface $order) use ($apiKey) {
             $mollieApi = $this->loadMollieApi($apiKey);
             $method = $this->mollieHelper->getApiMethod($order);
+
+            // When clicking the back button from the hosted payment we need a way to verify if the order was paid or not.
+            // If this is not the case, we restore the quote. This flag is used to determine if it was paid or not.
+            $order->getPayment()->setAdditionalInformation('mollie_success', false);
 
             if ($method == 'order') {
                 return $this->startTransactionUsingTheOrdersApi($order, $mollieApi);
