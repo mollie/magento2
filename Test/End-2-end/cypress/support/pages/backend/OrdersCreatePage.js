@@ -5,6 +5,10 @@ export default class OrdersCreatePage {
         cy.contains('Create New Order').click();
 
         cy.contains(customerName).click();
+
+        cy.get('.loader').should('not.exist');
+
+        cy.contains(customerName);
     }
 
     addProduct(productName) {

@@ -101,9 +101,10 @@ type MollieApplePayValidationOutput {
 }
 
 input PaymentMethodInput {
-    mollie_selected_issuer: String @doc(description: "Provided the issuer chosen by the end-user")
-    mollie_card_token: String @doc(description: "The card token provided by Mollie Components")
     mollie_applepay_payment_token: String @doc(description: "The Apple Pay payment token")
+    mollie_card_token: String @doc(description: "The card token provided by Mollie Components")
+    mollie_selected_issuer: String @doc(description: "Provided the issuer chosen by the end-user")
+    mollie_selected_terminal: String @doc(description: "Provided the terminal chosen")
 }
 
 input MollieTransactionInput {

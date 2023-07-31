@@ -20,7 +20,24 @@ export default class VisitCheckoutPaymentCompositeAction {
     checkoutPage.continue();
   }
 
-  fillAddress(fixture) {
+  visitAsCustomer(fixture = 'NL', quantity = 1) {
+    productPage.openProduct(Cypress.env('defaultProductId'));
+
+    productPage.addSimpleProductToCart(quantity);
+
+    checkoutPage.visit();
+
+    this.fillAddress(fixture, true);
+
+    checkoutShippingPage.selectFirstAvailableShippingMethod();
+    checkoutPage.continue();
+  }
+
+  fillAddress(fixture, asCustomer = false) {
+      if (asCustomer) {
+          checkoutShippingPage.skipUsername();
+      }
+
     if (fixture === 'DE') {
       checkoutShippingPage.fillGermanShippingAddress();
       return;

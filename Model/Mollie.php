@@ -416,16 +416,20 @@ class Mollie extends Adapter
         parent::assignData($data);
 
         $additionalData = $data->getAdditionalData();
-        if (isset($additionalData['selected_issuer'])) {
-            $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $additionalData['selected_issuer']);
+        if (isset($additionalData['applepay_payment_token'])) {
+            $this->getInfoInstance()->setAdditionalInformation('applepay_payment_token', $additionalData['applepay_payment_token']);
         }
 
         if (isset($additionalData['card_token'])) {
             $this->getInfoInstance()->setAdditionalInformation('card_token', $additionalData['card_token']);
         }
 
-        if (isset($additionalData['applepay_payment_token'])) {
-            $this->getInfoInstance()->setAdditionalInformation('applepay_payment_token', $additionalData['applepay_payment_token']);
+        if (isset($additionalData['selected_issuer'])) {
+            $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $additionalData['selected_issuer']);
+        }
+
+        if (isset($additionalData['selected_terminal'])) {
+            $this->getInfoInstance()->setAdditionalInformation('selected_terminal', $additionalData['selected_terminal']);
         }
 
         return $this;

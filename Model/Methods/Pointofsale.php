@@ -6,13 +6,19 @@
 
 namespace Mollie\Payment\Model\Methods;
 
-class Przelewy24 extends \Mollie\Payment\Model\Mollie
-{
+use Mollie\Payment\Model\Mollie;
 
+/**
+ * Class Pointofsale
+ *
+ * @package Mollie\Payment\Model\Methods
+ */
+class Pointofsale extends Mollie
+{
     /**
      * Payment method code
      *
      * @var string
      */
-    const CODE = 'mollie_methods_przelewy24';
+    const CODE = 'mollie_methods_pointofsale';
 }
