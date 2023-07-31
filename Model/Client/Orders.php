@@ -238,14 +238,14 @@ class Orders extends AbstractModel
     }
 
     /**
-     * @param Order $order
+     * @param OrderInterface $order
      * @param MollieApiClient $mollieApi
      *
      * @return string
      * @throws LocalizedException
      * @throws ApiException
      */
-    public function startTransaction(Order $order, $mollieApi)
+    public function startTransaction(OrderInterface $order, $mollieApi)
     {
         $storeId = $order->getStoreId();
         $orderId = $order->getEntityId();
