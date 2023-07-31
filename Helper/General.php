@@ -429,11 +429,11 @@ class General extends AbstractHelper
     }
 
     /***
-     * @param \Magento\Sales\Model\Order $order
+     * @param OrderInterface $order
      *
      * @return mixed
      */
-    public function getApiMethod($order)
+    public function getApiMethod(OrderInterface $order)
     {
         $method = $order->getPayment()->getMethodInstance()->getCode();
         $method = str_replace('_vault', '', $method);

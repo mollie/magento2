@@ -209,13 +209,13 @@ class Payments extends AbstractModel
     }
 
     /**
-     * @param Order                       $order
+     * @param OrderInterface $order
      * @param \Mollie\Api\MollieApiClient $mollieApi
      *
      * @return string
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function startTransaction(Order $order, $mollieApi)
+    public function startTransaction(OrderInterface $order, $mollieApi)
     {
         $storeId = $order->getStoreId();
         $orderId = $order->getEntityId();

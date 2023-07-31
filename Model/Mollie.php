@@ -243,7 +243,7 @@ class Mollie extends Adapter
     /**
      * @param Order|OrderInterface $order
      *
-     * @return bool|void
+     * @return string|null|bool
      * @throws LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
      */
@@ -260,19 +260,21 @@ class Mollie extends Adapter
             return false;
         }
 
-        $mollieApi = $this->loadMollieApi($apiKey);
-        $method = $this->mollieHelper->getApiMethod($order);
+        return $this->orderLockService->execute($order, function (OrderInterface $order) use ($apiKey) {
+            $mollieApi = $this->loadMollieApi($apiKey);
+            $method = $this->mollieHelper->getApiMethod($order);
 
-        if ($method == 'order') {
-            return $this->startTransactionUsingTheOrdersApi($order, $mollieApi);
-        }
+            if ($method == 'order') {
+                return $this->startTransactionUsingTheOrdersApi($order, $mollieApi);
+            }
 
-        return $this->timeout->retry( function () use ($order, $mollieApi) {
-            return $this->paymentsApi->startTransaction($order, $mollieApi);
+            return $this->timeout->retry( function () use ($order, $mollieApi) {
+                return $this->paymentsApi->startTransaction($order, $mollieApi);
+            });
         });
     }
 
-    private function startTransactionUsingTheOrdersApi(Order $order, MollieApiClient $mollieApi)
+    private function startTransactionUsingTheOrdersApi(OrderInterface $order, MollieApiClient $mollieApi)
     {
         try {
             return $this->timeout->retry( function () use ($order, $mollieApi) {
