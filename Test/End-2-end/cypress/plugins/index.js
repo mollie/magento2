@@ -1,10 +1,6 @@
 const webpackPreprocessor = require('@cypress/webpack-preprocessor')
-const TestRailReporter = require('cypress-testrail');
 
 module.exports = (on, config) => {
-  const customCommand = 'Magento';
-  new TestRailReporter(on, config, customCommand).register();
-
   on('file:preprocessor', webpackPreprocessor({
     webpackOptions: require('../../webpack.config'),
   }))
