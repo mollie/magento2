@@ -25,6 +25,12 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieTest extends IntegrationTestCase
 {
+    protected function setUpWithoutVoid()
+    {
+        // The OrderLockService interferes with the tests, so we replace it with a fake.
+        $this->loadFakeOrderLockService();
+    }
+
     public function processTransactionUsesTheCorrectApiProvider()
     {
         return [
@@ -192,6 +198,26 @@ class MollieTest extends IntegrationTestCase
         $instance->assignData($data);
 
         $this->assertEquals('TESTBANK', $payment->getAdditionalInformation()['selected_issuer']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function testAssignsTerminalId()
+    {
+        $data = new DataObject;
+        $data->setAdditionalData(['selected_terminal' => 'term_randomstringid']);
+
+        $order = $this->loadOrder('100000001');
+        $payment = $order->getPayment();
+
+        /** @var Mollie $instance */
+        $instance = $this->objectManager->create(\Mollie\Payment\Model\Methods\Pointofsale::class);
+        $instance->setInfoInstance($payment);
+        $instance->assignData($data);
+
+        $this->assertEquals('term_randomstringid', $payment->getAdditionalInformation()['selected_terminal']);
     }
 
     /**

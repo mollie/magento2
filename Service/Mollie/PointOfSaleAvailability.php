@@ -1,0 +1,45 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Mollie\Payment\Service\Mollie;
+
+use Magento\Customer\Model\Session;
+use Magento\Quote\Api\Data\CartInterface;
+use Mollie\Payment\Config;
+
+class PointOfSaleAvailability
+{
+    /**
+     * @var Config
+     */
+    private $config;
+    /**
+     * @var Session
+     */
+    private $customerSession;
+
+    public function __construct(
+        Config $config,
+        Session $customerSession
+    ) {
+        $this->config = $config;
+        $this->customerSession = $customerSession;
+    }
+
+    public function isAvailable(CartInterface $cart): bool
+    {
+        $customerId = $this->customerSession->getCustomerId();
+        if ($customerId === null) {
+            return false;
+        }
+
+        $storeId = (int)$cart->getStoreId();
+        $allowedGroups = explode(',', $this->config->pointofsaleAllowedCustomerGroups($storeId));
+
+        return in_array(
+            (string)$this->customerSession->getCustomerGroupId(),
+            $allowedGroups
+        );
+    }
+}

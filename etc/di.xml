@@ -107,6 +107,7 @@
                 <item name="PhoneNumber" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\PhoneNumber</item>
                 <item name="DateOfBirth" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\DateOfBirth</item>
                 <item name="CaptureMode" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureMode</item>
+                <item name="terminalId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\TerminalId</item>
             </argument>
         </arguments>
     </type>
@@ -1347,6 +1348,51 @@
     <virtualType name="MolliePaysafecardCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
             <argument name="config" xsi:type="object">MolliePaysafecardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Point Of Sale -->
+    <type name="Mollie\Payment\Model\Methods\Pointofsale">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Mollie\Payment\Block\Form\Pointofsale</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MolliePointofsaleValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MolliePointofsaleValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MolliePointofsaleValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MolliePointofsaleConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePointofsaleConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MolliePointofsaleConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePointofsaleConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Pointofsale::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePointofsaleValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MolliePointofsaleCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePointofsaleCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MolliePointofsaleConfig</argument>
         </arguments>
     </virtualType>
 

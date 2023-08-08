@@ -209,13 +209,13 @@ class Payments extends AbstractModel
     }
 
     /**
-     * @param Order                       $order
+     * @param OrderInterface $order
      * @param \Mollie\Api\MollieApiClient $mollieApi
      *
      * @return string
      * @throws \Mollie\Api\Exceptions\ApiException
      */
-    public function startTransaction(Order $order, $mollieApi)
+    public function startTransaction(OrderInterface $order, $mollieApi)
     {
         $storeId = $order->getStoreId();
         $orderId = $order->getEntityId();
@@ -307,6 +307,13 @@ class Payments extends AbstractModel
         $order->getPayment()->setAdditionalInformation('payment_status', $payment->status);
         if (isset($payment->expiresAt)) {
             $order->getPayment()->setAdditionalInformation('expires_at', $payment->expiresAt);
+        }
+
+        if (isset($payment->_links->changePaymentState->href)) {
+            $order->getPayment()->setAdditionalInformation(
+                'mollie_change_payment_state_url',
+                $payment->_links->changePaymentState->href
+            );
         }
 
         $status = $this->mollieHelper->getPendingPaymentStatus($order);

@@ -2,13 +2,16 @@
 
 namespace Mollie\Payment\Service\Mollie\Order;
 
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\Methods\Creditcard;
 use Mollie\Payment\Model\Methods\Directdebit;
+use Mollie\Payment\Model\Methods\Pointofsale;
 use Mollie\Payment\Model\Mollie;
 
 class RedirectUrl
@@ -17,6 +20,11 @@ class RedirectUrl
      * @var Config
      */
     private $config;
+
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
 
     /**
      * @var UrlInterface
@@ -30,10 +38,12 @@ class RedirectUrl
 
     public function __construct(
         Config $config,
+        EncryptorInterface $encryptor,
         UrlInterface $url,
         ManagerInterface $messageManager
     ) {
         $this->config = $config;
+        $this->encryptor = $encryptor;
         $this->url = $url;
         $this->messageManager = $messageManager;
     }
@@ -52,6 +62,13 @@ class RedirectUrl
         $emptyUrlAllowed = $methodInstance instanceof ApplePay || $methodInstance instanceof Creditcard;
         if (!$redirectUrl && $emptyUrlAllowed) {
             return $this->url->getUrl('checkout/onepage/success/');
+        }
+
+        if ($methodInstance instanceof Pointofsale && !$redirectUrl) {
+            return $this->url->getUrl(
+                'mollie/checkout/pointofsale',
+                ['token' => base64_encode($this->encryptor->encrypt((string)$order->getId()))]
+            );
         }
 
         if (!$redirectUrl) {

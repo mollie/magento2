@@ -37,7 +37,7 @@ $status = $block->getPaymentStatus();
                 </tr>
             <?php endif; ?>
             <?php if ($block->getCheckoutUrl() && $status == 'created'): ?>
-                <tr>
+                <tr class="mollie-checkout-url">
                     <th><?= __('Checkout Url'); ?></th>
                     <td>
                         <?= $block->getCheckoutUrl(); ?>
@@ -90,6 +90,17 @@ $status = $block->getPaymentStatus();
                     </a>
                 </td>
             </tr>
+            <?php if ($changePaymentStatusUrl = $block->getChangePaymentStatusUrl()): ?>
+                <tr class="change-payment-status">
+                    <th><?= __('Update Payment Status'); ?></th>
+                    <td>
+                        <?= $changePaymentStatusUrl; ?>
+                        <span class="mollie-copy-url" data-url="<?= $changePaymentStatusUrl; ?>" title="<?php echo __('Copy'); ?>">
+                        &#x2398;
+                    </span>
+                    </td>
+                </tr>
+            <?php endif; ?>
             <tr class="mollie-order-status-result" style="display: none;"></tr>
         </tbody>
     </table>

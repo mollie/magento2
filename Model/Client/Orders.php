@@ -238,14 +238,14 @@ class Orders extends AbstractModel
     }
 
     /**
-     * @param Order $order
+     * @param OrderInterface $order
      * @param MollieApiClient $mollieApi
      *
      * @return string
      * @throws LocalizedException
      * @throws ApiException
      */
-    public function startTransaction(Order $order, $mollieApi)
+    public function startTransaction(OrderInterface $order, $mollieApi)
     {
         $storeId = $order->getStoreId();
         $orderId = $order->getEntityId();
@@ -350,6 +350,13 @@ class Orders extends AbstractModel
         $order->getPayment()->setAdditionalInformation('payment_status', $mollieOrder->status);
         if (isset($mollieOrder->expiresAt)) {
             $order->getPayment()->setAdditionalInformation('expires_at', $mollieOrder->expiresAt);
+        }
+
+        if (isset($mollieOrder->_links->changePaymentState->href)) {
+            $order->getPayment()->setAdditionalInformation(
+                'mollie_change_payment_state_url',
+                $mollieOrder->_links->changePaymentState->href
+            );
         }
 
         $this->orderLines->linkOrderLines($mollieOrder->lines, $order);

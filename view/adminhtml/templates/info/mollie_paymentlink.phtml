@@ -24,7 +24,7 @@ $status = $block->getPaymentStatus();
                 </tr>
             <?php endif; ?>
             <?php if ($block->getCheckoutUrl() && $status == 'created'): ?>
-                <tr>
+                <tr class="mollie-checkout-url">
                     <th><?= __('Checkout Url'); ?></th>
                     <td>
                         <?= $block->getCheckoutUrl(); ?>

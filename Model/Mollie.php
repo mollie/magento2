@@ -243,7 +243,7 @@ class Mollie extends Adapter
     /**
      * @param Order|OrderInterface $order
      *
-     * @return bool|void
+     * @return string|null|bool
      * @throws LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
      */
@@ -251,28 +251,30 @@ class Mollie extends Adapter
     {
         $this->eventManager->dispatch('mollie_start_transaction', ['order' => $order]);
 
-        // When clicking the back button from the hosted payment we need a way to verify if the order was paid or not.
-        // If this is not the case, we restore the quote. This flag is used to determine if it was paid or not.
-        $order->getPayment()->setAdditionalInformation('mollie_success', false);
-
         $storeId = $order->getStoreId();
         if (!$apiKey = $this->mollieHelper->getApiKey($storeId)) {
             return false;
         }
 
-        $mollieApi = $this->loadMollieApi($apiKey);
-        $method = $this->mollieHelper->getApiMethod($order);
+        return $this->orderLockService->execute($order, function (OrderInterface $order) use ($apiKey) {
+            $mollieApi = $this->loadMollieApi($apiKey);
+            $method = $this->mollieHelper->getApiMethod($order);
 
-        if ($method == 'order') {
-            return $this->startTransactionUsingTheOrdersApi($order, $mollieApi);
-        }
+            // When clicking the back button from the hosted payment we need a way to verify if the order was paid or not.
+            // If this is not the case, we restore the quote. This flag is used to determine if it was paid or not.
+            $order->getPayment()->setAdditionalInformation('mollie_success', false);
 
-        return $this->timeout->retry( function () use ($order, $mollieApi) {
-            return $this->paymentsApi->startTransaction($order, $mollieApi);
+            if ($method == 'order') {
+                return $this->startTransactionUsingTheOrdersApi($order, $mollieApi);
+            }
+
+            return $this->timeout->retry( function () use ($order, $mollieApi) {
+                return $this->paymentsApi->startTransaction($order, $mollieApi);
+            });
         });
     }
 
-    private function startTransactionUsingTheOrdersApi(Order $order, MollieApiClient $mollieApi)
+    private function startTransactionUsingTheOrdersApi(OrderInterface $order, MollieApiClient $mollieApi)
     {
         try {
             return $this->timeout->retry( function () use ($order, $mollieApi) {
@@ -416,16 +418,20 @@ class Mollie extends Adapter
         parent::assignData($data);
 
         $additionalData = $data->getAdditionalData();
-        if (isset($additionalData['selected_issuer'])) {
-            $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $additionalData['selected_issuer']);
+        if (isset($additionalData['applepay_payment_token'])) {
+            $this->getInfoInstance()->setAdditionalInformation('applepay_payment_token', $additionalData['applepay_payment_token']);
         }
 
         if (isset($additionalData['card_token'])) {
             $this->getInfoInstance()->setAdditionalInformation('card_token', $additionalData['card_token']);
         }
 
-        if (isset($additionalData['applepay_payment_token'])) {
-            $this->getInfoInstance()->setAdditionalInformation('applepay_payment_token', $additionalData['applepay_payment_token']);
+        if (isset($additionalData['selected_issuer'])) {
+            $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $additionalData['selected_issuer']);
+        }
+
+        if (isset($additionalData['selected_terminal'])) {
+            $this->getInfoInstance()->setAdditionalInformation('selected_terminal', $additionalData['selected_terminal']);
         }
 
         return $this;

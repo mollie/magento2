@@ -9,8 +9,10 @@ namespace Mollie\Payment\Plugin\Quote\Api;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Methods\Pointofsale;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Model\MollieConfigProvider;
+use Mollie\Payment\Service\Mollie\PointOfSaleAvailability;
 
 class PaymentMethodManagementPlugin
 {
@@ -34,16 +36,23 @@ class PaymentMethodManagementPlugin
      */
     private $cartRepository;
 
+    /**
+     * @var PointOfSaleAvailability
+     */
+    private $pointOfSaleAvailability;
+
     public function __construct(
         Config $config,
         Mollie $mollieModel,
         MollieConfigProvider $mollieConfigProvider,
-        CartRepositoryInterface $cartRepository
+        CartRepositoryInterface $cartRepository,
+        PointOfSaleAvailability $pointOfSaleAvailability
     ) {
         $this->config = $config;
         $this->mollieModel = $mollieModel;
         $this->mollieConfigProvider = $mollieConfigProvider;
         $this->cartRepository = $cartRepository;
+        $this->pointOfSaleAvailability = $pointOfSaleAvailability;
     }
 
     public function afterGetList(PaymentMethodManagementInterface $subject, $result, $cartId)
@@ -57,9 +66,13 @@ class PaymentMethodManagementPlugin
         $cart = $this->cartRepository->get($cartId);
         $activeMethods = $this->mollieConfigProvider->getActiveMethods($mollieApi, $cart);
 
-        return array_filter($result, function ($method) use ($activeMethods) {
+        return array_filter($result, function ($method) use ($activeMethods, $cart) {
             if (!$method instanceof Mollie) {
                 return true;
+            }
+
+            if ($method instanceof Pointofsale) {
+                return $this->pointOfSaleAvailability->isAvailable($cart);
             }
 
             return array_key_exists($method->getCode(), $activeMethods);
