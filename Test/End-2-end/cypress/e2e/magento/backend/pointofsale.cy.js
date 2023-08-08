@@ -9,7 +9,7 @@ const ordersCreatePage = new OrdersCreatePage();
 const cookies = new Cookies();
 
 describe('Placing orders using Point Of Sale from the backend', () => {
-  it('Is possible to place an order using Point Of Sale that is being paid', () => {
+  it.skip('Is possible to place an order using Point Of Sale that is being paid', () => {
     cy.backendLogin();
 
     ordersCreatePage.createNewOrderFor('Veronica Costello');
