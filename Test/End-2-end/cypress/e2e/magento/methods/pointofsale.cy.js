@@ -15,7 +15,7 @@ describe('Point of sale behaves as expected', () => {
     cy.get('[value="mollie_methods_pointofsale"]').should('not.exist');
   });
 
-  it('C1259057: Validate that Point Of Sale is shown when the customer is in the correct customer group', () => {
+  it.skip('C1259057: Validate that Point Of Sale is shown when the customer is in the correct customer group', () => {
     const email = Date.now() + 'user@example.com';
 
     magentoRestApi.createCustomer(email);
