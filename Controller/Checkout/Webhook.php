@@ -16,6 +16,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Mollie as MollieModel;
+use Mollie\Payment\Service\OrderLockService;
 
 /**
  * Class Webhook
@@ -50,24 +51,19 @@ class Webhook extends Action
      * @var EncryptorInterface
      */
     private $encryptor;
-
     /**
-     * Webhook constructor.
-     *
-     * @param Context       $context
-     * @param Session       $checkoutSession
-     * @param MollieModel   $mollieModel
-     * @param MollieHelper  $mollieHelper
-     * @param OrderRepositoryInterface $orderRepository
-     * @param EncryptorInterface $encryptor
+     * @var OrderLockService
      */
+    private $orderLockService;
+
     public function __construct(
         Context $context,
         Session $checkoutSession,
         MollieModel $mollieModel,
         MollieHelper $mollieHelper,
         OrderRepositoryInterface $orderRepository,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        OrderLockService $orderLockService
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->resultFactory = $context->getResultFactory();
@@ -75,6 +71,7 @@ class Webhook extends Action
         $this->mollieHelper = $mollieHelper;
         $this->orderRepository = $orderRepository;
         $this->encryptor = $encryptor;
+        $this->orderLockService = $orderLockService;
         parent::__construct($context);
     }
 
@@ -99,6 +96,14 @@ class Webhook extends Action
             }
 
             foreach ($orders as $order) {
+                // If this returns true, it means that the order is just created but did go straight to "paid".
+                // That can happen for Apple Pay and Credit Card. In that case, Mollie immediately sends a webhook,
+                // but we are not ready to process it yet.
+                if ($this->orderLockService->isLocked($order)) {
+                    $this->mollieHelper->addTolog('info', 'Order is locked, skipping webhook');
+                    continue;
+                }
+
                 $order->setMollieTransactionId($transactionId);
                 $this->mollieModel->processTransactionForOrder($order, 'webhook');
             }

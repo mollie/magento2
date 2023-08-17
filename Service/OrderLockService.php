@@ -45,7 +45,7 @@ class OrderLockService
 
     public function execute(OrderInterface $order, callable $callback)
     {
-        $key = 'mollie.order.' . $order->getEntityId();
+        $key = $this->getKeyName($order);
         if ($this->lockService->checkIfIsLockedWithWait($key)) {
             throw new LocalizedException(__('Unable to get lock for %1', $key));
         }
@@ -84,5 +84,17 @@ class OrderLockService
         }
 
         return $result;
+    }
+
+    public function isLocked(OrderInterface $order): bool
+    {
+        $key = $this->getKeyName($order);
+
+        return $this->lockService->isLocked($key);
+    }
+
+    private function getKeyName(OrderInterface $order): string
+    {
+        return 'mollie.order.' . $order->getEntityId();
     }
 }
