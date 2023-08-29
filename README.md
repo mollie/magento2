@@ -26,6 +26,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 
 ## Supported Mollie Payment Methods
 
+- Apple Pay (direct)
 - Bancontact
 - Bank transfer
 - Belfius Pay Button
@@ -37,6 +38,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - iDEAL
 - in3
 - KBC/CBC Payment Button
+- Klarna One
 - Klarna Pay now
 - Klarna Pay later
 - Klarna Slice it
