@@ -9,6 +9,8 @@ namespace Mollie\Payment\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
 use Magento\Framework\Message\ManagerInterface;
+use Mollie\Payment\Config;
+use Mollie\Payment\Model\Methods\Pointofsale;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
 
@@ -32,6 +34,10 @@ class ConfigObserver implements ObserverInterface
      * @var MollieHelper
      */
     private $mollieHelper;
+    /**
+     * @var Config
+     */
+    private $config;
 
     /**
      * ConfigObserver constructor.
@@ -43,11 +49,13 @@ class ConfigObserver implements ObserverInterface
     public function __construct(
         ManagerInterface $messageManager,
         MollieModel $mollieModel,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        Config $config
     ) {
         $this->messageManager = $messageManager;
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
+        $this->config = $config;
     }
 
     /**
@@ -73,20 +81,20 @@ class ConfigObserver implements ObserverInterface
      * @param $storeId
      * @param $modus
      *
-     * @return mixed
+     * @return void
      */
-    public function validatePaymentMethods($storeId, $modus)
+    public function validatePaymentMethods($storeId, string $modus): void
     {
         if (!class_exists('Mollie\Api\CompatibilityChecker')) {
             $error = $this->mollieHelper->getPhpApiErrorMessage(false);
             $this->mollieHelper->disableExtension();
             $this->mollieHelper->addTolog('error', $error);
             $this->messageManager->addErrorMessage($error);
-            return false;
+            return;
         }
 
         if ($modus == 'test') {
-            return false;
+            return;
         }
 
         try {
@@ -94,11 +102,11 @@ class ConfigObserver implements ObserverInterface
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             $this->messageManager->addErrorMessage($e->getMessage());
-            return false;
+            return;
         }
 
         if (empty($apiMethods)) {
-            return false;
+            return;
         }
 
         $activeMethods = $this->mollieHelper->getAllActiveMethods($storeId);
@@ -108,18 +116,21 @@ class ConfigObserver implements ObserverInterface
             $methods[$apiMethod->id] = $apiMethod;
         }
 
-        $errors = [];
-        foreach ($activeMethods as $k => $v) {
-            $code = $v['code'];
-            if (!isset($methods[$code])) {
-                $errors[] = __('%1: method not enabled in Mollie Dashboard', ucfirst($code));
-                continue;
+        $disabledMethods = [];
+        foreach ($activeMethods as $method) {
+            $code = $method['code'];
+            if ($code != Pointofsale::CODE && !isset($methods[$code])) {
+                $disabledMethods[] = $this->config->getMethodTitle($code);
             }
         }
 
-        if (!empty($errors)) {
-            $errorMethods = implode(', ', $errors);
-            $this->messageManager->addErrorMessage($errorMethods);
+        if ($disabledMethods) {
+            $this->messageManager->addComplexErrorMessage(
+                'MollieUnavailableMethodsMessage',
+                [
+                    'methods' => $disabledMethods,
+                ]
+            );
         }
     }
 }
