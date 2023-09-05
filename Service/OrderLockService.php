@@ -43,9 +43,9 @@ class OrderLockService
         $this->config = $config;
     }
 
-    public function execute(OrderInterface $order, callable $callback)
+    public function execute(OrderInterface $originalOrder, callable $callback)
     {
-        $key = $this->getKeyName($order);
+        $key = $this->getKeyName($originalOrder);
         if ($this->lockService->checkIfIsLockedWithWait($key)) {
             throw new LocalizedException(__('Unable to get lock for %1', $key));
         }
@@ -59,13 +59,13 @@ class OrderLockService
         $connection->beginTransaction();
 
         // Save this value, so we can restore it after the order has been saved.
-        $mollieTransactionId = $order->getMollieTransactionId();
+        $mollieTransactionId = $originalOrder->getMollieTransactionId();
 
         // The order repository uses caching to make sure it only loads the order once, but in this case we want
         // the latest version of the order, so we need to make sure we get a new instance of the repository.
         /** @var OrderRepositoryInterface $orderRepository */
         $orderRepository = $this->orderRepositoryFactory->create();
-        $order = $orderRepository->get($order->getEntityId());
+        $order = $orderRepository->get($originalOrder->getEntityId());
 
         // Restore the transaction ID as it might not be set on the saved order yet.
         // This is required further down the process.
@@ -75,6 +75,9 @@ class OrderLockService
             $result = $callback($order);
             $orderRepository->save($order);
             $connection->commit();
+
+            // Update the original order with the new data.
+            $originalOrder->setData($order->getData());
         } catch (\Exception $e) {
             $connection->rollBack();
             throw $e;
