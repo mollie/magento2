@@ -72,7 +72,7 @@ class MollieTest extends IntegrationTestCase
         $instance = $this->objectManager->create(Mollie::class, [
             'paymentsApi' => $paymentsApiMock,
             'mollieHelper' => $mollieHelperMock,
-            'ordersProcessTraction' => $orderProcessTransactionFake,
+            'ordersProcessTransaction' => $orderProcessTransactionFake,
             'mollieApiClient' => $mollieApiMock,
         ]);
 
