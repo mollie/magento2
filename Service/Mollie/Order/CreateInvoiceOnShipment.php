@@ -38,7 +38,7 @@ class CreateInvoiceOnShipment
             $this->config->useManualCapture($order->getStoreId()) &&
             $api == 'payments'
         ) {
-            return true;
+            return false;
         }
 
         return false;

@@ -41,7 +41,7 @@ class CreateInvoiceOnShipmentTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/enable_manual_capture 1
      * @return void
      */
-    public function testIsEnabledWhenCreatePaymentAuthorizationIsEnabledAndApiIsPayments(): void
+    public function testIsDisabledWhenCreatePaymentAuthorizationIsEnabledAndApiIsPayments(): void
     {
         $order = $this->loadOrderById('100000001');
         $order->getPayment()->setMethod('mollie_methods_creditcard');
@@ -50,7 +50,7 @@ class CreateInvoiceOnShipmentTest extends IntegrationTestCase
         /** @var CreateInvoiceOnShipment $instance */
         $instance = $this->objectManager->create(CreateInvoiceOnShipment::class);
 
-        $this->assertTrue($instance->execute($order));
+        $this->assertFalse($instance->execute($order));
     }
 
     /**

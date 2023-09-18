@@ -61,6 +61,9 @@
     <event name="sales_order_invoice_pay">
         <observer name="mollie_mark_virtual_items_as_shipped" instance="Mollie\Payment\Observer\SalesOrderInvoicePay\MarkVirtualItemsAsShipped" />
     </event>
+    <event name="sales_order_invoice_register">
+        <observer name="mollie_capture_invoice" instance="Mollie\Payment\Observer\SalesOrderInvoiceRegister\CaptureInvoice" />
+    </event>
     <event name="sales_quote_payment_import_data_before">
         <observer name="mollie_clear_issuer_on_method_change" instance="Mollie\Payment\Observer\SalesQuotePaymentImportDataBefore\ClearIssuerOnMethodChange" />
     </event>
