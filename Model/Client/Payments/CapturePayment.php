@@ -2,9 +2,12 @@
 
 namespace Mollie\Payment\Model\Client\Payments;
 
+use Magento\Framework\Pricing\PriceCurrencyInterface;
+use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
@@ -47,6 +50,10 @@ class CapturePayment
      * @var ShouldEmailInvoice
      */
     private $shouldEmailInvoice;
+    /**
+     * @var PriceCurrencyInterface
+     */
+    private $price;
 
     public function __construct(
         MollieApiClient $mollieApiClient,
@@ -55,7 +62,8 @@ class CapturePayment
         OrderRepositoryInterface $orderRepository,
         InvoiceSender $invoiceSender,
         OrderCommentHistory $orderCommentHistory,
-        ShouldEmailInvoice $shouldEmailInvoice
+        ShouldEmailInvoice $shouldEmailInvoice,
+        PriceCurrencyInterface $price
     ) {
         $this->mollieApiClient = $mollieApiClient;
         $this->partialInvoice = $partialInvoice;
@@ -64,15 +72,16 @@ class CapturePayment
         $this->invoiceSender = $invoiceSender;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->shouldEmailInvoice = $shouldEmailInvoice;
+        $this->price = $price;
     }
 
-    public function execute(ShipmentInterface $shipment, OrderInterface $order): void
+    public function execute(InvoiceInterface $invoice): void
     {
+        $order = $invoice->getOrder();
         $payment = $order->getPayment();
-        $invoice = $this->partialInvoice->createFromShipment($shipment);
-        if (!$invoice) {
-            return;
-        }
+
+        $order->setState(Order::STATE_PAYMENT_REVIEW);
+        $status = $order->getConfig()->getStateDefaultStatus(Order::STATE_PAYMENT_REVIEW);
 
         $captureAmount = $invoice->getBaseGrandTotal();
 
@@ -88,17 +97,15 @@ class CapturePayment
         }
 
         $capture = $mollieApi->paymentCaptures->createForId($mollieTransactionId, $data);
-
         $payment->setTransactionId($capture->id);
-        $payment->registerCaptureNotification($captureAmount, true);
 
-        $this->orderRepository->save($order);
-
-        $sendInvoice = $this->shouldEmailInvoice->execute($order->getStoreId(), $payment->getMethod());
-        if ($invoice && $invoice->getId() && !$invoice->getEmailSent() && $sendInvoice) {
-            $this->invoiceSender->send($invoice);
-            $message = __('Notified customer about invoice #%1', $invoice->getIncrementId());
-            $this->orderCommentHistory->add($order, $message, true);
-        }
+        $order->addCommentToStatusHistory(
+            __(
+                'Trying to capture %1. Capture ID: %2',
+                $this->price->format($captureAmount),
+                $capture->id
+            ),
+            $status
+        );
     }
 }
