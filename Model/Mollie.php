@@ -99,7 +99,7 @@ class Mollie extends Adapter
     /**
      * @var ProcessTransaction
      */
-    private $ordersProcessTraction;
+    private $ordersProcessTransaction;
 
     /**
      * @var OrderLockService
@@ -131,7 +131,7 @@ class Mollie extends Adapter
         AssetRepository $assetRepository,
         Config $config,
         Timeout $timeout,
-        ProcessTransaction $ordersProcessTraction,
+        ProcessTransaction $ordersProcessTransaction,
         OrderLockService $orderLockService,
         \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
         TransactionToOrderRepositoryInterface $transactionToOrderRepository,
@@ -167,7 +167,7 @@ class Mollie extends Adapter
         $this->assetRepository = $assetRepository;
         $this->config = $config;
         $this->timeout = $timeout;
-        $this->ordersProcessTraction = $ordersProcessTraction;
+        $this->ordersProcessTransaction = $ordersProcessTransaction;
         $this->orderLockService = $orderLockService;
         $this->mollieApiClient = $mollieApiClient;
         $this->transactionToOrderRepository = $transactionToOrderRepository;
@@ -363,7 +363,7 @@ class Mollie extends Adapter
             $paymentToken
         ) {
             if (substr($transactionId, 0, 4) == 'ord_') {
-                $result = $this->ordersProcessTraction->execute($order, $type)->toArray();
+                $result = $this->ordersProcessTransaction->execute($order, $type)->toArray();
             } else {
                 $mollieApi = $this->mollieApiClient->loadByStore($order->getStoreId());
                 $result = $this->paymentsApi->processTransaction($order, $mollieApi, $type, $paymentToken);
