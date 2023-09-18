@@ -1,0 +1,15 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+?>
+<p><?= __('The following method(s) are disabled in the Mollie Dashboard. They won\'t be available in the checkout.'); ?></p>
+<ul>
+    <?php foreach($block->getData('methods') as $method): ?>
+        <li><?= $escaper->escapeHtml($method); ?></li>
+    <?php endforeach; ?>
+</ul>

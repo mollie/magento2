@@ -586,7 +586,7 @@ class Config
      * @param null|int|string $storeId
      * @return string
      */
-    public function getMethodTitle($method, $storeId = null)
+    public function getMethodTitle($method, $storeId = null): string
     {
         return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_TITLE, $method), $storeId);
     }

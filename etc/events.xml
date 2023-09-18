@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="admin_system_config_changed_section_payment">
+    <event name="admin_system_config_changed_section_mollie_payment_methods">
         <observer name="custom_admin_system_config_changed_section_payment" instance="Mollie\Payment\Observer\ConfigObserver"/>
     </event>
     <event name="order_cancel_after">

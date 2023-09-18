@@ -31,4 +31,17 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Framework\View\Element\Message\MessageConfigurationsPool">
+        <arguments>
+            <argument name="configurationsMap" xsi:type="array">
+                <item name="MollieUnavailableMethodsMessage" xsi:type="array">
+                    <item name="renderer" xsi:type="const">\Magento\Framework\View\Element\Message\Renderer\BlockRenderer::CODE</item>
+                    <item name="data" xsi:type="array">
+                        <item name="template" xsi:type="string">Mollie_Payment::system/config/message/unavailable-methods.phtml</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>
