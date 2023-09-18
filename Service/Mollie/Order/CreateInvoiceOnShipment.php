@@ -6,23 +6,6 @@ use Magento\Sales\Api\Data\OrderInterface;
 
 class CreateInvoiceOnShipment
 {
-    /**
-     * @var CanUseManualCapture
-     */
-    private $canUseManualCapture;
-    /**
-     * @var UsedMollieApi
-     */
-    private $usedMollieApi;
-
-    public function __construct(
-        CanUseManualCapture $canUseManualCapture,
-        UsedMollieApi $usedMollieApi
-    ) {
-        $this->canUseManualCapture = $canUseManualCapture;
-        $this->usedMollieApi = $usedMollieApi;
-    }
-
     public function execute(OrderInterface $order): bool
     {
         $methodCode = $order->getPayment()->getMethod();
@@ -37,12 +20,6 @@ class CreateInvoiceOnShipment
             return true;
         }
 
-        if ($this->usedMollieApi->execute($order) == UsedMollieApi::TYPE_PAYMENTS &&
-            $this->canUseManualCapture->execute($order)
-        ) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 }
