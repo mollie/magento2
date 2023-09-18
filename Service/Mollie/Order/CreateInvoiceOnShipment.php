@@ -3,19 +3,24 @@
 namespace Mollie\Payment\Service\Mollie\Order;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Payment\Config;
 
 class CreateInvoiceOnShipment
 {
     /**
-     * @var Config
+     * @var CanUseManualCapture
      */
-    private $config;
+    private $canUseManualCapture;
+    /**
+     * @var UsedMollieApi
+     */
+    private $usedMollieApi;
 
     public function __construct(
-        Config $config
+        CanUseManualCapture $canUseManualCapture,
+        UsedMollieApi $usedMollieApi
     ) {
-        $this->config = $config;
+        $this->canUseManualCapture = $canUseManualCapture;
+        $this->usedMollieApi = $usedMollieApi;
     }
 
     public function execute(OrderInterface $order): bool
@@ -32,13 +37,10 @@ class CreateInvoiceOnShipment
             return true;
         }
 
-        $transactionId = $order->getMollieTransactionId() ?? '';
-        $api = substr($transactionId, 0, 4) == 'ord_' ? 'orders' : 'payments';
-        if ($methodCode == 'mollie_methods_creditcard' &&
-            $this->config->useManualCapture($order->getStoreId()) &&
-            $api == 'payments'
+        if ($this->usedMollieApi->execute($order) == UsedMollieApi::TYPE_PAYMENTS &&
+            $this->canUseManualCapture->execute($order)
         ) {
-            return false;
+            return true;
         }
 
         return false;
