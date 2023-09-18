@@ -14,6 +14,8 @@ use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Client\Payments\CapturePayment;
+use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
+use Mollie\Payment\Service\Mollie\Order\UsedMollieApi;
 
 class CaptureInvoice implements ObserverInterface
 {
@@ -25,22 +27,34 @@ class CaptureInvoice implements ObserverInterface
      * @var CapturePayment
      */
     private $capturePayment;
+    /**
+     * @var CanUseManualCapture
+     */
+    private $canUseManualCapture;
+    /**
+     * @var UsedMollieApi
+     */
+    private $usedMollieApi;
 
     public function __construct(
         Config $config,
-        CapturePayment $capturePayment
+        CapturePayment $capturePayment,
+        CanUseManualCapture $canUseManualCapture,
+        UsedMollieApi $usedMollieApi
     ) {
         $this->capturePayment = $capturePayment;
         $this->config = $config;
+        $this->canUseManualCapture = $canUseManualCapture;
+        $this->usedMollieApi = $usedMollieApi;
     }
 
     public function execute(Observer $observer)
     {
         /** @var OrderInterface $order */
         $order = $observer->getData('order');
-        $transactionId = $order->getMollieTransactionId() ?? '';
-        $useOrdersApi = substr($transactionId, 0, 4) == 'ord_';
-        if ($useOrdersApi || !$this->config->useManualCapture((int)$order->getStoreId())) {
+        if ($this->usedMollieApi->execute($order) == UsedMollieApi::TYPE_ORDERS ||
+            !$this->canUseManualCapture->execute($order)
+        ) {
             return;
         }
 

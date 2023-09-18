@@ -44,7 +44,8 @@ class CreateInvoiceOnShipmentTest extends IntegrationTestCase
     public function testIsDisabledWhenCreatePaymentAuthorizationIsEnabledAndApiIsPayments(): void
     {
         $order = $this->loadOrderById('100000001');
-        $order->getPayment()->setMethod('mollie_methods_creditcard');
+        $methods = ['mollie_methods_applepay', 'mollie_methods_creditcard'];
+        $order->getPayment()->setMethod($methods[array_rand($methods)]);
         $order->setMollieTransactionId('tr_1234567890');
 
         /** @var CreateInvoiceOnShipment $instance */
@@ -62,7 +63,8 @@ class CreateInvoiceOnShipmentTest extends IntegrationTestCase
     public function testIsDisabledWhenCreatePaymentAuthorizationIsEnabledAndApiIsOrders(): void
     {
         $order = $this->loadOrderById('100000001');
-        $order->getPayment()->setMethod('mollie_methods_creditcard');
+        $methods = ['mollie_methods_applepay', 'mollie_methods_creditcard'];
+        $order->getPayment()->setMethod($methods[array_rand($methods)]);
         $order->setMollieTransactionId('ord_1234567890');
 
         /** @var CreateInvoiceOnShipment $instance */

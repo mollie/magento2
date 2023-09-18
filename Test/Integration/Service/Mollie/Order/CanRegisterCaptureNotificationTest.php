@@ -64,7 +64,8 @@ class CanRegisterCaptureNotificationTest extends IntegrationTestCase
     public function testCannotCaptureWhenEnabledAndCreditcard(): void
     {
         $order = $this->loadOrderById('100000001');
-        $order->getPayment()->setMethod('mollie_methods_creditcard');
+        $methods = ['mollie_methods_applepay', 'mollie_methods_creditcard'];
+        $order->getPayment()->setMethod($methods[array_rand($methods)]);
 
         /** @var CanRegisterCaptureNotification $instance */
         $instance = $this->objectManager->create(CanRegisterCaptureNotification::class);
