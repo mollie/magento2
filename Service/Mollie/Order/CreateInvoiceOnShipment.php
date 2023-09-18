@@ -40,9 +40,9 @@ class CreateInvoiceOnShipment
         if ($this->usedMollieApi->execute($order) == UsedMollieApi::TYPE_PAYMENTS &&
             $this->canUseManualCapture->execute($order)
         ) {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 }
