@@ -17,7 +17,7 @@ define(
     function (
         $,
         _,
-        __,
+        $t,
         ko,
         url,
         storage,
@@ -39,7 +39,7 @@ define(
 
                     if (!billingAddress || !billingAddress.company) {
                         this.messageContainer.addErrorMessage({
-                            message: __('Please enter a company name.')
+                            message: $t('Please enter a company name.')
                         });
 
                         return false;
