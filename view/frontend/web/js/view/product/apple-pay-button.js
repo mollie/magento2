@@ -29,6 +29,7 @@ define([
         countryCode: null,
         productName: null,
         storeName: null,
+        supportedNetworks: [],
 
         initObservable: function () {
             this._super().observe([
@@ -57,7 +58,7 @@ define([
             var request = {
                 countryCode: this.countryCode,
                 currencyCode: this.currencyCode,
-                supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
+                supportedNetworks: this.supportedNetworks,
                 merchantCapabilities: ['supports3DS'],
                 total: {
                     type: 'final',

@@ -14,7 +14,8 @@ use Magento\Framework\Escaper;
              "storeName": "<?= $escaper->escapeJs($block->getStoreName()); ?>",
              "grandTotalAmount": "<?= $escaper->escapeJs($block->getBaseGrandTotal()); ?>",
              "storeCountry": "<?= $escaper->escapeJs($block->getStoreCountry()); ?>",
-             "storeCurrency": "<?= $escaper->escapeJs($block->getStoreCurrency()); ?>"
+             "storeCurrency": "<?= $escaper->escapeJs($block->getStoreCurrency()); ?>",
+             "supportedNetworks": <?= json_encode($block->getSupportedNetworks()); ?>
          }
      }'
      class="mollie-applepay-minicart mollie-applepay-button-hidden">
