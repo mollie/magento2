@@ -8,7 +8,6 @@ namespace Mollie\Payment\Model;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
-use Magento\Framework\Escaper;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Helper\Data as PaymentHelper;
@@ -19,6 +18,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Mollie as MollieModel;
+use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 use Mollie\Payment\Service\Mollie\MethodParameters;
 
@@ -62,10 +62,6 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var array
      */
     private $methods = [];
-    /**
-     * @var Escaper
-     */
-    private $escaper;
     /**
      * @var AssetRepository
      */
@@ -111,46 +107,35 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var MethodParameters
      */
     private $methodParameters;
-
     /**
-     * MollieConfigProvider constructor.
-     *
-     * @param Mollie $mollieModel
-     * @param MollieHelper $mollieHelper
-     * @param PaymentHelper $paymentHelper
-     * @param CheckoutSession $checkoutSession
-     * @param AssetRepository $assetRepository
-     * @param Escaper $escaper
-     * @param Resolver $localeResolver
-     * @param Config $config
-     * @param GetIssuers $getIssuers
-     * @param StoreManagerInterface $storeManager
-     * @param MethodParameters $methodParameters
+     * @var SupportedNetworks
      */
+    private $supportedNetworks;
+
     public function __construct(
         MollieModel $mollieModel,
         MollieHelper $mollieHelper,
         PaymentHelper $paymentHelper,
         CheckoutSession $checkoutSession,
         AssetRepository $assetRepository,
-        Escaper $escaper,
         Resolver $localeResolver,
         Config $config,
         GetIssuers $getIssuers,
         StoreManagerInterface $storeManager,
-        MethodParameters $methodParameters
+        MethodParameters $methodParameters,
+        SupportedNetworks $supportedNetworks
     ) {
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
         $this->paymentHelper = $paymentHelper;
         $this->checkoutSession = $checkoutSession;
-        $this->escaper = $escaper;
         $this->assetRepository = $assetRepository;
         $this->config = $config;
         $this->localeResolver = $localeResolver;
         $this->getIssuers = $getIssuers;
         $this->storeManager = $storeManager;
         $this->methodParameters = $methodParameters;
+        $this->supportedNetworks = $supportedNetworks;
 
         foreach ($this->methodCodes as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
@@ -188,6 +173,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['mollie']['locale'] = $this->getLocale($storeId);
         $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
         $config['payment']['mollie']['applepay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
+        $config['payment']['mollie']['applepay']['supported_networks'] = $this->supportedNetworks->execute((int)$storeId);
         $config['payment']['mollie']['store']['name'] = $storeName;
         $config['payment']['mollie']['store']['currency'] = $this->config->getStoreCurrency($storeId);
         $config['payment']['mollie']['vault']['enabled'] = $this->config->isMagentoVaultEnabled($storeId);
