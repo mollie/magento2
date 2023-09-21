@@ -46,29 +46,6 @@ define(
                     }
 
                     return true;
-                },
-
-                bbbbbeforePlaceOrder: function () {
-                    var serviceUrl;
-
-                    /**
-                     * We retrieve a payment token. This is used to start the transaction once the order is placed.
-                     */
-                    if (customer.isLoggedIn()) {
-                        serviceUrl = urlBuilder.createUrl('/carts/mine/mollie/payment-token', {});
-                    } else {
-                        serviceUrl = urlBuilder.createUrl('/guest-carts/:quoteId/mollie/payment-token', {
-                            quoteId: quote.getQuoteId()
-                        });
-                    }
-
-                    var promise = storage.get(serviceUrl);
-
-                    promise.done( function (result) {
-                        this.paymentToken(result);
-                    }.bind(this));
-
-                    return promise;
                 }
             }
         );
