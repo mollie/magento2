@@ -34,12 +34,10 @@ class Base extends Info
      * @var DateTime\TimezoneInterface
      */
     private $timezone;
-
     /**
      * @var Registry
      */
     private $registry;
-
     /**
      * @var PriceCurrencyInterface
      */
@@ -66,23 +64,17 @@ class Base extends Info
         $this->price = $price;
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getCheckoutType()
+    public function getCheckoutType(): ?string
     {
         try {
             return $this->getInfo()->getAdditionalInformation('checkout_type');
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            return false;
+            return null;
         }
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getExpiresAt()
+    public function getExpiresAt(): ?string
     {
         try {
             if ($expiresAt = $this->getInfo()->getAdditionalInformation('expires_at')) {
@@ -92,80 +84,67 @@ class Base extends Info
             $this->mollieHelper->addTolog('error', $e->getMessage());
         }
 
-        return false;
+        return null;
     }
 
     /**
-     * @param int|null $storeId
-     * @return bool|string
+     * @param mixed $storeId
      */
-    public function getPaymentLink($storeId = null)
+    public function getPaymentLink($storeId = null): ?string
     {
         if ($checkoutUrl = $this->getCheckoutUrl()) {
             return $this->mollieHelper->getPaymentLinkMessage($checkoutUrl, $storeId);
         }
 
-        return false;
+        return null;
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getCheckoutUrl()
+    public function getCheckoutUrl(): ?string
     {
         try {
             return $this->getInfo()->getAdditionalInformation('checkout_url');
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            return false;
+            return null;
         }
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getPaymentStatus()
+    public function getPaymentStatus(): ?string
     {
         try {
             return $this->getInfo()->getAdditionalInformation('payment_status');
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            return false;
+            return null;
         }
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getDashboardUrl()
+    public function getDashboardUrl(): ?string
     {
         try {
             return $this->getInfo()->getAdditionalInformation('dashboard_url');
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            return false;
+            return null;
         }
     }
 
-    public function getChangePaymentStatusUrl(): string
+    public function getChangePaymentStatusUrl(): ?string
     {
         try {
             return (string)$this->getInfo()->getAdditionalInformation('mollie_change_payment_state_url');
         } catch (\Exception $exception) {
-            return '';
+            return null;
         }
     }
 
-    /**
-     * @return bool|string
-     */
-    public function getMollieId()
+    public function getMollieId(): ?string
     {
         try {
             return $this->getInfo()->getAdditionalInformation('mollie_id');
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            return false;
+            return null;
         }
     }
 
@@ -189,10 +168,9 @@ class Base extends Info
     }
 
     /**
-     * @return mixed
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getPaymentImage()
+    public function getPaymentImage(): string
     {
         $code = $this->getInfo()->getMethod();
         if (strpos($code, 'mollie_methods_') !== false) {
@@ -202,10 +180,7 @@ class Base extends Info
         return $code . '.svg';
     }
 
-    /**
-     * @return string|null
-     */
-    public function getOrderId()
+    public function getOrderId(): ?string
     {
         try {
             return $this->getInfo()->getParentId();
@@ -240,10 +215,7 @@ class Base extends Info
         return $this->price->format($amount);
     }
 
-    /**
-     * @return OrderInterface|null
-     */
-    private function getOrder()
+    private function getOrder(): ?OrderInterface
     {
         return $this->registry->registry('current_order');
     }

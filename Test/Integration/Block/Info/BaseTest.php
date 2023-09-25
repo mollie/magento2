@@ -36,23 +36,22 @@ class BaseTest extends IntegrationTestCase
         $this->assertEquals('ord_123abc', $instance->getMollieId());
     }
 
-    public function returnsFalseWhenInfoIsNotAvailable()
+    public function returnsNullWhenInfoIsNotAvailable()
     {
         return [
             ['getDashboardUrl'],
             ['getMollieId'],
-            ['getRemainderAmount'],
         ];
     }
 
     /**
-     * @dataProvider returnsFalseWhenInfoIsNotAvailable
+     * @dataProvider returnsNullWhenInfoIsNotAvailable
      */
-    public function testReturnsFalseWhenInfoIsNotAvailable($method)
+    public function testReturnsNullWhenInfoIsNotAvailable($method)
     {
         /** @var Base $instance */
         $instance = $this->objectManager->create(Base::class);
-        $this->assertFalse($instance->{$method}());
+        $this->assertNull($instance->{$method}());
     }
 
     public function testReturnsTheRemainderAmount()

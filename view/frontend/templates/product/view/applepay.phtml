@@ -25,7 +25,8 @@ if (!$block->isEnabled()) {
                         "currencyCode": "<?= $block->escapeJs($block->getCurrencyCode()); ?>",
                         "countryCode": "<?= $block->escapeJs($block->getCountryCode()); ?>",
                         "productName": "<?= $block->escapeJs($block->getProductName()); ?>",
-                        "storeName": "<?= $block->escapeJs($block->getStoreName()); ?>"
+                        "storeName": "<?= $block->escapeJs($block->getStoreName()); ?>",
+                        "supportedNetworks": <?= json_encode($block->getSupportedNetworks()); ?>
                     }
                 }
             }

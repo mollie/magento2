@@ -12,13 +12,11 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\OrderRepository;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Helper\General as MollieHelper;
-use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\Client\Payments\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Mollie\Order\CanRegisterCaptureNotification;
@@ -386,9 +384,18 @@ class Payments extends AbstractModel
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
                     $payment->setIsTransactionClosed(true);
 
-                    if ($this->canRegisterCaptureNotification->execute($order) ||
+                    if ($this->canRegisterCaptureNotification->execute($order, $paymentData) ||
                         $type != static::TRANSACTION_TYPE_WEBHOOK
                     ) {
+                        if ($paymentData->getAmountCaptured() != 0.0) {
+                            $order->addCommentToStatusHistory(
+                                __(
+                                    'Successfully captured an amount of %1.',
+                                    $order->getBaseCurrency()->formatTxt($paymentData->getAmountCaptured())
+                                )
+                            );
+                        }
+
                         $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
                     }
 

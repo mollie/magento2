@@ -4,6 +4,7 @@ namespace Mollie\Payment\Test\Integration\Service\Order\TransactionPart;
 
 use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
+use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\Methods\Creditcard;
 use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Service\Order\TransactionPart\CaptureMode;
@@ -32,7 +33,7 @@ class CaptureModeTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @return void
      */
-    public function testDoesNothingWhenThePaymentMethodIsNotCreditcard(): void
+    public function testDoesNothingWhenThePaymentMethodIsNotCreditCardOrApplePay(): void
     {
         $order = $this->loadOrderById('100000001');
         $order->getPayment()->setMethod(Ideal::CODE);
@@ -72,7 +73,8 @@ class CaptureModeTest extends IntegrationTestCase
     public function testSetsTheModeWhenApplicable(): void
     {
         $order = $this->loadOrderById('100000001');
-        $order->getPayment()->setMethod(Creditcard::CODE);
+        $methods = [ApplePay::CODE, Creditcard::CODE];
+        $order->getPayment()->setMethod($methods[array_rand($methods)]);
 
         /** @var CaptureMode $instance */
         $instance = $this->objectManager->create(CaptureMode::class);

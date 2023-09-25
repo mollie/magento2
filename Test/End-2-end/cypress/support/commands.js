@@ -7,7 +7,7 @@ Cypress.log = function (opts, ...other) {
   return origLog(opts, ...other);
 };
 
-Cypress.Commands.add('backendLogin', () => {
+Cypress.Commands.add('backendLogin', (visitDashboard = true) => {
   const username = 'exampleuser';
   const password = 'examplepassword123';
 
@@ -20,7 +20,9 @@ Cypress.Commands.add('backendLogin', () => {
     cy.url().should('include', '/admin/admin/dashboard');
   });
 
-  cy.visit('/admin/admin/dashboard');
+  if (visitDashboard) {
+      cy.visit('/admin/admin/dashboard');
+  }
 });
 
 Cypress.Commands.add('getIframeBody', (selector) => {

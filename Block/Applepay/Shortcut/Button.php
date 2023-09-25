@@ -7,6 +7,7 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Element\Template;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Config;
+use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
 
 class Button extends Template implements ShortcutInterface
 {
@@ -16,21 +17,26 @@ class Button extends Template implements ShortcutInterface
      * @var Session
      */
     private $checkoutSession;
-
     /**
      * @var Config
      */
     private $config;
+    /**
+     * @var SupportedNetworks
+     */
+    private $supportedNetworks;
 
     public function __construct(
         Template\Context $context,
         Session $checkoutSession,
         Config $config,
+        SupportedNetworks $supportedNetworks,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->checkoutSession = $checkoutSession;
         $this->config = $config;
+        $this->supportedNetworks = $supportedNetworks;
     }
 
     /**
@@ -86,5 +92,10 @@ class Button extends Template implements ShortcutInterface
         }
 
         return implode(' ', $classes);
+    }
+
+    public function getSupportedNetworks(): array
+    {
+        return $this->supportedNetworks->execute((int)$this->_storeManager->getStore()->getId());
     }
 }

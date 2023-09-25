@@ -52,4 +52,10 @@ export default class OrdersPage {
 
         cy.url().should('include', '/admin/order_shipment/new/order_id/');
     }
+
+    invoice() {
+        cy.get('#order_invoice').should('be.enabled').click();
+
+        cy.url().should('include', '/admin/sales/order_invoice/new/order_id/');
+    }
 }
