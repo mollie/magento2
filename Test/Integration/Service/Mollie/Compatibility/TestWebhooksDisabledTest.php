@@ -6,7 +6,7 @@
 
 namespace Mollie\Payment\Test\Integration\Service\Mollie\Compatibility;
 
-use Mollie\Payment\Service\Mollie\Compatibility\TestWebhooksDisabled;
+use Mollie\Payment\Service\Mollie\SelfTests\TestWebhooksDisabled;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class TestWebhooksDisabledTest extends IntegrationTestCase

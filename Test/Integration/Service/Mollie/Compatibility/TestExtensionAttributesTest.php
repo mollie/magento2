@@ -7,7 +7,7 @@
 namespace Mollie\Payment\Test\Integration\Service\Mollie\Compatibility;
 
 use Magento\Framework\ObjectManagerInterface;
-use Mollie\Payment\Service\Mollie\Compatibility\TestExtensionAttributes;
+use Mollie\Payment\Service\Mollie\SelfTests\TestExtensionAttributes;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class TestExtensionAttributesTest extends IntegrationTestCase
