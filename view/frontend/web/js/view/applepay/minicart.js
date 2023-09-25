@@ -42,7 +42,7 @@ define([
             var request = {
                 countryCode: this.storeCountry,
                 currencyCode: this.storeCurrency,
-                supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
+                supportedNetworks: this.supportedNetworks,
                 merchantCapabilities: ['supports3DS'],
                 total: {
                     label: this.storeName,

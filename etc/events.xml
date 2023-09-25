@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="admin_system_config_changed_section_payment">
+    <event name="admin_system_config_changed_section_mollie_payment_methods">
         <observer name="custom_admin_system_config_changed_section_payment" instance="Mollie\Payment\Observer\ConfigObserver"/>
     </event>
     <event name="order_cancel_after">
@@ -60,6 +60,9 @@
     </event>
     <event name="sales_order_invoice_pay">
         <observer name="mollie_mark_virtual_items_as_shipped" instance="Mollie\Payment\Observer\SalesOrderInvoicePay\MarkVirtualItemsAsShipped" />
+    </event>
+    <event name="sales_order_invoice_register">
+        <observer name="mollie_capture_invoice" instance="Mollie\Payment\Observer\SalesOrderInvoiceRegister\CaptureInvoice" />
     </event>
     <event name="sales_quote_payment_import_data_before">
         <observer name="mollie_clear_issuer_on_method_change" instance="Mollie\Payment\Observer\SalesQuotePaymentImportDataBefore\ClearIssuerOnMethodChange" />

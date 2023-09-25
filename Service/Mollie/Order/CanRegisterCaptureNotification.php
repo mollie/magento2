@@ -1,32 +1,35 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\Order;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Payment\Config;
-use Mollie\Payment\Model\Methods\Creditcard;
+use Mollie\Api\Resources\Payment;
 
 class CanRegisterCaptureNotification
 {
     /**
-     * @var Config
+     * @var CanUseManualCapture
      */
-    private $config;
+    private $canUseManualCapture;
 
     public function __construct(
-        Config $config
+        CanUseManualCapture $canUseManualCapture
     ) {
-        $this->config = $config;
+        $this->canUseManualCapture = $canUseManualCapture;
     }
 
-    public function execute(OrderInterface $order): bool
+    public function execute(OrderInterface $order, Payment $molliePayment): bool
     {
-        if ($this->config->useManualCapture($order->getStoreId()) &&
-            $order->getPayment()->getMethod() == Creditcard::CODE
-        ) {
-            return false;
+        if (!$this->canUseManualCapture->execute($order)) {
+            return true;
         }
 
-        return true;
+        return $molliePayment->isPaid() && $molliePayment->getAmountCaptured() !== 0.0;
     }
 }

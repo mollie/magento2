@@ -59,9 +59,5 @@ class CreateMollieShipment implements ObserverInterface
         if ($useOrdersApi) {
             $this->ordersApi->createShipment($shipment, $order);
         }
-
-        if (!$useOrdersApi && $this->config->useManualCapture((int)$order->getStoreId())) {
-            $this->capturePayment->execute($shipment, $order);
-        }
     }
 }

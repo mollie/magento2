@@ -110,7 +110,7 @@ class ShippingMethods extends Action
             'shipping_methods' => array_map(function ($method) {
                 return [
                     'identifier' => $method->getCarrierCode() . '_' . $method->getMethodCode(),
-                    'label' => $method->getCarrierTitle(),
+                    'label' => $method->getMethodTitle() . ' - ' . $method->getCarrierTitle(),
                     'amount' => number_format($method->getPriceInclTax(), 2, '.', ''),
                     'detail' => '',
                 ];

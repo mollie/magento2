@@ -65,7 +65,7 @@ define(
                 var request = {
                     countryCode: window.checkoutConfig.defaultCountryId,
                     currencyCode: window.checkoutConfig.payment.mollie.store.currency,
-                    supportedNetworks: ['amex', 'maestro', 'masterCard', 'visa', 'vPay'],
+                    supportedNetworks: window.checkoutConfig.payment.mollie.applepay.supported_networks,
                     merchantCapabilities: ['supports3DS'],
                     total: {
                         label: checkoutConfig.mollie.store.name,
