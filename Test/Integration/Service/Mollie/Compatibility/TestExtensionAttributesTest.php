@@ -36,9 +36,9 @@ class TestExtensionAttributesTest extends IntegrationTestCase
             'objectManager' => $objectManagerMock,
         ]);
 
-        $result = $instance->execute([]);
+        $instance->execute();
 
-        $this->assertCount(0, $result);
+        $this->assertCount(0, $instance->getMessages());
     }
 
     public function testReturnsErrorWhenMethodsDoNotExists()
@@ -58,8 +58,8 @@ class TestExtensionAttributesTest extends IntegrationTestCase
             'objectManager' => $objectManagerMock,
         ]);
 
-        $result = $instance->execute([]);
+        $instance->execute();
 
-        $this->assertCount(1, $result);
+        $this->assertCount(1, $instance->getMessages());
     }
 }

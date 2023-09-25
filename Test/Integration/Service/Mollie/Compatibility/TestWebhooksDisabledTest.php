@@ -19,9 +19,9 @@ class TestWebhooksDisabledTest extends IntegrationTestCase
     {
         /** @var TestWebhooksDisabled $instance */
         $instance = $this->objectManager->get(TestWebhooksDisabled::class);
-        $results = $instance->execute([]);
+        $instance->execute();
 
-        $this->assertCount(0, $results);
+        $this->assertCount(0, $instance->getMessages());
     }
 
     /**
@@ -33,8 +33,8 @@ class TestWebhooksDisabledTest extends IntegrationTestCase
     {
         /** @var TestWebhooksDisabled $instance */
         $instance = $this->objectManager->get(TestWebhooksDisabled::class);
-        $results = $instance->execute([]);
+        $instance->execute();
 
-        $this->assertCount(1, $results);
+        $this->assertCount(1, $instance->getMessages());
     }
 }
