@@ -10,6 +10,8 @@ namespace Mollie\Payment\Controller\ApplePay;
 
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Filesystem\Driver\File;
+use Magento\Framework\Module\Dir;
 
 class AppleDeveloperMerchantidDomainAssociation implements HttpGetActionInterface
 {
@@ -17,19 +19,34 @@ class AppleDeveloperMerchantidDomainAssociation implements HttpGetActionInterfac
      * @var ResultFactory
      */
     private $resultFactory;
+    /**
+     * @var File
+     */
+    private $driverFile;
+    /**
+     * @var Dir
+     */
+    private $moduleDir;
 
     public function __construct(
-        ResultFactory $resultFactory
+        ResultFactory $resultFactory,
+        File $driverFile,
+        Dir $moduleDir
     ) {
         $this->resultFactory = $resultFactory;
+        $this->driverFile = $driverFile;
+        $this->moduleDir = $moduleDir;
     }
-
 
     public function execute()
     {
-        $redirect = $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_REDIRECT);
-        $redirect->setUrl('http://www.mollie.com/.well-known/apple-developer-merchantid-domain-association');
+        $path = $this->moduleDir->getDir('Mollie_Payment');
+        $contents =  $this->driverFile->fileGetContents($path . '/apple-developer-merchantid-domain-association');
 
-        return $redirect;
+        $response = $this->resultFactory->create(ResultFactory::TYPE_RAW);
+        $response->setHeader('Content-Type', 'text/plain');
+        $response->setContents($contents);
+
+        return $response;
     }
 }
