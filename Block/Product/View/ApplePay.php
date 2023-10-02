@@ -59,12 +59,12 @@ class ApplePay extends Template
 
     public function getCountryCode(): string
     {
-        return $this->_scopeConfig->getValue('general/country/default');
+        return $this->_scopeConfig->getValue('general/country/default') ?? '';
     }
 
     public function getCurrencyCode(): string
     {
-        return $this->_storeManager->getStore()->getCurrentCurrency()->getCode();
+        return $this->_storeManager->getStore()->getCurrentCurrency()->getCode() ?? '';
     }
 
     public function isEnabled(): bool
