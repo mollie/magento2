@@ -581,12 +581,13 @@ class Mollie extends Adapter
      * Get list of Issuers from API
      *
      * @param MollieApiClient|null $mollieApi
-     * @param $method
-     * @param $issuerListType
+     * @param string $method
+     * @param string $issuerListType
+     * @param int $count for internal use only
      *
      * @return array|null
      */
-    public function getIssuers(MollieApiClient $mollieApi = null, $method, $issuerListType): ?array
+    public function getIssuers(MollieApiClient $mollieApi = null, string $method, string $issuerListType, int $count = 0): ?array
     {
         $issuers = [];
         if (empty($mollieApi) || $issuerListType == 'none') {
@@ -596,6 +597,16 @@ class Mollie extends Adapter
         $methodCode = str_replace('mollie_methods_', '', $method);
         try {
             $issuers = $mollieApi->methods->get($methodCode, ['include' => 'issuers'])->issuers;
+
+            // If the list can't be retrieved for some reason, try again.
+            if (!$issuers && $count == 0) {
+                $this->mollieHelper->addTolog(
+                    'error',
+                    'Retrieving method issuers gave an issue. Retrying.' . var_export($issuers, true)
+                );
+
+                return $this->getIssuers($mollieApi, $method, $issuerListType, 1);
+            }
 
             if (!$issuers) {
                 return null;

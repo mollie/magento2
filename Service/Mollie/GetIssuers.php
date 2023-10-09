@@ -62,7 +62,7 @@ class GetIssuers
      * @param string $type On of: dropdown, radio, none
      * @return array|null
      */
-    public function execute(MollieApiClient $mollieApi, $method, $type)
+    public function execute(MollieApiClient $mollieApi, string $method, string $type)
     {
         $identifier = static::CACHE_IDENTIFIER_PREFIX . $method . $type . $this->resolver->getLocale();
         $result = $this->cache->load($identifier);
@@ -75,6 +75,11 @@ class GetIssuers
             $method,
             $type
         );
+
+        // If the result is false-y, don't cache it.
+        if (!$result) {
+            return $result;
+        }
 
         // $result will be a nested stdClass, this converts it on all levels to an array.
         $result = json_decode(json_encode($result), true);
@@ -94,7 +99,7 @@ class GetIssuers
      * @param $method
      * @return array|null
      */
-    public function getForGraphql($storeId, $method): ?array
+    public function getForGraphql($storeId, string $method): ?array
     {
         $mollieApi = $this->mollieModel->getMollieApi($storeId);
 
