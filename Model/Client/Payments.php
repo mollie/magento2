@@ -16,6 +16,7 @@ use Magento\Sales\Model\OrderRepository;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
+use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Payments\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
@@ -137,6 +138,10 @@ class Payments extends AbstractModel
      * @var CanRegisterCaptureNotification
      */
     private $canRegisterCaptureNotification;
+    /**
+     * @var TransactionToOrderRepositoryInterface
+     */
+    private $transactionToOrderRepository;
 
     /**
      * Payments constructor.
@@ -182,7 +187,8 @@ class Payments extends AbstractModel
         ValidateMetadata $validateMetadata,
         SaveAdditionalInformationDetails $saveAdditionalInformationDetails,
         ExpiredOrderToTransaction $expiredOrderToTransaction,
-        CanRegisterCaptureNotification $canRegisterCaptureNotification
+        CanRegisterCaptureNotification $canRegisterCaptureNotification,
+        TransactionToOrderRepositoryInterface $transactionToOrderRepository
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -204,6 +210,7 @@ class Payments extends AbstractModel
         $this->saveAdditionalInformationDetails = $saveAdditionalInformationDetails;
         $this->expiredOrderToTransaction = $expiredOrderToTransaction;
         $this->canRegisterCaptureNotification = $canRegisterCaptureNotification;
+        $this->transactionToOrderRepository = $transactionToOrderRepository;
     }
 
     /**
@@ -524,7 +531,8 @@ class Payments extends AbstractModel
             return;
         }
 
-        if ($this->checkoutSession->getLastOrderId() != $order->getId()) {
+        $transaction = $this->transactionToOrderRepository->getByTransactionId($paymentData->id);
+        if ($this->checkoutSession->getLastOrderId() != $order->getId() && !$transaction->getOrderId()) {
             if ($paymentToken && isset($paymentData->metadata->payment_token)) {
                 if ($paymentToken == $paymentData->metadata->payment_token) {
                     $this->checkoutSession->setLastQuoteId($order->getQuoteId())

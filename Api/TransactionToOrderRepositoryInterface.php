@@ -16,6 +16,8 @@ interface TransactionToOrderRepositoryInterface
      */
     public function get(int $id): \Mollie\Payment\Api\Data\TransactionToOrderInterface;
 
+    public function getByTransactionId(string $transactionId): TransactionToOrderInterface;
+
     /**
       * @param \Magento\Framework\Api\SearchCriteriaInterface $criteria
       * @return \Mollie\Payment\Api\Data\TransactionToOrderSearchResultsInterface

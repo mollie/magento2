@@ -93,6 +93,16 @@ class TransactionToOrderRepository implements TransactionToOrderRepositoryInterf
         return $transactionToOrder->getDataModel();
     }
 
+    public function getByTransactionId(string $transactionId): TransactionToOrderInterface
+    {
+        $transactionToOrder = $this->transactionToOrderFactory->create();
+        $this->resource->load($transactionToOrder, $transactionId, 'transaction_id');
+        if (!$transactionToOrder->getId()) {
+            throw new NoSuchEntityException(__('TransactionToOrder with transaction_id "%1" does not exist.', $transactionId));
+        }
+        return $transactionToOrder;
+    }
+
     /**
      * {@inheritdoc}
      */
