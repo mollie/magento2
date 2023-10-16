@@ -100,8 +100,7 @@ class Webhook extends Action
                 // That can happen for Apple Pay and Credit Card. In that case, Mollie immediately sends a webhook,
                 // but we are not ready to process it yet.
                 if ($this->orderLockService->isLocked($order)) {
-                    $this->mollieHelper->addTolog('info', 'Order is locked, skipping webhook');
-                    continue;
+                    throw new \Exception('Order is locked, skipping webhook', 425);
                 }
 
                 $order->setMollieTransactionId($transactionId);
@@ -112,7 +111,7 @@ class Webhook extends Action
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
 
-            return $this->getErrorResponse(503);
+            return $this->getErrorResponse($e->getCode() ?: 503);
         }
     }
 
