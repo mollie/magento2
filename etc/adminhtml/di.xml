@@ -23,11 +23,16 @@
         <plugin name="mollie_payment_fix_the_path" type="Mollie\Payment\Plugin\Email\Model\Template\Config" />
     </type>
 
-    <type name="Mollie\Payment\Helper\Tests">
+    <type name="Mollie\Payment\Controller\Adminhtml\Action\SelfTest">
         <arguments>
             <argument name="tests" xsi:type="array">
-                <item xsi:type="object" name="extension_attributes">Mollie\Payment\Service\Mollie\Compatibility\TestExtensionAttributes</item>
-                <item xsi:type="object" name="webhooks_disabled">Mollie\Payment\Service\Mollie\Compatibility\TestWebhooksDisabled</item>
+                <item name="phpVersion" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestPhpVersion</item>
+                <item name="jsonExtension" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestJsonExtension</item>
+                <item name="defaultBankTransferStatus" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestDefaultBankTransferStatus</item>
+                <item name="appCodeInstall" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestAppCodeInstall</item>
+                <item name="extensionAttributes" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestExtensionAttributes</item>
+                <item name="webhooksDisabled" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestWebhooksDisabled</item>
+                <item name="applePayDomainValidationFile" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestApplePayDomainValidationFile</item>
             </argument>
         </arguments>
     </type>

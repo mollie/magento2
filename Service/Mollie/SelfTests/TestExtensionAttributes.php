@@ -4,7 +4,7 @@
  *  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Mollie\Compatibility;
+namespace Mollie\Payment\Service\Mollie\SelfTests;
 
 use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Module\Dir\Reader;
@@ -16,7 +16,7 @@ use Magento\Framework\Xml\Parser;
  * that are required so we can see if `setup:di:compile` has run. For this we use the object manager, as the list of
  * extension attributes can be (and will be) changed over time, and we don't now which classes are required.
  */
-class TestExtensionAttributes implements CompatibilityTestInterface
+class TestExtensionAttributes extends AbstractSelfTest
 {
     /**
      * @var Reader
@@ -43,14 +43,12 @@ class TestExtensionAttributes implements CompatibilityTestInterface
         $this->objectManager = $objectManager;
     }
 
-    public function execute(array $results)
+    public function execute(): void
     {
         if (!$this->allExtensionAttributesExists()) {
-            $msg = __('Error: It looks like not all extension attributes are present. Make sure you run `bin/magento setup:di:compile`.');
-            $results[] = '<span class="mollie-error">' . $msg . '</span>';
+            $message = __('Error: It looks like not all extension attributes are present. Make sure you run `bin/magento setup:di:compile`.');
+            $this->addMessage('error', $message);
         }
-
-        return $results;
     }
 
     private function allExtensionAttributesExists()

@@ -11,6 +11,7 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Helper\Tests as TestsHelper;
+use Mollie\Payment\Service\Mollie\SelfTests\AbstractSelfTest;
 
 /**
  * Class Compatibility
@@ -35,26 +36,24 @@ class SelfTest extends Action
      * @var MollieHelper
      */
     private $mollieHelper;
-
     /**
-     * Compatibility constructor.
-     *
-     * @param Context      $context
-     * @param JsonFactory  $resultJsonFactory
-     * @param TestsHelper  $testsHelper
-     * @param MollieHelper $mollieHelper
+     * @var AbstractSelfTest[]
      */
+    private $tests;
+
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
         TestsHelper $testsHelper,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        array $tests
     ) {
         $this->request = $context->getRequest();
         $this->resultJsonFactory = $resultJsonFactory;
         $this->testsHelper = $testsHelper;
         $this->mollieHelper = $mollieHelper;
         parent::__construct($context);
+        $this->tests = $tests;
     }
 
     /**
@@ -73,8 +72,19 @@ class SelfTest extends Action
             return $this->getPhpApiErrorMessage($result);
         }
 
-        $compatibilityResult = $this->testsHelper->compatibilityChecker();
-        $result->setData(['success' => true, 'msg' => implode('<br/>', $compatibilityResult)]);
+        $messages = [];
+        foreach ($this->tests as $test) {
+            $test->execute();
+
+            $messages = array_merge($messages, $test->getMessages());
+        }
+
+        $output = '';
+        foreach ($messages as $message) {
+            $output .= '<div class="mollie-' . $message['type'] . '">' . $message['message'] . '</div>';
+        }
+
+        $result->setData(['success' => true, 'msg' => $output]);
         return $result;
     }
 
