@@ -262,7 +262,7 @@ class Payments extends AbstractModel
         $this->processResponse($order, $payment);
 
         // Order is paid immediately (eg. Credit Card with Components, Apple Pay), process transaction
-        if ($payment->isPaid()) {
+        if ($payment->isAuthorized() || $payment->isPaid()) {
             $this->processTransaction->execute($order, static::TRANSACTION_TYPE_WEBHOOK);
         }
 

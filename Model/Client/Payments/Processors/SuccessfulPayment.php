@@ -155,7 +155,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $payment->setTransactionId($magentoOrder->getMollieTransactionId());
         $payment->setIsTransactionClosed(true);
 
-        if ($this->canRegisterCaptureNotification->execute($magentoOrder, $molliePayment) ||
+        if ($this->canRegisterCaptureNotification->execute($magentoOrder, $molliePayment) &&
             $type != Payments::TRANSACTION_TYPE_SUBSCRIPTION
         ) {
             if ($molliePayment->getAmountCaptured() != 0.0) {

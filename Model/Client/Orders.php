@@ -300,7 +300,7 @@ class Orders extends AbstractModel
         $this->processResponse($order, $mollieOrder);
 
         // Order is paid immediately (eg. Credit Card with Components, Apple Pay), process transaction
-        if ($mollieOrder->isPaid()) {
+        if ($mollieOrder->isAuthorized() || $mollieOrder->isPaid()) {
             $this->processTransaction->execute($order, 'webhook');
         }
 
