@@ -61,7 +61,6 @@ class SendPendingPaymentReminders
         $this->sortOrderFactory = $sortOrderFactory;
         $this->dateTime = $dateTime;
         $this->paymentReminder = $paymentReminder;
-        $this->config = $config;
     }
 
     public function execute()
