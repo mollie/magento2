@@ -56,7 +56,7 @@ class SaveApiKey extends Encrypted
 
     public function beforeSave()
     {
-        // Save the unecrypted value so we can test it.
+        // Save the unencrypted value so we can test it.
         $value = (string)$this->getValue();
 
         parent::beforeSave();
@@ -76,7 +76,7 @@ class SaveApiKey extends Encrypted
     {
         /** @var ApiKeyFallbackInterface $model */
         $model = $this->apiKeyFallbackFactory->create();
-        $model->setApikey($this->getOldValue());
+        $model->setApikey($this->_encryptor->encrypt($this->getOldValue()));
         $model->setMode($this->getPath() === 'payment/mollie_general/apikey_live' ? 'live' : 'test');
 
         $this->apiKeyFallbackRepository->save($model);
