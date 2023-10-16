@@ -8,6 +8,7 @@ namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\Data\PendingPaymentReminderInterface;
@@ -87,6 +88,20 @@ class PaymentReminder
             return $order;
         }
 
+        if (!$this->orderIsInStock($order)) {
+            $this->logger->addInfoLog(
+                'info',
+                sprintf(
+                    'On or more products from order #%s are not stock, not sending payment reminder',
+                    $order->getIncrementId()
+                )
+            );
+
+            $this->pendingPaymentReminderRepository->delete($pendingPaymentReminder);
+
+            return $order;
+        }
+
         $this->logger->addInfoLog(
             'info',
             sprintf('Preparing to send the payment reminder for order #%s', $order->getIncrementId())
@@ -131,5 +146,17 @@ class PaymentReminder
         } catch (NoSuchEntityException $exception) {
             return false;
         }
+    }
+
+    private function orderIsInStock(OrderInterface $order): bool
+    {
+        /** @var OrderItemInterface $item */
+        foreach ($order->getAllVisibleItems() as $item) {
+            if (!$item->getProduct()->isSaleable()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
