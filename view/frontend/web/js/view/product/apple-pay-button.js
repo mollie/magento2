@@ -48,10 +48,13 @@ define([
         },
 
         getProductPrice: function () {
-            return $('[data-role=priceBox][data-product-id] [data-price-type="finalPrice"] .price')
+            var price = $('[data-role=priceBox][data-product-id] [data-price-type="finalPrice"] .price')
                 .html()
-                .replace(/[^\d,.-]/g, '')
-                .replace(',', '.');
+                .replace(/[^\d,.-]/g, '');
+
+            // We get the price formatted as in the currency, eg 1.000,00 or 1,000.00. So remove all dots and
+            // commas and divide by 100 to get the price in cents.
+            return (price.replace(',', '').replace('.', '') / 100).toFixed(2);
         },
 
         createApplePaySession: function () {
