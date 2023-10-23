@@ -270,7 +270,7 @@ class OrderLines extends AbstractModel
      * @param bool $addShipping
      * @return array
      */
-    public function getCreditmemoOrderLines(CreditmemoInterface $creditmemo, $addShipping)
+    public function getCreditmemoOrderLines(CreditmemoInterface $creditmemo, bool $addShipping): array
     {
         $orderLines = [];
 
