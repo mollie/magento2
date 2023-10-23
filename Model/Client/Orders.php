@@ -757,7 +757,8 @@ class Orders extends AbstractModel
             }
         }
 
-        if (!$creditmemo->getAllItems() || $this->adjustmentFee->doNotRefundInMollie()) {
+        $shouldRefund = $addShippingToRefund || !$creditmemo->getAllItems();
+        if (!$shouldRefund || $this->adjustmentFee->doNotRefundInMollie()) {
             return $this;
         }
 
