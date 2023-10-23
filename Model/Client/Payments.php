@@ -314,10 +314,14 @@ class Payments extends AbstractModel
             );
         }
 
-        $status = $this->mollieHelper->getPendingPaymentStatus($order);
+        $message = __('Customer redirected to Mollie');
+        if ($order->getPayment()->getMethodInstance()->getCode() == 'mollie_methods_paymentlink') {
+            $message = __('Created Mollie Checkout Url');
+        }
 
+        $status = $this->mollieHelper->getPendingPaymentStatus($order);
+        $order->addStatusToHistory($status, $message, false);
         $order->setState(Order::STATE_PENDING_PAYMENT);
-        $order->addStatusToHistory($status, __('Customer redirected to Mollie'), false);
         $this->linkTransactionToOrder->execute($payment->id, $order);
         $this->orderRepository->save($order);
     }
