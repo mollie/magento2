@@ -17,10 +17,12 @@ $title = $block->escapeHtml($block->getMethod()->getTitle());
         <?= /* @noEscape */
         $title; ?>
     </dt>
-    <?php if (($block->getPaymentStatus() == 'created') && ($paymentUrl = $block->getPaymentLink($block->getMethod()->getStore()))): ?>
+    <?php
+    if (in_array($block->getPaymentStatus(), ['created', 'open']) &&
+        $paymentUrl = $block->getPaymentLink($block->getMethod()->getStore())
+    ): ?>
         <dt>
-            <?= /* @noEscape */
-            $paymentUrl; ?>
+            <?= /* @noEscape */ $paymentUrl; ?>
         </dt>
     <?php endif; ?>
     <?php if ($specificInfo): ?>
