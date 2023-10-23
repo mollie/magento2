@@ -4,40 +4,30 @@
  *  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Mollie\Compatibility;
+namespace Mollie\Payment\Service\Mollie\SelfTests;
 
-use Magento\Framework\App\State;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Adminhtml\Source\WebhookUrlOptions;
 
-class TestWebhooksDisabled implements CompatibilityTestInterface
+class TestWebhooksDisabled extends AbstractSelfTest
 {
     /**
      * @var Config
      */
     private $config;
 
-    /**
-     * @var State
-     */
-    private $appState;
-
     public function __construct(
-        Config $config,
-        State $appState
+        Config $config
     ) {
         $this->config = $config;
-        $this->appState = $appState;
     }
 
-    public function execute(array $results)
+    public function execute(): void
     {
         if ($this->hasError()) {
-            $msg = __('Warning: Webhooks are currently disabled.');
-            $results[] = '<span class="mollie-error">' . $msg . '</span>';
+            $message = __('Warning: Webhooks are currently disabled.');
+            $this->addMessage('error', $message);
         }
-
-        return $results;
     }
 
     private function hasError()

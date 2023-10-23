@@ -380,11 +380,11 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param $method
+     * @param string $method
      *
      * @return mixed
      */
-    public function getIssuerListType($method)
+    public function getIssuerListType(string $method): string
     {
         $methodXpath = str_replace('%method%', $method, self::XPATH_ISSUER_LIST_TYPE);
         return $this->getStoreConfig($methodXpath);

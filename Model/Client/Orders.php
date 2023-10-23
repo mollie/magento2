@@ -300,7 +300,7 @@ class Orders extends AbstractModel
         $this->processResponse($order, $mollieOrder);
 
         // Order is paid immediately (eg. Credit Card with Components, Apple Pay), process transaction
-        if ($mollieOrder->isPaid()) {
+        if ($mollieOrder->isAuthorized() || $mollieOrder->isPaid()) {
             $this->processTransaction->execute($order, 'webhook');
         }
 
@@ -757,7 +757,8 @@ class Orders extends AbstractModel
             }
         }
 
-        if (!$creditmemo->getAllItems() || $this->adjustmentFee->doNotRefundInMollie()) {
+        $shouldRefund = $addShippingToRefund || !$creditmemo->getAllItems();
+        if (!$shouldRefund || $this->adjustmentFee->doNotRefundInMollie()) {
             return $this;
         }
 
