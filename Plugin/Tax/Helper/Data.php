@@ -58,10 +58,20 @@ class Data
         $this->result = $result;
 
         $order = $source->getOrder();
+        if (!$order->getPayment() ||
+            strstr($order->getPayment()->getMethod(), 'mollie_methods_') === false
+        ) {
+            return $result;
+        }
+
         $amount = $order->getMolliePaymentFee();
         $taxAmount = $order->getMolliePaymentFeeTax();
         $baseTaxAmount = $order->getMolliePaymentFee();
-        $rate = round(($taxAmount / $amount) * 100);
+
+        $rate = 0;
+        if ((float)$order->getMolliePaymentFeeTax()) {
+            $rate = round(($taxAmount / $amount) * 100);
+        }
 
         $taxClassId = $this->config->paymentSurchargeTaxClass(
             $order->getPayment()->getMethod(),
