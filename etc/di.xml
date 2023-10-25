@@ -355,10 +355,6 @@
         </arguments>
     </type>
 
-    <type name="Magento\Tax\Helper\Data">
-        <plugin name="mollie_add_payment_fee_tax_rate" type="Mollie\Payment\Plugin\Tax\Helper\Data" />
-    </type>
-
     <!-- Payment methods configuration start -->
     <!-- ApplePay -->
     <type name="Mollie\Payment\Model\Methods\ApplePay">
