@@ -76,10 +76,12 @@ jobs:
           MAGENTO_URL=$(docker exec magento-project-community-edition /bin/bash -c "curl -s ngrok:4040/api/tunnels |jq -r \".tunnels[0].public_url\"")
           echo "magento_url=$MAGENTO_URL" >> $GITHUB_ENV
 
+      # Note the `mollie-pwa.html` file, as it is copied to the pub folder. This is so that it can be accessed by Cypress.
       - name: Upload the code into the docker container
         run: |
           sed -i '/version/d' ./composer.json && \
           docker cp $(pwd) magento-project-community-edition:/data/extensions/ && \
+          docker cp $(pwd)/Test/End-2-end/cypress/fixtures/mollie-pwa.html magento-project-community-edition:/data/pub/opt/ && \
           docker exec magento-project-community-edition ./install-composer-package mollie/magento2:@dev
 
       - name: Activate the extension
