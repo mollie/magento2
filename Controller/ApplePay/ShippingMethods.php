@@ -6,18 +6,13 @@
 
 namespace Mollie\Payment\Controller\ApplePay;
 
-use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\AddressInterfaceFactory;
 use Magento\Quote\Api\Data\CartInterface;
-use Magento\Quote\Api\Data\PaymentInterface;
-use Magento\Quote\Api\Data\PaymentInterfaceFactory;
 use Magento\Quote\Api\GuestCartRepositoryInterface;
-use Magento\Quote\Api\PaymentMethodManagementInterface;
-use Magento\Quote\Api\ShippingMethodManagementInterface;
+use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\Quote\Address\Total as AddressTotal;
 
 class ShippingMethods extends Action
@@ -32,78 +27,39 @@ class ShippingMethods extends Action
      */
     private $guestCartRepository;
 
-    /**
-     * @var AddressInterfaceFactory
-     */
-    private $addressFactory;
-
-    /**
-     * @var PaymentMethodManagementInterface
-     */
-    private $paymentMethodManagement;
-
-    /**
-     * @var PaymentInterfaceFactory
-     */
-    private $paymentInterfaceFactory;
-
-    /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
-
-    /**
-     * @var ShippingMethodManagementInterface
-     */
-    private $shippingMethodManagement;
-
     public function __construct(
         Context $context,
         CartRepositoryInterface $cartRepository,
         GuestCartRepositoryInterface $guestCartRepository,
-        ShippingMethodManagementInterface $shippingMethodManagement,
-        AddressInterfaceFactory $addressFactory,
-        PaymentMethodManagementInterface $paymentMethodManagement,
-        PaymentInterfaceFactory $paymentInterfaceFactory,
-        CheckoutSession $checkoutSession
     ) {
         parent::__construct($context);
-
         $this->guestCartRepository = $guestCartRepository;
-        $this->shippingMethodManagement = $shippingMethodManagement;
-        $this->addressFactory = $addressFactory;
-        $this->paymentMethodManagement = $paymentMethodManagement;
-        $this->paymentInterfaceFactory = $paymentInterfaceFactory;
         $this->cartRepository = $cartRepository;
-        $this->checkoutSession = $checkoutSession;
     }
 
     public function execute()
     {
         $cart = $this->getCart();
 
-        $address = $this->addressFactory->create();
+        /**
+         * @var Address $address
+         */
+        $address = $cart->getShippingAddress();
+        $address->setData(null);
         $address->setCountryId($this->getRequest()->getParam('countryCode'));
         $address->setPostcode($this->getRequest()->getParam('postalCode'));
 
-        $cart->setShippingAddress($address);
-
-        $cart->collectTotals();
-        $this->cartRepository->save($cart);
-
         if ($this->getRequest()->getParam('shippingMethod')) {
-            $this->addShippingMethod($cart, $this->getRequest()->getParam('shippingMethod')['identifier']);
+            $address->setCollectShippingRates(true);
+            $address->setShippingMethod($this->getRequest()->getParam('shippingMethod')['identifier']);
         }
 
+        $cart->setPaymentMethod('mollie_methods_applepay');
+        $cart->getPayment()->importData(['method' => 'mollie_methods_applepay']);
+        $this->cartRepository->save($cart);
+        $cart->collectTotals();
+
         $methods = $this->shippingMethodManagement->getList($cart->getId());
-        $this->setDefaultShippingMethod($cart, $methods);
-
-        /** @var PaymentInterface $payment */
-        $payment = $this->paymentInterfaceFactory->create();
-        $payment->setMethod('mollie_methods_applepay');
-        $this->paymentMethodManagement->set($cart->getId(), $payment);
-        $cart = $this->cartRepository->get($cart->getId());
-
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         return $response->setData([
@@ -123,36 +79,6 @@ class ShippingMethods extends Action
                 ];
             }, array_values($cart->getTotals()))
         ]);
-    }
-
-    /**
-     * @param CartInterface $cart
-     * @param \Magento\Quote\Api\Data\ShippingMethodInterface[] $methods
-     */
-    private function setDefaultShippingMethod(CartInterface $cart, array $methods)
-    {
-        if ($cart->getShippingAddress()->getShippingMethod()) {
-            return;
-        }
-
-        $method = array_shift($methods);
-        if (!$method) {
-            return;
-        }
-
-        $this->addShippingMethod($cart, $method->getCarrierCode() . '_' . $method->getMethodCode());
-        $this->cartRepository->save($cart);
-    }
-
-    private function addShippingMethod(CartInterface $cart, string $identifier)
-    {
-        $address = $cart->getShippingAddress();
-
-        $address->setShippingMethod($identifier);
-        $address->setCollectShippingRates(true);
-        $address->save();
-
-        $address->collectShippingRates();
     }
 
     /**
