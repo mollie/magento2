@@ -17,4 +17,15 @@ export default class InvoicePage {
 
         cy.url().should('include', '/admin/sales/order/view/order_id/');
     }
+
+    creditMemo() {
+        // Last element on the page so javascript has time to load
+        cy.get('.magento-version').should('be.visible');
+        cy.wait(500);
+
+        cy.get('.credit-memo')
+            .should('be.visible')
+            .should('not.be.disabled')
+            .click();
+    }
 }
