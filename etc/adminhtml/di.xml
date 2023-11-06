@@ -49,4 +49,8 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Tax\Helper\Data">
+        <plugin name="mollie_add_payment_fee_to_tax_total" type="Mollie\Payment\Plugin\Tax\Helper\DataPlugin" />
+    </type>
 </config>

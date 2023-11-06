@@ -103,6 +103,7 @@ class PaymentFeeTaxTest extends IntegrationTestCase
     {
         /** @var AddressInterface $address */
         $address = $this->objectManager->create(AddressInterface::class);
+        $address->setQuote($this->getQuote());
 
         /** @var ShippingInterface $shipping */
         $shipping = $this->objectManager->create(ShippingInterface::class);
