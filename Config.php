@@ -58,6 +58,7 @@ class Config
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
+    const PAYMENT_METHOD_ISSUER_LIST_TYPE = 'payment/mollie_methods_%s/issuer_list_type';
     const PAYMENT_METHOD_PAYMENT_ACTIVE = 'payment/mollie_methods_%s/active';
     const PAYMENT_METHOD_PAYMENT_DESCRIPTION = 'payment/mollie_methods_%s/payment_description';
     const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
@@ -72,6 +73,7 @@ class Config
     const PAYMENT_VOUCHER_CATEGORY = 'payment/mollie_methods_voucher/category';
     const PAYMENT_VOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_voucher/custom_attribute';
     const CURRENCY_OPTIONS_DEFAULT = 'currency/options/default';
+
 
     /**
      * @var ScopeConfigInterface
@@ -724,6 +726,20 @@ class Config
     public function encryptPaymentDetails($storeId = null): bool
     {
         return $this->isSetFlag(static::GENERAL_ENCRYPT_PAYMENT_DETAILS, $storeId);
+    }
+
+    /**
+     * @param string $method
+     * @param null|int|string $storeId
+     *
+     * @return string
+     */
+    public function getIssuerListType(string $method, $storeId = null): string
+    {
+        return $this->getPath(
+            $this->addMethodToPath(static::PAYMENT_METHOD_ISSUER_LIST_TYPE, $method),
+            $storeId
+        ) ?? 'none';
     }
 
     /**

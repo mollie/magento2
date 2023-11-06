@@ -263,7 +263,7 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     private function getIssuers(MollieApiClient $mollieApi, string $code, array $config): array
     {
-        $issuerListType = $this->mollieHelper->getIssuerListType($code);
+        $issuerListType = $this->config->getIssuerListType($code, $this->storeManager->getStore()->getId());
         $config['payment']['issuersListType'][$code] = $issuerListType;
         $config['payment']['issuers'][$code] = $this->getIssuers->execute($mollieApi, $code, $issuerListType);
 

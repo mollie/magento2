@@ -15,6 +15,19 @@ export default class OrdersPage {
         cy.visit('/admin/sales/order/view/order_id/' + id);
     }
 
+    openByIncrementId(incrementId) {
+        cy.visit('/admin/sales/order/');
+
+        cy.get('.data-grid-cell-content')
+            .contains(incrementId)
+            .parents('tr')
+            .find('a.action-menu-item')
+            .contains('View')
+            .then((element) => {
+                cy.visit(element.attr('href'));
+            });
+    }
+
     callFetchStatus() {
         cy.get('.fetch-mollie-payment-status').click();
 

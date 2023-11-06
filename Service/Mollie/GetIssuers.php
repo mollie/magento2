@@ -10,6 +10,7 @@ use Magento\Framework\App\CacheInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Locale\Resolver;
 use Mollie\Api\MollieApiClient;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Mollie as MollieModel;
 
@@ -36,24 +37,23 @@ class GetIssuers
      * @var Resolver
      */
     private $resolver;
-
     /**
-     * @var General
+     * @var Config
      */
-    private $general;
+    private $config;
 
     public function __construct(
         CacheInterface $cache,
         SerializerInterface $serializer,
         MollieModel $mollieModel,
         Resolver $resolver,
-        General $general
+        Config $config
     ) {
         $this->cache = $cache;
         $this->serializer = $serializer;
         $this->mollieModel = $mollieModel;
         $this->resolver = $resolver;
-        $this->general = $general;
+        $this->config = $config;
     }
 
     /**
@@ -106,7 +106,7 @@ class GetIssuers
         $issuers = $this->execute(
             $mollieApi,
             $method,
-            $this->general->getIssuerListType($method)
+            $this->config->getIssuerListType($method)
         );
 
         if (!$issuers) {
