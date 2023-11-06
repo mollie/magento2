@@ -30,7 +30,7 @@ class ShippingMethods extends Action
     public function __construct(
         Context $context,
         CartRepositoryInterface $cartRepository,
-        GuestCartRepositoryInterface $guestCartRepository,
+        GuestCartRepositoryInterface $guestCartRepository
     ) {
         parent::__construct($context);
         $this->guestCartRepository = $guestCartRepository;
