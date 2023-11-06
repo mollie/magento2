@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Controller\ApplePay;
 
+use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\ResultFactory;
@@ -33,16 +34,23 @@ class ShippingMethods extends Action
      */
     private $shippingMethodManagement;
 
+    /**
+     * @var CheckoutSession
+     */
+    private $checkoutSession;
+
     public function __construct(
         Context $context,
         CartRepositoryInterface $cartRepository,
         ShippingMethodManagementInterface $shippingMethodManagement,
+        CheckoutSession $checkoutSession,
         GuestCartRepositoryInterface $guestCartRepository
     ) {
         parent::__construct($context);
         $this->shippingMethodManagement = $shippingMethodManagement;
         $this->guestCartRepository = $guestCartRepository;
         $this->cartRepository = $cartRepository;
+        $this->checkoutSession = $checkoutSession;
     }
 
     public function execute()
