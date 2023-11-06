@@ -198,7 +198,7 @@
 "We recommend using another 'pending' status as the default Magento pending status can automatically cancel the order before the payment expiry time is reached.<br>By default the status ""Pending Payment"" is not visible for customers, therefore we advise you to create a new status for this, which should also be visible to the customer, informing them they still have to complete their payment.","Wir empfehlen, einen anderen als den standardmäßigen ausstehenden Status von Magento zu verwenden, da die Zahlung bei diesem vor Ablauf der Zahlungsfrist automatisch storniert werden kann.<br>Standardmäßig ist der Status „Ausstehende Zahlung“ für den Kunden nicht sichtbar. Wir empfehlen Ihnen daher, einen neuen Status zu erstellen, der auch für den Kunden sichtbar ist und ihm mitteilt, dass er die Zahlung noch vervollständigen muss."
 "Due Days","Zahlungstermine"
 "Belfius","Belfius"
-"Credit Card","Kreditkarte"
+"Credit Card","Kredit-/Debitkarte"
 "Use Mollie Components","Mollie-Komponenten verwenden"
 "Enable Single Click Payments","Ein-Klick-Zahlungen aktivieren"
 "SEPA Direct Debit","SEPA-Lastschrift"
