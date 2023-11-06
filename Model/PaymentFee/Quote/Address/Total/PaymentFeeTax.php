@@ -6,25 +6,30 @@
 
 namespace Mollie\Payment\Model\PaymentFee\Quote\Address\Total;
 
+use Magento\Customer\Api\AccountManagementInterface as CustomerAccountManagement;
+use Magento\Customer\Api\Data\AddressInterfaceFactory as CustomerAddressFactory;
+use Magento\Customer\Api\Data\RegionInterfaceFactory as CustomerAddressRegionFactory;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Total;
 use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
+use Magento\Tax\Api\Data\QuoteDetailsInterfaceFactory;
+use Magento\Tax\Api\Data\QuoteDetailsItemExtensionInterfaceFactory;
+use Magento\Tax\Api\Data\QuoteDetailsItemInterfaceFactory;
+use Magento\Tax\Api\Data\TaxClassKeyInterface;
+use Magento\Tax\Api\Data\TaxClassKeyInterfaceFactory;
+use Magento\Tax\Api\TaxCalculationInterface;
+use Magento\Tax\Helper\Data as TaxHelper;
+use Magento\Tax\Model\Config as TaxConfig;
 use Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector;
 use Mollie\Payment\Config;
 use Mollie\Payment\Exceptions\UnknownPaymentFeeType;
-use Mollie\Payment\Service\Config\PaymentFee as PaymentFeeConfig;
 use Mollie\Payment\Service\PaymentFee\Calculate;
 use Mollie\Payment\Service\PaymentFee\Result;
 
-class PaymentFeeTax extends AbstractTotal
+class PaymentFeeTax extends CommonTaxCollector
 {
-    /**
-     * @var PaymentFeeConfig
-     */
-    private $paymentFeeConfig;
-
     /**
      * @var PriceCurrencyInterface
      */
@@ -41,14 +46,55 @@ class PaymentFeeTax extends AbstractTotal
     private $config;
 
     public function __construct(
-        PaymentFeeConfig $paymentFeeConfig,
-        PriceCurrencyInterface $priceCurrency,
+        TaxConfig $taxConfig,
+        TaxCalculationInterface $taxCalculationService,
+        QuoteDetailsInterfaceFactory $quoteDetailsDataObjectFactory,
+        QuoteDetailsItemInterfaceFactory $quoteDetailsItemDataObjectFactory,
+        TaxClassKeyInterfaceFactory $taxClassKeyDataObjectFactory,
+        CustomerAddressFactory $customerAddressFactory,
+        CustomerAddressRegionFactory $customerAddressRegionFactory,
         Calculate $calculate,
-        Config $config
+        PriceCurrencyInterface $priceCurrency,
+        Config $config,
+        TaxHelper $taxHelper = null,
+        QuoteDetailsItemExtensionInterfaceFactory $quoteDetailsItemExtensionInterfaceFactory = null,
+        ?CustomerAccountManagement $customerAccountManagement = null
     ) {
-        $this->paymentFeeConfig = $paymentFeeConfig;
-        $this->priceCurrency = $priceCurrency;
+        $parent = new \ReflectionClass(parent::class);
+        $parentConstructor = $parent->getConstructor();
+
+        // The parent call fails when running setup:di:compile in 2.4.3 and lower due to an extra parameter.
+        if ($parentConstructor->getNumberOfParameters() == 9) {
+            // @phpstan-ignore-next-line
+            parent::__construct(
+                $taxConfig,
+                $taxCalculationService,
+                $quoteDetailsDataObjectFactory,
+                $quoteDetailsItemDataObjectFactory,
+                $taxClassKeyDataObjectFactory,
+                $customerAddressFactory,
+                $customerAddressRegionFactory,
+                $taxHelper,
+                $quoteDetailsItemExtensionInterfaceFactory
+            );
+        } else {
+            // @phpstan-ignore-next-line
+            parent::__construct(
+                $taxConfig,
+                $taxCalculationService,
+                $quoteDetailsDataObjectFactory,
+                $quoteDetailsItemDataObjectFactory,
+                $taxClassKeyDataObjectFactory,
+                $customerAddressFactory,
+                $customerAddressRegionFactory,
+                $taxHelper,
+                $quoteDetailsItemExtensionInterfaceFactory,
+                $customerAccountManagement
+            );
+        }
+
         $this->calculate = $calculate;
+        $this->priceCurrency = $priceCurrency;
         $this->config = $config;
     }
 
@@ -74,10 +120,26 @@ class PaymentFeeTax extends AbstractTotal
 
         $this->addAssociatedTaxable($shippingAssignment, $result, $quote);
 
+        $feeDataObject = $this->quoteDetailsItemDataObjectFactory->create()
+            ->setType('mollie_payment_fee')
+            ->setCode('mollie_payment_fee')
+            ->setQuantity(1);
+
+        $feeDataObject->setUnitPrice($result->getRoundedAmount());
+        $feeDataObject->setTaxClassKey(
+            $this->taxClassKeyDataObjectFactory->create()
+                ->setType(TaxClassKeyInterface::TYPE_ID)
+                ->setValue(4)
+        );
+        $feeDataObject->setIsTaxIncluded(true);
+
+        $quoteDetails = $this->prepareQuoteDetails($shippingAssignment, [$feeDataObject]);
+
+        $this->taxCalculationService->calculateTax($quoteDetails, $quote->getStoreId());
+
         parent::collect($quote, $shippingAssignment, $total);
 
         $extensionAttributes = $quote->getExtensionAttributes();
-
         if (!$extensionAttributes) {
             return $this;
         }
