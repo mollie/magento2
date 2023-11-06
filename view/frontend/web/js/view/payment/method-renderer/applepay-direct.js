@@ -2,6 +2,7 @@ define(
     [
         'jquery',
         'uiRegistry',
+        'ko',
         'Mollie_Payment/js/view/payment/method-renderer/default',
         'Magento_Checkout/js/model/totals',
         'mage/url',
@@ -11,6 +12,7 @@ define(
     function (
         $,
         uiRegistry,
+        ko,
         Component,
         totals,
         url,
@@ -28,6 +30,7 @@ define(
             defaults: {
                 template: 'Mollie_Payment/payment/applepay-direct',
                 isIosc: uiRegistry.has("checkout.iosc.ajax"),
+                applePayPaymentToken: ko.observable('')
             },
 
             initObservable: function () {
