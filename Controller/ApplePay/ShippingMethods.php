@@ -12,6 +12,7 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\GuestCartRepositoryInterface;
+use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\Quote\Address\Total as AddressTotal;
 
@@ -27,12 +28,19 @@ class ShippingMethods extends Action
      */
     private $guestCartRepository;
 
+    /**
+     * @var ShippingMethodManagementInterface
+     */
+    private $shippingMethodManagement;
+
     public function __construct(
         Context $context,
         CartRepositoryInterface $cartRepository,
+        ShippingMethodManagementInterface $shippingMethodManagement,
         GuestCartRepositoryInterface $guestCartRepository
     ) {
         parent::__construct($context);
+        $this->shippingMethodManagement = $shippingMethodManagement;
         $this->guestCartRepository = $guestCartRepository;
         $this->cartRepository = $cartRepository;
     }
