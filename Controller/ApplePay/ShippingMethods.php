@@ -90,6 +90,7 @@ class ShippingMethods extends Action
             'totals' => array_map(function (AddressTotal $total) {
                 return [
                     'type' => 'final',
+                    'code' => $total->getCode(),
                     'label' => $total->getData('title'),
                     'amount' => number_format($total->getData('value'), 2, '.', ''),
                 ];

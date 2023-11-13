@@ -223,7 +223,9 @@ define([
 
         getLineItems: function () {
             let totals = [...this.quoteTotals];
-            totals.pop();
+
+            // Delete the item that has code == grand_total
+            totals.splice(totals.findIndex(total => total.code === 'grand_total'), 1);
 
             return totals;
         },
@@ -231,7 +233,7 @@ define([
         getTotal: function () {
             let totals = [...this.quoteTotals];
 
-            var total = totals.pop();
+            const total = totals.find(total => total.code === 'grand_total');
 
             total.label = this.storeName;
 
