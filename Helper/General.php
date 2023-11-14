@@ -380,6 +380,8 @@ class General extends AbstractHelper
     }
 
     /**
+     * @deprecated See \Mollie\Payment\Config::getIssuerListType instead
+     *
      * @param string $method
      *
      * @return mixed
@@ -387,7 +389,7 @@ class General extends AbstractHelper
     public function getIssuerListType(string $method): string
     {
         $methodXpath = str_replace('%method%', $method, self::XPATH_ISSUER_LIST_TYPE);
-        return $this->getStoreConfig($methodXpath);
+        return $this->getStoreConfig($methodXpath) ?? 'none';
     }
 
     /**
