@@ -24,6 +24,7 @@ use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\BuildTransaction;
+use Mollie\Payment\Service\Order\MethodCode;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
@@ -137,31 +138,11 @@ class Payments extends AbstractModel
      * @var CanRegisterCaptureNotification
      */
     private $canRegisterCaptureNotification;
-
     /**
-     * Payments constructor.
-     *
-     * @param OrderRepository $orderRepository
-     * @param CheckoutSession $checkoutSession
-     * @param MollieHelper $mollieHelper
-     * @param OrderCommentHistory $orderCommentHistory
-     * @param BuildTransaction $buildTransaction
-     * @param DashboardUrl $dashboardUrl
-     * @param Transaction $transaction
-     * @param TransactionProcessor $transactionProcessor
-     * @param OrderAmount $orderAmount
-     * @param TransactionDescription $transactionDescription
-     * @param CancelOrder $cancelOrder
-     * @param PaymentTokenForOrder $paymentTokenForOrder
-     * @param SendOrderEmails $sendOrderEmails
-     * @param EventManager $eventManager
-     * @param LinkTransactionToOrder $linkTransactionToOrder
-     * @param ProcessTransaction $processTransaction
-     * @param ValidateMetadata $validateMetadata
-     * @param SaveAdditionalInformationDetails $saveAdditionalInformationDetails
-     * @param ExpiredOrderToTransaction $expiredOrderToTransaction
-     * @param CanRegisterCaptureNotification $canRegisterCaptureNotification
+     * @var MethodCode
      */
+    private $methodCode;
+
     public function __construct(
         OrderRepository $orderRepository,
         CheckoutSession $checkoutSession,
@@ -182,7 +163,8 @@ class Payments extends AbstractModel
         ValidateMetadata $validateMetadata,
         SaveAdditionalInformationDetails $saveAdditionalInformationDetails,
         ExpiredOrderToTransaction $expiredOrderToTransaction,
-        CanRegisterCaptureNotification $canRegisterCaptureNotification
+        CanRegisterCaptureNotification $canRegisterCaptureNotification,
+        MethodCode $methodCode
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -204,6 +186,7 @@ class Payments extends AbstractModel
         $this->saveAdditionalInformationDetails = $saveAdditionalInformationDetails;
         $this->expiredOrderToTransaction = $expiredOrderToTransaction;
         $this->canRegisterCaptureNotification = $canRegisterCaptureNotification;
+        $this->methodCode = $methodCode;
     }
 
     /**
@@ -225,7 +208,8 @@ class Payments extends AbstractModel
         }
 
         $paymentToken = $this->paymentTokenForOrder->execute($order);
-        $method = $this->mollieHelper->getMethodCode($order);
+        $method = $this->methodCode->execute($order);
+
         $paymentData = [
             'amount'         => $this->mollieHelper->getOrderAmountByOrder($order),
             'description'    => $this->transactionDescription->forRegularTransaction($order),
