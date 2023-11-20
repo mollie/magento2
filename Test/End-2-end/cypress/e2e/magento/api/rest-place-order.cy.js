@@ -13,20 +13,18 @@ const mollieHostedPaymentPage = new MollieHostedPaymentPage();
 const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 
-describe('Check that the headless endpoints work as expected', () => {
-  it('C1835263: Validate that an order can be placed through GraphQL ', () => {
-    cy.visit('opt/mollie-pwa.html');
+describe('Check that the headless REST endpoints work as expected', () => {
+  it('C1988313: Validate that an order can be placed through REST', () => {
+    cy.visit('opt/mollie-pwa-rest.html');
 
     cy.get('[data-key="start-checkout-process"]').click();
 
     cy.get('[data-key="mollie_methods_ideal"]').click();
 
-    cy.get('[data-key="mollie_methods_ideal-issuer"]').first().click();
-
     cy.get('[data-key="place-order-action"]').click();
 
-    cy.get('[data-key="increment-id"]').then((element) => {
-      cy.wrap(element.text()).as('increment-id');
+    cy.get('[data-key="order-id"]').then((element) => {
+      cy.wrap(element.text()).as('order-id');
     });
 
     cookies.disableSameSiteCookieRestrictions();
@@ -35,14 +33,15 @@ describe('Check that the headless endpoints work as expected', () => {
       cy.visit(element.attr('href'));
     });
 
+    mollieHostedPaymentPage.selectFirstIssuer();
     mollieHostedPaymentPage.selectStatus('paid');
 
     checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
 
     cy.backendLogin(false);
 
-    cy.get('@increment-id').then((incrementId) => {
-      ordersPage.openByIncrementId(incrementId);
+    cy.get('@order-id').then((orderId) => {
+      ordersPage.openOrderById(orderId);
     });
 
     ordersPage.assertOrderStatusIs('Processing');
