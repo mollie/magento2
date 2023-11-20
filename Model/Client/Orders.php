@@ -716,7 +716,7 @@ class Orders extends AbstractModel
          * Check if Shipping Fee needs to be refunded.
          * Throws exception if Shipping Amount of credit does not match Shipping Fee of paid orderLine.
          */
-        $addShippingToRefund = null;
+        $addShippingToRefund = false;
         $shippingCostsLine = $this->orderLines->getShippingFeeItemLineOrder($orderId);
         if ($shippingCostsLine->getId() && $shippingCostsLine->getQtyRefunded() == 0) {
             if ($creditmemo->getShippingAmount() > 0) {
@@ -729,7 +729,7 @@ class Orders extends AbstractModel
             }
         }
 
-        $shouldRefund = $addShippingToRefund || !$creditmemo->getAllItems();
+        $shouldRefund = $addShippingToRefund || $creditmemo->getAllItems();
         if (!$shouldRefund || $this->adjustmentFee->doNotRefundInMollie()) {
             return $this;
         }
