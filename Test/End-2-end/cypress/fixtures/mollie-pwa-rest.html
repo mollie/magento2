@@ -1,0 +1,537 @@
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/vue@3"></script>
+<script src="https://js.mollie.com/v1/mollie.js"></script>
+
+<div class="mx-auto container mb-20">
+    <div id="app">
+        <div v-if="hasError" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline" v-text="errorMessage"></span>
+        </div>
+
+        <div class="border bg-gray-200 p-2 mb-4 mt-4">
+            <dl class="grid grid-cols-1 gap-x-4 gap-y-8 sm:grid-cols-3">
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">Profile ID (optional)</dt>
+                    <dd class="mt-1 text-sm text-gray-900"><input class="border px-2" type="text" v-model="profileId"></dd>
+                </div>
+
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">
+                        Mode
+                        <span class="text-xs">(Must match <code>payment/mollie_general/type</code>)</span>
+                    </dt>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        <label><input type="radio" value="live" name="mode" v-model="mode"> Live</label><br>
+                        <label><input type="radio" value="test" name="mode" v-model="mode"> Test</label>
+                    </dd>
+                </div>
+
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">CurrentStep</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ currentStep }}</dd>
+                </div>
+
+                <div>
+                    <dt class="text-sm font-medium text-gray-500">CartId</dt>
+                    <dd class="mt-1 text-sm text-gray-900">{{ cartId }}</dd>
+                </div>
+
+                <div v-if="currentStep === 0">
+                    <button data-key="start-checkout-process" class="mt-4 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" @click="callNextStep()">Start</button>
+                </div>
+            </dl>
+        </div>
+        <ul>
+            <li>
+                <svg v-if="stepIsRunning(0)" class="animate-spin h-5 w-5 text-black inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg v-if="stepIsDone(0)" class="h-5 w-5 text-black inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                Create cart
+                <span v-if="cartIdFromStorage">
+                    (from storage)
+                </span>
+            </li>
+            <li>
+                <svg v-if="stepIsRunning(1)" class="animate-spin h-5 w-5 text-black inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg v-if="stepIsDone(1)" class="h-5 w-5 text-black inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                Add product to cart
+            </li>
+            <li>
+                <svg v-if="stepIsRunning(2)" class="animate-spin h-5 w-5 text-black inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg v-if="stepIsDone(2)" class="h-5 w-5 text-black inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                Add shipping & billing address
+            </li>
+            <li>
+                <svg v-if="stepIsRunning(3)" class="animate-spin h-5 w-5 text-black inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg v-if="stepIsDone(3)" class="h-5 w-5 text-black inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                Get shipping methods <span v-if="shippingMethod">({{ shippingMethod }})</span>
+            </li>
+            <li>
+                <svg v-if="stepIsRunning(4)" class="animate-spin h-5 w-5 text-black inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg v-if="stepIsDone(4)" class="h-5 w-5 text-black inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                Set shipping method
+            </li>
+            <li>
+                <svg v-if="stepIsRunning(8)" class="animate-spin h-5 w-5 text-black inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg v-if="stepIsDone(8)" class="h-5 w-5 text-black inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                Place order
+            </li>
+            <li>
+                <svg v-if="stepIsRunning(9)" class="animate-spin h-5 w-5 text-black inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <svg v-if="stepIsDone(9)" class="h-5 w-5 text-black inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                Start transaction
+            </li>
+        </ul>
+
+        <div v-if="orderId">
+            <div class="rounded-md bg-green-50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <!-- Heroicon name: solid/check-circle -->
+                        <svg class="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800">Order done!</h3>
+                        <div class="mt-2 text-sm text-green-700">
+                            <p><strong>Order ID:</strong> <span data-key="order-id">{{ orderId }}</span></p>
+                            <p class="mt-4 font-bold">1. Please open this url and select a payment status (or not):</p>
+                            <a data-key="redirect-url" v-if="redirectUrl" v-bind:href="redirectUrl" target="_blank">{{ redirectUrl }}</a><br>
+
+                            <p class="mt-4 font-bold">2. When you have opened the url, check the status in the backend of your webshop.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="mollieMethods && currentStep === 4" class="grid gap-x-8 gap-y-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 mt-8">
+            <div
+                :data-key="method.code"
+                v-for="method in mollieMethods"
+                @click="setMethod(method.code)"
+                v-bind:class="{'bg-gray-300': selectedMethod === method.code}"
+                class="bg-gray-200 hover:bg-gray-300 cursor-pointer p-2"
+            >
+                <svg v-if="selectedMethod === method.code" class="h-5 w-5 text-black inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+
+                {{ method.title }}
+
+                <div
+                    v-if="method.code === 'mollie_methods_creditcard' && profileId"
+                    v-show="selectedMethod === method.code"
+                    class="pt-4"
+                >
+                    <div class="mb-4">
+                        <div class="text-small text-gray-600">Card Number</div>
+                        <div class="bg-white py-2 px-2" ref="cardNumber"></div>
+                        <div
+                            class="p-2 mt-2 bg-red-300 border border-red-400 text-red-800"
+                            ref="cardNumberError"
+                            v-show="cardNumberError"
+                        ></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="text-small text-gray-600">Card Holder</div>
+                        <div class="bg-white py-2 px-2" ref="cardHolder"></div>
+                        <div
+                            class="p-2 mt-2 bg-red-300 border border-red-400 text-red-800"
+                            ref="cardHolderError"
+                            v-show="cardHolderError"
+                        ></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="text-small text-gray-600">Expiry Date</div>
+                        <div class="bg-white py-2 px-2" ref="expiryDate"></div>
+                        <div
+                            class="p-2 mt-2 bg-red-300 border border-red-400 text-red-800"
+                            ref="expiryDateError"
+                            v-show="expiryDateError"
+                        ></div>
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="text-small text-gray-600">CVV</div>
+                        <div class="bg-white py-2 px-2" ref="verificationCode"></div>
+                        <div
+                            class="p-2 mt-2 bg-red-300 border border-red-400 text-red-800"
+                            ref="verificationCodeError"
+                            v-show="verificationCodeError"
+                        ></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="paused && currentStep === 4 && selectedMethod" class="mt-8">
+            <div>
+                <button @click="callPlaceOrder()"
+                        data-key="place-order-action"
+                        type="button"
+                        class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                >Place order</button>
+            </div>
+        </div>
+
+        <div v-if="paused && !hasError && currentStep === 8" class="mt-8">
+            <div>
+                <button @click="currentStep === 8 && callNextStep()" type="button" class="inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">Place order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function restApi(endpoint, method = 'GET', data = null) {
+        const url = `/rest/V1/${endpoint}`;
+        const options = {
+            method,
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        };
+
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+
+        const response = await fetch(url, options);
+
+        return await response.json();
+    }
+</script>
+<script>
+    const { createApp } = Vue
+
+    createApp({
+        data() {
+            return {
+                mode: 'test',
+                cartId: null,
+                cartIdFromStorage: false,
+                currentStep: 0,
+                orderId: null,
+                paused: true,
+                hasError: false,
+                errorMessage: '',
+                shippingMethod: '',
+                mollieMethods: [],
+                selectedMethod: null,
+                redirectUrl: null,
+                paymentToken: null,
+                mollie: null,
+                fieldsMounted: false,
+                cardNumberError: false,
+                cardHolderError: false,
+                expiryDateError: false,
+                verificationCodeError: false,
+                componentsToken: null,
+                profileId: null,
+            }
+        },
+
+        async mounted() {
+            this.getProfileIdFromLocalStorage();
+        },
+
+        watch: {
+            selectedMethod(method) {
+                if (method !== 'mollie_methods_creditcard' || this.fieldsMounted || !this.profileId) {
+                    return;
+                }
+
+                Vue.nextTick(() => {
+                    this.addComponentField('cardNumber');
+                    this.addComponentField('cardHolder');
+                    this.addComponentField('expiryDate');
+                    this.addComponentField('verificationCode');
+                    this.fieldsMounted = true;
+                    console.info('Mollie Component fields mounted');
+                });
+            },
+
+            profileId(profileId) {
+                if (!profileId) {
+                    return;
+                }
+
+                localStorage.setItem('mollie_profile_id', profileId);
+                this.loadMollieComponents();
+                this.callNextStep();
+            }
+        },
+
+        methods: {
+            loadMollieComponents() {
+                this.mollie = Mollie(this.profileId, { locale: 'nl_NL', testmode: this.mode === 'test' });
+            },
+
+            stepIsRunning(step) {
+                return !this.paused && !this.hasError && this.currentStep === step;
+            },
+
+            stepIsDone(step) {
+                return (!this.paused && !this.hasError && this.currentStep > step) || (this.paused && this.currentStep >= step);
+            },
+
+            getProfileIdFromLocalStorage() {
+                const profileId = localStorage.getItem('mollie_profile_id');
+
+                if (profileId) {
+                    this.profileId = profileId;
+                    this.loadMollieComponents();
+                }
+            },
+
+            async callPlaceOrder() {
+                debugger;
+                if (this.selectedMethod !== 'mollie_methods_creditcard') {
+                    this.currentStep = 5;
+                    this.callNextStep();
+                    return;
+                }
+
+                var { token, error } = await this.mollie.createToken();
+
+                if (error) {
+                    // Something wrong happened while creating the token. Handle this situation gracefully.
+                    this.hasError = 'One or more fields are invalid.';
+                    this.errorMessage = error.message;
+                    this.componentsToken = null;
+                    return;
+                }
+
+                this.componentsToken = token;
+
+                this.currentStep = 5;
+                this.callNextStep();
+            },
+
+            addComponentField(name) {
+                const field = this.mollie.createComponent(name);
+                field.mount(this.$refs[name][0]);
+
+                field.addEventListener('change', event => {
+                    if (event.error && event.touched) {
+                        this.$refs[`${name}Error`][0].textContent = event.error;
+                        this[`${name}Error`] = true
+                    } else {
+                        this.$refs[`${name}Error`][0].textContent = '';
+                        this[`${name}Error`] = false
+                    }
+                });
+            },
+
+            setMethod(method) {
+                this.selectedMethod = method;
+            },
+
+            async callNextStep() {
+                this.currentStep++;
+
+                if (this.hasError) {
+                    return;
+                }
+
+                this.paused = false;
+                if (this.currentStep === 1) {
+                    await this.getCart();
+                    return;
+                }
+
+                if (this.currentStep === 2) {
+                    await this.addProductToCart();
+                    return;
+                }
+
+                if (this.currentStep === 3) {
+                    await this.getShippingMethods();
+                    return;
+                }
+
+                if (this.currentStep === 4) {
+                    await this.setShippingAndBillingAddress();
+                    return;
+                }
+
+                if (this.currentStep === 6) {
+                    await this.createMolliePaymentToken();
+                    return;
+                }
+
+                if (this.currentStep === 7) {
+                    await this.placeOrder();
+                    return;
+                }
+
+                if (this.currentStep === 8) {
+                    await this.startTransaction();
+                    return;
+                }
+
+                // 0. Create cart
+                // 1. Add product to cart
+                // 2. Add shipping & billing address
+                // 3. Get shippings methods
+                // 4. Set shipping method
+                // 7. Set guest email
+                // 8. Place order
+                // 9. Start transaction
+            },
+
+            async getCart() {
+                const cartId = localStorage.getItem('cartId');
+                if (!cartId) {
+                    this.createEmptyCart();
+                    return;
+                }
+
+                this.cartId = cartId;
+                this.cartIdFromStorage = true;
+                this.callNextStep();
+            },
+
+            async createEmptyCart() {
+                restApi('guest-carts', 'POST')
+                    .then(response => {
+                        this.cartId = response;
+                        this.callNextStep();
+
+                        localStorage.setItem('cartId', this.cartId);
+                    });
+            },
+
+            async addProductToCart() {
+                if (this.cartIdFromStorage) {
+                    this.callNextStep();
+                    return;
+                }
+
+                restApi(`guest-carts/${this.cartId}/items`, 'POST', {
+                    cartItem: {
+                        sku: '24-MB04',
+                        qty: 1,
+                        quote_id: this.cartId,
+                    }
+                }).then(response => {
+                    this.checkResponse(response);
+                    this.callNextStep();
+                });
+            },
+
+            async setShippingAndBillingAddress() {
+                restApi(`guest-carts/${this.cartId}/shipping-information`, 'POST', {
+                    addressInformation: {
+                        shipping_address: {
+                            region: 'Noord-Holland',
+                            region_id: 12,
+                            country_id: 'NL',
+                            street: ['Keizersgracht 126'],
+                            postcode: '1015CW',
+                            city: 'Amsterdam',
+                            firstname: 'Jan',
+                            lastname: 'Janssen',
+                            email: 'johndoe@example.com',
+                            telephone: '0612345678',
+                            same_as_billing: 1,
+                        },
+                        shipping_carrier_code: this.shippingMethod,
+                        shipping_method_code: this.shippingMethod,
+                    }
+                }).then(response => {
+                    this.checkResponse(response);
+                    this.paused = true;
+
+                    const methods = response.payment_methods
+                    this.mollieMethods = methods.filter(element => element.code.indexOf('mollie_methods_') === 0);
+                    if (!this.mollieMethods) {
+                        alert('No Mollie payment method found. Please check if they are activated');
+                    }
+                });
+            },
+
+            async getShippingMethods() {
+                restApi(`guest-carts/${this.cartId}/estimate-shipping-methods`, 'POST', {
+                    address: {
+                        region: 'Noord-Holland',
+                        region_id: 12,
+                        country_id: 'NL',
+                        street: ['Keizersgracht 126'],
+                        postcode: '1015CW',
+                        city: 'Amsterdam',
+                    }
+                }).then(response => {
+                    this.checkResponse(response);
+                    this.shippingMethod = response[0].method_code;
+                    console.log('Setting shipping method to', response[0].method_code);
+                    this.callNextStep();
+                });
+            },
+
+            async createMolliePaymentToken() {
+                restApi(`guest-carts/${this.cartId}/mollie/payment-token`)
+                    .then(response => {
+                        this.checkResponse(response);
+                        this.paymentToken = response;
+                        this.callNextStep();
+                    });
+            },
+
+            async placeOrder() {
+                restApi(`guest-carts/${this.cartId}/payment-information`, 'POST', {
+                    email: 'guest@example.com',
+                    paymentMethod: {
+                        method: this.selectedMethod,
+                        additional_data: {
+                            card_token: this.componentsToken,
+                        }
+                    },
+                    billingAddress: {
+                        region: 'Noord-Holland',
+                        region_id: 12,
+                        country_id: 'NL',
+                        street: ['Keizersgracht 126'],
+                        postcode: '1015CW',
+                        city: 'Amsterdam',
+                        firstname: 'Jan',
+                        lastname: 'Janssen',
+                        email: 'johndoe@example.com',
+                        telephone: '0612345678',
+                    }
+                }).then(response => {
+                    this.checkResponse(response);
+
+                    this.orderId = response;
+                    localStorage.removeItem('cartId');
+
+                    this.callNextStep();
+                });
+            },
+
+            async startTransaction() {
+                restApi(`mollie/transaction/start`, 'POST', {
+                    'token': this.paymentToken
+                }).then(response => {
+                    this.checkResponse(response);
+
+                    this.redirectUrl = response;
+
+                    this.paused = true;
+                    this.currentStep++;
+                })
+            },
+
+            checkResponse(response) {
+                if (!response.message) {
+                    return;
+                }
+
+                this.hasError = true;
+                this.errorMessage = response.message;
+                throw new Error(response.message);
+            }
+        }
+    }).mount('#app')
+</script>

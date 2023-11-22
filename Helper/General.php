@@ -9,12 +9,9 @@ namespace Mollie\Payment\Helper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\ProductMetadataInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Locale\Resolver;
-use Magento\Framework\Math\Random as MathRandom;
 use Magento\Framework\Module\ModuleListInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Store\Model\StoreManagerInterface;
@@ -25,9 +22,8 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Logger\MollieLogger;
 use Magento\SalesRule\Model\Coupon;
 use Magento\SalesRule\Model\ResourceModel\Coupon\Usage as CouponUsage;
-use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Service\Order\CancelOrder;
-use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\MethodCode;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\Order\Uncancel;
 
@@ -130,10 +126,6 @@ class General extends AbstractHelper
      */
     private $orderRepository;
     /**
-     * @var MathRandom
-     */
-    private $mathRandom;
-    /**
      * @var Coupon
      */
     private $coupon;
@@ -141,14 +133,6 @@ class General extends AbstractHelper
      * @var CouponUsage
      */
     private $couponUsage;
-    /**
-     * @var OrderCommentHistory
-     */
-    private $orderCommentHistory;
-    /**
-     * @var OrderManagementInterface
-     */
-    private $orderManagement;
     /**
      * @var Config
      */
@@ -163,44 +147,15 @@ class General extends AbstractHelper
     private $uncancel;
 
     /**
-     * @var TransactionDescription
-     */
-    private $transactionDescription;
-
-    /**
      * @var CancelOrder
      */
     private $cancelOrder;
 
     /**
-     * @var EncryptorInterface
+     * @var MethodCode
      */
-    private $encryptor;
+    private $methodCode;
 
-    /**
-     * General constructor.
-     *
-     * @param Context $context
-     * @param PaymentHelper $paymentHelper
-     * @param OrderRepository $orderRepository
-     * @param StoreManagerInterface $storeManager
-     * @param ResourceConfig $resourceConfig
-     * @param ModuleListInterface $moduleList
-     * @param ProductMetadataInterface $metadata
-     * @param Resolver $resolver
-     * @param MathRandom $mathRandom
-     * @param MollieLogger $logger
-     * @param Coupon $coupon
-     * @param CouponUsage $couponUsage
-     * @param OrderCommentHistory $orderCommentHistory
-     * @param OrderManagementInterface $orderManagement
-     * @param Config $config
-     * @param Transaction $transaction
-     * @param Uncancel $uncancel
-     * @param TransactionDescription $transactionDescription
-     * @param CancelOrder $cancelOrder
-     * @param EncryptorInterface $encryptor
-     */
     public function __construct(
         Context $context,
         PaymentHelper $paymentHelper,
@@ -210,18 +165,14 @@ class General extends AbstractHelper
         ModuleListInterface $moduleList,
         ProductMetadataInterface $metadata,
         Resolver $resolver,
-        MathRandom $mathRandom,
         MollieLogger $logger,
         Coupon $coupon,
         CouponUsage $couponUsage,
-        OrderCommentHistory $orderCommentHistory,
-        OrderManagementInterface $orderManagement,
         Config $config,
         Transaction $transaction,
         Uncancel $uncancel,
-        TransactionDescription $transactionDescription,
         CancelOrder $cancelOrder,
-        EncryptorInterface $encryptor
+        MethodCode $methodCode
     ) {
         $this->paymentHelper = $paymentHelper;
         $this->storeManager = $storeManager;
@@ -229,20 +180,16 @@ class General extends AbstractHelper
         $this->orderRepository = $orderRepository;
         $this->urlBuilder = $context->getUrlBuilder();
         $this->moduleList = $moduleList;
-        $this->mathRandom = $mathRandom;
         $this->metadata = $metadata;
         $this->resolver = $resolver;
         $this->logger = $logger;
         $this->coupon = $coupon;
         $this->couponUsage = $couponUsage;
-        $this->orderCommentHistory = $orderCommentHistory;
-        $this->orderManagement = $orderManagement;
         $this->config = $config;
         $this->transaction = $transaction;
         $this->uncancel = $uncancel;
-        $this->transactionDescription = $transactionDescription;
         $this->cancelOrder = $cancelOrder;
-        $this->encryptor = $encryptor;
+        $this->methodCode = $methodCode;
         parent::__construct($context);
     }
 
@@ -418,16 +365,13 @@ class General extends AbstractHelper
      * @param OrderInterface $order
      *
      * @return string
+     *
+     * @deprecated since v2.33.0
+     * @see \Mollie\Payment\Service\Order\MethodCode
      */
     public function getMethodCode($order): string
     {
-        $method = $order->getPayment()->getMethodInstance()->getCode();
-
-        if ($method == 'mollie_methods_paymentlink' || strstr($method, 'mollie_methods') === false) {
-            return '';
-        }
-
-        return str_replace('mollie_methods_', '', $method);
+        return $this->methodCode->execute($order);
     }
 
     /***

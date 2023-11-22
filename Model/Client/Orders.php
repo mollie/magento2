@@ -36,11 +36,11 @@ use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\Invoice\ShouldEmailInvoice;
 use Mollie\Payment\Service\Order\Lines\StoreCredit;
+use Mollie\Payment\Service\Order\MethodCode;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\PartialInvoice;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 use Mollie\Payment\Service\Order\Transaction;
-use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Service\PaymentToken\PaymentTokenForOrder;
 
 /**
@@ -149,42 +149,14 @@ class Orders extends AbstractModel
     private $linkTransactionToOrder;
 
     /**
-     * @var OrderLockService
-     */
-    private $orderLockService;
-    /**
      * @var ShouldEmailInvoice
      */
     private $shouldEmailInvoice;
-
     /**
-     * Orders constructor.
-     *
-     * @param OrderLines $orderLines
-     * @param InvoiceSender $invoiceSender
-     * @param OrderRepository $orderRepository
-     * @param CheckoutSession $checkoutSession
-     * @param ManagerInterface $messageManager
-     * @param Registry $registry
-     * @param MollieHelper $mollieHelper
-     * @param ProcessAdjustmentFee $adjustmentFee
-     * @param OrderCommentHistory $orderCommentHistory
-     * @param PartialInvoice $partialInvoice
-     * @param StoreCredit $storeCredit
-     * @param RefundUsingPayment $refundUsingPayment
-     * @param Expires $expires
-     * @param State $orderState
-     * @param Transaction $transaction
-     * @param BuildTransaction $buildTransaction
-     * @param PaymentTokenForOrder $paymentTokenForOrder
-     * @param ProcessTransaction $processTransaction
-     * @param \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient
-     * @param Config $config
-     * @param EventManager $eventManager
-     * @param LinkTransactionToOrder $linkTransactionToOrder
-     * @param OrderLockService $orderLockService
-     * @param ShouldEmailInvoice $shouldEmailInvoice
+     * @var MethodCode
      */
+    private $methodCode;
+
     public function __construct(
         OrderLines $orderLines,
         InvoiceSender $invoiceSender,
@@ -208,8 +180,8 @@ class Orders extends AbstractModel
         Config $config,
         EventManager $eventManager,
         LinkTransactionToOrder $linkTransactionToOrder,
-        OrderLockService $orderLockService,
-        ShouldEmailInvoice $shouldEmailInvoice
+        ShouldEmailInvoice $shouldEmailInvoice,
+        MethodCode $methodCode
     ) {
         $this->orderLines = $orderLines;
         $this->invoiceSender = $invoiceSender;
@@ -233,8 +205,8 @@ class Orders extends AbstractModel
         $this->mollieApiClient = $mollieApiClient;
         $this->config = $config;
         $this->linkTransactionToOrder = $linkTransactionToOrder;
-        $this->orderLockService = $orderLockService;
         $this->shouldEmailInvoice = $shouldEmailInvoice;
+        $this->methodCode = $methodCode;
     }
 
     /**
@@ -258,7 +230,7 @@ class Orders extends AbstractModel
         }
 
         $paymentToken = $this->paymentTokenForOrder->execute($order);
-        $method = $this->mollieHelper->getMethodCode($order);
+        $method = $this->methodCode->execute($order);
         $method = str_replace('_vault', '', $method);
         $orderData = [
             'amount'              => $this->mollieHelper->getOrderAmountByOrder($order),
@@ -673,7 +645,7 @@ class Orders extends AbstractModel
             return $this;
         }
 
-        $methodCode = $this->mollieHelper->getMethodCode($order);
+        $methodCode = $this->methodCode->execute($order);
         $methods = ['klarna', 'klarnapaylater', 'klarnasliceit', 'klarnapaynow'];
         if (!$order->hasShipments() && (in_array($methodCode, $methods))) {
             $msg = __('Order can only be refunded after Klarna has been captured (after shipment)');
@@ -744,7 +716,7 @@ class Orders extends AbstractModel
          * Check if Shipping Fee needs to be refunded.
          * Throws exception if Shipping Amount of credit does not match Shipping Fee of paid orderLine.
          */
-        $addShippingToRefund = null;
+        $addShippingToRefund = false;
         $shippingCostsLine = $this->orderLines->getShippingFeeItemLineOrder($orderId);
         if ($shippingCostsLine->getId() && $shippingCostsLine->getQtyRefunded() == 0) {
             if ($creditmemo->getShippingAmount() > 0) {
@@ -757,7 +729,7 @@ class Orders extends AbstractModel
             }
         }
 
-        $shouldRefund = $addShippingToRefund || !$creditmemo->getAllItems();
+        $shouldRefund = $addShippingToRefund || $creditmemo->getAllItems();
         if (!$shouldRefund || $this->adjustmentFee->doNotRefundInMollie()) {
             return $this;
         }

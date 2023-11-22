@@ -83,7 +83,7 @@ class ShippingMethods extends Action
                 return [
                     'identifier' => $method->getCarrierCode() . '_' . $method->getMethodCode(),
                     'label' => $method->getMethodTitle() . ' - ' . $method->getCarrierTitle(),
-                    'amount' => number_format($method->getPriceInclTax(), 2, '.', ''),
+                    'amount' => number_format($method->getPriceInclTax() ?: 0.0, 2, '.', ''),
                     'detail' => '',
                 ];
             }, $methods),
@@ -92,7 +92,7 @@ class ShippingMethods extends Action
                     'type' => 'final',
                     'code' => $total->getCode(),
                     'label' => $total->getData('title'),
-                    'amount' => number_format($total->getData('value'), 2, '.', ''),
+                    'amount' => number_format($total->getData('value') ?: 0.0, 2, '.', ''),
                 ];
             }, array_values($cart->getTotals()))
         ]);
