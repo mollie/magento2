@@ -372,6 +372,20 @@ class Payments extends AbstractModel
                     $payment->setCurrencyCode($order->getBaseCurrencyCode());
                     $payment->setIsTransactionClosed(true);
 
+                    if ($paymentData->hasChargebacks()) {
+                        $order->addCommentToStatusHistory(
+                            __(
+                                'Mollie: Received a chargeback with an amount of %1',
+                                $order->getBaseCurrency()->formatTxt($paymentData->getAmountChargedBack())
+                            )
+                        );
+
+                        $msg = ['success' => true, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
+                        $this->mollieHelper->addTolog('success', $msg);
+                        $this->checkCheckoutSession($order, $paymentToken, $paymentData, $type);
+                        return $msg;
+                    }
+
                     if ($this->canRegisterCaptureNotification->execute($order, $paymentData) ||
                         $type != static::TRANSACTION_TYPE_WEBHOOK
                     ) {

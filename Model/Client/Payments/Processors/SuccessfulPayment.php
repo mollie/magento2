@@ -101,6 +101,22 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $amount = $molliePayment->amount->value;
         $currency = $molliePayment->amount->currency;
 
+        if ($molliePayment->hasChargebacks()) {
+            $this->orderCommentHistory->add($magentoOrder,
+                __(
+                    'Mollie: Received a chargeback with an amount of %1',
+                    $magentoOrder->getBaseCurrency()->formatTxt($molliePayment->getAmountChargedBack())
+                )
+            );
+
+            return $this->processTransactionResponseFactory->create([
+                'success' => false,
+                'status' => 'chargeback',
+                'order_id' => $magentoOrder->getId(),
+                'type' => $type,
+            ]);
+        }
+
         $orderAmount = $this->orderAmount->getByTransactionId($magentoOrder->getMollieTransactionId());
         if ($currency != $orderAmount['currency']) {
             return $this->processTransactionResponseFactory->create([
