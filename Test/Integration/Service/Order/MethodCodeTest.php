@@ -71,4 +71,20 @@ class MethodCodeTest extends IntegrationTestCase
 
         $this->assertEquals('ideal', $result);
     }
+
+    public function testReturnsNothingWhenLimitedMethodsIsNull(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->getPayment()->setMethod('mollie_methods_paymentlink');
+        $order->getPayment()->setAdditionalInformation(
+            'limited_methods',
+            null
+        );
+
+        $instance = $this->objectManager->create(MethodCode::class);
+
+        $result = $instance->execute($order);
+
+        $this->assertEquals('', $result);
+    }
 }
