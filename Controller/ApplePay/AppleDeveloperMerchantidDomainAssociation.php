@@ -12,9 +12,15 @@ use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Module\Dir;
+use Mollie\Payment\Config;
+use Mollie\Payment\Service\Mollie\ApplePay\Certificate;
 
 class AppleDeveloperMerchantidDomainAssociation implements HttpGetActionInterface
 {
+    /**
+     * @var Config
+     */
+    private $config;
     /**
      * @var ResultFactory
      */
@@ -27,21 +33,34 @@ class AppleDeveloperMerchantidDomainAssociation implements HttpGetActionInterfac
      * @var Dir
      */
     private $moduleDir;
+    /**
+     * @var Certificate
+     */
+    private $certificate;
 
     public function __construct(
+        Config $config,
         ResultFactory $resultFactory,
         File $driverFile,
-        Dir $moduleDir
+        Dir $moduleDir,
+        Certificate $certificate
     ) {
         $this->resultFactory = $resultFactory;
         $this->driverFile = $driverFile;
         $this->moduleDir = $moduleDir;
+        $this->certificate = $certificate;
+        $this->config = $config;
     }
 
     public function execute()
     {
-        $path = $this->moduleDir->getDir('Mollie_Payment');
-        $contents =  $this->driverFile->fileGetContents($path . '/apple-developer-merchantid-domain-association');
+        try {
+            $contents = $this->certificate->execute();
+        } catch (\Exception $exception) {
+            $this->config->addToLog('Unable to retrieve Apple Pay certificate', [$exception->getTraceAsString()]);
+            $path = $this->moduleDir->getDir('Mollie_Payment');
+            $contents =  $this->driverFile->fileGetContents($path . '/apple-developer-merchantid-domain-association');
+        }
 
         $response = $this->resultFactory->create(ResultFactory::TYPE_RAW);
         $response->setHeader('Content-Type', 'text/plain');
