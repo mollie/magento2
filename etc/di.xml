@@ -27,6 +27,11 @@
     <preference for="Mollie\Payment\Api\Data\TransactionToOrderInterface" type="Mollie\Payment\Model\TransactionToOrder"/>
     <preference for="Mollie\Payment\Api\Data\TransactionToOrderSearchResultsInterface" type="Mollie\Payment\Model\TransactionToOrderSearchResults"/>
 
+    <preference for="Mollie\Payment\Api\Webapi\PaymentInformationMetaInterface" type="Mollie\Payment\Webapi\PaymentInformationMeta"/>
+    <preference for="Mollie\Payment\Api\Data\MethodMetaInterface" type="Mollie\Payment\Model\MethodMeta" />
+    <preference for="Mollie\Payment\Api\Data\IssuerInterface" type="Mollie\Payment\Model\Issuer" />
+    <preference for="Mollie\Payment\Api\Data\TerminalInterface" type="Mollie\Payment\Model\Terminal" />
+
     <type name="Mollie\Payment\Config">
         <arguments>
             <argument name="productMetadata" xsi:type="object">Magento\Framework\App\ProductMetadataInterface\Proxy</argument>
