@@ -8,6 +8,7 @@ namespace Mollie\Payment\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Model\Mollie as MollieModel;
 
 /**
@@ -58,6 +59,13 @@ class Tests extends AbstractHelper
                         $availableMethods[] = ucfirst($apiMethod->id);
                     }
 
+                    try {
+                        $mollieApi->terminals->page();
+                        $availableMethods[] = 'Point of sale';
+                    } catch (ApiException $exception) {}
+
+                    sort($availableMethods);
+
                     if (empty($availableMethods)) {
                         $msg = __('Enabled Methods: None, Please enable the payment methods in your Mollie dashboard.');
                         $methodsMsg = '<span class="enabled-methods-error">' . $msg . '</span>';
@@ -90,6 +98,13 @@ class Tests extends AbstractHelper
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
                     }
+
+                    try {
+                        $mollieApi->terminals->page();
+                        $availableMethods[] = 'Point of sale';
+                    } catch (ApiException $exception) {}
+
+                    sort($availableMethods);
 
                     if (empty($availableMethods)) {
                         $msg = __('Enabled Methods: None, Please enable the payment methods in your Mollie dashboard.');
