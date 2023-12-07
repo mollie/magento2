@@ -261,8 +261,11 @@ class Orders extends AbstractModel
             $orderData['method'] = $additionalData['limited_methods'];
         }
 
-        if ($this->expires->availableForMethod($method, $storeId)) {
-            $orderData['expiresAt'] = $this->expires->atDateForMethod($method, $storeId);
+        if ($this->expires->availableForMethod($this->methodCode->getExpiresAtMethod(), $storeId)) {
+            $orderData['expiresAt'] = $this->expires->atDateForMethod(
+                $this->methodCode->getExpiresAtMethod(),
+                $storeId
+            );
         }
 
         $orderData = $this->buildTransaction->execute($order, static::CHECKOUT_TYPE, $orderData);
