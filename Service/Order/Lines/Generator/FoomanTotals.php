@@ -62,6 +62,11 @@ class FoomanTotals implements GeneratorInterface
             if ($taxAmount && $amount != 0) {
                 $vatRate = round(($taxAmount / $amount) * 100, 2);
             }
+
+            if (abs($amount + $taxAmount) < 0.01) {
+                return $orderLines;
+            }
+
             $orderLines[] = [
                 'type' => 'surcharge',
                 'name' =>  $total->getLabel(),

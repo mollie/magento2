@@ -344,7 +344,7 @@ class Order
         return $url;
     }
 
-    private function getAdjustment(OrderInterface $order, array $orderLines)
+    private function getAdjustment(OrderInterface $order, array $orderLines): ?array
     {
         $orderLinesTotal = 0;
         foreach ($orderLines as $orderLine) {
@@ -358,22 +358,25 @@ class Order
 
         $max = $orderLinesTotal + 0.05;
         $min = $orderLinesTotal - 0.05;
-        if (($min <= $grandTotal) && ($grandTotal <= $max)) {
-            $difference = $grandTotal - $orderLinesTotal;
-
-            return [
-                'item_id' => '',
-                'type' => 'discount',
-                'name' => 'Adjustment',
-                'quantity' => 1,
-                'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $difference),
-                'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $difference),
-                'vatRate' => sprintf("%.2f", 0),
-                'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, 0),
-                'sku' => 'adjustment',
-            ];
+        if ($grandTotal < $min || $grandTotal > $max) {
+            return null;
         }
 
-        return false;
+        $difference = $grandTotal - $orderLinesTotal;
+        if (abs($difference) < 0.01) {
+            return null;
+        }
+
+        return [
+            'item_id' => '',
+            'type' => 'discount',
+            'name' => 'Adjustment',
+            'quantity' => 1,
+            'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $difference),
+            'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $difference),
+            'vatRate' => sprintf("%.2f", 0),
+            'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, 0),
+            'sku' => 'adjustment',
+        ];
     }
 }

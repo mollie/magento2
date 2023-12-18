@@ -38,6 +38,10 @@ class MagentoGiftWrapping implements GeneratorInterface
             $extensionAttributes->getGwItemsBasePriceInclTax() :
             $extensionAttributes->getGwItemsPriceInclTax();
 
+        if (abs($amount) < 0.01) {
+            return $orderLines;
+        }
+
         $orderLines[] = [
             'type' => OrderLineType::TYPE_SURCHARGE,
             'name' => __('Magento Gift Wrapping'),

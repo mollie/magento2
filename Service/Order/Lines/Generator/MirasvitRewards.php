@@ -74,6 +74,10 @@ class MirasvitRewards implements GeneratorInterface
 
         $amount = $this->forceBaseCurrency ? $purchase->getBaseSpendAmount() : $purchase->getSpendAmount();
 
+        if (abs($amount) < 0.01) {
+            return $orderLines;
+        }
+
         $orderLines[] = [
             'type' => 'surcharge',
             'name' => 'Mirasvit Rewards',
