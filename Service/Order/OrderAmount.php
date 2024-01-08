@@ -58,7 +58,7 @@ class OrderAmount
         $currencies = [];
         $orders = $this->getOrders($transactionId);
         foreach ($orders->getItems() as $order) {
-            if ($this->config->useBaseCurrency()) {
+            if ($this->config->useBaseCurrency($order->getStoreId())) {
                 $currencies[] = $order->getBaseCurrencyCode();
                 $amount += $order->getBaseGrandTotal();
             } else {

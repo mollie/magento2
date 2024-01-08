@@ -50,4 +50,18 @@ export default class VisitCheckoutPaymentCompositeAction {
 
     checkoutShippingPage.fillShippingAddressUsingFixture(fixture);
   }
+
+  changeStoreViewTo(name) {
+    cy.visit('/');
+
+    cy.get('.greet.welcome').should('be.visible');
+
+    cy.get('.switcher-trigger').then(($el) => {
+        if ($el.text().includes('Default Store View')) {
+            cy.get('#switcher-language-trigger .view-default').click();
+
+            cy.get('.switcher-dropdown').contains(name).click();
+        }
+    });
+  }
 }

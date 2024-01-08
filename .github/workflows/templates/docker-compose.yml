@@ -10,6 +10,7 @@ services:
     volumes:
       - ../../../magento-logs:/data/var/log
       - ./magento/configure-mollie.sh:/data/configure-mollie.sh
+      - ./magento/merge-config.php.stub:/data/merge-config.php
     depends_on:
       - ngrok
 

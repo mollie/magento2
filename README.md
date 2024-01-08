@@ -49,6 +49,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Przelewy24
 - SEPA Direct Debit
 - SOFORT Banking
+- TWINT
 
 ## Additional modules
 

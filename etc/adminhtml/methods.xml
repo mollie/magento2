@@ -30,5 +30,6 @@
     <include path="Mollie_Payment::methods/pointofsale.xml"/>
     <include path="Mollie_Payment::methods/przelewy24.xml"/>
     <include path="Mollie_Payment::methods/sofort.xml"/>
+    <include path="Mollie_Payment::methods/twint.xml"/>
     <include path="Mollie_Payment::methods/voucher.xml"/>
 </include>
