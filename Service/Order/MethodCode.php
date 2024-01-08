@@ -34,7 +34,7 @@ class MethodCode
             return '';
         }
 
-        if (count($additionalInformation['limited_methods']) !== 1) {
+        if (!is_array($additionalInformation['limited_methods']) || count($additionalInformation['limited_methods']) !== 1) {
             return '';
         }
 
