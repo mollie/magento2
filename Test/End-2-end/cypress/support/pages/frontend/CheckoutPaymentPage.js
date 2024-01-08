@@ -22,7 +22,7 @@ export default class CheckoutPaymentPage {
   placeOrder() {
     cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-    cy.intercept('POST', 'rest/default/V1/guest-carts/*/payment-information').as('placeOrderAction');
+    cy.intercept('POST', 'rest/*/V1/guest-carts/*/payment-information').as('placeOrderAction');
 
     this.pressPlaceOrderButton();
 
