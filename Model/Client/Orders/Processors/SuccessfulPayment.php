@@ -122,6 +122,21 @@ class SuccessfulPayment implements OrderProcessorInterface
             return $this->processTransactionResponseFactory->create($result);
         }
 
+        /** @var false|\Mollie\Api\Resources\Payment $payment */
+        $payment = $mollieOrder->payments()->offsetGet(0);
+        if ($payment && $payment->hasChargebacks()) {
+            $this->orderCommentHistory->add($order,
+                __(
+                    'Mollie: Received a chargeback with an amount of %1',
+                    $order->getBaseCurrency()->formatTxt($payment->getAmountChargedBack())
+                )
+            );
+
+            $result = ['success' => false, 'status' => 'paid', 'order_id' => $orderId, 'type' => $type];
+            $this->mollieHelper->addTolog('error', __('Payment has chargebacks.'));
+            return $this->processTransactionResponseFactory->create($result);
+        }
+
         if (!$order->getPayment()->getIsTransactionClosed() && $type == 'webhook') {
             $this->handleWebhookCall($order, $mollieOrder);
             $this->sendOrderEmails($order);

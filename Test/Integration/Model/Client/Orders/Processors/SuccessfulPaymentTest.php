@@ -227,6 +227,38 @@ class SuccessfulPaymentTest extends IntegrationTestCase
         ), 'We expect the order status to be "processing" or "complete".');
     }
 
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testAddsChargebackCommentWhenApplicable(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
+
+        /** @var MollieOrderBuilder $orderBuilder */
+        $orderBuilder = $this->objectManager->create(MollieOrderBuilder::class);
+        $orderBuilder->setAmount(100);
+        $orderBuilder->addPayment('payment_001');
+        $orderBuilder->setStatus(OrderStatus::STATUS_PAID);
+        $orderBuilder->addChargeback(100);
+
+        /** @var SuccessfulPayment $instance */
+        $instance = $this->objectManager->create(SuccessfulPayment::class);
+
+        $historyCount = count($order->getStatusHistories());
+
+        $instance->process(
+            $order,
+            $orderBuilder->build(),
+            'webhook',
+            $this->createResponse(false)
+        );
+
+        $freshOrder = $this->objectManager->get(OrderInterface::class)->load($order->getId(), 'entity_id');
+
+        $this->assertEquals($historyCount + 1, count($freshOrder->getStatusHistories()));
+    }
+
     private function createResponse(
         bool $succes,
         string $status = 'paid',

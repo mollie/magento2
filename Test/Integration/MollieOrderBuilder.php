@@ -68,6 +68,17 @@ class MollieOrderBuilder
         $this->order->method = $method;
     }
 
+    public function addChargeback(float $value, string $current = 'EUR'): void
+    {
+        if (!isset($this->order->_embedded->payments)) {
+            $this->addPayment('chargeback');
+        }
+
+        $payment = $this->order->_embedded->payments[0];
+        $payment->_links = new \StdClass();
+        $payment->_links->chargebacks = new \StdClass();
+    }
+
     public function build(): Order
     {
         return $this->order;
