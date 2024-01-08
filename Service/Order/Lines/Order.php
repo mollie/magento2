@@ -117,11 +117,12 @@ class Order
             $orderLines[] = $this->paymentFee->getOrderLine($order, $this->forceBaseCurrency);
         }
 
+        $orderLines = $this->orderLinesGenerator->execute($order, $orderLines);
+
+        // The adjustment line should be the last one. This corrects any rounding issues.
         if ($adjustment = $this->getAdjustment($order, $orderLines)) {
             $orderLines[] = $adjustment;
         }
-
-        $orderLines = $this->orderLinesGenerator->execute($order, $orderLines);
 
         $this->saveOrderLines($orderLines, $order);
         foreach ($orderLines as &$orderLine) {
