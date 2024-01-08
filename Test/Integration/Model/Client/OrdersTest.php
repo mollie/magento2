@@ -154,31 +154,40 @@ class OrdersTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 5
+     * @magentoConfigFixture default_store payment/mollie_methods_paymentlink/days_before_expire 6
      *
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
+     *
+     * @dataProvider startTransactionIncludesTheExpiresAtParameterProvider
      */
-    public function testStartTransactionIncludesTheExpiresAtParameter()
-    {
+    public function testStartTransactionIncludesTheExpiresAtParameter(
+        string $method,
+        int $days,
+        array $limitedMethods
+    ): void {
         $cart = $this->objectManager->create(Quote::class);
         $cart->load('test01', 'reserved_order_id');
 
         $order = $this->loadOrder('100000001');
         $order->setBaseCurrencyCode('EUR');
         $order->setQuoteId($cart->getId());
-        $order->getPayment()->setMethod('mollie_methods_ideal');
+        $order->getPayment()->setMethod($method);
+        if ($limitedMethods) {
+            $order->getPayment()->setAdditionalInformation('limited_methods', $limitedMethods);
+        }
 
         $mollieOrderMock = $this->createMock(\Mollie\Api\Resources\Order::class);
         $mollieOrderMock->id = 'abc123';
 
         $mollieApiMock = $this->createMock(MollieApiClient::class);
         $orderEndpointMock = $this->createMock(OrderEndpoint::class);
-        $orderEndpointMock->method('create')->with( $this->callback(function ($orderData) {
+        $orderEndpointMock->method('create')->with( $this->callback(function ($orderData) use ($days) {
             $this->assertArrayHasKey('expiresAt', $orderData);
             $this->assertNotEmpty($orderData['expiresAt']);
 
             $now = $this->objectManager->create(TimezoneInterface::class)->scopeDate(null);
-            $expected = $now->add(new \DateInterval('P5D'));
+            $expected = $now->add(new \DateInterval('P' . $days . 'D'));
 
             $this->assertEquals($expected->format('Y-m-d'), $orderData['expiresAt']);
 
@@ -193,6 +202,18 @@ class OrdersTest extends IntegrationTestCase
         ]);
 
         $instance->startTransaction($order, $mollieApiMock);
+    }
+
+    public function startTransactionIncludesTheExpiresAtParameterProvider(): array
+    {
+        return [
+            'ideal' =>
+                ['mollie_methods_ideal', 5, []],
+            'payment link with single method should use method' =>
+                ['mollie_methods_paymentlink', 5, ['ideal']],
+            'payment link with multiple methods should use payment link' =>
+                ['mollie_methods_paymentlink', 6, ['ideal', 'creditcard']],
+        ];
     }
 
     public function checksIfTheOrderHasAnUpdateProvider(): array
