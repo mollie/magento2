@@ -33,6 +33,10 @@ class MagentoGiftCard implements GeneratorInterface
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $amount = $order->getData(($forceBaseCurrency ? 'base_' : '') . 'gift_cards_amount');
 
+        if (abs($amount) < 0.01) {
+            return $orderLines;
+        }
+
         $orderLines[] = [
             'type' => OrderLineType::TYPE_GIFT_CARD,
             'name' => __('Magento Gift Card'),

@@ -29,6 +29,10 @@ class ShippingDiscount implements GeneratorInterface
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $amount = abs($order->getData(($forceBaseCurrency ? 'base_' : '') . 'shipping_discount_amount'));
 
+        if (abs($amount) < 0.01) {
+            return $orderLines;
+        }
+
         $orderLines[] = [
             'type' => OrderLineType::TYPE_DISCOUNT,
             'name' => __('Magento Discount'),

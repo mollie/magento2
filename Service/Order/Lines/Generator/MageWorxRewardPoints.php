@@ -24,19 +24,24 @@ class MageWorxRewardPoints implements GeneratorInterface
 
     public function process(OrderInterface $order, array $orderLines): array
     {
-        if (!$order->getMwRwrdpointsAmnt()) {
+        $amount = $order->getMwRwrdpointsAmnt();
+        if (!$amount) {
             return $orderLines;
         }
 
         $forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
 
+        if (abs($amount) < 0.01) {
+            return $orderLines;
+        }
+
         $orderLines[] = [
             'type' => 'surcharge',
             'name' => 'Reward Points',
             'quantity' => 1,
-            'unitPrice' => $this->mollieHelper->getAmountArray($currency, -$order->getMwRwrdpointsAmnt()),
-            'totalAmount' => $this->mollieHelper->getAmountArray($currency, -$order->getMwRwrdpointsAmnt()),
+            'unitPrice' => $this->mollieHelper->getAmountArray($currency, -$amount),
+            'totalAmount' => $this->mollieHelper->getAmountArray($currency, -$amount),
             'vatRate' => 0,
             'vatAmount' => $this->mollieHelper->getAmountArray($currency, 0.0),
         ];

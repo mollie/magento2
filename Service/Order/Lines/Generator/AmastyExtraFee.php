@@ -40,6 +40,10 @@ class AmastyExtraFee implements GeneratorInterface
                 $extensionAttributes->getAmextrafeeBaseTaxAmount();
         }
 
+        if (abs($amount) < 0.01) {
+            return $orderLines;
+        }
+
         $orderLines[] = [
             'type' => 'surcharge',
             'name' => 'Amasty Fee',
