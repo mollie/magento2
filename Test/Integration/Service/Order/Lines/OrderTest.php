@@ -211,6 +211,29 @@ class OrderTest extends IntegrationTestCase
         }
     }
 
+    public function testSupportsProductsWithVowelMutations(): void
+    {
+        $this->loadFixture('Magento/Sales/order_item_list.php');
+
+        $order = $this->loadOrderById('100000001');
+        $order->setBaseCurrencyCode('EUR');
+
+        $products = $order->getItems();
+        $product = array_shift($products);
+        $product->setName('Demö Produçt');
+
+        /** @var Subject $instance */
+        $instance = $this->objectManager->get(Subject::class);
+
+        $result = $instance->get($order);
+
+        $result = array_filter($result, function ($line) {
+            return $line['name'] == 'Demö Produçt';
+        });
+
+        $this->assertCount(1, $result);
+    }
+
     public function adjustmentsDataProvider(): array
     {
         return [
