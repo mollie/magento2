@@ -114,7 +114,7 @@ input MollieTransactionInput {
 
 input MolliePaymentMethodsInput {
     amount: Float! = 10
-    currency: String! = EUR
+    currency: String = EUR
 }
 
 input MollieResetCartInput {

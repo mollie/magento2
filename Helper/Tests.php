@@ -49,10 +49,7 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieModel->loadMollieApi($testKey);
-                    $methods = $mollieApi->methods->all([
-                        'resource' => 'orders',
-                        'includeWallets' => 'applepay',
-                    ]);
+                    $methods = $mollieApi->methods->allAvailable();
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
@@ -82,10 +79,7 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieModel->loadMollieApi($liveKey);
-                    $methods = $mollieApi->methods->all([
-                        'resource' => 'orders',
-                        'includeWallets' => 'applepay',
-                    ]);
+                    $methods = $mollieApi->methods->allAvailable();
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
