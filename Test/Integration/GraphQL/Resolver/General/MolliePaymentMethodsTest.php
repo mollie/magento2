@@ -150,8 +150,14 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
     {
         $this->loadFakeEncryptor()->addReturnValue('', 'test_dummyapikeythatisvalidandislongenough');
 
+        $methodCollection = new \Mollie\Api\Resources\MethodCollection(count($methods), null);
+        foreach ($methods as $method) {
+            $methodCollection[] = $method;
+        }
+
         $methodsEndpointMock = $this->createMock(MethodEndpoint::class);
-        $methodsEndpointMock->method('allActive')->willReturn($methods);
+        $methodsEndpointMock->method('allActive')->willReturn($methodCollection);
+        $methodsEndpointMock->method('allAvailable')->willReturn($methodCollection);
 
         $mollieApiMock = $this->createMock(MollieApiClient::class);
         $mollieApiMock->methods = $methodsEndpointMock;
