@@ -18,82 +18,65 @@ module.exports = defineConfig({
       require('./cypress/plugins/disable-successful-videos.js')(on, config);
 
       // Retrieve available method
-      await new Promise((methodsPromiseResolve, reject) => {
+      await new Promise((resolve, reject) => {
         var https = require('follow-redirects').https;
 
         const baseUrl = config.baseUrl;
         const urlObj = new URL(baseUrl);
         const hostname = urlObj.hostname;
 
-        const currencies = ['EUR', 'CHF'];
+        const query = `
+          query {
+             molliePaymentMethods(input:{amount:100, currency:null}) {
+               methods {
+                 code
+                 image
+                 name
+               }
+             }
+            }
+          `;
 
-        let promises = [];
+        var options = {
+          'method': 'GET',
+          'hostname': hostname,
+          'path': '/graphql?query=' + encodeURIComponent(query),
+          'headers': {
+            'Content-Type': 'application/json',
+            // 'Cookie': 'XDEBUG_SESSION=PHPSTORM'
+          },
+          'maxRedirects': 20
+        };
 
-        currencies.forEach(currency => {
-            const query = `
-              query {
-                 molliePaymentMethods(input:{amount:100, currency:"${currency}"}) {
-                   methods {
-                     code
-                     image
-                     name
-                   }
-                 }
-                }
-            `;
+        console.log('Requesting Mollie payment methods from "' + baseUrl + '". One moment please...');
+        var req = https.request(options, function (res) {
+          var chunks = [];
 
-            var options = {
-                'method': 'GET',
-                'hostname': hostname,
-                'path': '/graphql?query=' + encodeURIComponent(query),
-                'headers': {
-                    'Content-Type': 'application/json',
-                    // 'Cookie': 'XDEBUG_SESSION=PHPSTORM'
-                },
-                'maxRedirects': 20
-            };
+          res.on("data", function (chunk) {
+            chunks.push(chunk);
+          });
 
-            console.log(`Requesting Mollie payment methods from "${baseUrl}" for ${currency}. One moment please...`);
-            const promise = new Promise((resolve, reject) => {
-                var req = https.request(options, function (res) {
-                    var chunks = [];
+          res.on("end", function (chunk) {
+            const body = Buffer.concat(chunks);
 
-                    res.on("data", function (chunk) {
-                        chunks.push(chunk);
-                    });
+            const methods = JSON.parse(body.toString()).data.molliePaymentMethods.methods.map(data => {
+              return data.code
+            })
 
-                    res.on("end", function (chunk) {
-                        const body = Buffer.concat(chunks);
+            config.env.mollie_available_methods = methods;
 
-                        const methods = JSON.parse(body.toString()).data.molliePaymentMethods.methods.map(data => {
-                            return data.code
-                        })
+            console.log('Available Mollie payment methods: ', methods);
 
-                        console.log(`Available Mollie payment methods for ${currency}: `, methods);
+            resolve(config);
+          });
 
-                        resolve(methods);
-                    });
-
-                    res.on("error", function (error) {
-                        console.error('Error while fetching Mollie Payment methods', error);
-                        reject(error);
-                    });
-                });
-
-                req.end();
-            });
-
-            promises.push(promise);
+          res.on("error", function (error) {
+            console.error('Error while fetching Mollie Payment methods', error);
+            reject(error);
+          });
         });
 
-        Promise.all(promises).then((values) => {
-            const methods = [].concat(...values);
-            config.env.mollie_available_methods = [...new Set(methods)];
-
-            console.log('Available Mollie payment methods: ', config.env.mollie_available_methods);
-
-            methodsPromiseResolve();
-        });
+        req.end();
       });
 
       // retrieve admin token

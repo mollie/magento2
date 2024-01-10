@@ -64,7 +64,7 @@ class MolliePaymentMethods implements ResolverInterface
         }
 
         $storeId = $context->getExtensionAttributes()->getStore()->getId();
-        $apiMethods = $this->getMethods($amount, $currency, $storeId);
+        $apiMethods = $this->getMethods($amount, $currency, $storeId) ?? [];
 
         $methods = [];
         /** @var Method $method */
@@ -90,7 +90,7 @@ class MolliePaymentMethods implements ResolverInterface
         ];
     }
 
-    public function getMethods(float $amount, ?string $currency, int $storeId): MethodCollection
+    public function getMethods(float $amount, ?string $currency, int $storeId): ?MethodCollection
     {
         $mollieApiClient = $this->mollieApiClient->loadByStore($storeId);
 
