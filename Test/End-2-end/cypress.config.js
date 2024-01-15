@@ -27,7 +27,7 @@ module.exports = defineConfig({
 
         const query = `
           query {
-             molliePaymentMethods(input:{amount:100, currency:null}) {
+             molliePaymentMethods(input:{amount:50, currency:"EUR"}) {
                methods {
                  code
                  image
