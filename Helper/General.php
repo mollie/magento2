@@ -478,6 +478,7 @@ class General extends AbstractHelper
      * @param int|null $storeId
      *
      * @return mixed
+     * @deprecated since 2.34.0
      */
     public function getPaymentLinkMessage($checkoutUrl, $storeId = null)
     {

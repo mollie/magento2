@@ -23,12 +23,12 @@ $status = $block->getPaymentStatus();
                     <td><?= ucfirst($block->getCheckoutType()); ?></td>
                 </tr>
             <?php endif; ?>
-            <?php if ($block->getCheckoutUrl() && $status == 'created'): ?>
+            <?php if ($status != 'paid'): ?>
                 <tr class="mollie-checkout-url">
                     <th><?= __('Checkout Url'); ?></th>
                     <td>
-                        <?= $block->getCheckoutUrl(); ?>
-                        <span class="mollie-copy-url" data-url="<?= $block->getCheckoutUrl(); ?>" title="<?php echo __('Copy'); ?>">
+                        <?= __('Click <a href="%1" target="_blank">here</a> to pay', $block->getPaymentLinkUrl()); ?>
+                        <span class="mollie-copy-url" data-url="<?= $block->getPaymentLinkUrl(); ?>" title="<?php echo __('Copy'); ?>">
                             &#x2398;
                         </span>
                     </td>

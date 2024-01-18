@@ -69,6 +69,8 @@ class Config
     const PAYMENT_METHOD_PAYMENT_TITLE = 'payment/mollie_methods_%s/title';
     const PAYMENT_PAYMENTLINK_ALLOW_MARK_AS_PAID = 'payment/mollie_methods_paymentlink/allow_mark_as_paid';
     const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
+    const PAYMENT_PAYMENTLINK_ADD_MESSAGE = 'payment/mollie_methods_paymentlink/add_message';
+    const PAYMENT_PAYMENTLINK_MESSAGE = 'payment/mollie_methods_paymentlink/message';
     const PAYMENT_POINTOFSALE_ALLOWED_CUSTOMER_GROUPS = 'payment/mollie_methods_pointofsale/allowed_customer_groups';
     const PAYMENT_VOUCHER_CATEGORY = 'payment/mollie_methods_voucher/category';
     const PAYMENT_VOUCHER_CUSTOM_ATTRIBUTE = 'payment/mollie_methods_voucher/custom_attribute';
@@ -491,6 +493,22 @@ class Config
         return $this->config->getValue(
             static::PAYMENT_PAYMENTLINK_NEW_STATUS,
             ScopeInterface::SCOPE_STORE,
+            $storeId
+        );
+    }
+
+    public function addPaymentLinkMessage($storeId = null): string
+    {
+        return (string)$this->getPath(
+            static::PAYMENT_PAYMENTLINK_ADD_MESSAGE,
+            $storeId
+        );
+    }
+
+    public function paymentLinkMessage($storeId = null): string
+    {
+        return (string)$this->getPath(
+            static::PAYMENT_PAYMENTLINK_MESSAGE,
             $storeId
         );
     }

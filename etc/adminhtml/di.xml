@@ -53,4 +53,10 @@
     <type name="Magento\Tax\Helper\Data">
         <plugin name="mollie_add_payment_fee_to_tax_total" type="Mollie\Payment\Plugin\Tax\Helper\DataPlugin" />
     </type>
+
+    <type name="Mollie\Payment\Block\Info\Base">
+        <arguments>
+            <argument name="urlBuilder" xsi:type="object">Magento\Framework\Url</argument>
+        </arguments>
+    </type>
 </config>
