@@ -43,25 +43,6 @@ $code; ?>" style="display:none">
             </div>
         </div>
         <p><?= $block->escapeHtml(__('If only one method is chosen, the selection screen is skipped and the customer is sent directly to the payment method.')); ?></p>
-
-        <div class="field admin__field">
-            <label for="<?= $code ?>_days_before_expire" class="label admin__field-label"><span><?= $block->escapeHtml(__('This order expires at:')) ?></span></label>
-            <div class="control admin__field-control">
-                <input
-                    id="<?= $code ?>_days_before_expire"
-                    name="payment[days_before_expire]"
-                    class="admin__control-multiselect mollie_methods_paymentlink_days_before_expire"
-                    value="<?php echo $block->getExpiresAt(); ?>"
-                    data-x-magent
-                >
-
-                <a href="#" class="mollie-tooltip">(i)
-                    <span>
-                        <?php echo __('It is not posible to use Klarna Slice it or Klarna Pay later as method when your expiry date is more than 28 days, unless another maximum is agreed between the merchant and Klarna.'); ?>
-                    </span>
-                </a>
-            </div>
-        </div>
     </div>
 </fieldset>
 
