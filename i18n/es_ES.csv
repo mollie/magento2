@@ -393,3 +393,4 @@ ending,finalizando
 "Encrypt payment details","Cifrar detalles de pago"
 "Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated.","Envíe un correo electrónico a los clientes con un pago fallido o inconcluso para darles una segunda oportunidad de finalizar el pago a través del enlace de pago y revivir su pedido.<br>Puede enviar estos recordatorios de pago manualmente o activar el correo electrónico completamente automatizado."
 "Payment Method To Use For Second Change Payments","Método de pago para usar en pagos de segunda oportunidad"
+"Your order has already been paid.","Su pedido ya ha sido pagado."

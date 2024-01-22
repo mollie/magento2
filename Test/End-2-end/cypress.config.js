@@ -17,6 +17,11 @@ module.exports = defineConfig({
       require('./cypress/plugins/index.js')(on, config);
       require('./cypress/plugins/disable-successful-videos.js')(on, config);
 
+      // If we're running in CI, we need to set the CI env variable
+      if (process.env.CI) {
+        config.env.CI = true
+      }
+
       // Retrieve available method
       await new Promise((resolve, reject) => {
         var https = require('follow-redirects').https;
@@ -27,7 +32,7 @@ module.exports = defineConfig({
 
         const query = `
           query {
-             molliePaymentMethods(input:{amount:100, currency:null}) {
+             molliePaymentMethods(input:{amount:50, currency:"EUR"}) {
                methods {
                  code
                  image
