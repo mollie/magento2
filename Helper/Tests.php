@@ -8,6 +8,7 @@ namespace Mollie\Payment\Helper;
 
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Model\Mollie as MollieModel;
 
 /**
@@ -49,14 +50,18 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieModel->loadMollieApi($testKey);
-                    $methods = $mollieApi->methods->all([
-                        'resource' => 'orders',
-                        'includeWallets' => 'applepay',
-                    ]);
+                    $methods = $mollieApi->methods->allAvailable() ?? [];
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
                     }
+
+                    try {
+                        $mollieApi->terminals->page();
+                        $availableMethods[] = 'Point of sale';
+                    } catch (ApiException $exception) {}
+
+                    sort($availableMethods);
 
                     if (empty($availableMethods)) {
                         $msg = __('Enabled Methods: None, Please enable the payment methods in your Mollie dashboard.');
@@ -82,14 +87,18 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieModel->loadMollieApi($liveKey);
-                    $methods = $mollieApi->methods->all([
-                        'resource' => 'orders',
-                        'includeWallets' => 'applepay',
-                    ]);
+                    $methods = $mollieApi->methods->allAvailable() ?? [];
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
                     }
+
+                    try {
+                        $mollieApi->terminals->page();
+                        $availableMethods[] = 'Point of sale';
+                    } catch (ApiException $exception) {}
+
+                    sort($availableMethods);
 
                     if (empty($availableMethods)) {
                         $msg = __('Enabled Methods: None, Please enable the payment methods in your Mollie dashboard.');

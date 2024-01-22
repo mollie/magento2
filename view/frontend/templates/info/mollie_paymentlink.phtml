@@ -17,12 +17,9 @@ $title = $block->escapeHtml($block->getMethod()->getTitle());
         <?= /* @noEscape */
         $title; ?>
     </dt>
-    <?php
-    if (in_array($block->getPaymentStatus(), ['created', 'open']) &&
-        $paymentUrl = $block->getPaymentLink($block->getMethod()->getStore())
-    ): ?>
+    <?php if ($url = $block->getPaymentLink()): ?>
         <dt>
-            <?= /* @noEscape */ $paymentUrl; ?>
+            <?= /* @noEscape */ $url; ?>
         </dt>
     <?php endif; ?>
     <?php if ($specificInfo): ?>

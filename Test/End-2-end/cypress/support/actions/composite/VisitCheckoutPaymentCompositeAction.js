@@ -7,8 +7,8 @@ const checkoutPage = new CheckoutPage();
 const checkoutShippingPage = new CheckoutShippingPage();
 
 export default class VisitCheckoutPaymentCompositeAction {
-  visit(fixture = 'NL', quantity = 1) {
-    productPage.openProduct(Cypress.env('defaultProductId'));
+  visit(fixture = 'NL', quantity = 1, productId = Cypress.env('defaultProductId')) {
+    productPage.openProduct(productId);
 
     productPage.addSimpleProductToCart(quantity);
 
@@ -49,5 +49,19 @@ export default class VisitCheckoutPaymentCompositeAction {
     }
 
     checkoutShippingPage.fillShippingAddressUsingFixture(fixture);
+  }
+
+  changeStoreViewTo(name) {
+    cy.visit('/');
+
+    cy.get('.greet.welcome').should('be.visible');
+
+    cy.get('.switcher-trigger').then(($el) => {
+        if ($el.text().includes('Default Store View')) {
+            cy.get('#switcher-language-trigger .view-default').click();
+
+            cy.get('.switcher-dropdown').contains(name).click();
+        }
+    });
   }
 }

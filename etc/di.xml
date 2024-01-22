@@ -27,6 +27,11 @@
     <preference for="Mollie\Payment\Api\Data\TransactionToOrderInterface" type="Mollie\Payment\Model\TransactionToOrder"/>
     <preference for="Mollie\Payment\Api\Data\TransactionToOrderSearchResultsInterface" type="Mollie\Payment\Model\TransactionToOrderSearchResults"/>
 
+    <preference for="Mollie\Payment\Api\Webapi\PaymentInformationMetaInterface" type="Mollie\Payment\Webapi\PaymentInformationMeta"/>
+    <preference for="Mollie\Payment\Api\Data\MethodMetaInterface" type="Mollie\Payment\Model\MethodMeta" />
+    <preference for="Mollie\Payment\Api\Data\IssuerInterface" type="Mollie\Payment\Model\Issuer" />
+    <preference for="Mollie\Payment\Api\Data\TerminalInterface" type="Mollie\Payment\Model\Terminal" />
+
     <type name="Mollie\Payment\Config">
         <arguments>
             <argument name="productMetadata" xsi:type="object">Magento\Framework\App\ProductMetadataInterface\Proxy</argument>
@@ -1528,6 +1533,51 @@
     <virtualType name="MollieSofortCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
             <argument name="config" xsi:type="object">MollieSofortConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- TWINT -->
+    <type name="Mollie\Payment\Model\Methods\Twint">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieTwintValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieTwintValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieTwintValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieTwintConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieTwintConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieTwintConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieTwintConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Twint::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieTwintValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieTwintCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieTwintCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieTwintConfig</argument>
         </arguments>
     </virtualType>
 

@@ -478,6 +478,7 @@ class General extends AbstractHelper
      * @param int|null $storeId
      *
      * @return mixed
+     * @deprecated since 2.34.0
      */
     public function getPaymentLinkMessage($checkoutUrl, $storeId = null)
     {
@@ -642,6 +643,7 @@ class General extends AbstractHelper
             'mollie_methods_pointofsale',
             'mollie_methods_przelewy24',
             'mollie_methods_sofort',
+            'mollie_methods_twint',
         ];
 
         foreach ($methodCodes as $methodCode) {

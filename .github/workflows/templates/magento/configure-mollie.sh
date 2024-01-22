@@ -29,6 +29,7 @@ bin/magento config:set payment/mollie_methods_paymentlink/active 1 &
 bin/magento config:set payment/mollie_methods_paysafecard/active 1 &
 bin/magento config:set payment/mollie_methods_pointofsale/active 1 &
 bin/magento config:set payment/mollie_methods_sofort/active 1 &
+bin/magento config:set payment/mollie_methods_twint/active 1 &
 
 # Enable Components
 bin/magento config:set payment/mollie_methods_creditcard/use_components 1 &
@@ -37,6 +38,11 @@ bin/magento config:set payment/mollie_methods_creditcard/use_components 1 &
 bin/magento config:set payment/mollie_methods_ideal/add_qr 1 &
 
 bin/magento config:set payment/mollie_general/use_webhooks disabled &
+
+# Configure currency for the swiss store view
+bin/magento config:set currency/options/allow EUR,CHF &
+bin/magento config:set currency/options/default CHF --scope=ch &
+bin/magento config:set payment/mollie_general/currency 0 --scope=ch &
 
 wait
 

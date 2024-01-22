@@ -17,6 +17,11 @@ module.exports = defineConfig({
       require('./cypress/plugins/index.js')(on, config);
       require('./cypress/plugins/disable-successful-videos.js')(on, config);
 
+      // If we're running in CI, we need to set the CI env variable
+      if (process.env.CI) {
+        config.env.CI = true
+      }
+
       // Retrieve available method
       await new Promise((resolve, reject) => {
         var https = require('follow-redirects').https;
@@ -27,7 +32,7 @@ module.exports = defineConfig({
 
         const query = `
           query {
-             molliePaymentMethods(input:{amount:100, currency:"EUR"}) {
+             molliePaymentMethods(input:{amount:50, currency:"EUR"}) {
                methods {
                  code
                  image
@@ -38,42 +43,42 @@ module.exports = defineConfig({
           `;
 
         var options = {
-            'method': 'GET',
-            'hostname': hostname,
-            'path': '/graphql?query=' + encodeURIComponent(query),
-            'headers': {
-                'Content-Type': 'application/json',
-                // 'Cookie': 'XDEBUG_SESSION=PHPSTORM'
-            },
-            'maxRedirects': 20
+          'method': 'GET',
+          'hostname': hostname,
+          'path': '/graphql?query=' + encodeURIComponent(query),
+          'headers': {
+            'Content-Type': 'application/json',
+            // 'Cookie': 'XDEBUG_SESSION=PHPSTORM'
+          },
+          'maxRedirects': 20
         };
 
         console.log('Requesting Mollie payment methods from "' + baseUrl + '". One moment please...');
         var req = https.request(options, function (res) {
-            var chunks = [];
+          var chunks = [];
 
-            res.on("data", function (chunk) {
-                chunks.push(chunk);
-            });
+          res.on("data", function (chunk) {
+            chunks.push(chunk);
+          });
 
-            res.on("end", function (chunk) {
-                const body = Buffer.concat(chunks);
+          res.on("end", function (chunk) {
+            const body = Buffer.concat(chunks);
 
-                const methods = JSON.parse(body.toString()).data.molliePaymentMethods.methods.map(data => {
-                    return data.code
-                })
+            const methods = JSON.parse(body.toString()).data.molliePaymentMethods.methods.map(data => {
+              return data.code
+            })
 
-                config.env.mollie_available_methods = methods;
+            config.env.mollie_available_methods = methods;
 
-                console.log('Available Mollie payment methods: ', methods);
+            console.log('Available Mollie payment methods: ', methods);
 
-                resolve(config);
-            });
+            resolve(config);
+          });
 
-            res.on("error", function (error) {
-                console.error('Error while fetching Mollie Payment methods', error);
-                reject(error);
-            });
+          res.on("error", function (error) {
+            console.error('Error while fetching Mollie Payment methods', error);
+            reject(error);
+          });
         });
 
         req.end();

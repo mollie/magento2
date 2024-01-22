@@ -6,12 +6,15 @@
 
 namespace Mollie\Payment\Block\Info;
 
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Registry;
+use Magento\Framework\UrlInterface;
 use Magento\Payment\Block\Info;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Stdlib\DateTime;
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Billie;
 use Mollie\Payment\Model\Methods\Klarna;
@@ -21,7 +24,6 @@ use Mollie\Payment\Model\Methods\Klarnasliceit;
 
 class Base extends Info
 {
-
     /**
      * @var string
      */
@@ -42,26 +44,36 @@ class Base extends Info
      * @var PriceCurrencyInterface
      */
     private $price;
-
     /**
-     * Base constructor.
-     *
-     * @param Context $context
-     * @param MollieHelper $mollieHelper
-     * @param Registry $registry
-     * @param PriceCurrencyInterface $price
+     * @var EncryptorInterface
      */
+    private $encryptor;
+    /**
+     * @var Config
+     */
+    private $config;
+    /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
+
     public function __construct(
         Context $context,
+        Config $config,
         MollieHelper $mollieHelper,
         Registry $registry,
-        PriceCurrencyInterface $price
+        PriceCurrencyInterface $price,
+        EncryptorInterface $encryptor,
+        UrlInterface $urlBuilder
     ) {
         parent::__construct($context);
         $this->mollieHelper = $mollieHelper;
         $this->timezone = $context->getLocaleDate();
         $this->registry = $registry;
         $this->price = $price;
+        $this->encryptor = $encryptor;
+        $this->config = $config;
+        $this->urlBuilder = $urlBuilder;
     }
 
     public function getCheckoutType(): ?string
@@ -87,16 +99,24 @@ class Base extends Info
         return null;
     }
 
-    /**
-     * @param mixed $storeId
-     */
     public function getPaymentLink($storeId = null): ?string
     {
-        if ($checkoutUrl = $this->getCheckoutUrl()) {
-            return $this->mollieHelper->getPaymentLinkMessage($checkoutUrl, $storeId);
+        if (!$this->config->addPaymentLinkMessage($storeId)) {
+            return null;
         }
 
-        return null;
+        return str_replace(
+            '%link%',
+            $this->getPaymentLinkUrl(),
+            $this->config->paymentLinkMessage($storeId)
+        );
+    }
+
+    public function getPaymentLinkUrl(): string
+    {
+        return $this->urlBuilder->getUrl('mollie/checkout/paymentlink', [
+            'order' => base64_encode($this->encryptor->encrypt($this->getInfo()->getParentId())),
+        ]);
     }
 
     public function getCheckoutUrl(): ?string

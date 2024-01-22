@@ -21,7 +21,12 @@ export default class Configuration {
             }
         });
 
-        cy.get('label').contains(field).parents('tr').find(':input').select(value, {force: true});
+        cy.contains('.entry-edit-head', group).parents('.section-config').within(element => {
+            cy.contains('label', field)
+                .parents('tr')
+                .find(':input')
+                .select(value, {force: true});
+        })
 
         cy.get('#save').click();
 

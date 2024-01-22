@@ -223,6 +223,7 @@
 "Point Of Sale (POS)","Point Of Sale (POS)"
 "Przelewy24","Przelewy24"
 "Sofort","Sofort"
+"TWINT","TWINT"
 "Voucher","Voucher"
 "Category","Category"
 "Product attribute","Product attribute"
@@ -369,3 +370,4 @@ ending,ending
 "Encrypt payment details","Encrypt payment details"
 "Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated.","Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated."
 "Payment Method To Use For Second Change Payments","Payment Method To Use For Second Change Payments"
+"Your order has already been paid.","Your order has already been paid."

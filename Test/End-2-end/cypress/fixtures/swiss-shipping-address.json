@@ -1,0 +1,15 @@
+{
+  "type": {
+    "username": "johnsmith@mollie.com",
+    "firstname": "John",
+    "lastname": "Smith",
+    "street[0]": "Bahnhofstrasse 10",
+    "city": "Zurich",
+    "postcode": "8001",
+    "telephone": "0441234567"
+  },
+  "select": {
+    "country_id": "CH",
+    "region_id": "Zürich"
+  }
+}

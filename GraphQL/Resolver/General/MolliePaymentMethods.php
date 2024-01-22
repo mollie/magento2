@@ -11,6 +11,7 @@ use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Quote\Api\Data\CartInterfaceFactory;
 use Mollie\Api\Resources\Method;
+use Mollie\Api\Resources\MethodCollection;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\MethodParameters;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
@@ -52,7 +53,7 @@ class MolliePaymentMethods implements ResolverInterface
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
     {
         $amount = 10;
-        $currency = 'EUR';
+        $currency = null;
 
         if (isset($args['input'], $args['input']['amount'])) {
             $amount = $args['input']['amount'];
@@ -62,17 +63,8 @@ class MolliePaymentMethods implements ResolverInterface
             $currency = $args['input']['currency'];
         }
 
-        $parameters = [
-            'amount[value]' => number_format($amount, 2, '.', ''),
-            'amount[currency]' => $currency,
-            'resource' => 'orders',
-            'includeWallets' => 'applepay',
-        ];
-
-        $parameters = $this->methodParameters->enhance($parameters, $this->cartFactory->create());
         $storeId = $context->getExtensionAttributes()->getStore()->getId();
-        $mollieApiClient = $this->mollieApiClient->loadByStore($storeId);
-        $apiMethods = $mollieApiClient->methods->allActive($parameters);
+        $apiMethods = $this->getMethods($amount, $currency, $storeId) ?? [];
 
         $methods = [];
         /** @var Method $method */
@@ -96,5 +88,25 @@ class MolliePaymentMethods implements ResolverInterface
         return [
             'methods' => $methods,
         ];
+    }
+
+    public function getMethods(float $amount, ?string $currency, int $storeId): ?MethodCollection
+    {
+        $mollieApiClient = $this->mollieApiClient->loadByStore($storeId);
+
+        if ($currency === null) {
+            return $mollieApiClient->methods->allAvailable();
+        }
+
+        $parameters = [
+            'amount[value]' => number_format($amount, 2, '.', ''),
+            'amount[currency]' => $currency,
+            'resource' => 'orders',
+            'includeWallets' => 'applepay',
+        ];
+
+        return $mollieApiClient->methods->allActive(
+            $this->methodParameters->enhance($parameters, $this->cartFactory->create())
+        );
     }
 }

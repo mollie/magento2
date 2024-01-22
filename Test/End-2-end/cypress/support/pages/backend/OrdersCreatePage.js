@@ -6,11 +6,22 @@ export default class OrdersCreatePage {
 
         cy.contains('Create New Order').click();
 
-        cy.contains(customerName).click();
+        cy.get('#sales_order_create_customer_grid_table').contains(customerName).should('be.visible').click();
 
         cy.wait('@header-block');
 
         cy.get('.loader').should('not.exist');
+
+        cy.get('.page-wrapper').then(element => {
+            cy.log(element.find('#order-store-selector'));
+
+            if (element.find('#order-store-selector').is(':visible')) {
+                cy.get('.tree-store-scope')
+                    .contains('Default Store View')
+                    .should('be.visible')
+                    .click();
+            }
+        })
 
         cy.contains('Address Information').should('be.visible');
     }

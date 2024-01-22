@@ -19,10 +19,18 @@ export default class CheckoutPaymentPage {
     cy.get('.payment-method._active .action.primary.checkout').click();
   }
 
+  enterCouponCode(code = 'H20') {
+    cy.contains('Apply Discount Code').click();
+    cy.get('[name=discount_code]').should('be.visible').type(code);
+    cy.get('.action.action-apply').click();
+
+    cy.get('.totals.discount').should('be.visible');
+  }
+
   placeOrder() {
     cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-    cy.intercept('POST', 'rest/default/V1/guest-carts/*/payment-information').as('placeOrderAction');
+    cy.intercept('POST', 'rest/*/V1/guest-carts/*/payment-information').as('placeOrderAction');
 
     this.pressPlaceOrderButton();
 

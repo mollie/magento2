@@ -66,6 +66,10 @@ class WeeeFeeGenerator implements GeneratorInterface
             $total += $this->getWeeeAmountForItem($item);
         }
 
+        if (abs($total) < 0.01) {
+            return null;
+        }
+
         return [
             'type' => 'surcharge',
             'name' => $this->getTitle($weeeItems),
