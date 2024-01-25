@@ -24,7 +24,7 @@ interface IssuerInterface
     public function getImage(): string;
 
     /**
-     * @return array
+     * @return string[]
      */
     public function getImages(): array;
 
