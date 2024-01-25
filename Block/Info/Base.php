@@ -6,10 +6,8 @@
 
 namespace Mollie\Payment\Block\Info;
 
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Registry;
-use Magento\Framework\UrlInterface;
 use Magento\Payment\Block\Info;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Stdlib\DateTime;
@@ -21,6 +19,7 @@ use Mollie\Payment\Model\Methods\Klarna;
 use Mollie\Payment\Model\Methods\Klarnapaylater;
 use Mollie\Payment\Model\Methods\Klarnapaynow;
 use Mollie\Payment\Model\Methods\Klarnasliceit;
+use Mollie\Payment\Service\Magento\PaymentLinkUrl;
 
 class Base extends Info
 {
@@ -45,17 +44,13 @@ class Base extends Info
      */
     private $price;
     /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-    /**
      * @var Config
      */
     private $config;
     /**
-     * @var UrlInterface
+     * @var PaymentLinkUrl
      */
-    private $urlBuilder;
+    private $paymentLinkUrl;
 
     public function __construct(
         Context $context,
@@ -63,17 +58,15 @@ class Base extends Info
         MollieHelper $mollieHelper,
         Registry $registry,
         PriceCurrencyInterface $price,
-        EncryptorInterface $encryptor,
-        UrlInterface $urlBuilder
+        PaymentLinkUrl $paymentLinkUrl
     ) {
         parent::__construct($context);
         $this->mollieHelper = $mollieHelper;
         $this->timezone = $context->getLocaleDate();
         $this->registry = $registry;
         $this->price = $price;
-        $this->encryptor = $encryptor;
         $this->config = $config;
-        $this->urlBuilder = $urlBuilder;
+        $this->paymentLinkUrl = $paymentLinkUrl;
     }
 
     public function getCheckoutType(): ?string
@@ -114,9 +107,7 @@ class Base extends Info
 
     public function getPaymentLinkUrl(): string
     {
-        return $this->urlBuilder->getUrl('mollie/checkout/paymentlink', [
-            'order' => base64_encode($this->encryptor->encrypt($this->getInfo()->getParentId())),
-        ]);
+        return $this->paymentLinkUrl->execute((int)$this->getInfo()->getParentId());
     }
 
     public function getCheckoutUrl(): ?string

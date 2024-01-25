@@ -45,15 +45,3 @@ $code; ?>" style="display:none">
         <p><?= $block->escapeHtml(__('If only one method is chosen, the selection screen is skipped and the customer is sent directly to the payment method.')); ?></p>
     </div>
 </fieldset>
-
-<script>
-    require([
-        'jquery',
-        'mage/calendar'
-    ], function ($) {
-        $('#<?php echo $code; ?>_days_before_expire').calendar({
-            dateFormat: 'yy-mm-dd',
-            maxDate: 100
-        });
-    });
-</script>
