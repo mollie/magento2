@@ -24,7 +24,7 @@
     </route>
 
     <route url="/V1/mollie/payment-method/meta" method="GET">
-        <service class="\Mollie\Payment\Api\Webapi\PaymentInformationMetaInterface" method="getPaymentMethodsMeta"/>
+        <service class="Mollie\Payment\Api\Webapi\PaymentInformationMetaInterface" method="getPaymentMethodsMeta"/>
         <resources>
             <resource ref="anonymous" />
         </resources>
