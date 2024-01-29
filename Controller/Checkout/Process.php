@@ -17,6 +17,7 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
+use Mollie\Payment\Service\Mollie\ValidateProcessRequest;
 use Mollie\Payment\Service\Order\RedirectOnError;
 
 /**
@@ -58,6 +59,10 @@ class Process extends Action
      * @var RedirectOnError
      */
     private $redirectOnError;
+    /**
+     * @var ValidateProcessRequest
+     */
+    private $validateProcessRequest;
 
     public function __construct(
         Context $context,
@@ -67,7 +72,8 @@ class Process extends Action
         MollieHelper $mollieHelper,
         OrderRepositoryInterface $orderRepository,
         RedirectOnError $redirectOnError,
-        ManagerInterface $eventManager
+        ManagerInterface $eventManager,
+        ValidateProcessRequest $validateProcessRequest
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->paymentHelper = $paymentHelper;
@@ -76,6 +82,7 @@ class Process extends Action
         $this->orderRepository = $orderRepository;
         $this->redirectOnError = $redirectOnError;
         $this->eventManager = $eventManager;
+        $this->validateProcessRequest = $validateProcessRequest;
 
         parent::__construct($context);
     }
@@ -85,7 +92,7 @@ class Process extends Action
      */
     public function execute()
     {
-        $orderIds = $this->getOrderIds();
+        $orderIds = $this->validateProcessRequest->execute();
         if (!$orderIds) {
             $this->mollieHelper->addTolog('error', __('Invalid return, missing order id.'));
             $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));
@@ -94,8 +101,7 @@ class Process extends Action
 
         try {
             $result = [];
-            $paymentToken = $this->getRequest()->getParam('payment_token');
-            foreach ($orderIds as $orderId) {
+            foreach ($orderIds as $orderId => $paymentToken) {
                 $result = $this->mollieModel->processTransaction($orderId, 'success', $paymentToken);
             }
         } catch (\Exception $e) {
@@ -132,18 +138,6 @@ class Process extends Action
         }
 
         return $this->handleNonSuccessResult($result, $orderIds);
-    }
-
-    /**
-     * @return array
-     */
-    protected function getOrderIds(): array
-    {
-        if ($orderId = $this->getRequest()->getParam('order_id')) {
-            return [$orderId];
-        }
-
-        return $this->getRequest()->getParam('order_ids') ?? [];
     }
 
     protected function handleNonSuccessResult(array $result, array $orderIds): ResponseInterface
