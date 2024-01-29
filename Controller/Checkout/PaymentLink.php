@@ -12,12 +12,9 @@ use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Sales\Model\Order;
-use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Magento\PaymentLinkRedirect;
 
 class PaymentLink implements HttpGetActionInterface
 {
@@ -25,10 +22,6 @@ class PaymentLink implements HttpGetActionInterface
      * @var RequestInterface
      */
     private $request;
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
     /**
      * @var ResultFactory
      */
@@ -38,28 +31,20 @@ class PaymentLink implements HttpGetActionInterface
      */
     private $messageManager;
     /**
-     * @var OrderRepositoryInterface
+     * @var PaymentLinkRedirect
      */
-    private $orderRepository;
-    /**
-     * @var Mollie
-     */
-    private $mollie;
+    private $paymentLinkRedirect;
 
     public function __construct(
         RequestInterface $request,
-        EncryptorInterface $encryptor,
         ResultFactory $resultFactory,
         ManagerInterface $messageManager,
-        OrderRepositoryInterface $orderRepository,
-        Mollie $mollie
+        PaymentLinkRedirect $paymentLinkRedirect
     ) {
         $this->request = $request;
-        $this->encryptor = $encryptor;
         $this->resultFactory = $resultFactory;
         $this->messageManager = $messageManager;
-        $this->orderRepository = $orderRepository;
-        $this->mollie = $mollie;
+        $this->paymentLinkRedirect = $paymentLinkRedirect;
     }
 
     public function execute()
@@ -69,27 +54,19 @@ class PaymentLink implements HttpGetActionInterface
             return $this->returnStatusCode(400);
         }
 
-        $id = $this->encryptor->decrypt(base64_decode($orderKey));
-
-        if (empty($id)) {
-            return $this->returnStatusCode(404);
-        }
-
         try {
-            $order = $this->orderRepository->get($id);
+            $result = $this->paymentLinkRedirect->execute($orderKey);
         } catch (NoSuchEntityException $exception) {
             return $this->returnStatusCode(404);
         }
 
-        if (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE])) {
+        if ($result->isAlreadyPaid()) {
             $this->messageManager->addSuccessMessage(__('Your order has already been paid.'));
 
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setUrl('/');
         }
 
-        $url = $this->mollie->startTransaction($order);
-
-        return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setUrl($url);
+        return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setUrl($result->getRedirectUrl());
     }
 
     public function returnStatusCode(int $code): ResultInterface

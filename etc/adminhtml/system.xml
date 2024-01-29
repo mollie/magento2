@@ -303,6 +303,25 @@
                         <field id="use_custom_redirect_url">1</field>
                     </depends>
                 </field>
+                <field id="use_custom_paymentlink_url" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Use custom payment link url?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/use_custom_paymentlink_url</config_path>
+                </field>
+                <field id="custom_paymentlink_url" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Custom payment link url</label>
+                    <config_path>payment/mollie_general/custom_paymentlink_url</config_path>
+                    <comment><![CDATA[
+                        <strong>Note:</strong> You can use the following placeholders:<br>
+                        <br>
+                        <strong>{{order}}</strong>: Mandatory. The encrypted entity ID of the order.<br>
+                    ]]></comment>
+                    <depends>
+                        <field id="use_custom_paymentlink_url">1</field>
+                    </depends>
+                </field>
             </group>
         </section>
 
