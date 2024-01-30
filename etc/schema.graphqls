@@ -8,6 +8,9 @@ type Mutation {
         domain: String @doc(description: "The domain to validate. If this is omitted, the base url of the store is used.")
         validationUrl: String! @doc(description: "The validation URL provided by Apple Pay.")
     ): MollieApplePayValidationOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\ApplePay\\ApplePayValidation")
+    molliePaymentLinkRedirect(
+        order: String @doc(description: "The encrypted order ID that is included in the payment link url")
+    ): MolliePaymentLinkRedirectOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\PaymentLinkRedirect")
 }
 
 type Order {
@@ -98,6 +101,11 @@ type MolliePaymentFee {
 
 type MollieApplePayValidationOutput {
     response: String!
+}
+
+type MolliePaymentLinkRedirectOutput {
+    redirect_url: String
+    already_paid: Boolean!
 }
 
 input PaymentMethodInput {

@@ -12,6 +12,8 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\TestCase\AbstractController;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\ValidateProcessRequest;
+use Mollie\Payment\Test\Fakes\Service\Mollie\FakeValidateProcessRequest;
 
 class ProcessTest extends AbstractController
 {
@@ -25,6 +27,8 @@ class ProcessTest extends AbstractController
 
     public function testRedirectsToCartOnException()
     {
+        $this->fakeValidation(['123' => 'abc']);
+
         $mollieModel = $this->createMock(Mollie::class);
         $mollieModel->method('processTransaction')->willThrowException(new \Exception('[TEST] Transaction failed. Please verify your billing information and payment method, and try again.'));
 
@@ -45,6 +49,7 @@ class ProcessTest extends AbstractController
     public function testUsesOrderIdParameter()
     {
         $order = $this->loadOrderById('100000001');
+        $this->fakeValidation([(string)$order->getId() => 'abc']);
 
         $mollieModel = $this->createMock(Mollie::class);
         $mollieModel->expects($this->once())->method('processTransaction')->with($order->getId())->willReturn([]);
@@ -63,6 +68,13 @@ class ProcessTest extends AbstractController
         $order2 = $this->loadOrderById('100000002');
         $order3 = $this->loadOrderById('100000003');
         $order4 = $this->loadOrderById('100000004');
+
+        $this->fakeValidation([
+            (string)$order1->getId() => 'abc',
+            (string)$order2->getId() => 'def',
+            (string)$order3->getId() => 'ghi',
+            (string)$order4->getId() => 'jkl',
+        ]);
 
         $mollieModel = $this->createMock(Mollie::class);
         $mollieModel->expects($this->exactly(4))->method('processTransaction')->willReturn([]);
@@ -92,5 +104,13 @@ class ProcessTest extends AbstractController
         $orderList = $repository->getList($searchCriteria)->getItems();
 
         return array_shift($orderList);
+    }
+
+    private function fakeValidation(array $response): void
+    {
+        $validateProcessRequest = $this->_objectManager->create(FakeValidateProcessRequest::class);
+        $validateProcessRequest->setResponse($response);
+
+        $this->_objectManager->addSharedInstance($validateProcessRequest, ValidateProcessRequest::class);
     }
 }
