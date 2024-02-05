@@ -32,6 +32,8 @@
     <preference for="Mollie\Payment\Api\Data\IssuerInterface" type="Mollie\Payment\Model\Issuer" />
     <preference for="Mollie\Payment\Api\Data\TerminalInterface" type="Mollie\Payment\Model\Terminal" />
 
+    <preference for="Mollie\Payment\Api\Data\TransactionToProcessInterface" type="Mollie\Payment\Model\Queue\TransactionToProcess"/>
+
     <type name="Mollie\Payment\Config">
         <arguments>
             <argument name="productMetadata" xsi:type="object">Magento\Framework\App\ProductMetadataInterface\Proxy</argument>

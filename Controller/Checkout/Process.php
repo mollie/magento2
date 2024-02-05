@@ -17,6 +17,8 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
+use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
+use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\ValidateProcessRequest;
 use Mollie\Payment\Service\Order\RedirectOnError;
 
@@ -63,6 +65,10 @@ class Process extends Action
      * @var ValidateProcessRequest
      */
     private $validateProcessRequest;
+    /**
+     * @var ProcessTransaction
+     */
+    private $processTransaction;
 
     public function __construct(
         Context $context,
@@ -73,7 +79,8 @@ class Process extends Action
         OrderRepositoryInterface $orderRepository,
         RedirectOnError $redirectOnError,
         ManagerInterface $eventManager,
-        ValidateProcessRequest $validateProcessRequest
+        ValidateProcessRequest $validateProcessRequest,
+        ProcessTransaction $processTransaction
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->paymentHelper = $paymentHelper;
@@ -83,6 +90,7 @@ class Process extends Action
         $this->redirectOnError = $redirectOnError;
         $this->eventManager = $eventManager;
         $this->validateProcessRequest = $validateProcessRequest;
+        $this->processTransaction = $processTransaction;
 
         parent::__construct($context);
     }
@@ -100,9 +108,10 @@ class Process extends Action
         }
 
         try {
-            $result = [];
+            $result = null;
             foreach ($orderIds as $orderId => $paymentToken) {
-                $result = $this->mollieModel->processTransaction($orderId, 'success', $paymentToken);
+                $order = $this->orderRepository->get($orderId);
+                $result = $this->processTransaction->execute($orderId, $order->getMollieTransactionId());
             }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
@@ -110,9 +119,12 @@ class Process extends Action
             return $this->_redirect($this->redirectOnError->getUrl());
         }
 
-        if (!empty($result['success'])) {
+        if ($result !== null && in_array($result->getStatus(), ['paid', 'authorized'])) {
             try {
-                $this->checkoutSession->start();
+                $this->checkoutSession->setLastOrderId($order->getId());
+                $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
+                $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
+                $this->checkoutSession->setLastQuoteId($order->getQuoteId());
 
                 $redirect = new DataObject([
                     'path' => 'checkout/onepage/success',
@@ -140,7 +152,7 @@ class Process extends Action
         return $this->handleNonSuccessResult($result, $orderIds);
     }
 
-    protected function handleNonSuccessResult(array $result, array $orderIds): ResponseInterface
+    protected function handleNonSuccessResult(GetMollieStatusResult $result, array $orderIds): ResponseInterface
     {
         $this->checkIfLastRealOrder($orderIds);
         $this->checkoutSession->restoreQuote();
@@ -149,23 +161,20 @@ class Process extends Action
         return $this->_redirect($this->redirectOnError->getUrl());
     }
 
-    /**
-     * @param array $result
-     */
-    protected function addResultMessage(array $result)
+    protected function addResultMessage(GetMollieStatusResult $result)
     {
-        if (!isset($result['status'])) {
-            $this->messageManager->addErrorMessage(__('Transaction failed. Please verify your billing information and payment method, and try again.'));
-            return;
-        }
-
-        if ($result['status'] == 'canceled') {
+        if ($result->getStatus() == 'canceled') {
             $this->messageManager->addNoticeMessage(__('Payment canceled, please try again.'));
             return;
         }
 
-        if ($result['status'] == 'failed' && isset($result['method'])) {
-            $this->messageManager->addErrorMessage(__('Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.', $result['method']));
+        if ($result->getStatus() == 'failed' && $result->getMethod()) {
+            $this->messageManager->addErrorMessage(
+                __(
+                    'Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.',
+                    $result->getMethod()
+                )
+            );
             return;
         }
 

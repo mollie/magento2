@@ -257,7 +257,14 @@
                         <field id="use_webhooks">custom_url</field>
                     </depends>
                 </field>
-                <field id="encrypt_payment_details" translate="label" type="select" sortOrder="120" showInDefault="1"
+
+                <field id="process_transactions_in_the_queue" translate="label" type="select" sortOrder="120" showInDefault="1" showInStore="0" showInWebsite="0" canRestore="1">
+                    <label>Process transactions in the queue (experimental)</label>
+                    <config_path>payment/mollie_general/process_transactions_in_the_queue</config_path>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+
+                <field id="encrypt_payment_details" translate="label" type="select" sortOrder="130" showInDefault="1"
                        showInWebsite="0" showInStore="1">
                     <label>Encrypt payment details</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
