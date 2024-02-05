@@ -35,7 +35,7 @@ class ShippingDiscount implements GeneratorInterface
 
         $orderLines[] = [
             'type' => OrderLineType::TYPE_DISCOUNT,
-            'name' => __('Magento Discount'),
+            'name' => __('Shipping Discount'),
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($currency, -$amount),
             'totalAmount' => $this->mollieHelper->getAmountArray($currency, -$amount),
