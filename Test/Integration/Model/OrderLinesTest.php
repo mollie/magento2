@@ -57,8 +57,10 @@ class OrderLinesTest extends IntegrationTestCase
 
         /** @var CreditmemoItemInterface $creditmemoItem */
         $creditmemoItem = $this->objectManager->create(CreditmemoItemInterface::class);
-        $creditmemoItem->setBaseRowTotalInclTax(45);
+        $creditmemoItem->setBaseRowTotal(45); // 45 - 21% tax
+        $creditmemoItem->setBaseRowTotalInclTax(45 * 1.21);
         $creditmemoItem->setBaseDiscountAmount(9);
+        $creditmemoItem->setBaseTaxAmount(7.56); // 21% tax
         $creditmemoItem->setQty(1);
         $creditmemoItem->setOrderItemId(999);
 
@@ -75,7 +77,7 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertCount(1, $result['lines']);
 
         $line = $result['lines'][0];
-        $this->assertEquals(36, $line['amount']['value']);
+        $this->assertEquals(45 - 9 + 7.56, $line['amount']['value']);
         $this->assertEquals(1, $line['quantity']);
     }
 
@@ -143,7 +145,9 @@ class OrderLinesTest extends IntegrationTestCase
 
             /** @var OrderItemInterface $orderItem */
             $orderItem = $item->getOrderItem();
-            $orderItem->setBaseRowTotalInclTax(100);
+            $orderItem->setBaseRowTotal(100);
+            $orderItem->setBaseTaxAmount(21);
+            $orderItem->setBaseRowTotalInclTax(121);
             $orderItem->setBaseDiscountAmount(30);
             $orderItem->setQtyOrdered(10);
         }
@@ -158,12 +162,13 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertEquals('EUR', $result['lines'][0]['amount']['currency']);
 
         // 100 euro subtotal
+        // 21 euro tax
         // 30 discount
         // 70 grand total
         // 10 items = 10 euro each
         // 2 items ordered
-        // ((100 - 30) / 10) * 2 = 14
-        $this->assertEquals(14, $result['lines'][0]['amount']['value']);
+        // ((100 + 21 - 30) / 10) * 2 = 14
+        $this->assertEquals(18.2, $result['lines'][0]['amount']['value']);
     }
 
     public function tearDownWithoutVoid()

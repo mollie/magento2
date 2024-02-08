@@ -16,7 +16,6 @@ use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
-use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Handler\State;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -219,7 +218,10 @@ class OrderLines extends AbstractModel
 
             if ($orderHasDiscount) {
                 $orderItem = $item->getOrderItem();
-                $rowTotal = $orderItem->getBaseRowTotalInclTax() - $orderItem->getBaseDiscountAmount();
+                $rowTotal = $orderItem->getBaseRowTotal()
+                    - $orderItem->getBaseDiscountAmount()
+                    + $orderItem->getBaseTaxAmount()
+                    + $orderItem->getBaseDiscountTaxCompensationAmount();
 
                 $line['amount'] = $this->mollieHelper->getAmountArray(
                     $order->getBaseCurrencyCode(),
@@ -288,10 +290,12 @@ class OrderLines extends AbstractModel
             ];
 
             if ($item->getBaseDiscountAmount()) {
-                $line['amount'] = $this->mollieHelper->getAmountArray(
-                    $creditmemo->getBaseCurrencyCode(),
-                    $item->getBaseRowTotalInclTax() - $item->getBaseDiscountAmount()
-                );
+                $rowTotal = $item->getBaseRowTotal()
+                    - $item->getBaseDiscountAmount()
+                    + $item->getBaseTaxAmount()
+                    + $item->getBaseDiscountTaxCompensationAmount();
+
+                $line['amount'] = $this->mollieHelper->getAmountArray($creditmemo->getBaseCurrencyCode(), $rowTotal);
             }
 
             $orderLines[] = $line;
