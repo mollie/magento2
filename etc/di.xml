@@ -3,6 +3,7 @@
     <preference for="Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface" type="Mollie\Payment\Webapi\PaymentToken" />
     <preference for="Mollie\Payment\Api\Webapi\StartTransactionRequestInterface" type="Mollie\Payment\Webapi\StartTransaction" />
     <preference for="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" type="Mollie\Payment\Webapi\GetCustomerOrder" />
+    <preference for="Mollie\Payment\Api\Webapi\GetPaymentLinkRedirectInterface" type="Mollie\Payment\Webapi\GetPaymentLinkRedirect" />
     <preference for="Mollie\Payment\Api\MagentoOrderRepositoryInterface" type="Mollie\Payment\Model\MagentoOrderRepository" />
 
     <preference for="Mollie\Payment\Api\PaymentTokenRepositoryInterface" type="Mollie\Payment\Model\PaymentTokenRepository"/>
@@ -31,6 +32,8 @@
     <preference for="Mollie\Payment\Api\Data\MethodMetaInterface" type="Mollie\Payment\Model\MethodMeta" />
     <preference for="Mollie\Payment\Api\Data\IssuerInterface" type="Mollie\Payment\Model\Issuer" />
     <preference for="Mollie\Payment\Api\Data\TerminalInterface" type="Mollie\Payment\Model\Terminal" />
+
+    <preference for="Mollie\Payment\Api\Data\PaymentLinkRedirectResultInterface" type="Mollie\Payment\Service\Magento\PaymentLinkRedirectResult"/>
 
     <type name="Mollie\Payment\Config">
         <arguments>

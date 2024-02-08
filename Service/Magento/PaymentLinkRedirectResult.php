@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Magento;
 
-class PaymentLinkRedirectResult
+use Mollie\Payment\Api\Data\PaymentLinkRedirectResultInterface;
+
+class PaymentLinkRedirectResult implements PaymentLinkRedirectResultInterface
 {
     /**
      * @var bool
