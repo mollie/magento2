@@ -11,6 +11,7 @@ interface TransactionToOrderInterface extends ExtensibleDataInterface
     public const TRANSACTION_ID = 'transaction_id';
     public const ORDER_ID = 'order_id';
     public const SKIPPED = 'skipped';
+    public const REDIRECTED = 'redirected';
     public const CREATED_AT = 'created_at';
 
     /**
@@ -47,7 +48,7 @@ interface TransactionToOrderInterface extends ExtensibleDataInterface
     public function setCreatedAt(string $created_at): \Mollie\Payment\Api\Data\TransactionToOrderInterface;
 
     /**
-     * @return string|null
+     * @return int|null
      */
     public function getSkipped(): ?int;
 
@@ -56,6 +57,17 @@ interface TransactionToOrderInterface extends ExtensibleDataInterface
      * @return \Mollie\Payment\Api\Data\TransactionToOrderInterface
      */
     public function setSkipped(int $skipped): \Mollie\Payment\Api\Data\TransactionToOrderInterface;
+
+    /**
+     * @return int|null
+     */
+    public function getRedirected(): ?int;
+
+    /**
+     * @param int $redirected
+     * @return \Mollie\Payment\Api\Data\TransactionToOrderInterface
+     */
+    public function setRedirected(int $redirected): \Mollie\Payment\Api\Data\TransactionToOrderInterface;
 
     /**
      * @return \Mollie\Payment\Api\Data\TransactionToOrderExtensionInterface|null

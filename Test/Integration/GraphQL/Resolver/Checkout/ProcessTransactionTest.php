@@ -10,7 +10,10 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
+use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\PaymentToken\Generate;
+use Mollie\Payment\Test\Fakes\Service\Mollie\ProcessTransactionFake;
 use Mollie\Payment\Test\Integration\GraphQLTestCase;
 
 /**
@@ -32,11 +35,17 @@ class ProcessTransactionTest extends GraphQLTestCase
 
         $order = $this->loadOrder('100000001');
         $order->setQuoteId($cart->getId());
+        $order->setMollieTransactionId('tr_123');
+        $order->save();
 
         $tokenModel = $this->objectManager->get(Generate::class)->forOrder($order);
-        $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('processTransaction')->willReturn(['status' => 'failed']);
-        $this->objectManager->addSharedInstance($mollieMock, Mollie::class);
+
+        $fake = $this->objectManager->create(ProcessTransactionFake::class);
+        $fake->setResponse($this->objectManager->create(
+            GetMollieStatusResult::class,
+            ['status' => 'failed', 'method' => 'ideal']
+        ));
+        $this->objectManager->addSharedInstance($fake, ProcessTransaction::class);
 
         $result = $this->graphQlQuery('mutation {
             mollieProcessTransaction(input: { payment_token: "' . $tokenModel->getToken() . '" }) {
@@ -65,11 +74,17 @@ class ProcessTransactionTest extends GraphQLTestCase
 
         $order = $this->loadOrder('100000001');
         $order->setQuoteId($cart->getId());
+        $order->setMollieTransactionId('tr_123');
+        $order->save();
 
         $tokenModel = $this->objectManager->get(Generate::class)->forOrder($order);
-        $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('processTransaction')->willReturn(['status' => 'pending', 'success' => true]);
-        $this->objectManager->addSharedInstance($mollieMock, Mollie::class);
+
+        $fake = $this->objectManager->create(ProcessTransactionFake::class);
+        $fake->setResponse($this->objectManager->create(
+            GetMollieStatusResult::class,
+            ['status' => 'pending', 'method' => 'ideal']
+        ));
+        $this->objectManager->addSharedInstance($fake, ProcessTransaction::class);
 
         $result = $this->graphQlQuery('mutation {
             mollieProcessTransaction(input: { payment_token: "' . $tokenModel->getToken() . '" }) {

@@ -18,6 +18,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
 use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
+use Mollie\Payment\Service\Mollie\Order\SuccessPageRedirect;
 use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\ValidateProcessRequest;
 use Mollie\Payment\Service\Order\RedirectOnError;
@@ -69,6 +70,10 @@ class Process extends Action
      * @var ProcessTransaction
      */
     private $processTransaction;
+    /**
+     * @var SuccessPageRedirect
+     */
+    private $successPageRedirect;
 
     public function __construct(
         Context $context,
@@ -80,7 +85,8 @@ class Process extends Action
         RedirectOnError $redirectOnError,
         ManagerInterface $eventManager,
         ValidateProcessRequest $validateProcessRequest,
-        ProcessTransaction $processTransaction
+        ProcessTransaction $processTransaction,
+        SuccessPageRedirect $successPageRedirect
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->paymentHelper = $paymentHelper;
@@ -91,6 +97,7 @@ class Process extends Action
         $this->eventManager = $eventManager;
         $this->validateProcessRequest = $validateProcessRequest;
         $this->processTransaction = $processTransaction;
+        $this->successPageRedirect = $successPageRedirect;
 
         parent::__construct($context);
     }
@@ -121,27 +128,8 @@ class Process extends Action
 
         if ($result !== null && in_array($result->getStatus(), ['paid', 'authorized'])) {
             try {
-                $this->checkoutSession->setLastOrderId($order->getId());
-                $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
-                $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
-                $this->checkoutSession->setLastQuoteId($order->getQuoteId());
-
-                $redirect = new DataObject([
-                    'path' => 'checkout/onepage/success',
-                    'query' => ['utm_nooverride' => 1],
-                ]);
-
-                $this->eventManager->dispatch('mollie_checkout_success_redirect', [
-                    'redirect' => $redirect,
-                    'order_ids' => $orderIds,
-                    'request' => $this->getRequest(),
-                    'response' => $this->getResponse(),
-                ]);
-
-                return $this->_redirect($redirect->getData('path'), [
-                    '_query' => $redirect->getData('query'),
-                    '_use_rewrite' => false,
-                ]);
+                $this->successPageRedirect->execute($order, $orderIds);
+                return $this->getResponse();
             } catch (\Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
                 $this->messageManager->addErrorMessage(__('Transaction failed. Please verify your billing information and payment method, and try again.'));
