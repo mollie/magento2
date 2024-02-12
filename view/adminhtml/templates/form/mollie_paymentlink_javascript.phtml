@@ -1,0 +1,49 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const saveSelectedMethods = () => {
+            // Save the selected payment methods to local storage
+            var paymentMethods = document.getElementById('mollie_methods_paymentlink_methods');
+            if (!paymentMethods) {
+                return;
+            }
+
+            paymentMethods.addEventListener('change', function () {
+                var selected = [];
+                for (var i = 0; i < paymentMethods.options.length; i++) {
+                    if (paymentMethods.options[i].selected) {
+                        selected.push(paymentMethods.options[i].value);
+                    }
+                }
+                localStorage.setItem('mollie_paymentlink_methods', JSON.stringify(selected));
+            });
+        };
+
+        const setSelectedMethods = () => {
+            var paymentMethods = document.getElementById('mollie_methods_paymentlink_methods');
+            const selectedMethods = JSON.parse(localStorage.getItem('mollie_paymentlink_methods'));
+            if (!selectedMethods || !paymentMethods) {
+                return;
+            }
+
+            for (var i = 0; i < paymentMethods.options.length; i++) {
+                if (selectedMethods.indexOf(paymentMethods.options[i].value) !== -1) {
+                    paymentMethods.options[i].selected = true;
+                }
+            }
+        };
+
+        saveSelectedMethods();
+        setSelectedMethods();
+
+        document.getElementById('order-billing_method').addEventListener('DOMSubtreeModified', () => {
+            saveSelectedMethods();
+            setSelectedMethods();
+        })
+    });
+</script>
