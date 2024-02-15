@@ -26,6 +26,15 @@ class SaveApiKey extends Encrypted
      * @var ApiKeyFallbackInterfaceFactory
      */
     private $apiKeyFallbackFactory;
+    /**
+     * @var UpdateProfileId
+     */
+    private $updateProfileId;
+
+    /**
+     * @var bool|string
+     */
+    private $shouldUpdateProfileId = false;
 
     public function __construct(
         Context $context,
@@ -35,6 +44,7 @@ class SaveApiKey extends Encrypted
         EncryptorInterface $encryptor,
         ApiKeyFallbackRepositoryInterface $apiKeyFallbackRepository,
         ApiKeyFallbackInterfaceFactory $apiKeyFallbackFactory,
+        UpdateProfileId $updateProfileId,
         AbstractResource $resource = null,
         AbstractDb $resourceCollection = null,
         array $data = []
@@ -52,6 +62,7 @@ class SaveApiKey extends Encrypted
 
         $this->apiKeyFallbackRepository = $apiKeyFallbackRepository;
         $this->apiKeyFallbackFactory = $apiKeyFallbackFactory;
+        $this->updateProfileId = $updateProfileId;
     }
 
     public function beforeSave()
@@ -65,11 +76,22 @@ class SaveApiKey extends Encrypted
             // Validate the new API key before saving.
             (new MollieApiClient())->setApiKey($value);
 
+            $this->shouldUpdateProfileId = $value;
+
             $this->saveApiKey();
             $this->_cacheManager->clean(['mollie_payment', 'mollie_payment_methods']);
         }
 
         return $this;
+    }
+
+    public function afterSave()
+    {
+        if ($this->shouldUpdateProfileId !== false) {
+            $this->updateProfileId->execute($this->shouldUpdateProfileId, $this->getScope(), $this->getScopeId());
+        }
+
+        return parent::afterSave();
     }
 
     private function saveApiKey(): void

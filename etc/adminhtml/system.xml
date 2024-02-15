@@ -51,7 +51,7 @@
                 <field id="type" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1"
                        showInStore="1">
                     <label>Modus</label>
-                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\FlushMollieCache</backend_model>
+                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\ChangeApiMode</backend_model>
                     <source_model>Mollie\Payment\Model\Adminhtml\Source\ApiKey</source_model>
                     <config_path>payment/mollie_general/type</config_path>
                 </field>
@@ -69,9 +69,12 @@
                     <config_path>payment/mollie_general/apikey_live</config_path>
                     <comment model="Mollie\Payment\Model\Adminhtml\Comment\CurrentApiKeyMeta" />
                 </field>
-                <field id="profileid" translate="label" type="text" sortOrder="50" showInDefault="1"
+                <field id="profileid" translate="label comment" type="text" sortOrder="50" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Profile ID</label>
+                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\DoNoUpdate</backend_model>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\DisabledInput</frontend_model>
+                    <comment>When you save the api key or change the mode, this value is automatically updated.</comment>
                     <config_path>payment/mollie_general/profileid</config_path>
                 </field>
                 <field id="credentials_checker" translate="label" type="button" sortOrder="60" showInDefault="1"

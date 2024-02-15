@@ -209,20 +209,35 @@ class Config
         }
 
         if (!$this->isProductionMode($storeId)) {
-            $apiKey = trim($this->getPath(static::GENERAL_APIKEY_TEST, $storeId) ?? '');
-            if (empty($apiKey)) {
-                $this->addToLog('error', 'Mollie API key not set (test modus)');
-            }
-
-            if (!preg_match('/^test_\w+$/', $apiKey)) {
-                $this->addToLog('error', 'Mollie set to test modus, but API key does not start with "test_"');
-            }
+            $apiKey = $this->getTestApiKey($storeId === null ? null : (int)$storeId);
 
             $keys[$storeId] = $apiKey;
             return $apiKey;
         }
 
-        $apiKey = trim($this->getPath(static::GENERAL_APIKEY_LIVE, $storeId) ?? '');
+        $apiKey = $this->getLiveApiKey($storeId === null ? null : (int)$storeId);
+
+        $keys[$storeId] = $apiKey;
+        return $apiKey;
+    }
+
+    public function getTestApiKey(int $storeId = null): string
+    {
+        $apiKey = trim((string)$this->getPath(static::GENERAL_APIKEY_TEST, $storeId) ?? '');
+        if (empty($apiKey)) {
+            $this->addToLog('error', 'Mollie API key not set (test modus)');
+        }
+
+        if (!preg_match('/^test_\w+$/', $apiKey)) {
+            $this->addToLog('error', 'Mollie set to test modus, but API key does not start with "test_"');
+        }
+
+        return $apiKey;
+    }
+
+    public function getLiveApiKey(int $storeId = null): string
+    {
+        $apiKey = trim((string)$this->getPath(static::GENERAL_APIKEY_LIVE, $storeId) ?? '');
         if (empty($apiKey)) {
             $this->addToLog('error', 'Mollie API key not set (live modus)');
         }
@@ -231,7 +246,6 @@ class Config
             $this->addToLog('error', 'Mollie set to live modus, but API key does not start with "live_"');
         }
 
-        $keys[$storeId] = $apiKey;
         return $apiKey;
     }
 
