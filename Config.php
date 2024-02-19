@@ -31,6 +31,7 @@ class Config
     const GENERAL_DASHBOARD_URL_PAYMENTS_API = 'payment/mollie_general/dashboard_url_payments_api';
     const GENERAL_ENABLE_MAGENTO_VAULT = 'payment/mollie_general/enable_magento_vault';
     const GENERAL_ENABLE_SECOND_CHANCE_EMAIL = 'payment/mollie_general/enable_second_chance_email';
+    const GENERAL_PROCESS_TRANSACTION_IN_THE_QUEUE =  'payment/mollie_general/process_transactions_in_the_queue';
     const GENERAL_ENCRYPT_PAYMENT_DETAILS = 'payment/mollie_general/encrypt_payment_details';
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
@@ -754,6 +755,11 @@ class Config
     public function isMultishippingEnabled(): bool
     {
         return $this->moduleManager->isEnabled('Mollie_Multishipping');
+    }
+
+    public function processTransactionsInTheQueue(int $storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_PROCESS_TRANSACTION_IN_THE_QUEUE, $storeId);
     }
 
     public function encryptPaymentDetails($storeId = null): bool

@@ -13,18 +13,13 @@ use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Mollie\Api\Types\PaymentStatus;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
-use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\ProcessTransaction as ProcessTransactionAction;
 use Mollie\Payment\Service\Mollie\ShouldRedirectToSuccessPage;
 
 class ProcessTransaction implements ResolverInterface
 {
-    /**
-     * @var Mollie
-     */
-    private $mollie;
-
     /**
      * @var PaymentTokenRepositoryInterface
      */
@@ -39,17 +34,27 @@ class ProcessTransaction implements ResolverInterface
      * @var ShouldRedirectToSuccessPage
      */
     private $shouldRedirectToSuccessPage;
+    /**
+     * @var ProcessTransactionAction
+     */
+    private $processTransaction;
+    /**
+     * @var OrderRepositoryInterface
+     */
+    private $orderRepository;
 
     public function __construct(
-        Mollie $mollie,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         CartRepositoryInterface $cartRepository,
-        ShouldRedirectToSuccessPage $shouldRedirectToSuccessPage
+        ShouldRedirectToSuccessPage $shouldRedirectToSuccessPage,
+        ProcessTransactionAction $processTransaction,
+        OrderRepositoryInterface $orderRepository
     ) {
-        $this->mollie = $mollie;
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->cartRepository = $cartRepository;
         $this->shouldRedirectToSuccessPage = $shouldRedirectToSuccessPage;
+        $this->processTransaction = $processTransaction;
+        $this->orderRepository = $orderRepository;
     }
 
     public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
@@ -65,7 +70,8 @@ class ProcessTransaction implements ResolverInterface
             throw new GraphQlNoSuchEntityException(__('No order found with token "%1"', $token));
         }
 
-        $result = $this->mollie->processTransaction($tokenModel->getOrderId(), 'success', $token);
+        $order = $this->orderRepository->get($tokenModel->getOrderId());
+        $result = $this->processTransaction->execute($tokenModel->getOrderId(), $order->getMollieTransactionId());
         $redirectToSuccessPage = $this->shouldRedirectToSuccessPage->execute($result);
 
         $cart = null;
@@ -74,7 +80,7 @@ class ProcessTransaction implements ResolverInterface
         }
 
         return [
-            'paymentStatus' => strtoupper($result['status']),
+            'paymentStatus' => strtoupper($result->getStatus()),
             'cart' => $cart,
             'redirect_to_cart' => !$redirectToSuccessPage,
             'redirect_to_success_page' => $redirectToSuccessPage,
