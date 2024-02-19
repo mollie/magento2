@@ -10,6 +10,7 @@
         <referenceContainer name="submit_before">
             <block template="Mollie_Payment::order/shipment/create/payment_hold_warning.phtml"
                    name="mollie.payment.hold.warning"
+                   ifconfig="payment/mollie_general/enable_manual_capture"
             />
         </referenceContainer>
     </body>
