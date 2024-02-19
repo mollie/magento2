@@ -8,9 +8,7 @@ namespace Mollie\Payment\Block\Form;
 
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Payment\Block\Form;
-use Mollie\Api\Exceptions\ApiException;
-use Mollie\Api\Resources\Terminal;
-use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Mollie\AvailableTerminals;
 
 /**
  * Class Pointofsale
@@ -20,22 +18,23 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 class Pointofsale extends Form
 {
     /**
+     * @var AvailableTerminals
+     */
+    private $availableTerminals;
+
+    /**
      * @var string
      */
     protected $_template = 'Mollie_Payment::form/pointofsale.phtml';
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
 
     public function __construct(
         Context $context,
-        MollieApiClient $mollieApiClient,
+        AvailableTerminals $availableTerminals,
         array $data = []
     ) {
         parent::__construct($context, $data);
 
-        $this->mollieApiClient = $mollieApiClient;
+        $this->availableTerminals = $availableTerminals;
     }
 
     /**
@@ -46,36 +45,11 @@ class Pointofsale extends Form
      *     serialNumber: string|null,
      *     description: string
      * }
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getTerminals(): array
     {
         $storeId = $this->_storeManager->getStore()->getId();
 
-        try {
-            $mollieApiClient = $this->mollieApiClient->loadByStore((int)$storeId);
-            $terminals = $mollieApiClient->terminals->page();
-        } catch (ApiException $exception) {
-            return [];
-        }
-
-        $output = [];
-        /** @var Terminal $terminal */
-        foreach ($terminals as $terminal) {
-            if (!$terminal->isActive()) {
-                continue;
-            }
-
-            $output[] = [
-                'id' => $terminal->id,
-                'brand' => $terminal->brand,
-                'model' => $terminal->model,
-                'serialNumber' => $terminal->serialNumber,
-                'description' => $terminal->description,
-            ];
-        }
-
-        return $output;
+        return $this->availableTerminals->execute((int)$storeId);
     }
 }

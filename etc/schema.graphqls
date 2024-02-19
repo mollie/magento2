@@ -24,6 +24,7 @@ type Cart {
 
 type AvailablePaymentMethod {
     mollie_available_issuers: [MollieIssuer!] @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\AvailableIssuersForMethod") @doc(description: "Available issuers for this payment method")
+    mollie_available_terminals: [MollieTerminalOutput!] @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\AvailableTerminalsForMethod") @doc(description: "Available terminals for this payment method")
     mollie_meta: MolliePaymentMethodMeta! @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\PaymentMethodMeta") @doc(description: "Retrieve meta information for this payment method (image)")
 }
 
@@ -71,6 +72,14 @@ type Query {
         hash: String @doc(description: "The hash added to your custom URL")
     ): CustomerOrder @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\MollieCustomerOrder")
     molliePaymentMethods(input: MolliePaymentMethodsInput): MolliePaymentMethodsOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\General\\MolliePaymentMethods") @cache(cacheIdentity: "Mollie\\Payment\\GraphQL\\Resolver\\Cache\\PaymentMethodsCache")
+}
+
+type MollieTerminalOutput {
+    id: String!
+    brand: String!
+    model: String!
+    serialNumber: String
+    description: String!
 }
 
 type MollieResetCartOutput {
