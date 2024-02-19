@@ -51,6 +51,13 @@
         </resources>
     </route>
 
+    <route url="/V1/mollie/get-payment-link-redirect/:hash" method="GET">
+        <service class="Mollie\Payment\Api\Webapi\GetPaymentLinkRedirectInterface" method="byHash"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
     <route url="/V1/mollie/orders/recurring" method="GET">
         <service class="Mollie\Payment\Api\MagentoOrderRepositoryInterface" method="getRecurringOrders"/>
         <resources>
