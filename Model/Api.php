@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Model;
 
+use Magento\Framework\Module\Manager;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Api\MollieApiClient;
@@ -21,13 +22,19 @@ class Api extends MollieApiClient
      * @var
      */
     public $mollieHelper;
+    /**
+     * @var Manager
+     */
+    private $moduleManager;
 
     public function __construct(
         Config $config,
-        MollieHelper $mollieHelper
+        MollieHelper $mollieHelper,
+        Manager $moduleManager
     ) {
         $this->config = $config;
         $this->mollieHelper = $mollieHelper;
+        $this->moduleManager = $moduleManager;
         parent::__construct();
     }
 
@@ -41,5 +48,13 @@ class Api extends MollieApiClient
         $this->addVersionString('Magento/' . $this->config->getMagentoVersion());
         $this->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
         $this->addVersionString('MollieMagento2/' . $this->mollieHelper->getExtensionVersion());
+
+        if ($this->moduleManager->isEnabled('Hyva_Theme')) {
+            $this->addVersionString('HyvaTheme');
+        }
+
+        if ($this->moduleManager->isEnabled('Hyva_Checkout')) {
+            $this->addVersionString('HyvaCheckout');
+        }
     }
 }
