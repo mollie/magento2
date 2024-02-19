@@ -16,9 +16,14 @@ class FlushMollieCache extends Value
         parent::beforeSave();
 
         if ($this->getOldValue() != $this->getValue()) {
-            $this->_cacheManager->clean(['mollie_payment', 'mollie_payment_methods']);
+            $this->flush();
         }
 
         return $this;
+    }
+
+    public function flush(): void
+    {
+        $this->_cacheManager->clean(['mollie_payment', 'mollie_payment_methods']);
     }
 }
