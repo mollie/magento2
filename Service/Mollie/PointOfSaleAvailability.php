@@ -42,4 +42,14 @@ class PointOfSaleAvailability
             $allowedGroups
         );
     }
+
+    public function isAvailableForCustomerGroupId(int $customerGroupId, int $storeId): bool
+    {
+        $allowedGroups = explode(',', $this->config->pointofsaleAllowedCustomerGroups($storeId));
+
+        return in_array(
+            (string)$customerGroupId,
+            $allowedGroups
+        );
+    }
 }
