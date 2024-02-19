@@ -16,7 +16,6 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Service\Mollie\ProcessTransaction as ProcessTransactionAction;
-use Mollie\Payment\Service\Mollie\ShouldRedirectToSuccessPage;
 
 class ProcessTransaction implements ResolverInterface
 {
@@ -31,10 +30,6 @@ class ProcessTransaction implements ResolverInterface
     private $cartRepository;
 
     /**
-     * @var ShouldRedirectToSuccessPage
-     */
-    private $shouldRedirectToSuccessPage;
-    /**
      * @var ProcessTransactionAction
      */
     private $processTransaction;
@@ -46,13 +41,11 @@ class ProcessTransaction implements ResolverInterface
     public function __construct(
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         CartRepositoryInterface $cartRepository,
-        ShouldRedirectToSuccessPage $shouldRedirectToSuccessPage,
         ProcessTransactionAction $processTransaction,
         OrderRepositoryInterface $orderRepository
     ) {
         $this->paymentTokenRepository = $paymentTokenRepository;
         $this->cartRepository = $cartRepository;
-        $this->shouldRedirectToSuccessPage = $shouldRedirectToSuccessPage;
         $this->processTransaction = $processTransaction;
         $this->orderRepository = $orderRepository;
     }
@@ -72,7 +65,7 @@ class ProcessTransaction implements ResolverInterface
 
         $order = $this->orderRepository->get($tokenModel->getOrderId());
         $result = $this->processTransaction->execute($tokenModel->getOrderId(), $order->getMollieTransactionId());
-        $redirectToSuccessPage = $this->shouldRedirectToSuccessPage->execute($result);
+        $redirectToSuccessPage = in_array($result->getStatus(), ['pending', 'paid', 'authorized']);
 
         $cart = null;
         if ($tokenModel->getCartId()) {
