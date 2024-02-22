@@ -93,6 +93,25 @@ class TransactionToOrder extends AbstractExtensibleModel implements TransactionT
     }
 
     /**
+     * Get redirected
+     * @return int|null
+     */
+    public function getRedirected(): ?int
+    {
+        return (int)$this->getData(self::REDIRECTED);
+    }
+
+    /**
+     * Set redirected
+     * @param int $redirected
+     * @return TransactionToOrderInterface
+     */
+    public function setRedirected(int $redirected): TransactionToOrderInterface
+    {
+        return $this->setData(self::REDIRECTED, $redirected);
+    }
+
+    /**
      * Retrieve existing extension attributes object or create a new one.
      * @return TransactionToOrderExtensionInterface|null
      */

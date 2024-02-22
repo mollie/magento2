@@ -84,6 +84,7 @@
             "transaction_id": true,
             "order_id": true,
             "skipped": true,
+            "redirected": true,
             "created_at": true
         },
         "constaint": {

@@ -16,6 +16,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Mollie as MollieModel;
+use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\OrderLockService;
 
 /**
@@ -55,6 +56,10 @@ class Webhook extends Action
      * @var OrderLockService
      */
     private $orderLockService;
+    /**
+     * @var ProcessTransaction
+     */
+    private $processTransaction;
 
     public function __construct(
         Context $context,
@@ -63,7 +68,8 @@ class Webhook extends Action
         MollieHelper $mollieHelper,
         OrderRepositoryInterface $orderRepository,
         EncryptorInterface $encryptor,
-        OrderLockService $orderLockService
+        OrderLockService $orderLockService,
+        ProcessTransaction $processTransaction
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->resultFactory = $context->getResultFactory();
@@ -72,6 +78,7 @@ class Webhook extends Action
         $this->orderRepository = $orderRepository;
         $this->encryptor = $encryptor;
         $this->orderLockService = $orderLockService;
+        $this->processTransaction = $processTransaction;
         parent::__construct($context);
     }
 
@@ -103,8 +110,7 @@ class Webhook extends Action
                     throw new \Exception('Order is locked, skipping webhook', 425);
                 }
 
-                $order->setMollieTransactionId($transactionId);
-                $this->mollieModel->processTransactionForOrder($order, 'webhook');
+                $this->processTransaction->execute((int)$order->getEntityId(), $transactionId);
             }
 
             return $this->getOkResponse();

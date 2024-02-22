@@ -117,6 +117,7 @@
         <column name="transaction_id" xsi:type="varchar" comment="transaction_id" nullable="true"/>
         <column name="order_id" xsi:type="int" comment="order_id" nullable="true"/>
         <column name="skipped" xsi:type="int" comment="skipped" nullable="false" default="0"/>
+        <column name="redirected" xsi:type="int" comment="redirected" nullable="false" default="0"/>
         <column name="created_at" xsi:type="timestamp" default="CURRENT_TIMESTAMP" nullable="false" comment="Created At"/>
 
         <constraint xsi:type="primary" referenceId="PRIMARY">

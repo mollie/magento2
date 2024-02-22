@@ -17,6 +17,7 @@ use Mollie\Payment\Api\Data\MethodMetaInterfaceFactory;
 use Mollie\Payment\Api\Webapi\PaymentInformationMetaInterface;
 use Mollie\Payment\Block\Form\Pointofsale;
 use Mollie\Payment\Config;
+use Mollie\Payment\Service\Mollie\AvailableTerminals;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\PaymentMethods;
@@ -44,6 +45,10 @@ class PaymentInformationMeta implements PaymentInformationMetaInterface
      */
     private $pointofsale;
     /**
+     * @var AvailableTerminals
+     */
+    private $availableTerminals;
+    /**
      * @var Config
      */
     private $config;
@@ -63,6 +68,7 @@ class PaymentInformationMeta implements PaymentInformationMetaInterface
         PaymentMethods $paymentMethods,
         GetIssuers $getIssuers,
         Pointofsale $pointofsale,
+        AvailableTerminals $availableTerminals,
         IssuerInterfaceFactory $issuerFactory,
         TerminalInterfaceFactory $terminalFactory
     ) {
@@ -71,6 +77,7 @@ class PaymentInformationMeta implements PaymentInformationMetaInterface
         $this->paymentMethods = $paymentMethods;
         $this->getIssuers = $getIssuers;
         $this->pointofsale = $pointofsale;
+        $this->availableTerminals = $availableTerminals;
         $this->config = $config;
         $this->issuerFactory = $issuerFactory;
         $this->terminalFactory = $terminalFactory;
@@ -119,6 +126,6 @@ class PaymentInformationMeta implements PaymentInformationMetaInterface
 
         return array_map(function (array $terminal) {
             return $this->terminalFactory->create($terminal);
-        }, $this->pointofsale->getTerminals());
+        }, $this->availableTerminals->execute());
     }
 }

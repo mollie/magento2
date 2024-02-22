@@ -16,6 +16,7 @@
             <module name="Magento_Ui"/>
             <module name="Magento_Vault"/>
             <module name="Magento_Tax" />
+            <module name="Magento_MessageQueue"/>
         </sequence>
     </module>
 </config>

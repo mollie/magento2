@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
+    <consumer name="mollie.transaction.processor"
+              queue="mollie.transaction.processor"
+              connection="db"
+              maxMessages="100"
+              handler="Mollie\Payment\Queue\Handler\TransactionProcessor::execute"/>
+</config>

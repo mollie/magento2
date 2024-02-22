@@ -12,8 +12,11 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\TestCase\AbstractController;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
+use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\ValidateProcessRequest;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeValidateProcessRequest;
+use Mollie\Payment\Test\Fakes\Service\Mollie\ProcessTransactionFake;
 
 class ProcessTest extends AbstractController
 {
@@ -51,12 +54,17 @@ class ProcessTest extends AbstractController
         $order = $this->loadOrderById('100000001');
         $this->fakeValidation([(string)$order->getId() => 'abc']);
 
-        $mollieModel = $this->createMock(Mollie::class);
-        $mollieModel->expects($this->once())->method('processTransaction')->with($order->getId())->willReturn([]);
+        $fake = $this->_objectManager->create(ProcessTransactionFake::class);
+        $fake->setResponse($this->_objectManager->create(
+            GetMollieStatusResult::class,
+            ['status' => 'paid', 'method' => 'ideal']
+        ));
 
-        $this->_objectManager->addSharedInstance($mollieModel, Mollie::class);
+        $this->_objectManager->addSharedInstance($fake, ProcessTransaction::class);
 
         $this->dispatch('mollie/checkout/process?order_id=' . $order->getId());
+
+        $this->assertEquals(1, $fake->getTimesCalled());
     }
 
     /**
@@ -76,10 +84,13 @@ class ProcessTest extends AbstractController
             (string)$order4->getId() => 'jkl',
         ]);
 
-        $mollieModel = $this->createMock(Mollie::class);
-        $mollieModel->expects($this->exactly(4))->method('processTransaction')->willReturn([]);
+        $fake = $this->_objectManager->create(ProcessTransactionFake::class);
+        $fake->setResponse($this->_objectManager->create(
+            GetMollieStatusResult::class,
+            ['status' => 'paid', 'method' => 'ideal']
+        ));
 
-        $this->_objectManager->addSharedInstance($mollieModel, Mollie::class);
+        $this->_objectManager->addSharedInstance($fake, ProcessTransaction::class);
 
         $queryString = [
             'order_ids[]=' . $order1->getId(),
@@ -89,6 +100,8 @@ class ProcessTest extends AbstractController
         ];
 
         $this->dispatch('mollie/checkout/process?' . implode('&', $queryString));
+
+        $this->assertEquals(4, $fake->getTimesCalled());
     }
 
     /**
@@ -103,7 +116,11 @@ class ProcessTest extends AbstractController
 
         $orderList = $repository->getList($searchCriteria)->getItems();
 
-        return array_shift($orderList);
+        $order = array_shift($orderList);
+        $order->setMollieTransactionId('ord_abc' . $orderId);
+        $repository->save($order);
+
+        return $order;
     }
 
     private function fakeValidation(array $response): void

@@ -7,6 +7,7 @@
 namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Module\Manager;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\Wrapper\FetchFallbackApiKeys;
 use Mollie\Payment\Service\Mollie\Wrapper\MollieApiClientFallbackWrapper;
@@ -33,15 +34,21 @@ class MollieApiClient
      * @var FetchFallbackApiKeys
      */
     private $fetchFallbackApiKeys;
+    /**
+     * @var Manager
+     */
+    private $moduleManager;
 
     public function __construct(
         Config $config,
         MollieApiClientFallbackWrapperFactory $mollieApiClientWrapperFactory,
-        FetchFallbackApiKeys $fetchFallbackApiKeys
+        FetchFallbackApiKeys $fetchFallbackApiKeys,
+        Manager $moduleManager
     ) {
         $this->config = $config;
         $this->mollieApiClientWrapperFactory = $mollieApiClientWrapperFactory;
         $this->fetchFallbackApiKeys = $fetchFallbackApiKeys;
+        $this->moduleManager = $moduleManager;
     }
 
     public function loadByStore(int $storeId = null): \Mollie\Api\MollieApiClient
@@ -68,6 +75,15 @@ class MollieApiClient
         $mollieApiClient->addVersionString('Magento/' . $this->config->getMagentoVersion());
         $mollieApiClient->addVersionString('MagentoEdition/' . $this->config->getMagentoEdition());
         $mollieApiClient->addVersionString('MollieMagento2/' . $this->config->getVersion());
+
+        if ($this->moduleManager->isEnabled('Hyva_Theme')) {
+            $mollieApiClient->addVersionString('HyvaTheme');
+        }
+
+        if ($this->moduleManager->isEnabled('Hyva_Checkout')) {
+            $mollieApiClient->addVersionString('HyvaCheckout');
+        }
+
         $this->instances[$apiKey] = $mollieApiClient;
 
         return $mollieApiClient;

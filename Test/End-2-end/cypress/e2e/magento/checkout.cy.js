@@ -93,4 +93,25 @@ describe('Checkout usage', () => {
 
     cy.get('.mollie-checkout-type').should('contain', 'Order');
   });
+
+  it('C2530311: Validate that the success page can only be visited once', () => {
+    visitCheckoutPayment.visit();
+
+    checkoutPaymentPage.selectPaymentMethod('iDeal');
+    checkoutPaymentPage.selectFirstAvailableIssuer();
+
+    cy.intercept('mollie/checkout/process/*').as('processAction');
+
+    checkoutPaymentPage.placeOrder();
+
+    mollieHostedPaymentPage.selectStatus('paid');
+
+    checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
+
+    cy.wait('@processAction').then((interception) => {
+      cy.visit(interception.request.url);
+    });
+
+    cy.url().should('include', 'checkout/cart');
+  });
 })
