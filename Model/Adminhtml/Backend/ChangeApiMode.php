@@ -69,7 +69,9 @@ class ChangeApiMode extends Value
     public function afterSave()
     {
         $apiKey = $this->getApiKey($this->getValue());
-        $this->updateProfileId->execute($apiKey, $this->getScope(), $this->getScopeId());
+        if ($apiKey) {
+            $this->updateProfileId->execute($apiKey, $this->getScope(), $this->getScopeId());
+        }
 
         return parent::afterSave();
     }
