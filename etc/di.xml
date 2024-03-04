@@ -365,6 +365,10 @@
         </arguments>
     </type>
 
+    <type name="Magento\Sales\Model\Order\Email\Sender\OrderSender">
+        <plugin name="mollie_send_payment_link_confirmation" type="Mollie\Payment\Plugin\Sales\Model\Order\Email\Sender\SendPaymentLinkConfirmation" />
+    </type>
+
     <!-- Payment methods configuration start -->
     <!-- ApplePay -->
     <type name="Mollie\Payment\Model\Methods\ApplePay">

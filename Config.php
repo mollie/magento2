@@ -72,6 +72,8 @@ class Config
     const PAYMENT_PAYMENTLINK_NEW_STATUS = 'payment/mollie_methods_paymentlink/order_status_new';
     const PAYMENT_PAYMENTLINK_ADD_MESSAGE = 'payment/mollie_methods_paymentlink/add_message';
     const PAYMENT_PAYMENTLINK_MESSAGE = 'payment/mollie_methods_paymentlink/message';
+    const PAYMENT_PAYMENTLINK_USE_CUSTOM_EMAIL_TEMPLATE = 'payment/mollie_methods_paymentlink/use_custom_email_template';
+    const PAYMENT_PAYMENTLINK_EMAIL_TEMPLATE = 'payment/mollie_methods_paymentlink/email_template';
     const PAYMENT_USE_CUSTOM_PAYMENTLINK_URL = 'payment/mollie_general/use_custom_paymentlink_url';
     const PAYMENT_CUSTOM_PAYMENTLINK_URL = 'payment/mollie_general/custom_paymentlink_url';
     const PAYMENT_POINTOFSALE_ALLOWED_CUSTOMER_GROUPS = 'payment/mollie_methods_pointofsale/allowed_customer_groups';
@@ -526,6 +528,22 @@ class Config
     {
         return (string)$this->getPath(
             static::PAYMENT_PAYMENTLINK_MESSAGE,
+            $storeId
+        );
+    }
+
+    public function paymentLinkUseCustomEmailTemplate(int $storeId = null): string
+    {
+        return $this->getPath(
+            static::PAYMENT_PAYMENTLINK_USE_CUSTOM_EMAIL_TEMPLATE,
+            $storeId
+        );
+    }
+
+    public function paymentLinkEmailTemplate(int $storeId = null): string
+    {
+        return $this->getPath(
+            static::PAYMENT_PAYMENTLINK_EMAIL_TEMPLATE,
             $storeId
         );
     }
