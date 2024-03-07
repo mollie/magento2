@@ -60,6 +60,12 @@ class PaymentLink implements HttpGetActionInterface
             return $this->returnStatusCode(404);
         }
 
+        if ($result->isExpired()) {
+            $this->messageManager->addErrorMessage(__('Your payment link has expired.'));
+
+            return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setUrl('/');
+        }
+
         if ($result->isAlreadyPaid()) {
             $this->messageManager->addSuccessMessage(__('Your order has already been paid.'));
 
