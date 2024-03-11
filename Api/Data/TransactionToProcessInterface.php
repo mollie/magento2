@@ -29,4 +29,15 @@ interface TransactionToProcessInterface
      * @return int|null
      */
     public function getOrderId(): ?int;
+
+    /**
+     * @param string $type
+     * @return \Mollie\Payment\Api\Data\TransactionToProcessInterface
+     */
+    public function setType(string $type): TransactionToProcessInterface;
+
+    /**
+     * @return string|null
+     */
+    public function getType(): ?string;
 }

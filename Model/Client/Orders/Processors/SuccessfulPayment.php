@@ -179,7 +179,8 @@ class SuccessfulPayment implements OrderProcessorInterface
         }
 
         if ($mollieOrder->isAuthorized() &&
-            $this->mollieHelper->getInvoiceMoment($order->getStoreId()) == InvoiceMoment::ON_AUTHORIZE
+            $this->mollieHelper->getInvoiceMoment($order->getStoreId()) == InvoiceMoment::ON_AUTHORIZE &&
+            $order->getInvoiceCollection()->count() === 0
         ) {
             $payment->setIsTransactionClosed(false);
             $payment->registerAuthorizationNotification($order->getBaseGrandTotal(), true);
