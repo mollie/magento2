@@ -36,4 +36,14 @@ class GetMollieStatusResult
     {
         return $this->method;
     }
+
+    public function shouldRedirectToSuccessPage(): bool
+    {
+        $status = $this->status;
+        if ($status == 'created' && $this->method == 'banktransfer') {
+            return true;
+        }
+
+        return in_array($status, ['pending', 'paid', 'authorized']);
+    }
 }
