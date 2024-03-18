@@ -348,7 +348,8 @@
     <virtualType name="ScandiPWA\Router\Controller\ConfigurableRouter" type="ScandiPWA\Router\Controller\Router">
         <arguments>
             <argument name="ignoredURLs" xsi:type="array">
-                <item name="mollie" xsi:type="string">^/mollie/.*</item>
+                <item name="mollie-webhook" xsi:type="string">^/mollie/checkout/webhook.*</item>
+                <item name="mollie-secondchance" xsi:type="string">^/mollie/checkout/secondchance.*</item>
             </argument>
         </arguments>
     </virtualType>
