@@ -23,7 +23,7 @@ class PaymentlinkTest extends IntegrationTestCase
         $now = $this->objectManager->create(TimezoneInterface::class)->scopeDate(null);
         $expected = $now->add(new \DateInterval('P10D'));
 
-        $this->assertEquals($expected->format('Y-m-d'), $instance->getExpiresAt());
+        $this->assertEquals($expected->format('Y-m-d H:i:s'), $instance->getExpiresAt());
     }
 
     /**

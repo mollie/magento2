@@ -14,6 +14,7 @@ use Magento\Framework\Exception\NotFoundException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\Order\IsPaymentLinkExpired;
 
 class PaymentLinkRedirect
 {
@@ -33,17 +34,23 @@ class PaymentLinkRedirect
      * @var PaymentLinkRedirectResultFactory
      */
     private $paymentLinkRedirectResultFactory;
+    /**
+     * @var IsPaymentLinkExpired
+     */
+    private $isPaymentLinkExpired;
 
     public function __construct(
         EncryptorInterface $encryptor,
         OrderRepositoryInterface $orderRepository,
         Mollie $mollie,
-        PaymentLinkRedirectResultFactory $paymentLinkRedirectResultFactory
+        PaymentLinkRedirectResultFactory $paymentLinkRedirectResultFactory,
+        IsPaymentLinkExpired $isPaymentLinkExpired
     ) {
         $this->encryptor = $encryptor;
         $this->orderRepository = $orderRepository;
         $this->mollie = $mollie;
         $this->paymentLinkRedirectResultFactory = $paymentLinkRedirectResultFactory;
+        $this->isPaymentLinkExpired = $isPaymentLinkExpired;
     }
 
     public function execute(string $orderId): PaymentLinkRedirectResult
@@ -60,15 +67,25 @@ class PaymentLinkRedirect
             throw new NotFoundException(__('Order not found'));
         }
 
+        if ($this->isPaymentLinkExpired->execute($order)) {
+            return $this->paymentLinkRedirectResultFactory->create([
+                'redirectUrl' => null,
+                'isExpired' => true,
+                'alreadyPaid' => false,
+            ]);
+        }
+
         if (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE])) {
             return $this->paymentLinkRedirectResultFactory->create([
                 'redirectUrl' => null,
+                'isExpired' => false,
                 'alreadyPaid' => true,
             ]);
         }
 
         return $this->paymentLinkRedirectResultFactory->create([
             'redirectUrl' => $this->mollie->startTransaction($order),
+            'isExpired' => false,
             'alreadyPaid' => false,
         ]);
     }

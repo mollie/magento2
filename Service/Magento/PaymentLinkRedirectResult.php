@@ -20,13 +20,19 @@ class PaymentLinkRedirectResult implements PaymentLinkRedirectResultInterface
      * @var string|null
      */
     private $redirectUrl;
+    /**
+     * @var bool
+     */
+    private $isExpired;
 
     public function __construct(
         bool $alreadyPaid,
+        bool $isExpired,
         string $redirectUrl = null
     ) {
         $this->alreadyPaid = $alreadyPaid;
         $this->redirectUrl = $redirectUrl;
+        $this->isExpired = $isExpired;
     }
 
     public function isAlreadyPaid(): bool
@@ -37,5 +43,10 @@ class PaymentLinkRedirectResult implements PaymentLinkRedirectResultInterface
     public function getRedirectUrl(): ?string
     {
         return $this->redirectUrl;
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->isExpired;
     }
 }

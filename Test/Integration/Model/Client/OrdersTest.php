@@ -189,7 +189,7 @@ class OrdersTest extends IntegrationTestCase
             $now = $this->objectManager->create(TimezoneInterface::class)->scopeDate(null);
             $expected = $now->add(new \DateInterval('P' . $days . 'D'));
 
-            $this->assertEquals($expected->format('Y-m-d'), $orderData['expiresAt']);
+            $this->assertEquals($expected->format('Y-m-d H:i:s'), $orderData['expiresAt']);
 
             return true;
         }))->willReturn($mollieOrderMock);

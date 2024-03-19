@@ -17,4 +17,9 @@ interface PaymentLinkRedirectResultInterface
      * @return string|null
      */
     public function getRedirectUrl(): ?string;
+
+    /**
+     * @return bool
+     */
+    public function isExpired(): bool;
 }

@@ -41,6 +41,7 @@ class PaymentLinkRedirect implements ResolverInterface
         return [
             'already_paid' => $result->isAlreadyPaid(),
             'redirect_url' => $result->getRedirectUrl(),
+            'is_expired' => $result->isExpired(),
         ];
     }
 }

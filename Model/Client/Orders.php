@@ -225,8 +225,7 @@ class Orders extends AbstractModel
 
         $transactionId = $order->getMollieTransactionId();
         if (!empty($transactionId)) {
-            $mollieOrder = $mollieApi->orders->get($transactionId);
-            return $mollieOrder->getCheckoutUrl();
+            return $this->getCheckoutUrl($mollieApi, $order);
         }
 
         $paymentToken = $this->paymentTokenForOrder->execute($order);
@@ -899,5 +898,17 @@ class Orders extends AbstractModel
         }
 
         return $order->getBaseGrandTotal();
+    }
+
+    private function getCheckoutUrl(MollieApiClient $mollieApi, OrderInterface $order): string
+    {
+        $mollieOrder = $mollieApi->orders->get($order->getMollieTransactionId());
+        if ($checkoutUrl = $mollieOrder->getCheckoutUrl()) {
+            return $checkoutUrl;
+        }
+
+        // There is no checkout URL, the transaction is either canceled or expired. Create a new transaction.
+        $order->setMollieTransactionId(null);
+        return $this->startTransaction($order, $mollieApi);
     }
 }
