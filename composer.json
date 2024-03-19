@@ -48,7 +48,7 @@
     "magento 2"
   ],
   "require": {
-    "mollie/mollie-api-php": "^2.1",
+    "mollie/mollie-api-php": "^2.65",
     "magento/framework": ">=102.0.3",
     "magento/module-backend": ">=100.3.3",
     "magento/module-catalog": ">=100.3.3",
