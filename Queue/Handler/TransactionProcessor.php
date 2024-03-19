@@ -44,7 +44,7 @@ class TransactionProcessor
             $order = $this->orderRepository->get($data->getOrderId());
             $order->setMollieTransactionId($data->getTransactionId());
 
-            $this->mollieModel->processTransactionForOrder($order, 'webhook');
+            $this->mollieModel->processTransactionForOrder($order, $data->getType());
         } catch (\Throwable $throwable) {
             $this->config->addToLog('error', [
                 'from' => 'TransactionProcessor consumer',

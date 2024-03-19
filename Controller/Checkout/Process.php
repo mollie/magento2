@@ -118,7 +118,7 @@ class Process extends Action
             $result = null;
             foreach ($orderIds as $orderId => $paymentToken) {
                 $order = $this->orderRepository->get($orderId);
-                $result = $this->processTransaction->execute($orderId, $order->getMollieTransactionId());
+                $result = $this->processTransaction->execute($orderId, $order->getMollieTransactionId(), 'success');
             }
         } catch (\Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
