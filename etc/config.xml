@@ -411,6 +411,8 @@
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Paymentlink</model>
                 <title>Mollie: Payment Link</title>
+                <use_custom_email_template>0</use_custom_email_template>
+                <email_template>mollie_payment_methods_mollie_methods_paymentlink_email_template</email_template>
                 <payment_description>{ordernumber}</payment_description>
                 <method>order</method>
                 <payment_action>order</payment_action>
