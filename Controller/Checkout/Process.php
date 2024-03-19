@@ -126,7 +126,7 @@ class Process extends Action
             return $this->_redirect($this->redirectOnError->getUrl());
         }
 
-        if ($result !== null && in_array($result->getStatus(), ['paid', 'authorized'])) {
+        if ($result !== null && $result->shouldRedirectToSuccessPage()) {
             try {
                 $this->successPageRedirect->execute($order, $orderIds);
                 return $this->getResponse();
