@@ -51,6 +51,15 @@ export default class VisitCheckoutPaymentCompositeAction {
     checkoutShippingPage.fillShippingAddressUsingFixture(fixture);
   }
 
+  changeCurrencyTo(currency) {
+    cy.visit('/');
+
+    cy.get('.greet.welcome').should('be.visible');
+
+    cy.get('#switcher-currency-trigger span').click();
+    cy.get('.switcher-dropdown').contains(currency).click();
+  }
+
   changeStoreViewTo(name) {
     cy.visit('/');
 
