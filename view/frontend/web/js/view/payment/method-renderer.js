@@ -28,6 +28,7 @@ define(
             {type: 'mollie_methods_banktransfer', component: defaultComponent},
             {type: 'mollie_methods_belfius', component: defaultComponent},
             {type: 'mollie_methods_billie', component: billieComponent},
+            {type: 'mollie_methods_blik', component: defaultComponent},
             {type: 'mollie_methods_creditcard', component: creditcardComponent},
             {type: 'mollie_methods_directdebit', component: defaultComponent},
             {type: 'mollie_methods_eps', component: defaultComponent},
