@@ -23,6 +23,8 @@ class GetMollieStatusResult
         string $status,
         string $method
     ) {
+        $method = str_replace('mollie_methods_', '', $method);
+
         $this->status = $status;
         $this->method = $method;
     }
@@ -40,7 +42,7 @@ class GetMollieStatusResult
     public function shouldRedirectToSuccessPage(): bool
     {
         $status = $this->status;
-        if ($status == 'created' && $this->method == 'banktransfer') {
+        if (in_array($status, ['created', 'open']) && $this->method == 'banktransfer') {
             return true;
         }
 
