@@ -70,7 +70,7 @@ class ChangeApiMode extends Value
     {
         $apiKey = $this->getApiKey($this->getValue());
         if ($apiKey) {
-            $this->updateProfileId->execute($apiKey, $this->getScope(), $this->getScopeId());
+            $this->updateProfileId->execute($apiKey, $this->getScope(), (int)$this->getScopeId());
         }
 
         return parent::afterSave();
