@@ -94,9 +94,7 @@ class Base extends Info
 
     public function getPaymentLink($storeId = null): ?string
     {
-        if (!$this->config->addPaymentLinkMessage($storeId) ||
-            $this->config->paymentLinkUseCustomEmailTemplate($storeId)
-        ) {
+        if (!$this->config->addPaymentLinkMessage($storeId)) {
             return null;
         }
 
