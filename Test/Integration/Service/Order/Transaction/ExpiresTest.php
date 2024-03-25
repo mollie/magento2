@@ -46,7 +46,7 @@ class ExpiresTest extends IntegrationTestCase
         /** @var Expires $instance */
         $instance = $this->objectManager->create(Expires::class);
 
-        $this->assertEquals($expected->format('Y-m-d H:i:s'), $instance->atDateForMethod('ideal'));
+        $this->assertEquals($expected->format('Y-m-d'), $instance->atDateForMethod('ideal'));
     }
 
     public function testIsAvailableWhenSetInTheRequest()

@@ -54,7 +54,7 @@ class Expires
         $date = $this->timezone->scopeDate($storeId);
         $date->add(new \DateInterval('P' . $days . 'D'));
 
-        return $date->format('Y-m-d H:i:s');
+        return $date->format('Y-m-d');
     }
 
     /**
