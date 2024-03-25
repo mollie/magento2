@@ -54,6 +54,7 @@ class PaymentLinkUrl
 
         return $this->urlBuilder->getUrl('mollie/checkout/paymentlink', [
             'order' => $orderId,
+            '_scope' => $order->getStoreId()
         ]);
     }
 

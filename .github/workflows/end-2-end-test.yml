@@ -47,9 +47,9 @@ jobs:
       matrix:
         include:
           - PHP_VERSION: php74-fpm
-            MAGENTO_VERSION: 2.3.7-p3
-          - PHP_VERSION: php81-fpm
-            MAGENTO_VERSION: 2.4.6
+            MAGENTO_VERSION: 2.3.7-p4
+          - PHP_VERSION: php82-fpm
+            MAGENTO_VERSION: 2.4.6-p4
     runs-on: ubuntu-latest
     env:
       PHP_VERSION: ${{ matrix.PHP_VERSION }}

@@ -14,6 +14,7 @@ use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Magento\PaymentLinkRedirect;
 use Mollie\Payment\Service\Magento\PaymentLinkRedirectResult;
 use Mollie\Payment\Service\Magento\PaymentLinkRedirectResultFactory;
+use Mollie\Payment\Service\Mollie\Order\IsPaymentLinkExpired;
 
 class PaymentLinkRedirectFake extends PaymentLinkRedirect
 {
@@ -30,17 +31,26 @@ class PaymentLinkRedirectFake extends PaymentLinkRedirect
         EncryptorInterface $encryptor,
         OrderRepositoryInterface $orderRepository,
         Mollie $mollie,
-        PaymentLinkRedirectResultFactory $paymentLinkRedirectResultFactory
+        PaymentLinkRedirectResultFactory $paymentLinkRedirectResultFactory,
+        IsPaymentLinkExpired $isPaymentLinkExpired
     ) {
-        parent::__construct($encryptor, $orderRepository, $mollie, $paymentLinkRedirectResultFactory);
+        parent::__construct(
+            $encryptor,
+            $orderRepository,
+            $mollie,
+            $paymentLinkRedirectResultFactory,
+            $isPaymentLinkExpired
+        );
+
         $this->paymentLinkRedirectResultFactory = $paymentLinkRedirectResultFactory;
     }
 
-    public function fakeResponse(?string $redirectUrl, bool $alreadyPaid)
+    public function fakeResponse(?string $redirectUrl, bool $alreadyPaid, bool $isExpired): void
     {
         $this->result = $this->paymentLinkRedirectResultFactory->create([
             'alreadyPaid' => $alreadyPaid,
             'redirectUrl' => $redirectUrl,
+            'isExpired' => $isExpired,
         ]);
     }
 

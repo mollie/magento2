@@ -115,6 +115,7 @@ type MollieApplePayValidationOutput {
 type MolliePaymentLinkRedirectOutput {
     redirect_url: String
     already_paid: Boolean!
+    is_expired: Boolean!
 }
 
 input PaymentMethodInput {

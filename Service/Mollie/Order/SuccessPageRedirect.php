@@ -75,6 +75,12 @@ class SuccessPageRedirect
         $this->config = $config;
     }
 
+    /**
+     * This function has a few responsibilities:
+     * - Check if the user has already been redirected to the success page.
+     * - If not, mark as redirected and actually redirect.
+     * - If already redirected, redirect to the cart page.
+     */
     public function execute(OrderInterface $order, array $orderIds): void
     {
         $this->searchCriteriaBuilder->addFilter('transaction_id', $order->getMollieTransactionId());

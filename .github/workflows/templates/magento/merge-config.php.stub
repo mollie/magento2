@@ -69,7 +69,16 @@ $magentoConfig['scopes'] = [
             'website_id' => '1',
             'group_id' => '1',
             'name' => 'Swiss',
-            'sort_order' => '0',
+            'sort_order' => '1',
+            'is_active' => '1'
+        ],
+        'pl' => [
+            'store_id' => '3',
+            'code' => 'pl',
+            'website_id' => '1',
+            'group_id' => '1',
+            'name' => 'Poland',
+            'sort_order' => '2',
             'is_active' => '1'
         ]
     ]
