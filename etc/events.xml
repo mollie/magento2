@@ -66,4 +66,7 @@
     <event name="sales_quote_payment_import_data_before">
         <observer name="mollie_clear_issuer_on_method_change" instance="Mollie\Payment\Observer\SalesQuotePaymentImportDataBefore\ClearIssuerOnMethodChange" />
     </event>
+    <event name="adminhtml_sales_order_create_process_item_before">
+        <observer name="mollie_set_purchase_type_on_create_order_item" instance="Mollie\Payment\Observer\AdminhtmlSalesOrderCreateProcessItemBefore\SetPurchaseTypeOnCreateOrderItem" />
+    </event>
 </config>
