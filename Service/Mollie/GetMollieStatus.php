@@ -35,10 +35,17 @@ class GetMollieStatus
         $this->getMollieStatusResultFactory = $getMollieStatusResultFactory;
     }
 
-    public function execute(int $orderId): GetMollieStatusResult
+    public function execute(int $orderId, string $transactionId = null): GetMollieStatusResult
     {
         $order = $this->orderRepository->get($orderId);
-        $transactionId = $order->getMollieTransactionId();
+        if ($transactionId === null) {
+            $transactionId = $order->getMollieTransactionId();
+        }
+
+        if ($transactionId === null) {
+            throw new \Exception('No transaction ID found for order ' . $orderId);
+        }
+
         $mollieApi = $this->mollieApiClient->loadByStore((int)$order->getStoreId());
 
         if (substr($transactionId, 0, 4) == 'ord_') {

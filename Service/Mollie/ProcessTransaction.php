@@ -68,7 +68,7 @@ class ProcessTransaction
     {
         if ($this->config->processTransactionsInTheQueue()) {
             $this->queueOrder($orderId, $transactionId, $type);
-            return $this->getMollieStatus->execute($orderId);
+            return $this->getMollieStatus->execute($orderId, $transactionId);
         }
 
         $order = $this->orderRepository->get($orderId);
