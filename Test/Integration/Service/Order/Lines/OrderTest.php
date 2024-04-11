@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -157,14 +157,17 @@ class OrderTest extends IntegrationTestCase
         $lastLine = end($result);
 
         $this->assertEquals('discount', $lastLine['type']);
-        $this->assertEquals($adjustment, $lastLine['totalAmount']['value']);
+        $this->assertEquals(round($adjustment, 2), $lastLine['totalAmount']['value']);
 
         $total = 0;
         foreach ($result as $orderLine) {
             $total += $orderLine['totalAmount']['value'];
         }
 
-        $this->assertEquals($order->getBaseGrandTotal(), $total);
+        $this->assertEquals(
+            round($order->getBaseGrandTotal(), 2),
+            $total
+        );
     }
 
     /**
@@ -242,6 +245,8 @@ class OrderTest extends IntegrationTestCase
             [-0.03],
             [-0.02],
             [-0.01],
+            [0.0051111111], // Rounds up to 0.1, so valid
+            [0.0099999999], // Rounds up to 0.1, so valid
             [0.01],
             [0.02],
             [0.03],
