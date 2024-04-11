@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Test\Integration\Helper;
 
@@ -138,6 +142,7 @@ class GeneralTest extends IntegrationTestCase
             'free' => ['free', ''],
 
             'applepay' => ['mollie_methods_applepay', 'applepay'],
+            'alma' => ['mollie_methods_alma', 'alma'],
             'bancontact' => ['mollie_methods_bancontact', 'bancontact'],
             'banktransfer' => ['mollie_methods_banktransfer', 'banktransfer'],
             'belfius' => ['mollie_methods_belfius', 'belfius'],
