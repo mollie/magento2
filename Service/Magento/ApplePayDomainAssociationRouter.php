@@ -53,7 +53,6 @@ class ApplePayDomainAssociationRouter implements RouterInterface
         }
 
         $actionClassName = $this->actionList->get($modules[0], null, 'ApplePay', 'AppleDeveloperMerchantidDomainAssociation');
-        $actionInstance = $this->actionFactory->create($actionClassName);
-        return $actionInstance;
+        return $this->actionFactory->create($actionClassName);
     }
 }
