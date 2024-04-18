@@ -367,6 +367,10 @@
         </arguments>
     </type>
 
+    <type name="Magento\CustomerBalance\Observer\RevertStoreCreditObserver">
+        <plugin name="mollie_prevent_double_credit_revert" type="Mollie\Payment\Plugin\CustomerBalance\Observer\PreventDoubleCreditRevert" />
+    </type>
+
     <!-- Payment methods configuration start -->
     <!-- ApplePay -->
     <type name="Mollie\Payment\Model\Methods\ApplePay">
