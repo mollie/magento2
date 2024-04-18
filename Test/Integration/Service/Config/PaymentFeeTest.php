@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -24,6 +24,7 @@ class PaymentFeeTest extends IntegrationTestCase
     {
         return [
             ['mollie_methods_applepay', true],
+            ['mollie_methods_alma', true],
             ['mollie_methods_bancontact', true],
             ['mollie_methods_banktransfer', true],
             ['mollie_methods_belfius', true],

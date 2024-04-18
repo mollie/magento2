@@ -15,6 +15,7 @@ class MethodsConfigurationTest extends IntegrationTestCase
     {
         return [
             ['mollie_methods_applepay'],
+            ['mollie_methods_alma'],
             ['mollie_methods_bancontact'],
             ['mollie_methods_banktransfer'],
             ['mollie_methods_belfius'],

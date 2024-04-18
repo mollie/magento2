@@ -16,6 +16,7 @@ use Magento\Quote\Api\GuestCartRepositoryInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\Quote\Address\Total as AddressTotal;
+use Mollie\Payment\Service\Magento\ChangeShippingMethodForQuote;
 
 class ShippingMethods extends Action
 {
@@ -23,34 +24,37 @@ class ShippingMethods extends Action
      * @var CartRepositoryInterface
      */
     private $cartRepository;
-
     /**
      * @var GuestCartRepositoryInterface
      */
     private $guestCartRepository;
-
     /**
      * @var ShippingMethodManagementInterface
      */
     private $shippingMethodManagement;
-
     /**
      * @var CheckoutSession
      */
     private $checkoutSession;
+    /**
+     * @var ChangeShippingMethodForQuote
+     */
+    private $changeShippingMethodForQuote;
 
     public function __construct(
         Context $context,
         CartRepositoryInterface $cartRepository,
         ShippingMethodManagementInterface $shippingMethodManagement,
         CheckoutSession $checkoutSession,
-        GuestCartRepositoryInterface $guestCartRepository
+        GuestCartRepositoryInterface $guestCartRepository,
+        ChangeShippingMethodForQuote $changeShippingMethodForQuote
     ) {
         parent::__construct($context);
         $this->shippingMethodManagement = $shippingMethodManagement;
         $this->guestCartRepository = $guestCartRepository;
         $this->cartRepository = $cartRepository;
         $this->checkoutSession = $checkoutSession;
+        $this->changeShippingMethodForQuote = $changeShippingMethodForQuote;
     }
 
     public function execute()
@@ -66,8 +70,10 @@ class ShippingMethods extends Action
         $address->setPostcode($this->getRequest()->getParam('postalCode'));
 
         if ($this->getRequest()->getParam('shippingMethod')) {
-            $address->setCollectShippingRates(true);
-            $address->setShippingMethod($this->getRequest()->getParam('shippingMethod')['identifier']);
+            $this->changeShippingMethodForQuote->execute(
+                $address,
+                $this->getRequest()->getParam('shippingMethod')['identifier']
+            );
         }
 
         $cart->setPaymentMethod('mollie_methods_applepay');

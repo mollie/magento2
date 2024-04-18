@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -620,6 +620,7 @@ class General extends AbstractHelper
         $activeMethods = [];
         $methodCodes = [
             'mollie_methods_applepay',
+            'mollie_methods_alma',
             'mollie_methods_bancontact',
             'mollie_methods_banktransfer',
             'mollie_methods_belfius',

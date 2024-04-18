@@ -1,4 +1,9 @@
 
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 import CheckoutPaymentPage from "Pages/frontend/CheckoutPaymentPage";
 import VisitCheckoutPaymentCompositeAction from "CompositeActions/VisitCheckoutPaymentCompositeAction";
 import MollieHostedPaymentPage from "Pages/mollie/MollieHostedPaymentPage";
@@ -23,6 +28,7 @@ describe('Checkout usage', () => {
 
     const availableMethods = Cypress.env('mollie_available_methods');
     [
+      'alma',
       'bancontact',
       'banktransfer',
       'belfius',

@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -26,6 +26,7 @@ class PaymentMethods
      */
     private $methods = [
         'mollie_methods_applepay',
+        'mollie_methods_alma',
         'mollie_methods_bancontact',
         'mollie_methods_banktransfer',
         'mollie_methods_belfius',

@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -363,7 +363,7 @@ class Order
             return null;
         }
 
-        $difference = $grandTotal - $orderLinesTotal;
+        $difference = round($grandTotal - $orderLinesTotal, 2);
         if (abs($difference) < 0.01) {
             return null;
         }
