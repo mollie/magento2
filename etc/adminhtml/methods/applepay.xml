@@ -48,7 +48,7 @@
             <config_path>payment/mollie_methods_applepay/integration_type</config_path>
             <comment><![CDATA[What kind of integration should be used?<br><br>
             <strong>External</strong>: The user is redirected to a Mollie page. No extra configuration required.<br>
-            <strong>Direct</strong>: The user can use Apple Pay in your checkout. You need to upload a certificate to your server for this to work. <a target="_BLANK" href="https://docs.mollie.com/wallets/applepay-direct-integration#prepare-your-server">View instructions</a>.
+            <strong>Direct</strong>: The user can use Apple Pay directly from your checkout, product page, minicart and shopping cart page.
             ]]></comment>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayIntegrationType</source_model>
             <depends>
