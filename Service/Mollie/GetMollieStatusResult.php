@@ -15,13 +15,13 @@ class GetMollieStatusResult
      */
     private $status;
     /**
-     * @var string
+     * @var string|null
      */
     private $method;
 
     public function __construct(
         string $status,
-        string $method
+        string $method = null
     ) {
         $method = str_replace('mollie_methods_', '', $method);
 
@@ -34,7 +34,7 @@ class GetMollieStatusResult
         return $this->status;
     }
 
-    public function getMethod(): string
+    public function getMethod(): ?string
     {
         return $this->method;
     }
