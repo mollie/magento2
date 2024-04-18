@@ -21,6 +21,7 @@ bin/magento config:set payment/mollie_methods_kbc/active 1 &
 bin/magento config:set payment/mollie_methods_klarnasliceit/active 1 &
 bin/magento config:set payment/mollie_methods_paypal/active 1 &
 bin/magento config:set payment/mollie_methods_przelewy24/active 1 &
+bin/magento config:set payment/mollie_methods_alma/active 1 &
 bin/magento config:set payment/mollie_methods_bancontact/active 1 &
 bin/magento config:set payment/mollie_methods_belfius/active 1 &
 bin/magento config:set payment/mollie_methods_eps/active 1 &

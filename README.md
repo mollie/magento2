@@ -27,6 +27,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 ## Supported Mollie Payment Methods
 
 - Apple Pay (direct)
+- Alma
 - Bancontact
 - Bank transfer
 - Belfius Pay Button
