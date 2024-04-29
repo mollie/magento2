@@ -143,6 +143,7 @@ class GeneralTest extends IntegrationTestCase
 
             'applepay' => ['mollie_methods_applepay', 'applepay'],
             'alma' => ['mollie_methods_alma', 'alma'],
+            'bancomat' => ['mollie_methods_bancomat', 'bancomat'],
             'bancontact' => ['mollie_methods_bancontact', 'bancontact'],
             'banktransfer' => ['mollie_methods_banktransfer', 'banktransfer'],
             'belfius' => ['mollie_methods_belfius', 'belfius'],

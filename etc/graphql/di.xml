@@ -10,6 +10,7 @@
             <argument name="dataProviders" xsi:type="array">
                 <item name="mollie_methods_applepay" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_alma" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
+                <item name="mollie_methods_bancomat" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_bancontact" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_banktransfer" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_belfius" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>

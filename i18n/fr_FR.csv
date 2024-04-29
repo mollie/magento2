@@ -194,6 +194,7 @@
 "Sorting Order","Tri des commandes"
 "Alma","Alma"
 "Bancontact","Bancontact"
+"Bancomat Pay","Bancomat Pay"
 "Banktransfer","Virement bancaire"
 "Status Pending","Statut en attente"
 "We recommend using another 'pending' status as the default Magento pending status can automatically cancel the order before the payment expiry time is reached.<br>By default the status ""Pending Payment"" is not visible for customers, therefore we advise you to create a new status for this, which should also be visible to the customer, informing them they still have to complete their payment.","Nous vous recommandons d'utiliser un autre statut «en attente», car le statut en attente Magento par défaut peut annuler automatiquement la commande avant même l'expiration du délai de paiement.<br>Comme le statut «Paiement en attente» n'est pas visible par défaut par les clients, nous vous recommandons de créer un nouveau statut qui sera visible par la clientèle et l'informera qu'elle doit finaliser son paiement."
