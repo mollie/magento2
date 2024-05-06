@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Test\Integration\Model;
 
@@ -38,10 +42,12 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertArrayHasKey('mollie_methods_giftcard', $result['payment']['issuersListType']);
 
         $this->assertArrayHasKey('mollie_methods_applepay', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_alma', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_bancontact', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_banktransfer', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_belfius', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_billie', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_blik', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_creditcard', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_directdebit', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_eps', $result['payment']['image']);

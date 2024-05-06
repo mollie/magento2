@@ -31,7 +31,7 @@ if (Cypress.env('mollie_available_methods').includes('banktransfer')) {
 
         mollieHostedPaymentPage.selectStatus(testCase.status);
 
-        if (testCase.status === 'paid') {
+        if (testCase.status === 'paid' || testCase.status === 'open') {
           checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
         }
 

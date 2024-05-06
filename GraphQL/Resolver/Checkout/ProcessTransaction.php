@@ -65,7 +65,7 @@ class ProcessTransaction implements ResolverInterface
 
         $order = $this->orderRepository->get($tokenModel->getOrderId());
         $result = $this->processTransaction->execute($tokenModel->getOrderId(), $order->getMollieTransactionId());
-        $redirectToSuccessPage = in_array($result->getStatus(), ['pending', 'paid', 'authorized']);
+        $redirectToSuccessPage = $result->shouldRedirectToSuccessPage();
 
         $cart = null;
         if ($tokenModel->getCartId()) {

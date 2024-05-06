@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -17,10 +17,12 @@ $code; ?>" style="display:none">
             <label for="<?= $code ?>_methods" class="label admin__field-label"><span><?= $block->escapeHtml(__('Limit to the following method(s)')) ?></span></label>
             <div class="control admin__field-control">
                 <select multiple="multiple" size="16" id="<?= $code ?>_methods" name="payment[limited_methods][]" class="admin__control-multiselect">
+                    <option value="alma">Alma</option>
                     <option value="bancontact">Bancontact</option>
                     <option value="banktransfer">Banktransfer</option>
                     <option value="belfius">Belfius</option>
                     <option value="billie">Billie</option>
+                    <option value="blik">Blik</option>
                     <option value="creditcard">Creditcard</option>
                     <option value="directdebit">SEPA Direct Debit</option>
                     <option value="eps">EPS</option>

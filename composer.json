@@ -1,17 +1,19 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "2.35.1",
+  "version": "2.37.0",
   "keywords": [
     "mollie",
     "payment",
     "service",
     "apple pay",
+    "alma",
     "bancontact",
     "banktransfer",
     "belfius",
     "belfius direct net",
     "billie",
+    "blik",
     "cbc",
     "creditcard",
     "directdebit",
@@ -48,7 +50,7 @@
     "magento 2"
   ],
   "require": {
-    "mollie/mollie-api-php": "^2.1",
+    "mollie/mollie-api-php": "^2.65",
     "magento/framework": ">=102.0.3",
     "magento/module-backend": ">=100.3.3",
     "magento/module-catalog": ">=100.3.3",

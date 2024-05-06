@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/age_configuration.xsd">
     <head>
         <css src="Mollie_Payment::css/styles.css"/>
@@ -25,6 +30,9 @@
                                                                         <item name="mollie_methods_applepay" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
+                                                                        <item name="mollie_methods_alma" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
                                                                         <item name="mollie_methods_bancontact" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
@@ -35,6 +43,9 @@
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                         <item name="mollie_methods_billie" xsi:type="array">
+                                                                            <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="mollie_methods_blik" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
                                                                         <item name="mollie_methods_creditcard" xsi:type="array">

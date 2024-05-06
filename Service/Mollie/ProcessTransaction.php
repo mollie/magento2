@@ -64,17 +64,17 @@ class ProcessTransaction
         $this->getMollieStatus = $getMollieStatus;
     }
 
-    public function execute(int $orderId, string $transactionId): GetMollieStatusResult
+    public function execute(int $orderId, string $transactionId, string $type = 'webhook'): GetMollieStatusResult
     {
         if ($this->config->processTransactionsInTheQueue()) {
-            $this->queueOrder($orderId, $transactionId);
-            return $this->getMollieStatus->execute($orderId);
+            $this->queueOrder($orderId, $transactionId, $type);
+            return $this->getMollieStatus->execute($orderId, $transactionId);
         }
 
         $order = $this->orderRepository->get($orderId);
 
         $order->setMollieTransactionId($transactionId);
-        $result = $this->mollieModel->processTransactionForOrder($order, 'webhook');
+        $result = $this->mollieModel->processTransactionForOrder($order, $type);
 
         return $this->getMollieStatusResultFactory->create([
             'status' => $result['status'],
@@ -82,12 +82,13 @@ class ProcessTransaction
         ]);
     }
 
-    private function queueOrder(int $orderId, string $transactionId)
+    private function queueOrder(int $orderId, string $transactionId, string $type): void
     {
         /** @var TransactionToProcessInterface $data */
         $data = $this->transactionToProcessFactory->create();
         $data->setOrderId($orderId);
         $data->setTransactionId($transactionId);
+        $data->setType($type);
 
         $this->publishTransactionToProcess->publish($data);
     }

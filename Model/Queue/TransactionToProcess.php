@@ -22,6 +22,11 @@ class TransactionToProcess implements TransactionToProcessInterface
      */
     private $orderId = null;
 
+    /**
+     * @var null | string
+     */
+    private $type = null;
+
     public function setTransactionId(string $id): TransactionToProcessInterface
     {
         $this->transactionId = $id;
@@ -44,5 +49,17 @@ class TransactionToProcess implements TransactionToProcessInterface
     public function getOrderId(): ?int
     {
         return $this->orderId;
+    }
+
+    public function setType(string $type): TransactionToProcessInterface
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getType(): ?string
+    {
+        return $this->type;
     }
 }

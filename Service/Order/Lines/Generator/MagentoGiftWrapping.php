@@ -38,7 +38,7 @@ class MagentoGiftWrapping implements GeneratorInterface
             $extensionAttributes->getGwItemsBasePriceInclTax() :
             $extensionAttributes->getGwItemsPriceInclTax();
 
-        if (abs($amount) < 0.01) {
+        if ($amount === null || abs($amount) < 0.01) {
             return $orderLines;
         }
 
