@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -34,6 +34,7 @@ use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
+use Mollie\Payment\Service\Mollie\GetApiMethod;
 use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Mollie\Payment\Service\Mollie\Wrapper\MollieApiClientFallbackWrapper;
@@ -115,6 +116,10 @@ class Mollie extends Adapter
      * @var TransactionToOrderRepositoryInterface
      */
     private $transactionToOrderRepository;
+    /**
+     * @var GetApiMethod
+     */
+    private $getApiMethod;
 
     public function __construct(
         ManagerInterface $eventManager,
@@ -135,6 +140,7 @@ class Mollie extends Adapter
         OrderLockService $orderLockService,
         \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
         TransactionToOrderRepositoryInterface $transactionToOrderRepository,
+        GetApiMethod $getApiMethod,
         $formBlockType,
         $infoBlockType,
         CommandPoolInterface $commandPool = null,
@@ -171,6 +177,7 @@ class Mollie extends Adapter
         $this->orderLockService = $orderLockService;
         $this->mollieApiClient = $mollieApiClient;
         $this->transactionToOrderRepository = $transactionToOrderRepository;
+        $this->getApiMethod = $getApiMethod;
     }
 
     public function getCode()
@@ -258,7 +265,7 @@ class Mollie extends Adapter
 
         return $this->orderLockService->execute($order, function (OrderInterface $order) use ($apiKey) {
             $mollieApi = $this->loadMollieApi($apiKey);
-            $method = $this->mollieHelper->getApiMethod($order);
+            $method = $this->getApiMethod->execute($order);
 
             // When clicking the back button from the hosted payment we need a way to verify if the order was paid or not.
             // If this is not the case, we restore the quote. This flag is used to determine if it was paid or not.

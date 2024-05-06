@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -231,8 +231,10 @@ class Orders extends AbstractModel
         $additionalData = $order->getPayment()->getAdditionalInformation();
 
         $transactionId = $order->getMollieTransactionId();
-        if (!empty($transactionId)) {
-            return $this->getCheckoutUrl($mollieApi, $order);
+        if (!empty($transactionId) &&
+            $checkoutUrl = $this->getCheckoutUrl($mollieApi, $order)
+        ) {
+            return $checkoutUrl;
         }
 
         $paymentToken = $this->paymentTokenForOrder->execute($order);
@@ -315,7 +317,7 @@ class Orders extends AbstractModel
      *
      * @throws LocalizedException
      */
-    public function processResponse(Order $order, $mollieOrder)
+    public function processResponse(OrderInterface $order, MollieOrder $mollieOrder): void
     {
         $eventData = [
             'order' => $order,

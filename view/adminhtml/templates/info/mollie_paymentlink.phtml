@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -44,6 +44,19 @@ $status = $block->getPaymentStatus();
                 <tr>
                     <th><?= __('Payment Status'); ?></th>
                     <td><?= ucfirst($status); ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($dashboardUrl = $block->getDashboardUrl()): ?>
+                <tr>
+                    <th><?= __('Mollie ID'); ?></th>
+                    <td>
+                        <a href="<?php echo $dashboardUrl; ?>" target="_blank" class="mollie-order-id">
+                            <?php echo $block->getMollieId() ?: __('View in Mollie dashboard'); ?>
+                        </a>
+                        <span class="mollie-copy-url" data-url="<?php echo $dashboardUrl; ?>" title="<?php echo __('Copy'); ?>">
+                            &#x2398;
+                        </span>
+                    </td>
                 </tr>
             <?php endif; ?>
             <tr>

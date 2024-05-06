@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -202,9 +202,11 @@ class Payments extends AbstractModel
         $orderId = $order->getEntityId();
 
         $transactionId = $order->getMollieTransactionId();
-        if (!empty($transactionId) && substr($transactionId, 0, 4) != 'ord_') {
-            $payment = $mollieApi->payments->get($transactionId);
-            return $payment->getCheckoutUrl();
+        if (!empty($transactionId) &&
+            substr($transactionId, 0, 4) != 'ord_' &&
+            $checkoutUrl = $this->getCheckoutUrl($mollieApi, $transactionId)
+        ) {
+            return $checkoutUrl;
         }
 
         $paymentToken = $this->paymentTokenForOrder->execute($order);
@@ -536,5 +538,17 @@ class Payments extends AbstractModel
                 }
             }
         }
+    }
+
+    /**
+     * @param MollieApiClient $mollieApi
+     * @param $transactionId
+     * @return string|null
+     * @throws \Mollie\Api\Exceptions\ApiException
+     */
+    public function getCheckoutUrl(MollieApiClient $mollieApi, $transactionId): ?string
+    {
+        $payment = $mollieApi->payments->get($transactionId);
+        return $payment->getCheckoutUrl();
     }
 }

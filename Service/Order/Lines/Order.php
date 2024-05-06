@@ -13,6 +13,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Model\OrderLinesFactory;
+use Mollie\Payment\Model\ResourceModel\OrderLines\CollectionFactory;
 
 class Order
 {
@@ -52,6 +53,11 @@ class Order
     private $order;
 
     /**
+     * @var CollectionFactory
+     */
+    private $orderLinesCollectionFactory;
+
+    /**
      * @var OrderLinesProcessor
      */
     private $orderLinesProcessor;
@@ -60,7 +66,6 @@ class Order
      * @var OrderLinesGenerator
      */
     private $orderLinesGenerator;
-
     /**
      * @var StoreManagerInterface
      */
@@ -70,6 +75,7 @@ class Order
         MollieHelper $mollieHelper,
         StoreCredit $storeCredit,
         PaymentFee $paymentFee,
+        CollectionFactory $orderLinesCollection,
         OrderLinesFactory $orderLinesFactory,
         OrderLinesProcessor $orderLinesProcessor,
         OrderLinesGenerator $orderLinesGenerator,
@@ -78,6 +84,7 @@ class Order
         $this->mollieHelper = $mollieHelper;
         $this->storeCredit = $storeCredit;
         $this->paymentFee = $paymentFee;
+        $this->orderLinesCollectionFactory = $orderLinesCollection;
         $this->orderLinesFactory = $orderLinesFactory;
         $this->orderLinesProcessor = $orderLinesProcessor;
         $this->orderLinesGenerator = $orderLinesGenerator;
@@ -313,6 +320,14 @@ class Order
      */
     public function saveOrderLines($orderLines, OrderInterface $order)
     {
+        $existingItems = $this->orderLinesCollectionFactory->create()
+            ->addFieldToFilter('order_id', ['eq' => $order->getEntityId()]);
+
+        // When the orderLines already exists, do not create again.
+        if ($existingItems->getSize() == count($orderLines)) {
+            return;
+        }
+
         foreach ($orderLines as $line) {
             /** @var OrderLines $orderLine */
             $orderLine = $this->orderLinesFactory->create();
