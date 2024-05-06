@@ -1,3 +1,8 @@
+#
+# Copyright Magmodules.eu. All rights reserved.
+# See COPYING.txt for license details.
+#
+
 if [ -z "$MOLLIE_API_KEY_TEST" ]; then
     echo "Variable \$MOLLIE_API_KEY_TEST is not set"
     exit 1
@@ -39,6 +44,7 @@ bin/magento config:set payment/mollie_methods_creditcard/use_components 1 &
 # Enable QR
 bin/magento config:set payment/mollie_methods_ideal/add_qr 1 &
 
+# Disable webhooks
 bin/magento config:set payment/mollie_general/use_webhooks disabled &
 
 # Configure currency for the swiss store view
@@ -51,6 +57,13 @@ bin/magento config:set payment/mollie_general/currency 0 --scope=ch &
 # Polish scope
 bin/magento config:set currency/options/default PLN --scope=pl &
 bin/magento config:set payment/mollie_general/currency 0 --scope=pl &
+
+# Disable the use of the base currency
+bin/magento config:set payment/mollie_general/currency 0 &
+
+# Insert rates, otherwise the currency switcher won't show
+magerun2 db:query 'INSERT INTO `directory_currency_rate` (`currency_from`, `currency_to`, `rate`) VALUES ("EUR", "PLN", 1.0);' &
+magerun2 db:query 'INSERT INTO `directory_currency_rate` (`currency_from`, `currency_to`, `rate`) VALUES ("EUR", "CHF", 1.0);' &
 
 wait
 
