@@ -37,7 +37,7 @@ class ChangeShippingMethodForQuote
         $address->setCollectShippingRates(true);
         $address->setShippingMethod($identifier);
 
-        [$carrierCode, $methodCode] = explode('_', $identifier);
+        [$carrierCode, $methodCode] = explode('__SPLIT__', $identifier);
         $shippingInformation = $this->shippingInformationFactory->create([
             'data' => [
                 ShippingInformationInterface::SHIPPING_ADDRESS => $address,
