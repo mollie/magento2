@@ -26,7 +26,8 @@ if (Cypress.env('mollie_available_methods').includes('alma')) {
       {status: 'canceled', orderStatus: 'Canceled', title: 'C2938628: Validate the submission of an order with Alma as payment method and payment mark as "Cancelled"'},
     ].forEach((testCase) => {
       it(testCase.title, () => {
-        visitCheckoutPayment.visit();
+        // Minimum order amount == €50, so order the product twice.
+        visitCheckoutPayment.visit('NL', 2);
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
