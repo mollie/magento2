@@ -29,6 +29,7 @@ describe('Checkout usage', () => {
     const availableMethods = Cypress.env('mollie_available_methods');
     [
       'alma',
+      'bancomatpay',
       'bancontact',
       'banktransfer',
       'belfius',

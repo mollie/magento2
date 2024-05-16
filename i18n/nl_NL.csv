@@ -194,6 +194,7 @@
 "Sorting Order","Sorteervolgorde"
 "Alma","Alma"
 "Bancontact","Bancontact"
+"Bancomat Pay","Bancomat Pay"
 "Banktransfer","Bankoverschrijving"
 "Status Pending","Status openstaand"
 "We recommend using another 'pending' status as the default Magento pending status can automatically cancel the order before the payment expiry time is reached.<br>By default the status ""Pending Payment"" is not visible for customers, therefore we advise you to create a new status for this, which should also be visible to the customer, informing them they still have to complete their payment.","Wij raden u aan om een andere status voor 'openstaand' te gebruiken, omdat de standaard Magento-status 'openstaand' de bestelling automatisch kan annuleren, voordat de vervaltermijn is afgelopen.<br>Standaard is de status 'openstaande betaling' niet zichtbaar voor klanten, daarom adviseren wij u om hiervoor een nieuwe status aan te maken, die ook zichtbaar is voor de klant, om hem te laten weten dat hij zijn betaling nog dient te voltooien."

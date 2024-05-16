@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
@@ -109,6 +114,25 @@
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_bancontact>
+            <mollie_methods_bancomatpay>
+                <active>1</active>
+                <model>Mollie\Payment\Model\Methods\Bancomatpay</model>
+                <title>Bancomat Pay</title>
+                <payment_description>{ordernumber}</payment_description>
+                <method>payment</method>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+                <can_use_checkout>1</can_use_checkout>
+                <can_order>1</can_order>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_use_internal>0</can_use_internal>
+                <can_cancel>1</can_cancel>
+                <can_authorize>0</can_authorize>
+                <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
+            </mollie_methods_bancomatpay>
             <mollie_methods_banktransfer>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Banktransfer</model>

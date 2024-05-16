@@ -1,3 +1,8 @@
+#
+# Copyright Magmodules.eu. All rights reserved.
+# See COPYING.txt for license details.
+#
+
 if [ -z "$MOLLIE_API_KEY_TEST" ]; then
     echo "Variable \$MOLLIE_API_KEY_TEST is not set"
     exit 1
@@ -23,6 +28,7 @@ bin/magento config:set payment/mollie_methods_paypal/active 1 &
 bin/magento config:set payment/mollie_methods_przelewy24/active 1 &
 bin/magento config:set payment/mollie_methods_alma/active 1 &
 bin/magento config:set payment/mollie_methods_bancontact/active 1 &
+bin/magento config:set payment/mollie_methods_bancomatpay/active 1 &
 bin/magento config:set payment/mollie_methods_belfius/active 1 &
 bin/magento config:set payment/mollie_methods_eps/active 1 &
 bin/magento config:set payment/mollie_methods_giropay/active 1 &

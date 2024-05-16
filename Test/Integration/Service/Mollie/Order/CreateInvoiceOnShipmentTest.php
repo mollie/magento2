@@ -2,7 +2,6 @@
 
 namespace Mollie\Payment\Test\Integration\Service\Mollie\Order;
 
-use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\Methods\Bancontact;
 use Mollie\Payment\Model\Methods\Banktransfer;
 use Mollie\Payment\Model\Methods\Billie;
