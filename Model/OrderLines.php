@@ -280,7 +280,7 @@ class OrderLines extends AbstractModel
         foreach ($creditmemo->getAllItems() as $item) {
             $orderItemId = $item->getOrderItemId();
             $lineId = $this->getOrderLineByItemId($orderItemId)->getLineId();
-            if (!$lineId || $item->getOrderItem()->getProductType() == 'bundle') {
+            if (!$lineId || $this->shouldSkipCreditmemoForBundleProduct($item)) {
                 continue;
             }
 
@@ -423,6 +423,19 @@ class OrderLines extends AbstractModel
     public function _construct()
     {
         $this->_init('Mollie\Payment\Model\ResourceModel\OrderLines');
+    }
+
+    private function shouldSkipCreditmemoForBundleProduct(CreditmemoItemInterface $item): bool
+    {
+        if ($item->getOrderItem()->getProductType() != 'bundle') {
+            return false;
+        }
+
+        if ($item->getOrderItem()->getProductOptionByCode('product_calculations') == 1) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

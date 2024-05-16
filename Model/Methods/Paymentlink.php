@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Model\Methods;
 
+use Magento\Sales\Model\Order;
 use Mollie\Payment\Model\Mollie;
 use Magento\Framework\DataObject;
 
@@ -38,6 +39,8 @@ class Paymentlink extends Mollie
         /** @var \Magento\Sales\Model\Order $order */
         $order = $payment->getOrder();
         $order->setCanSendNewEmailFlag(false);
+
+        $stateObject->setState(Order::STATE_PENDING_PAYMENT);
 
         if ($status = $this->config->statusNewPaymentLink($order->getStoreId())) {
             $stateObject->setStatus($status);

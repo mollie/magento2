@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "2.37.0",
+  "version": "2.38.0",
   "keywords": [
     "mollie",
     "payment",
@@ -9,6 +9,8 @@
     "apple pay",
     "alma",
     "bancontact",
+    "bancomat",
+    "bancomat pay",
     "banktransfer",
     "belfius",
     "belfius direct net",

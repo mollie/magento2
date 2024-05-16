@@ -85,6 +85,7 @@
             <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonColor</source_model>
             <depends>
                 <field id="active">1</field>
+                <field id="integration_type">direct</field>
                 <field id="enable_buy_now_button">1</field>
             </depends>
             <comment>
@@ -98,6 +99,7 @@
             <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonText</source_model>
             <depends>
                 <field id="active">1</field>
+                <field id="integration_type">direct</field>
                 <field id="enable_buy_now_button">1</field>
             </depends>
             <comment>
@@ -124,6 +126,7 @@
             <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonColor</source_model>
             <depends>
                 <field id="active">1</field>
+                <field id="integration_type">direct</field>
                 <field id="enable_minicart_button">1</field>
             </depends>
             <comment>
@@ -137,6 +140,7 @@
             <source_model>Mollie\Payment\Model\Adminhtml\Source\ApplePayButtonText</source_model>
             <depends>
                 <field id="active">1</field>
+                <field id="integration_type">direct</field>
                 <field id="enable_minicart_button">1</field>
             </depends>
             <comment>

@@ -381,7 +381,7 @@ class General extends AbstractHelper
      */
     public function getApiMethod(OrderInterface $order)
     {
-        $method = $order->getPayment()->getMethodInstance()->getCode();
+        $method = $order->getPayment()->getMethod();
         $method = str_replace('_vault', '', $method);
         $methodXpath = str_replace('%method%', $method, self::XML_PATH_API_METHOD);
         return $this->getStoreConfig($methodXpath, $order->getStoreId());
@@ -621,6 +621,7 @@ class General extends AbstractHelper
         $methodCodes = [
             'mollie_methods_applepay',
             'mollie_methods_alma',
+            'mollie_methods_bancomatpay',
             'mollie_methods_bancontact',
             'mollie_methods_banktransfer',
             'mollie_methods_belfius',

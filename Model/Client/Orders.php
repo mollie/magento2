@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -35,6 +35,7 @@ use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 use Mollie\Payment\Service\Order\BuildTransaction;
 use Mollie\Payment\Service\Order\Invoice\ShouldEmailInvoice;
+use Mollie\Payment\Service\Order\Lines\Order as OrderOrderLines;
 use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Service\Order\MethodCode;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
@@ -61,6 +62,10 @@ class Orders extends AbstractModel
      * @var OrderLines
      */
     private $orderLines;
+    /**
+     * @var OrderOrderLines
+     */
+    private $orderOrderLines;
     /**
      * @var OrderRepository
      */
@@ -113,6 +118,7 @@ class Orders extends AbstractModel
      * @var Transaction
      */
     private $transaction;
+
     /**
      * @var BuildTransaction
      */
@@ -147,7 +153,6 @@ class Orders extends AbstractModel
      * @var LinkTransactionToOrder
      */
     private $linkTransactionToOrder;
-
     /**
      * @var ShouldEmailInvoice
      */
@@ -159,6 +164,7 @@ class Orders extends AbstractModel
 
     public function __construct(
         OrderLines $orderLines,
+        OrderOrderLines $orderOrderLines,
         InvoiceSender $invoiceSender,
         OrderRepository $orderRepository,
         CheckoutSession $checkoutSession,
@@ -184,6 +190,7 @@ class Orders extends AbstractModel
         MethodCode $methodCode
     ) {
         $this->orderLines = $orderLines;
+        $this->orderOrderLines = $orderOrderLines;
         $this->invoiceSender = $invoiceSender;
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -224,8 +231,10 @@ class Orders extends AbstractModel
         $additionalData = $order->getPayment()->getAdditionalInformation();
 
         $transactionId = $order->getMollieTransactionId();
-        if (!empty($transactionId)) {
-            return $this->getCheckoutUrl($mollieApi, $order);
+        if (!empty($transactionId) &&
+            $checkoutUrl = $this->getCheckoutUrl($mollieApi, $order)
+        ) {
+            return $checkoutUrl;
         }
 
         $paymentToken = $this->paymentTokenForOrder->execute($order);
@@ -236,7 +245,7 @@ class Orders extends AbstractModel
             'orderNumber'         => $order->getIncrementId(),
             'billingAddress'      => $this->getAddressLine($order->getBillingAddress()),
             'consumerDateOfBirth' => null,
-            'lines'               => $this->orderLines->getOrderLines($order),
+            'lines'               => $this->orderOrderLines->get($order),
             'redirectUrl'         => $this->transaction->getRedirectUrl($order, $paymentToken),
             'webhookUrl'          => $this->transaction->getWebhookUrl([$order]),
             'locale'              => $this->mollieHelper->getLocaleCode($storeId, self::CHECKOUT_TYPE),
@@ -308,7 +317,7 @@ class Orders extends AbstractModel
      *
      * @throws LocalizedException
      */
-    public function processResponse(Order $order, $mollieOrder)
+    public function processResponse(OrderInterface $order, MollieOrder $mollieOrder): void
     {
         $eventData = [
             'order' => $order,

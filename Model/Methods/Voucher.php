@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -27,6 +27,7 @@ use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\GetApiMethod;
 use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Timeout;
@@ -66,6 +67,7 @@ class Voucher extends Mollie
         OrderLockService $orderLockService,
         MollieApiClient $mollieApiClient,
         TransactionToOrderRepositoryInterface $transactionToOrderRepository,
+        GetApiMethod $getApiMethod,
         $formBlockType,
         $infoBlockType,
         QuoteHasMealVoucherProducts $quoteHasMealVoucherProducts,
@@ -93,6 +95,7 @@ class Voucher extends Mollie
             $orderLockService,
             $mollieApiClient,
             $transactionToOrderRepository,
+            $getApiMethod,
             $formBlockType,
             $infoBlockType,
             $commandPool,

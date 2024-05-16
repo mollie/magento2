@@ -5,7 +5,7 @@
             <argument name="routerList" xsi:type="array">
                 <item name="mollie_applepay_domain_association" xsi:type="array">
                     <item name="class" xsi:type="string">Mollie\Payment\Service\Magento\ApplePayDomainAssociationRouter</item>
-                    <item name="sortOrder" xsi:type="string">10</item>
+                    <item name="sortOrder" xsi:type="string">9</item>
                 </item>
             </argument>
         </arguments>
