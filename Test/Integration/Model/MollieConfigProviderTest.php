@@ -43,7 +43,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
 
         $this->assertArrayHasKey('mollie_methods_applepay', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_alma', $result['payment']['image']);
-        $this->assertArrayHasKey('mollie_methods_bancomat', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_bancomatpay', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_bancontact', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_banktransfer', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_belfius', $result['payment']['image']);

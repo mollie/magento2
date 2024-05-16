@@ -30,7 +30,7 @@ define(
 
         var methods = [
             {type: 'mollie_methods_alma', component: defaultComponent},
-            {type: 'mollie_methods_bancomat', component: defaultComponent},
+            {type: 'mollie_methods_bancomatpay', component: defaultComponent},
             {type: 'mollie_methods_bancontact', component: defaultComponent},
             {type: 'mollie_methods_banktransfer', component: defaultComponent},
             {type: 'mollie_methods_belfius', component: defaultComponent},
