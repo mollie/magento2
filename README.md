@@ -29,6 +29,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Apple Pay (direct)
 - Alma
 - Bancontact
+- Bancomat Pay
 - Bank transfer
 - Belfius Pay Button
 - Billie

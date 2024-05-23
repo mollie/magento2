@@ -87,7 +87,9 @@ class ShippingMethods extends Action
         return $response->setData([
             'shipping_methods' => array_map(function ($method) {
                 return [
-                    'identifier' => $method->getCarrierCode() . '_' . $method->getMethodCode(),
+                    // Magento uses an _ (underscore) to separate the carrier and method, but those can have an
+                    // underscore as well. So separate by a different divider to prevent errors.
+                    'identifier' => $method->getCarrierCode() . '__SPLIT__' . $method->getMethodCode(),
                     'label' => $method->getMethodTitle() . ' - ' . $method->getCarrierTitle(),
                     'amount' => number_format($method->getPriceInclTax() ?: 0.0, 2, '.', ''),
                     'detail' => '',

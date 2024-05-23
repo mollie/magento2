@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -59,6 +59,7 @@ class Config
     const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
+    const PAYMENT_METHOD_API_METHOD = 'payment/mollie_methods_%s/method';
     const PAYMENT_METHOD_ISSUER_LIST_TYPE = 'payment/mollie_methods_%s/issuer_list_type';
     const PAYMENT_METHOD_PAYMENT_ACTIVE = 'payment/mollie_methods_%s/active';
     const PAYMENT_METHOD_PAYMENT_DESCRIPTION = 'payment/mollie_methods_%s/payment_description';
@@ -779,6 +780,14 @@ class Config
     public function encryptPaymentDetails($storeId = null): bool
     {
         return $this->isSetFlag(static::GENERAL_ENCRYPT_PAYMENT_DETAILS, $storeId);
+    }
+
+    public function getApiMethod(string $method, int $storeId = null): string
+    {
+        return (string)$this->getPath(
+            $this->addMethodToPath(static::PAYMENT_METHOD_API_METHOD, $method),
+            $storeId
+        );
     }
 
     /**
