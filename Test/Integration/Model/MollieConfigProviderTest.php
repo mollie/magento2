@@ -37,7 +37,6 @@ class MollieConfigProviderTest extends IntegrationTestCase
 
         $result = $instance->getConfig();
 
-        $this->assertArrayHasKey('mollie_methods_ideal', $result['payment']['issuersListType']);
         $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['issuersListType']);
         $this->assertArrayHasKey('mollie_methods_giftcard', $result['payment']['issuersListType']);
 
@@ -70,7 +69,6 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertArrayHasKey('mollie_methods_twint', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_voucher', $result['payment']['image']);
 
-        $this->assertEquals([], $result['payment']['issuers']['mollie_methods_ideal']);
         $this->assertEquals([], $result['payment']['issuers']['mollie_methods_kbc']);
         $this->assertEquals([], $result['payment']['issuers']['mollie_methods_giftcard']);
     }

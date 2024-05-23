@@ -15,16 +15,7 @@ class PaymentMethods
      */
     private $config;
 
-    public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
-
-    /**
-     * @var array
-     */
-    private $methods = [
+    public const METHODS = [
         'mollie_methods_applepay',
         'mollie_methods_alma',
         'mollie_methods_bancomatpay',
@@ -55,12 +46,18 @@ class PaymentMethods
         'mollie_methods_voucher',
     ];
 
-    public function getCodes()
-    {
-        return $this->methods;
+    public function __construct(
+        Config $config
+    ) {
+        $this->config = $config;
     }
 
-    public function getCodeswithTitle()
+    public function getCodes(): array
+    {
+        return static::METHODS;
+    }
+
+    public function getCodesWithTitle(): array
     {
         return array_map(function ($method) {
             return [

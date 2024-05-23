@@ -17,7 +17,6 @@ define(
         'use strict';
         var billieComponent = 'Mollie_Payment/js/view/payment/method-renderer/billie';
         var defaultComponent = 'Mollie_Payment/js/view/payment/method-renderer/default';
-        var idealComponent = 'Mollie_Payment/js/view/payment/method-renderer/ideal';
         var giftcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/giftcard';
         var kbcComponent = 'Mollie_Payment/js/view/payment/method-renderer/kbc';
         var pointofsaleComponent = 'Mollie_Payment/js/view/payment/method-renderer/pointofsale';
@@ -40,7 +39,7 @@ define(
             {type: 'mollie_methods_directdebit', component: defaultComponent},
             {type: 'mollie_methods_eps', component: defaultComponent},
             {type: 'mollie_methods_giftcard', component: giftcardComponent},
-            {type: 'mollie_methods_ideal', component: idealComponent},
+            {type: 'mollie_methods_ideal', component: defaultComponent},
             {type: 'mollie_methods_in3', component: defaultComponent},
             {type: 'mollie_methods_giropay', component: defaultComponent},
             {type: 'mollie_methods_kbc', component: kbcComponent},
