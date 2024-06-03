@@ -46,6 +46,11 @@ class GetMollieStatusResult
             return true;
         }
 
-        return in_array($status, ['pending', 'paid', 'authorized']);
+        return in_array($status, [
+            'pending',
+            'paid',
+            'authorized',
+            'completed', // Completed is mainly to support digital products
+        ]);
     }
 }
