@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 #mm-mollie-button {
 
     &_test,
@@ -50,6 +55,24 @@
             transition: 0.3s background-color;
             margin-right: 10px;
         }
+
+        &:hover {
+            color: @mm-mollie-color__2;
+
+            &::before {
+                background-color: @mm-mollie-color__2;
+            }
+        }
+    }
+
+    &_download {
+        background: transparent;
+        padding-left: 0.85rem;
+        margin: -0.8rem 0 -1rem 0;
+        white-space: nowrap;
+        color: @mm-mollie-version-btn-border;
+        border: 1px solid @mm-mollie-color-gray_light;
+        transition: 0.3s color, 0.3s border;
 
         &:hover {
             color: @mm-mollie-color__2;
