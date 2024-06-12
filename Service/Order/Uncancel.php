@@ -101,8 +101,6 @@ class Uncancel
     {
         /** @var OrderItemInterface $item */
         foreach ($order->getAllItems() as $item) {
-            $item->setQtyCanceled(0);
-
             if ($this->isInventorySalesApiEnabled) {
                 $this->uncancelOrderItemReservation->execute($item);
             }

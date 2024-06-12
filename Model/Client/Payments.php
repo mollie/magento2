@@ -284,8 +284,13 @@ class Payments extends AbstractModel
 
         $this->eventManager->dispatch('mollie_process_response', $eventData);
         $this->eventManager->dispatch('mollie_process_response_payments_api', $eventData);
-
         $this->mollieHelper->addTolog('response', $payment);
+
+        // The order is canceled before but now restarted, so uncancel the order.
+        if ($order->getState() == Order::STATE_CANCELED) {
+            $this->mollieHelper->uncancelOrder($order);
+        }
+
         $order->getPayment()->setAdditionalInformation('checkout_url', $payment->getCheckoutUrl());
         $order->getPayment()->setAdditionalInformation('checkout_type', self::CHECKOUT_TYPE);
         $order->getPayment()->setAdditionalInformation('payment_status', $payment->status);
