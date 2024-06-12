@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Config:etc/system_file.xsd">
     <system>
@@ -26,12 +24,18 @@
             <group id="version" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1"
                    showInStore="1">
                 <label>Version</label>
+                <attribute type="expanded">1</attribute>
                 <field id="version_button" translate="label" type="button" sortOrder="10" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Version</label>
                     <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Button\VersionCheck</frontend_model>
                 </field>
-                <field id="enabled" translate="label" type="select" sortOrder="20" showInDefault="1"
+                <field id="documentation" translate="label" type="button" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Documentation</label>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Button\Documentation</frontend_model>
+                </field>
+                <field id="enabled" translate="label" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1" showInStore="1">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
