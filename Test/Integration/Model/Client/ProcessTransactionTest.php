@@ -88,6 +88,7 @@ class ProcessTransactionTest extends IntegrationTestCase
         $order = $this->loadOrder('100000001');
         $order->setBaseCurrencyCode($currency);
         $order->setOrderCurrencyCode($currency);
+        $order->setState(Order::STATE_NEW);
 
         if ($mollieOrderStatus == OrderStatus::STATUS_PAID) {
             $order->setEmailSent(1);

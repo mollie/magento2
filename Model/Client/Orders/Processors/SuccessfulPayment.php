@@ -173,7 +173,7 @@ class SuccessfulPayment implements OrderProcessorInterface
         $payment->setTransactionId($paymentId);
         $payment->setCurrencyCode($order->getBaseCurrencyCode());
 
-        if ($mollieOrder->isPaid()) {
+        if ($order->getState() != \Magento\Sales\Model\Order::STATE_PROCESSING && $mollieOrder->isPaid()) {
             $payment->setIsTransactionClosed(true);
             $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
         }
