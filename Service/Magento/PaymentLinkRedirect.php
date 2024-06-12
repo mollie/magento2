@@ -67,19 +67,19 @@ class PaymentLinkRedirect
             throw new NotFoundException(__('Order not found'));
         }
 
-        if ($this->isPaymentLinkExpired->execute($order)) {
-            return $this->paymentLinkRedirectResultFactory->create([
-                'redirectUrl' => null,
-                'isExpired' => true,
-                'alreadyPaid' => false,
-            ]);
-        }
-
         if (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE])) {
             return $this->paymentLinkRedirectResultFactory->create([
                 'redirectUrl' => null,
                 'isExpired' => false,
                 'alreadyPaid' => true,
+            ]);
+        }
+
+        if ($this->isPaymentLinkExpired->execute($order) || !$order->canReorder()) {
+            return $this->paymentLinkRedirectResultFactory->create([
+                'redirectUrl' => null,
+                'isExpired' => true,
+                'alreadyPaid' => false,
             ]);
         }
 
