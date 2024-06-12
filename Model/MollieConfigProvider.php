@@ -198,6 +198,7 @@ class MollieConfigProvider implements ConfigProviderInterface
                 continue;
             }
 
+            $isActive = array_key_exists($code, $activeMethods);
             $isAvailable = $this->methods[$code]->isActive();
 
             $config['payment']['image'][$code] = '';
@@ -208,6 +209,7 @@ class MollieConfigProvider implements ConfigProviderInterface
             }
 
             if ($isAvailable &&
+                $isActive &&
                 $mollieApi &&
                 in_array($code, ['mollie_methods_ideal', 'mollie_methods_kbc', 'mollie_methods_giftcard'])
             ) {
