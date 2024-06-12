@@ -64,10 +64,10 @@ describe('Checkout usage', () => {
     visitCheckoutPayment.visit();
 
     checkoutPaymentPage.selectPaymentMethod('iDeal');
-    checkoutPaymentPage.selectFirstAvailableIssuer();
 
     checkoutPaymentPage.placeOrder();
 
+    mollieHostedPaymentPage.selectFirstIssuer();
     mollieHostedPaymentPage.assertIsVisible();
 
     // The original test included a call to cy.go('back');, but this fails for unknown reasons in CI.
@@ -82,12 +82,12 @@ describe('Checkout usage', () => {
     visitCheckoutPayment.visit('NL', 1, 15);
 
     checkoutPaymentPage.selectPaymentMethod('iDeal');
-    checkoutPaymentPage.selectFirstAvailableIssuer();
 
     checkoutPaymentPage.enterCouponCode();
 
     checkoutPaymentPage.placeOrder();
 
+    mollieHostedPaymentPage.selectFirstIssuer();
     mollieHostedPaymentPage.selectStatus('paid');
 
     checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
@@ -105,12 +105,12 @@ describe('Checkout usage', () => {
     visitCheckoutPayment.visit();
 
     checkoutPaymentPage.selectPaymentMethod('iDeal');
-    checkoutPaymentPage.selectFirstAvailableIssuer();
 
     cy.intercept('mollie/checkout/process/*').as('processAction');
 
     checkoutPaymentPage.placeOrder();
 
+    mollieHostedPaymentPage.selectFirstIssuer();
     mollieHostedPaymentPage.selectStatus('paid');
 
     checkoutSuccessPage.assertThatOrderSuccessPageIsShown();

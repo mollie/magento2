@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -30,7 +30,7 @@ class MolliePaymentMethod implements OptionSourceInterface
         return array_merge(
             [['value' => '', 'label' => __('None')]],
             [['value' => 'first_mollie_method', 'label' => __('First available Mollie method')]],
-            $this->methods->getCodeswithTitle()
+            $this->methods->getCodesWithTitle()
         );
     }
 }
