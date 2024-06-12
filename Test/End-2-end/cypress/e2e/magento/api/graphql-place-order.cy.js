@@ -21,8 +21,6 @@ describe('Check that the headless GraphQL endpoints work as expected', () => {
 
     cy.get('[data-key="mollie_methods_ideal"]').click();
 
-    cy.get('[data-key="mollie_methods_ideal-issuer"]').first().click();
-
     cy.get('[data-key="place-order-action"]').click();
 
     cy.get('[data-key="increment-id"]').then((element) => {
@@ -35,6 +33,7 @@ describe('Check that the headless GraphQL endpoints work as expected', () => {
       cy.visit(element.attr('href'));
     });
 
+    mollieHostedPaymentPage.selectFirstIssuer();
     mollieHostedPaymentPage.selectStatus('paid');
 
     checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
