@@ -20,7 +20,6 @@ export default class PlaceOrderComposite {
         checkoutPaymentsPage.selectPaymentMethod('iDeal');
         checkoutPaymentsPage.placeOrder();
 
-        mollieHostedPaymentPage.selectFirstIssuer();
         mollieHostedPaymentPage.selectStatus('paid');
 
         checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
