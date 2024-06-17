@@ -21,6 +21,7 @@ use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 use Mollie\Payment\Service\Mollie\MethodParameters;
+use Mollie\Payment\Service\Mollie\PaymentMethods;
 
 /**
  * Class MollieConfigProvider
@@ -29,39 +30,6 @@ use Mollie\Payment\Service\Mollie\MethodParameters;
  */
 class MollieConfigProvider implements ConfigProviderInterface
 {
-    /**
-     * @var array
-     */
-    private $methodCodes = [
-        'mollie_methods_applepay',
-        'mollie_methods_alma',
-        'mollie_methods_bancomatpay',
-        'mollie_methods_bancontact',
-        'mollie_methods_banktransfer',
-        'mollie_methods_belfius',
-        'mollie_methods_billie',
-        'mollie_methods_blik',
-        'mollie_methods_creditcard',
-        'mollie_methods_directdebit',
-        'mollie_methods_eps',
-        'mollie_methods_giftcard',
-        'mollie_methods_giropay',
-        'mollie_methods_ideal',
-        'mollie_methods_in3',
-        'mollie_methods_kbc',
-        'mollie_methods_klarna',
-        'mollie_methods_klarnapaylater',
-        'mollie_methods_klarnapaynow',
-        'mollie_methods_klarnasliceit',
-        'mollie_methods_mybank',
-        'mollie_methods_paypal',
-        'mollie_methods_paysafecard',
-        'mollie_methods_pointofsale',
-        'mollie_methods_przelewy24',
-        'mollie_methods_sofort',
-        'mollie_methods_twint',
-        'mollie_methods_voucher',
-    ];
     /**
      * @var array
      */
@@ -141,7 +109,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $this->methodParameters = $methodParameters;
         $this->supportedNetworks = $supportedNetworks;
 
-        foreach ($this->methodCodes as $code) {
+        foreach (PaymentMethods::METHODS as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
         }
     }
@@ -193,11 +161,12 @@ class MollieConfigProvider implements ConfigProviderInterface
             $this->mollieHelper->addTolog('error', $exception->getMessage());
         }
 
-        foreach ($this->methodCodes as $code) {
+        foreach (PaymentMethods::METHODS as $code) {
             if (empty($this->methods[$code])) {
                 continue;
             }
 
+            $isActive = array_key_exists($code, $activeMethods);
             $isAvailable = $this->methods[$code]->isActive();
 
             $config['payment']['image'][$code] = '';
@@ -208,8 +177,9 @@ class MollieConfigProvider implements ConfigProviderInterface
             }
 
             if ($isAvailable &&
+                $isActive &&
                 $mollieApi &&
-                in_array($code, ['mollie_methods_ideal', 'mollie_methods_kbc', 'mollie_methods_giftcard'])
+                in_array($code, ['mollie_methods_kbc', 'mollie_methods_giftcard'])
             ) {
                 $config = $this->getIssuers($mollieApi, $code, $config);
             }

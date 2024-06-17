@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 import CheckoutPaymentPage from "Pages/frontend/CheckoutPaymentPage";
 import VisitCheckoutPaymentCompositeAction from "CompositeActions/VisitCheckoutPaymentCompositeAction";
 import MollieHostedPaymentPage from "Pages/mollie/MollieHostedPaymentPage";
@@ -27,7 +32,6 @@ if (Cypress.env('mollie_available_methods').includes('ideal')) {
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
         checkoutPaymentPage.selectPaymentMethod('iDeal');
-        checkoutPaymentPage.selectFirstAvailableIssuer();
         checkoutPaymentPage.placeOrder();
 
         mollieHostedPaymentPage.selectStatus(testCase.status);

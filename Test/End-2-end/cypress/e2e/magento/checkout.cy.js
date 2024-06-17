@@ -64,7 +64,6 @@ describe('Checkout usage', () => {
     visitCheckoutPayment.visit();
 
     checkoutPaymentPage.selectPaymentMethod('iDeal');
-    checkoutPaymentPage.selectFirstAvailableIssuer();
 
     checkoutPaymentPage.placeOrder();
 
@@ -82,7 +81,6 @@ describe('Checkout usage', () => {
     visitCheckoutPayment.visit('NL', 1, 15);
 
     checkoutPaymentPage.selectPaymentMethod('iDeal');
-    checkoutPaymentPage.selectFirstAvailableIssuer();
 
     checkoutPaymentPage.enterCouponCode();
 
@@ -105,7 +103,6 @@ describe('Checkout usage', () => {
     visitCheckoutPayment.visit();
 
     checkoutPaymentPage.selectPaymentMethod('iDeal');
-    checkoutPaymentPage.selectFirstAvailableIssuer();
 
     cy.intercept('mollie/checkout/process/*').as('processAction');
 

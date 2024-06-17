@@ -1,5 +1,8 @@
 name: End-2-end
 on:
+  push:
+    tags:
+      - '*'
   pull_request:
     types:
       - opened
@@ -49,7 +52,7 @@ jobs:
           - PHP_VERSION: php74-fpm
             MAGENTO_VERSION: 2.3.7-p4
           - PHP_VERSION: php82-fpm
-            MAGENTO_VERSION: 2.4.6-p4
+            MAGENTO_VERSION: 2.4.6-p5
     runs-on: ubuntu-latest
     env:
       PHP_VERSION: ${{ matrix.PHP_VERSION }}

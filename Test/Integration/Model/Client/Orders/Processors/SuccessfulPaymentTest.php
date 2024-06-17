@@ -77,6 +77,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $order->setBaseCurrencyCode('EUR');
+        $order->setState(Order::STATE_NEW);
 
         $this->assertNull($order->getTotalPaid());
 
@@ -102,10 +103,49 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    public function testDoesNotCreateACaptureNotificationIfTheOrderIsAlreadyProcessing()
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
+        $order->setState(Order::STATE_PROCESSING);
+
+        $this->assertNull($order->getTotalPaid());
+
+        /** @var MollieOrderBuilder $orderBuilder */
+        $orderBuilder = $this->objectManager->create(MollieOrderBuilder::class);
+        $orderBuilder->setAmount(100);
+        $orderBuilder->addPayment('payment_001');
+        $orderBuilder->setStatus(OrderStatus::STATUS_PAID);
+
+        /** @var SuccessfulPayment $instance */
+        $instance = $this->objectManager->create(SuccessfulPayment::class);
+
+        $instance->process(
+            $order,
+            $orderBuilder->build(),
+            'webhook',
+            $this->createResponse(false)
+        );
+
+        // Get order comment history
+        $histories = $order->getStatusHistories();
+
+        foreach ($histories as $history) {
+            $this->assertStringNotContainsString(
+                'Registered notification about captured amount of',
+                $history->getComment()
+            );
+        }
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
     public function testGeneratesInvoice()
     {
         $order = $this->loadOrder('100000001');
         $order->setBaseCurrencyCode('EUR');
+        $order->setState(Order::STATE_NEW);
 
         $this->assertNull($order->getPayment()->getCreatedInvoice());
 
@@ -135,6 +175,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $order->setBaseCurrencyCode('EUR');
+        $order->setState(Order::STATE_NEW);
 
         $this->assertNull($order->getPayment()->getCreatedInvoice());
 
