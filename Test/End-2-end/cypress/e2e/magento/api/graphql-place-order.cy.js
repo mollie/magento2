@@ -33,7 +33,6 @@ describe('Check that the headless GraphQL endpoints work as expected', () => {
       cy.visit(element.attr('href'));
     });
 
-    mollieHostedPaymentPage.selectFirstIssuer();
     mollieHostedPaymentPage.selectStatus('paid');
 
     checkoutSuccessPage.assertThatOrderSuccessPageIsShown();

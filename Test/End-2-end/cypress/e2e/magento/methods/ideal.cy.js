@@ -34,7 +34,6 @@ if (Cypress.env('mollie_available_methods').includes('ideal')) {
         checkoutPaymentPage.selectPaymentMethod('iDeal');
         checkoutPaymentPage.placeOrder();
 
-        mollieHostedPaymentPage.selectFirstIssuer();
         mollieHostedPaymentPage.selectStatus(testCase.status);
 
         if (testCase.status === 'paid') {
