@@ -81,7 +81,7 @@
                 <model>Mollie\Payment\Model\Methods\Alma</model>
                 <title>ALMA</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
+                <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
