@@ -36,6 +36,7 @@ bin/magento config:set payment/mollie_methods_klarnapaylater/active 1 &
 bin/magento config:set payment/mollie_methods_paymentlink/active 1 &
 bin/magento config:set payment/mollie_methods_paysafecard/active 1 &
 bin/magento config:set payment/mollie_methods_pointofsale/active 1 &
+bin/magento config:set payment/mollie_methods_riverty/active 1 &
 bin/magento config:set payment/mollie_methods_sofort/active 1 &
 bin/magento config:set payment/mollie_methods_twint/active 1 &
 

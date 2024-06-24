@@ -40,6 +40,7 @@ describe('Checkout usage', () => {
       // TODO: Figure out why paypal fails
       // 'paypal',
       'przelewy24',
+      'riverty',
       'sofort',
     ].forEach((method) => {
       if (!availableMethods.includes(method)) {
