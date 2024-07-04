@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -11,7 +11,6 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\View\Result\PageFactory;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -20,8 +19,6 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Config;
-use Mollie\Payment\Helper\General as MollieHelper;
-use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\Methods\CreditcardVault;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\FormatExceptionMessages;
@@ -39,17 +36,9 @@ class Redirect extends Action
      */
     protected $checkoutSession;
     /**
-     * @var PageFactory
-     */
-    protected $resultPageFactory;
-    /**
      * @var PaymentHelper
      */
     protected $paymentHelper;
-    /**
-     * @var MollieHelper
-     */
-    protected $mollieHelper;
     /**
      * @var OrderManagementInterface
      */
@@ -81,9 +70,7 @@ class Redirect extends Action
      *
      * @param Context $context
      * @param Session $checkoutSession
-     * @param PageFactory $resultPageFactory
      * @param PaymentHelper $paymentHelper
-     * @param MollieHelper $mollieHelper
      * @param OrderManagementInterface $orderManagement
      * @param Config $config
      * @param PaymentTokenRepositoryInterface $paymentTokenRepository ,
@@ -94,9 +81,7 @@ class Redirect extends Action
     public function __construct(
         Context $context,
         Session $checkoutSession,
-        PageFactory $resultPageFactory,
         PaymentHelper $paymentHelper,
-        MollieHelper $mollieHelper,
         OrderManagementInterface $orderManagement,
         Config $config,
         PaymentTokenRepositoryInterface $paymentTokenRepository,
@@ -105,9 +90,7 @@ class Redirect extends Action
         FormatExceptionMessages $formatExceptionMessages
     ) {
         $this->checkoutSession = $checkoutSession;
-        $this->resultPageFactory = $resultPageFactory;
         $this->paymentHelper = $paymentHelper;
-        $this->mollieHelper = $mollieHelper;
         $this->orderManagement = $orderManagement;
         $this->config = $config;
         $this->paymentTokenRepository = $paymentTokenRepository;
@@ -125,50 +108,39 @@ class Redirect extends Action
         try {
             $order = $this->getOrder();
         } catch (LocalizedException $exception) {
-            $this->mollieHelper->addTolog('error', $exception->getMessage());
+            $this->config->addTolog('error', $exception->getMessage());
             return $this->_redirect('checkout/cart');
         }
 
         try {
-            $payment = $order->getPayment();
-            if (!isset($payment)) {
+            if ($order->getPayment() === null) {
                 return $this->_redirect('checkout/cart');
             }
 
             $method = $order->getPayment()->getMethod();
             $methodInstance = $this->getMethodInstance($method);
-            if ($methodInstance instanceof Mollie) {
-                $storeId = $order->getStoreId();
-                $redirectUrl = $this->redirectUrl->execute($methodInstance, $order);
-                // This is deprecated since 2.18.0 and will be removed in a future version.
-                if (!($methodInstance instanceof ApplePay) &&
-                    $this->mollieHelper->useLoadingScreen($storeId)
-                ) {
-                    $resultPage = $this->resultPageFactory->create();
-                    $resultPage->getLayout()->initMessages();
-                    $resultPage->getLayout()->getBlock('mollie_loading')->setMollieRedirect($redirectUrl);
-                    return $resultPage;
-                } else {
-                    return $this->getResponse()->setRedirect($redirectUrl);
-                }
-            } else {
+            if (!$methodInstance instanceof Mollie) {
                 $msg = __('Payment Method not found');
                 $this->messageManager->addErrorMessage($msg);
-                $this->mollieHelper->addTolog('error', $msg);
+                $this->config->addTolog('error', $msg);
                 $this->checkoutSession->restoreQuote();
                 return $this->_redirect('checkout/cart');
             }
+
+            return $this->getResponse()->setRedirect(
+                $this->redirectUrl->execute($methodInstance, $order)
+            );
         } catch (Exception $exception) {
             $errorMessage = $this->formatExceptionMessages->execute($exception, $methodInstance ?? null);
             $this->messageManager->addErrorMessage($errorMessage);
-            $this->mollieHelper->addTolog('error', $exception->getMessage());
+            $this->config->addTolog('error', $exception->getMessage());
             $this->checkoutSession->restoreQuote();
             $this->cancelUnprocessedOrder($order, $exception->getMessage());
             return $this->_redirect('checkout/cart');
         }
     }
 
-    private function cancelUnprocessedOrder(OrderInterface $order, $message)
+    private function cancelUnprocessedOrder(OrderInterface $order, string $message): void
     {
         if (!$this->config->cancelFailedOrders()) {
             return;
@@ -184,21 +156,16 @@ class Redirect extends Action
             $this->orderManagement->cancel($order->getEntityId());
             $order->addCommentToStatusHistory($order->getEntityId(), $historyMessage);
 
-            $this->mollieHelper->addToLog('info', sprintf('Canceled order %s', $order->getIncrementId()));
+            $this->config->addToLog('info', sprintf('Canceled order %s', $order->getIncrementId()));
         } catch (Exception $e) {
             $message = sprintf('Cannot cancel order %s: %s', $order->getIncrementId(), $e->getMessage());
-            $this->mollieHelper->addToLog('error', $message);
+            $this->config->addToLog('error', $message);
         }
     }
 
-    /**
-     * @return OrderInterface
-     * @throws LocalizedException
-     */
-    private function getOrder()
+    private function getOrder(): OrderInterface
     {
         $token = $this->getRequest()->getParam('paymentToken');
-
         if (!$token) {
             throw new LocalizedException(__('The required payment token is not available'));
         }
