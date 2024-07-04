@@ -167,6 +167,7 @@ class GeneralTest extends IntegrationTestCase
             'pointofsale' => ['mollie_methods_pointofsale', 'pointofsale'],
             'przelewy24' => ['mollie_methods_przelewy24', 'przelewy24'],
             'sofort' => ['mollie_methods_sofort', 'sofort'],
+            'trustly' => ['mollie_methods_trustly', 'trustly'],
             'twint' => ['mollie_methods_twint', 'twint'],
         ];
     }

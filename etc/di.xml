@@ -1732,6 +1732,51 @@
         </arguments>
     </virtualType>
 
+    <!-- Trustly -->
+    <type name="Mollie\Payment\Model\Methods\Trustly">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieTrustlyValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieTrustlyValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieTrustlyValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieTrustlyConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieTrustlyConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieTrustlyConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieTrustlyConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Trustly::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieTrustlyValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieTrustlyCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieTrustlyCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieTrustlyConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- TWINT -->
     <type name="Mollie\Payment\Model\Methods\Twint">
         <arguments>
