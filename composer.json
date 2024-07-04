@@ -38,6 +38,7 @@
     "refunds",
     "sofort",
     "sofortbanking",
+    "trustly",
     "twint",
     "voucher",
     "api",
