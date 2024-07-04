@@ -1057,51 +1057,6 @@
         </arguments>
     </virtualType>
 
-    <!-- Giropay -->
-    <type name="Mollie\Payment\Model\Methods\Giropay">
-        <arguments>
-            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
-            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
-            <argument name="valueHandlerPool" xsi:type="object">MollieGiropayValueHandlerPool</argument>
-            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
-            <argument name="validatorPool" xsi:type="object">MollieGiropayValidatorPool</argument>
-        </arguments>
-    </type>
-
-    <virtualType name="MollieGiropayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
-        <arguments>
-            <argument name="handlers" xsi:type="array">
-                <item name="default" xsi:type="string">MollieGiropayConfigValueHandler</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieGiropayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
-        <arguments>
-            <argument name="configInterface" xsi:type="object">MollieGiropayConfig</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieGiropayConfig" type="Magento\Payment\Gateway\Config\Config">
-        <arguments>
-            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Giropay::CODE</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieGiropayValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
-        <arguments>
-            <argument name="validators" xsi:type="array">
-                <item name="country" xsi:type="string">MollieGiropayCountryValidator</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieGiropayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
-        <arguments>
-            <argument name="config" xsi:type="object">MollieGiropayConfig</argument>
-        </arguments>
-    </virtualType>
-
     <!-- Ideal -->
     <type name="Mollie\Payment\Model\Methods\Ideal">
         <arguments>

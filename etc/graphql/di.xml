@@ -20,7 +20,6 @@
                 <item name="mollie_methods_directdebit" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_eps" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_giftcard" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
-                <item name="mollie_methods_giropay" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_ideal" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_in3" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_kbc" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
