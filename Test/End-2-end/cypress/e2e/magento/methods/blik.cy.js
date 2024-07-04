@@ -1,37 +1,32 @@
-/*
- * Copyright Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
-
 import CheckoutPaymentPage from "Pages/frontend/CheckoutPaymentPage";
 import VisitCheckoutPaymentCompositeAction from "CompositeActions/VisitCheckoutPaymentCompositeAction";
 import MollieHostedPaymentPage from "Pages/mollie/MollieHostedPaymentPage";
 import CheckoutSuccessPage from "Pages/frontend/CheckoutSuccessPage";
-import OrdersPage from "Pages/backend/OrdersPage";
 import CartPage from "Pages/frontend/CartPage";
+import OrdersPage from "Pages/backend/OrdersPage";
 
-const checkoutPaymentPage = new CheckoutPaymentPage();
-const visitCheckoutPayment = new VisitCheckoutPaymentCompositeAction();
-const mollieHostedPaymentPage = new MollieHostedPaymentPage();
-const checkoutSuccessPage = new CheckoutSuccessPage();
-const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
+const checkoutPaymentPage = new CheckoutPaymentPage();
+const checkoutSuccessPage = new CheckoutSuccessPage();
+const mollieHostedPaymentPage = new MollieHostedPaymentPage();
+const ordersPage = new OrdersPage();
+const visitCheckoutPayment = new VisitCheckoutPaymentCompositeAction();
 
-if (Cypress.env('mollie_available_methods').includes('alma')) {
-  describe('Check that Alma behaves as expected', () => {
+if (Cypress.env('mollie_available_methods').includes('blik')) {
+  describe('Check if Blik behaves as expected', () => {
     [
-      {status: 'paid', orderStatus: 'Processing', title: 'C2938625: Validate the submission of an order with Alma as payment method and payment mark as "Paid"'},
-      {status: 'failed', orderStatus: 'Canceled', title: 'C2938626: Validate the submission of an order with Alma as payment method and payment mark as "Failed"'},
-      {status: 'expired', orderStatus: 'Canceled', title: 'C2938627: Validate the submission of an order with Alma as payment method and payment mark as "Expired"'},
-      {status: 'canceled', orderStatus: 'Canceled', title: 'C2938628: Validate the submission of an order with Alma as payment method and payment mark as "Cancelled"'},
+      {status: 'paid', orderStatus: 'Processing', title: 'C2775017: Validate the submission of an order with Blik as payment method and payment mark as "Paid"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C2775018: Validate the submission of an order with Blik as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C2775019: Validate the submission of an order with Blik as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C2775020: Validate the submission of an order with Blik as payment method and payment mark as "Cancelled"'},
     ].forEach((testCase) => {
       it(testCase.title, () => {
-        // Minimum order amount == €50, so order the product twice.
-        visitCheckoutPayment.visit('NL', 2);
+        visitCheckoutPayment.changeCurrencyTo('PLN');
+        visitCheckoutPayment.visit();
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-        checkoutPaymentPage.selectPaymentMethod('ALMA');
+        checkoutPaymentPage.selectPaymentMethod('Blik');
         checkoutPaymentPage.placeOrder();
 
         mollieHostedPaymentPage.selectStatus(testCase.status);

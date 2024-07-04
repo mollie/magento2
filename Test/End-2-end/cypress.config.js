@@ -32,7 +32,7 @@ module.exports = defineConfig({
 
         const query = `
           query {
-             molliePaymentMethods(input:{amount:50, currency:"EUR"}) {
+             molliePaymentMethods(input:{amount:50}) {
                methods {
                  code
                  image
