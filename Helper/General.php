@@ -14,6 +14,7 @@ use Magento\Framework\Module\ModuleListInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
+use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Config\Model\ResourceModel\Config as ResourceConfig;
 use Magento\Payment\Helper\Data as PaymentHelper;
@@ -226,7 +227,7 @@ class General extends AbstractHelper
      */
     public function getStoreConfig($path, $storeId = 0)
     {
-        return $this->scopeConfig->getValue($path, \Magento\Store\Model\ScopeInterface::SCOPE_STORE, $storeId);
+        return $this->scopeConfig->getValue($path, ScopeInterface::SCOPE_STORE, $storeId);
     }
 
     /**
@@ -620,18 +621,22 @@ class General extends AbstractHelper
     {
         $activeMethods = [];
         foreach (PaymentMethods::METHODS as $methodCode) {
-            $activePath = 'payment/' . $methodCode . '/active';
-            $active = $this->getStoreConfig($activePath, $storeId);
-
-            if ($active) {
-                $maxPath = 'payment/' . $methodCode . '/max_order_total';
-                $max = $this->getStoreConfig($maxPath, $storeId);
-                $code = str_replace('mollie_methods_', '', $methodCode);
-                $activeMethods[$methodCode] = ['code' => $code, 'max' => $max];
+            if (!$this->isMethodActive($methodCode, $storeId)) {
+                continue;
             }
+
+            $maxPath = 'payment/' . $methodCode . '/max_order_total';
+            $max = $this->getStoreConfig($maxPath, $storeId);
+            $code = str_replace('mollie_methods_', '', $methodCode);
+            $activeMethods[$methodCode] = ['code' => $code, 'max' => $max];
         }
 
         return $activeMethods;
+    }
+
+    public function isMethodActive(string $methodCode, int $storeId = null): bool
+    {
+        return (bool)$this->getStoreConfig('payment/' . $methodCode . '/active', $storeId);
     }
 
     /**
