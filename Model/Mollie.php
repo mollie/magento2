@@ -680,9 +680,6 @@ class Mollie extends Adapter
 
         $mollieApi = $this->loadMollieApi($apiKey);
 
-        return $mollieApi->methods->allActive([
-            'resource' => 'orders',
-            'includeWallets' => 'applepay',
-        ]);
+        return $mollieApi->methods->allAvailable();
     }
 }
