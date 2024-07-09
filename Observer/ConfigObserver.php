@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -9,7 +9,9 @@ namespace Mollie\Payment\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Event\Observer as EventObserver;
 use Magento\Framework\Message\ManagerInterface;
+use Mollie\Api\Resources\Method;
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Methods\Directdebit;
 use Mollie\Payment\Model\Methods\Pointofsale;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -112,14 +114,19 @@ class ConfigObserver implements ObserverInterface
         $activeMethods = $this->mollieHelper->getAllActiveMethods($storeId);
 
         $methods = [];
+        $apiMethods = array_filter((array)$apiMethods, function (Method $method) {
+            return $method->status == 'activated';
+        });
+
         foreach ($apiMethods as $apiMethod) {
             $methods[$apiMethod->id] = $apiMethod;
         }
 
         $disabledMethods = [];
+        $doNotCheckMethods = [Pointofsale::CODE, Directdebit::CODE];
         foreach ($activeMethods as $method) {
             $code = $method['code'];
-            if ($code != Pointofsale::CODE && !isset($methods[$code])) {
+            if (!in_array('mollie_methods_' . $code, $doNotCheckMethods) && !isset($methods[$code])) {
                 $disabledMethods[] = $this->config->getMethodTitle($code);
             }
         }
