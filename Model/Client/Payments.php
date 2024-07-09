@@ -545,14 +545,12 @@ class Payments extends AbstractModel
         }
     }
 
-    /**
-     * @param MollieApiClient $mollieApi
-     * @param $transactionId
-     * @return string|null
-     * @throws \Mollie\Api\Exceptions\ApiException
-     */
-    public function getCheckoutUrl(MollieApiClient $mollieApi, $transactionId): ?string
+    private function getCheckoutUrl(MollieApiClient $mollieApi, ?string $transactionId): ?string
     {
+        if ($transactionId === null) {
+            return null;
+        }
+
         $payment = $mollieApi->payments->get($transactionId);
         return $payment->getCheckoutUrl();
     }

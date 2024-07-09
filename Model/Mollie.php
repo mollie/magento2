@@ -29,6 +29,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Api\Data\TransactionToOrderInterface;
 use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Config;
+use Mollie\Payment\Exceptions\PaymentAborted;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Orders as OrdersApi;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
@@ -293,7 +294,7 @@ class Mollie extends Adapter
 
         $methodCode = $this->mollieHelper->getMethodCode($order);
         $methods = ['billie', 'klarna', 'klarnapaylater', 'klarnapaynow', 'klarnasliceit', 'voucher', 'in3'];
-        if (in_array($methodCode, $methods)) {
+        if (in_array($methodCode, $methods) || $exception instanceof PaymentAborted) {
             throw new LocalizedException(__($exception->getMessage()));
         }
 
