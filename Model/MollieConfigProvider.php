@@ -211,6 +211,7 @@ class MollieConfigProvider implements ConfigProviderInterface
                 'amount[currency]' => $amount['currency'],
                 'resource' => 'orders',
                 'includeWallets' => 'applepay',
+                'billingCountry' => $cart->getBillingAddress()->getCountry(),
             ];
 
             $this->methodData = [];
