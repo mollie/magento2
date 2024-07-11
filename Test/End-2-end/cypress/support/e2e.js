@@ -33,7 +33,8 @@ Cypress.on('uncaught:exception', (error, runnable) => {
 
     // These errors are happing in Magento 2.4.7
     if (error.message.indexOf('$fotoramaElement.fotorama is not a function') !== -1 ||
-        error.message.indexOf('You cannot apply bindings multiple times to the same element.') !== -1
+        error.message.indexOf('You cannot apply bindings multiple times to the same element.') !== -1 ||
+        error.message.indexOf('$(...).filter(...).collapse is not a function') !== -1
     ) {
         return false
     }

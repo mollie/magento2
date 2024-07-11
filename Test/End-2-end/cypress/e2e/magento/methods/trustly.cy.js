@@ -18,7 +18,7 @@ const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
 if (Cypress.env('mollie_available_methods').includes('trustly')) {
-  describe('CCheck that trustly behaves as expected', () => {
+  describe('Check that trustly behaves as expected', () => {
     [
       {status: 'paid', orderStatus: 'Processing', title: 'C3385963: Validate the submission of an order with Trustly as payment method and payment mark as "Paid"'},
       {status: 'failed', orderStatus: 'Canceled', title: 'C3385964: Validate the submission of an order with Trustly as payment method and payment mark as "Failed"'},
