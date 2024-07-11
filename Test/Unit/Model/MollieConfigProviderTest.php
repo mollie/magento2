@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Test\Unit\Model;
 
@@ -32,7 +36,10 @@ class MollieConfigProviderTest extends UnitTestCase
             'mollieHelper' => $mollieHelperMock,
         ]);
 
-        $result = $instance->getActiveMethods($client, $this->objectManager->getObject(Quote::class));
+        $cart = $this->createMock(Quote::class);
+        $cart->method('getBillingAddress')->willReturnSelf();
+
+        $result = $instance->getActiveMethods($client, $cart);
         $this->assertTrue(is_array($result));
         $this->assertArrayHasKey('mollie_methods_ideal', $result);
         $this->assertEquals('ideal.svg', $result['mollie_methods_ideal']['image']);
