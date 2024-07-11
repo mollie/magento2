@@ -179,7 +179,7 @@ class Process extends Action
         }
 
         try {
-            $order = $this->orderRepository->get(end($orderIds));
+            $order = $this->orderRepository->get(array_key_last($orderIds));
             $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
         } catch (NoSuchEntityException $exception) {
             //
