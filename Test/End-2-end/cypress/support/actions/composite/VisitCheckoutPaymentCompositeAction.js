@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 import ProductPage from "Pages/frontend/ProductPage";
 import CheckoutPage from "Pages/frontend/CheckoutPage";
 import CheckoutShippingPage from "Pages/frontend/CheckoutShippingPage";
@@ -45,6 +50,11 @@ export default class VisitCheckoutPaymentCompositeAction {
 
     if (fixture === 'NL') {
       checkoutShippingPage.fillDutchShippingAddress();
+      return;
+    }
+
+    if (fixture === 'FR') {
+      checkoutShippingPage.fillFrenchShippingAddress();
       return;
     }
 

@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 export default class CheckoutShippingPage {
   shouldSkipUsername = false
 
@@ -13,6 +18,12 @@ export default class CheckoutShippingPage {
 
   fillGermanShippingAddress() {
     cy.fixture('german-shipping-address').then((address) => {
+      this.fillShippingAddress(address);
+    });
+  }
+
+  fillFrenchShippingAddress() {
+    cy.fixture('french-shipping-address').then((address) => {
       this.fillShippingAddress(address);
     });
   }

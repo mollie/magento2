@@ -27,7 +27,7 @@ if (Cypress.env('mollie_available_methods').includes('alma')) {
     ].forEach((testCase) => {
       it(testCase.title, () => {
         // Minimum order amount == €50, so order the product twice.
-        visitCheckoutPayment.visit('NL', 2);
+        visitCheckoutPayment.visit('FR', 2);
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
