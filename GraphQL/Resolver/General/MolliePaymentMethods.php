@@ -90,12 +90,17 @@ class MolliePaymentMethods implements ResolverInterface
         ];
     }
 
-    public function getMethods(float $amount, ?string $currency, int $storeId): ?MethodCollection
+    private function getMethods(float $amount, ?string $currency, int $storeId): ?array
     {
         $mollieApiClient = $this->mollieApiClient->loadByStore($storeId);
 
         if ($currency === null) {
-            return $mollieApiClient->methods->allAvailable();
+            $available = $mollieApiClient->methods->allAvailable();
+            $available = array_filter((array)$available, function (Method $method) use ($storeId) {
+                return $method->status == 'activated';
+            });
+
+            return $available;
         }
 
         $parameters = [
@@ -105,7 +110,7 @@ class MolliePaymentMethods implements ResolverInterface
             'includeWallets' => 'applepay',
         ];
 
-        return $mollieApiClient->methods->allActive(
+        return (array)$mollieApiClient->methods->allActive(
             $this->methodParameters->enhance($parameters, $this->cartFactory->create())
         );
     }
