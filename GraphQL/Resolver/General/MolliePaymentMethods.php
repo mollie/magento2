@@ -96,7 +96,7 @@ class MolliePaymentMethods implements ResolverInterface
 
         if ($currency === null) {
             $available = $mollieApiClient->methods->allAvailable();
-            $available = array_filter((array)$available, function (Method $method) use ($storeId) {
+            $available = array_filter((array)$available, function (Method $method) {
                 return $method->status == 'activated';
             });
 
