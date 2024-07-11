@@ -18,21 +18,12 @@ class Selftest extends Field
      */
     protected $_template = 'Mollie_Payment::system/config/button/selftest.phtml';
 
-    public function __construct(
-        Context $context,
-        array $data = []
-    ) {
-        parent::__construct($context, $data);
-
-        $this->request = $context->getRequest();
-    }
-
     /**
      * @param AbstractElement $element
      *
      * @return string
      */
-    public function render(AbstractElement $element)
+    public function render(AbstractElement $element): string
     {
         $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
         return parent::render($element);
@@ -43,7 +34,7 @@ class Selftest extends Field
      *
      * @return string
      */
-    public function _getElementHtml(AbstractElement $element)
+    public function _getElementHtml(AbstractElement $element): string
     {
         return $this->_toHtml();
     }
@@ -51,7 +42,7 @@ class Selftest extends Field
     /**
      * @return string
      */
-    public function getSelftestUrl()
+    public function getSelftestUrl(): string
     {
         return $this->getUrl('mollie/action/selfTest/');
     }
