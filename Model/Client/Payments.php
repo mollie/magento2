@@ -16,6 +16,7 @@ use Magento\Sales\Model\OrderRepository;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
+use Mollie\Payment\Exceptions\PaymentAborted;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Payments\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
@@ -552,6 +553,10 @@ class Payments extends AbstractModel
         }
 
         $payment = $mollieApi->payments->get($transactionId);
+        if ($payment->status == 'paid') {
+            throw new PaymentAborted(__('This order already has been paid.'));
+        }
+
         return $payment->getCheckoutUrl();
     }
 }
