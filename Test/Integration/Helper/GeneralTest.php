@@ -153,7 +153,6 @@ class GeneralTest extends IntegrationTestCase
             'directdebit' => ['mollie_methods_directdebit', 'directdebit'],
             'eps' => ['mollie_methods_eps', 'eps'],
             'giftcard' => ['mollie_methods_giftcard', 'giftcard'],
-            'giropay' => ['mollie_methods_giropay', 'giropay'],
             'ideal' => ['mollie_methods_ideal', 'ideal'],
             'in3' => ['mollie_methods_in3', 'in3'],
             'kbc' => ['mollie_methods_kbc', 'kbc'],
@@ -167,7 +166,9 @@ class GeneralTest extends IntegrationTestCase
             'paysafecard' => ['mollie_methods_paysafecard', 'paysafecard'],
             'pointofsale' => ['mollie_methods_pointofsale', 'pointofsale'],
             'przelewy24' => ['mollie_methods_przelewy24', 'przelewy24'],
+            'riverty' => ['mollie_methods_riverty', 'riverty'],
             'sofort' => ['mollie_methods_sofort', 'sofort'],
+            'trustly' => ['mollie_methods_trustly', 'trustly'],
             'twint' => ['mollie_methods_twint', 'twint'],
         ];
     }

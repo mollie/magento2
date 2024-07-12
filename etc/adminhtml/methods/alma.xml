@@ -23,15 +23,6 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_description" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Description</label>
-            <config_path>payment/mollie_methods_alma/payment_description</config_path>
-            <comment model="Mollie\Payment\Model\Adminhtml\Comment\AvailableDescriptionVariables"/>
-            <depends>
-                <field id="method">payment</field>
-                <field id="active">1</field>
-            </depends>
-        </field>
         <field id="days_before_expire" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Days to expire</label>
@@ -39,7 +30,6 @@
             <config_path>payment/mollie_methods_alma/days_before_expire</config_path>
             <depends>
                 <field id="active">1</field>
-                <field id="method">order</field>
             </depends>
             <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
         </field>

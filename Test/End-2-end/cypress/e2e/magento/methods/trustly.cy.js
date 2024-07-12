@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 import CheckoutPaymentPage from "Pages/frontend/CheckoutPaymentPage";
 import VisitCheckoutPaymentCompositeAction from "CompositeActions/VisitCheckoutPaymentCompositeAction";
 import MollieHostedPaymentPage from "Pages/mollie/MollieHostedPaymentPage";
@@ -12,20 +17,20 @@ const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
-if (Cypress.env('mollie_available_methods').includes('giropay')) {
-  describe('Check that giropay behaves as expected', () => {
+if (Cypress.env('mollie_available_methods').includes('trustly')) {
+  describe('Check that trustly behaves as expected', () => {
     [
-      {status: 'paid', orderStatus: 'Processing', title: 'C3081: Validate the submission of an order with Giropay as payment method and payment mark as "Paid"'},
-      {status: 'failed', orderStatus: 'Canceled', title: 'C3082: Validate the submission of an order with Giropay as payment method and payment mark as "Failed"'},
-      {status: 'expired', orderStatus: 'Canceled', title: 'C3084: Validate the submission of an order with Giropay as payment method and payment mark as "Expired"'},
-      {status: 'canceled', orderStatus: 'Canceled', title: 'C3083: Validate the submission of an order with Giropay as payment method and payment mark as "Cancelled"'},
+      {status: 'paid', orderStatus: 'Processing', title: 'C3385963: Validate the submission of an order with Trustly as payment method and payment mark as "Paid"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C3385964: Validate the submission of an order with Trustly as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C3385965: Validate the submission of an order with Trustly as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C3385966: Validate the submission of an order with Trustly as payment method and payment mark as "Canceled" '},
     ].forEach((testCase) => {
       it(testCase.title, () => {
         visitCheckoutPayment.visit();
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-        checkoutPaymentPage.selectPaymentMethod('Giropay');
+        checkoutPaymentPage.selectPaymentMethod('Trustly');
         checkoutPaymentPage.placeOrder();
 
         mollieHostedPaymentPage.selectStatus(testCase.status);
@@ -43,10 +48,6 @@ if (Cypress.env('mollie_available_methods').includes('giropay')) {
         cy.get('@order-id').then((orderId) => {
           ordersPage.openOrderById(orderId);
         });
-
-        if (testCase.status === 'expired') {
-          ordersPage.callFetchStatus();
-        }
 
         ordersPage.assertOrderStatusIs(testCase.orderStatus);
       });

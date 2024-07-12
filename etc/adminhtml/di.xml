@@ -1,4 +1,9 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Sales\Block\Adminhtml\Order\View">
         <plugin name="mollie_payment_sales_order_view_buttons" type="Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\View" />
@@ -33,6 +38,7 @@
                 <item name="extensionAttributes" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestExtensionAttributes</item>
                 <item name="webhooksDisabled" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestWebhooksDisabled</item>
                 <item name="applePayDomainValidationFile" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestApplePayDomainValidationFile</item>
+                <item name="isDateofbirthEnabled" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestIsDobEnabled</item>
             </argument>
         </arguments>
     </type>

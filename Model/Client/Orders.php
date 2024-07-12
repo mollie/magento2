@@ -26,6 +26,7 @@ use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\Payment;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Config;
+use Mollie\Payment\Exceptions\PaymentAborted;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
@@ -914,6 +915,15 @@ class Orders extends AbstractModel
         $mollieOrder = $mollieApi->orders->get($order->getMollieTransactionId());
         if ($checkoutUrl = $mollieOrder->getCheckoutUrl()) {
             return $checkoutUrl;
+        }
+
+        if ($mollieOrder->status == 'paid') {
+            $this->config->addToLog('error', [
+                'message' => 'This order already has been paid.',
+                'order' => $order->getEntityId(),
+            ]);
+
+            throw new PaymentAborted(__('This order already has been paid.'));
         }
 
         // There is no checkout URL, the transaction is either canceled or expired. Create a new transaction.

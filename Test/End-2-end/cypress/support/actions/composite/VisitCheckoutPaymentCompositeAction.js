@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 import ProductPage from "Pages/frontend/ProductPage";
 import CheckoutPage from "Pages/frontend/CheckoutPage";
 import CheckoutShippingPage from "Pages/frontend/CheckoutShippingPage";
@@ -48,7 +53,21 @@ export default class VisitCheckoutPaymentCompositeAction {
       return;
     }
 
+    if (fixture === 'FR') {
+      checkoutShippingPage.fillFrenchShippingAddress();
+      return;
+    }
+
     checkoutShippingPage.fillShippingAddressUsingFixture(fixture);
+  }
+
+  changeCurrencyTo(currency) {
+    cy.visit('/');
+
+    cy.get('.greet.welcome').should('be.visible');
+
+    cy.get('#switcher-currency-trigger span').click();
+    cy.get('.switcher-dropdown').contains(currency).click();
   }
 
   changeStoreViewTo(name) {

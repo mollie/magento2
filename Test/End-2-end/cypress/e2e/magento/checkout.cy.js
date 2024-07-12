@@ -40,6 +40,7 @@ describe('Checkout usage', () => {
       // TODO: Figure out why paypal fails
       // 'paypal',
       'przelewy24',
+      'riverty',
       'sofort',
     ].forEach((method) => {
       if (!availableMethods.includes(method)) {
@@ -67,6 +68,7 @@ describe('Checkout usage', () => {
 
     checkoutPaymentPage.placeOrder();
 
+    mollieHostedPaymentPage.selectFirstIssuer();
     mollieHostedPaymentPage.assertIsVisible();
 
     // The original test included a call to cy.go('back');, but this fails for unknown reasons in CI.
@@ -86,6 +88,7 @@ describe('Checkout usage', () => {
 
     checkoutPaymentPage.placeOrder();
 
+    mollieHostedPaymentPage.selectFirstIssuer();
     mollieHostedPaymentPage.selectStatus('paid');
 
     checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
@@ -108,6 +111,7 @@ describe('Checkout usage', () => {
 
     checkoutPaymentPage.placeOrder();
 
+    mollieHostedPaymentPage.selectFirstIssuer();
     mollieHostedPaymentPage.selectStatus('paid');
 
     checkoutSuccessPage.assertThatOrderSuccessPageIsShown();

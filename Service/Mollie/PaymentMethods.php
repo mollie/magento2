@@ -29,7 +29,6 @@ class PaymentMethods
         'mollie_methods_eps',
         'mollie_methods_ideal',
         'mollie_methods_in3',
-        'mollie_methods_giropay',
         'mollie_methods_giftcard',
         'mollie_methods_kbc',
         'mollie_methods_klarna',
@@ -41,7 +40,9 @@ class PaymentMethods
         'mollie_methods_paysafecard',
         'mollie_methods_pointofsale',
         'mollie_methods_przelewy24',
+        'mollie_methods_riverty',
         'mollie_methods_sofort',
+        'mollie_methods_trustly',
         'mollie_methods_twint',
         'mollie_methods_voucher',
     ];

@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -21,17 +21,9 @@ use Mollie\Payment\Service\Mollie\SelfTests\AbstractSelfTest;
 class SelfTest extends Action
 {
     /**
-     * @var \Magento\Framework\App\RequestInterface
-     */
-    private $request;
-    /**
      * @var JsonFactory
      */
     private $resultJsonFactory;
-    /**
-     * @var TestsHelper
-     */
-    private $testsHelper;
     /**
      * @var MollieHelper
      */
@@ -44,15 +36,13 @@ class SelfTest extends Action
     public function __construct(
         Context $context,
         JsonFactory $resultJsonFactory,
-        TestsHelper $testsHelper,
         MollieHelper $mollieHelper,
         array $tests
     ) {
-        $this->request = $context->getRequest();
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->testsHelper = $testsHelper;
-        $this->mollieHelper = $mollieHelper;
         parent::__construct($context);
+
+        $this->resultJsonFactory = $resultJsonFactory;
+        $this->mollieHelper = $mollieHelper;
         $this->tests = $tests;
     }
 
@@ -67,7 +57,6 @@ class SelfTest extends Action
     public function execute()
     {
         $result = $this->resultJsonFactory->create();
-
         if (!class_exists('Mollie\Api\CompatibilityChecker')) {
             return $this->getPhpApiErrorMessage($result);
         }

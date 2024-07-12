@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -15,10 +15,12 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Billie;
+use Mollie\Payment\Model\Methods\In3;
 use Mollie\Payment\Model\Methods\Klarna;
 use Mollie\Payment\Model\Methods\Klarnapaylater;
 use Mollie\Payment\Model\Methods\Klarnapaynow;
 use Mollie\Payment\Model\Methods\Klarnasliceit;
+use Mollie\Payment\Model\Methods\Riverty;
 use Mollie\Payment\Service\Magento\PaymentLinkUrl;
 
 class Base extends Info
@@ -166,7 +168,15 @@ class Base extends Info
     {
         try {
             $code = $this->getInfo()->getMethod();
-            $methods = [Billie::CODE, Klarna::CODE, Klarnapaylater::CODE, Klarnasliceit::CODE, Klarnapaynow::CODE];
+            $methods = [
+                Billie::CODE,
+                In3::CODE,
+                Klarna::CODE,
+                Klarnapaylater::CODE,
+                Klarnasliceit::CODE,
+                Klarnapaynow::CODE,
+                Riverty::CODE,
+            ];
 
             if (in_array($code, $methods)) {
                 return true;

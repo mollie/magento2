@@ -1,10 +1,15 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\General;
 
 use Magento\PageCache\Model\Cache\Type;
 use Mollie\Api\Endpoints\MethodEndpoint;
 use Mollie\Api\MollieApiClient;
+use Mollie\Api\Resources\Method;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\GraphQLTestCase;
 
@@ -179,12 +184,16 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         ')['molliePaymentMethods']['methods'];
     }
 
-    private function arrayToObject($array): \stdClass
+    private function arrayToObject($array, $nested = false)
     {
-        $object = new \stdClass();
+        $client = $this->objectManager->get(\Mollie\Api\MollieApiClient::class);
+        $method = new Method($client);
+        $method->status = 'activated';
+
+        $object = $nested ? new \stdClass() : $method;
         foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $value = $this->arrayToObject($value);
+                $value = $this->arrayToObject($value, true);
             }
 
             $object->$key = $value;

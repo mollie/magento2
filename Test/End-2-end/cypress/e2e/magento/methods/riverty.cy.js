@@ -17,22 +17,20 @@ const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
-if (Cypress.env('mollie_available_methods').includes('alma')) {
-  describe('Check that Alma behaves as expected', () => {
+if (Cypress.env('mollie_available_methods').includes('riverty')) {
+  describe('Check that riverty behaves as expected', () => {
     [
-      {status: 'paid', orderStatus: 'Processing', title: 'C2938625: Validate the submission of an order with Alma as payment method and payment mark as "Paid"'},
-      {status: 'failed', orderStatus: 'Canceled', title: 'C2938626: Validate the submission of an order with Alma as payment method and payment mark as "Failed"'},
-      {status: 'expired', orderStatus: 'Canceled', title: 'C2938627: Validate the submission of an order with Alma as payment method and payment mark as "Expired"'},
-      {status: 'canceled', orderStatus: 'Canceled', title: 'C2938628: Validate the submission of an order with Alma as payment method and payment mark as "Cancelled"'},
+      {status: 'paid', orderStatus: 'Processing', title: 'C3303025: Validate the submission of an order with Riverty as payment method and payment mark as "Paid"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C3303026: Validate the submission of an order with Riverty as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C3303027: Validate the submission of an order with Riverty as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C3303028: Validate the submission of an order with Riverty as payment method and payment mark as "Canceled"'},
     ].forEach((testCase) => {
-      // TODO: For some reason, these tests are failing in CI.
-      it.skip(testCase.title, () => {
-        // Minimum order amount == €50, so order the product twice.
-        visitCheckoutPayment.visit('FR', 2);
+      it(testCase.title, () => {
+        visitCheckoutPayment.visit();
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-        checkoutPaymentPage.selectPaymentMethod('ALMA');
+        checkoutPaymentPage.selectPaymentMethod('Riverty');
         checkoutPaymentPage.placeOrder();
 
         mollieHostedPaymentPage.selectStatus(testCase.status);

@@ -37,7 +37,6 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Credit card (VISA, MasterCard, Maestro and American Express)
 - EPS
 - Gift cards (Webshop Giftcard, Podium Cadeaukaart, VVV Cadeaukaart, YourGift etc.)
-- Giropay
 - iDEAL
 - in3
 - KBC/CBC Payment Button
@@ -52,6 +51,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Przelewy24
 - SEPA Direct Debit
 - SOFORT Banking
+- Trustly
 - TWINT
 
 ## Additional modules

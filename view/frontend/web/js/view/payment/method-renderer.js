@@ -41,7 +41,6 @@ define(
             {type: 'mollie_methods_giftcard', component: giftcardComponent},
             {type: 'mollie_methods_ideal', component: defaultComponent},
             {type: 'mollie_methods_in3', component: defaultComponent},
-            {type: 'mollie_methods_giropay', component: defaultComponent},
             {type: 'mollie_methods_kbc', component: kbcComponent},
             {type: 'mollie_methods_klarna', component: defaultComponent},
             {type: 'mollie_methods_klarnapaylater', component: defaultComponent},
@@ -52,7 +51,9 @@ define(
             {type: 'mollie_methods_paysafecard', component: defaultComponent},
             {type: 'mollie_methods_pointofsale', component: pointofsaleComponent},
             {type: 'mollie_methods_przelewy24', component: defaultComponent},
+            {type: 'mollie_methods_riverty', component: defaultComponent},
             {type: 'mollie_methods_sofort', component: defaultComponent},
+            {type: 'mollie_methods_trustly', component: defaultComponent},
             {type: 'mollie_methods_twint', component: defaultComponent},
             {type: 'mollie_methods_voucher', component: defaultComponent}
         ];
