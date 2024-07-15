@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://info.mollie.com/hubfs/github/magento-2/logo.png" width="128" height="128"/>
+  <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/24823946/348646786-e32c4d54-5153-48ea-bcd6-3fcf977e2d15.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20240715%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20240715T084846Z&X-Amz-Expires=300&X-Amz-Signature=ff70d20db3fa04e7b896c2cff653fb1e75ae4472962298475a54ce99c577a8f9&X-Amz-SignedHeaders=host&actor_id=24823946&key_id=0&repo_id=77065612" />
+  
 </p>
 <h1 align="center">Mollie for Magento 2.3.3 and higher</h1>
 
 > **Magento 1.x** users check out our [Mollie Magento 1 plugin](https://github.com/mollie/Magento).
 
-***
 
 ## Installation & Update the Mollie Payments plugin
 
