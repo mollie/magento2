@@ -40,8 +40,8 @@ class IsPaymentLinkExpired
 
     public function execute(OrderInterface $order): bool
     {
-        $methodCode = $this->methodCode->execute($order);
-        $this->methodCode->getExpiresAtMethod();
+        $this->methodCode->execute($order);
+        $methodCode = $this->methodCode->getExpiresAtMethod();
         if (!$this->expires->availableForMethod($methodCode, $order->getStoreId())) {
             return $this->checkWithDefaultDate($order);
         }
@@ -51,11 +51,15 @@ class IsPaymentLinkExpired
         return $expiresAt < $order->getCreatedAt();
     }
 
+    /**
+     * Default for when no expiry date is set on the chosen method.
+     */
     private function checkWithDefaultDate(OrderInterface $order): bool
     {
-        $date = $this->timezone->scopeDate($order->getStoreId());
-        $date = $date->add(new \DateInterval('P28D'));
+        $now = $this->timezone->scopeDate($order->getStoreId());
+        $orderDate = $this->timezone->scopeDate($order->getStoreId(), $order->getCreatedAt());
+        $diff = $now->diff($orderDate);
 
-        return $date->format('Y-m-d H:i:s') < $order->getCreatedAt();
+        return $diff->days >= 28;
     }
 }
