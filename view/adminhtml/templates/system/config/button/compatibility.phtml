@@ -1,24 +1,28 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker;
+
 /**
- * @see \Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker
- * @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Checker $block
+ * @see Checker
+ * @var Checker $block
+ * @var SecureHtmlRenderer $secureRenderer
  */
-?>
-<script>
+
+$scriptString = <<<SCRIPT
     require([
         'jquery',
         'mage/translate',
         'prototype',
-    ], function (jQuery, $t) {
+    ], function (jQuery, \$t) {
         var resultSpan = jQuery('#result_compatibility');
         jQuery('#compatibility_button').click(function () {
             var params = {};
-            new Ajax.Request('<?= $block->getAjaxUrl() ?>', {
+            new Ajax.Request('{$block->getAjaxUrl()}', {
                 parameters: params,
                 loaderArea: false,
                 asynchronous: true,
@@ -36,7 +40,7 @@
                         if (typeof json.msg != 'undefined') {
                             resultText = json.msg;
                         } else {
-                            resultText = $t('Invalid response received. This indicates an unknown problem.');
+                            resultText = \$t('Invalid response received. This indicates an unknown problem.');
                         }
                     }
                     resultSpan.find('.result').show();
@@ -46,5 +50,8 @@
         });
 
     });
-</script>
-<?= $block->getButtonHtml() ?>
+SCRIPT;
+
+echo $secureRenderer->renderTag('script', [], $scriptString, false);
+
+echo $block->getButtonHtml();
