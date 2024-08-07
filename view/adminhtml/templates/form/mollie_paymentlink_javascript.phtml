@@ -3,8 +3,12 @@
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
-?>
-<script>
+
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+
+/** @var SecureHtmlRenderer $secureRenderer */
+
+$scriptString = <<<SCRIPT
     document.addEventListener('DOMContentLoaded', function () {
         const saveSelectedMethods = () => {
             // Save the selected payment methods to local storage
@@ -46,4 +50,6 @@
             setSelectedMethods();
         })
     });
-</script>
+SCRIPT;
+
+echo $secureRenderer->renderTag('script', [], $scriptString, false);
