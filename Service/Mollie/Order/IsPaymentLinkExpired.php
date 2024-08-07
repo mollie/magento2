@@ -57,7 +57,7 @@ class IsPaymentLinkExpired
     private function checkWithDefaultDate(OrderInterface $order): bool
     {
         $now = $this->timezone->scopeDate($order->getStoreId());
-        $orderDate = $this->timezone->scopeDate($order->getStoreId(), $order->getCreatedAt());
+        $orderDate = $this->timezone->scopeDate($order->getStoreId(), new \DateTime($order->getCreatedAt()));
         $diff = $now->diff($orderDate);
 
         return $diff->days >= 28;
