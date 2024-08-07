@@ -406,7 +406,9 @@ class Payments extends AbstractModel
                             );
                         }
 
-                        $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
+                        if (!in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE])) {
+                            $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
+                        }
                     }
 
                     $order->setState(Order::STATE_PROCESSING);

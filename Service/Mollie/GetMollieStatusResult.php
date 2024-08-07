@@ -50,6 +50,7 @@ class GetMollieStatusResult
             'pending',
             'paid',
             'authorized',
+            'shipping', // When having free or virtual products orders might go into shipping status real quick
             'completed', // Completed is mainly to support digital products
         ]);
     }

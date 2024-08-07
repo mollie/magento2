@@ -104,12 +104,12 @@ class SuccessfulPayment implements OrderProcessorInterface
     }
 
     /**
-     * @param OrderInterface|\Magento\Sales\Model\Order $order
+     * @param OrderInterface|MagentoOrder $order
      * @param MollieOrder $mollieOrder
      * @param string $type
      * @param ProcessTransactionResponse $response
-     * @throws \Magento\Framework\Exception\LocalizedException
      * @return ProcessTransactionResponse|null
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function process(OrderInterface $order, Order $mollieOrder, string $type, ProcessTransactionResponse $response): ?ProcessTransactionResponse
     {
@@ -173,7 +173,9 @@ class SuccessfulPayment implements OrderProcessorInterface
         $payment->setTransactionId($paymentId);
         $payment->setCurrencyCode($order->getBaseCurrencyCode());
 
-        if ($order->getState() != \Magento\Sales\Model\Order::STATE_PROCESSING && $mollieOrder->isPaid()) {
+        if (!in_array($order->getState(), [MagentoOrder::STATE_PROCESSING, MagentoOrder::STATE_COMPLETE]) &&
+            $mollieOrder->isPaid()
+        ) {
             $payment->setIsTransactionClosed(true);
             $payment->registerCaptureNotification($order->getBaseGrandTotal(), true);
         }
@@ -230,7 +232,7 @@ class SuccessfulPayment implements OrderProcessorInterface
     }
 
     /**
-     * @param OrderInterface|\Magento\Sales\Model\Order $order
+     * @param OrderInterface|MagentoOrder $order
      */
     protected function sendOrderEmails(OrderInterface $order): void
     {

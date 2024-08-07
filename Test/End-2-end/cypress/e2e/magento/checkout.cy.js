@@ -28,7 +28,7 @@ describe('Checkout usage', () => {
 
     const availableMethods = Cypress.env('mollie_available_methods');
     [
-      'alma',
+      // 'alma', Disabled, not available in NL
       'bancomatpay',
       'bancontact',
       'banktransfer',

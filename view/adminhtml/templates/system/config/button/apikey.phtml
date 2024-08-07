@@ -1,15 +1,19 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker;
+
 /**
- * @see \Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker
- * @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker $block
+ * @see Checker
+ * @var Checker $block
+ * @var SecureHtmlRenderer $secureRenderer
  */
-?>
-<script>
+
+$scriptString = <<<SCRIPT
     require([
         'jquery',
         'prototype'
@@ -20,7 +24,7 @@
                 "test_key": jQuery("#mollie_general_api_details_apikey_test").val(),
                 "live_key": jQuery("#mollie_general_api_details_apikey_live").val()
             	};
-            new Ajax.Request('<?= $block->getAjaxUrl() ?>', {
+            new Ajax.Request('{$block->getAjaxUrl()}', {
                 parameters: params,
                 loaderArea: false,
                 asynchronous: true,
@@ -45,5 +49,8 @@
             });
         });
     });
-</script>
-<?= $block->getButtonHtml() ?>
+SCRIPT;
+
+echo $secureRenderer->renderTag('script', [], $scriptString, false);
+
+echo $block->getButtonHtml();
