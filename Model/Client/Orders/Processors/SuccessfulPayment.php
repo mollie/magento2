@@ -24,6 +24,7 @@ use Mollie\Payment\Model\Client\OrderProcessorInterface;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\ProcessCaptures;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\TransactionProcessor;
 
@@ -78,6 +79,10 @@ class SuccessfulPayment implements OrderProcessorInterface
      * @var SendOrderEmails
      */
     private $sendOrderEmails;
+    /**
+     * @var ProcessCaptures
+     */
+    private $processCaptures;
 
     public function __construct(
         ProcessTransactionResponseFactory $processTransactionResponseFactory,
@@ -89,7 +94,8 @@ class SuccessfulPayment implements OrderProcessorInterface
         TransactionProcessor $transactionProcessor,
         OrderCommentHistory $orderCommentHistory,
         OrderRepositoryInterface $orderRepository,
-        SendOrderEmails $sendOrderEmails
+        SendOrderEmails $sendOrderEmails,
+        ProcessCaptures $processCaptures
     ) {
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
         $this->request = $request;
@@ -101,6 +107,7 @@ class SuccessfulPayment implements OrderProcessorInterface
         $this->orderCommentHistory = $orderCommentHistory;
         $this->orderRepository = $orderRepository;
         $this->sendOrderEmails = $sendOrderEmails;
+        $this->processCaptures = $processCaptures;
     }
 
     /**
@@ -140,6 +147,10 @@ class SuccessfulPayment implements OrderProcessorInterface
         if (!$order->getPayment()->getIsTransactionClosed() && $type == 'webhook') {
             $this->handleWebhookCall($order, $mollieOrder);
             $this->sendOrderEmails($order);
+        }
+
+        if ($mollieOrder->amountCaptured !== null && $mollieOrder->amountCaptured->value != '0.00') {
+            $this->processCaptures->execute($order, $mollieOrder->captures());
         }
 
         $result = ['success' => true, 'status' => $mollieOrder->status, 'order_id' => $orderId, 'type' => $type];

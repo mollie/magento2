@@ -30,6 +30,7 @@ use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\ExpiredOrderToTransaction;
+use Mollie\Payment\Service\Order\ProcessCaptures;
 use Mollie\Payment\Service\Order\SaveAdditionalInformationDetails;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\Transaction;
@@ -143,6 +144,10 @@ class Payments extends AbstractModel
      * @var MethodCode
      */
     private $methodCode;
+    /**
+     * @var ProcessCaptures
+     */
+    private $processCaptures;
 
     public function __construct(
         OrderRepository $orderRepository,
@@ -165,7 +170,8 @@ class Payments extends AbstractModel
         SaveAdditionalInformationDetails $saveAdditionalInformationDetails,
         ExpiredOrderToTransaction $expiredOrderToTransaction,
         CanRegisterCaptureNotification $canRegisterCaptureNotification,
-        MethodCode $methodCode
+        MethodCode $methodCode,
+        ProcessCaptures $processCaptures
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -188,6 +194,7 @@ class Payments extends AbstractModel
         $this->expiredOrderToTransaction = $expiredOrderToTransaction;
         $this->canRegisterCaptureNotification = $canRegisterCaptureNotification;
         $this->methodCode = $methodCode;
+        $this->processCaptures = $processCaptures;
     }
 
     /**
@@ -421,6 +428,10 @@ class Payments extends AbstractModel
                             );
                             $this->orderCommentHistory->add($order, $message);
                         }
+                    }
+
+                    if ($paymentData->amountCaptured !== null && $paymentData->amountCaptured->value != '0.00') {
+                        $this->processCaptures->execute($order, $paymentData->captures());
                     }
 
                     if (!$order->getIsVirtual()) {

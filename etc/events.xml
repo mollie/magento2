@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="admin_system_config_changed_section_mollie_payment_methods">
         <observer name="custom_admin_system_config_changed_section_payment" instance="Mollie\Payment\Observer\ConfigObserver"/>
@@ -9,6 +14,7 @@
     <event name="sales_order_shipment_save_before">
         <!-- Order of execution is important -->
         <observer name="mollie_aaaa_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
+        <observer name="mollie_create_invoice" instance="Mollie\Payment\Observer\SalesOrderShipmentSaveBefore\CreateInvoice"/>
         <observer name="mollie_create_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentSaveBefore\CreateMollieShipment"/>
     </event>
     <event name="sales_order_shipment_save_after">
