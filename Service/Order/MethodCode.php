@@ -51,6 +51,7 @@ class MethodCode
         }
 
         if (!is_array($additionalInformation['limited_methods']) || count($additionalInformation['limited_methods']) !== 1) {
+            $this->expiresAtMethod = 'paymentlink';
             return '';
         }
 
