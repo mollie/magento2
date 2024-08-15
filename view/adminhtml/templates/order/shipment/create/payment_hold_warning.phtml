@@ -16,12 +16,12 @@ use Magento\Framework\View\Helper\SecureHtmlRenderer;
 </div>
 
 <?php
-$scriptString = <<<SCRIPT
+$scriptString = '
     (() => {
-        let warningElement = document.querySelector('.mollie-manual-capture-warning');
-        let fields = Array.from(document.querySelectorAll('.qty-item'));
+        let warningElement = document.querySelector(\'.mollie-manual-capture-warning\');
+        let fields = Array.from(document.querySelectorAll(\'.qty-item\'));
         fields.forEach(function (item) {
-            item.addEventListener('change', function (event) {
+            item.addEventListener(\'change\', function (event) {
                 checkFields();
             });
         });
@@ -31,11 +31,17 @@ $scriptString = <<<SCRIPT
                 return element.value != element.defaultValue;
             })
 
-            warningElement.style.display = alteredFields.length ? 'block' : 'none';
+            warningElement.style.display = alteredFields.length ? \'block\' : \'none\';
         }
 
         checkFields();
     })();
-SCRIPT;
+';
 
-echo $secureRenderer->renderTag('script', [], $scriptString, false);
+// @phpstan-ignore-next-line
+if (isset($secureRenderer)) {
+    echo $secureRenderer->renderTag('script', [], $scriptString, false);
+    return;
+}
+
+echo '<script>' . $scriptString . '</script>';

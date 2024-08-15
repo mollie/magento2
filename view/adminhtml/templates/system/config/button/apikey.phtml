@@ -13,44 +13,52 @@ use Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Checker;
  * @var SecureHtmlRenderer $secureRenderer
  */
 
-$scriptString = <<<SCRIPT
+$scriptString = '
     require([
-        'jquery',
-        'prototype'
+        \'jquery\',
+        \'prototype\'
     ], function (jQuery) {
-        var resultSpan = jQuery('#result_apikey');
-        jQuery('#apikey_button').click(function () {
+        var resultSpan = jQuery(\'#result_apikey\');
+        jQuery(\'#apikey_button\').click(function () {
             var params = {
                 "test_key": jQuery("#mollie_general_api_details_apikey_test").val(),
                 "live_key": jQuery("#mollie_general_api_details_apikey_live").val()
             	};
-            new Ajax.Request('{$block->getAjaxUrl()}', {
+            new Ajax.Request(\'' . $block->getAjaxUrl() . '\', {
                 parameters: params,
                 loaderArea: false,
                 asynchronous: true,
                 onCreate: function () {
-                    resultSpan.find('.connecting').show();
-                    resultSpan.find('.result').hide();
+                    resultSpan.find(\'.connecting\').show();
+                    resultSpan.find(\'.result\').hide();
                 },
                 onSuccess: function (response) {
-                    resultSpan.find('.connecting').hide();
-                    var resultText = '';
+                    resultSpan.find(\'.connecting\').hide();
+                    var resultText = \'\';
                     if (response.status > 200) {
                         resultText = response.statusText;
                     } else {
                         var json = response.responseJSON;
-                        if (typeof json.msg != 'undefined') {
+                        if (typeof json.msg != \'undefined\') {
                             resultText = json.msg;
                         }
                     }
-                    resultSpan.find('.result').show();
-                    resultSpan.find('.result').html(resultText);
+                    resultSpan.find(\'.result\').show();
+                    resultSpan.find(\'.result\').html(resultText);
                 }
             });
         });
     });
-SCRIPT;
+';
 
-echo $secureRenderer->renderTag('script', [], $scriptString, false);
+// @phpstan-ignore-next-line
+if (isset($secureRenderer)) {
+    echo $secureRenderer->renderTag('script', [], $scriptString, false);
+}
+
+// @phpstan-ignore-next-line
+if (!isset($secureRenderer)) {
+    echo '<script>' . $scriptString . '</script>';
+}
 
 echo $block->getButtonHtml();
