@@ -39,6 +39,7 @@ class PaymentMethods
         'mollie_methods_paypal',
         'mollie_methods_paysafecard',
         'mollie_methods_pointofsale',
+        'mollie_methods_payconiq',
         'mollie_methods_przelewy24',
         'mollie_methods_riverty',
         'mollie_methods_sofort',

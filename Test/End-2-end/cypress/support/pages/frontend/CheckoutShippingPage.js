@@ -16,6 +16,12 @@ export default class CheckoutShippingPage {
     });
   }
 
+  fillBelgianShippingAddress() {
+    cy.fixture('belgian-shipping-address').then((address) => {
+      this.fillShippingAddress(address);
+    });
+  }
+
   fillGermanShippingAddress() {
     cy.fixture('german-shipping-address').then((address) => {
       this.fillShippingAddress(address);

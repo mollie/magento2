@@ -39,9 +39,14 @@ export default class VisitCheckoutPaymentCompositeAction {
   }
 
   fillAddress(fixture, asCustomer = false) {
-      if (asCustomer) {
-          checkoutShippingPage.skipUsername();
-      }
+    if (asCustomer) {
+      checkoutShippingPage.skipUsername();
+    }
+
+    if (fixture === 'BE') {
+      checkoutShippingPage.fillBelgianShippingAddress();
+      return;
+    }
 
     if (fixture === 'DE') {
       checkoutShippingPage.fillGermanShippingAddress();
