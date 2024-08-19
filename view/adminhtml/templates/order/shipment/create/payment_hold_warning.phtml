@@ -1,19 +1,27 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
-?>
 
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+
+/** @var SecureHtmlRenderer $secureRenderer */
+?>
 <div class="mollie-manual-capture-warning message message-warning">
     Please note: You are creating a partial shipment, but it's only possible to capture the payment once.
     Please double-check you are shipping the correct items.
 </div>
 
-<script>
+<?php
+$scriptString = '
     (() => {
-        let warningElement = document.querySelector('.mollie-manual-capture-warning');
-        let fields = Array.from(document.querySelectorAll('.qty-item'));
+        let warningElement = document.querySelector(\'.mollie-manual-capture-warning\');
+        let fields = Array.from(document.querySelectorAll(\'.qty-item\'));
         fields.forEach(function (item) {
-            item.addEventListener('change', function (event) {
+            item.addEventListener(\'change\', function (event) {
                 checkFields();
             });
         });
@@ -23,9 +31,17 @@ declare(strict_types=1);
                 return element.value != element.defaultValue;
             })
 
-            warningElement.style.display = alteredFields.length ? 'block' : 'none';
+            warningElement.style.display = alteredFields.length ? \'block\' : \'none\';
         }
 
         checkFields();
     })();
-</script>
+';
+
+// @phpstan-ignore-next-line
+if (isset($secureRenderer)) {
+    echo $secureRenderer->renderTag('script', [], $scriptString, false);
+    return;
+}
+
+echo '<script>' . $scriptString . '</script>';

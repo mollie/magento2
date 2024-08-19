@@ -86,13 +86,16 @@ class PlaceOrder extends Action
 
         $cart->setCustomerEmail($this->getRequest()->getParam('shippingAddress')['emailAddress']);
 
-        $shippingAddress->setShippingMethod(
-            str_replace(
-                '__SPLIT__',
-                '_',
-                $this->getRequest()->getParam('shippingMethod')['identifier']
-            )
-        );
+        // Orders with digital products can't have a shipping method
+        if ($this->getRequest()->getParam('shippingMethod')) {
+            $shippingAddress->setShippingMethod(
+                str_replace(
+                    '__SPLIT__',
+                    '_',
+                    $this->getRequest()->getParam('shippingMethod')['identifier']
+                )
+            );
+        }
 
         $cart->setPaymentMethod('mollie_methods_applepay');
         $cart->setCustomerIsGuest(true);

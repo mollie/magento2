@@ -75,7 +75,7 @@ class PaymentLinkRedirect
             ]);
         }
 
-        if ($this->isPaymentLinkExpired->execute($order) || !$order->canReorder()) {
+        if ($this->isPaymentLinkExpired->execute($order)) {
             return $this->paymentLinkRedirectResultFactory->create([
                 'redirectUrl' => null,
                 'isExpired' => true,
