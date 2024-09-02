@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -6,10 +10,14 @@ declare(strict_types=1);
 /** @var \Magento\Framework\View\Element\Template $block */
 ?>
 
-<div id="loading-mask" data-mage-init='{"loader": { "icon": "<?= $escaper->escapeUrl($block->getViewFileUrl('images/loader-1.gif')); ?>"}}'></div>
+<div id="loading-mask"></div>
 
 <div id="mollie-order-status"><?= __('Current Status: Loading...'); ?></div>
 <div id="mollie-order-error"></div>
+
+<div id="mollie-retry-order" style="display: none;">
+    <button class="action primary"><?= __('Retry'); ?></button>
+</div>
 
 <script>
 require([
@@ -18,7 +26,9 @@ require([
     'mage/translate',
     'loader',
 ], function ($, storage, __, loader) {
-    var serviceUrl = '/rest/<?= $block->getData('storeCode'); ?>/V1/mollie/get-order/<?= $escaper->escapeJs($block->getData('token')); ?>';
+    var serviceUrl = '<?= $escaper->escapeJs($block->getData('status_url')); ?>';
+    var resetUrl = '<?= $escaper->escapeJs($block->getData('reset_url')); ?>';
+    var retryUrl = '<?= $escaper->escapeJs($block->getData('retry_url')); ?>';
     var statusElement = document.getElementById('mollie-order-status');
     var errorElement = document.getElementById('mollie-order-error');
     var waitTime = 100;
@@ -38,14 +48,18 @@ require([
                 return;
             }
 
+            statusElement.innerHTML = __('Current Status: %1').replace('%1', status);
+
             if (status === 'canceled') {
-                window.location.href = '/checkout/cart';
+                $('#loading-mask').loader('hide');
+                $('#mollie-retry-order').show();
                 return;
             }
 
-            statusElement.innerHTML = __('Current Status: %1').replace('%1', status);
+            if (waitTime < 1000) {
+                waitTime += 100;
+            }
 
-            waitTime += 100;
             setTimeout(checkOrderStatus, waitTime);
         }).fail(function (error) {
             console.error('Received error: ', error);
@@ -57,5 +71,13 @@ require([
     }
 
     checkOrderStatus();
+
+    $('#mollie-retry-order .primary').click(function () {
+        $('#loading-mask').loader('show');
+
+        storage.post(resetUrl).done(function (response) {
+            window.location.href = retryUrl;
+        });
+    });
 })
 </script>
