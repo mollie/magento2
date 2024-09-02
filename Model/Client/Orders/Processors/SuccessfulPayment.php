@@ -149,8 +149,8 @@ class SuccessfulPayment implements OrderProcessorInterface
             $this->sendOrderEmails($order);
         }
 
-        if ($mollieOrder->amountCaptured !== null && $mollieOrder->amountCaptured->value != '0.00') {
-            $this->processCaptures->execute($order, $mollieOrder->captures());
+        if ($payment && $mollieOrder->amountCaptured !== null && $mollieOrder->amountCaptured->value != '0.00') {
+            $this->processCaptures->execute($order, $payment->captures());
         }
 
         $result = ['success' => true, 'status' => $mollieOrder->status, 'order_id' => $orderId, 'type' => $type];
