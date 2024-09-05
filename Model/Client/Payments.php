@@ -341,6 +341,7 @@ class Payments extends AbstractModel
         $dashboardUrl = $this->dashboardUrl->forPaymentsApi($order->getStoreId(), $paymentData->id);
         $order->getPayment()->setAdditionalInformation('dashboard_url', $dashboardUrl);
         $order->getPayment()->setAdditionalInformation('mollie_id', $paymentData->id);
+        $order->getPayment()->setAdditionalInformation('method', $paymentData->method);
 
         $status = $paymentData->status;
         $payment = $order->getPayment();

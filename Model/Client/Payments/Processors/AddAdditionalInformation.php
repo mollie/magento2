@@ -43,6 +43,7 @@ class AddAdditionalInformation implements PaymentProcessorInterface
         $dashboardUrl = $this->dashboardUrl->forPaymentsApi($order->getStoreId(), $molliePayment->id);
         $magentoPayment->setAdditionalInformation('dashboard_url', $dashboardUrl);
         $magentoPayment->setAdditionalInformation('mollie_id', $molliePayment->id);
+        $magentoPayment->setAdditionalInformation('method', $molliePayment->method);
 
         $status = $molliePayment->status;
         if ($type == 'webhook' && $magentoPayment->getAdditionalInformation('payment_status') != $status) {

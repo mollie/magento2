@@ -49,6 +49,7 @@ class AddAdditionalInformation implements OrderProcessorInterface
         $dashboardUrl = $this->dashboardUrl->forOrdersApi($magentoOrder->getStoreId(), $mollieOrder->id);
         $magentoOrder->getPayment()->setAdditionalInformation('mollie_id', $mollieOrder->id);
         $magentoOrder->getPayment()->setAdditionalInformation('dashboard_url', $dashboardUrl);
+        $magentoOrder->getPayment()->setAdditionalInformation('method', $mollieOrder->method);
 
         $status = $mollieOrder->status;
         $payment = $magentoOrder->getPayment();
