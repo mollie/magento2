@@ -50,7 +50,7 @@
                        showInWebsite="1" showInStore="1">
                     <label>API Details</label>
                     <frontend_model>Mollie\Payment\Block\Adminhtml\Render\Heading</frontend_model>
-                    <comment><![CDATA[You can find your Api Keys in your <a href="https://www.mollie.com/dashboard/" title="Mollie Profiles" target="_blank">Mollie Profile</a>.<br>]]></comment>
+                    <comment><![CDATA[You can find your Api Keys in your <a href="https://www.mollie.com/dashboard/" title="Mollie Profiles" rel="noopener noreferrer" target="_blank">Mollie Profile</a>.<br>]]></comment>
                 </field>
                 <field id="type" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1"
                        showInStore="1">
