@@ -52,6 +52,7 @@ define(
             {type: 'mollie_methods_pointofsale', component: pointofsaleComponent},
             {type: 'mollie_methods_przelewy24', component: defaultComponent},
             {type: 'mollie_methods_riverty', component: defaultComponent},
+            {type: 'mollie_methods_satispay', component: defaultComponent},
             {type: 'mollie_methods_sofort', component: defaultComponent},
             {type: 'mollie_methods_trustly', component: defaultComponent},
             {type: 'mollie_methods_twint', component: defaultComponent},

@@ -49,6 +49,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Paysafecard
 - Point Of Sale (POS)
 - Przelewy24
+- Satispay
 - SEPA Direct Debit
 - SOFORT Banking
 - Trustly

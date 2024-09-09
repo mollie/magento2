@@ -1732,6 +1732,51 @@
         </arguments>
     </virtualType>
 
+    <!-- Satispay -->
+    <type name="Mollie\Payment\Model\Methods\Satispay">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieSatispayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieSatispayValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieSatispayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieSatispayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSatispayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieSatispayConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSatispayConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Satispay::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSatispayValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieSatispayCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSatispayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieSatispayConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Sofort -->
     <type name="Mollie\Payment\Model\Methods\Sofort">
         <arguments>

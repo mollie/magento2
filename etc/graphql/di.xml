@@ -34,6 +34,7 @@
                 <item name="mollie_methods_pointofsale" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_przelewy24" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_riverty" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
+                <item name="mollie_methods_satispay" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_sofort" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_trustly" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_twint" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>

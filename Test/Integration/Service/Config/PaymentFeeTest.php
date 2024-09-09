@@ -48,6 +48,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_pointofsale', true],
             ['mollie_methods_przelewy24', true],
             ['mollie_methods_riverty', true],
+            ['mollie_methods_satispay', true],
             ['mollie_methods_sofort', true],
             ['mollie_methods_trustly', true],
             ['mollie_methods_twint', true],
