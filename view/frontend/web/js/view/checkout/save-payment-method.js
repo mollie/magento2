@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 define([
     'ko',
     'uiComponent',
@@ -64,7 +69,8 @@ define([
                 extension_attributes: {}
             };
 
-            payload.billingAddress = quote.billingAddress();
+            // Do not send the billing address, this is saved by Magento itself
+            // payload.billingAddress = quote.billingAddress();
 
             /**
              * Problem: We need to set the payment method, therefor we created this function. The api call requires

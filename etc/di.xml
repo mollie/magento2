@@ -9,6 +9,7 @@
     <preference for="Mollie\Payment\Api\Webapi\StartTransactionRequestInterface" type="Mollie\Payment\Webapi\StartTransaction" />
     <preference for="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" type="Mollie\Payment\Webapi\GetCustomerOrder" />
     <preference for="Mollie\Payment\Api\Webapi\GetPaymentLinkRedirectInterface" type="Mollie\Payment\Webapi\GetPaymentLinkRedirect" />
+    <preference for="Mollie\Payment\Api\Webapi\ResetCartInterface" type="Mollie\Payment\Webapi\ResetCart" />
     <preference for="Mollie\Payment\Api\MagentoOrderRepositoryInterface" type="Mollie\Payment\Model\MagentoOrderRepository" />
 
     <preference for="Mollie\Payment\Api\PaymentTokenRepositoryInterface" type="Mollie\Payment\Model\PaymentTokenRepository"/>
@@ -1594,6 +1595,51 @@
     <virtualType name="MolliePointofsaleCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
             <argument name="config" xsi:type="object">MolliePointofsaleConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Payconiq -->
+    <type name="Mollie\Payment\Model\Methods\Payconiq">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MolliePayconiqValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MolliePayconiqValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MolliePayconiqValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MolliePayconiqConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePayconiqConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MolliePayconiqConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePayconiqConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Payconiq::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePayconiqValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MolliePayconiqCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePayconiqCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MolliePayconiqConfig</argument>
         </arguments>
     </virtualType>
 
