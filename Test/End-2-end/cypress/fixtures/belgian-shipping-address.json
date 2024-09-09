@@ -1,0 +1,15 @@
+{
+  "type": {
+    "username": "annaschmidt@mollie.com",
+    "firstname": "Anna",
+    "company": "Acme Firma BVBA",
+    "lastname": "Schmidt",
+    "street[0]": "Voorbeeldstraat 1",
+    "city": "Brussel",
+    "postcode": "1000",
+    "telephone": "+32 2 XXXXXXX"
+  },
+  "select": {
+    "country_id": "BE"
+  }
+}
