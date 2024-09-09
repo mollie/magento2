@@ -78,7 +78,7 @@ class ProcessTransaction
 
         return $this->getMollieStatusResultFactory->create([
             'status' => $result['status'],
-            'method' => $order->getPayment()->getAdditionalInformation('method'),
+            'method' => $order->getPayment()->getAdditionalInformation('method') ?? $order->getPayment()->getMethod(),
         ]);
     }
 
