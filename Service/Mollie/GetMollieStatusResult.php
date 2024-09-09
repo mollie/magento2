@@ -23,7 +23,9 @@ class GetMollieStatusResult
         string $status,
         string $method = null
     ) {
-        $method = str_replace('mollie_methods_', '', $method);
+        if ($method !== null) {
+            $method = str_replace('mollie_methods_', '', $method);
+        }
 
         $this->status = $status;
         $this->method = $method;
