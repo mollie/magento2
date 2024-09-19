@@ -22,6 +22,10 @@ class MethodCode
         $method = $order->getPayment()->getMethodInstance()->getCode();
         $this->expiresAtMethod = $method;
 
+        if ($method == 'mollie_methods_googlepay')  {
+            return 'creditcard';
+        }
+
         if ($method == 'mollie_methods_paymentlink') {
             return $this->paymentLinkMethod($order);
         }
