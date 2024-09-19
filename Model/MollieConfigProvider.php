@@ -8,6 +8,7 @@ namespace Mollie\Payment\Model;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Helper\Data as PaymentHelper;
@@ -38,6 +39,10 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var AssetRepository
      */
     private $assetRepository;
+    /**
+     * @var Http
+     */
+    private $request;
     /**
      * @var Mollie
      */
@@ -70,11 +75,11 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var GetIssuers
      */
     private $getIssuers;
+
     /**
      * @var StoreManagerInterface
      */
     private $storeManager;
-
     /**
      * @var MethodParameters
      */
@@ -85,6 +90,7 @@ class MollieConfigProvider implements ConfigProviderInterface
     private $supportedNetworks;
 
     public function __construct(
+        Http $request,
         MollieModel $mollieModel,
         MollieHelper $mollieHelper,
         PaymentHelper $paymentHelper,
@@ -97,6 +103,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         MethodParameters $methodParameters,
         SupportedNetworks $supportedNetworks
     ) {
+        $this->request = $request;
         $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
         $this->paymentHelper = $paymentHelper;
@@ -135,6 +142,11 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     public function getConfig(): array
     {
+        // Do not load the config when on the cart page.
+        if ($this->request->getControllerName() === 'cart') {
+            return [];
+        }
+
         $store = $this->storeManager->getStore();
         $storeId = $store->getId();
         $storeName = $store->getFrontendName();
