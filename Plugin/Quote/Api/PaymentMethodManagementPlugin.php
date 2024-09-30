@@ -22,11 +22,6 @@ class PaymentMethodManagementPlugin
     private $config;
 
     /**
-     * @var Mollie
-     */
-    private $mollieModel;
-
-    /**
      * @var MollieConfigProvider
      */
     private $mollieConfigProvider;
@@ -43,13 +38,11 @@ class PaymentMethodManagementPlugin
 
     public function __construct(
         Config $config,
-        Mollie $mollieModel,
         MollieConfigProvider $mollieConfigProvider,
         CartRepositoryInterface $cartRepository,
         PointOfSaleAvailability $pointOfSaleAvailability
     ) {
         $this->config = $config;
-        $this->mollieModel = $mollieModel;
         $this->mollieConfigProvider = $mollieConfigProvider;
         $this->cartRepository = $cartRepository;
         $this->pointOfSaleAvailability = $pointOfSaleAvailability;
@@ -57,14 +50,12 @@ class PaymentMethodManagementPlugin
 
     public function afterGetList(PaymentMethodManagementInterface $subject, $result, $cartId)
     {
-        if (!$this->containsMollieMethods($result)) {
+        $cart = $this->cartRepository->get($cartId);
+        if (!$this->containsMollieMethods($result) || !$this->config->isMethodsApiEnabled((int)$cart->getStoreId())) {
             return $result;
         }
 
-        $apiKey = $this->config->getApiKey();
-        $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
-        $cart = $this->cartRepository->get($cartId);
-        $activeMethods = $this->mollieConfigProvider->getActiveMethods($mollieApi, $cart);
+        $activeMethods = $this->mollieConfigProvider->getActiveMethods($cart);
 
         return array_filter($result, function ($method) use ($activeMethods, $cart) {
             if (!$method instanceof Mollie) {

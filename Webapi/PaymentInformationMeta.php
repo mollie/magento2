@@ -105,7 +105,7 @@ class PaymentInformationMeta implements PaymentInformationMetaInterface
             $mollieApiClient = $this->mollieApiClient->loadByStore();
         }
 
-        $issuers = $this->getIssuers->execute($mollieApiClient, $code, 'list');
+        $issuers = $this->getIssuers->execute($code, 'list');
         if ($issuers === null) {
             return [];
         }

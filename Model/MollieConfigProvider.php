@@ -14,13 +14,12 @@ use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
-use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 use Mollie\Payment\Service\Mollie\MethodParameters;
+use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\PaymentMethods;
 
 /**
@@ -38,10 +37,6 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var AssetRepository
      */
     private $assetRepository;
-    /**
-     * @var Mollie
-     */
-    private $mollieModel;
     /**
      * @var MollieHelper
      */
@@ -83,9 +78,12 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var SupportedNetworks
      */
     private $supportedNetworks;
+    /**
+     * @var MollieApiClient
+     */
+    private $mollieApiClient;
 
     public function __construct(
-        MollieModel $mollieModel,
         MollieHelper $mollieHelper,
         PaymentHelper $paymentHelper,
         CheckoutSession $checkoutSession,
@@ -95,9 +93,9 @@ class MollieConfigProvider implements ConfigProviderInterface
         GetIssuers $getIssuers,
         StoreManagerInterface $storeManager,
         MethodParameters $methodParameters,
-        SupportedNetworks $supportedNetworks
+        SupportedNetworks $supportedNetworks,
+        MollieApiClient $mollieApiClient
     ) {
-        $this->mollieModel = $mollieModel;
         $this->mollieHelper = $mollieHelper;
         $this->paymentHelper = $paymentHelper;
         $this->checkoutSession = $checkoutSession;
@@ -108,6 +106,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $this->storeManager = $storeManager;
         $this->methodParameters = $methodParameters;
         $this->supportedNetworks = $supportedNetworks;
+        $this->mollieApiClient = $mollieApiClient;
 
         foreach (PaymentMethods::METHODS as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
@@ -149,25 +148,12 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['mollie']['store']['name'] = $storeName;
         $config['payment']['mollie']['store']['currency'] = $this->config->getStoreCurrency($storeId);
         $config['payment']['mollie']['vault']['enabled'] = $this->config->isMagentoVaultEnabled($storeId);
-        $apiKey = $this->mollieHelper->getApiKey();
         $useImage = $this->mollieHelper->useImage();
-
-        $activeMethods = [];
-        try {
-            $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
-            $activeMethods = $this->getActiveMethods($mollieApi);
-        } catch (\Exception $exception) {
-            $mollieApi = null;
-            $this->mollieHelper->addTolog('error', $exception->getMessage());
-        }
 
         foreach (PaymentMethods::METHODS as $code) {
             if (empty($this->methods[$code])) {
                 continue;
             }
-
-            $isActive = array_key_exists($code, $activeMethods);
-            $isAvailable = $this->methods[$code]->isActive();
 
             $config['payment']['image'][$code] = '';
             if ($useImage) {
@@ -176,34 +162,28 @@ class MollieConfigProvider implements ConfigProviderInterface
                 $config['payment']['image'][$code] = $url;
             }
 
-            if ($isAvailable &&
-                $isActive &&
-                $mollieApi &&
-                in_array($code, ['mollie_methods_kbc', 'mollie_methods_giftcard'])
+            if (in_array($code, ['mollie_methods_kbc', 'mollie_methods_giftcard']) &&
+                $this->methods[$code]->isActive() &&
+                $this->isMethodActive($code)
             ) {
-                $config = $this->getIssuers($mollieApi, $code, $config);
+                $config = $this->getIssuers($code, $config);
             }
         }
 
         return $config;
     }
 
-    /**
-     * @param MollieApiClient $mollieApi
-     * @param CartInterface|null $cart
-     *
-     * @return array
-     */
-    public function getActiveMethods(MollieApiClient $mollieApi, CartInterface $cart = null): array
+    public function getActiveMethods(CartInterface $cart = null): array
     {
-        if (!$cart) {
-            $cart = $this->checkoutSession->getQuote();
-        }
-
         if ($this->methodData !== null) {
             return $this->methodData;
         }
 
+        if (!$cart) {
+            $cart = $this->checkoutSession->getQuote();
+        }
+
+        $mollieApi = $this->mollieApiClient->loadByStore();
         try {
             $amount = $this->mollieHelper->getOrderAmountByQuote($cart);
             $parameters = [
@@ -230,14 +210,9 @@ class MollieConfigProvider implements ConfigProviderInterface
         return $this->methodData;
     }
 
-    /**
-     * @param MollieApiClient $mollieApi
-     * @param string $code
-     * @param array $config
-     * @return array
-     */
-    private function getIssuers(MollieApiClient $mollieApi, string $code, array $config): array
+    private function getIssuers(string $code, array $config): array
     {
+        $mollieApi = $this->mollieApiClient->loadByStore();
         $issuerListType = $this->config->getIssuerListType($code, $this->storeManager->getStore()->getId());
         $config['payment']['issuersListType'][$code] = $issuerListType;
         $config['payment']['issuers'][$code] = $this->getIssuers->execute($mollieApi, $code, $issuerListType);
@@ -259,5 +234,14 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
 
         return $locale;
+    }
+
+    private function isMethodActive(string $code): bool
+    {
+        if ($this->config->isMethodsApiEnabled()) {
+            return true;
+        }
+
+        return array_key_exists($code, $this->getActiveMethods());
     }
 }

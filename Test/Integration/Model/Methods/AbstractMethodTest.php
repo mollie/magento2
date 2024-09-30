@@ -14,6 +14,7 @@ use Mollie\Api\Resources\Method;
 use Mollie\Api\Resources\MethodCollection;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\MollieConfigProvider;
+use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 abstract class AbstractMethodTest extends IntegrationTestCase
@@ -86,15 +87,23 @@ abstract class AbstractMethodTest extends IntegrationTestCase
         $methodCollection = $this->objectManager->create(MethodCollection::class, ['count' => 0, '_links' => 0]);
         $methodCollection[] = $method;
 
-        $mollieApiClient = $this->createMock(MollieApiClient::class);
-        $mollieApiClient->methods = $this->createMock(MethodEndpoint::class);
-        $mollieApiClient->methods->method('allActive')->willReturn($methodCollection);
+        $methodsEndpointMock = $this->createMock(MethodEndpoint::class);
+        $methodsEndpointMock->method('allActive')->willReturn($methodCollection);
+        $methodsEndpointMock->method('allAvailable')->willReturn($methodCollection);
+
+        $mollieApiMock = $this->createMock(MollieApiClient::class);
+        $mollieApiMock->methods = $methodsEndpointMock;
+
+        /** @var FakeMollieApiClient $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
+        $fakeMollieApiClient->setInstance($mollieApiMock);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
 
         /** @var MollieConfigProvider $instance */
         $instance = $this->objectManager->create(MollieConfigProvider::class, [
             'mollieHelper' => $mollieHelperMock,
         ]);
-        $methods = $instance->getActiveMethods($mollieApiClient);
+        $methods = $instance->getActiveMethods();
 
         $this->assertArrayHasKey('mollie_methods_' . $this->code, $methods);
         $this->assertEquals($method->image->size2x, $methods['mollie_methods_' . $this->code]['image']);
