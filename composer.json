@@ -90,5 +90,14 @@
     "psr-4": {
       "Mollie\\Payment\\": ""
     }
+  },
+  "suggest": {
+      "mollie/magento2-hyva-compatibility": "Hyvä compatibility for Mollie Payments",
+      "mollie/magento2-hyva-checkout": "Hyvä Checkout integration for Mollie Payments",
+      "mollie/magento2-hyva-react-checkout": "Hyvä React Checkout integration for Mollie Payments",
+      "mollie/magento2-multishipping": "Multishipping integration for Mollie Payments",
+      "mollie/magento2-scandipwa": "ScandiPWA integration for Mollie Payments",
+      "mollie/magento2-analytics": "Analytics integration for Mollie Payments",
+      "mollie/magento2-subscriptions": "Subscriptions integration for Mollie Payments"
   }
 }
