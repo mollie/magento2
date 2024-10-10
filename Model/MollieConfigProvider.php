@@ -8,6 +8,7 @@ namespace Mollie\Payment\Model;
 
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Framework\App\Request\Http;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Helper\Data as PaymentHelper;
@@ -38,6 +39,10 @@ class MollieConfigProvider implements ConfigProviderInterface
      */
     private $assetRepository;
     /**
+     * @var Http
+     */
+    private $request;
+    /**
      * @var MollieHelper
      */
     private $mollieHelper;
@@ -65,7 +70,6 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @var GetIssuers
      */
     private $getIssuers;
-
     /**
      * @var StoreManagerInterface
      */
@@ -84,6 +88,7 @@ class MollieConfigProvider implements ConfigProviderInterface
     private $mollieApiClient;
 
     public function __construct(
+        Http $request,
         MollieHelper $mollieHelper,
         PaymentHelper $paymentHelper,
         CheckoutSession $checkoutSession,
@@ -96,6 +101,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         SupportedNetworks $supportedNetworks,
         MollieApiClient $mollieApiClient
     ) {
+        $this->request = $request;
         $this->mollieHelper = $mollieHelper;
         $this->paymentHelper = $paymentHelper;
         $this->checkoutSession = $checkoutSession;

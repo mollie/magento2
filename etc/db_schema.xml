@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!--
-  ~ Copyright © Magmodules.eu. All rights reserved.
+  ~ Copyright Magmodules.eu. All rights reserved.
   ~ See COPYING.txt for license details.
   -->
 <schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -88,7 +88,7 @@
             <column name="entity_id"/>
         </constraint>
 
-        <index referenceId="INDEX_HASH" indexType="hash">
+        <index referenceId="INDEX_HASH" indexType="btree">
            <column name="hash"/>
        </index>
     </table>
