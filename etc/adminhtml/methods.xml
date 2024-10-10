@@ -31,6 +31,7 @@
     <include path="Mollie_Payment::methods/payconiq.xml"/>
     <include path="Mollie_Payment::methods/przelewy24.xml"/>
     <include path="Mollie_Payment::methods/riverty.xml"/>
+    <include path="Mollie_Payment::methods/satispay.xml"/>
     <include path="Mollie_Payment::methods/sofort.xml"/>
     <include path="Mollie_Payment::methods/trustly.xml"/>
     <include path="Mollie_Payment::methods/twint.xml"/>

@@ -87,6 +87,9 @@
         <method name="mollie_methods_riverty">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="mollie_methods_satispay">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="mollie_methods_sofort">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
