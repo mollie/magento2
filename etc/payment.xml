@@ -42,6 +42,9 @@
         <method name="mollie_methods_giftcard">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="mollie_methods_googlepay">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="mollie_methods_ideal">
             <allow_multiple_address>0</allow_multiple_address>
         </method>

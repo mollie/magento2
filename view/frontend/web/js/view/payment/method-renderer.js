@@ -39,6 +39,7 @@ define(
             {type: 'mollie_methods_directdebit', component: defaultComponent},
             {type: 'mollie_methods_eps', component: defaultComponent},
             {type: 'mollie_methods_giftcard', component: giftcardComponent},
+            {type: 'mollie_methods_googlepay', component: defaultComponent},
             {type: 'mollie_methods_ideal', component: defaultComponent},
             {type: 'mollie_methods_in3', component: defaultComponent},
             {type: 'mollie_methods_kbc', component: kbcComponent},

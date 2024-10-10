@@ -9,6 +9,7 @@ namespace Mollie\Payment\Plugin\Quote\Api;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Methods\GooglePay;
 use Mollie\Payment\Model\Methods\Pointofsale;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Model\MollieConfigProvider;
@@ -58,7 +59,7 @@ class PaymentMethodManagementPlugin
         $activeMethods = $this->mollieConfigProvider->getActiveMethods($cart);
 
         return array_filter($result, function ($method) use ($activeMethods, $cart) {
-            if (!$method instanceof Mollie) {
+            if (!$method instanceof Mollie || $method instanceof GooglePay) {
                 return true;
             }
 
