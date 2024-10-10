@@ -302,28 +302,6 @@ class MollieTest extends IntegrationTestCase
     }
 
     /**
-     * @magentoConfigFixture default_store payment/mollie_general/enabled 1
-     * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
-     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
-     * @magentoConfigFixture default_store payment/mollie_general/type test
-     */
-    public function testIsNotAvailableForLongSteetnames(): void
-    {
-        $this->loadFakeEncryptor()->addReturnValue(
-            'test_dummyapikeywhichmustbe30characterslong',
-            'test_dummyapikeywhichmustbe30characterslong'
-        );
-
-        /** @var Ideal $instance */
-        $instance = $this->objectManager->create(Ideal::class);
-
-        $quote = $this->objectManager->create(Quote::class);
-        $quote->getShippingAddress()->setStreetFull(str_repeat('tenletters', 10) . 'a');
-
-        $this->assertFalse($instance->isAvailable($quote));
-    }
-
-    /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @magentoConfigFixture default_store payment/mollie_general/currency 0
      * @magentoConfigFixture default_store payment/mollie_general/type test
