@@ -59,12 +59,15 @@
     "mollie_pending_payment_reminder": {
         "column": {
             "entity_id": true,
+            "customer_id": true,
+            "hash": true,
             "order_id": true,
             "created_at": true
         },
         "constraint": {
             "MOLLIE_PENDING_PAYMENT_REMINDER_ORDER_ID": true,
-            "PRIMARY": true
+            "PRIMARY": true,
+            "INDEX_HASH": true
         }
     },
     "mollie_sent_payment_reminder": {

@@ -7,57 +7,43 @@
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Mollie\Payment\Api\Data\PendingPaymentReminderInterface;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Config;
 
 class DeletePaymentReminder
 {
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var DateTime
-     */
-    private $dateTime;
-
-    /**
      * @var SearchCriteriaBuilderFactory
      */
     private $criteriaBuilderFactory;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
     /**
      * @var PendingPaymentReminderRepositoryInterface
      */
     private $paymentReminderRepository;
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
 
     public function __construct(
-        Config $config,
-        DateTime $dateTime,
+        EncryptorInterface $encryptor,
         SearchCriteriaBuilderFactory $criteriaBuilderFactory,
-        OrderRepositoryInterface $orderRepository,
         PendingPaymentReminderRepositoryInterface $paymentReminderRepository
     ) {
-        $this->config = $config;
-        $this->dateTime = $dateTime;
         $this->criteriaBuilderFactory = $criteriaBuilderFactory;
-        $this->orderRepository = $orderRepository;
         $this->paymentReminderRepository = $paymentReminderRepository;
+        $this->encryptor = $encryptor;
     }
 
     /**
      * Delete payment reminders by reference
-     * Reference can be a customer ID or Email Address
+     * This reference can be a customer ID or Email Address
      *
      * @param string|int|null $reference
      */
@@ -67,25 +53,18 @@ class DeletePaymentReminder
             return;
         }
 
-        // Delay + 1 hour.
-        $delay = (int)$this->config->secondChanceEmailDelay() + 1;
-        $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT' . $delay . 'H'));
-
         $criteria = $this->criteriaBuilderFactory->create();
-        $criteria->addFilter(Order::CREATED_AT, $date, 'gt');
         if (is_numeric($reference)) {
-            $criteria->addFilter(Order::CUSTOMER_ID, $reference);
+            $criteria->addFilter(PendingPaymentReminderInterface::CUSTOMER_ID, $reference);
         } else {
-            $criteria->addFilter(Order::CUSTOMER_ID, '', 'null');
-            $criteria->addFilter(Order::CUSTOMER_EMAIL, $reference);
+            $criteria->addFilter(PendingPaymentReminderInterface::CUSTOMER_ID, '', 'null');
+            $criteria->addFilter(PendingPaymentReminderInterface::HASH, $this->encryptor->hash($reference));
         }
 
-        $orders = $this->orderRepository->getList($criteria->create());
-        $ids = array_keys($orders->getItems());
-
-        foreach ($ids as $orderId) {
+        $reminders = $this->paymentReminderRepository->getList($criteria->create());
+        foreach ($reminders->getItems() as $reminder) {
             try {
-                $this->paymentReminderRepository->deleteByOrderId($orderId);
+                $this->paymentReminderRepository->delete($reminder);
             } catch (NoSuchEntityException $exception) {
                 // Silence is golden
             }

@@ -75,6 +75,8 @@
 
     <table name="mollie_pending_payment_reminder" engine="innodb" resource="default" comment="mollie_pending_payment_reminder Table">
         <column name="entity_id" xsi:type="int" identity="true" nullable="false" unsigned="true" comment="Entity ID"/>
+        <column name="customer_id" xsi:type="int" nullable="true" comment="Customer ID"/>
+        <column name="hash" xsi:type="varchar" nullable="true" comment="Unique hash"/>
         <column name="order_id" xsi:type="bigint" nullable="false" unsigned="true" default="0" comment="Order Id"/>
         <column name="created_at" xsi:type="timestamp" default="CURRENT_TIMESTAMP" nullable="false" comment="Created At"/>
 
@@ -85,6 +87,10 @@
         <constraint referenceId="PRIMARY" xsi:type="primary">
             <column name="entity_id"/>
         </constraint>
+
+        <index referenceId="INDEX_HASH" indexType="hash">
+           <column name="hash"/>
+       </index>
     </table>
 
     <table name="mollie_sent_payment_reminder" engine="innodb" resource="default" comment="mollie_sent_payment_reminder Table">
