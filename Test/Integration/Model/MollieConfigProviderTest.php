@@ -12,6 +12,7 @@ use Mollie\Api\Resources\MethodCollection;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\MollieConfigProvider;
+use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieConfigProviderTest extends IntegrationTestCase
@@ -142,9 +143,14 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $api = new \Mollie\Api\MollieApiClient;
         $api->methods = $methodMock;
 
+        /** @var FakeMollieApiClient $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
+        $fakeMollieApiClient->setInstance($api);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
+
         /** @var MollieConfigProvider $instance */
         $instance = $this->objectManager->create(MollieConfigProvider::class);
-        $result = $instance->getActiveMethods($api);
+        $result = $instance->getActiveMethods();
 
         $this->assertTrue(is_array($result), 'We expect an array');
         $this->assertCount(0, $result);
