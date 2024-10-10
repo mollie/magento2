@@ -14,6 +14,11 @@ jobs:
                 MAGENTO_VERSION: 2.4.6-p4
               - PHP_VERSION: php83-fpm
                 MAGENTO_VERSION: 2.4.7
+              - PHP_VERSION: php83-fpm
+                MAGENTO_VERSION: 2.4.7
+                PHPSTAN_LEVEL: 2
+
+        name: PHP ${{ matrix.PHP_VERSION }} Magento ${{ matrix.MAGENTO_VERSION }}${{ matrix.PHPSTAN_LEVEL && format(' Level {0}', matrix.PHPSTAN_LEVEL) || '' }}
 
         runs-on: ubuntu-latest
         steps:
@@ -35,4 +40,12 @@ jobs:
               run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade && php bin/magento setup:di:compile"
 
             - name: Run PHPStan
-              run: docker exec magento-project-community-edition /bin/bash -c "./vendor/bin/phpstan analyse --no-progress -c /data/extensions/*/phpstan.neon /data/extensions"
+              continue-on-error: ${{ matrix.PHPSTAN_LEVEL == 2 }}
+              run: |
+                LEVEL_OPTION=""
+
+                if [ -n "${{ matrix.PHPSTAN_LEVEL }}" ]; then
+                  LEVEL_OPTION="--level=${{ matrix.PHPSTAN_LEVEL }}"
+                fi
+
+                docker exec magento-project-community-edition /bin/bash -c "./vendor/bin/phpstan analyse --no-progress $LEVEL_OPTION -c /data/extensions/*/phpstan.neon /data/extensions"

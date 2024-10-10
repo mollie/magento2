@@ -1,47 +1,46 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Method Mollie\\\\Payment\\\\Block\\\\Info\\\\Base\\:\\:getOrderId\\(\\) should return string but return statement is missing\\.$#"
-			count: 1
-			path: Block/Info/Base.php
-
-		-
-			message: "#^Method Mollie\\\\Payment\\\\Controller\\\\Checkout\\\\Process\\:\\:execute\\(\\) should return Magento\\\\Framework\\\\App\\\\ResponseInterface\\|Magento\\\\Framework\\\\Controller\\\\ResultInterface but return statement is missing\\.$#"
-			count: 1
-			path: Controller/Checkout/Process.php
-
-		-
-			message: "#^Method Mollie\\\\Payment\\\\Controller\\\\Checkout\\\\Redirect\\:\\:execute\\(\\) should return Magento\\\\Framework\\\\App\\\\ResponseInterface\\|Magento\\\\Framework\\\\Controller\\\\ResultInterface but return statement is missing\\.$#"
-			count: 1
-			path: Controller/Checkout/Redirect.php
-
-		-
-			message: "#^Method Mollie\\\\Payment\\\\Controller\\\\Checkout\\\\Restart\\:\\:execute\\(\\) should return Magento\\\\Framework\\\\App\\\\ResponseInterface\\|Magento\\\\Framework\\\\Controller\\\\ResultInterface but return statement is missing\\.$#"
-			count: 1
-			path: Controller/Checkout/Restart.php
-
-		-
-			message: "#^Method Mollie\\\\Payment\\\\Controller\\\\Checkout\\\\Success\\:\\:execute\\(\\) should return Magento\\\\Framework\\\\App\\\\ResponseInterface\\|Magento\\\\Framework\\\\Controller\\\\ResultInterface but return statement is missing\\.$#"
-			count: 1
-			path: Controller/Checkout/Success.php
-
-		-
-			message: "#^Method Mollie\\\\Payment\\\\Helper\\\\General\\:\\:getBanktransferDueDate\\(\\) should return string\\|false but return statement is missing\\.$#"
+			message: "#^Use service contracts to persist entities in favour of Magento\\\\SalesRule\\\\Model\\\\Coupon\\:\\:load\\(\\) method$#"
 			count: 1
 			path: Helper/General.php
 
 		-
-			message: "#^Method Mollie\\\\Payment\\\\Model\\\\Adminhtml\\\\Backend\\\\VerifiyPaymentFee\\:\\:beforeSave\\(\\) should return \\$this\\(Mollie\\\\Payment\\\\Model\\\\Adminhtml\\\\Backend\\\\VerifiyPaymentFee\\) but return statement is missing\\.$#"
+			message: "#^Use service contracts to persist entities in favour of Magento\\\\SalesRule\\\\Model\\\\Coupon\\:\\:save\\(\\) method$#"
 			count: 1
-			path: Model/Adminhtml/Backend/VerifiyPaymentFee.php
+			path: Helper/General.php
 
 		-
-			message: "#^Method Mollie\\\\Payment\\\\Model\\\\Methods\\\\Reorder\\:\\:initialize\\(\\) should return \\$this\\(Mollie\\\\Payment\\\\Model\\\\Methods\\\\Reorder\\) but return statement is missing\\.$#"
+			message: "#^Use service contracts to persist entities in favour of Magento\\\\Sales\\\\Model\\\\Order\\:\\:save\\(\\) method$#"
 			count: 1
 			path: Model/Methods/Reorder.php
 
 		-
-			message: "#^Method Mollie\\\\Payment\\\\Model\\\\Mollie\\:\\:createOrderRefund\\(\\) should return \\$this\\(Mollie\\\\Payment\\\\Model\\\\Mollie\\) but return statement is missing\\.$#"
+			message: "#^Use service contracts to persist entities in favour of Mollie\\\\Payment\\\\Model\\\\OrderLines\\:\\:load\\(\\) method$#"
 			count: 1
-			path: Model/Mollie.php
+			path: Model/OrderLines.php
 
+		-
+			message: "#^Use service contracts to persist entities in favour of Mollie\\\\Payment\\\\Model\\\\OrderLines\\:\\:save\\(\\) method$#"
+			count: 2
+			path: Model/OrderLines.php
+
+		-
+			message: "#^Use service contracts to persist entities in favour of Magento\\\\SalesRule\\\\Model\\\\Coupon\\:\\:load\\(\\) method$#"
+			count: 1
+			path: Service/Order/CancelOrder.php
+
+		-
+			message: "#^Use service contracts to persist entities in favour of Magento\\\\SalesRule\\\\Model\\\\Coupon\\:\\:save\\(\\) method$#"
+			count: 1
+			path: Service/Order/CancelOrder.php
+
+		-
+			message: "#^Use service contracts to persist entities in favour of Mollie\\\\Payment\\\\Model\\\\OrderLines\\:\\:save\\(\\) method$#"
+			count: 1
+			path: Service/Order/Lines/Order.php
+
+		-
+			message: "#^Use service contracts to persist entities in favour of Magento\\\\Quote\\\\Model\\\\QuoteIdMask\\:\\:load\\(\\) method$#"
+			count: 1
+			path: Webapi/PaymentToken.php
