@@ -16,6 +16,7 @@
     <include path="Mollie_Payment::methods/directdebit.xml"/>
     <include path="Mollie_Payment::methods/eps.xml"/>
     <include path="Mollie_Payment::methods/giftcard.xml"/>
+    <include path="Mollie_Payment::methods/googlepay.xml"/>
     <include path="Mollie_Payment::methods/ideal.xml"/>
     <include path="Mollie_Payment::methods/in3.xml"/>
     <include path="Mollie_Payment::methods/kbc.xml"/>
@@ -31,6 +32,7 @@
     <include path="Mollie_Payment::methods/payconiq.xml"/>
     <include path="Mollie_Payment::methods/przelewy24.xml"/>
     <include path="Mollie_Payment::methods/riverty.xml"/>
+    <include path="Mollie_Payment::methods/satispay.xml"/>
     <include path="Mollie_Payment::methods/sofort.xml"/>
     <include path="Mollie_Payment::methods/trustly.xml"/>
     <include path="Mollie_Payment::methods/twint.xml"/>

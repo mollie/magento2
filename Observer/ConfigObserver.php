@@ -12,6 +12,7 @@ use Magento\Framework\Message\ManagerInterface;
 use Mollie\Api\Resources\Method;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Methods\Directdebit;
+use Mollie\Payment\Model\Methods\GooglePay;
 use Mollie\Payment\Model\Methods\Pointofsale;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -123,7 +124,7 @@ class ConfigObserver implements ObserverInterface
         }
 
         $disabledMethods = [];
-        $doNotCheckMethods = [Pointofsale::CODE, Directdebit::CODE];
+        $doNotCheckMethods = [Pointofsale::CODE, Directdebit::CODE, GooglePay::CODE];
         foreach ($activeMethods as $method) {
             $code = $method['code'];
             if (!in_array('mollie_methods_' . $code, $doNotCheckMethods) && !isset($methods[$code])) {

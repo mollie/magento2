@@ -9,6 +9,7 @@ namespace Mollie\Payment\Plugin\Quote\Api;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Methods\GooglePay;
 use Mollie\Payment\Model\Methods\Pointofsale;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Model\MollieConfigProvider;
@@ -20,11 +21,6 @@ class PaymentMethodManagementPlugin
      * @var Config
      */
     private $config;
-
-    /**
-     * @var Mollie
-     */
-    private $mollieModel;
 
     /**
      * @var MollieConfigProvider
@@ -43,13 +39,11 @@ class PaymentMethodManagementPlugin
 
     public function __construct(
         Config $config,
-        Mollie $mollieModel,
         MollieConfigProvider $mollieConfigProvider,
         CartRepositoryInterface $cartRepository,
         PointOfSaleAvailability $pointOfSaleAvailability
     ) {
         $this->config = $config;
-        $this->mollieModel = $mollieModel;
         $this->mollieConfigProvider = $mollieConfigProvider;
         $this->cartRepository = $cartRepository;
         $this->pointOfSaleAvailability = $pointOfSaleAvailability;
@@ -57,17 +51,15 @@ class PaymentMethodManagementPlugin
 
     public function afterGetList(PaymentMethodManagementInterface $subject, $result, $cartId)
     {
-        if (!$this->containsMollieMethods($result)) {
+        $cart = $this->cartRepository->get($cartId);
+        if (!$this->containsMollieMethods($result) || !$this->config->isMethodsApiEnabled((int)$cart->getStoreId())) {
             return $result;
         }
 
-        $apiKey = $this->config->getApiKey();
-        $mollieApi = $this->mollieModel->loadMollieApi($apiKey);
-        $cart = $this->cartRepository->get($cartId);
-        $activeMethods = $this->mollieConfigProvider->getActiveMethods($mollieApi, $cart);
+        $activeMethods = $this->mollieConfigProvider->getActiveMethods($cart);
 
         return array_filter($result, function ($method) use ($activeMethods, $cart) {
-            if (!$method instanceof Mollie) {
+            if (!$method instanceof Mollie || $method instanceof GooglePay) {
                 return true;
             }
 

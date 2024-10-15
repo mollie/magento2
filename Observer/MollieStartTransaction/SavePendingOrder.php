@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Observer\MollieStartTransaction;
 
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -37,17 +38,23 @@ class SavePendingOrder implements ObserverInterface
      * @var PendingPaymentReminderRepositoryInterface
      */
     private $repository;
+    /**
+     * @var EncryptorInterface
+     */
+    private $encryptor;
 
     public function __construct(
         General $mollieHelper,
         Config $config,
         PendingPaymentReminderInterfaceFactory $reminderFactory,
-        PendingPaymentReminderRepositoryInterface $repository
+        PendingPaymentReminderRepositoryInterface $repository,
+        EncryptorInterface $encryptor
     ) {
         $this->mollieHelper = $mollieHelper;
         $this->config = $config;
         $this->reminderFactory = $reminderFactory;
         $this->repository = $repository;
+        $this->encryptor = $encryptor;
     }
 
     public function execute(Observer $observer)
@@ -72,6 +79,14 @@ class SavePendingOrder implements ObserverInterface
             /** @var PendingPaymentReminderInterface $reminder */
             $reminder = $this->reminderFactory->create();
             $reminder->setOrderId($order->getEntityId());
+
+            if ($order->getCustomerId()) {
+                $reminder->setCustomerId($order->getCustomerId());
+            }
+
+            if (!$order->getCustomerId() && $order->getCustomerEmail()) {
+                $reminder->setHash($this->encryptor->hash($order->getCustomerEmail()));
+            }
 
             $this->repository->save($reminder);
         } catch (\Exception $exception) {

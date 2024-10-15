@@ -32,6 +32,44 @@ class PendingPaymentReminder extends AbstractExtensibleObject implements Pending
     }
 
     /**
+     * Get customer_id
+     * @return string|null
+     */
+    public function getCustomerId()
+    {
+        return $this->_get(self::CUSTOMER_ID);
+    }
+
+    /**
+     * Set customer_id
+     * @param int|null $customerId
+     * @return PendingPaymentReminderInterface
+     */
+    public function setCustomerId(int $customerId = null)
+    {
+        return $this->setData(self::CUSTOMER_ID, $customerId);
+    }
+
+    /**
+     * Get hash
+     * @return string|null
+     */
+    public function getHash()
+    {
+        return $this->_get(self::HASH);
+    }
+
+    /**
+     * Set hash
+     * @param string|null $hash
+     * @return PendingPaymentReminderInterface
+     */
+    public function setHash(string $hash = null)
+    {
+        return $this->setData(self::HASH, $hash);
+    }
+
+    /**
      * @param int $orderId
      * @return PendingPaymentReminderInterface
      */

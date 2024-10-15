@@ -124,6 +124,7 @@
                 <item name="DateOfBirth" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\DateOfBirth</item>
                 <item name="CaptureMode" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureMode</item>
                 <item name="terminalId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\TerminalId</item>
+                <item name="LimitStreetLength" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitStreetLength</item>
             </argument>
         </arguments>
     </type>
@@ -1058,6 +1059,51 @@
         </arguments>
     </virtualType>
 
+    <!-- Google Pay -->
+    <type name="Mollie\Payment\Model\Methods\GooglePay">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieGooglePayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieGooglePayValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieGooglePayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieGooglePayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGooglePayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieGooglePayConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGooglePayConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\GooglePay::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGooglePayValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieGooglePayCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieGooglePayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieGooglePayConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Ideal -->
     <type name="Mollie\Payment\Model\Methods\Ideal">
         <arguments>
@@ -1775,6 +1821,51 @@
     <virtualType name="MollieRivertyCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
             <argument name="config" xsi:type="object">MollieRivertyConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Satispay -->
+    <type name="Mollie\Payment\Model\Methods\Satispay">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieSatispayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieSatispayValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieSatispayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieSatispayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSatispayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieSatispayConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSatispayConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Satispay::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSatispayValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieSatispayCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSatispayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieSatispayConfig</argument>
         </arguments>
     </virtualType>
 

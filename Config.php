@@ -18,6 +18,7 @@ class Config
     const EXTENSION_CODE = 'Mollie_Payment';
     const ADVANCED_INVOICE_MOMENT = 'payment/mollie_general/invoice_moment';
     const ADVANCED_ENABLE_MANUAL_CAPTURE = 'payment/mollie_general/enable_manual_capture';
+    const ADVANCED_ENABLE_METHODS_API = 'payment/mollie_general/enable_methods_api';
     const GENERAL_ENABLED = 'payment/mollie_general/enabled';
     const GENERAL_APIKEY_LIVE = 'payment/mollie_general/apikey_live';
     const GENERAL_APIKEY_TEST = 'payment/mollie_general/apikey_test';
@@ -276,6 +277,15 @@ class Config
     public function useManualCapture($storeId): bool
     {
         return $this->isSetFlag(static::ADVANCED_ENABLE_MANUAL_CAPTURE, $storeId);
+    }
+
+    /**
+     * @param int|null $storeId
+     * @return bool
+     */
+    public function isMethodsApiEnabled(int $storeId = null): bool
+    {
+        return $this->isSetFlag(static::ADVANCED_ENABLE_METHODS_API, $storeId);
     }
 
     /**

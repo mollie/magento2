@@ -12,6 +12,7 @@ use Mollie\Api\Resources\MethodCollection;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\MollieConfigProvider;
+use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieConfigProviderTest extends IntegrationTestCase
@@ -52,6 +53,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertArrayHasKey('mollie_methods_directdebit', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_eps', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_giftcard', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_googlepay', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_ideal', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_in3', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['image']);
@@ -66,6 +68,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertArrayHasKey('mollie_methods_payconiq', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_przelewy24', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_riverty', $result['payment']['image']);
+        $this->assertArrayHasKey('mollie_methods_satispay', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_sofort', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_trustly', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_twint', $result['payment']['image']);
@@ -141,9 +144,14 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $api = new \Mollie\Api\MollieApiClient;
         $api->methods = $methodMock;
 
+        /** @var FakeMollieApiClient $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
+        $fakeMollieApiClient->setInstance($api);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
+
         /** @var MollieConfigProvider $instance */
         $instance = $this->objectManager->create(MollieConfigProvider::class);
-        $result = $instance->getActiveMethods($api);
+        $result = $instance->getActiveMethods();
 
         $this->assertTrue(is_array($result), 'We expect an array');
         $this->assertCount(0, $result);
