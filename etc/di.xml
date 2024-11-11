@@ -158,6 +158,7 @@
     <type name="Mollie\Payment\Service\Order\Lines\OrderLinesGenerator">
         <arguments>
             <argument name="generators" xsi:type="array">
+                <item name="magento_discount" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoDiscount</item>
                 <item name="fooman_totals" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\FoomanTotals</item>
                 <item name="weee_fee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\WeeeFeeGenerator</item>
                 <item name="mageworx_rewardpoints" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MageWorxRewardPoints</item>
