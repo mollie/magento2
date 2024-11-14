@@ -18,7 +18,9 @@ use Magento\Quote\Model\QuoteManagement;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface;
+use Mollie\Payment\Config;
 use Mollie\Payment\Service\PaymentToken\Generate;
+use Mollie\Payment\Service\Quote\SetRegionFromApplePayAddress;
 
 class PlaceOrder extends Action
 {
@@ -56,6 +58,14 @@ class PlaceOrder extends Action
      * @var OrderRepositoryInterface
      */
     private $orderRepository;
+    /**
+     * @var SetRegionFromApplePayAddress
+     */
+    private $setRegionFromApplePayAddress;
+    /**
+     * @var Config
+     */
+    private $config;
 
     public function __construct(
         Context $context,
@@ -64,7 +74,9 @@ class PlaceOrder extends Action
         QuoteManagement $quoteManagement,
         Session $checkoutSession,
         Generate $paymentToken,
-        OrderRepositoryInterface $orderRepository
+        SetRegionFromApplePayAddress $setRegionFromApplePayAddress,
+        OrderRepositoryInterface $orderRepository,
+        Config $config
     ) {
         parent::__construct($context);
 
@@ -74,6 +86,8 @@ class PlaceOrder extends Action
         $this->checkoutSession = $checkoutSession;
         $this->paymentToken = $paymentToken;
         $this->orderRepository = $orderRepository;
+        $this->setRegionFromApplePayAddress = $setRegionFromApplePayAddress;
+        $this->config = $config;
     }
 
     public function execute()
@@ -104,8 +118,22 @@ class PlaceOrder extends Action
         $this->cartRepository->save($cart);
         $cart->getPayment()->addData(['method' => 'mollie_methods_applepay']);
 
-        /** @var OrderInterface $order */
-        $order = $this->quoteManagement->submit($cart);
+        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+
+        try {
+            /** @var OrderInterface $order */
+            $order = $this->quoteManagement->submit($cart);
+        } catch (\Exception $exception) {
+            $this->config->addToLog('error', [
+                'message' => 'Error while try place Apple Pay order',
+                'quote_id' => $cart->getId(),
+                'exception' => $exception->getMessage(),
+                'trace' => $exception->getTraceAsString(),
+            ]);
+
+            return $response->setData(['error' => true, 'error_message' => $exception->getMessage()]);
+        }
+
         $order->getPayment()->setAdditionalInformation(
             'applepay_payment_token',
             $this->getRequest()->getParam('applePayPaymentToken')
@@ -126,8 +154,7 @@ class PlaceOrder extends Action
             ->setLastRealOrderId($order->getIncrementId())
             ->setLastOrderId($order->getId());
 
-        $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-        return $response->setData(['url' => $url]);
+        return $response->setData(['url' => $url, 'error' => false, 'error_message' => '']);
     }
 
     private function updateAddress(AddressInterface $address, array $input)
@@ -140,6 +167,8 @@ class PlaceOrder extends Action
             AddressInterface::KEY_CITY => $input['locality'],
             AddressInterface::KEY_POSTCODE => $input['postalCode'],
         ]);
+
+        $this->setRegionFromApplePayAddress->execute($address, $input);
 
         if (isset($input['phoneNumber'])) {
             $address->setTelephone($input['phoneNumber']);
