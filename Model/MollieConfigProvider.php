@@ -141,7 +141,7 @@ class MollieConfigProvider implements ConfigProviderInterface
     public function getConfig(): array
     {
         // Do not load the config when on the cart page.
-        if ($this->request->getControllerName() === 'cart') {
+        if (!$this->config->isModuleEnabled() || $this->request->getControllerName() === 'cart') {
             return [];
         }
 
