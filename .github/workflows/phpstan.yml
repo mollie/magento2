@@ -37,7 +37,7 @@ jobs:
               run: docker exec magento-project-community-edition ./install-composer-package mollie/magento2:@dev
 
             - name: Activate the extension
-              run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade && php bin/magento setup:di:compile"
+              run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade --keep-generated && php bin/magento setup:di:compile"
 
             - name: Run PHPStan
               continue-on-error: ${{ matrix.PHPSTAN_LEVEL == 2 }}

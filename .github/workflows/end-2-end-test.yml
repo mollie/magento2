@@ -98,7 +98,8 @@ jobs:
         run: |
           docker exec magento-project-community-edition php /data/merge-config.php
           docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment"
-          docker exec magento-project-community-edition ./retry "php bin/magento setup:upgrade --no-interaction"
+          docker exec magento-project-community-edition ./retry "php bin/magento setup:upgrade --keep-generated --no-interaction"
+          docker exec magento-project-community-edition /bin/bash /data/configure-mollie.sh
           docker exec magento-project-community-edition ./retry "bin/magento config:set payment/mollie_general/use_webhooks custom_url"
           docker exec magento-project-community-edition ./retry "bin/magento config:set payment/mollie_general/custom_webhook_url ${{ env.magento_url }}/mollie/checkout/webhook"
 

@@ -30,7 +30,7 @@ jobs:
         run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition ./install-composer-package mollie/magento2:@dev
 
       - name: Activate the extension
-        run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade"
+        run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade --keep-generated"
 
       - name: Run tests
         run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && /data/vendor/bin/phpunit -c /data/dev/tests/integration/phpunit.xml"

@@ -8,53 +8,48 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Setup\Patch\Data;
 
-use Magento\Framework\Api\Search\SearchCriteriaBuilder;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Setup\Patch\DataPatchInterface;
-use Mollie\Payment\Api\ApiKeyFallbackRepositoryInterface;
 
 class EncryptFallbackKeys implements DataPatchInterface
 {
     /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-    /**
-     * @var ApiKeyFallbackRepositoryInterface
-     */
-    private $apiKeyFallbackRepository;
-    /**
      * @var EncryptorInterface
      */
     private $encryptor;
+    /**
+     * @var ResourceConnection
+     */
+    private $resourceConnection;
 
     public function __construct(
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        ApiKeyFallbackRepositoryInterface $apiKeyFallbackRepository,
-        EncryptorInterface $encryptor
+        EncryptorInterface $encryptor,
+        ResourceConnection $resourceConnection
     ) {
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->apiKeyFallbackRepository = $apiKeyFallbackRepository;
         $this->encryptor = $encryptor;
+        $this->resourceConnection = $resourceConnection;
     }
 
     public function apply()
     {
-        $criteria = $this->searchCriteriaBuilder->create();
-        $list = $this->apiKeyFallbackRepository->getList($criteria);
+        $connection = $this->resourceConnection->getConnection();
+        $tableName = $connection->getTableName('mollie_payment_apikey_fallback');
 
-        if ($list->getTotalCount() === 0) {
+        if (!$connection->isTableExists($tableName)) {
             return $this;
         }
 
-        foreach ($list->getItems() as $item) {
-            $start = substr($item->getApiKey(), 0, 4);
+        $query = 'select * from ' . $tableName;
+        $result = $connection->fetchAll($query);
+        foreach ($result as $row) {
+            $start = substr($row['api_key'], 0, 4);
             if (!in_array($start, ['live', 'test'])) {
                 continue;
             }
 
-            $item->setApiKey($this->encryptor->encrypt($item->getApiKey()));
-            $this->apiKeyFallbackRepository->save($item);
+            $encrypted = $this->encryptor->encrypt($row['api_key']);
+            $connection->update($tableName, ['api_key' => $encrypted], ['id = ?' => $row['id']]);
         }
 
         return $this;
