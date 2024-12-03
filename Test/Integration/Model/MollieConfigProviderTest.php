@@ -82,7 +82,15 @@ class MollieConfigProviderTest extends IntegrationTestCase
     {
         $configMock = $this->createMock(Config::class);
         $useComponents = (bool)rand(0, 1);
+        $configMock->method('isModuleEnabled')->willReturn(true);
         $configMock->method('creditcardUseComponents')->willReturn($useComponents);
+
+        $api = new \Mollie\Api\MollieApiClient;
+
+        /** @var FakeMollieApiClient $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
+        $fakeMollieApiClient->setInstance($api);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
 
         /** @var MollieConfigProvider $instance */
         $instance = $this->objectManager->create(MollieConfigProvider::class, ['config' => $configMock]);
@@ -109,6 +117,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
     public function testConfigContainsGeneralSettings($key, $method, $expected)
     {
         $configMock = $this->createMock(Config::class);
+        $configMock->method('isModuleEnabled')->willReturn(true);
         $configMock->method($method)->willReturn($expected);
 
         /** @var MollieConfigProvider $instance */
@@ -122,6 +131,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
     }
 
     /**
+     * @magentoConfigFixture default_store payment/mollie_general/enabled 1
      * @magentoConfigFixture default_store payment/mollie_general/locale nl_NL
      */
     public function testContainsTheLocale()
