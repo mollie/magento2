@@ -144,6 +144,18 @@ define([
                             return;
                         }
 
+                        if (result.error) {
+                            this.sendMessage(result.error_message);
+                            this.session.abort()
+                            return;
+                        }
+
+                        if (!result.url) {
+                            this.sendMessage('Something went wrong, please try again later.');
+                            this.session.abort()
+                            return;
+                        }
+
                         this.session.completePayment(ApplePaySession.STATUS_SUCCESS);
 
                         customerData.invalidate(['cart']);
@@ -174,6 +186,19 @@ define([
             }.bind(this);
 
             this.session.begin();
+        },
+
+        sendMessage: function (message) {
+            var customerMessages = customerData.get('messages')() || {},
+                messages = customerMessages.messages || [];
+
+            messages.push({
+                text: message,
+                type: 'error'
+            });
+
+            customerMessages.messages = messages;
+            customerData.set('messages', customerMessages);
         }
     });
 });

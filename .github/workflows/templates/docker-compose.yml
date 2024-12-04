@@ -34,6 +34,7 @@ services:
     links:
       - "nginx-proxy:magento.test"
     environment:
+      - NO_API_KEY_TEST
       - CYPRESS_TESTRAIL_DOMAIN
       - CYPRESS_TESTRAIL_USERNAME
       - CYPRESS_TESTRAIL_PASSWORD

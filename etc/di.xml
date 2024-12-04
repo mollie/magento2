@@ -162,7 +162,6 @@
                 <item name="weee_fee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\WeeeFeeGenerator</item>
                 <item name="mageworx_rewardpoints" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MageWorxRewardPoints</item>
                 <item name="amasty_extrafee" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\AmastyExtraFee</item>
-                <item name="mirasvit_rewards" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MirasvitRewards</item>
                 <item name="aheadworks_addfreegift" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\AheadworksAddFreeGift</item>
                 <item name="magento_giftcard" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftCard</item>
                 <item name="magento_giftwrapping" xsi:type="object">Mollie\Payment\Service\Order\Lines\Generator\MagentoGiftWrapping</item>

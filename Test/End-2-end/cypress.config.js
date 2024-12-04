@@ -22,6 +22,18 @@ module.exports = defineConfig({
         config.env.CI = true
       }
 
+      config.excludeSpecPattern = ['cypress/e2e/magento/no-api-key.cy.js'];
+      if (typeof process.env.NO_API_KEY_TEST != 'undefined' && process.env.NO_API_KEY_TEST == 'true') {
+        console.info('Running tests without API key');
+
+        config.specPattern = ['cypress/e2e/magento/no-api-key.cy.js'];
+        config.excludeSpecPattern = [];
+
+        return config;
+      }
+
+      process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = 0;
+
       // Retrieve available method
       await new Promise((resolve, reject) => {
         var https = require('follow-redirects').https;

@@ -53,8 +53,8 @@
             </depends>
         </field>
         <field id="order_status_new" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Status New</label>
-            <source_model>Mollie\Payment\Model\Adminhtml\Source\NewStatus</source_model>
+            <label>Status After Creation</label>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\PendingPaymentStatus</source_model>
             <config_path>payment/mollie_methods_paymentlink/order_status_new</config_path>
             <depends>
                 <field id="active">1</field>
