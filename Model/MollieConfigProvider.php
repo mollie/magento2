@@ -141,7 +141,7 @@ class MollieConfigProvider implements ConfigProviderInterface
     public function getConfig(): array
     {
         // Do not load the config when on the cart page.
-        if ($this->request->getControllerName() === 'cart') {
+        if (!$this->config->isModuleEnabled() || $this->request->getControllerName() === 'cart') {
             return [];
         }
 
@@ -223,10 +223,16 @@ class MollieConfigProvider implements ConfigProviderInterface
 
     private function getIssuers(string $code, array $config): array
     {
-        $mollieApi = $this->mollieApiClient->loadByStore();
         $issuerListType = $this->config->getIssuerListType($code, $this->storeManager->getStore()->getId());
         $config['payment']['issuersListType'][$code] = $issuerListType;
-        $config['payment']['issuers'][$code] = $this->getIssuers->execute($mollieApi, $code, $issuerListType);
+
+        try {
+            $mollieApi = $this->mollieApiClient->loadByStore();
+            $config['payment']['issuers'][$code] = $this->getIssuers->execute($mollieApi, $code, $issuerListType);
+        } catch (\Exception $exception) {
+            $this->config->addTolog('error', 'Unable to load issuers: ' . $exception->getMessage());
+            $config['payment']['issuers'][$code] = [];
+        }
 
         return $config;
     }

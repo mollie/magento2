@@ -51,14 +51,20 @@ jobs:
         include:
           - PHP_VERSION: php74-fpm
             MAGENTO_VERSION: 2.3.7-p4
+            NO_API_KEY_TEST: false
           - PHP_VERSION: php82-fpm
             MAGENTO_VERSION: 2.4.6-p5
+            NO_API_KEY_TEST: false
+          - PHP_VERSION: php74-fpm
+            MAGENTO_VERSION: 2.3.7-p4
+            NO_API_KEY_TEST: true
     runs-on: ubuntu-latest
     env:
       PHP_VERSION: ${{ matrix.PHP_VERSION }}
       MAGENTO_VERSION: ${{ matrix.MAGENTO_VERSION }}
       MOLLIE_API_KEY_TEST: ${{ secrets.MOLLIE_API_KEY_TEST }}
       NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+      NO_API_KEY_TEST: ${{ matrix.NO_API_KEY_TEST }}
       CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
       CYPRESS_TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
       CYPRESS_TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
@@ -92,10 +98,16 @@ jobs:
         run: |
           docker exec magento-project-community-edition php /data/merge-config.php
           docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment"
-          docker exec magento-project-community-edition ./retry "php bin/magento setup:upgrade --no-interaction"
+          docker exec magento-project-community-edition ./retry "php bin/magento setup:upgrade --keep-generated --no-interaction"
           docker exec magento-project-community-edition /bin/bash /data/configure-mollie.sh
           docker exec magento-project-community-edition ./retry "bin/magento config:set payment/mollie_general/use_webhooks custom_url"
           docker exec magento-project-community-edition ./retry "bin/magento config:set payment/mollie_general/custom_webhook_url ${{ env.magento_url }}/mollie/checkout/webhook"
+
+      - name: Configure Mollie
+        run: |
+          if [ ${{ matrix.NO_API_KEY_TEST }} == 'false' ]; then
+            docker exec magento-project-community-edition /bin/bash /data/configure-mollie.sh
+          fi
 
       - name: Prepare Magento
         run: |
