@@ -24,6 +24,9 @@ class CustomerGroup implements OptionSourceInterface
     {
         $groups = $this->groupManagement->getLoggedInGroups();
 
+        $notLoggedInGroup = $this->groupManagement->getNotLoggedInGroup();
+        array_unshift($groups, $notLoggedInGroup);
+
         $output = [];
         foreach ($groups as $group) {
             $output[] = [

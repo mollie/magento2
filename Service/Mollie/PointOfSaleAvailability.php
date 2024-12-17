@@ -29,18 +29,9 @@ class PointOfSaleAvailability
 
     public function isAvailable(CartInterface $cart): bool
     {
-        $customerId = $this->customerSession->getCustomerId();
-        if ($customerId === null) {
-            return false;
-        }
-
         $storeId = (int)$cart->getStoreId();
-        $allowedGroups = explode(',', $this->config->pointofsaleAllowedCustomerGroups($storeId));
 
-        return in_array(
-            (string)$this->customerSession->getCustomerGroupId(),
-            $allowedGroups
-        );
+        return $this->isAvailableForCustomerGroupId((int)$this->customerSession->getCustomerGroupId(), $storeId);
     }
 
     public function isAvailableForCustomerGroupId(int $customerGroupId, int $storeId): bool
