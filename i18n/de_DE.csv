@@ -20,7 +20,6 @@
 "There was an error checking the transaction status.","Bei der Überprüfung des Transaktionsstatus ist ein Fehler aufgetreten."
 "Transaction failed. Please verify your billing information and payment method, and try again.","Transaktion fehlgeschlagen. Bitte überprüfen Sie Ihre Rechnungsinformationen und Zahlungsmethode, und versuchen Sie es erneut."
 "Payment canceled, please try again.","Zahlung abgebrochen. Bitte versuchen Sie es noch einmal."
-"Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Die Zahlung vom Typ %1 wurde abgelehnt. Die Entscheidung basiert auf der Bestellung und dem Ergebnis der Risikobewertung."
 "Payment Method not found","Zahlungsmethode nicht gefunden"
 "Canceled because an error occurred while redirecting the customer to Mollie","Die Zahlung wurde wegen eines Fehlers bei der Weiterleitung des Kunden zu Mollie abgebrochen"
 "A Timeout while connecting to %1 occurred, this could be the result of an outage. Please try again or select another payment method.","Bei der Verbindung mit %1 wurde die Zeitüberschreitung erreicht. Das kann an einer fehlenden Netzwerkverbindung liegen. Bitte versuchen Sie es noch einmal oder wählen Sie eine andere Zahlungsmethode aus."

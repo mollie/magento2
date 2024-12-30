@@ -7,8 +7,6 @@
 namespace Mollie\Payment\Controller\Checkout;
 
 use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\DataObject;
-use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Model\Mollie as MollieModel;
@@ -18,6 +16,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Checkout\Model\Session;
 use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
+use Mollie\Payment\Service\Mollie\Order\AddResultMessage;
 use Mollie\Payment\Service\Mollie\Order\SuccessPageRedirect;
 use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\ValidateProcessRequest;
@@ -54,11 +53,6 @@ class Process extends Action
     private $orderRepository;
 
     /**
-     * @var ManagerInterface
-     */
-    private $eventManager;
-
-    /**
      * @var RedirectOnError
      */
     private $redirectOnError;
@@ -74,6 +68,10 @@ class Process extends Action
      * @var SuccessPageRedirect
      */
     private $successPageRedirect;
+    /**
+     * @var AddResultMessage
+     */
+    private $addResultMessage;
 
     public function __construct(
         Context $context,
@@ -83,10 +81,10 @@ class Process extends Action
         MollieHelper $mollieHelper,
         OrderRepositoryInterface $orderRepository,
         RedirectOnError $redirectOnError,
-        ManagerInterface $eventManager,
         ValidateProcessRequest $validateProcessRequest,
         ProcessTransaction $processTransaction,
-        SuccessPageRedirect $successPageRedirect
+        SuccessPageRedirect $successPageRedirect,
+        AddResultMessage $addResultMessage
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->paymentHelper = $paymentHelper;
@@ -94,10 +92,10 @@ class Process extends Action
         $this->mollieHelper = $mollieHelper;
         $this->orderRepository = $orderRepository;
         $this->redirectOnError = $redirectOnError;
-        $this->eventManager = $eventManager;
         $this->validateProcessRequest = $validateProcessRequest;
         $this->processTransaction = $processTransaction;
         $this->successPageRedirect = $successPageRedirect;
+        $this->addResultMessage = $addResultMessage;
 
         parent::__construct($context);
     }
@@ -144,29 +142,9 @@ class Process extends Action
     {
         $this->checkIfLastRealOrder($orderIds);
         $this->checkoutSession->restoreQuote();
-        $this->addResultMessage($result);
+        $this->addResultMessage->execute($result);
 
         return $this->_redirect($this->redirectOnError->getUrl());
-    }
-
-    protected function addResultMessage(GetMollieStatusResult $result)
-    {
-        if ($result->getStatus() == 'canceled') {
-            $this->messageManager->addNoticeMessage(__('Payment canceled, please try again.'));
-            return;
-        }
-
-        if ($result->getStatus() == 'failed' && $result->getMethod()) {
-            $this->messageManager->addErrorMessage(
-                __(
-                    'Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.',
-                    $result->getMethod()
-                )
-            );
-            return;
-        }
-
-        $this->messageManager->addErrorMessage(__('Transaction failed. Please verify your billing information and payment method, and try again.'));
     }
 
     /**
