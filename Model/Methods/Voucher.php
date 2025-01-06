@@ -28,6 +28,7 @@ use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\GetApiMethod;
+use Mollie\Payment\Service\Mollie\LogException;
 use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Timeout;
@@ -68,6 +69,7 @@ class Voucher extends Mollie
         MollieApiClient $mollieApiClient,
         TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         GetApiMethod $getApiMethod,
+        LogException $logException,
         $formBlockType,
         $infoBlockType,
         QuoteHasMealVoucherProducts $quoteHasMealVoucherProducts,
@@ -96,6 +98,7 @@ class Voucher extends Mollie
             $mollieApiClient,
             $transactionToOrderRepository,
             $getApiMethod,
+            $logException,
             $formBlockType,
             $infoBlockType,
             $commandPool,
