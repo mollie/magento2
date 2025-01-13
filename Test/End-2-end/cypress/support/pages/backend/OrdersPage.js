@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 import MagentoRestApi from "Services/MagentoRestApi";
 
 const magentoRestApi = new MagentoRestApi();
@@ -38,8 +43,26 @@ export default class OrdersPage {
         cy.wait(1000);
     }
 
-    assertOrderStatusIs(status) {
-        cy.get('#order_status').contains(status);
+    /**
+     * 90 seconds is pretty high but test webhooks are considered non-essential so may be slow.
+     * @param status
+     * @param retries
+     */
+    assertOrderStatusIs(status, retries = 90) {
+      // Webhooks are async. So sometimes we may visit the order page before the status is updated.
+      // If that's the case, we reload the page and try again, and do this 3 times.
+      cy.get('#order_status').then((element) => {
+        if (!element.text().includes(status) && retries > 0) {
+          cy.reload();
+          cy.wait(1000);
+
+          this.assertOrderStatusIs(status, retries - 1);
+          return;
+        }
+
+        // Trigger assertion to fail.
+        cy.get('#order_status').contains(status, { timeout: 100 });
+      });
     }
 
     assertMolliePaymentStatusIs(status) {
