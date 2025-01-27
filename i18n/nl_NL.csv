@@ -20,7 +20,6 @@
 "There was an error checking the transaction status.","Er is een fout opgetreden bij het controleren van de transactiestatus."
 "Transaction failed. Please verify your billing information and payment method, and try again.","Transactie mislukt. Controleer uw factuurgegevens en betaalmethode, en probeer het opnieuw."
 "Payment canceled, please try again.","Betaling geannuleerd, probeer het opnieuw."
-"Payment of type %1 has been rejected. Decision is based on order and outcome of risk assessment.","Betaling van het type %1 is geweigerd. De beslissing is gebaseerd op de bestelling en het resultaat van de risicobeoordeling."
 "Payment Method not found","Betaalmethode niet gevonden"
 "Canceled because an error occurred while redirecting the customer to Mollie","Geannuleerd, omdat er een fout is opgetreden bij het doorsturen van de klant naar Mollie"
 "A Timeout while connecting to %1 occurred, this could be the result of an outage. Please try again or select another payment method.","Er is een time-out opgetreden tijdens de verbinding met %1, dit kan het gevolg zijn van een storing. Probeer het opnieuw of kies een andere betaalmethode."
