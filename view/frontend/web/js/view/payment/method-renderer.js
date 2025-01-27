@@ -48,6 +48,7 @@ define(
             {type: 'mollie_methods_klarnapaynow', component: defaultComponent},
             {type: 'mollie_methods_klarnasliceit', component: defaultComponent},
             {type: 'mollie_methods_mbway', component: defaultComponent},
+            {type: 'mollie_methods_multibanco', component: defaultComponent},
             {type: 'mollie_methods_mybank', component: defaultComponent},
             {type: 'mollie_methods_paypal', component: defaultComponent},
             {type: 'mollie_methods_paysafecard', component: defaultComponent},

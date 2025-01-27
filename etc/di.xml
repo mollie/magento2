@@ -1463,6 +1463,51 @@
         </arguments>
     </virtualType>
 
+    <!-- Multibanco -->
+    <type name="Mollie\Payment\Model\Methods\Multibanco">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieMultibancoValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieMultibancoValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieMultibancoValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieMultibancoConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMultibancoConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieMultibancoConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMultibancoConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Multibanco::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMultibancoValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieMultibancoCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMultibancoCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieMultibancoConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- MyBank -->
     <type name="Mollie\Payment\Model\Methods\MyBank">
         <arguments>

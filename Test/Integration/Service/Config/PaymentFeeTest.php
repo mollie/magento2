@@ -44,6 +44,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_klarnapaynow', true],
             ['mollie_methods_klarnasliceit', true],
             ['mollie_methods_mbway', true],
+            ['mollie_methods_multibanco', true],
             ['mollie_methods_mybank', true],
             ['mollie_methods_paypal', true],
             ['mollie_methods_paysafecard', true],
