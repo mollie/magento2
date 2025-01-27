@@ -19,8 +19,13 @@
     <event name="sales_order_shipment_save_after">
         <observer name="mollie_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
     </event>
+    <event name="sales_order_shipment_track_save_before">
+        <observer name="mollie_aaaa_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
+    </event>
     <event name="sales_order_shipment_track_save_after">
         <observer name="mollie_create_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentTrackSaveAfter"/>
+        <!-- Order of execution is important -->
+        <observer name="mollie_zzzz_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
     </event>
     <event name="sales_order_creditmemo_save_after">
         <observer name="mollie_create_online_refund" instance="Mollie\Payment\Observer\SalesOrderCreditmemoSaveAfter"/>

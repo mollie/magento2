@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Observer;
 
@@ -7,7 +11,6 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
-use Mollie\Payment\Config;
 use Mollie\Payment\Service\LockService;
 
 class LockUnlockOrder implements ObserverInterface
@@ -18,16 +21,14 @@ class LockUnlockOrder implements ObserverInterface
     private $lockService;
 
     /**
-     * @var Config
+     * @var string
      */
-    private $config;
+    private $reason = '';
 
     public function __construct(
-        Config $config,
         LockService $lockService
     ) {
         $this->lockService = $lockService;
-        $this->config = $config;
     }
 
     public function execute(Observer $observer)
@@ -41,7 +42,7 @@ class LockUnlockOrder implements ObserverInterface
                 throw new LocalizedException(__('Unable to get lock for %1', $key));
             }
 
-            $this->lockService->lock($key);
+            $this->lockService->lock($key, -1, $this->reason);
         }
 
         if (strpos($name, 'save_after') !== false) {
@@ -54,6 +55,13 @@ class LockUnlockOrder implements ObserverInterface
         /** @var ShipmentInterface $shipment */
         $shipment = $observer->getEvent()->getData('shipment');
 
-        return $shipment->getOrder();
+        if ($shipment) {
+            $this->reason = 'shipment';
+            return $shipment->getOrder();
+        }
+
+        $this->reason = 'shipment tracking';
+        $track = $observer->getEvent()->getData('track');
+        return $track->getShipment()->getOrder();
     }
 }
