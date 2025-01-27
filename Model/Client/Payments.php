@@ -233,12 +233,12 @@ class Payments extends AbstractModel
         }
 
         if ($method == 'banktransfer') {
-            $paymentData['billingEmail'] = $order->getCustomerEmail();
+            $paymentData['billingAddress']['email'] = $order->getCustomerEmail();
             $paymentData['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
         }
 
         if ($method == 'przelewy24') {
-            $paymentData['billingEmail'] = $order->getCustomerEmail();
+            $paymentData['billingAddress']['email'] = $order->getCustomerEmail();
         }
 
         $paymentData = $this->buildTransaction->execute($order, static::CHECKOUT_TYPE, $paymentData);
