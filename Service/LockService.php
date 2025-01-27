@@ -61,16 +61,18 @@ class LockService
      *
      * @param string $name lock name
      * @param int $timeout How long to wait lock acquisition in seconds, negative value means infinite timeout
+     * @param ?string $reason Reason for locking, will be logged only
      * @return bool
      */
-    public function lock(string $name, int $timeout = -1): bool
+    public function lock(string $name, int $timeout = -1, ?string $reason = null): bool
     {
         // Make sure we only lock once per request.
         if ($this->alreadyLocked) {
             return true;
         }
 
-        $this->config->addToLog('info', 'Locking: ' . $name);
+        $message = 'Locking: ' . $name . ($reason ? ' - Reaseon: ' . $reason : '');
+        $this->config->addToLog('info', $message);
         if ($this->isLockManagerAvailable()) {
             return $this->alreadyLocked = $this->lockManager->lock($name, $timeout);
         }
