@@ -35,6 +35,7 @@ class MethodsConfigurationTest extends IntegrationTestCase
             ['mollie_methods_klarnapaynow'],
             ['mollie_methods_klarnasliceit'],
             ['mollie_methods_voucher'],
+            ['mollie_methods_mbway'],
             ['mollie_methods_mybank'],
             ['mollie_methods_paypal'],
             ['mollie_methods_paysafecard'],
