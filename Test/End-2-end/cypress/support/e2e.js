@@ -38,4 +38,8 @@ Cypress.on('uncaught:exception', (error, runnable) => {
     ) {
         return false
     }
+
+    if (error.message.indexOf('[object Object]') !== -1) {
+        return false
+    }
 })

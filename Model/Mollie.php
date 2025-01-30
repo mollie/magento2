@@ -36,6 +36,7 @@ use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Service\Mollie\GetApiMethod;
+use Mollie\Payment\Service\Mollie\LogException;
 use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Service\Mollie\Timeout;
 use Mollie\Payment\Service\Mollie\Wrapper\MollieApiClientFallbackWrapper;
@@ -121,6 +122,10 @@ class Mollie extends Adapter
      * @var GetApiMethod
      */
     private $getApiMethod;
+    /**
+     * @var LogException
+     */
+    private $logException;
 
     public function __construct(
         ManagerInterface $eventManager,
@@ -142,6 +147,7 @@ class Mollie extends Adapter
         \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
         TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         GetApiMethod $getApiMethod,
+        LogException $logException,
         $formBlockType,
         $infoBlockType,
         CommandPoolInterface $commandPool = null,
@@ -179,6 +185,7 @@ class Mollie extends Adapter
         $this->mollieApiClient = $mollieApiClient;
         $this->transactionToOrderRepository = $transactionToOrderRepository;
         $this->getApiMethod = $getApiMethod;
+        $this->logException = $logException;
     }
 
     public function getCode()
@@ -280,7 +287,7 @@ class Mollie extends Adapter
                 return $this->ordersApi->startTransaction($order, $mollieApi);
             });
         } catch (\Exception $exception) {
-            $this->mollieHelper->addTolog('error', $exception->getMessage());
+            $this->logException->execute($exception);
         }
 
         $methodCode = $this->mollieHelper->getMethodCode($order);

@@ -19,18 +19,8 @@ class LimitStreetLength implements TransactionPartInterface
 
     public function process(OrderInterface $order, $apiMethod, array $transaction): array
     {
-        if ($apiMethod == Orders::CHECKOUT_TYPE) {
-            $transaction['billingAddress']['streetAndNumber'] = $this->limitStreetLength($transaction['billingAddress']['streetAndNumber']);
-            $transaction['shippingAddress']['streetAndNumber'] = $this->limitStreetLength($transaction['shippingAddress']['streetAndNumber']);
-        }
-
-        if ($apiMethod == Payments::CHECKOUT_TYPE) {
-            $transaction['billingAddress']['streetAndNumber'] = $this->limitStreetLength($transaction['billingAddress']['streetAndNumber']);
-        }
-
-        if ($apiMethod == Payments::CHECKOUT_TYPE && array_key_exists('shippingAddress', $transaction)) {
-            $transaction['shippingAddress']['streetAndNumber'] = $this->limitStreetLength($transaction['shippingAddress']['streetAndNumber']);
-        }
+        $transaction = $this->limitAddress('billingAddress', $transaction);
+        $transaction = $this->limitAddress('shippingAddress', $transaction);
 
         if ($this->streetTruncated) {
             $transaction['metadata']['street_truncated'] = true;
@@ -47,5 +37,15 @@ class LimitStreetLength implements TransactionPartInterface
 
         $this->streetTruncated = true;
         return mb_substr($street, 0, 100);
+    }
+
+    private function limitAddress(string $type, array $transaction): array
+    {
+        if (array_key_exists($type, $transaction)) {
+            $limited = $this->limitStreetLength($transaction[$type]['streetAndNumber']);
+            $transaction[$type]['streetAndNumber'] = $limited;
+        }
+
+        return $transaction;
     }
 }

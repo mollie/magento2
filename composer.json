@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "2.42.1",
+  "version": "2.43.0",
   "keywords": [
     "mollie",
     "payment",
@@ -24,6 +24,8 @@
     "fashioncheque",
     "gift cards",
     "mistercash",
+    "mb way",
+    "multibanco",
     "mybank",
     "kbc",
     "klarna",
