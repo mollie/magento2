@@ -71,7 +71,7 @@ class LockService
             return true;
         }
 
-        $message = 'Locking: ' . $name . ($reason ? ' - Reaseon: ' . $reason : '');
+        $message = 'Locking: ' . $name . ($reason ? ' - Reason: ' . $reason : '');
         $this->config->addToLog('info', $message);
         if ($this->isLockManagerAvailable()) {
             return $this->alreadyLocked = $this->lockManager->lock($name, $timeout);
