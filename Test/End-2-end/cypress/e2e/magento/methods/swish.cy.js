@@ -26,7 +26,8 @@ if (Cypress.env('mollie_available_methods').includes('swish')) {
       {status: 'canceled', orderStatus: 'Canceled', title: 'C4235814: Validate the submission of an order with Swish as payment method and payment mark as "Canceled"'},
     ].forEach((testCase) => {
       it(testCase.title, () => {
-        visitCheckoutPayment.visit();
+        visitCheckoutPayment.changeCurrencyTo('SEK');
+        visitCheckoutPayment.visit('SE');
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 

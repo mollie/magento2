@@ -1,0 +1,16 @@
+{
+  "type": {
+    "username": "jeandupont@mollie.com",
+    "firstname": "Jean",
+    "company": "Exempel AB",
+    "lastname": "Dupont",
+    "street[0]": "Exempelgatan 1",
+    "city": "Stockholm",
+    "postcode": "111 22",
+    "telephone": "+46 8 XXXXXXXX"
+  },
+  "select": {
+    "country_id": "SE",
+    "region_id": "Blekinge län"
+  }
+}
