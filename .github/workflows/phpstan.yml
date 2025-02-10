@@ -22,7 +22,7 @@ jobs:
 
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v1
+            - uses: actions/checkout@v4
 
             - name: Start Docker
               run: docker run --detach --name magento-project-community-edition michielgerritsen/magento-project-community-edition:${{ matrix.PHP_VERSION }}-magento${{ matrix.MAGENTO_VERSION }}
@@ -37,7 +37,7 @@ jobs:
               run: docker exec magento-project-community-edition ./install-composer-package mollie/magento2:@dev
 
             - name: Activate the extension
-              run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade --keep-generated && php bin/magento setup:di:compile"
+              run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:di:compile && php bin/magento setup:upgrade --keep-generated"
 
             - name: Run PHPStan
               continue-on-error: ${{ matrix.PHPSTAN_LEVEL == 2 }}

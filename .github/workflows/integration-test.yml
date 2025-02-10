@@ -4,6 +4,7 @@ on: [push, pull_request]
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         include:
           - PHP_VERSION: php73-fpm
@@ -18,7 +19,7 @@ jobs:
             MAGENTO_VERSION: 2.4.7
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Start Docker
         run: docker run --detach --name magento-project-community-edition michielgerritsen/magento-project-community-edition:${{ matrix.PHP_VERSION }}-magento${{ matrix.MAGENTO_VERSION }}
@@ -30,7 +31,11 @@ jobs:
         run: docker cp $(pwd) magento-project-community-edition:/data/extensions/ && docker exec magento-project-community-edition ./install-composer-package mollie/magento2:@dev
 
       - name: Activate the extension
-        run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade --keep-generated"
+        run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade"
+
+      - name: Set developer mode for 2.3.7 and 2.4.0
+        if: ${{ matrix.MAGENTO_VERSION == '2.3.7-p4' || matrix.MAGENTO_VERSION == '2.4.0' }}
+        run: docker exec magento-project-community-edition ./retry "php bin/magento deploy:mode:set developer"
 
       - name: Run tests
         run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && /data/vendor/bin/phpunit -c /data/dev/tests/integration/phpunit.xml"

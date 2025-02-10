@@ -58,6 +58,7 @@ define(
             {type: 'mollie_methods_riverty', component: defaultComponent},
             {type: 'mollie_methods_satispay', component: defaultComponent},
             {type: 'mollie_methods_sofort', component: defaultComponent},
+            {type: 'mollie_methods_swish', component: defaultComponent},
             {type: 'mollie_methods_trustly', component: defaultComponent},
             {type: 'mollie_methods_twint', component: defaultComponent},
             {type: 'mollie_methods_voucher', component: defaultComponent}

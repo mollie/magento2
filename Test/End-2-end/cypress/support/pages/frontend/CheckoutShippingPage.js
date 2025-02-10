@@ -34,6 +34,12 @@ export default class CheckoutShippingPage {
     });
   }
 
+    fillSwedishShippingAddress() {
+    cy.fixture('swedish-shipping-address').then((address) => {
+      this.fillShippingAddress(address);
+    });
+  }
+
   fillShippingAddressUsingFixture(fixture) {
     cy.fixture(fixture).then((address) => {
       this.fillShippingAddress(address);

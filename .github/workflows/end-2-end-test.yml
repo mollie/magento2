@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Remove run E2E tests label
-        uses: actions/github-script@v5
+        uses: actions/github-script@v7
         with:
           script: |
             github.rest.issues.removeLabel({
@@ -74,7 +74,7 @@ jobs:
       CYPRESS_TESTRAIL_RUN_NAME: "Github Workflow, ${{ github.head_ref || github.ref_name }}, PHP version: ${{ matrix.PHP_VERSION }}, Magento version: ${{ matrix.MAGENTO_VERSION }}"
       CYPRESS_TESTRAIL_RUN_CLOSE: true
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Start the Magento container
         run: |
@@ -135,10 +135,10 @@ jobs:
           docker compose -f .github/workflows/templates/docker-compose.yml logs e2e > e2e.log
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: E2E logs - ${{ matrix.PHP_VERSION }} - ${{ matrix.MAGENTO_VERSION }}
+          name: E2E logs - ${{ matrix.PHP_VERSION }} - ${{ matrix.MAGENTO_VERSION }} - API ${{ matrix.NO_API_KEY_TEST }}
           path: |
             Test/End-2-end/cypress/videos
             Test/End-2-end/cypress/screenshots
