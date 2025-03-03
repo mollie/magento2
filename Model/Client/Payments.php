@@ -233,11 +233,10 @@ class Payments extends AbstractModel
         }
 
         if ($method == 'banktransfer') {
-            $paymentData['billingAddress']['email'] = $order->getCustomerEmail();
             $paymentData['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
         }
 
-        if ($method == 'przelewy24') {
+        if (in_array($method, ['przelewy24', 'trustly', 'banktransfer'])) {
             $paymentData['billingAddress']['email'] = $order->getCustomerEmail();
         }
 
