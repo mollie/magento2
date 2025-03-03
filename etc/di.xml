@@ -2003,6 +2003,51 @@
         </arguments>
     </virtualType>
 
+    <!-- Swish -->
+    <type name="Mollie\Payment\Model\Methods\Swish">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieSwishValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieSwishValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieSwishValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieSwishConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSwishConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieSwishConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSwishConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Swish::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSwishValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieSwishCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieSwishCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieSwishConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Trustly -->
     <type name="Mollie\Payment\Model\Methods\Trustly">
         <arguments>
