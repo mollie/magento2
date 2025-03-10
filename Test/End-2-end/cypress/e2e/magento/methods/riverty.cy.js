@@ -20,7 +20,7 @@ const cartPage = new CartPage();
 if (Cypress.env('mollie_available_methods').includes('riverty')) {
   describe('Check that riverty behaves as expected', () => {
     [
-      {status: 'paid', orderStatus: 'Processing', title: 'C3303025: Validate the submission of an order with Riverty as payment method and payment mark as "Paid"'},
+      {status: 'authorized', orderStatus: 'Processing', title: 'C3303025: Validate the submission of an order with Riverty as payment method and payment mark as "Paid"'},
       {status: 'failed', orderStatus: 'Canceled', title: 'C3303026: Validate the submission of an order with Riverty as payment method and payment mark as "Failed"'},
       {status: 'expired', orderStatus: 'Canceled', title: 'C3303027: Validate the submission of an order with Riverty as payment method and payment mark as "Expired"'},
       {status: 'canceled', orderStatus: 'Canceled', title: 'C3303028: Validate the submission of an order with Riverty as payment method and payment mark as "Canceled"'},
@@ -35,7 +35,7 @@ if (Cypress.env('mollie_available_methods').includes('riverty')) {
 
         mollieHostedPaymentPage.selectStatus(testCase.status);
 
-        if (testCase.status === 'paid') {
+        if (testCase.status === 'authorized') {
           checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
         }
 
