@@ -17,25 +17,26 @@ const checkoutSuccessPage = new CheckoutSuccessPage();
 const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
-if (Cypress.env('mollie_available_methods').includes('riverty')) {
-  describe('Check that riverty behaves as expected', () => {
+if (Cypress.env('mollie_available_methods').includes('swish')) {
+  describe('Check that Swish behaves as expected', () => {
     [
-      {status: 'authorized', orderStatus: 'Processing', title: 'C3303025: Validate the submission of an order with Riverty as payment method and payment mark as "Paid"'},
-      {status: 'failed', orderStatus: 'Canceled', title: 'C3303026: Validate the submission of an order with Riverty as payment method and payment mark as "Failed"'},
-      {status: 'expired', orderStatus: 'Canceled', title: 'C3303027: Validate the submission of an order with Riverty as payment method and payment mark as "Expired"'},
-      {status: 'canceled', orderStatus: 'Canceled', title: 'C3303028: Validate the submission of an order with Riverty as payment method and payment mark as "Canceled"'},
+      {status: 'paid', orderStatus: 'Processing', title: 'C4235811: Validate the submission of an order with Swish as payment method and payment mark as "Paid"'},
+      {status: 'failed', orderStatus: 'Canceled', title: 'C4235812: Validate the submission of an order with Swish as payment method and payment mark as "Failed"'},
+      {status: 'expired', orderStatus: 'Canceled', title: 'C4235813: Validate the submission of an order with Swish as payment method and payment mark as "Expired"'},
+      {status: 'canceled', orderStatus: 'Canceled', title: 'C4235814: Validate the submission of an order with Swish as payment method and payment mark as "Canceled"'},
     ].forEach((testCase) => {
       it(testCase.title, () => {
-        visitCheckoutPayment.visit();
+        visitCheckoutPayment.changeCurrencyTo('SEK');
+        visitCheckoutPayment.visit('SE');
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-        checkoutPaymentPage.selectPaymentMethod('Riverty');
+        checkoutPaymentPage.selectPaymentMethod('Swish');
         checkoutPaymentPage.placeOrder();
 
         mollieHostedPaymentPage.selectStatus(testCase.status);
 
-        if (testCase.status === 'authorized') {
+        if (testCase.status === 'paid') {
           checkoutSuccessPage.assertThatOrderSuccessPageIsShown();
         }
 

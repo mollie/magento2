@@ -284,7 +284,7 @@
                     <label>Enable the methods API</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/mollie_general/enable_methods_api</config_path>
-                    <comment><![CDATA[Only show relevant payment methods based on the country and the amount of items in the cart. Disabling this will save you an API call in the checkout, but requires you to configure this manually.]]></comment>
+                    <comment><![CDATA[Display only payment methods that are applicable based on the customer's country and the total value of the products in the cart. Disabling this will save you an API call in the checkout, but requires you to configure this manually.]]></comment>
                 </field>
             </group>
 

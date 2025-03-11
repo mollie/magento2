@@ -8,7 +8,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v2.43.0</version>
+                <version>v2.44.0</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -682,6 +682,25 @@
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_sofort>
+            <mollie_methods_swish>
+                <active>1</active>
+                <model>Mollie\Payment\Model\Methods\Swish</model>
+                <title>Swish</title>
+                <payment_description>{ordernumber}</payment_description>
+                <method>payment</method>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+                <can_use_checkout>1</can_use_checkout>
+                <can_order>1</can_order>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_use_internal>0</can_use_internal>
+                <can_cancel>1</can_cancel>
+                <can_authorize>0</can_authorize>
+                <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
+            </mollie_methods_swish>
             <mollie_methods_trustly>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Trustly</model>

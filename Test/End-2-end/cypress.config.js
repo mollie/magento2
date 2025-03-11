@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 const { defineConfig } = require("cypress");
 
 const defaultProductId = process.env.DEFAULT_PRODUCT_ID || 2;
@@ -79,6 +84,14 @@ module.exports = defineConfig({
             const methods = JSON.parse(body.toString()).data.molliePaymentMethods.methods.map(data => {
               return data.code
             })
+
+            // Region ID is expected to be a select, but in Magento 2.3.7-p4 it is an input
+            if (process.env.MAGENTO_VERSION === '2.3.7-p4') {
+              methods.splice(methods.indexOf('swish'), 1);
+
+              console.log('Detected Magento 2.3.7-p4, removing Swish from the list of available methods');
+            }
+
 
             config.env.mollie_available_methods = methods;
 

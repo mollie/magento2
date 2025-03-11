@@ -63,6 +63,11 @@ export default class VisitCheckoutPaymentCompositeAction {
       return;
     }
 
+    if (fixture === 'SE') {
+      checkoutShippingPage.fillSwedishShippingAddress();
+      return;
+    }
+
     checkoutShippingPage.fillShippingAddressUsingFixture(fixture);
   }
 
