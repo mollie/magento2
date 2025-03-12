@@ -19,6 +19,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Service\Mollie\Order\CanRegisterCaptureNotification;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Mollie\Payment\Service\Order\ProcessCaptures;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\TransactionProcessor;
 use Mollie\Payment\Service\Order\Uncancel;
@@ -69,6 +70,10 @@ class SuccessfulPayment implements PaymentProcessorInterface
      * @var CanRegisterCaptureNotification
      */
     private $canRegisterCaptureNotification;
+    /**
+     * @var ProcessCaptures
+     */
+    private $processCaptures;
 
     public function __construct(
         ProcessTransactionResponseFactory $processTransactionResponseFactory,
@@ -79,7 +84,8 @@ class SuccessfulPayment implements PaymentProcessorInterface
         General $mollieHelper,
         OrderRepositoryInterface $orderRepository,
         SendOrderEmails $sendOrderEmails,
-        CanRegisterCaptureNotification $canRegisterCaptureNotification
+        CanRegisterCaptureNotification $canRegisterCaptureNotification,
+        ProcessCaptures $processCaptures
     ) {
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
         $this->orderAmount = $orderAmount;
@@ -90,6 +96,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $this->orderRepository = $orderRepository;
         $this->sendOrderEmails = $sendOrderEmails;
         $this->canRegisterCaptureNotification = $canRegisterCaptureNotification;
+        $this->processCaptures = $processCaptures;
     }
 
     public function process(
@@ -198,6 +205,10 @@ class SuccessfulPayment implements PaymentProcessorInterface
                 );
                 $this->orderCommentHistory->add($magentoOrder, $message);
             }
+        }
+
+        if ($molliePayment->amountCaptured !== null && $molliePayment->amountCaptured->value != '0.00') {
+            $this->processCaptures->execute($magentoOrder, $molliePayment->captures());
         }
 
         if (!$magentoOrder->getIsVirtual()) {
