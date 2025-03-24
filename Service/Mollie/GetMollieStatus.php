@@ -35,7 +35,7 @@ class GetMollieStatus
         $this->getMollieStatusResultFactory = $getMollieStatusResultFactory;
     }
 
-    public function execute(int $orderId, string $transactionId = null): GetMollieStatusResult
+    public function execute(int $orderId, ?string $transactionId = null): GetMollieStatusResult
     {
         $order = $this->orderRepository->get($orderId);
         if ($transactionId === null) {

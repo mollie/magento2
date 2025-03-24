@@ -5,6 +5,7 @@ namespace Mollie\Payment\Test\Unit\Service\Order;
 use Magento\Framework\TestFramework\Unit\Helper\ObjectManager;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Model\Order;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
@@ -19,7 +20,7 @@ class ProcessAdjustmentFeeTest extends UnitTestCase
     private $instance;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit\Framework\MockObject\MockObject
      */
     private $paymentEndpoint;
 
@@ -93,16 +94,13 @@ class ProcessAdjustmentFeeTest extends UnitTestCase
         $this->assertSame($expected, $this->instance->doNotRefundInMollie());
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
-     */
-    private function getOrderMock()
+    private function getOrderMock(): Order
     {
-        $order = $this->getMockBuilder(OrderInterface::class)
-            ->setMethods(['getMollieTransactionId', 'getOrderCurrencyCode'])
-            ->getMockForAbstractClass();
-        $order->method('getOrderCurrencyCode')->willReturn('EUR');
-        $order->method('getMollieTransactionId')->willReturn(999);
+        /** @var Order $order */
+        $order = $this->objectManager->getObject(Order::class);
+
+        $order->setOrderCurrencyCode('EUR');
+        $order->setMollieTransactionId(999);
 
         return $order;
     }

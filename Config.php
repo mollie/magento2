@@ -224,7 +224,7 @@ class Config
         return $apiKey;
     }
 
-    public function getTestApiKey(int $storeId = null): string
+    public function getTestApiKey(?int $storeId = null): string
     {
         $apiKey = trim((string)$this->getPath(static::GENERAL_APIKEY_TEST, $storeId) ?? '');
         if (empty($apiKey)) {
@@ -238,7 +238,7 @@ class Config
         return $apiKey;
     }
 
-    public function getLiveApiKey(int $storeId = null): string
+    public function getLiveApiKey(?int $storeId = null): string
     {
         $apiKey = trim((string)$this->getPath(static::GENERAL_APIKEY_LIVE, $storeId) ?? '');
         if (empty($apiKey)) {
@@ -283,7 +283,7 @@ class Config
      * @param int|null $storeId
      * @return bool
      */
-    public function isMethodsApiEnabled(int $storeId = null): bool
+    public function isMethodsApiEnabled(?int $storeId = null): bool
     {
         return $this->isSetFlag(static::ADVANCED_ENABLE_METHODS_API, $storeId);
     }
@@ -368,7 +368,7 @@ class Config
      * @param null|int|string $storeId
      * @return string|null
      */
-    public function secondChanceSendBccTo(int $storeId = null): ?string
+    public function secondChanceSendBccTo(?int $storeId = null): ?string
     {
         return $this->getPath(static::GENERAL_SECOND_CHANCE_SEND_BCC_TO, $storeId);
     }
@@ -377,7 +377,7 @@ class Config
      * @param null|int|string $storeId
      * @return string|null
      */
-    public function secondChanceUsePaymentMethod(int $storeId = null): ?string
+    public function secondChanceUsePaymentMethod(?int $storeId = null): ?string
     {
         return $this->getPath(static::GENERAL_SECOND_CHANCE_USE_PAYMENT_METHOD, $storeId);
     }
@@ -559,7 +559,7 @@ class Config
      * @param int|null $storeId
      * @return bool
      */
-    public function isMethodActive(string $method, int $storeId = null): bool
+    public function isMethodActive(string $method, ?int $storeId = null): bool
     {
         return $this->isSetFlag($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_ACTIVE, $method), $storeId);
     }
@@ -637,7 +637,7 @@ class Config
      * @param int|null $storeId
      * @return string
      */
-    public function pointofsaleAllowedCustomerGroups(int $storeId = null)
+    public function pointofsaleAllowedCustomerGroups(?int $storeId = null)
     {
         return (string)$this->getPath(static::PAYMENT_POINTOFSALE_ALLOWED_CUSTOMER_GROUPS, $storeId);
     }
@@ -782,7 +782,7 @@ class Config
         return $this->moduleManager->isEnabled('Mollie_Multishipping');
     }
 
-    public function processTransactionsInTheQueue(int $storeId = null): bool
+    public function processTransactionsInTheQueue(?int $storeId = null): bool
     {
         return $this->isSetFlag(static::GENERAL_PROCESS_TRANSACTION_IN_THE_QUEUE, $storeId);
     }
@@ -792,7 +792,7 @@ class Config
         return $this->isSetFlag(static::GENERAL_ENCRYPT_PAYMENT_DETAILS, $storeId);
     }
 
-    public function getApiMethod(string $method, int $storeId = null): string
+    public function getApiMethod(string $method, ?int $storeId = null): string
     {
         return (string)$this->getPath(
             $this->addMethodToPath(static::PAYMENT_METHOD_API_METHOD, $method),

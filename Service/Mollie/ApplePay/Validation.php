@@ -33,7 +33,7 @@ class Validation
         $this->mollieApiClient = $mollieApiClient;
     }
 
-    public function execute(string $validationUrl, string $domain = null): string
+    public function execute(string $validationUrl, ?string $domain = null): string
     {
         $store = $this->storeManager->getStore();
         $api = $this->mollieApiClient->loadByStore($store->getId());

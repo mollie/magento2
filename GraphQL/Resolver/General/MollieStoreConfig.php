@@ -20,7 +20,7 @@ class MollieStoreConfig implements ResolverInterface
         $this->config = $config;
     }
 
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         return [
             'profile_id' => $this->config->getProfileId(),

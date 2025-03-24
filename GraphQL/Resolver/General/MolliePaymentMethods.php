@@ -50,7 +50,7 @@ class MolliePaymentMethods implements ResolverInterface
         $this->config = $config;
     }
 
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         $amount = 10;
         $currency = null;

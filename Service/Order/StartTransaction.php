@@ -76,7 +76,7 @@ class StartTransaction
         return array_shift($items);
     }
 
-    private function startTransactionForOrder(OrderInterface $order = null)
+    private function startTransactionForOrder(?OrderInterface $order = null)
     {
         if (!$order) {
             return null;

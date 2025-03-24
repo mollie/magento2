@@ -71,7 +71,6 @@ class GetIssuers
         }
 
         $result = $this->mollieModel->getIssuers(
-            $mollieApi,
             $method,
             $type
         );

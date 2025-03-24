@@ -150,10 +150,10 @@ class Mollie extends Adapter
         LogException $logException,
         $formBlockType,
         $infoBlockType,
-        CommandPoolInterface $commandPool = null,
-        ValidatorPoolInterface $validatorPool = null,
-        CommandManagerInterface $commandExecutor = null,
-        LoggerInterface $logger = null
+        ?CommandPoolInterface $commandPool = null,
+        ?ValidatorPoolInterface $validatorPool = null,
+        ?CommandManagerInterface $commandExecutor = null,
+        ?LoggerInterface $logger = null
     ) {
         parent::__construct(
             $eventManager,
@@ -202,7 +202,7 @@ class Mollie extends Adapter
      * @throws LocalizedException
      * @throws NoSuchEntityException
      */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
+    public function isAvailable(?\Magento\Quote\Api\Data\CartInterface $quote = null)
     {
         if ($quote == null) {
             $quote = $this->checkoutSession->getQuote();
@@ -597,21 +597,21 @@ class Mollie extends Adapter
     /**
      * Get list of Issuers from API
      *
-     * @param MollieApiClient|null $mollieApi
      * @param string $method
      * @param string $issuerListType
      * @param int $count for internal use only
      *
      * @return array|null
      */
-    public function getIssuers(MollieApiClient $mollieApi = null, string $method, string $issuerListType, int $count = 0): ?array
+    public function getIssuers(string $method, string $issuerListType, int $count = 0): ?array
     {
         $issuers = [];
         // iDeal 2.0 does not have issuers anymore.
-        if (empty($mollieApi) || $issuerListType == 'none' || $method == 'mollie_methods_ideal') {
+        if ($issuerListType == 'none' || $method == 'mollie_methods_ideal') {
             return $issuers;
         }
 
+        $mollieApi = $this->mollieApiClient->loadByStore();
         $methodCode = str_replace('mollie_methods_', '', $method);
         try {
             $issuers = $mollieApi->methods->get($methodCode, ['include' => 'issuers'])->issuers;
@@ -623,7 +623,7 @@ class Mollie extends Adapter
                     'Retrieving method issuers gave an issue. Retrying.' . var_export($issuers, true)
                 );
 
-                return $this->getIssuers($mollieApi, $method, $issuerListType, 1);
+                return $this->getIssuers($method, $issuerListType, 1);
             }
 
             if (!$issuers) {

@@ -12,7 +12,7 @@ use Mollie\Payment\Service\Order\Lines\Processor\ProcessorInterface;
 
 class BuyRequestToMetadata implements ProcessorInterface
 {
-    public function process($orderLine, OrderInterface $order, OrderItemInterface $orderItem = null): array
+    public function process($orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array
     {
         if (!$orderItem) {
             return $orderLine;

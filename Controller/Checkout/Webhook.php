@@ -129,7 +129,7 @@ class Webhook extends Action
         return $result;
     }
 
-    private function getErrorResponse(int $code, string $message = null): Json
+    private function getErrorResponse(int $code, ?string $message = null): Json
     {
         $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $result->setData(['error' => true]);

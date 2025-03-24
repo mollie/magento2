@@ -28,7 +28,7 @@ class PaymentLinkRedirect implements ResolverInterface
         $this->paymentLinkRedirect = $paymentLinkRedirect;
     }
 
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         $order = $args['order'];
 

@@ -51,7 +51,7 @@ class UpdateCustomerReturnUrl implements DataPatchInterface
         return $this;
     }
 
-    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId, string $currentValue = null)
+    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId, ?string $currentValue = null)
     {
         $append = '?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&utm_nooverride=1';
 

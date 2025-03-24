@@ -24,7 +24,7 @@ class VoucherCategory implements ProcessorInterface
         $this->config = $config;
     }
 
-    public function process($orderLine, OrderInterface $order, OrderItemInterface $orderItem = null): array
+    public function process($orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array
     {
         if (!$orderItem || !$order->getPayment() || $order->getPayment()->getMethod() != 'mollie_methods_voucher') {
             return $orderLine;

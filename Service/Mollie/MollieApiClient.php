@@ -51,7 +51,7 @@ class MollieApiClient
         $this->moduleManager = $moduleManager;
     }
 
-    public function loadByStore(int $storeId = null): \Mollie\Api\MollieApiClient
+    public function loadByStore(?int $storeId = null): \Mollie\Api\MollieApiClient
     {
         if (!class_exists('Mollie\Api\MollieApiClient')) {
             throw new LocalizedException(__('Class Mollie\Api\MollieApiClient does not exist'));

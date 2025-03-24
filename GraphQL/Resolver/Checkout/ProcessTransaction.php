@@ -50,7 +50,7 @@ class ProcessTransaction implements ResolverInterface
         $this->orderRepository = $orderRepository;
     }
 
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         if (!isset($args['input']['payment_token'])) {
             throw new GraphQlInputException(__('Missing "payment_token" input argument'));
