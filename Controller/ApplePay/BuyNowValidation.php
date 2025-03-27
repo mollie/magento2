@@ -24,8 +24,7 @@ use Magento\Quote\Api\GuestCartManagementInterface;
 use Magento\Quote\Api\GuestCartRepositoryInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Config;
-use Mollie\Payment\Helper\General as MollieHelper;
-use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class BuyNowValidation extends Action
 {
@@ -60,16 +59,6 @@ class BuyNowValidation extends Action
     private $productRepository;
 
     /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-
-    /**
-     * @var Mollie
-     */
-    private $mollie;
-
-    /**
      * @var UrlInterface
      */
     private $url;
@@ -83,6 +72,10 @@ class BuyNowValidation extends Action
      * @var Config
      */
     private $config;
+    /**
+     * @var MollieApiClient
+     */
+    private $mollieApiClient;
 
     public function __construct(
         Context $context,
@@ -97,8 +90,7 @@ class BuyNowValidation extends Action
         CartRepositoryInterface $cartRepository,
         StoreManagerInterface $storeManager,
         ProductRepositoryInterface $productRepository,
-        MollieHelper $mollieHelper,
-        Mollie $mollie,
+        MollieApiClient $mollieApiClient,
         UrlInterface $url
     ) {
         parent::__construct($context, $customerSession, $customerRepository, $accountManagement);
@@ -111,9 +103,8 @@ class BuyNowValidation extends Action
         $this->cartRepository = $cartRepository;
         $this->storeManager = $storeManager;
         $this->productRepository = $productRepository;
-        $this->mollieHelper = $mollieHelper;
-        $this->mollie = $mollie;
         $this->url = $url;
+        $this->mollieApiClient = $mollieApiClient;
     }
 
     /**
@@ -194,7 +185,7 @@ class BuyNowValidation extends Action
 
         try {
             $store = $this->storeManager->getStore();
-            $api = $this->mollie->loadMollieApi($this->mollieHelper->getApiKey($store->getId()));
+            $api = $this->mollieApiClient->loadByApiKey($this->getLiveApiKey((int)$store->getId()));
             $url = $this->url->getBaseUrl();
 
             $result = $api->wallets->requestApplePayPaymentSession(
@@ -219,5 +210,15 @@ class BuyNowValidation extends Action
         ]);
 
         return $response;
+    }
+
+    private function getLiveApiKey(int $storeId): string
+    {
+        $liveApikey = $this->config->getLiveApiKey($storeId);
+        if (!$liveApikey) {
+            throw new \Exception(__('For Apple Pay the live API key is required, even when in test mode'));
+        }
+
+        return $liveApikey;
     }
 }
