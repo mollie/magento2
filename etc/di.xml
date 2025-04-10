@@ -1598,6 +1598,51 @@
         </arguments>
     </virtualType>
 
+    <!-- Paybybank -->
+    <type name="Mollie\Payment\Model\Methods\Paybybank">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MolliePaybybankValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MolliePaybybankValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MolliePaybybankValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MolliePaybybankConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaybybankConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MolliePaybybankConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaybybankConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Paybybank::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaybybankValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MolliePaybybankCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MolliePaybybankCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MolliePaybybankConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Paypal -->
     <type name="Mollie\Payment\Model\Methods\Paypal">
         <arguments>
