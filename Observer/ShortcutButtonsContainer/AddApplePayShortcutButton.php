@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Observer\ShortcutButtonsContainer;
 
@@ -38,8 +42,7 @@ class AddApplePayShortcutButton implements ObserverInterface
 
     private function isEnabled(): bool
     {
-        return $this->config->isProductionMode() &&
-            $this->config->isMethodActive('mollie_methods_applepay') &&
+        return $this->config->isMethodActive('mollie_methods_applepay') &&
             $this->config->applePayEnableMinicartButton();
     }
 }

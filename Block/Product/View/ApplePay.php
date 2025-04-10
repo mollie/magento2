@@ -69,8 +69,7 @@ class ApplePay extends Template
 
     public function isEnabled(): bool
     {
-        return $this->config->isProductionMode() &&
-            $this->config->isMethodActive('mollie_methods_applepay') &&
+        return $this->config->isMethodActive('mollie_methods_applepay') &&
             $this->config->applePayEnableBuyNowButton();
     }
 
