@@ -24,6 +24,7 @@ bin/magento config:set payment/mollie_methods_giftcard/active 1
 bin/magento config:set payment/mollie_methods_ideal/active 1
 bin/magento config:set payment/mollie_methods_kbc/active 1
 bin/magento config:set payment/mollie_methods_klarnasliceit/active 1
+bin/magento config:set payment/mollie_methods_paybybank/active 1
 bin/magento config:set payment/mollie_methods_paypal/active 1
 bin/magento config:set payment/mollie_methods_przelewy24/active 1
 bin/magento config:set payment/mollie_methods_payconiq/active 1
