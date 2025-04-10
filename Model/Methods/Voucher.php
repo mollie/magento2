@@ -73,10 +73,10 @@ class Voucher extends Mollie
         $formBlockType,
         $infoBlockType,
         QuoteHasMealVoucherProducts $quoteHasMealVoucherProducts,
-        CommandPoolInterface $commandPool = null,
-        ValidatorPoolInterface $validatorPool = null,
-        CommandManagerInterface $commandExecutor = null,
-        LoggerInterface $logger = null
+        ?CommandPoolInterface $commandPool = null,
+        ?ValidatorPoolInterface $validatorPool = null,
+        ?CommandManagerInterface $commandExecutor = null,
+        ?LoggerInterface $logger = null
     ) {
         parent::__construct(
             $eventManager,
@@ -110,7 +110,7 @@ class Voucher extends Mollie
         $this->quoteHasMealVoucherProducts = $quoteHasMealVoucherProducts;
     }
 
-    public function isAvailable(CartInterface $quote = null)
+    public function isAvailable(?CartInterface $quote = null)
     {
         $storeId = $quote ? $quote->getStoreId() : null;
         $voucherCategory = $this->config->getVoucherCategory($storeId);

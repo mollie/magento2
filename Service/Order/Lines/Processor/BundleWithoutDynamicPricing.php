@@ -25,7 +25,7 @@ class BundleWithoutDynamicPricing implements ProcessorInterface
         $this->mollieHelper = $mollieHelper;
     }
 
-    public function process($orderLine, OrderInterface $order, OrderItemInterface $orderItem = null): array
+    public function process($orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array
     {
         if (
             !$orderItem ||

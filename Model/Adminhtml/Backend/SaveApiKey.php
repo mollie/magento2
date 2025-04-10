@@ -45,8 +45,8 @@ class SaveApiKey extends Encrypted
         ApiKeyFallbackRepositoryInterface $apiKeyFallbackRepository,
         ApiKeyFallbackInterfaceFactory $apiKeyFallbackFactory,
         UpdateProfileId $updateProfileId,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct(

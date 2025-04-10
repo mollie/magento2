@@ -7,7 +7,7 @@
     "street[0]": "Musterstraße 1",
     "city": "Berlin",
     "postcode": "10115",
-    "telephone": "+49 30 XXXXXXXX"
+    "telephone": "+493012345678"
   },
   "select": {
     "country_id": "DE"

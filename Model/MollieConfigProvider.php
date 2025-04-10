@@ -184,7 +184,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         return $config;
     }
 
-    public function getActiveMethods(CartInterface $cart = null): array
+    public function getActiveMethods(?CartInterface $cart = null): array
     {
         if ($this->methodData !== null) {
             return $this->methodData;

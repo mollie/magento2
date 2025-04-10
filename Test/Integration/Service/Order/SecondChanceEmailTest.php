@@ -29,7 +29,24 @@ class SecondChanceEmailTest extends IntegrationTestCase
         /** @var TransportBuilderMock $transportBuilder */
         $transportBuilder = $this->objectManager->get(TransportBuilderMock::class);
 
-        $bcc = $transportBuilder->getSentMessage()->getHeaders()['Bcc'];
+        $bcc = null;
+        // Magento 2.4.8 and later
+        $message = $transportBuilder->getSentMessage();
+        if (method_exists($message, 'getBcc')) {
+            $addresses = [];
+            $bccs = $message->getBcc();
+            /** @var \Magento\Framework\Mail\Address $address */
+            foreach ($bccs as $address) {
+                $addresses[] = $address->getEmail();
+            }
+
+            $bcc = implode(',', $addresses);
+        }
+
+        // Magento 2.4.7 and earlier
+        if ($bcc === null) {
+            $bcc = $message->getHeaders()['Bcc'];
+        }
 
         $this->assertStringContainsString('example@mollie.com', $bcc);
         $this->assertStringContainsString('example2@mollie.com', $bcc);

@@ -896,7 +896,7 @@ class Orders extends AbstractModel
      * @param InvoiceInterface|null $invoice
      * @return double
      */
-    private function getCaptureAmount(OrderInterface $order, InvoiceInterface $invoice = null)
+    private function getCaptureAmount(OrderInterface $order, ?InvoiceInterface $invoice = null)
     {
         if ($invoice) {
             return $invoice->getBaseGrandTotal();

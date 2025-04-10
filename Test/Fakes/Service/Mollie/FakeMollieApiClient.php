@@ -29,7 +29,7 @@ class FakeMollieApiClient extends MollieApiClient
         }
     }
 
-    public function loadByStore(int $storeId = null): \Mollie\Api\MollieApiClient
+    public function loadByStore(?int $storeId = null): \Mollie\Api\MollieApiClient
     {
         if ($this->instance) {
             return $this->instance;
@@ -38,7 +38,7 @@ class FakeMollieApiClient extends MollieApiClient
         return parent::loadByStore($storeId);
     }
 
-    public function returnFakePayment(Payment $payment = null): ?Payment
+    public function returnFakePayment(?Payment $payment = null): ?Payment
     {
         $this->loadInstance();
 

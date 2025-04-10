@@ -41,7 +41,7 @@ class MollieCustomerOrder implements ResolverInterface
         $this->objectManager = $objectManager;
     }
 
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         $hash = $args['hash'];
         $decodedHash = base64_decode($hash);

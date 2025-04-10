@@ -29,8 +29,8 @@ class PreventSavingWhenIoscOneStepCheckoutIsActive extends Value
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
         Manager $moduleManager,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);

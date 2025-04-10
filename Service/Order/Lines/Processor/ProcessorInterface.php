@@ -17,5 +17,5 @@ interface ProcessorInterface
      * @param OrderItemInterface|null $orderItem
      * @return array
      */
-    public function process($orderLine, OrderInterface $order, OrderItemInterface $orderItem = null): array;
+    public function process($orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array;
 }

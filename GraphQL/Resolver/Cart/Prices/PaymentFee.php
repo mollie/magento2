@@ -11,7 +11,7 @@ use Magento\Quote\Api\Data\CartInterface;
 
 class PaymentFee implements ResolverInterface
 {
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         if (!isset($value['model'])) {
             return [];

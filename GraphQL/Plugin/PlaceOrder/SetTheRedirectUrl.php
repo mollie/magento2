@@ -27,8 +27,8 @@ class SetTheRedirectUrl
         $field,
         $context,
         $info,
-        array $value = null,
-        array $args = null
+        ?array $value = null,
+        ?array $args = null
     ) {
         if (isset($args['input']['mollie_return_url'])) {
             $this->transaction->setRedirectUrl($args['input']['mollie_return_url']);

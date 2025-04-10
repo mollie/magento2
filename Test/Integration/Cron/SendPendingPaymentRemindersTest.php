@@ -1,7 +1,7 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
 
 namespace Mollie\Payment\Test\Integration\Cron;
@@ -19,20 +19,21 @@ class SendPendingPaymentRemindersTest extends IntegrationTestCase
      */
     public function testSecondChanceDisabledAutoSendEnabled()
     {
-        /** @var SortOrderFactory|MockObject $sortOrderFactoryMock */
-        $sortOrderFactoryMock = $this->getMockBuilder(SortOrderFactory::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['create'])
-            ->getMock();
-        $sortOrderFactoryMock->expects($this->never())->method('create');
+        $this->objectManager->create(SortOrderFactory::class);
 
-        $this->objectManager->addSharedInstance(
-            $sortOrderFactoryMock,
-            SortOrderFactory::class
-        );
+        $fake = new class extends SortOrderFactory {
+            public function __construct() {}
+
+            public function create(array $data = [])
+            {
+                throw new \Exception('This should not be called');
+            }
+        };
 
         /** @var SendPendingPaymentReminders $sendReminderJob */
-        $sendReminderJob = $this->objectManager->get(SendPendingPaymentReminders::class);
+        $sendReminderJob = $this->objectManager->create(SendPendingPaymentReminders::class, [
+            'sortOrderFactory' => $fake,
+        ]);
         $sendReminderJob->execute();
     }
 }

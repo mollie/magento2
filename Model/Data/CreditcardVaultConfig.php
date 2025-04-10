@@ -33,7 +33,7 @@ class CreditcardVaultConfig implements ConfigInterface
      */
     public function __construct(
         ScopeConfigInterface $scopeConfig,
-        string $methodCode = null,
+        ?string $methodCode = null,
         string $pathPattern = self::DEFAULT_PATH_PATTERN
     ) {
         $this->scopeConfig = $scopeConfig;

@@ -33,7 +33,7 @@ class AvailableTerminals
      *      description: string
      *  }
      */
-    public function execute(int $storeId = null): array
+    public function execute(?int $storeId = null): array
     {
         try {
             $mollieApiClient = $this->mollieApiClient->loadByStore($storeId);

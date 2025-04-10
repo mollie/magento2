@@ -51,7 +51,7 @@ class PaymentToken implements ResolverInterface
     /**
      * @inheritDoc
      */
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         $order = $this->getOrderByIncrementId($value['order_id']);
 

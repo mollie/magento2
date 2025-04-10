@@ -634,7 +634,7 @@ class General extends AbstractHelper
         return $activeMethods;
     }
 
-    public function isMethodActive(string $methodCode, int $storeId = null): bool
+    public function isMethodActive(string $methodCode, ?int $storeId = null): bool
     {
         return (bool)$this->getStoreConfig('payment/' . $methodCode . '/active', $storeId);
     }

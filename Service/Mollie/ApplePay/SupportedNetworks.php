@@ -23,7 +23,7 @@ class SupportedNetworks
         $this->config = $config;
     }
 
-    public function execute(int $storeId = null): array
+    public function execute(?int $storeId = null): array
     {
         $output = ['amex', 'masterCard', 'visa'];
         if (!$this->config->useManualCapture($storeId)) {

@@ -12,7 +12,7 @@ use Mollie\Api\Resources\Payment;
 
 class SaveRemainingAmount implements ProcessTransactionInterface
 {
-    public function process(OrderInterface $order, MollieOrder $mollieOrder = null, Payment $molliePayment = null)
+    public function process(OrderInterface $order, ?MollieOrder $mollieOrder = null, ?Payment $molliePayment = null)
     {
         if ($mollieOrder) {
             $this->processOrder($order, $mollieOrder);

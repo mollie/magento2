@@ -51,12 +51,16 @@
 
     <type name="Mollie\Payment\Logger\MollieLogger">
         <arguments>
-            <argument name="name" xsi:type="string">Mollie</argument>
-            <argument name="handlers" xsi:type="array">
-                <item name="system" xsi:type="object">Mollie\Payment\Logger\MollieHandler</item>
-            </argument>
+            <argument name="logger" xsi:type="object">mollieLogger</argument>
+            <argument name="handler" xsi:type="object">Mollie\Payment\Logger\MollieHandler</argument>
         </arguments>
     </type>
+
+    <virtualType name="mollieLogger" type="Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">mollie-logger</argument>
+        </arguments>
+    </virtualType>
 
     <!-- Set sensitive information -->
     <type name="Magento\Config\Model\Config\TypePool">

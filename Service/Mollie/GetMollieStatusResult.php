@@ -21,7 +21,7 @@ class GetMollieStatusResult
 
     public function __construct(
         string $status,
-        string $method = null
+        ?string $method = null
     ) {
         if ($method !== null) {
             $method = str_replace('mollie_methods_', '', $method);
