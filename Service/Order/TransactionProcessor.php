@@ -24,7 +24,7 @@ class TransactionProcessor
         $this->processors = $processors;
     }
 
-    public function process(OrderInterface $order, MollieOrder $mollieOrder = null, Payment $molliePayment = null)
+    public function process(OrderInterface $order, ?MollieOrder $mollieOrder = null, ?Payment $molliePayment = null)
     {
         /** @var ProcessTransactionInterface $processor */
         foreach ($this->processors as $processor) {

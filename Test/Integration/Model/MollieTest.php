@@ -290,13 +290,10 @@ class MollieTest extends IntegrationTestCase
         $methodEndpointMock = $this->createMock(MethodEndpoint::class);
         $methodEndpointMock->method('get')->willReturn($response);
 
-        $mollieApi = new MollieApiClient;
-        $mollieApi->methods = $methodEndpointMock;
-
         /** @var Mollie $instance */
         $instance = $this->objectManager->create(Mollie::class);
 
-        $result = $instance->getIssuers($mollieApi, 'mollie_methods_ideal', 'radio');
+        $result = $instance->getIssuers('mollie_methods_ideal', 'radio');
 
         $this->assertSame(array_values($result), $result);
     }

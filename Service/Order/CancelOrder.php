@@ -12,8 +12,6 @@ use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\StatusResolver;
-use Magento\SalesRule\Model\Coupon;
-use Magento\SalesRule\Model\ResourceModel\Coupon\Usage;
 use Mollie\Payment\Config;
 
 class CancelOrder
@@ -39,16 +37,6 @@ class CancelOrder
     private $orderRepository;
 
     /**
-     * @var Coupon
-     */
-    private $coupon;
-
-    /**
-     * @var Usage
-     */
-    private $couponUsage;
-
-    /**
      * @var StatusResolver
      */
     private $statusResolver;
@@ -63,8 +51,6 @@ class CancelOrder
         OrderCommentHistory $orderCommentHistory,
         OrderManagementInterface $orderManagement,
         OrderRepositoryInterface $orderRepository,
-        Coupon $coupon,
-        Usage $couponUsage,
         StatusResolver $statusResolver,
         ResourceConnection $resource
     ) {
@@ -72,8 +58,6 @@ class CancelOrder
         $this->orderCommentHistory = $orderCommentHistory;
         $this->orderManagement = $orderManagement;
         $this->orderRepository = $orderRepository;
-        $this->coupon = $coupon;
-        $this->couponUsage = $couponUsage;
         $this->statusResolver = $statusResolver;
         $this->resource = $resource;
     }
@@ -101,27 +85,7 @@ class CancelOrder
 
         $this->orderManagement->cancel($order->getId());
 
-        if ($order->getCouponCode()) {
-            $this->resetCouponAfterCancellation($order);
-        }
-
         return true;
-    }
-
-    public function resetCouponAfterCancellation(OrderInterface $order)
-    {
-        $this->coupon->load($order->getCouponCode(), 'code');
-        if (!$this->coupon->getId()) {
-            return;
-        }
-
-        $this->coupon->setTimesUsed($this->coupon->getTimesUsed() - 1);
-        $this->coupon->save();
-
-        $customerId = $order->getCustomerId();
-        if ($customerId) {
-            $this->couponUsage->updateCustomerCouponTimesUsed($customerId, $this->coupon->getId(), false);
-        }
     }
 
     /**

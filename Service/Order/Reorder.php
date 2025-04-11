@@ -128,8 +128,8 @@ class Reorder
 
     public function createAndInvoice(
         OrderInterface $originalOrder,
-        string $state = null,
-        string $status = null
+        ?string $state = null,
+        ?string $status = null
     ): OrderInterface {
         $this->transaction = $this->transactionFactory->create();
 

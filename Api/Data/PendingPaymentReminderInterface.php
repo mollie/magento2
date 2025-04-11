@@ -30,7 +30,7 @@ interface PendingPaymentReminderInterface extends ExtensibleDataInterface
      * @param int|null $customerId
      * @return \Mollie\Payment\Api\Data\PendingPaymentReminderInterface
      */
-    public function setCustomerId(int $customerId = null);
+    public function setCustomerId(?int $customerId = null);
 
     /**
      * @return int
@@ -41,7 +41,7 @@ interface PendingPaymentReminderInterface extends ExtensibleDataInterface
      * @param string|null $hash
      * @return \Mollie\Payment\Api\Data\PendingPaymentReminderInterface
      */
-    public function setHash(string $hash = null);
+    public function setHash(?string $hash = null);
 
     /**
      * @return string

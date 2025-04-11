@@ -28,6 +28,7 @@
     <include path="Mollie_Payment::methods/multibanco.xml"/>
     <include path="Mollie_Payment::methods/mybank.xml"/>
     <include path="Mollie_Payment::methods/paymentlink.xml"/>
+    <include path="Mollie_Payment::methods/paybybank.xml"/>
     <include path="Mollie_Payment::methods/paypal.xml"/>
     <include path="Mollie_Payment::methods/paysafecard.xml"/>
     <include path="Mollie_Payment::methods/pointofsale.xml"/>

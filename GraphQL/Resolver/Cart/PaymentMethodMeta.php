@@ -28,8 +28,8 @@ class PaymentMethodMeta implements ResolverInterface
         Field $field,
         $context,
         ResolveInfo $info,
-        array $value = null,
-        array $args = null
+        ?array $value = null,
+        ?array $args = null
     ) {
         $method = $value['code'];
         if (strpos($method, 'mollie_method') !== 0) {

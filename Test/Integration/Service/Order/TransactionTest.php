@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -76,18 +76,25 @@ class TransactionTest extends IntegrationTestCase
     {
         $configMock = $this->createMock(ScopeConfigInterface::class);
 
+        $callIndex = 0;
         $configMock
             ->method('getValue')
-            ->withConsecutive(
-                ['web/unsecure/base_url', 'store', null],
-                ['web/unsecure/base_url', 'store', null],
-                ['web/secure/base_url', 'store', null]
-            )
-            ->willReturnOnConsecutiveCalls(
-                'http://base_url.test/',
-                'http://unsecure_base_url.test/',
-                'https://secure_base_url.test/'
-            );
+            ->willReturnCallback( function ($path) use (&$callIndex) {
+                $callIndex++;
+                if ($callIndex == 1 && $path == 'web/unsecure/base_url') {
+                    return 'http://base_url.test/';
+                }
+
+                if ($path == 'web/unsecure/base_url') {
+                    return 'http://unsecure_base_url.test/';
+                }
+
+                if ($path == 'web/secure/base_url') {
+                    return 'https://secure_base_url.test/';
+                }
+
+                throw new \Exception('Unexpected path: ' . $path . ' ' . $callIndex);
+            });
 
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class, [

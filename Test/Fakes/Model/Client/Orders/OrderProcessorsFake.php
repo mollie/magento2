@@ -60,7 +60,7 @@ class OrderProcessorsFake extends OrderProcessors
         OrderInterface $magentoOrder,
         Order $mollieOrder,
         string $type,
-        ProcessTransactionResponse $response = null
+        ?ProcessTransactionResponse $response = null
     ): ?ProcessTransactionResponse {
         $this->calledEvents[] = $event;
 

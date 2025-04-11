@@ -33,7 +33,7 @@ class AvailableTerminalsForMethod implements ResolverInterface
         $this->availableTerminals = $availableTerminals;
     }
 
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         $method = $value['code'];
         if ($method != 'mollie_methods_pointofsale' || !$context->getExtensionAttributes()->getIsCustomer()) {

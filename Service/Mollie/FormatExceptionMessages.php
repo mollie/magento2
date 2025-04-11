@@ -21,7 +21,7 @@ class FormatExceptionMessages
         $this->allowedErrorMessages = array_merge($this->allowedErrorMessages, $allowedErrorMessages);
     }
 
-    public function execute(\Exception $exception, MethodInterface $methodInstance = null): string
+    public function execute(\Exception $exception, ?MethodInterface $methodInstance = null): string
     {
         // Make sure this can be picked up by bin/magento i18n:collect-phrases
         // __('The billing country is not supported for this payment method.')

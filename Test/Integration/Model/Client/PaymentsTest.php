@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Test\Integration\Model\Client;
 
@@ -84,16 +88,11 @@ class PaymentsTest extends IntegrationTestCase
         $invoiceSenderMock = $this->createMock(InvoiceSender::class);
         $invoiceSenderMock->method('send')->willReturn(true);
 
-        $orderCommentHistoryMock = $this->createMock(OrderCommentHistory::class);
-
-        $orderCommentHistoryMock->method('add')->withConsecutive(...$orderCommentHistoryMessages);
-
         /** @var Payments\ProcessTransaction $instance */
         $instance = $this->objectManager->create(Payments\ProcessTransaction::class, [
             'orderLines' => $orderLinesMock,
             'orderSender' => $orderSenderMock,
             'invoiceSender' => $invoiceSenderMock,
-            'orderCommentHistory' => $orderCommentHistoryMock,
         ]);
 
         $order = $this->loadOrder('100000001');

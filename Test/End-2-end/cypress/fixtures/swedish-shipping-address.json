@@ -7,7 +7,7 @@
     "street[0]": "Exempelgatan 1",
     "city": "Stockholm",
     "postcode": "111 22",
-    "telephone": "+46 8 XXXXXXXX"
+    "telephone": "+46812345678"
   },
   "select": {
     "country_id": "SE",

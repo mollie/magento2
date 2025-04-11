@@ -40,8 +40,8 @@ class ChangeApiMode extends Value
         Config $mollieConfig,
         FlushMollieCache $flushMollieCache,
         UpdateProfileId $updateProfileId,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct(

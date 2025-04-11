@@ -22,6 +22,7 @@ class LimitMethodsForRecurringPayments
         'mollie_methods_ideal',
         'mollie_methods_kbc',
         'mollie_methods_mybank',
+        'mollie_methods_paybybank',
         'mollie_methods_paypal',
         'mollie_methods_satispay',
         'mollie_methods_trustly',

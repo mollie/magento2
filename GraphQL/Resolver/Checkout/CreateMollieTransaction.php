@@ -33,7 +33,7 @@ class CreateMollieTransaction implements ResolverInterface
     /**
      * @inheritDoc
      */
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         self::$issuer = isset($args['input']['issuer']) ? $args['input']['issuer'] : null;
         $paymentToken = $args['input']['payment_token'];

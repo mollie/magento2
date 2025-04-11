@@ -20,5 +20,5 @@ interface ProcessTransactionInterface
      * @param Payment|null $molliePayment
      * @return void
      */
-    public function process(OrderInterface $order, MollieOrder $mollieOrder = null, Payment $molliePayment = null);
+    public function process(OrderInterface $order, ?MollieOrder $mollieOrder = null, ?Payment $molliePayment = null);
 }

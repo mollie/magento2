@@ -89,8 +89,8 @@ class OrderLines extends AbstractModel
         Registry $registry,
         CreditmemoService $creditmemoService,
         OrderOrderLines $orderOrderLines,
-        AbstractResource $resource = null,
-        AbstractDb $resourceCollection = null,
+        ?AbstractResource $resource = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         $this->mollieHelper = $mollieHelper;

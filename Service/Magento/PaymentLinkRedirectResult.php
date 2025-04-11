@@ -28,7 +28,7 @@ class PaymentLinkRedirectResult implements PaymentLinkRedirectResultInterface
     public function __construct(
         bool $alreadyPaid,
         bool $isExpired,
-        string $redirectUrl = null
+        ?string $redirectUrl = null
     ) {
         $this->alreadyPaid = $alreadyPaid;
         $this->redirectUrl = $redirectUrl;

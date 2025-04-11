@@ -29,7 +29,7 @@ class ApiKeyFallback extends AbstractModel
         DataObjectHelper $dataObjectHelper,
         ApiKeyFallbackInterfaceFactory $apiKeyFallbackDataFactory,
         ResourceModel\ApiKeyFallback $resource,
-        AbstractDb $resourceCollection = null,
+        ?AbstractDb $resourceCollection = null,
         array $data = []
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);

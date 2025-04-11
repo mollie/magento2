@@ -56,8 +56,8 @@ class PaymentFeeTax extends CommonTaxCollector
         Calculate $calculate,
         PriceCurrencyInterface $priceCurrency,
         Config $config,
-        TaxHelper $taxHelper = null,
-        QuoteDetailsItemExtensionInterfaceFactory $quoteDetailsItemExtensionInterfaceFactory = null,
+        ?TaxHelper $taxHelper = null,
+        ?QuoteDetailsItemExtensionInterfaceFactory $quoteDetailsItemExtensionInterfaceFactory = null,
         ?CustomerAccountManagement $customerAccountManagement = null
     ) {
         $parent = new \ReflectionClass(parent::class);

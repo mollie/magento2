@@ -29,7 +29,7 @@ class AvailableIssuersForCart implements ResolverInterface
     /**
      * @inheritDoc
      */
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         /** @var CartInterface $cart */
         $cart = $value['model'];

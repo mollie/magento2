@@ -37,13 +37,13 @@ class Expires
         $this->request = $request;
     }
 
-    public function availableForMethod(string $method = null, $storeId = null): bool
+    public function availableForMethod(?string $method = null, $storeId = null): bool
     {
         $value = $this->getExpiresAtForMethod($method, $storeId);
         return (bool)$value;
     }
 
-    public function atDateForMethod(string $method = null, $storeId = null): string
+    public function atDateForMethod(?string $method = null, $storeId = null): string
     {
         $days = $this->getExpiresAtForMethod($method, $storeId);
 
@@ -62,7 +62,7 @@ class Expires
      * @param $storeId
      * @return mixed
      */
-    public function getExpiresAtForMethod(string $method = null, $storeId = null): ?string
+    public function getExpiresAtForMethod(?string $method = null, $storeId = null): ?string
     {
         if (!$method && $value = $this->getValueFromRequest()) {
             return $value;

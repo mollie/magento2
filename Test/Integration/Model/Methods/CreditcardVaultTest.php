@@ -53,7 +53,7 @@ class CreditcardVaultTest extends IntegrationTestCase
      */
     public function testIsNotAvailableWhenDisabled(): void
     {
-        $this->skipIf247();
+        $this->skipIfVersionWithError();
 
         $instance = $this->objectManager->create(CreditcardVault::class);
 
@@ -68,7 +68,7 @@ class CreditcardVaultTest extends IntegrationTestCase
      */
     public function testIsAvailableWhenEnabled(): void
     {
-        $this->skipIf247();
+        $this->skipIfVersionWithError();
 
         $this->loadFakeEncryptor()->disableDecryption();
 
@@ -77,11 +77,11 @@ class CreditcardVaultTest extends IntegrationTestCase
         $this->assertTrue($instance->isAvailable());
     }
 
-    private function skipIf247(): void
+    private function skipIfVersionWithError(): void
     {
         $version = $this->objectManager->get('Magento\Framework\App\ProductMetadataInterface')->getVersion();
 
-        if ($version == '2.4.7') {
+        if (version_compare($version, '2.4.7', '>=')) {
             $message = 'This test is skipped as Magento\PaymentServicesPaypal\Plugin\Vault\Method::afterIsAvailable()';
             $message .= ' is failing the tests';
 

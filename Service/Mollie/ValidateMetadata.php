@@ -32,9 +32,9 @@ class ValidateMetadata
     /**
      * @throws LocalizedException
      */
-    public function execute(\stdClass $metadata = null, OrderInterface $order): void
+    public function execute(?\stdClass $metadata = null, ?OrderInterface $order = null): void
     {
-        if ($this->skipValidation) {
+        if ($this->skipValidation || $order === null) {
             return;
         }
 

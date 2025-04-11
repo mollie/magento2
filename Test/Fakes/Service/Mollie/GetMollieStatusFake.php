@@ -23,7 +23,7 @@ class GetMollieStatusFake extends GetMollieStatus
         $this->response = $response;
     }
 
-    public function execute(int $orderId, string $transactionId = null): GetMollieStatusResult
+    public function execute(int $orderId, ?string $transactionId = null): GetMollieStatusResult
     {
         if ($this->response) {
             return $this->response;

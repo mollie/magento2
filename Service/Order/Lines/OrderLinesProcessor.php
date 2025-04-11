@@ -23,7 +23,7 @@ class OrderLinesProcessor
         $this->processors = $processors;
     }
 
-    public function process(array $orderLine, OrderInterface $order, OrderItemInterface $orderItem = null): array
+    public function process(array $orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array
     {
         foreach ($this->processors as $processor) {
             $orderLine = $processor->process($orderLine, $order, $orderItem);

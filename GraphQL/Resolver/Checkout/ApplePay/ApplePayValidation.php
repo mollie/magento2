@@ -20,7 +20,7 @@ class ApplePayValidation implements ResolverInterface
         $this->validation = $validation;
     }
 
-    public function resolve(Field $field, $context, ResolveInfo $info, array $value = null, array $args = null)
+    public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         return ['response' => $this->validation->execute($args['validationUrl'], $args['domain'] ?? null)];
     }

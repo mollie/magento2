@@ -29,7 +29,7 @@ class RefundUsingPaymentTest extends UnitTestCase
     {
         $mockBuilder = $this->getMockBuilder(PaymentFactory::class);
         $mockBuilder->disableOriginalConstructor();
-        $mockBuilder->setMethods(['create']);
+        $mockBuilder->onlyMethods(['create']);
         $paymentFactory = $mockBuilder->getMock();
         $paymentFactory->method('create')->willReturn($this->createMock(Payment::class));
 
@@ -55,7 +55,7 @@ class RefundUsingPaymentTest extends UnitTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit\Framework\MockObject\MockObject
      */
     private function buildMollieApiMock()
     {

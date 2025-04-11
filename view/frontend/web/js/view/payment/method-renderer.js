@@ -50,6 +50,7 @@ define(
             {type: 'mollie_methods_mbway', component: defaultComponent},
             {type: 'mollie_methods_multibanco', component: defaultComponent},
             {type: 'mollie_methods_mybank', component: defaultComponent},
+            {type: 'mollie_methods_paybybank', component: defaultComponent},
             {type: 'mollie_methods_paypal', component: defaultComponent},
             {type: 'mollie_methods_paysafecard', component: defaultComponent},
             {type: 'mollie_methods_pointofsale', component: pointofsaleComponent},
