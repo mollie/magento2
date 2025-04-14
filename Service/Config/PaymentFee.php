@@ -107,4 +107,13 @@ class PaymentFee
     {
         return $this->config->includeShippingInSurcharge($storeId);
     }
+
+    /**
+     * @param null $storeId
+     * @return bool
+     */
+    public function includeDiscountInSurcharge($storeId = null): bool
+    {
+        return $this->config->includeDiscountInSurcharge($storeId);
+    }
 }

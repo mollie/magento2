@@ -35,6 +35,7 @@ class Config
     const GENERAL_PROCESS_TRANSACTION_IN_THE_QUEUE =  'payment/mollie_general/process_transactions_in_the_queue';
     const GENERAL_ENCRYPT_PAYMENT_DETAILS = 'payment/mollie_general/encrypt_payment_details';
     const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
+    const GENERAL_INCLUDE_DISCOUNT_IN_SURCHARGE = 'payment/mollie_general/include_discount_in_surcharge';
     const GENERAL_INVOICE_NOTIFY = 'payment/mollie_general/invoice_notify';
     const GENERAL_INVOICE_NOTIFY_KLARNA = 'payment/mollie_general/invoice_notify_klarna';
     const GENERAL_LOCALE = 'payment/mollie_general/locale';
@@ -344,6 +345,11 @@ class Config
     public function includeShippingInSurcharge($storeId = null)
     {
         return $this->isSetFlag(static::GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE, $storeId);
+    }
+
+    public function includeDiscountInSurcharge(?int $storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_INCLUDE_DISCOUNT_IN_SURCHARGE, $storeId);
     }
 
     /**
