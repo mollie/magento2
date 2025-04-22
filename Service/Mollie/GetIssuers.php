@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -57,12 +57,11 @@ class GetIssuers
     }
 
     /**
-     * @param MollieApiClient $mollieApi
      * @param string $method
      * @param string $type On of: dropdown, radio, none
      * @return array|null
      */
-    public function execute(MollieApiClient $mollieApi, string $method, string $type)
+    public function execute(string $method, string $type): ?array
     {
         $identifier = static::CACHE_IDENTIFIER_PREFIX . $method . $type . $this->resolver->getLocale();
         $result = $this->cache->load($identifier);
@@ -100,10 +99,7 @@ class GetIssuers
      */
     public function getForGraphql($storeId, string $method): ?array
     {
-        $mollieApi = $this->mollieModel->getMollieApi($storeId);
-
         $issuers = $this->execute(
-            $mollieApi,
             $method,
             $this->config->getIssuerListType($method)
         );
