@@ -152,7 +152,7 @@ class PaymentReminder
     {
         /** @var OrderItemInterface $item */
         foreach ($order->getAllVisibleItems() as $item) {
-            if (!$item->getProduct()->isSaleable()) {
+            if (!$item->getProduct() || !$item->getProduct()->isSaleable()) {
                 return false;
             }
         }
