@@ -266,10 +266,6 @@ class Orders extends AbstractModel
             $orderData['payment']['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
         }
 
-        if (isset($additionalData['limited_methods'])) {
-            $orderData['method'] = $additionalData['limited_methods'];
-        }
-
         if ($this->expires->availableForMethod($this->methodCode->getExpiresAtMethod(), $storeId)) {
             $orderData['expiresAt'] = $this->expires->atDateForMethod(
                 $this->methodCode->getExpiresAtMethod(),
