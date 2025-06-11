@@ -10,6 +10,7 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Model\AbstractModel;
+use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderRepository;
@@ -236,7 +237,7 @@ class Payments extends AbstractModel
             $paymentData['dueDate'] = $this->mollieHelper->getBanktransferDueDate($storeId);
         }
 
-        if (in_array($method, ['przelewy24', 'trustly', 'banktransfer'])) {
+        if (!$paymentData['billingAddress']['email']) {
             $paymentData['billingAddress']['email'] = $order->getCustomerEmail();
         }
 
@@ -255,12 +256,7 @@ class Payments extends AbstractModel
         return $payment->getCheckoutUrl();
     }
 
-    /**
-     * @param \Magento\Sales\Api\Data\OrderAddressInterface $address
-     *
-     * @return array
-     */
-    public function getAddressLine($address)
+    public function getAddressLine(OrderAddressInterface $address): array
     {
         return [
             'streetAndNumber' => rtrim(implode(' ', $address->getStreet()), ' '),
@@ -268,6 +264,7 @@ class Payments extends AbstractModel
             'city'            => $address->getCity(),
             'region'          => $address->getRegion(),
             'country'         => $address->getCountryId(),
+            'email'           => $address->getEmail(),
         ];
     }
 
