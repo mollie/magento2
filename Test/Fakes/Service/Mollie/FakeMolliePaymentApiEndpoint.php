@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -9,20 +13,20 @@ use Mollie\Api\Resources\Payment;
 
 class FakeMolliePaymentApiEndpoint extends PaymentEndpoint
 {
-    /** @var Payment */
-    private $fakePayment;
+    /** @var Payment[] */
+    private $fakePayments = [];
 
     public function setFakePayment(Payment $payment): void
     {
-        $this->fakePayment = $payment;
+        $this->fakePayments[$payment->id] = $payment;
     }
 
     public function get($paymentId, array $parameters = [])
     {
-        if (!$this->fakePayment) {
+        if (!$this->fakePayments) {
             throw new \Exception('No fake payment set. Aborting');
         }
 
-        return $this->fakePayment;
+        return $this->fakePayments[$paymentId];
     }
 }

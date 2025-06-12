@@ -22,6 +22,7 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\Payments\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Mollie\Order\CanRegisterCaptureNotification;
+use Mollie\Payment\Service\Mollie\Order\GetTransactionId;
 use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
@@ -144,6 +145,10 @@ class Payments extends AbstractModel
      * @var MethodCode
      */
     private $methodCode;
+    /**
+     * @var GetTransactionId
+     */
+    private $getTransactionId;
 
     public function __construct(
         OrderRepository $orderRepository,
@@ -166,7 +171,8 @@ class Payments extends AbstractModel
         SaveAdditionalInformationDetails $saveAdditionalInformationDetails,
         ExpiredOrderToTransaction $expiredOrderToTransaction,
         CanRegisterCaptureNotification $canRegisterCaptureNotification,
-        MethodCode $methodCode
+        MethodCode $methodCode,
+        GetTransactionId $getTransactionId
     ) {
         $this->orderRepository = $orderRepository;
         $this->checkoutSession = $checkoutSession;
@@ -189,6 +195,7 @@ class Payments extends AbstractModel
         $this->expiredOrderToTransaction = $expiredOrderToTransaction;
         $this->canRegisterCaptureNotification = $canRegisterCaptureNotification;
         $this->methodCode = $methodCode;
+        $this->getTransactionId = $getTransactionId;
     }
 
     /**
@@ -328,7 +335,7 @@ class Payments extends AbstractModel
     {
         $orderId = $order->getId();
         $storeId = $order->getStoreId();
-        $transactionId = $order->getMollieTransactionId();
+        $transactionId = $this->getTransactionId->forOrder($order);
         $paymentData = $mollieApi->payments->get($transactionId);
 
         $this->validateMetadata->execute($paymentData->metadata, $order);
