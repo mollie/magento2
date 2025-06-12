@@ -26,13 +26,17 @@ class QuoteHasMealVoucherProducts
 
     public function check(CartInterface $cart): bool
     {
-        $itemsWithCategories = array_filter($cart->getItems() ?? [], function (CartItemInterface $cartItem) {
+        if ($cart->getItems() === null) {
+            return false;
+        }
+
+        $itemsWithCategories = array_filter($cart->getItems(), function (CartItemInterface $cartItem) {
             $category = $this->getProductCategory($cartItem->getProduct());
 
             return $category && $category != 'none';
         });
 
-        return count($itemsWithCategories);
+        return count($itemsWithCategories) == count($cart->getItems());
     }
 
     private function getProductCategory(ProductInterface $product)
