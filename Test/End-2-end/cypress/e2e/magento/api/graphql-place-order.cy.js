@@ -46,4 +46,54 @@ describe('Check that the headless GraphQL endpoints work as expected', () => {
 
     ordersPage.assertOrderStatusIs('Processing');
   });
+
+  it('C1835263: Validate that a point of sale order can be placed through GraphQL ', () => {
+    cy.visit('opt/mollie-pwa-graphql.html');
+
+    cy.get('[data-key="start-checkout-process"]').click();
+
+    cy.get('[data-key="mollie_methods_pointofsale"]').click();
+
+    cy.get('.mollie-terminal').first().check();
+
+    cy.get('[data-key="place-order-action"]').click();
+
+    cy.get('[data-key="increment-id"]').then((element) => {
+      cy.wrap(element.text()).as('increment-id');
+    });
+
+    cookies.disableSameSiteCookieRestrictions();
+
+    cy.backendLogin(false);
+
+    cy.get('@increment-id').then((incrementId) => {
+      ordersPage.openByIncrementId(incrementId);
+    });
+
+    ordersPage.assertOrderStatusIs('Pending Payment');
+
+    findSelectorOrReload('.change-payment-status span').then((element) => {
+      const dataUrl = element.attr('data-url');
+      cy.visit(dataUrl);
+    });
+
+    mollieHostedPaymentPage.selectStatus('paid');
+
+    cy.get('@increment-id').then((incrementId) => {
+      ordersPage.openByIncrementId(incrementId);
+    });
+
+    ordersPage.assertOrderStatusIs('Processing');
+  });
 })
+
+function findSelectorOrReload(selector) {
+  return cy.get('body').then($body => {
+    if ($body.find(selector).length > 0) {
+      return cy.get(selector);
+    }
+
+    cy.reload();
+    return findSelectorOrReload(selector);
+  });
+}
