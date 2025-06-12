@@ -227,8 +227,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['issuersListType'][$code] = $issuerListType;
 
         try {
-            $mollieApi = $this->mollieApiClient->loadByStore();
-            $config['payment']['issuers'][$code] = $this->getIssuers->execute($mollieApi, $code, $issuerListType);
+            $config['payment']['issuers'][$code] = $this->getIssuers->execute($code, $issuerListType);
         } catch (\Exception $exception) {
             $this->config->addTolog('error', 'Unable to load issuers: ' . $exception->getMessage());
             $config['payment']['issuers'][$code] = [];
