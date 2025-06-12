@@ -11,7 +11,6 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Locale\Resolver;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
-use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Mollie as MollieModel;
 
 class GetIssuers
@@ -93,8 +92,8 @@ class GetIssuers
     }
 
     /**
-     * @param $storeId
-     * @param $method
+     * @param int|string|null $storeId
+     * @param string $method
      * @return array|null
      */
     public function getForGraphql($storeId, string $method): ?array

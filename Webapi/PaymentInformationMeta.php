@@ -8,18 +8,13 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Webapi;
 
-use Mollie\Payment\Api\Data\IssuerInterface;
 use Mollie\Payment\Api\Data\IssuerInterfaceFactory;
-use Mollie\Payment\Api\Data\TerminalInterface;
 use Mollie\Payment\Api\Data\TerminalInterfaceFactory;
-use Mollie\Payment\Api\Data\MethodMetaInterface;
 use Mollie\Payment\Api\Data\MethodMetaInterfaceFactory;
 use Mollie\Payment\Api\Webapi\PaymentInformationMetaInterface;
-use Mollie\Payment\Block\Form\Pointofsale;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\AvailableTerminals;
 use Mollie\Payment\Service\Mollie\GetIssuers;
-use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\PaymentMethods;
 
 class PaymentInformationMeta implements PaymentInformationMetaInterface
@@ -36,14 +31,6 @@ class PaymentInformationMeta implements PaymentInformationMetaInterface
      * @var PaymentMethods
      */
     private $paymentMethods;
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-    /**
-     * @var Pointofsale
-     */
-    private $pointofsale;
     /**
      * @var AvailableTerminals
      */
@@ -64,19 +51,15 @@ class PaymentInformationMeta implements PaymentInformationMetaInterface
     public function __construct(
         Config $config,
         MethodMetaInterfaceFactory $methodMetaFactory,
-        MollieApiClient $mollieApiClient,
         PaymentMethods $paymentMethods,
         GetIssuers $getIssuers,
-        Pointofsale $pointofsale,
         AvailableTerminals $availableTerminals,
         IssuerInterfaceFactory $issuerFactory,
         TerminalInterfaceFactory $terminalFactory
     ) {
         $this->methodMetaFactory = $methodMetaFactory;
-        $this->mollieApiClient = $mollieApiClient;
         $this->paymentMethods = $paymentMethods;
         $this->getIssuers = $getIssuers;
-        $this->pointofsale = $pointofsale;
         $this->availableTerminals = $availableTerminals;
         $this->config = $config;
         $this->issuerFactory = $issuerFactory;
