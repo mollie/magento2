@@ -129,6 +129,7 @@
                 <item name="CaptureMode" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureMode</item>
                 <item name="terminalId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\TerminalId</item>
                 <item name="LimitStreetLength" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitStreetLength</item>
+                <item name="LimitedMethods" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitedMethods</item>
             </argument>
         </arguments>
     </type>
