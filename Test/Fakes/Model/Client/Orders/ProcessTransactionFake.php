@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Test\Fakes\Model\Client\Orders;
 
@@ -10,6 +14,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Mollie\Order\GetTransactionId;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
 
 class ProcessTransactionFake extends ProcessTransaction
@@ -40,7 +45,8 @@ class ProcessTransactionFake extends ProcessTransaction
         MollieApiClient $mollieApiClient,
         MollieHelper $mollieHelper,
         OrderLines $orderLines,
-        ValidateMetadata $validateMetadata
+        ValidateMetadata $validateMetadata,
+        GetTransactionId $getTransactionId
     ) {
         parent::__construct(
             $processTransactionResponseFactory,
@@ -48,7 +54,8 @@ class ProcessTransactionFake extends ProcessTransaction
             $mollieApiClient,
             $mollieHelper,
             $orderLines,
-            $validateMetadata
+            $validateMetadata,
+            $getTransactionId
         );
 
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;

@@ -33,6 +33,7 @@
     <preference for="Mollie\Payment\Api\TransactionToOrderRepositoryInterface" type="Mollie\Payment\Model\TransactionToOrderRepository" />
     <preference for="Mollie\Payment\Api\Data\TransactionToOrderInterface" type="Mollie\Payment\Model\TransactionToOrder"/>
     <preference for="Mollie\Payment\Api\Data\TransactionToOrderSearchResultsInterface" type="Mollie\Payment\Model\TransactionToOrderSearchResults"/>
+    <preference for="Mollie\Payment\Api\TransactionToOrderManagementInterface" type="Mollie\Payment\Model\TransactionToOrderManagement" />
 
     <preference for="Mollie\Payment\Api\Webapi\PaymentInformationMetaInterface" type="Mollie\Payment\Webapi\PaymentInformationMeta"/>
     <preference for="Mollie\Payment\Api\Data\MethodMetaInterface" type="Mollie\Payment\Model\MethodMeta" />

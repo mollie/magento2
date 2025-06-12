@@ -15,6 +15,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Mollie\Order\GetTransactionId;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
 
 class ProcessTransaction
@@ -48,6 +49,10 @@ class ProcessTransaction
      * @var ValidateMetadata
      */
     private $validateMetadata;
+    /**
+     * @var GetTransactionId
+     */
+    private $getTransactionId;
 
     public function __construct(
         ProcessTransactionResponseFactory $processTransactionResponseFactory,
@@ -55,7 +60,8 @@ class ProcessTransaction
         MollieApiClient $mollieApiClient,
         MollieHelper $mollieHelper,
         OrderLines $orderLines,
-        ValidateMetadata $validateMetadata
+        ValidateMetadata $validateMetadata,
+        GetTransactionId $getTransactionId
     ) {
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
         $this->mollieApiClient = $mollieApiClient;
@@ -63,6 +69,7 @@ class ProcessTransaction
         $this->orderLines = $orderLines;
         $this->orderProcessors = $orderProcessors;
         $this->validateMetadata = $validateMetadata;
+        $this->getTransactionId = $getTransactionId;
     }
 
     public function execute(
@@ -70,7 +77,8 @@ class ProcessTransaction
         string $type = 'webhook'
     ): ProcessTransactionResponse {
         $mollieApi = $this->mollieApiClient->loadByStore((int)$order->getStoreId());
-        $mollieOrder = $mollieApi->orders->get($order->getMollieTransactionId(), ['embed' => 'payments']);
+        $transactionId = $this->getTransactionId->forOrder($order);
+        $mollieOrder = $mollieApi->orders->get($transactionId, ['embed' => 'payments']);
         $this->mollieHelper->addTolog($type, $mollieOrder);
         $status = $mollieOrder->status;
 
