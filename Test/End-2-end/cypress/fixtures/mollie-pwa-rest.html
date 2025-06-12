@@ -1,3 +1,8 @@
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/vue@3"></script>
 <script src="https://js.mollie.com/v1/mollie.js"></script>
@@ -33,7 +38,10 @@
 
                 <div>
                     <dt class="text-sm font-medium text-gray-500">CartId</dt>
-                    <dd class="mt-1 text-sm text-gray-900">{{ cartId }}</dd>
+                    <dd class="mt-1 text-sm text-gray-900">
+                        {{ cartId }}
+                        <a v-show="cartId" href="#" @click="deleteCartIdFromStorage()" class="text-red-500">Delete</a>
+                    </dd>
                 </div>
 
                 <div v-if="currentStep === 0">
@@ -93,12 +101,15 @@
                     </div>
                     <div class="ml-3">
                         <h3 class="text-sm font-medium text-green-800">Order done!</h3>
-                        <div class="mt-2 text-sm text-green-700">
+                        <div class="mt-2 text-sm text-green-700"
+                        >
                             <p><strong>Order ID:</strong> <span data-key="order-id">{{ orderId }}</span></p>
-                            <p class="mt-4 font-bold">1. Please open this url and select a payment status (or not):</p>
-                            <a data-key="redirect-url" v-if="redirectUrl" v-bind:href="redirectUrl" target="_blank">{{ redirectUrl }}</a><br>
+                            <div v-show="selectedMethod !== 'mollie_methods_pointofsale'">
+                                <p class="mt-4 font-bold">1. Please open this url and select a payment status (or not):</p>
+                                <a data-key="redirect-url" v-if="redirectUrl" v-bind:href="redirectUrl" target="_blank">{{ redirectUrl }}</a><br>
 
-                            <p class="mt-4 font-bold">2. When you have opened the url, check the status in the backend of your webshop.</p>
+                                <p class="mt-4 font-bold">2. When you have opened the url, check the status in the backend of your webshop.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -161,6 +172,21 @@
                             v-show="verificationCodeError"
                         ></div>
                     </div>
+                </div>
+
+                <div
+                    v-if="methodMeta[method.code]?.terminals && methodMeta[method.code]?.terminals.length !== 0"
+                    v-show="selectedMethod === method.code"
+                    class="terminal-list pt-4"
+                >
+                    <ul>
+                        <li v-for="terminal in methodMeta[method.code].terminals">
+                            <label>
+                                <input type="radio" name="terminal" v-model="selectedTerminal" :value="terminal" />
+                                <span class="ml-2" v-text="terminal.description"></span>
+                            </label>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -229,27 +255,27 @@
                 verificationCodeError: false,
                 componentsToken: null,
                 profileId: null,
+                methodMeta: [],
+                selectedTerminal: null,
             }
         },
 
         async mounted() {
             this.getProfileIdFromLocalStorage();
+
+            const cartId = localStorage.getItem('cartId');
+            if (cartId) {
+                this.cartId = cartId;
+                this.cartIdFromStorage = true;
+            }
         },
 
         watch: {
             selectedMethod(method) {
-                if (method !== 'mollie_methods_creditcard' || this.fieldsMounted || !this.profileId) {
+                if (method === 'mollie_methods_creditcard' && !this.fieldsMounted && this.profileId) {
+                    this.renderComponents();
                     return;
                 }
-
-                Vue.nextTick(() => {
-                    this.addComponentField('cardNumber');
-                    this.addComponentField('cardHolder');
-                    this.addComponentField('expiryDate');
-                    this.addComponentField('verificationCode');
-                    this.fieldsMounted = true;
-                    console.info('Mollie Component fields mounted');
-                });
             },
 
             profileId(profileId) {
@@ -285,8 +311,21 @@
                 }
             },
 
+            deleteCartIdFromStorage() {
+                this.cartIdFromStorage = false;
+                this.cartId = null;
+                localStorage.removeItem('cartId');
+            },
+
             async callPlaceOrder() {
-                debugger;
+                if (this.methodMeta[this.selectedMethod]?.terminals &&
+                    this.methodMeta[this.selectedMethod]?.terminals.length &&
+                    !this.selectedTerminal
+                ) {
+                    alert('Please select a terminal');
+                    return;
+                }
+
                 if (this.selectedMethod !== 'mollie_methods_creditcard') {
                     this.currentStep = 5;
                     this.callNextStep();
@@ -450,6 +489,15 @@
                         alert('No Mollie payment method found. Please check if they are activated');
                     }
                 });
+
+                if (this.methodMeta.length === 0) {
+                    restApi(`mollie/payment-method/meta`)
+                        .then(response => {
+                            response.forEach(method => {
+                                this.methodMeta[method.code] = method;
+                            });
+                        })
+                }
             },
 
             async getShippingMethods() {
@@ -464,6 +512,13 @@
                     }
                 }).then(response => {
                     this.checkResponse(response);
+
+                    if (response.length === 0) {
+                        this.paused = true;
+                        alert('No shipping methods available');
+                        return;
+                    }
+
                     this.shippingMethod = response[0].method_code;
                     console.log('Setting shipping method to', response[0].method_code);
                     this.callNextStep();
@@ -486,6 +541,7 @@
                         method: this.selectedMethod,
                         additional_data: {
                             card_token: this.componentsToken,
+                            selected_terminal: this.selectedTerminal?.id,
                         }
                     },
                     billingAddress: {
@@ -531,7 +587,18 @@
                 this.hasError = true;
                 this.errorMessage = response.message;
                 throw new Error(response.message);
-            }
+            },
+
+            renderComponents() {
+                Vue.nextTick(() => {
+                    this.addComponentField('cardNumber');
+                    this.addComponentField('cardHolder');
+                    this.addComponentField('expiryDate');
+                    this.addComponentField('verificationCode');
+                    this.fieldsMounted = true;
+                    console.info('Mollie Component fields mounted');
+                });
+            },
         }
     }).mount('#app')
 </script>

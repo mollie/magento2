@@ -1,3 +1,8 @@
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/vue@3"></script>
 <script src="https://js.mollie.com/v1/mollie.js"></script>
@@ -105,10 +110,13 @@
                         <h3 class="text-sm font-medium text-green-800">Order done!</h3>
                         <div class="mt-2 text-sm text-green-700">
                             <p><strong>Order ID:</strong> <span data-key="increment-id">{{ orderId }}</span></p>
-                            <p class="mt-4 font-bold">1. Please open this url and select a payment status (or not):</p>
-                            <a data-key="redirect-url" v-bind:href="redirectUrl" target="_blank">{{ redirectUrl }}</a><br>
+                            <div v-show="selectedMethod !== 'mollie_methods_pointofsale'">
+                                <p class="mt-4 font-bold">1. Please open this url and select a payment status (or not):</p>
+                                <a data-key="redirect-url" v-bind:href="redirectUrl" target="_blank">{{ redirectUrl }}</a><br>
 
-                            <p class="mt-4 font-bold">2. When you have opened the url, click here to get the payment status:</p>
+                                <p class="mt-4 font-bold">2. When you have opened the url, click here to get the payment status:</p>
+                            </div>
+
                             <button @click="currentStep === 9 && checkTransactionStatus()" type="button" class="mt-4 inline-flex items-center px-2.5 py-1.5 border border-transparent text-xs font-medium rounded shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 Process Transaction
                                 <svg v-if="checkingPaymentStatus" class="ml-2 animate-spin h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -146,6 +154,21 @@
                                        :checked="selectedIssuer === issuer.code"
                                 />
                                 {{ issuer.name }}
+                            </label>
+                        </li>
+                    </ul>
+                </span>
+
+                <span v-if="selectedMethod === method.code && method.mollie_available_terminals">
+                    <ul>
+                        <li v-for="terminal in method.mollie_available_terminals">
+                            <label @click="setTerminal(terminal.id)">
+                                <input type="radio"
+                                       class="mollie-terminal"
+                                       :data-key="method.id + '-terminal'"
+                                       :checked="selectedTerminal === terminal.id"
+                                />
+                                {{ terminal.description }}
                             </label>
                         </li>
                     </ul>
@@ -260,6 +283,7 @@
                 mollieMethods: [],
                 selectedMethod: null,
                 selectedIssuer: null,
+                selectedTerminal: null,
                 redirectUrl: null,
                 paymentToken: null,
                 mollie: null,
@@ -364,6 +388,10 @@
 
             setIssuer(issuer) {
                 this.selectedIssuer = issuer;
+            },
+
+            setTerminal(terminal) {
+                this.selectedTerminal = terminal;
             },
 
             async callNextStep() {
@@ -700,6 +728,13 @@
                                     image
                                     svg
                                 }
+                                mollie_available_terminals {
+                                    id
+                                    brand
+                                    model
+                                    serialNumber
+                                    description
+                                }
                             }
                         }
                     }
@@ -729,6 +764,7 @@
                         $cartId: String!
                         $method: String!
                         $issuer: String
+                        $terminal: String
                         $componentsToken: String
                     ) {
                         setPaymentMethodOnCart(input: {
@@ -737,6 +773,7 @@
                                 code: $method
                                 mollie_card_token: $componentsToken
                                 mollie_selected_issuer: $issuer
+                                mollie_selected_terminal: $terminal
                             }
                         }) {
                             cart {
@@ -751,6 +788,7 @@
                         cartId: this.cartId,
                         method: this.selectedMethod,
                         issuer: this.selectedIssuer,
+                        terminal: this.selectedTerminal,
                         componentsToken: this.componentsToken,
                     }
                 ).then(response => {
