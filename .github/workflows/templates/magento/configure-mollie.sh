@@ -65,11 +65,15 @@ bin/magento config:set payment/mollie_general/currency 0 --scope=store --scope-c
 # Disable the use of the base currency
 bin/magento config:set payment/mollie_general/currency 0
 
+# Enable point of sale for all customer groupsAdd commentMore actions
+bin/magento config:set payment/mollie_methods_pointofsale/allowed_customer_groups 0,1,2,3
+
 # Insert rates, otherwise the currency switcher won't show
 magerun2 db:query 'INSERT INTO `directory_currency_rate` (`currency_from`, `currency_to`, `rate`) VALUES ("EUR", "PLN", 1.0);'
 magerun2 db:query 'INSERT INTO `directory_currency_rate` (`currency_from`, `currency_to`, `rate`) VALUES ("EUR", "CHF", 1.0);'
 magerun2 db:query 'INSERT INTO `directory_currency_rate` (`currency_from`, `currency_to`, `rate`) VALUES ("EUR", "SEK", 1.0);'
 
+# Disable two factor authentication when it's enabled
 if grep -q Magento_TwoFactorAuth "app/etc/config.php"; then
     ./retry "php bin/magento module:disable Magento_TwoFactorAuth -f"
 fi
