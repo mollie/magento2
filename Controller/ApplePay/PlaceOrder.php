@@ -161,7 +161,7 @@ class PlaceOrder extends Action
     {
         $address->addData([
             AddressInterface::KEY_STREET => implode(PHP_EOL, $input['addressLines']),
-            AddressInterface::KEY_COUNTRY_ID => $input['countryCode'],
+            AddressInterface::KEY_COUNTRY_ID => strtoupper($input['countryCode']),
             AddressInterface::KEY_LASTNAME => $input['familyName'],
             AddressInterface::KEY_FIRSTNAME => $input['givenName'],
             AddressInterface::KEY_CITY => $input['locality'],
