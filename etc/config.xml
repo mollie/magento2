@@ -8,7 +8,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v2.45.0</version>
+                <version>v2.46.0</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -382,8 +382,7 @@
                 <payment_description>{ordernumber}</payment_description>
                 <method>order</method>
                 <payment_action>order</payment_action>
-                <allowspecific>1</allowspecific>
-                <specificcountry>GB</specificcountry>
+                <allowspecific>0</allowspecific>
                 <instructions/>
                 <can_use_checkout>1</can_use_checkout>
                 <can_order>1</can_order>

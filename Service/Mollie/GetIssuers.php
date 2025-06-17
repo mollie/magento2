@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -11,7 +11,6 @@ use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Locale\Resolver;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
-use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Mollie as MollieModel;
 
 class GetIssuers
@@ -57,12 +56,11 @@ class GetIssuers
     }
 
     /**
-     * @param MollieApiClient $mollieApi
      * @param string $method
      * @param string $type On of: dropdown, radio, none
      * @return array|null
      */
-    public function execute(MollieApiClient $mollieApi, string $method, string $type)
+    public function execute(string $method, string $type): ?array
     {
         $identifier = static::CACHE_IDENTIFIER_PREFIX . $method . $type . $this->resolver->getLocale();
         $result = $this->cache->load($identifier);
@@ -94,16 +92,13 @@ class GetIssuers
     }
 
     /**
-     * @param $storeId
-     * @param $method
+     * @param int|string|null $storeId
+     * @param string $method
      * @return array|null
      */
     public function getForGraphql($storeId, string $method): ?array
     {
-        $mollieApi = $this->mollieModel->getMollieApi($storeId);
-
         $issuers = $this->execute(
-            $mollieApi,
             $method,
             $this->config->getIssuerListType($method)
         );

@@ -378,7 +378,7 @@ class Order
             return null;
         }
 
-        $difference = round($grandTotal - $orderLinesTotal, 2);
+        $difference = round(round($grandTotal, 2) - round($orderLinesTotal, 2), 2);
         if (abs($difference) < 0.01) {
             return null;
         }

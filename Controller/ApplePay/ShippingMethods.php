@@ -66,7 +66,7 @@ class ShippingMethods extends Action
          */
         $address = $cart->getShippingAddress();
         $address->setData(null);
-        $address->setCountryId($this->getRequest()->getParam('countryCode'));
+        $address->setCountryId(strtoupper($this->getRequest()->getParam('countryCode')));
         $address->setPostcode($this->getRequest()->getParam('postalCode'));
 
         if ($this->getRequest()->getParam('shippingMethod')) {

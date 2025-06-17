@@ -113,6 +113,7 @@ jobs:
         run: |
           docker exec magento-project-community-edition /bin/bash ./change-base-url https://magento.test/
           docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
+          docker exec magento-project-community-edition ./retry "php bin/magento app:config:import -n"
           docker exec magento-project-community-edition ./retry "php bin/magento setup:static-content:deploy -f"
           docker exec magento-project-community-edition ./retry "php bin/magento indexer:reindex"
 
