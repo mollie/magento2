@@ -38,8 +38,8 @@ class PaymentFee extends DefaultTotal
     public function getTotalsForDisplay()
     {
         $source = $this->getSource();
-        $sourceDataCurrency = $source->getData('order_currency_code');
-        $amount = $source->getMolliePaymentFee();
+        $amount = $source->getMolliePaymentFee() + $source->getMolliePaymentFeeTax();
+        $sourceDataCurrency = $source->getData('order_currency_code') ?: null;
 
         if (!$amount) {
             return [];
