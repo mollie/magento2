@@ -1,6 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
@@ -22,10 +22,6 @@ class Result extends Field
      * @var string
      */
     protected $_template = 'Mollie_Payment::system/config/fieldset/result_apikey.phtml';
-    /**
-     * @var \Magento\Framework\App\RequestInterface
-     */
-    private $request;
 
     /**
      * Result constructor.
@@ -37,7 +33,6 @@ class Result extends Field
         Context $context,
         array $data = []
     ) {
-        $this->request = $context->getRequest();
         parent::__construct($context, $data);
     }
 

@@ -4,31 +4,36 @@
  * See COPYING.txt for license details.
  */
 
-// @codingStandardsIgnoreFile
 /**
  * @var \Mollie\Payment\Block\Info\Base $block
- * @see \Mollie\Payment\Block\Info\Base
+ * @var \Magento\Framework\Escaper $escaper
  */
 $specificInfo = $block->getSpecificInformation();
 $status = $block->getPaymentStatus();
+
+// Magento 2.3 compatibility
+isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
 <div class="mollie-method">
-    <img src="<?= $block->escapeUrl($block->getViewFileUrl('Mollie_Payment::images/' . $block->getPaymentImage())) ?>"/>
-    <?= $block->escapeHtml($block->getMethod()->getTitle()); ?>
+    <img src="<?= $escaper->escapeHtmlAttr($escaper->escapeUrl($block->getViewFileUrl('Mollie_Payment::images/' . $block->getPaymentImage()))) ?>"/>
+    <?= $escaper->escapeHtml($escaper->escapeHtml($block->getMethod()->getTitle())); ?>
     <table class="data-table admin__table-secondary">
         <tbody>
             <?php if ($block->getCheckoutType()): ?>
                 <tr>
-                    <th><?= __('Checkout Type'); ?></th>
-                    <td><?= ucfirst($block->getCheckoutType()); ?></td>
+                    <th><?= $escaper->escapeHtml(__('Checkout Type')); ?></th>
+                    <td><?= $escaper->escapeHtml(ucfirst($block->getCheckoutType())); ?></td>
                 </tr>
             <?php endif; ?>
             <?php if ($status != 'paid'): ?>
                 <tr class="mollie-checkout-url">
-                    <th><?= __('Checkout Url'); ?></th>
+                    <th><?= $escaper->escapeHtml(__('Checkout Url')); ?></th>
                     <td>
-                        <?= __('Click <a href="%1" target="_blank">here</a> to pay', $block->getPaymentLinkUrl()); ?>
-                        <span class="mollie-copy-url" data-url="<?= $block->getPaymentLinkUrl(); ?>" title="<?php echo __('Copy'); ?>">
+                        <a href="<?= $escaper->escapeHtmlAttr($block->getPaymentLinkUrl()); ?>" target="_blank"><?= $escaper->escapeHtml(__('Click here to pay')); ?></a>
+                        <span class="mollie-copy-url"
+                              data-url="<?= $escaper->escapeHtmlAttr($block->getPaymentLinkUrl()); ?>"
+                              title="<?= $escaper->escapeHtmlAttr(__('Copy')); ?>"
+                        >
                             &#x2398;
                         </span>
                     </td>
@@ -36,41 +41,43 @@ $status = $block->getPaymentStatus();
             <?php endif; ?>
             <?php if ($block->getExpiresAt() && $status == 'created'): ?>
                 <tr>
-                    <th><?= __('Valid Until'); ?></th>
-                    <td><?= $block->getExpiresAt(); ?></td>
+                    <th><?= $escaper->escapeHtml(__('Valid Until')); ?></th>
+                    <td><?= $escaper->escapeHtml($block->getExpiresAt()); ?></td>
                 </tr>
             <?php endif; ?>
             <?php if ($block->getPaymentStatus()): ?>
                 <tr>
-                    <th><?= __('Payment Status'); ?></th>
-                    <td><?= ucfirst($status); ?></td>
+                    <th><?= $escaper->escapeHtml(__('Payment Status')); ?></th>
+                    <td><?= $escaper->escapeHtml(ucfirst($status)); ?></td>
                 </tr>
             <?php endif; ?>
             <?php if ($dashboardUrl = $block->getDashboardUrl()): ?>
                 <tr>
-                    <th><?= __('Mollie ID'); ?></th>
+                    <th><?= $escaper->escapeHtml(__('Mollie ID')); ?></th>
                     <td>
-                        <a href="<?php echo $dashboardUrl; ?>" target="_blank" class="mollie-order-id">
-                            <?php echo $block->getMollieId() ?: __('View in Mollie dashboard'); ?>
+                        <a href="<?= $escaper->escapeHtmlAttr($dashboardUrl); ?>" target="_blank" class="mollie-order-id">
+                            <?= $escaper->escapeHtml($block->getMollieId() ?: __('View in Mollie dashboard')); ?>
                         </a>
-                        <span class="mollie-copy-url" data-url="<?php echo $dashboardUrl; ?>" title="<?php echo __('Copy'); ?>">
+                        <span class="mollie-copy-url"
+                              data-url="<?= $escaper->escapeHtmlAttr($dashboardUrl); ?>"
+                              title="<?= $escaper->escapeHtmlAttr(__('Copy')); ?>">
                             &#x2398;
                         </span>
                     </td>
                 </tr>
             <?php endif; ?>
             <tr>
-                <th><?= __('Update Payment Status'); ?></th>
+                <th><?= $escaper->escapeHtml(__('Update Payment Status')); ?></th>
                 <td>
                     <?php if (!$block->getMollieId()): ?>
-                        <?= __('Payment not started'); ?>
+                        <?= $escaper->escapeHtml(__('Payment not started')); ?>
                     <?php endif; ?>
 
                     <?php if ($block->getMollieId()): ?>
-                        <button type="button" class="fetch-mollie-payment-status"><?= __('Fetch Status'); ?></button>
+                        <button type="button" class="fetch-mollie-payment-status"><?= $escaper->escapeHtmlAttr(__('Fetch Status')); ?></button>
                         <a href="#" class="mollie-tooltip">(i)
                             <span>
-                                <?= __('The payment-status will updated automatically by default, but in case of any interruption you can use this function to fetch the payment status manually.'); ?>
+                                <?= $escaper->escapeHtml(__('The payment-status will updated automatically by default, but in case of any interruption you can use this function to fetch the payment status manually.')); ?>
                             </span>
                         </a>
                     <?php endif; ?>
@@ -86,8 +93,8 @@ $status = $block->getPaymentStatus();
     {
         ".mollie-method": {
             "Mollie_Payment/js/order/fetch-order-status": {
-                "endpoint": "<?php echo $block->getUrl('mollie/action/fetchOrderStatus'); ?>",
-                "order_id": "<?php echo $block->getOrderId(); ?>"
+                "endpoint": "<?= $escaper->escapeHtmlAttr($block->getUrl('mollie/action/fetchOrderStatus')); ?>",
+                "order_id": "<?= $escaper->escapeHtmlAttr($block->getOrderId()); ?>"
             }
         },
         ".mollie-copy-url": {
