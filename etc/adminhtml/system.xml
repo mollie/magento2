@@ -410,7 +410,7 @@
                 </field>
                 <field id="second_chance_use_payment_method" translate="label" type="select" sortOrder="50" showInDefault="1"
                        showInWebsite="0" showInStore="1" canRestore="1">
-                    <label>Payment Method To Use For Second Change Payments</label>
+                    <label>Payment Method To Use For Second Chance Payments</label>
                     <source_model>Mollie\Payment\Model\Adminhtml\Source\SecondChancePaymentMethod</source_model>
                     <config_path>payment/mollie_general/second_chance_use_payment_method</config_path>
                     <depends>
