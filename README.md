@@ -33,6 +33,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Bank transfer
 - Belfius Pay Button
 - Billie
+- Bizum
 - Blik
 - Credit card (VISA, MasterCard, Maestro and American Express)
 - EPS
