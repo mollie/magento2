@@ -27,8 +27,9 @@ class CancelRewardPoints
 
     public function __construct(
         Manager $moduleManager,
-        ObjectManagerInterface $objectManager,
-    ) {
+        ObjectManagerInterface $objectManager
+    )
+    {
         $this->moduleManager = $moduleManager;
         $this->objectManager = $objectManager;
     }
@@ -53,6 +54,7 @@ class CancelRewardPoints
         $wrapper = new Observer();
         $wrapper->setData(array_merge(['event' => $event], $data));
 
+        // @phpstan-ignore-next-line
         $instance = $this->objectManager->create(ReturnRewardPoints::class);
         $instance->execute($wrapper);
     }
