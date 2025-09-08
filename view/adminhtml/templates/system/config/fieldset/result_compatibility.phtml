@@ -1,10 +1,16 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+/** @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility\Result $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+// Magento 2.3 compatibility
+isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
 <span id="result_compatibility">
-    <img class="connecting" hidden="hidden" style="margin:0 5px" src="<?= $block->getViewFileUrl('images/process_spinner.gif') ?>"/>
+    <img class="connecting" hidden="hidden" style="margin:0 5px" src="<?= $escaper->escapeHtmlAttr($block->getViewFileUrl('images/process_spinner.gif')) ?>"/>
     <span class="result"></span>
 </span>

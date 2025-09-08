@@ -6,17 +6,20 @@
 
 /**
  * @var \Mollie\Payment\Block\Form\Paymentlink $block
+ * @var \Magento\Framework\Escaper $escaper
  */
-$code = $block->escapeHtml($block->getMethodCode());
+$code = $block->getMethodCode();
+
+// Magento 2.3 compatibility
+isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
-<fieldset class="admin__fieldset payment-method" id="payment_form_<?= /* @noEscape */
-$code; ?>" style="display:none">
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?= $escaper->escapeHtmlAttr($code); ?>" style="display:none">
     <div class="mollie-admin-method">
-        <?= $block->escapeHtml(__('Create a Mollie Payment link and add this to the order email.')); ?>
+        <?= $escaper->escapeHtml(__('Create a Mollie Payment link and add this to the order email.')); ?>
         <div class="field admin__field">
-            <label for="<?= $code ?>_methods" class="label admin__field-label"><span><?= $block->escapeHtml(__('Limit to the following method(s)')) ?></span></label>
+            <label for="<?= $escaper->escapeHtmlAttr($code) ?>_methods" class="label admin__field-label"><span><?= $escaper->escapeHtml(__('Limit to the following method(s)')) ?></span></label>
             <div class="control admin__field-control">
-                <select multiple="multiple" size="16" id="<?= $code ?>_methods" name="payment[limited_methods][]" class="admin__control-multiselect">
+                <select multiple="multiple" size="16" id="<?= $escaper->escapeHtmlAttr($code) ?>_methods" name="payment[limited_methods][]" class="admin__control-multiselect">
                     <option value="alma">Alma</option>
                     <option value="bancomatpay">Bancomat Pay</option>
                     <option value="bancontact">Bancontact</option>
@@ -51,6 +54,6 @@ $code; ?>" style="display:none">
                 </select>
             </div>
         </div>
-        <p><?= $block->escapeHtml(__('If only one method is chosen, the selection screen is skipped and the customer is sent directly to the payment method.')); ?></p>
+        <p><?= $escaper->escapeHtml(__('If only one method is chosen, the selection screen is skipped and the customer is sent directly to the payment method.')); ?></p>
     </div>
 </fieldset>

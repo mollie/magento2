@@ -6,8 +6,11 @@
 
 /** @var \Magento\Framework\View\Element\Template $block */
 /** @var \Magento\Framework\Escaper $escaper */
+
+// Magento 2.3 compatibility
+isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
-<p><?= __('The following method(s) are disabled in the Mollie Dashboard. They won\'t be available in the checkout.'); ?></p>
+<p><?= $escaper->escapeHtml(__('The following method(s) are disabled in the Mollie Dashboard. They won\'t be available in the checkout.')); ?></p>
 <ul>
     <?php foreach($block->getData('methods') as $method): ?>
         <li><?= $escaper->escapeHtml($method); ?></li>

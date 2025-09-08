@@ -58,4 +58,4 @@ if (isset($secureRenderer)) {
     return;
 }
 
-echo '<script>' . $scriptString . '</script>';
+echo '<script>' . /* @noEscape */ $scriptString . '</script>';

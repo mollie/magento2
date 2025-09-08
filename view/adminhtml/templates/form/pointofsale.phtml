@@ -8,18 +8,29 @@
  * @var \Mollie\Payment\Block\Form\Pointofsale $block
  * @var \Magento\Framework\Escaper $escaper
  */
-$code = $escaper->escapeHtml($block->getMethodCode());
+$code = $block->getMethodCode();
 $first = true;
+
+// Magento 2.3 compatibility
+isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
-<fieldset class="admin__fieldset payment-method" id="payment_form_<?= /* @noEscape */$code; ?>" style="display:none">
+<fieldset class="admin__fieldset payment-method" id="payment_form_<?= $escaper->escapeHtmlAttr($code); ?>" style="display:none">
     <div class="mollie-admin-method">
         <div class="field admin__field">
-            <label for="<?= $code ?>_methods" class="label admin__field-label"><span><?= $escaper->escapeHtml(__('Select Terminal')) ?></span></label>
+            <label for="<?= $escaper->escapeHtmlAttr($code) ?>_methods" class="label admin__field-label"><span><?= $escaper->escapeHtml(__('Select Terminal')) ?></span></label>
             <div class="control admin__field-control pointofsale-terminal-list">
                 <?php foreach ($block->getTerminals() as $terminal): ?>
                     <label>
-                        <input type="radio" name="payment[selected_terminal]" value="<?= $terminal['id']; ?>"<?= $first ? ' checked="checked"' : ''; ?>>
-                        <?= $terminal['brand']; ?> <?= $terminal['model']; ?> <?= $terminal['serialNumber']; ?> <?= $terminal['description']; ?>
+                        <input
+                            type="radio"
+                            name="payment[selected_terminal]"
+                            value="<?= $escaper->escapeHtmlAttr($terminal['id']); ?>"
+                            <?= $escaper->escapeHtmlAttr($first ? ' checked="checked"' : ''); ?>
+                        >
+                        <?= $escaper->escapeHtml($terminal['brand']); ?>
+                        <?= $escaper->escapeHtml($terminal['model']); ?>
+                        <?= $escaper->escapeHtml($terminal['serialNumber']); ?>
+                        <?= $escaper->escapeHtml($terminal['description']); ?>
                     </label>
                 <?php $first = false; endforeach; ?>
             </div>
