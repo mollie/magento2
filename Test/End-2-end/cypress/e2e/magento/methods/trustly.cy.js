@@ -18,7 +18,7 @@ const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
 // Disabled as the testmode for Trustly has changed and it not supported right now.
-if (false && Cypress.env('mollie_available_methods').includes('trustly')) {
+if (Cypress.env('mollie_available_methods').includes('trustly')) {
   describe('Check that trustly behaves as expected', () => {
     [
       {status: 'paid', orderStatus: 'Processing', title: 'C3385963: Validate the submission of an order with Trustly as payment method and payment mark as "Paid"'},
