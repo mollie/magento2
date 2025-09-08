@@ -373,5 +373,5 @@
 "Custom webhook url","URL webhook personalizzato"
 "Encrypt payment details","Cifra i dettagli di pagamento"
 "Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated.","Invia un'email ai clienti con un pagamento non riuscito o non completato per dare loro una seconda possibilità di completare il pagamento attraverso il PaymentLink e recuperare il loro ordine.<br>Puoi inviare questi promemoria di pagamento manualmente o attivare l'e-mail in modo completamente automatico."
-"Payment Method To Use For Second Change Payments","Metodo di pagamento da utilizzare per i pagamenti di seconda possibilità"
+"Payment Method To Use For Second Chance Payments","Metodo di pagamento da utilizzare per i pagamenti di seconda possibilità"
 "Your order has already been paid.","Il tuo ordine è già stato pagato."

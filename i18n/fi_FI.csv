@@ -373,5 +373,5 @@ https://github.com/mollie/magento2/wiki/Webhook-Communication-between-your-Magen
 "Custom webhook url","Mukautettu Webhook-URL-osoite"
 "Encrypt payment details","Kryptaa maksutiedot"
 "Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated.","Lähetä sähköpostia asiakkaille, joilla on epäonnistunut tai kesken eräinen maksu, antaaksesi heille toisen mahdollisuuden suorittaa maksu PaymentLinkin kautta ja elvyttää heidän tilauksensa.<br> Voit joko lähettää nämä maksumuistutukset manuaalisesti tai aktivoida sähköpostit täysin automaattisesti."
-"Payment Method To Use For Second Change Payments","Maksutapa, jota käytetään toisen mahdollisuuden maksuille"
+"Payment Method To Use For Second Chance Payments","Maksutapa, jota käytetään toisen mahdollisuuden maksuille"
 "Your order has already been paid.","Tilauksesi on jo maksettu."
