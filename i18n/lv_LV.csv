@@ -375,5 +375,5 @@
 "Custom webhook url","Individualus webhook Url"
 "Encrypt payment details","Užšifruoti mokėjimo duomenis"
 "Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated.","Išsiųskite el. laišką klientams, kurių mokėjimas buvo nesėkmingas arba liko neužbaigtas, suteikdami jiems antrą šansą užbaigti mokėjimą per PaymentLink nuorodą ir atnaujinti jų užsakymą.<br>Šiuos mokėjimo priminimus galite siųsti rankiniu būdu arba aktyvuoti jų siuntimą automatiškai."
-"Payment Method To Use For Second Change Payments","Mokėjimo būdas, naudojamas pakartotiniams mokėjimams"
+"Payment Method To Use For Second Chance Payments","Mokėjimo būdas, naudojamas pakartotiniams mokėjimams"
 "Your order has already been paid.","Jūsų užsakymas jau buvo apmokėtas."
