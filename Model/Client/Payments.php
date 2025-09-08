@@ -13,6 +13,7 @@ use Magento\Framework\Model\AbstractModel;
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\OrderRepository;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
@@ -27,11 +28,11 @@ use Mollie\Payment\Service\Mollie\Order\LinkTransactionToOrder;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Service\Order\BuildTransaction;
+use Mollie\Payment\Service\Order\CancelOrder;
+use Mollie\Payment\Service\Order\ExpiredOrderToTransaction;
 use Mollie\Payment\Service\Order\MethodCode;
 use Mollie\Payment\Service\Order\OrderAmount;
-use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
-use Mollie\Payment\Service\Order\ExpiredOrderToTransaction;
 use Mollie\Payment\Service\Order\SaveAdditionalInformationDetails;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\Transaction;
@@ -265,14 +266,21 @@ class Payments extends AbstractModel
 
     public function getAddressLine(OrderAddressInterface $address): array
     {
-        return [
+        $output = [
             'streetAndNumber' => rtrim(implode(' ', $address->getStreet()), ' '),
-            'postalCode'      => $address->getPostcode(),
-            'city'            => $address->getCity(),
-            'region'          => $address->getRegion(),
-            'country'         => $address->getCountryId(),
-            'email'           => $address->getEmail(),
+            'postalCode' => $address->getPostcode(),
+            'city' => $address->getCity(),
+            'region' => $address->getRegion(),
+            'country' => $address->getCountryId(),
+            'email' => $address->getEmail(),
         ];
+
+        if ($address->getAddressType() == Address::TYPE_BILLING) {
+            $output['givenName'] = $address->getFirstname();
+            $output['familyName'] = $address->getLastname();
+        }
+
+        return $output;
     }
 
     /**
