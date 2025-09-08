@@ -27,6 +27,9 @@
         <method name="mollie_methods_billie">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="mollie_methods_bizum">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="mollie_methods_blik">
             <allow_multiple_address>0</allow_multiple_address>
         </method>

@@ -7,9 +7,6 @@
 namespace Mollie\Payment\Test\Integration\Service\Config;
 
 use Magento\Checkout\Model\Session;
-use Magento\Quote\Model\Quote;
-use Magento\Tax\Api\TaxCalculationInterface;
-use Magento\Tax\Api\TaxRateRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType;
 use Mollie\Payment\Service\Config\PaymentFee;
@@ -30,6 +27,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_banktransfer', true],
             ['mollie_methods_belfius', true],
             ['mollie_methods_billie', true],
+            ['mollie_methods_bizum', true],
             ['mollie_methods_blik', true],
             ['mollie_methods_creditcard', true],
             ['mollie_methods_directdebit', true],
@@ -76,7 +74,7 @@ class PaymentFeeTest extends IntegrationTestCase
             'config' => $configMock,
         ]);
 
-        /** @var $session \Magento\Checkout\Model\Session  */
+        /** @var $session Session */
         $session = $this->objectManager->create(Session::class);
         $quote = $session->getQuote();
         $quote->getPayment()->setMethod($method);
