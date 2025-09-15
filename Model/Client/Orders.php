@@ -690,6 +690,7 @@ class Orders extends AbstractModel
             $creditmemo->getGrandTotal();
         $maximumAmountToRefund = $order->getBaseGrandTotal() - $remainderAmount;
         if ($remainderAmount) {
+            $this->config->addToLog('Refunding order using remainder amount', ['order_id' => $order->getId()]);
             $amount = $grandTotal > $maximumAmountToRefund ? $maximumAmountToRefund : $grandTotal;
 
             $this->refundUsingPayment->execute(
@@ -705,6 +706,8 @@ class Orders extends AbstractModel
         }
 
         if ($this->storeCredit->creditmemoHasStoreCredit($creditmemo)) {
+            $this->config->addToLog('Refunding order using store credit', ['order_id' => $order->getId()]);
+
             $this->refundUsingPayment->execute(
                 $mollieApi,
                 $transactionId,
@@ -729,6 +732,7 @@ class Orders extends AbstractModel
         if ($shippingCostsLine->getId() && $shippingCostsLine->getQtyRefunded() == 0) {
             if ($creditmemo->getShippingAmount() > 0) {
                 $addShippingToRefund = true;
+                $this->config->addToLog('Add shipping to refund', ['order_id' => $order->getId()]);
                 if (abs($creditmemo->getShippingInclTax() - $shippingCostsLine->getTotalAmount()) > 0.01) {
                     $msg = __('Unable to create online refund, as shipping costs do not match');
                     $this->mollieHelper->addTolog('error', $msg);
@@ -757,9 +761,14 @@ class Orders extends AbstractModel
             $payment->update();
 
             if ($order->getState() == Order::STATE_CLOSED) {
+                $this->config->addToLog('Refunding all open items', ['order_id' => $order->getId()]);
                 $mollieOrder->refundAll();
             } else {
                 $orderLines = $this->orderLines->getCreditmemoOrderLines($creditmemo, $addShippingToRefund);
+                $this->config->addToLog('Partially refunding order', [
+                    'order_id' => $order->getId(),
+                    'order_lines' => $orderLines,
+                ]);
                 $mollieOrder->refund($orderLines);
             }
         } catch (\Exception $e) {
