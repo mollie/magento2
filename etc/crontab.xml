@@ -12,5 +12,8 @@
         <job instance="Mollie\Payment\Cron\RemoveSentPaymentReminders" method="execute" name="mollie_remove_sent_payment_reminders">
             <schedule>*/5 * * * *</schedule>
         </job>
+        <job instance="Mollie\Payment\Cron\ProcessPendingOrders" method="execute" name="mollie_process_pending_orders">
+            <schedule>*/30 * * * *</schedule>
+        </job>
     </group>
 </config>

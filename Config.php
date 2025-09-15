@@ -51,6 +51,8 @@ class Config
     const GENERAL_USE_CUSTOM_REDIRECT_URL = 'payment/mollie_general/use_custom_redirect_url';
     const GENERAL_USE_WEBHOOKS = 'payment/mollie_general/use_webhooks';
     const GENERAL_VERSION = 'payment/mollie_general/version';
+    const GENERAL_ENABLE_PENDING_ORDER_CRON = 'payment/mollie_general/enable_pending_order_cron';
+    const GENERAL_PENDING_ORDER_CRON_BATCH_SIZE = 'payment/mollie_general/pending_order_cron_batch_size';
     const PAYMENT_APPLEPAY_ENABLE_BUY_NOW_BUTTON = 'payment/mollie_methods_applepay/enable_buy_now_button';
     const PAYMENT_APPLEPAY_BUY_NOW_BUTTON_COLOR = 'payment/mollie_methods_applepay/buy_now_button_color';
     const PAYMENT_APPLEPAY_BUY_NOW_BUTTON_TEXT = 'payment/mollie_methods_applepay/buy_now_button_text';
@@ -818,6 +820,16 @@ class Config
             $this->addMethodToPath(static::PAYMENT_METHOD_ISSUER_LIST_TYPE, $method),
             $storeId
         ) ?? 'none';
+    }
+
+    public function isPendingOrderCronEnabled(?int $storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_ENABLE_PENDING_ORDER_CRON, $storeId);
+    }
+
+    public function pendingOrderCronBatchSize(?int $storeId = null): int
+    {
+        return (int)($this->getPath(static::GENERAL_PENDING_ORDER_CRON_BATCH_SIZE, $storeId) ?? 25);
     }
 
     /**
