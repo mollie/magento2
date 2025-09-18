@@ -39,6 +39,8 @@
                 <encrypt_payment_details>0</encrypt_payment_details>
                 <enable_manual_capture>0</enable_manual_capture>
                 <enable_methods_api>1</enable_methods_api>
+                <enable_pending_order_cron>1</enable_pending_order_cron>
+                <pending_order_cron_batch_size>25</pending_order_cron_batch_size>
             </mollie_general>
             <mollie_methods_general>
                 <model>Mollie\Payment\Model\Methods\General</model>
