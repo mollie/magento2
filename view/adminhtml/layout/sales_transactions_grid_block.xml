@@ -10,7 +10,7 @@
                 <arguments>
                     <argument name="header" xsi:type="string" translate="true">Mollie PayPal ID</argument>
                     <argument name="type" xsi:type="string">additional_information_renderer</argument>
-                    <argument name="index" xsi:type="string">additional_information</argument>
+                    <argument name="index" xsi:type="string">sop.additional_information</argument>
                     <argument name="id" xsi:type="string">additional_information</argument>
                     <argument name="header_css_class" xsi:type="string">col-id</argument>
                     <argument name="column_css_class" xsi:type="string">col-id</argument>
