@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="mollie_methods_bizum" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1"
+           showInStore="1">
+        <label>Bizum</label>
+        <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Enabled</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/mollie_methods_bizum/active</config_path>
+        </field>
+        <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Title</label>
+            <config_path>payment/mollie_methods_bizum/title</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="method" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Method</label>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\Method</source_model>
+            <config_path>payment/mollie_methods_bizum/method</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+            <comment><![CDATA[Click
+            <a href="https://github.com/mollie/magento2/wiki/Differences-Payments-API-&-Orders-API" target="_blank">here</a>
+            to read more about the differences between the Payment and Orders API.]]></comment>
+        </field>
+        <field id="payment_description" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Description</label>
+            <config_path>payment/mollie_methods_bizum/payment_description</config_path>
+            <comment model="Mollie\Payment\Model\Adminhtml\Comment\AvailableDescriptionVariables"/>
+            <depends>
+                <field id="method">payment</field>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="days_before_expire" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Days to expire</label>
+            <frontend_class>validate-digits-range digits-range-1-365</frontend_class>
+            <config_path>payment/mollie_methods_bizum/days_before_expire</config_path>
+            <depends>
+                <field id="active">1</field>
+                <field id="method">order</field>
+            </depends>
+            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
+        </field>
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="60" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Payment from Applicable Countries</label>
+            <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+            <config_path>payment/mollie_methods_bizum/allowspecific</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="70" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Payment from Specific Countries</label>
+            <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+            <can_be_empty>1</can_be_empty>
+            <config_path>payment/mollie_methods_bizum/specificcountry</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="min_order_total" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Minimum Order Total</label>
+            <config_path>payment/mollie_methods_bizum/min_order_total</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="max_order_total" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Maximum Order Total</label>
+            <config_path>payment/mollie_methods_bizum/max_order_total</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="payment_surcharge_type" translate="label" type="select" sortOrder="100" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Payment Surcharge</label>
+            <config_path>payment/mollie_methods_bizum/payment_surcharge_type</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType</source_model>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Payment Surcharge fixed amount</label>
+            <config_path>payment/mollie_methods_bizum/payment_surcharge_fixed_amount</config_path>
+            <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
+            <frontend_class>validate-not-negative-number</frontend_class>
+            <depends>
+                <field id="active">1</field>
+                <field id="payment_surcharge_type" separator=",">fixed_fee,fixed_fee_and_percentage</field>
+            </depends>
+        </field>
+        <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Payment Surcharge percentage</label>
+            <config_path>payment/mollie_methods_bizum/payment_surcharge_percentage</config_path>
+            <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
+            <frontend_class>validate-number-range number-range-0-10</frontend_class>
+            <depends>
+                <field id="active">1</field>
+                <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
+            </depends>
+        </field>
+        <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Payment Surcharge limit</label>
+            <config_path>payment/mollie_methods_bizum/payment_surcharge_limit</config_path>
+            <comment><![CDATA[Enter the maximum amount of payment surchage to should be charged to the customer.]]></comment>
+            <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
+            <frontend_class>validate-not-negative-number</frontend_class>
+            <depends>
+                <field id="active">1</field>
+                <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
+            </depends>
+        </field>
+        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="140" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Payment Surcharge Tax Class</label>
+            <config_path>payment/mollie_methods_bizum/payment_surcharge_tax_class</config_path>
+            <source_model>\Magento\Tax\Model\TaxClass\Source\Product</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="payment_surcharge_type" separator=",">fixed_fee,percentage,fixed_fee_and_percentage</field>
+            </depends>
+        </field>
+        <field id="sort_order" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
+               showInStore="1">
+            <label>Sort Order</label>
+            <frontend_class>validate-number</frontend_class>
+            <config_path>payment/mollie_methods_bizum/sort_order</config_path>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+    </group>
+</include>

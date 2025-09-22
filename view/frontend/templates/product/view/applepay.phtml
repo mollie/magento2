@@ -1,5 +1,14 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\Framework\Escaper $escaper */
 /** @var \Mollie\Payment\Block\Product\View\ApplePay $block */
+
+// Magento 2.3 compatibility
+isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 
 if (!$block->isEnabled()) {
     return;
@@ -8,7 +17,7 @@ if (!$block->isEnabled()) {
 
 <div id="product-page-mollie-apple-pay-button" data-bind="scope:'mollie-apple-pay-button'">
     <!-- ko if: canUseApplePay() -->
-    <div class="<?= $block->escapeHtmlAttr($block->getButtonClasses()); ?>" data-bind="click: payWithApplePay">
+    <div class="<?= $escaper->escapeHtmlAttr($block->getButtonClasses()); ?>" data-bind="click: payWithApplePay">
         <span>Apple Pay</span>
     </div>
     <!-- /ko -->
@@ -22,11 +31,11 @@ if (!$block->isEnabled()) {
                     "component": "Mollie_Payment/js/view/product/apple-pay-button",
                     "config": {
                         "formSelector": "#product_addtocart_form",
-                        "currencyCode": "<?= $block->escapeJs($block->getCurrencyCode()); ?>",
-                        "countryCode": "<?= $block->escapeJs($block->getCountryCode()); ?>",
-                        "productName": "<?= $block->escapeJs($block->getProductName()); ?>",
-                        "storeName": "<?= $block->escapeJs($block->getStoreName()); ?>",
-                        "supportedNetworks": <?= json_encode($block->getSupportedNetworks()); ?>
+                        "currencyCode": "<?= $escaper->escapeJs($block->getCurrencyCode()); ?>",
+                        "countryCode": "<?= $escaper->escapeJs($block->getCountryCode()); ?>",
+                        "productName": "<?= $escaper->escapeJs($block->getProductName()); ?>",
+                        "storeName": "<?= $escaper->escapeJs($block->getStoreName()); ?>",
+                        "supportedNetworks": <?= /* @noEscape */ json_encode($block->getSupportedNetworks()); ?>
                     }
                 }
             }

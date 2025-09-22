@@ -13,6 +13,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\StatusResolver;
 use Mollie\Payment\Config;
+use Mollie\Payment\Service\Magento\Order\CancelRewardPoints;
 
 class CancelOrder
 {
@@ -20,6 +21,11 @@ class CancelOrder
      * @var Config
      */
     private $config;
+
+    /**
+     * @var CancelRewardPoints
+     */
+    private $cancelRewardPoints;
 
     /**
      * @var OrderCommentHistory
@@ -40,7 +46,6 @@ class CancelOrder
      * @var StatusResolver
      */
     private $statusResolver;
-
     /**
      * @var ResourceConnection
      */
@@ -48,13 +53,16 @@ class CancelOrder
 
     public function __construct(
         Config $config,
+        CancelRewardPoints $cancelRewardPoints,
         OrderCommentHistory $orderCommentHistory,
         OrderManagementInterface $orderManagement,
         OrderRepositoryInterface $orderRepository,
         StatusResolver $statusResolver,
         ResourceConnection $resource
-    ) {
+    )
+    {
         $this->config = $config;
+        $this->cancelRewardPoints = $cancelRewardPoints;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->orderManagement = $orderManagement;
         $this->orderRepository = $orderRepository;
@@ -84,6 +92,7 @@ class CancelOrder
         $this->orderRepository->save($order);
 
         $this->orderManagement->cancel($order->getId());
+        $this->cancelRewardPoints->execute($order);
 
         return true;
     }

@@ -80,4 +80,7 @@
     <event name="adminhtml_sales_order_create_process_item_before">
         <observer name="mollie_set_purchase_type_on_create_order_item" instance="Mollie\Payment\Observer\AdminhtmlSalesOrderCreateProcessItemBefore\SetPurchaseTypeOnCreateOrderItem" />
     </event>
+    <event name="backend_block_widget_grid_prepare_grid_before">
+        <observer name="mollie_add_additional_data_to_collection" instance="Mollie\Payment\Observer\BackendBlockWidgetGridPrepareGridBefore\AddAdditionalInformationToCollection" />
+    </event>
 </config>

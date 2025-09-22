@@ -372,5 +372,5 @@
 "Custom webhook url","Vlastní webhook url"
 "Encrypt payment details","Zašifrovat platební údaje"
 "Send an e-mail to customers with a failed or unfinished payment to give them a second chance on finishing the payment through the PaymentLink and revive their order.<br>You can either send these payment reminders manually or activate the e-mail fully automated.","Odešlete e-mail zákazníkům s neúspěšnou nebo nedokončenou platbou, abyste jim dali druhou šanci na dokončení platby prostřednictvím PaymentLink a oživili jejich objednávku.<br> Tyto připomínky k platbě můžete odesílat ručně nebo aktivovat plně automatizovaný e-mail."
-"Payment Method To Use For Second Change Payments","Způsob platby pro platby objednávek druhé šance"
+"Payment Method To Use For Second Chance Payments","Způsob platby pro platby objednávek druhé šance"
 "Your order has already been paid.","Vaše objednávka již byla zaplacena."

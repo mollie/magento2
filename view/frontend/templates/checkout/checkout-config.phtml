@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
@@ -9,7 +9,7 @@
 <script type="text/x-magento-init">
 {
     "*": {
-        "Mollie_Payment/js/model/checkout-config": <?php echo json_encode(['selectedMethod' => $block->getDefaultSelectedMethod()]);?>
+        "Mollie_Payment/js/model/checkout-config": <?= /* @noEscape */ json_encode(['selectedMethod' => $block->getDefaultSelectedMethod()]);?>
     }
 }
 </script>

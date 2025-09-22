@@ -8,15 +8,18 @@ declare(strict_types=1);
 
 /** @var \Magento\Framework\Escaper $escaper */
 /** @var \Magento\Framework\View\Element\Template $block */
+
+// Magento 2.3 compatibility
+isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
 
 <div id="loading-mask"></div>
 
-<div id="mollie-order-status"><?= __('Current Status: Loading...'); ?></div>
+<div id="mollie-order-status"><?= $escaper->escapeHtml(__('Current Status: Loading...')); ?></div>
 <div id="mollie-order-error"></div>
 
 <div id="mollie-retry-order" style="display: none;">
-    <button class="action primary"><?= __('Retry'); ?></button>
+    <button class="action primary"><?= $escaper->escapeHtml(__('Retry')); ?></button>
 </div>
 
 <script>

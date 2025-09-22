@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "2.46.0",
+  "version": "2.47.0",
   "keywords": [
     "mollie",
     "payment",
@@ -15,6 +15,7 @@
     "belfius",
     "belfius direct net",
     "billie",
+    "bizum",
     "blik",
     "cbc",
     "creditcard",

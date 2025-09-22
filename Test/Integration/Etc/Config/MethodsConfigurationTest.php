@@ -21,6 +21,7 @@ class MethodsConfigurationTest extends IntegrationTestCase
             ['mollie_methods_banktransfer'],
             ['mollie_methods_belfius'],
             ['mollie_methods_billie'],
+            ['mollie_methods_bizum'],
             ['mollie_methods_blik'],
             ['mollie_methods_creditcard'],
             ['mollie_methods_directdebit'],

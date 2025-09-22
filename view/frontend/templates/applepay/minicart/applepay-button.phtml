@@ -1,4 +1,9 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 use Magento\Framework\Escaper;
 
 /**
@@ -6,6 +11,8 @@ use Magento\Framework\Escaper;
  * @var Escaper $escaper
  */
 
+// Magento 2.3 compatibility
+isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
 <div id="mollie_applepay_minicart"
      data-mage-init='{
@@ -15,12 +22,12 @@ use Magento\Framework\Escaper;
              "grandTotalAmount": "<?= $escaper->escapeJs($block->getBaseGrandTotal()); ?>",
              "storeCountry": "<?= $escaper->escapeJs($block->getStoreCountry()); ?>",
              "storeCurrency": "<?= $escaper->escapeJs($block->getStoreCurrency()); ?>",
-             "supportedNetworks": <?= json_encode($block->getSupportedNetworks()); ?>
+             "supportedNetworks": <?= /* @noEscape */ json_encode($block->getSupportedNetworks()); ?>
          }
      }'
      class="mollie-applepay-minicart mollie-applepay-button-hidden">
 
-    <div class="<?= $block->escapeHtmlAttr($block->getButtonClasses()); ?>">
+    <div class="<?= $escaper->escapeHtmlAttr($block->getButtonClasses()); ?>">
         <span class="text">Buy with</span>
         <span class="logo"></span>
     </div>

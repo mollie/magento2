@@ -39,6 +39,7 @@ class PaymentFee extends DefaultTotal
     {
         $source = $this->getSource();
         $amount = $source->getMolliePaymentFee() + $source->getMolliePaymentFeeTax();
+        $sourceDataCurrency = $source->getData('order_currency_code') ?: null;
 
         if (!$amount) {
             return [];
@@ -46,7 +47,13 @@ class PaymentFee extends DefaultTotal
 
         return [
             [
-                'amount' => $this->currency->format($amount, false),
+                'amount' => $this->currency->format(
+                    $amount,
+                    false,
+                    \Magento\Framework\Pricing\PriceCurrencyInterface::DEFAULT_PRECISION,
+                    null,
+                    $sourceDataCurrency
+                ),
                 'label' => __('Payment Fee'),
                 'font_size' => $this->getFontSize() ? $this->getFontSize() : 7,
             ],

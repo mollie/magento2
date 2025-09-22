@@ -274,14 +274,29 @@
                         <field id="use_webhooks">custom_url</field>
                     </depends>
                 </field>
-
                 <field id="process_transactions_in_the_queue" translate="label" type="select" sortOrder="130" showInDefault="1" showInStore="0" showInWebsite="0" canRestore="1">
                     <label>Process transactions in the queue (experimental)</label>
                     <config_path>payment/mollie_general/process_transactions_in_the_queue</config_path>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-
-                <field id="encrypt_payment_details" translate="label" type="select" sortOrder="140" showInDefault="1"
+                <field id="enable_pending_order_cron" translate="label" type="select" sortOrder="140" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Enable Pending Orders Cron Job</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/enable_pending_order_cron</config_path>
+                    <comment>
+                        <![CDATA[Enable the background cron job to automatically update stuck pending orders.]]></comment>
+                </field>
+                <field id="pending_order_cron_batch_size" translate="label" type="text" sortOrder="150"
+                       showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Pending Orders Cron Job Batch Size</label>
+                    <config_path>payment/mollie_general/pending_order_cron_batch_size</config_path>
+                    <depends>
+                        <field id="enable_pending_order_cron">1</field>
+                    </depends>
+                </field>
+                <field id="encrypt_payment_details" translate="label" type="select" sortOrder="160" showInDefault="1"
                        showInWebsite="0" showInStore="1">
                     <label>Encrypt payment details</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -289,7 +304,7 @@
                     <comment><![CDATA[Each order has extra information, name of the card, etc. When setting this option to Yes, this information will be encrypted before it is being saved.]]></comment>
                 </field>
 
-                <field id="enable_methods_api" translate="label" type="select" sortOrder="150" showInDefault="1"
+                <field id="enable_methods_api" translate="label" type="select" sortOrder="170" showInDefault="1"
                        showInWebsite="0" showInStore="1" canRestore="1">
                     <label>Enable the methods API</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -410,7 +425,7 @@
                 </field>
                 <field id="second_chance_use_payment_method" translate="label" type="select" sortOrder="50" showInDefault="1"
                        showInWebsite="0" showInStore="1" canRestore="1">
-                    <label>Payment Method To Use For Second Change Payments</label>
+                    <label>Payment Method To Use For Second Chance Payments</label>
                     <source_model>Mollie\Payment\Model\Adminhtml\Source\SecondChancePaymentMethod</source_model>
                     <config_path>payment/mollie_general/second_chance_use_payment_method</config_path>
                     <depends>
