@@ -587,6 +587,7 @@
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
+                <show_reference_in_transactions_grid>1</show_reference_in_transactions_grid>
             </mollie_methods_paypal>
             <mollie_methods_paysafecard>
                 <active>1</active>
