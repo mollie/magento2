@@ -6,11 +6,12 @@
 
 namespace Mollie\Payment\Block\Info;
 
+use Exception;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Registry;
-use Magento\Payment\Block\Info;
-use Magento\Framework\View\Element\Template\Context;
 use Magento\Framework\Stdlib\DateTime;
+use Magento\Framework\View\Element\Template\Context;
+use Magento\Payment\Block\Info;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
@@ -75,7 +76,7 @@ class Base extends Info
     {
         try {
             return $this->getInfo()->getAdditionalInformation('checkout_type');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             return null;
         }
@@ -87,7 +88,7 @@ class Base extends Info
             if ($expiresAt = $this->getInfo()->getAdditionalInformation('expires_at')) {
                 return $this->timezone->date($expiresAt)->format(DateTime::DATETIME_PHP_FORMAT);
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
         }
 
@@ -116,7 +117,7 @@ class Base extends Info
     {
         try {
             return $this->getInfo()->getAdditionalInformation('checkout_url');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             return null;
         }
@@ -126,7 +127,7 @@ class Base extends Info
     {
         try {
             return $this->getInfo()->getAdditionalInformation('payment_status');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             return null;
         }
@@ -136,7 +137,26 @@ class Base extends Info
     {
         try {
             return $this->getInfo()->getAdditionalInformation('dashboard_url');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+            return null;
+        }
+    }
+
+    public function getPayPalReference(): ?string
+    {
+        try {
+            $details = $this->getInfo()->getAdditionalInformation('details');
+            if (is_string($details)) {
+                $details = json_decode($details, true);
+            }
+
+            if (!array_key_exists('paypalReference', $details)) {
+                return null;
+            }
+
+            return $details['paypalReference'];
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             return null;
         }
@@ -146,7 +166,7 @@ class Base extends Info
     {
         try {
             return (string)$this->getInfo()->getAdditionalInformation('mollie_change_payment_state_url');
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             return null;
         }
     }
@@ -155,7 +175,7 @@ class Base extends Info
     {
         try {
             return $this->getInfo()->getAdditionalInformation('mollie_id');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             return null;
         }
@@ -181,7 +201,7 @@ class Base extends Info
             if (in_array($code, $methods)) {
                 return true;
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
         }
 
@@ -205,7 +225,7 @@ class Base extends Info
     {
         try {
             return $this->getInfo()->getParentId();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
             return null;
         }
@@ -224,7 +244,7 @@ class Base extends Info
     {
         try {
             return $this->getInfo()->getAdditionalInformation('remainder_amount');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
         }
 
