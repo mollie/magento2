@@ -151,7 +151,7 @@ class Base extends Info
                 $details = json_decode($details, true);
             }
 
-            if (!array_key_exists('paypalReference', $details)) {
+            if (!is_array($details) || !array_key_exists('paypalReference', $details)) {
                 return null;
             }
 
