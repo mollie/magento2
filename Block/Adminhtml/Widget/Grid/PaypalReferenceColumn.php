@@ -36,7 +36,7 @@ class PaypalReferenceColumn extends Column
             return '';
         }
 
-        $details = json_decode($information['details'], true);
+        $details = $this->getDetails($information);
         if (!array_key_exists('paypalReference', $details)) {
             return '';
         }
@@ -52,5 +52,19 @@ class PaypalReferenceColumn extends Column
 
         $value = $this->getFilter()->getValue();
         $collection->addFieldToFilter('sop.additional_information', ['like' => '%' . $value . '%']);
+    }
+
+    public function getDetails(array $information): array
+    {
+        $details = $information['details'];
+        if (is_array($details)) {
+            return $details;
+        }
+
+        if (!is_string($details)) {
+            return [];
+        }
+
+        return json_decode($details, true);
     }
 }
