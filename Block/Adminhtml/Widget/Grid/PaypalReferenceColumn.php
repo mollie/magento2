@@ -44,7 +44,7 @@ class PaypalReferenceColumn extends Column
         return $details['paypalReference'];
     }
 
-    public function filterPaypalReference(Collection $collection, self $column)
+    public function filterPaypalReference(Collection $collection, Column $column)
     {
         if (!$this->getFilter()->getValue()) {
             return;
