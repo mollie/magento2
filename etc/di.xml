@@ -1528,6 +1528,51 @@
         </arguments>
     </virtualType>
 
+    <!-- Mobilepay -->
+    <type name="Mollie\Payment\Model\Methods\Mobilepay">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieMobilepayValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieMobilepayValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieMobilepayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieMobilepayConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMobilepayConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieMobilepayConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMobilepayConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Mobilepay::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMobilepayValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieMobilepayCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieMobilepayCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieMobilepayConfig</argument>
+        </arguments>
+    </virtualType>
+
     <!-- Multibanco -->
     <type name="Mollie\Payment\Model\Methods\Multibanco">
         <arguments>

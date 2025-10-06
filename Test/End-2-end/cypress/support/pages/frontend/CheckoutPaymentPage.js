@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 import Cookies from "Services/Cookies";
 
 const cookies = new Cookies();

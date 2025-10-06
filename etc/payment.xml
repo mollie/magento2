@@ -72,6 +72,9 @@
         <method name="mollie_methods_mbway">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="mollie_methods_mobilepay">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="mollie_methods_multibanco">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
