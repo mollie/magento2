@@ -164,6 +164,7 @@ class GeneralTest extends IntegrationTestCase
             'klarnasliceit' => ['mollie_methods_klarnasliceit', 'klarnasliceit'],
             'voucher' => ['mollie_methods_voucher', 'voucher'],
             'mbway' => ['mollie_methods_mbway', 'mbway'],
+            'mobilepay' => ['mollie_methods_mobilepay', 'mobilepay'],
             'multibanco' => ['mollie_methods_multibanco', 'multibanco'],
             'mybank' => ['mollie_methods_mybank', 'mybank'],
             'paybybank' => ['mollie_methods_paybybank', 'paybybank'],
