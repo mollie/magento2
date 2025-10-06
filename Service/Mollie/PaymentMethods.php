@@ -52,6 +52,7 @@ class PaymentMethods
         'mollie_methods_swish',
         'mollie_methods_trustly',
         'mollie_methods_twint',
+        'mollie_methods_vipps',
         'mollie_methods_voucher',
     ];
 

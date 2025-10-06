@@ -178,6 +178,7 @@ class GeneralTest extends IntegrationTestCase
             'swish' => ['mollie_methods_swish', 'swish'],
             'trustly' => ['mollie_methods_trustly', 'trustly'],
             'twint' => ['mollie_methods_twint', 'twint'],
+            'vipps' => ['mollie_methods_vipps', 'vipps'],
         ];
     }
 

@@ -59,6 +59,7 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - Swish
 - Trustly
 - TWINT
+- Vipps
 
 ## Additional modules
 

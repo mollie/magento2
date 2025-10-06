@@ -228,6 +228,7 @@ definição, o estado ""Pagamento Pendente"" não é visível para os clientes. 
 "Sofort","Sofort"
 "Trustly","Trustly"
 "TWINT","TWINT"
+"Vipps","Vipps"
 "Voucher","Cupão"
 "Category","Categoria"
 "Product attribute","Atributo do Produto"
