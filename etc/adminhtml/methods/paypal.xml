@@ -152,5 +152,13 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="show_reference_in_transactions_grid" translate="label" type="select" sortOrder="160"
+               showInDefault="1"
+               showInWebsite="1"
+               showInStore="1">
+            <label>Add reference column to transactions grid</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/mollie_methods_paypal/show_reference_in_transactions_grid</config_path>
+        </field>
     </group>
 </include>

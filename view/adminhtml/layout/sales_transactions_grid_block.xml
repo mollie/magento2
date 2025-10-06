@@ -6,7 +6,9 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="sales.transactions.grid.columnSet">
-            <block class="Mollie\Payment\Block\Adminhtml\Widget\Grid\PaypalReferenceColumn" name="mollie_paypal_reference">
+            <block class="Mollie\Payment\Block\Adminhtml\Widget\Grid\PaypalReferenceColumn"
+                   name="mollie_paypal_reference"
+                   ifconfig="payment/mollie_methods_paypal/show_reference_in_transactions_grid">
                 <arguments>
                     <argument name="header" xsi:type="string" translate="true">Mollie PayPal ID</argument>
                     <argument name="type" xsi:type="string">additional_information_renderer</argument>
