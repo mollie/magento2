@@ -9,6 +9,7 @@
  * @var \Mollie\Payment\Block\Info\Base $block
  * @var \Magento\Framework\Escaper $escaper
  */
+
 use Mollie\Payment\Model\Methods\Voucher;
 
 // Magento 2.3 compatibility
@@ -84,6 +85,14 @@ $status = $block->getPaymentStatus();
                         >
                             &#x2398;
                         </span>
+                    </td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($paypalReference = $block->getPayPalReference()): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('PayPal Reference')); ?></th>
+                    <td>
+                        <?= $escaper->escapeHtml($paypalReference); ?>
                     </td>
                 </tr>
             <?php endif; ?>

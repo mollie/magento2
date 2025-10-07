@@ -49,6 +49,7 @@ define(
             {type: 'mollie_methods_klarnapaynow', component: defaultComponent},
             {type: 'mollie_methods_klarnasliceit', component: defaultComponent},
             {type: 'mollie_methods_mbway', component: defaultComponent},
+            {type: 'mollie_methods_mobilepay', component: defaultComponent},
             {type: 'mollie_methods_multibanco', component: defaultComponent},
             {type: 'mollie_methods_mybank', component: defaultComponent},
             {type: 'mollie_methods_paybybank', component: defaultComponent},
@@ -63,6 +64,7 @@ define(
             {type: 'mollie_methods_swish', component: defaultComponent},
             {type: 'mollie_methods_trustly', component: defaultComponent},
             {type: 'mollie_methods_twint', component: defaultComponent},
+            {type: 'mollie_methods_vipps', component: defaultComponent},
             {type: 'mollie_methods_voucher', component: defaultComponent}
         ];
 

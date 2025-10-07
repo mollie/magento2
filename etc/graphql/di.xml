@@ -31,6 +31,7 @@
                 <item name="mollie_methods_klarnasliceit" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_voucher" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_mbway" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
+                <item name="mollie_methods_mobilepay" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_multibanco" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_mybank" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_paybybank" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
@@ -45,6 +46,7 @@
                 <item name="mollie_methods_swish" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_trustly" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_twint" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
+                <item name="mollie_methods_vipps" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
             </argument>
         </arguments>
     </type>

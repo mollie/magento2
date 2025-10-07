@@ -38,6 +38,7 @@ class PaymentMethods
         'mollie_methods_klarnapaynow',
         'mollie_methods_klarnasliceit',
         'mollie_methods_mbway',
+        'mollie_methods_mobilepay',
         'mollie_methods_multibanco',
         'mollie_methods_mybank',
         'mollie_methods_paybybank',
@@ -52,6 +53,7 @@ class PaymentMethods
         'mollie_methods_swish',
         'mollie_methods_trustly',
         'mollie_methods_twint',
+        'mollie_methods_vipps',
         'mollie_methods_voucher',
     ];
 

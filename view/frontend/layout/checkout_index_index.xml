@@ -81,6 +81,12 @@
                                                                         <item name="mollie_methods_mbway" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
+                                                                        <item name="mollie_methods_mobilepay"
+                                                                              xsi:type="array">
+                                                                            <item name="isBillingAddressRequired"
+                                                                                  xsi:type="boolean">true
+                                                                            </item>
+                                                                        </item>
                                                                         <item name="mollie_methods_multibanco" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
                                                                         </item>
@@ -134,6 +140,12 @@
                                                                         </item>
                                                                         <item name="mollie_methods_twint" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>
+                                                                        </item>
+                                                                        <item name="mollie_methods_vipps"
+                                                                              xsi:type="array">
+                                                                            <item name="isBillingAddressRequired"
+                                                                                  xsi:type="boolean">true
+                                                                            </item>
                                                                         </item>
                                                                         <item name="mollie_methods_voucher" xsi:type="array">
                                                                             <item name="isBillingAddressRequired" xsi:type="boolean">true</item>

@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 import Cookies from "Services/Cookies";
 
 const cookies = new Cookies();
@@ -28,9 +33,9 @@ export default class CheckoutPaymentPage {
   }
 
   placeOrder() {
-    cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
+    cy.intercept('**/mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-    cy.intercept('POST', 'rest/*/V1/guest-carts/*/payment-information').as('placeOrderAction');
+    cy.intercept('POST', '**/rest/*/V1/guest-carts/*/payment-information').as('placeOrderAction');
 
     this.pressPlaceOrderButton();
 

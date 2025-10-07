@@ -42,6 +42,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_klarnapaynow', true],
             ['mollie_methods_klarnasliceit', true],
             ['mollie_methods_mbway', true],
+            ['mollie_methods_mobilepay', true],
             ['mollie_methods_multibanco', true],
             ['mollie_methods_mybank', true],
             ['mollie_methods_paybybank', true],
@@ -56,6 +57,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_swish', true],
             ['mollie_methods_trustly', true],
             ['mollie_methods_twint', true],
+            ['mollie_methods_vipps', true],
             ['mollie_methods_voucher', true],
             ['not_relevant_payment_method', false],
         ];
