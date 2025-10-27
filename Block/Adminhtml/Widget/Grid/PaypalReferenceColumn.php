@@ -65,6 +65,7 @@ class PaypalReferenceColumn extends Column
             return [];
         }
 
-        return json_decode($details, true);
+        $json = json_decode($details, true);
+        return is_array($json) ? $json : [];
     }
 }
