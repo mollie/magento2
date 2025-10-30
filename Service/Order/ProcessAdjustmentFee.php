@@ -1,20 +1,18 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Api\MollieApiClient;
-use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 
 class ProcessAdjustmentFee
 {
-    /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-
     /**
      * @var RefundUsingPayment
      */
@@ -26,15 +24,15 @@ class ProcessAdjustmentFee
     private $doNotRefundInMollie = false;
 
     public function __construct(
-        MollieHelper $mollieHelper,
         RefundUsingPayment $refundUsingPayment
     ) {
-        $this->mollieHelper = $mollieHelper;
         $this->refundUsingPayment = $refundUsingPayment;
     }
 
     public function handle(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo)
     {
+        $this->doNotRefundInMollie = false;
+
         if ($creditmemo->getAdjustment() > 0) {
             $this->positive($mollieApi, $order, $creditmemo);
         }
@@ -44,12 +42,12 @@ class ProcessAdjustmentFee
         }
     }
 
-    public function doNotRefundInMollie()
+    public function doNotRefundInMollie(): bool
     {
         return $this->doNotRefundInMollie;
     }
 
-    private function positive(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo)
+    private function positive(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo): void
     {
         $this->doNotRefundInMollie = false;
 
@@ -61,7 +59,7 @@ class ProcessAdjustmentFee
         );
     }
 
-    private function negative(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo)
+    private function negative(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo): void
     {
         $this->doNotRefundInMollie = true;
 
