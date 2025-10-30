@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Ui;
 
 use Magento\Vault\Api\Data\PaymentTokenInterface;
@@ -13,16 +15,9 @@ use Mollie\Payment\Model\Methods\CreditcardVault;
 
 class TokenUiComponentProvider implements TokenUiComponentProviderInterface
 {
-    /**
-     * @var TokenUiComponentInterfaceFactory
-     */
-    private $componentFactory;
-
     public function __construct(
-        TokenUiComponentInterfaceFactory $componentFactory
-    ) {
-        $this->componentFactory = $componentFactory;
-    }
+        private TokenUiComponentInterfaceFactory $componentFactory
+    ) {}
 
     public function getComponentForToken(PaymentTokenInterface $paymentToken)
     {
@@ -32,10 +27,10 @@ class TokenUiComponentProvider implements TokenUiComponentProviderInterface
                 'config' => [
                     'code' => CreditcardVault::CODE,
                     TokenUiComponentProviderInterface::COMPONENT_DETAILS => $jsonDetails,
-                    TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash()
+                    TokenUiComponentProviderInterface::COMPONENT_PUBLIC_HASH => $paymentToken->getPublicHash(),
                 ],
-                'name' => 'Mollie_Payment/js/view/payment/method-renderer/vault'
-            ]
+                'name' => 'Mollie_Payment/js/view/payment/method-renderer/vault',
+            ],
         );
 
         return $component;

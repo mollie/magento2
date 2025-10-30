@@ -1,49 +1,36 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Controller\Adminhtml\Action;
 
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Mollie\Payment\Helper\General as MollieHelper;
-use Mollie\Payment\Helper\Tests as TestsHelper;
 use Mollie\Payment\Service\Mollie\SelfTests\AbstractSelfTest;
 
-/**
- * Class Compatibility
- *
- * @package Mollie\Payment\Controller\Adminhtml\Action
- */
-class SelfTest extends Action
+class SelfTest extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var JsonFactory
-     */
-    private $resultJsonFactory;
-    /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-    /**
-     * @var AbstractSelfTest[]
-     */
-    private $tests;
+    const ADMIN_RESOURCE = 'Mollie_Payment::config';
 
     public function __construct(
         Context $context,
-        JsonFactory $resultJsonFactory,
-        MollieHelper $mollieHelper,
-        array $tests
+        private JsonFactory $resultJsonFactory,
+        private MollieHelper $mollieHelper,
+        /**
+         * @var AbstractSelfTest[]
+         */
+        private array $tests,
     ) {
         parent::__construct($context);
-
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->mollieHelper = $mollieHelper;
-        $this->tests = $tests;
     }
 
     /**
@@ -51,10 +38,8 @@ class SelfTest extends Action
      *
      * - Check if Mollie php API is installed
      * - Check for minimum system requirements of API
-     *
-     * @return \Magento\Framework\Controller\Result\Json
      */
-    public function execute()
+    public function execute(): Json
     {
         $result = $this->resultJsonFactory->create();
         if (!class_exists('Mollie\Api\CompatibilityChecker')) {
@@ -74,22 +59,11 @@ class SelfTest extends Action
         }
 
         $result->setData(['success' => true, 'msg' => $output]);
+
         return $result;
     }
 
-    /**
-     * @return bool
-     */
-    protected function _isAllowed()
-    {
-        return $this->_authorization->isAllowed('Mollie_Payment::config');
-    }
-
-    /**
-     * @param \Magento\Framework\Controller\Result\Json $result
-     * @return \Magento\Framework\Controller\Result\Json
-     */
-    private function getPhpApiErrorMessage(\Magento\Framework\Controller\Result\Json $result)
+    private function getPhpApiErrorMessage(Json $result): Json
     {
         $results = ['<span class="mollie-error">' . $this->mollieHelper->getPhpApiErrorMessage() . '</span>'];
 
@@ -99,6 +73,7 @@ class SelfTest extends Action
         }
 
         $result->setData(['success' => true, 'msg' => implode('<br/>', $results)]);
+
         return $result;
     }
 }

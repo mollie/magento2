@@ -4,24 +4,18 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Plugin\Catalog\Model;
 
 use Magento\Catalog\Model\Attribute\Config;
-use Mollie\Payment\Config as MollieConfig;
 use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 
 class AddMealVoucherCategoryToLoadedAttributes
 {
-    /**
-     * @var MollieConfig
-     */
-    private $config;
-
     public function __construct(
-        MollieConfig $config
-    ) {
-        $this->config = $config;
-    }
+        private \Mollie\Payment\Config $config
+    ) {}
 
     /**
      * The attribute that holds the meal voucher category is an attribute that can be selected via the config. With a

@@ -1,14 +1,18 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Methods;
 
-use Magento\Sales\Model\Order;
-use Mollie\Payment\Model\Mollie;
 use Magento\Framework\DataObject;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
+use Mollie\Payment\Model\Mollie;
 
 /**
  * Class Paymentlink
@@ -22,27 +26,26 @@ class Paymentlink extends Mollie
      *
      * @var string
      */
-    const CODE = 'mollie_methods_paymentlink';
+    public const CODE = 'mollie_methods_paymentlink';
 
     /**
      * @param string $paymentAction
      * @param object $stateObject
      *
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws LocalizedException
      */
-    public function initialize($paymentAction, $stateObject)
+    public function initialize($paymentAction, $stateObject): void
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var Payment $payment */
         $payment = $this->getInfoInstance();
 
-        /** @var \Magento\Sales\Model\Order $order */
+        /** @var Order $order */
         $order = $payment->getOrder();
         $order->setCanSendNewEmailFlag(false);
 
         $stateObject->setState(Order::STATE_PENDING_PAYMENT);
 
-        if ($status = $this->config->statusNewPaymentLink($order->getStoreId())) {
+        if ($status = $this->config->statusNewPaymentLink(storeId($order->getStoreId()))) {
             $stateObject->setStatus($status);
         }
     }
@@ -51,9 +54,9 @@ class Paymentlink extends Mollie
      * @param DataObject $data
      *
      * @return $this
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
-    public function assignData(DataObject $data)
+    public function assignData(DataObject $data): static
     {
         $limitedMethods = null;
         parent::assignData($data);

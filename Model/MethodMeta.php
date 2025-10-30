@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,28 +13,11 @@ use Mollie\Payment\Api\Data\MethodMetaInterface;
 
 class MethodMeta implements MethodMetaInterface
 {
-    /**
-     * @var string
-     */
-    private $code;
-    /**
-     * @var array
-     */
-    private $issuers;
-    /**
-     * @var array
-     */
-    private $terminals;
-
     public function __construct(
-        string $code,
-        array $issuers,
-        array $terminals
-    ) {
-        $this->code = $code;
-        $this->issuers = $issuers;
-        $this->terminals = $terminals;
-    }
+        private string $code,
+        private array $issuers,
+        private array $terminals
+    ) {}
 
     /**
      * @return string

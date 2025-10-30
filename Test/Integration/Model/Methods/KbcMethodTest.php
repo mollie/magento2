@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Kbc;
 
 class KbcMethodTest extends AbstractTestMethod
 {
-    protected $instance = Kbc::class;
+    protected ?string $instance = Kbc::class;
 
-    protected $code = 'kbc';
+    protected ?string $code = 'kbc';
 }

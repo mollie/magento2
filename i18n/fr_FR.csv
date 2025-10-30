@@ -268,7 +268,6 @@
 "Language Payment Page","Langue Page de paiement"
 "Let Mollie automatically detect the language or force the language from the store view.","Laisser Mollie détecter la langue automatiquement ou forcer la langue du point de vue du magasin."
 "Show Transaction Details","Afficher les détails de la transaction"
-"Use Loading Screen","Utiliser l'écran de chargement"
 "PWA Storefront Integration","Intégration PWA Storefront"
 "Advanced: PWA storefront integration","Avancée: Intégration PWA Storefront"
 "Only use this function if you want to integrate the Mollie extension with a PWA storefront. More information can be found <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">here</a>.","Utilisez uniquement cette fonction si vous souhaitez intégrer l'extension Mollie avec PWA storefront. Pour aller plus loin, consulter <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">ici</a>."

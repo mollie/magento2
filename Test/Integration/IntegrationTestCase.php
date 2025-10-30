@@ -4,15 +4,20 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration;
 
+use Exception;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Filesystem\DirectoryList;
+use Magento\Framework\ObjectManagerInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\TestFramework\Annotation\DataFixture;
 use Magento\TestFramework\ObjectManager;
+use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 use Mollie\Payment\Plugin\Quote\Api\PaymentMethodManagementPlugin;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\OrderLockService;
@@ -20,26 +25,17 @@ use Mollie\Payment\Test\Fakes\FakeEncryptor;
 use Mollie\Payment\Test\Fakes\Plugin\Quote\Api\PaymentMethodManagementPluginFake;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Fakes\Service\OrderLockServiceFake;
-use Magento\TestFramework\Workaround\Override\Fixture\Resolver;
 use PHPUnit\Framework\TestCase;
 
 class IntegrationTestCase extends TestCase
 {
-    /**
-     * @var \Magento\Framework\App\ObjectManager
-     */
-    protected $objectManager;
+    protected ?ObjectManagerInterface $objectManager;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->objectManager = ObjectManager::getInstance();
-        $this->setUpWithoutVoid();
-    }
-
-    protected function setUpWithoutVoid()
-    {
     }
 
     protected function tearDown(): void
@@ -54,34 +50,19 @@ class IntegrationTestCase extends TestCase
     }
 
     /**
-     * @param $orderId
-     * @return \Magento\Sales\Model\Order
-     */
-    public function loadOrderById($orderId)
-    {
-        $repository = $this->objectManager->get(OrderRepositoryInterface::class);
-        $builder = $this->objectManager->create(SearchCriteriaBuilder::class);
-        $searchCriteria = $builder->addFilter('increment_id', $orderId, 'eq')->create();
-
-        $orderList = $repository->getList($searchCriteria)->getItems();
-
-        return array_shift($orderList);
-    }
-
-    /**
      * Load a custom fixture in the Test/Fixtures folder, and make it think it's inside the
      * `dev/test/integration/testsuite` folder so it can rely on other fixtures.
      *
      * @param $path
-     * @throws \Exception
+     * @throws Exception
      */
-    public function loadFixture($path)
+    public function loadFixture(string $path): void
     {
         $cwd = getcwd();
 
         $fullPath = __DIR__ . '/../Fixtures/' . $path;
         if (!file_exists($fullPath)) {
-            throw new \Exception('The path "' . $fullPath . '" does not exists');
+            throw new Exception('The path "' . $fullPath . '" does not exists');
         }
 
         if (class_exists(Resolver::class)) {
@@ -106,23 +87,6 @@ class IntegrationTestCase extends TestCase
         return $path;
     }
 
-    /**
-     * @return OrderInterface
-     */
-    protected function loadOrder($incrementId)
-    {
-        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
-        $searchCriteriaBuilder = $this->objectManager->create(SearchCriteriaBuilder::class);
-
-        /** @var OrderRepositoryInterface $order */
-        $orderRepository = $this->objectManager->create(OrderRepositoryInterface::class);
-
-        $searchCriteria = $searchCriteriaBuilder->addFilter('increment_id', $incrementId, 'eq')->create();
-        $orderList = $orderRepository->getList($searchCriteria)->getItems();
-
-        return array_shift($orderList);
-    }
-
     public function loadFakeMollieApiClient(): FakeMollieApiClient
     {
         $client = $this->objectManager->create(FakeMollieApiClient::class);
@@ -137,6 +101,53 @@ class IntegrationTestCase extends TestCase
         $service = $this->objectManager->create(OrderLockServiceFake::class);
 
         $this->objectManager->addSharedInstance($service, OrderLockService::class);
+    }
+
+    protected function loadOrder(string $incrementId): OrderInterface
+    {
+        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
+        $searchCriteriaBuilder = $this->objectManager->create(SearchCriteriaBuilder::class);
+
+        /** @var OrderRepositoryInterface $order */
+        $orderRepository = $this->objectManager->create(OrderRepositoryInterface::class);
+
+        $searchCriteria = $searchCriteriaBuilder->addFilter('increment_id', $incrementId, 'eq')->create();
+        $orderList = $orderRepository->getList($searchCriteria)->getItems();
+
+        return array_shift($orderList);
+    }
+
+    public function loadOrderById(string $orderId): OrderInterface
+    {
+        $repository = $this->objectManager->get(OrderRepositoryInterface::class);
+        $builder = $this->objectManager->create(SearchCriteriaBuilder::class);
+        $searchCriteria = $builder->addFilter('increment_id', $orderId, 'eq')->create();
+
+        $orderList = $repository->getList($searchCriteria)->getItems();
+
+        $order = array_shift($orderList);
+        $order->setBaseCurrencyCode('EUR');
+        $order->setOrderCurrencyCode('EUR');
+
+        return $order;
+    }
+
+    /**
+     * @param $path
+     * @throws Exception
+     */
+    public function loadMagentoFixture(string $path): void
+    {
+        $cwd = getcwd();
+
+        $fullPath = $this->getRootDirectory() . '/dev/tests/integration/testsuite/' . $path;
+        if (!file_exists($fullPath)) {
+            throw new Exception('The path "' . $fullPath . '" does not exists');
+        }
+
+        chdir($this->getRootDirectory() . '/dev/tests/integration/testsuite/');
+        require $fullPath;
+        chdir($cwd);
     }
 
     public function loadFakeEncryptor(): FakeEncryptor

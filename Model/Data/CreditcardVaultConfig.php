@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Data;
 
@@ -9,22 +15,7 @@ use Mollie\Payment\Config;
 
 class CreditcardVaultConfig implements ConfigInterface
 {
-    const DEFAULT_PATH_PATTERN = 'payment/%s/%s';
-
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    /**
-     * @var string|null
-     */
-    private $methodCode;
-
-    /**
-     * @var string|null
-     */
-    private $pathPattern;
+    public const DEFAULT_PATH_PATTERN = 'payment/%s/%s';
 
     /**
      * @param ScopeConfigInterface $scopeConfig
@@ -32,14 +23,10 @@ class CreditcardVaultConfig implements ConfigInterface
      * @param string $pathPattern
      */
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
-        ?string $methodCode = null,
-        string $pathPattern = self::DEFAULT_PATH_PATTERN
-    ) {
-        $this->scopeConfig = $scopeConfig;
-        $this->methodCode = $methodCode;
-        $this->pathPattern = $pathPattern;
-    }
+        private ScopeConfigInterface $scopeConfig,
+        private ?string $methodCode = null,
+        private string $pathPattern = self::DEFAULT_PATH_PATTERN
+    ) {}
 
     /**
      * Sets method code
@@ -47,7 +34,7 @@ class CreditcardVaultConfig implements ConfigInterface
      * @param string $methodCode
      * @return void
      */
-    public function setMethodCode($methodCode)
+    public function setMethodCode($methodCode): void
     {
         $this->methodCode = $methodCode;
     }
@@ -58,7 +45,7 @@ class CreditcardVaultConfig implements ConfigInterface
      * @param string $pathPattern
      * @return void
      */
-    public function setPathPattern($pathPattern)
+    public function setPathPattern($pathPattern): void
     {
         $this->pathPattern = $pathPattern;
     }
@@ -86,7 +73,7 @@ class CreditcardVaultConfig implements ConfigInterface
         return $this->scopeConfig->getValue(
             $path,
             ScopeInterface::SCOPE_STORE,
-            $storeId
+            $storeId,
         );
     }
 }

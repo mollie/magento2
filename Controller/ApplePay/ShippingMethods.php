@@ -1,63 +1,44 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\ApplePay;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Api\Data\ShippingMethodInterface;
 use Magento\Quote\Api\GuestCartRepositoryInterface;
 use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\Quote\Address\Total as AddressTotal;
 use Mollie\Payment\Service\Magento\ChangeShippingMethodForQuote;
 
-class ShippingMethods extends Action
+class ShippingMethods extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-    /**
-     * @var GuestCartRepositoryInterface
-     */
-    private $guestCartRepository;
-    /**
-     * @var ShippingMethodManagementInterface
-     */
-    private $shippingMethodManagement;
-    /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
-    /**
-     * @var ChangeShippingMethodForQuote
-     */
-    private $changeShippingMethodForQuote;
-
     public function __construct(
         Context $context,
-        CartRepositoryInterface $cartRepository,
-        ShippingMethodManagementInterface $shippingMethodManagement,
-        CheckoutSession $checkoutSession,
-        GuestCartRepositoryInterface $guestCartRepository,
-        ChangeShippingMethodForQuote $changeShippingMethodForQuote
+        private CartRepositoryInterface $cartRepository,
+        private ShippingMethodManagementInterface $shippingMethodManagement,
+        private CheckoutSession $checkoutSession,
+        private GuestCartRepositoryInterface $guestCartRepository,
+        private ChangeShippingMethodForQuote $changeShippingMethodForQuote,
     ) {
         parent::__construct($context);
-        $this->shippingMethodManagement = $shippingMethodManagement;
-        $this->guestCartRepository = $guestCartRepository;
-        $this->cartRepository = $cartRepository;
-        $this->checkoutSession = $checkoutSession;
-        $this->changeShippingMethodForQuote = $changeShippingMethodForQuote;
     }
 
-    public function execute()
+    public function execute(): Json
     {
         $cart = $this->getCart();
 
@@ -72,7 +53,7 @@ class ShippingMethods extends Action
         if ($this->getRequest()->getParam('shippingMethod')) {
             $this->changeShippingMethodForQuote->execute(
                 $address,
-                $this->getRequest()->getParam('shippingMethod')['identifier']
+                $this->getRequest()->getParam('shippingMethod')['identifier'],
             );
         }
 
@@ -85,7 +66,7 @@ class ShippingMethods extends Action
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         return $response->setData([
-            'shipping_methods' => array_map(function ($method) {
+            'shipping_methods' => array_map(function (ShippingMethodInterface $method): array {
                 return [
                     // Magento uses an _ (underscore) to separate the carrier and method, but those can have an
                     // underscore as well. So separate by a different divider to prevent errors.
@@ -95,19 +76,19 @@ class ShippingMethods extends Action
                     'detail' => '',
                 ];
             }, $methods),
-            'totals' => array_map(function (AddressTotal $total) {
+            'totals' => array_map(function (AddressTotal $total): array {
                 return [
                     'type' => 'final',
                     'code' => $total->getCode(),
                     'label' => $total->getData('title'),
                     'amount' => number_format($total->getData('value') ?: 0.0, 2, '.', ''),
                 ];
-            }, array_values($cart->getTotals()))
+            }, array_values($cart->getTotals())),
         ]);
     }
 
     /**
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      * @return CartInterface
      */
     public function getCart(): CartInterface

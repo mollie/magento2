@@ -41,6 +41,7 @@
                 <item name="isDateofbirthEnabled" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestIsDobEnabled</item>
                 <item name="areHyvaModulesInstalled" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\AreHyvaModulesInstalled</item>
                 <item name="isHyvaThemesJsonCorrect" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\IsHyvaThemesJsonCorrect</item>
+                <item name="areQueuesConfiguredCorrectly" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\AreQueuesConfiguredCorrectlyTest</item>
             </argument>
         </arguments>
     </type>

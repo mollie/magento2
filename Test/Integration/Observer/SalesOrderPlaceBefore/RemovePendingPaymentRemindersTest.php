@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Observer\SalesOrderPlaceBefore;
 
 use Magento\Framework\Event\Observer;
@@ -18,7 +20,7 @@ class RemovePendingPaymentRemindersTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/enable_second_chance_email 0
      * @magentoConfigFixture default_store payment/mollie_general/automatically_send_second_chance_emails 0
      */
-    public function testDoesNothingWhenDisabled()
+    public function testDoesNothingWhenDisabled(): void
     {
         $deletePaymentReminderMock = $this->createMock(DeletePaymentReminder::class);
         $deletePaymentReminderMock->expects($this->never())->method('delete');
@@ -39,7 +41,7 @@ class RemovePendingPaymentRemindersTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/enable_second_chance_email 1
      * @magentoConfigFixture default_store payment/mollie_general/automatically_send_second_chance_emails 1
      */
-    public function testDoesNothingWhenNoEmailIsAvailable()
+    public function testDoesNothingWhenNoEmailIsAvailable(): void
     {
         $deletePaymentReminderMock = $this->createMock(DeletePaymentReminder::class);
         $deletePaymentReminderMock->expects($this->never())->method('delete');

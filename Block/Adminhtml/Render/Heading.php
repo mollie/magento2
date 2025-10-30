@@ -1,8 +1,11 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\Adminhtml\Render;
 
@@ -16,7 +19,6 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
  */
 class Heading extends Field
 {
-
     /**
      * Render block: table heading
      *

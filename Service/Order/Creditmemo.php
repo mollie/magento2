@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order;
 
@@ -16,7 +18,7 @@ class Creditmemo
      * @param CreditmemoInterface $creditmemo
      * @return bool
      */
-    public function isFullOrLastPartialCreditmemo(CreditmemoInterface $creditmemo)
+    public function isFullOrLastPartialCreditmemo(CreditmemoInterface $creditmemo): bool
     {
         /** @var CreditmemoItemInterface $item */
         foreach ($creditmemo->getAllItems() as $item) {
@@ -36,7 +38,7 @@ class Creditmemo
      * @param CreditmemoInterface $creditmemo
      * @return bool
      */
-    public function hasItemsLeftToRefund(CreditmemoInterface $creditmemo)
+    public function hasItemsLeftToRefund(CreditmemoInterface $creditmemo): bool
     {
         /** @var OrderItemInterface $order */
         $order = $creditmemo->getOrder();

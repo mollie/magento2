@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order\Lines;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -12,17 +14,11 @@ use Mollie\Payment\Service\Order\Lines\Generator\GeneratorInterface;
 class OrderLinesGenerator
 {
     /**
-     * @var array
-     */
-    private $generators;
-
-    /**
      * @param GeneratorInterface[] $generators
      */
-    public function __construct(array $generators = [])
-    {
-        $this->generators = $generators;
-    }
+    public function __construct(
+        private array $generators = []
+    ) {}
 
     public function execute(OrderInterface $order, array $orderLines): array
     {

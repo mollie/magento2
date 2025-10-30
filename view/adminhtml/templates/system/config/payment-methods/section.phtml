@@ -1,0 +1,65 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var Form $block */
+
+use Magento\Backend\Block\Widget\Form;
+
+?>
+<div class="mollie-methods-cards entry-edit form-inline">
+    <?= $block->getFormHtml() ?>
+</div>
+<?= $block->getChildHtml('form_after') ?>
+
+<script>
+(() => {
+    document.querySelectorAll('.mollie-method-card-head').forEach(method => {
+        method.addEventListener('click', e => {
+            e.preventDefault();
+
+            initDialog(method.dataset.method);
+
+            document.getElementById(method.dataset.method).style.display = '';
+            document.getElementById(method.dataset.method + '_dialog').showModal();
+            document.body.classList.add('_has-modal');
+        })
+    })
+
+    function initDialog(method) {
+        let dialog = document.getElementById(method + '_dialog');
+
+        dialog.addEventListener('close', e => {
+            document.body.classList.remove('_has-modal');
+        })
+
+        // Detect clicks on the backdrop
+        dialog.addEventListener('click', function(event) {
+            let rect = dialog.getBoundingClientRect();
+            let isInDialog = (rect.top <= event.clientY && event.clientY <= rect.top + rect.height &&
+                rect.left <= event.clientX && event.clientX <= rect.left + rect.width);
+
+            if (!isInDialog) {
+                dialog.close();
+            }
+        });
+
+        dialog.querySelector('.action-close').addEventListener('click', e => {
+            dialog.close();
+        })
+
+        dialog.querySelector('.mollie-payment-save-config').addEventListener('click', e => {
+            e.preventDefault();
+
+            document.getElementById('save').click();
+        })
+    }
+})();
+</script>

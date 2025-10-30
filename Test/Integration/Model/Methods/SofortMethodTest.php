@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Sofort;
 
 class SofortMethodTest extends AbstractTestMethod
 {
-    protected $instance = Sofort::class;
+    protected ?string $instance = Sofort::class;
 
-    protected $code = 'sofort';
+    protected ?string $code = 'sofort';
 }

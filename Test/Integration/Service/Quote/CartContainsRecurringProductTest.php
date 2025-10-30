@@ -4,12 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Quote;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Serialize\SerializerInterface;
-use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use Magento\Quote\Model\Quote;
 use Mollie\Payment\Service\Quote\CartContainsRecurringProduct;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class CartContainsRecurringProductTest extends IntegrationTestCase
 {
@@ -18,7 +21,7 @@ class CartContainsRecurringProductTest extends IntegrationTestCase
      */
     public function testReturnsFalseWhenNoItemAvailable(): void
     {
-        /** @var \Magento\Quote\Model\Quote $cart */
+        /** @var Quote $cart */
         $cart = $this->objectManager->create(Session::class)->getQuote();
 
         /** @var CartContainsRecurringProduct $instance */
@@ -35,7 +38,7 @@ class CartContainsRecurringProductTest extends IntegrationTestCase
         /** @var SerializerInterface $serializer */
         $serializer = $this->objectManager->create(SerializerInterface::class);
 
-        /** @var \Magento\Quote\Model\Quote $cart */
+        /** @var Quote $cart */
         $cart = $this->objectManager->create(Session::class)->getQuote();
         $items = $cart->getItems();
         $item = array_shift($items);
@@ -46,7 +49,7 @@ class CartContainsRecurringProductTest extends IntegrationTestCase
                 'qty' => 1,
                 'mollie_metadata' => [
                     'is_recurring' => 1,
-                ]
+                ],
             ]),
         ]);
 
@@ -61,7 +64,7 @@ class CartContainsRecurringProductTest extends IntegrationTestCase
      */
     public function testHandlesCasesWhereNoBuyRequestIsAvailable(): void
     {
-        /** @var \Magento\Quote\Model\Quote $cart */
+        /** @var Quote $cart */
         $cart = $this->objectManager->create(Session::class)->getQuote();
 
         /** @var CartContainsRecurringProduct $instance */

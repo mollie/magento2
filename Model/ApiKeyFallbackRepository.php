@@ -1,7 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model;
 
+use Exception;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
@@ -11,123 +18,64 @@ use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Reflection\DataObjectProcessor;
+use Mollie\Payment\Api\ApiKeyFallbackRepositoryInterface;
 use Mollie\Payment\Api\Data\ApiKeyFallbackInterface;
 use Mollie\Payment\Api\Data\ApiKeyFallbackInterfaceFactory;
 use Mollie\Payment\Api\Data\ApiKeyFallbackSearchResultsInterfaceFactory;
-use Mollie\Payment\Api\ApiKeyFallbackRepositoryInterface;
 use Mollie\Payment\Model\ResourceModel\ApiKeyFallback as ResourceApiKeyFallback;
 use Mollie\Payment\Model\ResourceModel\ApiKeyFallback\CollectionFactory as ApiKeyFallbackCollectionFactory;
 
 class ApiKeyFallbackRepository implements ApiKeyFallbackRepositoryInterface
 {
-    /**
-     * @var ResourceApiKeyFallback
-     */
-    protected $resource;
-
-    /**
-     * @var ApiKeyFallbackFactory
-     */
-    protected $apiKeyFallbackFactory;
-
-    /**
-     * @var ApiKeyFallbackCollectionFactory
-     */
-    protected $apiKeyFallbackCollectionFactory;
-
-    /**
-     * @var ApiKeyFallbackSearchResultsInterfaceFactory
-     */
-    protected $searchResultsFactory;
-
-    /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
-     * @var DataObjectProcessor
-     */
-    protected $dataObjectProcessor;
-
-    /**
-     * @var ApiKeyFallbackInterfaceFactory
-     */
-    protected $dataApiKeyFallbackFactory;
-
-    /**
-     * @var JoinProcessorInterface
-     */
-    protected $extensionAttributesJoinProcessor;
-
-    /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
-     * @var ExtensibleDataObjectConverter
-     */
-    protected $extensibleDataObjectConverter;
-
     public function __construct(
-        ResourceApiKeyFallback $resource,
-        ApiKeyFallbackFactory $apiKeyFallbackFactory,
-        ApiKeyFallbackInterfaceFactory $dataApiKeyFallbackFactory,
-        ApiKeyFallbackCollectionFactory $apiKeyFallbackCollectionFactory,
-        ApiKeyFallbackSearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
-        CollectionProcessorInterface $collectionProcessor,
-        JoinProcessorInterface $extensionAttributesJoinProcessor,
-        ExtensibleDataObjectConverter $extensibleDataObjectConverter
-    ) {
-        $this->resource = $resource;
-        $this->apiKeyFallbackFactory = $apiKeyFallbackFactory;
-        $this->apiKeyFallbackCollectionFactory = $apiKeyFallbackCollectionFactory;
-        $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataApiKeyFallbackFactory = $dataApiKeyFallbackFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->collectionProcessor = $collectionProcessor;
-        $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
-        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
-    }
+        protected ResourceApiKeyFallback $resource,
+        protected ApiKeyFallbackFactory $apiKeyFallbackFactory,
+        protected ApiKeyFallbackInterfaceFactory $dataApiKeyFallbackFactory,
+        protected ApiKeyFallbackCollectionFactory $apiKeyFallbackCollectionFactory,
+        protected ApiKeyFallbackSearchResultsInterfaceFactory $searchResultsFactory,
+        protected DataObjectHelper $dataObjectHelper,
+        protected DataObjectProcessor $dataObjectProcessor,
+        private CollectionProcessorInterface $collectionProcessor,
+        protected JoinProcessorInterface $extensionAttributesJoinProcessor,
+        protected ExtensibleDataObjectConverter $extensibleDataObjectConverter
+    ) {}
 
     /**
      * {@inheritdoc}
      */
-    public function save(ApiKeyFallbackInterface $apiKeyFallback)
+    public function save(ApiKeyFallbackInterface $apiKeyFallback): ApiKeyFallbackInterface
     {
         $apiKeyFallbackData = $this->extensibleDataObjectConverter->toNestedArray(
             $apiKeyFallback,
             [],
-            ApiKeyFallbackInterface::class
+            ApiKeyFallbackInterface::class,
         );
 
         $apiKeyFallbackModel = $this->apiKeyFallbackFactory->create()->setData($apiKeyFallbackData);
 
         try {
             $this->resource->save($apiKeyFallbackModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the apiKeyFallback: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return $apiKeyFallbackModel->getDataModel();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get(int $id)
+    public function get(int $id): ApiKeyFallbackInterface
     {
         $apiKeyFallback = $this->apiKeyFallbackFactory->create();
         $this->resource->load($apiKeyFallback, $id);
         if (!$apiKeyFallback->getId()) {
             throw new NoSuchEntityException(__('ApiKeyFallback with id "%1" does not exist.', $id));
         }
+
         return $apiKeyFallback->getDataModel();
     }
 
@@ -140,7 +88,7 @@ class ApiKeyFallbackRepository implements ApiKeyFallbackRepositoryInterface
 
         $this->extensionAttributesJoinProcessor->process(
             $collection,
-            ApiKeyFallbackInterface::class
+            ApiKeyFallbackInterface::class,
         );
 
         $this->collectionProcessor->process($criteria, $collection);
@@ -155,31 +103,33 @@ class ApiKeyFallbackRepository implements ApiKeyFallbackRepositoryInterface
 
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
+
         return $searchResults;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(ApiKeyFallbackInterface $apiKeyFallback)
+    public function delete(ApiKeyFallbackInterface $apiKeyFallback): bool
     {
         try {
             $apiKeyFallbackModel = $this->apiKeyFallbackFactory->create();
             $this->resource->load($apiKeyFallbackModel, $apiKeyFallback->getEntityId());
             $this->resource->delete($apiKeyFallbackModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the ApiKeyFallback: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteById(int $id)
+    public function deleteById(int $id): bool
     {
         return $this->delete($this->get($id));
     }

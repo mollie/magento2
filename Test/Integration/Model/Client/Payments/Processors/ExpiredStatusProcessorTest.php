@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Model\Client\Payments\Processors;
 
@@ -28,7 +34,7 @@ class ExpiredStatusProcessorTest extends IntegrationTestCase
 
         /** @var TransactionToOrderInterface $transactionToOrder */
         $transactionToOrder = $this->objectManager->create(TransactionToOrderInterface::class);
-        $transactionToOrder->setOrderId($order->getEntityId());
+        $transactionToOrder->setOrderId((int)$order->getEntityId());
         $transactionToOrder->setTransactionId($transactionId);
         $this->objectManager->get(TransactionToOrderRepositoryInterface::class)->save($transactionToOrder);
 
@@ -43,7 +49,7 @@ class ExpiredStatusProcessorTest extends IntegrationTestCase
                 'status' => 'test',
                 'order_id' => '-01',
                 'type' => 'webhook',
-            ])
+            ]),
         );
 
         $this->assertEquals(Order::STATE_CANCELED, $order->getState());
@@ -64,13 +70,13 @@ class ExpiredStatusProcessorTest extends IntegrationTestCase
 
         /** @var TransactionToOrderInterface $transactionToOrder1 */
         $transactionToOrder1 = $this->objectManager->create(TransactionToOrderInterface::class);
-        $transactionToOrder1->setOrderId($order->getEntityId());
+        $transactionToOrder1->setOrderId((int)$order->getEntityId());
         $transactionToOrder1->setTransactionId($transaction1);
         $this->objectManager->get(TransactionToOrderRepositoryInterface::class)->save($transactionToOrder1);
 
         /** @var TransactionToOrderInterface $transactionToOrder2 */
         $transactionToOrder2 = $this->objectManager->create(TransactionToOrderInterface::class);
-        $transactionToOrder2->setOrderId($order->getEntityId());
+        $transactionToOrder2->setOrderId((int)$order->getEntityId());
         $transactionToOrder2->setTransactionId($transaction2);
         $this->objectManager->get(TransactionToOrderRepositoryInterface::class)->save($transactionToOrder2);
 
@@ -85,7 +91,7 @@ class ExpiredStatusProcessorTest extends IntegrationTestCase
                 'status' => 'test',
                 'order_id' => '-01',
                 'type' => 'webhook',
-            ])
+            ]),
         );
 
         /** @var ExpiredOrderToTransaction $transactionToOrder */

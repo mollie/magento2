@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Mollie;
 
 use Magento\Framework\App\CacheInterface;
@@ -11,12 +13,13 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use stdClass;
 
 class GetIssuersTest extends IntegrationTestCase
 {
     public function testDoesNotReturnTheImageWhenNotAvailable(): void
     {
-        $method = new \stdClass();
+        $method = new stdClass();
         $method->name = 'Issuer name';
         $method->id = 'IDID';
 
@@ -41,10 +44,10 @@ class GetIssuersTest extends IntegrationTestCase
 
     public function testReturnsTheImageWhenAvailable(): void
     {
-        $method = new \stdClass();
+        $method = new stdClass();
         $method->name = 'Issuer name';
         $method->id = 'IDID';
-        $method->image = new \stdClass();
+        $method->image = new stdClass();
         $method->image->size2x = 'image.png';
         $method->image->svg = 'image.svg';
 

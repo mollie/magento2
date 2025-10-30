@@ -1,11 +1,15 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
-use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\TransactionPart\DateOfBirth;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -26,8 +30,7 @@ class DateOfBirthTest extends IntegrationTestCase
 
         $transaction = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            []
+            [],
         );
 
         $this->assertArrayNotHasKey('consumerDateOfBirth', $transaction);
@@ -46,8 +49,7 @@ class DateOfBirthTest extends IntegrationTestCase
 
         $newTransaction = $instance->process(
             $order,
-            Payments::CHECKOUT_TYPE,
-            $transaction
+            $transaction,
         );
 
         $this->assertSame($transaction, $newTransaction);
@@ -66,8 +68,7 @@ class DateOfBirthTest extends IntegrationTestCase
 
         $newTransaction = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            $transaction
+            $transaction,
         );
 
         $this->assertSame($transaction, $newTransaction);
@@ -88,13 +89,12 @@ class DateOfBirthTest extends IntegrationTestCase
 
         $transaction = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            []
+            [],
         );
 
         $this->assertSame(
             '2016-11-19',
-            $transaction['consumerDateOfBirth']
+            $transaction['consumerDateOfBirth'],
         );
     }
 
@@ -113,13 +113,12 @@ class DateOfBirthTest extends IntegrationTestCase
 
         $transaction = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            []
+            [],
         );
 
         $this->assertSame(
             '2016-11-19',
-            $transaction['consumerDateOfBirth']
+            $transaction['consumerDateOfBirth'],
         );
     }
 
@@ -134,13 +133,12 @@ class DateOfBirthTest extends IntegrationTestCase
 
         $transaction = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            []
+            [],
         );
 
         $this->assertArrayNotHasKey(
             'consumerDateOfBirth',
-            $transaction
+            $transaction,
         );
     }
 }

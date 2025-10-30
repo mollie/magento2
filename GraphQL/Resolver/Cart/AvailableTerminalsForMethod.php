@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -15,16 +16,9 @@ use Mollie\Payment\Service\Mollie\AvailableTerminals;
 
 class AvailableTerminalsForMethod implements ResolverInterface
 {
-    /**
-     * @var AvailableTerminals
-     */
-    private $availableTerminals;
-
     public function __construct(
-        AvailableTerminals $availableTerminals
-    ) {
-        $this->availableTerminals = $availableTerminals;
-    }
+        private AvailableTerminals $availableTerminals
+    ) {}
 
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
@@ -33,7 +27,8 @@ class AvailableTerminalsForMethod implements ResolverInterface
             return [];
         }
 
-        $storeId = (int)$context->getExtensionAttributes()->getStore()->getId();
-        return $this->availableTerminals->execute((int)$storeId);
+        $storeId = (int) $context->getExtensionAttributes()->getStore()->getId();
+
+        return $this->availableTerminals->execute((int) $storeId);
     }
 }

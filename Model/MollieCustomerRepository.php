@@ -1,11 +1,14 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model;
 
+use Exception;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
@@ -29,115 +32,44 @@ use Mollie\Payment\Model\ResourceModel\MollieCustomer\CollectionFactory as Custo
 
 class MollieCustomerRepository implements MollieCustomerRepositoryInterface
 {
-    /**
-     * @var ResourceCustomer
-     */
-    protected $resource;
-
-    /**
-     * @var MollieCustomerFactory
-     */
-    protected $mollieCustomerFactory;
-
-    /**
-     * @var CustomerCollectionFactory
-     */
-    protected $customerCollectionFactory;
-
-    /**
-     * @var SearchResultsInterface
-     */
-    protected $searchResultsFactory;
-
-    /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
-     * @var DataObjectProcessor
-     */
-    protected $dataObjectProcessor;
-
-    /**
-     * @var MollieCustomerInterfaceFactory
-     */
-    protected $dataCustomerFactory;
-
-    /**
-     * @var JoinProcessorInterface
-     */
-    protected $extensionAttributesJoinProcessor;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
-     * @var ExtensibleDataObjectConverter
-     */
-    protected $extensibleDataObjectConverter;
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $criteriaBuilderFactory;
-
     public function __construct(
-        ResourceCustomer $resource,
-        MollieCustomerFactory $mollieCustomerFactory,
-        MollieCustomerInterfaceFactory $dataCustomerFactory,
-        CustomerCollectionFactory $customerCollectionFactory,
-        SearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager,
-        CollectionProcessorInterface $collectionProcessor,
-        JoinProcessorInterface $extensionAttributesJoinProcessor,
-        ExtensibleDataObjectConverter $extensibleDataObjectConverter,
-        SearchCriteriaBuilderFactory $criteriaBuilderFactory
-    ) {
-        $this->resource = $resource;
-        $this->mollieCustomerFactory = $mollieCustomerFactory;
-        $this->customerCollectionFactory = $customerCollectionFactory;
-        $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataCustomerFactory = $dataCustomerFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->storeManager = $storeManager;
-        $this->collectionProcessor = $collectionProcessor;
-        $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
-        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
-        $this->criteriaBuilderFactory = $criteriaBuilderFactory;
-    }
+        protected ResourceCustomer $resource,
+        protected MollieCustomerFactory $mollieCustomerFactory,
+        protected MollieCustomerInterfaceFactory $dataCustomerFactory,
+        protected CustomerCollectionFactory $customerCollectionFactory,
+        protected SearchResultsInterfaceFactory $searchResultsFactory,
+        protected DataObjectHelper $dataObjectHelper,
+        protected DataObjectProcessor $dataObjectProcessor,
+        private StoreManagerInterface $storeManager,
+        private CollectionProcessorInterface $collectionProcessor,
+        protected JoinProcessorInterface $extensionAttributesJoinProcessor,
+        protected ExtensibleDataObjectConverter $extensibleDataObjectConverter,
+        private SearchCriteriaBuilderFactory $criteriaBuilderFactory
+    ) {}
 
     /**
      * {@inheritdoc}
      */
     public function save(
-        MollieCustomerInterface $customer
+        MollieCustomerInterface $customer,
     ) {
         $customerData = $this->extensibleDataObjectConverter->toNestedArray(
             $customer,
             [],
-            MollieCustomerInterface::class
+            MollieCustomerInterface::class,
         );
 
         $customerModel = $this->mollieCustomerFactory->create()->setData($customerData);
 
         try {
             $this->resource->save($customerModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the Mollie customer: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return $customerModel->getDataModel();
     }
 
@@ -196,7 +128,7 @@ class MollieCustomerRepository implements MollieCustomerRepositoryInterface
 
         $this->extensionAttributesJoinProcessor->process(
             $collection,
-            MollieCustomerInterface::class
+            MollieCustomerInterface::class,
         );
 
         $this->collectionProcessor->process($criteria, $collection);
@@ -212,6 +144,7 @@ class MollieCustomerRepository implements MollieCustomerRepositoryInterface
 
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
+
         return $searchResults;
     }
 
@@ -219,25 +152,26 @@ class MollieCustomerRepository implements MollieCustomerRepositoryInterface
      * {@inheritdoc}
      */
     public function delete(
-        MollieCustomerInterface $customer
-    ) {
+        MollieCustomerInterface $customer,
+    ): bool {
         try {
             $customerModel = $this->mollieCustomerFactory->create();
             $this->resource->load($customerModel, $customer->getCustomerId());
             $this->resource->delete($customerModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the Customer: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteById($customerId)
+    public function deleteById($customerId): bool
     {
         return $this->delete($this->get($customerId));
     }

@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -10,16 +14,9 @@ use Magento\Quote\Api\Data\AddressInterface;
 
 class SetRegionFromApplePayAddress
 {
-    /**
-     * @var CountryInformationAcquirerInterface
-     */
-    private $countryInformationAcquirer;
-
     public function __construct(
-        CountryInformationAcquirerInterface $countryInformationAcquirer
-    ) {
-        $this->countryInformationAcquirer = $countryInformationAcquirer;
-    }
+        private CountryInformationAcquirerInterface $countryInformationAcquirer
+    ) {}
 
     public function execute(AddressInterface $address, array $input): void
     {
@@ -36,12 +33,14 @@ class SetRegionFromApplePayAddress
         $regions = $information->getAvailableRegions();
         if ($regions === null) {
             $address->setRegion($input['administrativeArea']);
+
             return;
         }
 
         foreach ($regions as $region) {
             if ($region->getCode() === $input['administrativeArea']) {
                 $address->setRegionId($region->getId());
+
                 return;
             }
         }

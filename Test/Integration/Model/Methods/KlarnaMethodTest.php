@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Klarna;
 
 class KlarnaMethodTest extends AbstractTestMethod
 {
-    protected $instance = Klarna::class;
+    protected ?string $instance = Klarna::class;
 
-    protected $code = 'klarna';
+    protected ?string $code = 'klarna';
 }

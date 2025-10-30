@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,24 +13,12 @@ use Magento\Framework\Api\SearchCriteriaBuilder;
 use Mollie\Payment\Api\TransactionToOrderManagementInterface;
 use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 
-class TransactionToOrderManagement implements  TransactionToOrderManagementInterface
+class TransactionToOrderManagement implements TransactionToOrderManagementInterface
 {
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-    /**
-     * @var TransactionToOrderRepositoryInterface
-     */
-    private $transactionToOrderRepository;
-
     public function __construct(
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        TransactionToOrderRepositoryInterface $transactionToOrderRepository
-    ) {
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->transactionToOrderRepository = $transactionToOrderRepository;
-    }
+        private SearchCriteriaBuilder $searchCriteriaBuilder,
+        private TransactionToOrderRepositoryInterface $transactionToOrderRepository
+    ) {}
 
     public function getForOrder(int $entityId): array
     {

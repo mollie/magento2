@@ -1,14 +1,18 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\ResourceModel\PendingPaymentReminder;
 
-class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection
-{
+use Magento\Framework\Model\ResourceModel\Db\Collection\AbstractCollection;
+use Mollie\Payment\Model\PendingPaymentReminder;
 
+class Collection extends AbstractCollection
+{
     /**
      * @var string
      */
@@ -22,8 +26,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     protected function _construct()
     {
         $this->_init(
-            \Mollie\Payment\Model\PendingPaymentReminder::class,
-            \Mollie\Payment\Model\ResourceModel\PendingPaymentReminder::class
+            PendingPaymentReminder::class,
+            \Mollie\Payment\Model\ResourceModel\PendingPaymentReminder::class,
         );
     }
 }

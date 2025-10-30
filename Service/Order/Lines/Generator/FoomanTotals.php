@@ -4,31 +4,20 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order\Lines\Generator;
 
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Framework\Module\Manager;
+use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Helper\General;
 
 class FoomanTotals implements GeneratorInterface
 {
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-
     public function __construct(
-        General $mollieHelper,
-        Manager $moduleManager
-    ) {
-        $this->mollieHelper = $mollieHelper;
-        $this->moduleManager = $moduleManager;
-    }
+        private General $mollieHelper,
+        private Manager $moduleManager
+    ) {}
 
     public function process(OrderInterface $order, array $orderLines): array
     {
@@ -51,7 +40,7 @@ class FoomanTotals implements GeneratorInterface
             return $orderLines;
         }
 
-        $forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
+        $forceBaseCurrency = (bool) $this->mollieHelper->useBaseCurrency(storeId($order->getStoreId()));
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
 
         foreach ($totals as $total) {
@@ -69,12 +58,12 @@ class FoomanTotals implements GeneratorInterface
 
             $orderLines[] = [
                 'type' => 'surcharge',
-                'name' =>  $total->getLabel(),
+                'description' => $total->getLabel(),
                 'quantity' => 1,
                 'unitPrice' => $this->mollieHelper->getAmountArray($currency, $amount + $taxAmount),
                 'totalAmount' => $this->mollieHelper->getAmountArray($currency, $amount + $taxAmount),
                 'vatRate' => $vatRate,
-                'vatAmount' => $this->mollieHelper->getAmountArray($currency, $taxAmount)
+                'vatAmount' => $this->mollieHelper->getAmountArray($currency, $taxAmount),
             ];
         }
 

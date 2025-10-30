@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -22,7 +23,7 @@ class MethodCode
         $method = $order->getPayment()->getMethodInstance()->getCode();
         $this->expiresAtMethod = $method;
 
-        if ($method == 'mollie_methods_googlepay')  {
+        if ($method == 'mollie_methods_googlepay') {
             return 'creditcard';
         }
 
@@ -56,6 +57,7 @@ class MethodCode
 
         if (!is_array($additionalInformation['limited_methods']) || count($additionalInformation['limited_methods']) !== 1) {
             $this->expiresAtMethod = 'paymentlink';
+
             return '';
         }
 

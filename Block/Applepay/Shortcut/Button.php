@@ -1,10 +1,18 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\Applepay\Shortcut;
 
 use Magento\Catalog\Block\ShortcutInterface;
 use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 use Magento\Store\Model\ScopeInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
@@ -13,30 +21,14 @@ class Button extends Template implements ShortcutInterface
 {
     protected $_template = 'Mollie_Payment::applepay/minicart/applepay-button.phtml';
 
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var SupportedNetworks
-     */
-    private $supportedNetworks;
-
     public function __construct(
-        Template\Context $context,
-        Session $checkoutSession,
-        Config $config,
-        SupportedNetworks $supportedNetworks,
-        array $data = []
+        Context $context,
+        private Session $checkoutSession,
+        private Config $config,
+        private SupportedNetworks $supportedNetworks,
+        array $data = [],
     ) {
         parent::__construct($context, $data);
-        $this->checkoutSession = $checkoutSession;
-        $this->config = $config;
-        $this->supportedNetworks = $supportedNetworks;
     }
 
     /**
@@ -52,11 +44,11 @@ class Button extends Template implements ShortcutInterface
      */
     public function getBaseGrandTotal(): ?float
     {
-        return $this->checkoutSession->getQuote()->getBaseGrandTotal();
+        return (float)$this->checkoutSession->getQuote()->getBaseGrandTotal();
     }
 
     /**
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      * @return string
      */
     public function getStoreName(): string
@@ -96,6 +88,6 @@ class Button extends Template implements ShortcutInterface
 
     public function getSupportedNetworks(): array
     {
-        return $this->supportedNetworks->execute((int)$this->_storeManager->getStore()->getId());
+        return $this->supportedNetworks->execute((int) $this->_storeManager->getStore()->getId());
     }
 }

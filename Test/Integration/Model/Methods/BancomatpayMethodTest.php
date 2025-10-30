@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Bancomatpay;
 
 class BancomatpayMethodTest extends AbstractTestMethod
 {
-    protected $instance = Bancomatpay::class;
+    protected ?string $instance = Bancomatpay::class;
 
-    protected $code = 'bancomatpay';
+    protected ?string $code = 'bancomatpay';
 }

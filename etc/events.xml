@@ -3,32 +3,9 @@
   ~ Copyright Magmodules.eu. All rights reserved.
   ~ See COPYING.txt for license details.
   -->
-
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="admin_system_config_changed_section_mollie_payment_methods">
         <observer name="custom_admin_system_config_changed_section_payment" instance="Mollie\Payment\Observer\ConfigObserver"/>
-    </event>
-    <event name="order_cancel_after">
-        <observer name="mollie_cancel_order" instance="Mollie\Payment\Observer\OrderCancelAfter"/>
-    </event>
-    <event name="sales_order_shipment_save_before">
-        <!-- Order of execution is important -->
-        <observer name="mollie_aaaa_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
-        <observer name="mollie_create_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentSaveBefore\CreateMollieShipment"/>
-    </event>
-    <event name="sales_order_shipment_save_after">
-        <observer name="mollie_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
-    </event>
-    <event name="sales_order_shipment_track_save_before">
-        <observer name="mollie_aaaa_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
-    </event>
-    <event name="sales_order_shipment_track_save_after">
-        <observer name="mollie_create_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentTrackSaveAfter"/>
-        <!-- Order of execution is important -->
-        <observer name="mollie_zzzz_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
-    </event>
-    <event name="sales_order_creditmemo_save_after">
-        <observer name="mollie_create_online_refund" instance="Mollie\Payment\Observer\SalesOrderCreditmemoSaveAfter"/>
     </event>
     <event name="sales_model_service_quote_submit_before">
         <observer name="mollie_copy_payment_fee_to_order" instance="Mollie\Payment\Observer\SalesModelServiceQuoteSubmitBefore\CopyPaymentFeeToOrder" />

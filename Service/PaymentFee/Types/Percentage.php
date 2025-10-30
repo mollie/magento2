@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\PaymentFee\Types;
 
@@ -15,37 +17,16 @@ use Mollie\Payment\Service\Tax\TaxCalculate;
 
 class Percentage implements TypeInterface
 {
-    /**
-     * @var ResultFactory
-     */
-    private $resultFactory;
-
-    /**
-     * @var PaymentFee
-     */
-    private $config;
-
-    /**
-     * @var TaxCalculate
-     */
-    private $taxCalculate;
-
     public function __construct(
-        ResultFactory $resultFactory,
-        PaymentFee $config,
-        TaxCalculate $taxCalculate
-    ) {
-        $this->resultFactory = $resultFactory;
-        $this->config = $config;
-        $this->taxCalculate = $taxCalculate;
-    }
+        private ResultFactory $resultFactory,
+        private PaymentFee $config,
+        private TaxCalculate $taxCalculate
+    ) {}
 
-    /**
-     * @inheritDoc
-     */
-    public function calculate(CartInterface $cart, Total $total)
+    public function calculate(CartInterface $cart, Total $total): Result
     {
-        $percentage = $this->config->getPercentage($cart->getPayment()->getMethod(), $cart->getStoreId());
+        $storeId = storeId($cart->getStoreId());
+        $percentage = $this->config->getPercentage($cart->getPayment()->getMethod(), $storeId);
 
         $subtotal = $total->getData('base_subtotal_incl_tax');
         $shipping = $total->getBaseShippingInclTax();
@@ -55,12 +36,12 @@ class Percentage implements TypeInterface
             $subtotal = $total->getTotalAmount('subtotal');
         }
 
-        if ($discount && $this->config->includeDiscountInSurcharge((int)$cart->getStoreId())) {
+        if ($discount && $this->config->includeDiscountInSurcharge((int)$storeId)) {
             $subtotal = $subtotal - abs($discount);
         }
 
         $amount = $subtotal;
-        if ($this->config->includeShippingInSurcharge($cart->getStoreId())) {
+        if ($this->config->includeShippingInSurcharge($storeId)) {
             $amount = $subtotal + $shipping;
         }
 

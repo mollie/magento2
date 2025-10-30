@@ -1,11 +1,14 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model;
 
+use Exception;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
@@ -26,19 +29,9 @@ use Mollie\Payment\Model\ResourceModel\SentPaymentReminder\CollectionFactory as 
 class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInterface
 {
     /**
-     * @var ResourceSentPaymentReminder
-     */
-    protected $resource;
-
-    /**
      * @var SentPaymentReminderFactory
      */
     protected $sentPaymentReminderFactory;
-
-    /**
-     * @var SentPaymentReminderCollectionFactory
-     */
-    protected $sentPaymentReminderCollectionFactory;
 
     /**
      * @var SentPaymentReminderSearchResultsInterfaceFactory
@@ -46,64 +39,26 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
     protected $searchResultsFactory;
 
     /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
-     * @var DataObjectProcessor
-     */
-    protected $dataObjectProcessor;
-
-    /**
      * @var SentPaymentReminderInterfaceFactory
      */
     protected $dataSentPaymentReminderFactory;
 
-    /**
-     * @var JoinProcessorInterface
-     */
-    protected $extensionAttributesJoinProcessor;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
-     * @var ExtensibleDataObjectConverter
-     */
-    protected $extensibleDataObjectConverter;
-
     public function __construct(
-        ResourceSentPaymentReminder $resource,
+        protected ResourceSentPaymentReminder $resource,
         SentPaymentReminderFactory $sentPaymentReminderFactory,
         SentPaymentReminderInterfaceFactory $dataSentPaymentReminderFactory,
-        SentPaymentReminderCollectionFactory $sentPaymentReminderCollectionFactory,
+        protected SentPaymentReminderCollectionFactory $sentPaymentReminderCollectionFactory,
         SentPaymentReminderSearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager,
-        CollectionProcessorInterface $collectionProcessor,
-        JoinProcessorInterface $extensionAttributesJoinProcessor,
-        ExtensibleDataObjectConverter $extensibleDataObjectConverter
+        protected DataObjectHelper $dataObjectHelper,
+        protected DataObjectProcessor $dataObjectProcessor,
+        private StoreManagerInterface $storeManager,
+        private CollectionProcessorInterface $collectionProcessor,
+        protected JoinProcessorInterface $extensionAttributesJoinProcessor,
+        protected ExtensibleDataObjectConverter $extensibleDataObjectConverter,
     ) {
-        $this->resource = $resource;
         $this->sentPaymentReminderFactory = $sentPaymentReminderFactory;
-        $this->sentPaymentReminderCollectionFactory = $sentPaymentReminderCollectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
         $this->dataSentPaymentReminderFactory = $dataSentPaymentReminderFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->storeManager = $storeManager;
-        $this->collectionProcessor = $collectionProcessor;
-        $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
-        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
     }
 
     /**
@@ -119,19 +74,20 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
         $sentPaymentReminderData = $this->extensibleDataObjectConverter->toNestedArray(
             $sentPaymentReminder,
             [],
-            SentPaymentReminderInterface::class
+            SentPaymentReminderInterface::class,
         );
 
         $sentPaymentReminderModel = $this->sentPaymentReminderFactory->create()->setData($sentPaymentReminderData);
 
         try {
             $this->resource->save($sentPaymentReminderModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the sentPaymentReminder: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return $sentPaymentReminderModel->getDataModel();
     }
 
@@ -145,6 +101,7 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
         if (!$sentPaymentReminder->getId()) {
             throw new NoSuchEntityException(__('SentPaymentReminder with id "%1" does not exist.', $id));
         }
+
         return $sentPaymentReminder->getDataModel();
     }
 
@@ -158,6 +115,7 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
         if (!$sentPaymentReminder->getId()) {
             throw new NoSuchEntityException(__('SentPaymentReminder with id "%1" does not exist.', $id));
         }
+
         return $sentPaymentReminder->getDataModel();
     }
 
@@ -170,7 +128,7 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
 
         $this->extensionAttributesJoinProcessor->process(
             $collection,
-            SentPaymentReminderInterface::class
+            SentPaymentReminderInterface::class,
         );
 
         $this->collectionProcessor->process($criteria, $collection);
@@ -185,31 +143,33 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
 
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
+
         return $searchResults;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(SentPaymentReminderInterface $sentPaymentReminder)
+    public function delete(SentPaymentReminderInterface $sentPaymentReminder): bool
     {
         try {
             $sentPaymentReminderModel = $this->sentPaymentReminderFactory->create();
             $this->resource->load($sentPaymentReminderModel, $sentPaymentReminder->getEntityId());
             $this->resource->delete($sentPaymentReminderModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the SentPaymentReminder: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteById(int $id)
+    public function deleteById(int $id): bool
     {
         return $this->delete($this->get($id));
     }

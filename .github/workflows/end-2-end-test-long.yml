@@ -1,0 +1,179 @@
+name: End-2-end (Long)
+on:
+  push:
+    tags:
+      - '*'
+  pull_request:
+    types:
+      - opened
+      - labeled
+  workflow_dispatch:
+
+jobs:
+  secrets-gate:
+    # Only run tests if the pull request is opened or labeled with run_e2e_tests
+    if: ${{ github.event.label.name == 'run_e2e_tests' || github.event.action != 'labeled' }}
+    runs-on: ubuntu-latest
+    outputs:
+      is-secret-set: ${{ steps.is-secret-set.outputs.is_mollie_api_key_test_set }}
+    steps:
+      - id: is-secret-set
+        env:
+          MOLLIE_API_KEY_TEST: ${{ secrets.MOLLIE_API_KEY_TEST }}
+        if: "${{ env.MOLLIE_API_KEY_TEST != '' }}"
+        run: echo "is_mollie_api_key_test_set=true" >> $GITHUB_OUTPUT
+
+  # Remove flag used to trigger the e2e tests
+  remove_flag:
+    if: ${{ contains(github.event.*.labels.*.name, 'run_e2e_tests') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove run E2E tests label
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.removeLabel({
+              issue_number: ${{ github.event.issue.number || github.event.number }},
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: "run_e2e_tests"
+            })
+
+  e2e-tests:
+    needs:
+      - secrets-gate
+    # Only run this job if the secret is set
+    if: needs.secrets-gate.outputs.is-secret-set == 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - PHP_VERSION: php84-fpm
+            MAGENTO_VERSION: 2.4.8
+            NO_API_KEY_TEST: false
+          - PHP_VERSION: php81-fpm
+            MAGENTO_VERSION: 2.4.6-p13
+            NO_API_KEY_TEST: true
+    runs-on: ubuntu-latest
+    env:
+      PHP_VERSION: ${{ matrix.PHP_VERSION }}
+      MAGENTO_VERSION: ${{ matrix.MAGENTO_VERSION }}
+      MOLLIE_API_KEY_TEST: ${{ secrets.MOLLIE_API_KEY_TEST }}
+      NO_API_KEY_TEST: ${{ matrix.NO_API_KEY_TEST }}
+      TESTRAIL_DOMAIN: ${{ secrets.TESTRAIL_DOMAIN }}
+      TESTRAIL_USERNAME: ${{ secrets.TESTRAIL_USERNAME }}
+      TESTRAIL_PASSWORD: ${{ secrets.TESTRAIL_PASSWORD }}
+      TESTRAIL_PROJECT_ID: 5
+      TESTRAIL_SUITE_ID: 12
+      TESTRAIL_RUN_NAME: >-
+        Branch/ref: ${{ github.head_ref || github.ref_name }},
+        PHP version: ${{ matrix.PHP_VERSION }},
+        Magento version: ${{ matrix.MAGENTO_VERSION }},
+        Mollie: ${{ matrix.NO_API_KEY_TEST == 'true' && 'installed, not configured' || 'installed and configured' }}
+      TESTRAIL_RUN_CLOSE: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Start the Magento container
+        run: |
+          openssl req -x509 -newkey rsa:4096 -keyout .github/workflows/templates/nginx-proxy/magento.test.key -out .github/workflows/templates/nginx-proxy/magento.test.crt -days 365 -nodes -subj "/CN=magento.test" && \
+          # Start tunnel as first as it has some extra startup time
+          docker compose -f .github/workflows/templates/docker-compose.yml up -d --quiet-pull tunnel
+          # Start the rest of the containers
+          docker compose -f .github/workflows/templates/docker-compose.yml up -d --quiet-pull
+          # Get the URL from Cloudflare
+          tunnelOutput=$(docker compose -f .github/workflows/templates/docker-compose.yml logs tunnel)
+          MAGENTO_URL=$(echo "$tunnelOutput" | grep -oP 'https://\S*trycloudflare\.com' | head -n 1)
+          echo "Magento URL: $MAGENTO_URL"
+          echo "magento_url=$MAGENTO_URL" >> $GITHUB_ENV
+
+      # Note the `mollie-pwa-*.html` files, as it is copied to the pub folder. This is so that it can be accessed by Playwright.
+      - name: Upload the code into the docker container
+        run: |
+          sed -i '/version/d' ./composer.json && \
+          docker cp $(pwd) magento-project-community-edition:/data/extensions/ && \
+          docker cp $(pwd)/Test/End-2-end/fixtures/mollie-pwa-graphql.html magento-project-community-edition:/data/pub/opt/ && \
+          docker cp $(pwd)/Test/End-2-end/fixtures/mollie-pwa-rest.html magento-project-community-edition:/data/pub/opt/ && \
+          docker exec magento-project-community-edition ./install-composer-package mollie/magento2:@dev
+
+      - name: Activate the extension
+        run: |
+          docker exec magento-project-community-edition php /data/merge-config.php
+          docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment"
+          docker exec magento-project-community-edition ./retry "php bin/magento setup:upgrade --keep-generated --no-interaction"
+          docker exec magento-project-community-edition ./retry "bin/magento config:set payment/mollie_general/use_webhooks custom_url"
+          docker exec magento-project-community-edition ./retry "bin/magento config:set payment/mollie_general/custom_webhook_url ${{ env.magento_url }}/mollie/checkout/webhook"
+
+      - name: Configure Mollie
+        run: |
+          if [ ${{ matrix.NO_API_KEY_TEST }} == 'false' ]; then
+            docker exec magento-project-community-edition /bin/bash /data/configure-mollie.sh
+          fi
+
+      - name: Prepare Magento
+        run: |
+          sudo echo "127.0.0.1 magento.test" | sudo tee -a /etc/hosts
+          docker exec magento-project-community-edition /bin/bash ./change-base-url https://magento.test/
+          docker exec magento-project-community-edition ./retry "bin/magento config:set admin/security/admin_account_sharing 1"
+          docker exec magento-project-community-edition ./retry "bin/magento config:set admin/security/session_lifetime 86400"
+          docker exec magento-project-community-edition ./retry "bin/magento config:set web/cookie/cookie_lifetime 86400"
+          docker exec magento-project-community-edition ./retry "php bin/magento setup:di:compile"
+          docker exec magento-project-community-edition ./retry "php bin/magento app:config:import -n"
+          docker exec magento-project-community-edition ./retry "php bin/magento setup:static-content:deploy -f"
+          docker exec magento-project-community-edition ./retry "php bin/magento indexer:reindex"
+
+      - name: Check if we can reach the Magento frontend
+        run: |
+          curl --fail-with-body -k -v -w "%{http_code}" https://magento.test/
+
+      - name: Check if we can reach the Magento backend
+        run: |
+          curl --fail-with-body -k -v -w "%{http_code}" https://magento.test/admin/
+
+      - name: Install Playwright dependencies
+        run: |
+          cd Test/End-2-end
+          npm install
+          npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        id: run_tests
+        run: |
+          cd Test/End-2-end
+          BASE_URL="https://magento.test/" FORCE_COLOR=true npx playwright test
+
+      - name: Upload to TestRail
+        if: ${{ hashFiles('./Test/End-2-end/test-results/junit-report.xml') != '' }}
+        run: |
+          echo "Installing trcli"
+          pip install trcli --quiet
+          echo "Uploading test results to TestRail"
+          trcli -y \
+            -h https://${{ env.TESTRAIL_DOMAIN }} \
+            --project "Magento 2" \
+            --project-id ${{ env.TESTRAIL_PROJECT_ID }} \
+            --username ${{ env.TESTRAIL_USERNAME }} \
+            --password ${{ env.TESTRAIL_PASSWORD }} \
+            parse_junit \
+            --suite-id ${{ env.TESTRAIL_SUITE_ID }} \
+            --title "${{ env.TESTRAIL_RUN_NAME }}" \
+            -f "./Test/End-2-end/test-results/junit-report.xml" \
+            --case-matcher name \
+            --close-run
+
+      - name: Dump docker-compose logs
+        if: failure()
+        run: |
+          docker compose -f .github/workflows/templates/docker-compose.yml logs magento > magento.log
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: E2E logs - ${{ matrix.PHP_VERSION }} - ${{ matrix.MAGENTO_VERSION }} - API ${{ matrix.NO_API_KEY_TEST }}
+          path: |
+            Test/End-2-end/test-results
+            Test/End-2-end/playwright-report
+            magento-logs
+            magento.log
+            nginx-proxy.log

@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Mollie;
 
@@ -6,12 +12,13 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use stdClass;
 
 class ValidateMetadataTest extends IntegrationTestCase
 {
     public function testThrowsExceptionWhenTheOrderIdIsNotCorrect(): void
     {
-        $metadata = new \stdClass();
+        $metadata = new stdClass();
         $metadata->order_id = 1;
 
         /** @var ValidateMetadata $instance */
@@ -25,7 +32,7 @@ class ValidateMetadataTest extends IntegrationTestCase
 
     public function testThrowsExceptionWhenTheOrderIsNotInOrderIds(): void
     {
-        $metadata = new \stdClass();
+        $metadata = new stdClass();
         $metadata->order_ids = '1, 2, 3';
 
         /** @var ValidateMetadata $instance */
@@ -39,7 +46,7 @@ class ValidateMetadataTest extends IntegrationTestCase
 
     public function testThrowsExceptionWhenNoMetadataIsSet(): void
     {
-        $metadata = new \stdClass();
+        $metadata = new stdClass();
         /** @var ValidateMetadata $instance */
         $instance = $this->objectManager->create(ValidateMetadata::class);
 

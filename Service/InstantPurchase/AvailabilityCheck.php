@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\InstantPurchase;
 
 use Magento\InstantPurchase\PaymentMethodIntegration\AvailabilityCheckerInterface;
@@ -11,16 +13,9 @@ use Mollie\Payment\Config;
 
 class AvailabilityCheck implements AvailabilityCheckerInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
     public function isAvailable(): bool
     {

@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Client\Payments\Processors;
 
@@ -11,41 +17,24 @@ use Mollie\Payment\Service\Order\ExpiredOrderToTransaction;
 
 class ExpiredStatusProcessor implements PaymentProcessorInterface
 {
-    /**
-     * @var ExpiredOrderToTransaction
-     */
-    private $expiredOrderToTransaction;
-    /**
-     * @var FailedStatusProcessor
-     */
-    private $failedStatusProcessor;
-    /**
-     * @var ProcessTransactionResponseFactory
-     */
-    private $processTransactionResponseFactory;
-
     public function __construct(
-        ExpiredOrderToTransaction $expiredOrderToTransaction,
-        FailedStatusProcessor $failedStatusProcessor,
-        ProcessTransactionResponseFactory $processTransactionResponseFactory
-    ) {
-        $this->expiredOrderToTransaction = $expiredOrderToTransaction;
-        $this->failedStatusProcessor = $failedStatusProcessor;
-        $this->processTransactionResponseFactory = $processTransactionResponseFactory;
-    }
+        private ExpiredOrderToTransaction $expiredOrderToTransaction,
+        private FailedStatusProcessor $failedStatusProcessor,
+        private ProcessTransactionResponseFactory $processTransactionResponseFactory
+    ) {}
 
     public function process(
         OrderInterface $magentoOrder,
         Payment $molliePayment,
         string $type,
-        ProcessTransactionResponse $response
+        ProcessTransactionResponse $response,
     ): ?ProcessTransactionResponse {
         if ($this->shouldCancelProcessing($magentoOrder)) {
             return $this->processTransactionResponseFactory->create([
                 'success' => false,
                 'status' => $molliePayment->status,
                 'order_id' => $magentoOrder->getEntityId(),
-                'type' => $type
+                'type' => $type,
             ]);
         }
 
@@ -59,6 +48,7 @@ class ExpiredStatusProcessor implements PaymentProcessorInterface
         }
 
         $this->expiredOrderToTransaction->markTransactionAsSkipped($order->getMollieTransactionId());
+
         return true;
     }
 }

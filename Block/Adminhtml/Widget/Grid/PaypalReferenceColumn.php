@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -14,13 +15,13 @@ use Magento\Sales\Model\ResourceModel\Transaction\Grid\Collection;
 
 class PaypalReferenceColumn extends Column
 {
-    public function _construct()
+    public function _construct(): void
     {
         parent::_construct();
 
         $this->setData(
             'filter_condition_callback',
-            [$this, 'filterPaypalReference']
+            [$this, 'filterPaypalReference'],
         );
     }
 
@@ -44,7 +45,7 @@ class PaypalReferenceColumn extends Column
         return $details['paypalReference'];
     }
 
-    public function filterPaypalReference(Collection $collection, Column $column)
+    public function filterPaypalReference(Collection $collection, Column $column): void
     {
         if (!$this->getFilter()->getValue()) {
             return;

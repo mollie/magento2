@@ -4,9 +4,10 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Magento\Order;
 
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\Event;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Module\Manager;
@@ -16,23 +17,10 @@ use Magento\Sales\Api\Data\OrderInterface;
 
 class CancelRewardPoints
 {
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
-
     public function __construct(
-        Manager $moduleManager,
-        ObjectManagerInterface $objectManager
-    )
-    {
-        $this->moduleManager = $moduleManager;
-        $this->objectManager = $objectManager;
-    }
+        private Manager $moduleManager,
+        private ObjectManagerInterface $objectManager
+    ) {}
 
     /**
      * Magento Reward point has an even to listen for canceled orders, but this is only active in the adminhtml area.
@@ -40,7 +28,10 @@ class CancelRewardPoints
      */
     public function execute(OrderInterface $order): void
     {
-        if (!$this->moduleManager->isEnabled('Magento_Reward')) {
+        if (
+            !$this->moduleManager->isEnabled('Magento_Reward') ||
+            !class_exists(ReturnRewardPoints::class)
+        ) {
             return;
         }
 
@@ -54,7 +45,6 @@ class CancelRewardPoints
         $wrapper = new Observer();
         $wrapper->setData(array_merge(['event' => $event], $data));
 
-        // @phpstan-ignore-next-line
         $instance = $this->objectManager->create(ReturnRewardPoints::class);
         $instance->execute($wrapper);
     }

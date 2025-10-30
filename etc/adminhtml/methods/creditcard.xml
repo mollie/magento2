@@ -8,6 +8,8 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="mollie_methods_creditcard" translate="label" type="text" sortOrder="100" showInDefault="1"
            showInWebsite="1" showInStore="1">
+        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\GroupFrontendModel</frontend_model>
+
         <label>Credit Card</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
@@ -23,28 +25,24 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="method" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
-               showInStore="1">
-            <label>Method</label>
-            <source_model>Mollie\Payment\Model\Adminhtml\Source\Method</source_model>
-            <config_path>payment/mollie_methods_creditcard/method</config_path>
-            <depends>
-                <field id="active">1</field>
-            </depends>
-            <comment><![CDATA[Click
-            <a href="https://github.com/mollie/magento2/wiki/Differences-Payments-API-&-Orders-API" target="_blank">here</a>
-            to read more about the differences between the Payment and Orders API.]]></comment>
-        </field>
         <field id="payment_description" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Description</label>
             <config_path>payment/mollie_methods_creditcard/payment_description</config_path>
             <comment model="Mollie\Payment\Model\Adminhtml\Comment\AvailableDescriptionVariables"/>
             <depends>
-                <field id="method">payment</field>
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="use_components" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
+        <field id="capture_mode" translate="label comment" type="select" sortOrder="50" showInDefault="1"
+               showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Capture method</label>
+            <config_path>payment/mollie_methods_creditcard/capture_mode</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\CaptureMode</source_model>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="use_components" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Use Mollie Components</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -52,28 +50,17 @@
             <depends>
                 <field id="active">1</field>
             </depends>
-            <comment><![CDATA[With Components the customer can enter their credit card details within your webshop.<br><strong>Note:</strong> You need to enter your Profile ID in the general section of this extension configuration to use Mollie Components.]]></comment>
+            <comment><![CDATA[With Components, the customer can enter their credit card details within your webshop.<br><strong>Note:</strong> You need to enter your Profile ID in the general section of this extension configuration to use Mollie Components.]]></comment>
         </field>
-        <field id="enable_customers_api" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1"
+        <field id="enable_customers_api" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Enable Single Click Payments</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_creditcard/enable_customers_api</config_path>
-            <comment><![CDATA[This allows the customers to remember their Credit Card data for their next order using the <a href="https://docs.mollie.com/guides/checkout#single-click-payments-for-returning-customers" target="_blank">Customers API</a>.]]></comment>
+            <comment><![CDATA[This allows customers to remember their credit card data for their next order using the <a href="https://docs.mollie.com/guides/checkout#single-click-payments-for-returning-customers" target="_blank">Customers API</a>.]]></comment>
             <depends>
                 <field id="active">1</field>
             </depends>
-        </field>
-        <field id="days_before_expire" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1"
-               showInStore="1">
-            <label>Days to expire</label>
-            <frontend_class>validate-digits-range digits-range-1-365</frontend_class>
-            <config_path>payment/mollie_methods_creditcard/days_before_expire</config_path>
-            <depends>
-                <field id="active">1</field>
-                <field id="method">order</field>
-            </depends>
-            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
         </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="80" showInDefault="1"
                showInWebsite="1" showInStore="1">
@@ -145,7 +132,7 @@
                showInStore="1">
             <label>Payment Surcharge limit</label>
             <config_path>payment/mollie_methods_creditcard/payment_surcharge_limit</config_path>
-            <comment><![CDATA[Enter the maximum amount of payment surchage to should be charged to the customer.]]></comment>
+            <comment><![CDATA[Enter the maximum amount of payment surcharge that should be charged to the customer.]]></comment>
             <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
             <frontend_class>validate-not-negative-number</frontend_class>
             <depends>

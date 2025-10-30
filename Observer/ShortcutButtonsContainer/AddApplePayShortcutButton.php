@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Observer\ShortcutButtonsContainer;
 
 use Magento\Catalog\Block\ShortcutButtons;
@@ -15,18 +17,11 @@ use Mollie\Payment\Config;
 
 class AddApplePayShortcutButton implements ObserverInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         // We only want to show this button in the minicart
         if ($observer->getData('is_catalog_product') || !$this->isEnabled()) {

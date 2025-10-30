@@ -1,11 +1,16 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Controller\ApplePay;
 
+use Exception;
+use Laminas\Uri\Http;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Checkout\Controller\Action;
@@ -13,8 +18,12 @@ use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Data\Form\FormKey\Validator;
+use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Filter\LocalizedToNormalized;
 use Magento\Framework\Locale\ResolverInterface;
@@ -26,85 +35,26 @@ use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
-class BuyNowValidation extends Action
+class BuyNowValidation extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var GuestCartManagementInterface
-     */
-    private $cartManagement;
-
-    /**
-     * @var GuestCartRepositoryInterface
-     */
-    private $guestCartRepository;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
-    /**
-     * @var Validator
-     */
-    private $formKeyValidator;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
-    /**
-     * @var UrlInterface
-     */
-    private $url;
-
-    /**
-     * @var ResolverInterface
-     */
-    private $resolver;
-
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-
     public function __construct(
         Context $context,
         Session $customerSession,
         CustomerRepositoryInterface $customerRepository,
         AccountManagementInterface $accountManagement,
-        Config $config,
-        ResolverInterface $resolver,
-        Validator $formKeyValidator,
-        GuestCartManagementInterface $cartManagement,
-        GuestCartRepositoryInterface $guestCartRepository,
-        CartRepositoryInterface $cartRepository,
-        StoreManagerInterface $storeManager,
-        ProductRepositoryInterface $productRepository,
-        MollieApiClient $mollieApiClient,
-        UrlInterface $url
+        private Config $config,
+        private ResolverInterface $resolver,
+        private Validator $formKeyValidator,
+        private GuestCartManagementInterface $cartManagement,
+        private GuestCartRepositoryInterface $guestCartRepository,
+        private CartRepositoryInterface $cartRepository,
+        private StoreManagerInterface $storeManager,
+        private ProductRepositoryInterface $productRepository,
+        private MollieApiClient $mollieApiClient,
+        private UrlInterface $url,
+        private Http $uri,
     ) {
         parent::__construct($context, $customerSession, $customerRepository, $accountManagement);
-
-        $this->config = $config;
-        $this->resolver = $resolver;
-        $this->formKeyValidator = $formKeyValidator;
-        $this->cartManagement = $cartManagement;
-        $this->guestCartRepository = $guestCartRepository;
-        $this->cartRepository = $cartRepository;
-        $this->storeManager = $storeManager;
-        $this->productRepository = $productRepository;
-        $this->url = $url;
-        $this->mollieApiClient = $mollieApiClient;
     }
 
     /**
@@ -114,7 +64,7 @@ class BuyNowValidation extends Action
      */
     protected function _initProduct()
     {
-        $productId = (int)$this->getRequest()->getParam('product');
+        $productId = (int) $this->getRequest()->getParam('product');
         if ($productId) {
             $storeId = $this->storeManager->getStore()->getId();
             try {
@@ -123,15 +73,17 @@ class BuyNowValidation extends Action
                 return false;
             }
         }
+
         return false;
     }
 
-    public function execute()
+    public function execute(): ResponseInterface|Json
     {
         if (!$this->formKeyValidator->validate($this->getRequest())) {
             $this->messageManager->addErrorMessage(
-                __('Your session has expired')
+                __('Your session has expired'),
             );
+
             return $this->resultRedirectFactory->create()->setPath('*/*/');
         }
 
@@ -156,43 +108,45 @@ class BuyNowValidation extends Action
              */
             if (!$product) {
                 $response->setHttpResponseCode(404);
+
                 return $response->setData([
                     'error' => true,
-                    'message' => __('Product not found')
+                    'message' => __('Product not found'),
                 ]);
             }
 
-            $cart->addProduct($product, new \Magento\Framework\DataObject($params));
+            $cart->addProduct($product, new DataObject($params));
             if (!empty($related)) {
                 $cart->addProductsByIds(explode(',', $related));
             }
 
             $this->cartRepository->save($cart);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->messageManager->addExceptionMessage(
                 $e,
-                __('We can\'t add this item to your shopping cart right now.')
+                __('We can\'t add this item to your shopping cart right now.'),
             );
 
             $this->config->addToLog('error', $e);
 
             $response->setHttpResponseCode(403);
+
             return $response->setData([
                 'error' => true,
-                'message' => __('We can\'t add this item to your shopping cart right now.')
+                'message' => __('We can\'t add this item to your shopping cart right now.'),
             ]);
         }
 
         try {
             $store = $this->storeManager->getStore();
-            $api = $this->mollieApiClient->loadByApiKey($this->getLiveApiKey((int)$store->getId()));
+            $api = $this->mollieApiClient->loadByApiKey($this->getLiveApiKey((int) $store->getId()));
             $url = $this->url->getBaseUrl();
 
             $result = $api->wallets->requestApplePayPaymentSession(
-                parse_url($url, PHP_URL_HOST),
-                $this->getRequest()->getParam('validationURL')
+                $this->uri->parse($url)->getHost(),
+                $this->getRequest()->getParam('validationURL'),
             );
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $response->setHttpResponseCode(500);
             $response->setData([
                 'error' => true,
@@ -206,7 +160,7 @@ class BuyNowValidation extends Action
             'cartId' => $cartId,
             'store_name' => $this->storeManager->getStore()->getName(),
             'amount' => $cart->getGrandTotal(),
-            'validationData' => json_decode($result),
+            'validationData' => $result->toArray(),
         ]);
 
         return $response;
@@ -216,7 +170,7 @@ class BuyNowValidation extends Action
     {
         $liveApikey = $this->config->getLiveApiKey($storeId);
         if (!$liveApikey) {
-            throw new \Exception(__('For Apple Pay the live API key is required, even when in test mode'));
+            throw new Exception(__('For Apple Pay the live API key is required, even when in test mode'));
         }
 
         return $liveApikey;

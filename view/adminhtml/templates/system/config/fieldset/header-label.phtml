@@ -1,0 +1,28 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var HeaderLabel $block */
+/** @var Escaper $escaper */
+
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Adminhtml\Render\HeaderLabel;
+
+?>
+<div class="mollie-payment-method-heading">
+    <h2>
+        <?= $escaper->escapeHtml($block->getTitle()); ?>
+    </h2>
+
+    <div class="mollie-close-button">
+        <button class="action-close" data-role="closeBtn" type="button">
+            <span><?= $escaper->escapeHtml(__('Close')); ?></span>
+        </button>
+    </div>
+
+    <button class="mollie-payment-save-config save primary" type="button">
+        <?= $escaper->escapeHtml(__('Save Config')); ?>
+    </button>
+</div>

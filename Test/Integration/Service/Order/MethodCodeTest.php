@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -46,7 +47,7 @@ class MethodCodeTest extends IntegrationTestCase
         $order->getPayment()->setMethod('mollie_methods_paymentlink');
         $order->getPayment()->setAdditionalInformation(
             'limited_methods',
-            ['mollie_methods_ideal', 'mollie_methods_eps']
+            ['mollie_methods_ideal', 'mollie_methods_eps'],
         );
 
         $instance = $this->objectManager->create(MethodCode::class);
@@ -62,7 +63,7 @@ class MethodCodeTest extends IntegrationTestCase
         $order->getPayment()->setMethod('mollie_methods_paymentlink');
         $order->getPayment()->setAdditionalInformation(
             'limited_methods',
-            ['mollie_methods_ideal']
+            ['mollie_methods_ideal'],
         );
 
         $instance = $this->objectManager->create(MethodCode::class);
@@ -78,7 +79,7 @@ class MethodCodeTest extends IntegrationTestCase
         $order->getPayment()->setMethod('mollie_methods_paymentlink');
         $order->getPayment()->setAdditionalInformation(
             'limited_methods',
-            null
+            null,
         );
 
         $instance = $this->objectManager->create(MethodCode::class);
@@ -106,7 +107,7 @@ class MethodCodeTest extends IntegrationTestCase
         $order->getPayment()->setMethod('mollie_methods_paymentlink');
         $order->getPayment()->setAdditionalInformation(
             'limited_methods',
-            ['mollie_methods_ideal', 'mollie_methods_eps']
+            ['mollie_methods_ideal', 'mollie_methods_eps'],
         );
 
         $instance = $this->objectManager->create(MethodCode::class);
@@ -122,7 +123,7 @@ class MethodCodeTest extends IntegrationTestCase
         $order->getPayment()->setMethod('mollie_methods_paymentlink');
         $order->getPayment()->setAdditionalInformation(
             'limited_methods',
-            ['mollie_methods_ideal']
+            ['mollie_methods_ideal'],
         );
 
         $instance = $this->objectManager->create(MethodCode::class);

@@ -1,8 +1,6 @@
 <?php
-/*
- * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Data;
 
@@ -63,7 +61,7 @@ class SentPaymentReminder extends AbstractExtensibleObject implements SentPaymen
      * @return $this
      */
     public function setExtensionAttributes(
-        SentPaymentReminderExtensionInterface $extensionAttributes
+        SentPaymentReminderExtensionInterface $extensionAttributes,
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

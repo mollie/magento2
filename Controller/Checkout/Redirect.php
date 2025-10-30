@@ -1,8 +1,11 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\Checkout;
 
@@ -10,8 +13,10 @@ use Exception;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Payment\Helper\Data as PaymentHelper;
+use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
@@ -24,91 +29,32 @@ use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\FormatExceptionMessages;
 use Mollie\Payment\Service\Mollie\Order\RedirectUrl;
 
-/**
- * Class Redirect
- *
- * @package Mollie\Payment\Controller\Checkout
- */
-class Redirect extends Action
+class Redirect extends Action implements HttpGetActionInterface
 {
-    /**
-     * @var Session
-     */
-    protected $checkoutSession;
-    /**
-     * @var PaymentHelper
-     */
-    protected $paymentHelper;
-    /**
-     * @var OrderManagementInterface
-     */
-    private $orderManagement;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var RedirectUrl
-     */
-    private $redirectUrl;
-    /**
-     * @var FormatExceptionMessages
-     */
-    private $formatExceptionMessages;
-
-    /**
-     * Redirect constructor.
-     *
-     * @param Context $context
-     * @param Session $checkoutSession
-     * @param PaymentHelper $paymentHelper
-     * @param OrderManagementInterface $orderManagement
-     * @param Config $config
-     * @param PaymentTokenRepositoryInterface $paymentTokenRepository ,
-     * @param OrderRepositoryInterface $orderRepository
-     * @param RedirectUrl $redirectUrl
-     * @param FormatExceptionMessages $formatExceptionMessages
-     */
     public function __construct(
         Context $context,
-        Session $checkoutSession,
-        PaymentHelper $paymentHelper,
-        OrderManagementInterface $orderManagement,
-        Config $config,
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        OrderRepositoryInterface $orderRepository,
-        RedirectUrl $redirectUrl,
-        FormatExceptionMessages $formatExceptionMessages
+        protected Session $checkoutSession,
+        protected Data $paymentHelper,
+        private OrderManagementInterface $orderManagement,
+        private Config $config,
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private OrderRepositoryInterface $orderRepository,
+        private RedirectUrl $redirectUrl,
+        private FormatExceptionMessages $formatExceptionMessages,
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->paymentHelper = $paymentHelper;
-        $this->orderManagement = $orderManagement;
-        $this->config = $config;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->orderRepository = $orderRepository;
-        $this->redirectUrl = $redirectUrl;
-        $this->formatExceptionMessages = $formatExceptionMessages;
         parent::__construct($context);
     }
 
     /**
      * Execute Redirect to Mollie after placing order
      */
-    public function execute()
+    public function execute(): ResponseInterface
     {
         try {
             $order = $this->getOrder();
         } catch (LocalizedException $exception) {
             $this->config->addTolog('error', $exception->getMessage());
+
             return $this->_redirect('checkout/cart');
         }
 
@@ -124,11 +70,12 @@ class Redirect extends Action
                 $this->messageManager->addErrorMessage($msg);
                 $this->config->addTolog('error', $msg);
                 $this->checkoutSession->restoreQuote();
+
                 return $this->_redirect('checkout/cart');
             }
 
             return $this->getResponse()->setRedirect(
-                $this->redirectUrl->execute($methodInstance, $order)
+                $this->redirectUrl->execute($methodInstance, $order),
             );
         } catch (Exception $exception) {
             $errorMessage = $this->formatExceptionMessages->execute($exception, $methodInstance ?? null);
@@ -136,6 +83,7 @@ class Redirect extends Action
             $this->config->addTolog('error', $exception->getMessage());
             $this->checkoutSession->restoreQuote();
             $this->cancelUnprocessedOrder($order, $exception->getMessage());
+
             return $this->_redirect('checkout/cart');
         }
     }

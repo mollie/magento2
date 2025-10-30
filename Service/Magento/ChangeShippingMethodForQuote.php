@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -16,19 +17,14 @@ use Magento\Quote\Api\Data\AddressInterface;
 class ChangeShippingMethodForQuote
 {
     /**
-     * @var ShippingInformationManagementInterface
-     */
-    private $shippingInformationManagement;
-    /**
      * @var ShippingInformationInterfaceFactory
      */
     private $shippingInformationFactory;
 
     public function __construct(
-        ShippingInformationManagementInterface $shippingInformationManagement,
-        ShippingInformationInterfaceFactory $shippingInformationFactory
+        private ShippingInformationManagementInterface $shippingInformationManagement,
+        ShippingInformationInterfaceFactory $shippingInformationFactory,
     ) {
-        $this->shippingInformationManagement = $shippingInformationManagement;
         $this->shippingInformationFactory = $shippingInformationFactory;
     }
 

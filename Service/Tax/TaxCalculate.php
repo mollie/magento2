@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Tax;
 
@@ -12,36 +14,23 @@ use Mollie\Payment\Service\Config\PaymentFee;
 
 class TaxCalculate
 {
-    /**
-     * @var Calculation
-     */
-    private $taxCalculation;
-
-    /**
-     * @var PaymentFee
-     */
-    private $config;
-
     public function __construct(
-        Calculation $taxCalculation,
-        PaymentFee $config
-    ) {
-        $this->taxCalculation = $taxCalculation;
-        $this->config = $config;
-    }
+        private Calculation $taxCalculation,
+        private PaymentFee $config
+    ) {}
 
     public function getTaxFromAmountIncludingTax(CartInterface $cart, $amount)
     {
         $shippingAddress = $cart->getShippingAddress();
         $billingAddress = $cart->getBillingAddress();
         $customerTaxClassId = $cart->getCustomerTaxClassId();
-        $storeId = $cart->getStoreId();
+        $storeId = storeId($cart->getStoreId());
 
         $request = $this->taxCalculation->getRateRequest(
             $shippingAddress,
             $billingAddress,
             $customerTaxClassId,
-            $storeId
+            $storeId,
         );
 
         $request->setProductClassId($this->config->getTaxClass($cart));
@@ -52,7 +41,7 @@ class TaxCalculate
             $amount,
             $rate,
             true,
-            false
+            false,
         );
     }
 }

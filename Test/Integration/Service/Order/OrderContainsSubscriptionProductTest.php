@@ -4,17 +4,19 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Order;
 
-use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Payment\Service\Order\OrderContainsSubscriptionProduct;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class OrderContainsSubscriptionProductTest extends IntegrationTestCase
 {
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testReturnsFalseWhenTheOrderDoesNotContainSubscriptionProducts()
+    public function testReturnsFalseWhenTheOrderDoesNotContainSubscriptionProducts(): void
     {
         $order = $this->loadOrder('100000001');
 
@@ -26,7 +28,7 @@ class OrderContainsSubscriptionProductTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testReturnsTrueWhenTheOrderDoesContainSubscriptionProducts()
+    public function testReturnsTrueWhenTheOrderDoesContainSubscriptionProducts(): void
     {
         $order = $this->loadOrder('100000001');
         $items = $order->getItems();
@@ -36,7 +38,7 @@ class OrderContainsSubscriptionProductTest extends IntegrationTestCase
             'qty' => '1',
             'mollie_metadata' => [
                 'is_recurring' => 1,
-            ]
+            ],
         ]]);
 
         /** @var OrderContainsSubscriptionProduct $instance */

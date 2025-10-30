@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,16 +13,9 @@ use Mollie\Api\CompatibilityChecker;
 
 class TestPhpVersion extends AbstractSelfTest
 {
-    /**
-     * @var CompatibilityChecker
-     */
-    private $compatibilityChecker;
-
     public function __construct(
-        CompatibilityChecker $compatibilityChecker
-    ) {
-        $this->compatibilityChecker = $compatibilityChecker;
-    }
+        private CompatibilityChecker $compatibilityChecker
+    ) {}
 
     public function execute(): void
     {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -29,7 +30,7 @@ class SupportedNetworksTest extends IntegrationTestCase
     }
 
     /**
-     * @magentoConfigFixture default_store payment/mollie_general/enable_manual_capture 1
+     * @magentoConfigFixture default_store payment/mollie_methods_creditcard/capture_mode manual
      * @return void
      */
     public function testDoesNotIncludeMaestroAndVpayWhenManualCaptureIsEnabled(): void

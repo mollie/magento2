@@ -1,8 +1,11 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\GraphQL\Resolver\Checkout;
 
@@ -19,36 +22,12 @@ use Mollie\Payment\Service\Mollie\ProcessTransaction as ProcessTransactionAction
 
 class ProcessTransaction implements ResolverInterface
 {
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
-    /**
-     * @var ProcessTransactionAction
-     */
-    private $processTransaction;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
     public function __construct(
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        CartRepositoryInterface $cartRepository,
-        ProcessTransactionAction $processTransaction,
-        OrderRepositoryInterface $orderRepository
-    ) {
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->cartRepository = $cartRepository;
-        $this->processTransaction = $processTransaction;
-        $this->orderRepository = $orderRepository;
-    }
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private CartRepositoryInterface $cartRepository,
+        private ProcessTransactionAction $processTransaction,
+        private OrderRepositoryInterface $orderRepository
+    ) {}
 
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
@@ -64,7 +43,7 @@ class ProcessTransaction implements ResolverInterface
         }
 
         $order = $this->orderRepository->get($tokenModel->getOrderId());
-        $result = $this->processTransaction->execute($tokenModel->getOrderId(), $order->getMollieTransactionId());
+        $result = $this->processTransaction->execute((int)$tokenModel->getOrderId(), $order->getMollieTransactionId());
         $redirectToSuccessPage = $result->shouldRedirectToSuccessPage();
 
         $cart = null;

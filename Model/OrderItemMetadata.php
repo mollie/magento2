@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model;
 
 use Magento\Sales\Api\Data\OrderItemInterface;
@@ -11,16 +13,9 @@ use Mollie\Payment\Api\Data\OrderItemMetadataInterface;
 
 class OrderItemMetadata implements OrderItemMetadataInterface
 {
-    /**
-     * @var OrderItemInterface
-     */
-    private $orderItem;
-
     public function __construct(
-        OrderItemInterface $orderItem
-    ) {
-        $this->orderItem = $orderItem;
-    }
+        private OrderItemInterface $orderItem
+    ) {}
 
     public function getOrderId(): int
     {

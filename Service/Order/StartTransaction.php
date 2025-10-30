@@ -1,14 +1,16 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Payment\Helper\Data as PaymentHelper;
+use Magento\Payment\Helper\Data;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
@@ -16,39 +18,16 @@ use Mollie\Payment\Model\Mollie;
 
 class StartTransaction
 {
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var PaymentHelper
-     */
-    private $paymentHelper;
-
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        PaymentHelper $paymentHelper,
-        PaymentTokenRepositoryInterface $paymentTokenRepository
+        private OrderRepositoryInterface $orderRepository,
+        private SearchCriteriaBuilder $searchCriteriaBuilder,
+        private Data $paymentHelper,
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private \Mollie\Payment\Service\Mollie\StartTransaction $startTransaction,
     ) {
-        $this->orderRepository = $orderRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->paymentHelper = $paymentHelper;
-        $this->paymentTokenRepository = $paymentTokenRepository;
     }
 
-    public function byPaymentToken($token)
+    public function byPaymentToken($token): ?string
     {
         $tokenModel = $this->paymentTokenRepository->getByToken($token);
         if (!$tokenModel) {
@@ -60,14 +39,14 @@ class StartTransaction
         return $this->startTransactionForOrder($order);
     }
 
-    public function byIncrementId($incrementId)
+    public function byIncrementId($incrementId): ?string
     {
         $order = $this->getOrderByIncrementId($incrementId);
 
         return $this->startTransactionForOrder($order);
     }
 
-    private function getOrderByIncrementId($incrementId)
+    private function getOrderByIncrementId($incrementId): ?OrderInterface
     {
         $this->searchCriteriaBuilder->addFilter('increment_id', $incrementId);
 
@@ -76,7 +55,7 @@ class StartTransaction
         return array_shift($items);
     }
 
-    private function startTransactionForOrder(?OrderInterface $order = null)
+    private function startTransactionForOrder(?OrderInterface $order = null): ?string
     {
         if (!$order) {
             return null;
@@ -88,6 +67,6 @@ class StartTransaction
             return null;
         }
 
-        return $paymentMethod->startTransaction($order);
+        return $this->startTransaction->execute($order);
     }
 }

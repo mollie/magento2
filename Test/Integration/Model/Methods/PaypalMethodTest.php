@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Paypal;
 
 class PaypalMethodTest extends AbstractTestMethod
 {
-    protected $instance = Paypal::class;
+    protected ?string $instance = Paypal::class;
 
-    protected $code = 'paypal';
+    protected ?string $code = 'paypal';
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -8,32 +9,22 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\SelfTests;
 
+use Exception;
 use Hyva\Theme\Model\HyvaModulesConfig;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\Module\Manager;
 
 class IsHyvaThemesJsonCorrect extends AbstractSelfTest
 {
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-    /**
-     * @var File
-     */
-    private $file;
-
     public function __construct(
-        Manager $moduleManager,
-        File $file
-    ) {
-        $this->moduleManager = $moduleManager;
-        $this->file = $file;
-    }
+        private Manager $moduleManager,
+        private File $file
+    ) {}
 
     public function execute(): void
     {
-        if (!$this->moduleManager->isEnabled('Hyva_Theme') ||
+        if (
+            !$this->moduleManager->isEnabled('Hyva_Theme') ||
             !class_exists(HyvaModulesConfig::class)
         ) {
             return;
@@ -50,6 +41,7 @@ class IsHyvaThemesJsonCorrect extends AbstractSelfTest
 
         if ($contents === false) {
             $this->addMessage('error', __('The Hyva Themes configuration file is missing. Please run the command `bin/magento hyva:modules:config:generate` to generate the file.'));
+
             return;
         }
 
@@ -57,7 +49,7 @@ class IsHyvaThemesJsonCorrect extends AbstractSelfTest
             $json = json_decode($contents, true, 512, JSON_THROW_ON_ERROR);
             $this->validateThatModuleIsPresent($json, 'Mollie_HyvaCompatibility');
             $this->validateThatModuleIsPresent($json, 'Mollie_HyvaCheckout');
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->addMessage('error', __('The Hyva Themes configuration file is not a valid JSON file. Please run the command `bin/magento hyva:modules:config:generate` to generate the file.'));
         }
     }
@@ -76,7 +68,7 @@ class IsHyvaThemesJsonCorrect extends AbstractSelfTest
 
         $this->addMessage('error', __(
             'The %1 module is not present in the Hyva Themes configuration file. Please run the command `bin/magento hyva:modules:config:generate` to generate the file.',
-            $module
+            $module,
         ));
     }
 }

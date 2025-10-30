@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Plugin\Sales;
 
@@ -14,7 +16,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class AddPaymentFeeToOrderTest extends IntegrationTestCase
 {
-    public function testAddsTheFeeToTheSearchResults()
+    public function testAddsTheFeeToTheSearchResults(): void
     {
         /** @var AddPaymentFeeToOrder $instance */
         $instance = $this->objectManager->create(AddPaymentFeeToOrder::class);
@@ -36,7 +38,7 @@ class AddPaymentFeeToOrderTest extends IntegrationTestCase
         $this->assertEquals(0.3384, $extensionAttributes->getMolliePaymentFeeTax());
     }
 
-    public function testAddsTheFeeToASingleItem()
+    public function testAddsTheFeeToASingleItem(): void
     {
         /** @var AddPaymentFeeToOrder $instance */
         $instance = $this->objectManager->create(AddPaymentFeeToOrder::class);
@@ -55,7 +57,7 @@ class AddPaymentFeeToOrderTest extends IntegrationTestCase
         $this->assertEquals(0.3384, $extensionAttributes->getMolliePaymentFeeTax());
     }
 
-    public function testSetsTheValueToNullWhenNoPaymentFeeIsPresent()
+    public function testSetsTheValueToNullWhenNoPaymentFeeIsPresent(): void
     {
         /** @var AddPaymentFeeToOrder $instance */
         $instance = $this->objectManager->create(AddPaymentFeeToOrder::class);

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Plugin\Quote\Api;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -14,28 +16,23 @@ use Magento\Quote\Api\Data\CartInterface;
 
 class ParseMollieMetadata
 {
-    /**
-     * @var DataObject\Factory
-     */
-    private $objectFactory;
-
     public function __construct(
-        ObjectFactory $objectFactory
-    ) {
-        $this->objectFactory = $objectFactory;
-    }
+        private ObjectFactory $objectFactory
+    ) {}
 
     public function beforeAddProduct(
         CartInterface $subject,
         ProductInterface $product,
         $requestInfo = null,
-        $processMode = AbstractType::PROCESS_MODE_FULL
+        $processMode = AbstractType::PROCESS_MODE_FULL,
     ): array {
         $request = $this->getRequest($requestInfo);
 
-        if (!$request->hasData('purchase') ||
+        if (
+            !$request->hasData('purchase') ||
             $request->getData('purchase') != 'subscription' ||
-            !$request->hasData('recurring_metadata')) {
+            !$request->hasData('recurring_metadata')
+        ) {
             return [$product, $requestInfo, $processMode];
         }
 

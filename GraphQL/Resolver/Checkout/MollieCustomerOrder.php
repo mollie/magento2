@@ -1,8 +1,11 @@
 <?php
-/**
+
+/*
  * Copyright Magmodules.eu. All rights reserved.
- *  * See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\GraphQL\Resolver\Checkout;
 
@@ -16,34 +19,16 @@ use Magento\SalesGraphQl\Model\Formatter\Order as OrderFormatter;
 
 class MollieCustomerOrder implements ResolverInterface
 {
-    /**
-     * @var Encryptor
-     */
-    private $encryptor;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var ObjectManagerInterface
-     */
-    private $objectManager;
-
     public function __construct(
-        Encryptor $encryptor,
-        OrderRepositoryInterface $orderRepository,
-        ObjectManagerInterface $objectManager
-    ) {
-        $this->encryptor = $encryptor;
-        $this->orderRepository = $orderRepository;
-        $this->objectManager = $objectManager;
-    }
+        private Encryptor $encryptor,
+        private OrderRepositoryInterface $orderRepository,
+        private ObjectManagerInterface $objectManager
+    ) {}
 
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         $hash = $args['hash'];
+        // @phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
         $decodedHash = base64_decode($hash);
 
         $orderId = $this->encryptor->decrypt($decodedHash);

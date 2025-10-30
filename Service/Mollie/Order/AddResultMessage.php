@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -9,21 +13,15 @@ use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
 
 class AddResultMessage
 {
-    /**
-     * @var ManagerInterface
-     */
-    private $messageManager;
-
     public function __construct(
-        ManagerInterface $messageManager
-    ) {
-        $this->messageManager = $messageManager;
-    }
+        private ManagerInterface $messageManager
+    ) {}
 
     public function execute(GetMollieStatusResult $result): void
     {
         if ($result->getStatus() == 'canceled') {
             $this->messageManager->addNoticeMessage(__('Payment canceled, please try again.'));
+
             return;
         }
 

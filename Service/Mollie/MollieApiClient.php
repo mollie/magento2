@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\Exception\LocalizedException;
@@ -16,40 +18,16 @@ use Mollie\Payment\Service\Mollie\Wrapper\MollieApiClientFallbackWrapperFactory;
 class MollieApiClient
 {
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
      * @var \Mollie\Api\MollieApiClient[]
      */
     private $instances = [];
 
-    /**
-     * @var MollieApiClientFallbackWrapperFactory
-     */
-    private $mollieApiClientWrapperFactory;
-
-    /**
-     * @var FetchFallbackApiKeys
-     */
-    private $fetchFallbackApiKeys;
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-
     public function __construct(
-        Config $config,
-        MollieApiClientFallbackWrapperFactory $mollieApiClientWrapperFactory,
-        FetchFallbackApiKeys $fetchFallbackApiKeys,
-        Manager $moduleManager
-    ) {
-        $this->config = $config;
-        $this->mollieApiClientWrapperFactory = $mollieApiClientWrapperFactory;
-        $this->fetchFallbackApiKeys = $fetchFallbackApiKeys;
-        $this->moduleManager = $moduleManager;
-    }
+        private Config $config,
+        private MollieApiClientFallbackWrapperFactory $mollieApiClientWrapperFactory,
+        private FetchFallbackApiKeys $fetchFallbackApiKeys,
+        private Manager $moduleManager
+    ) {}
 
     public function loadByStore(?int $storeId = null): \Mollie\Api\MollieApiClient
     {
@@ -66,10 +44,9 @@ class MollieApiClient
             return $this->instances[$apiKey];
         }
 
-        /** @var MollieApiClientFallbackWrapper $mollieApiClientWrapper */
+        /** @var MollieApiClientFallbackWrapper $mollieApiClient */
         $mollieApiClient = $this->mollieApiClientWrapperFactory->create();
-        $mollieApiClient->orders->setFallbackApiKeysInstance($this->fetchFallbackApiKeys);
-        $mollieApiClient->payments->setFallbackApiKeysInstance($this->fetchFallbackApiKeys);
+        $mollieApiClient->setFallbackApiKeysInstance($this->fetchFallbackApiKeys);
 
         $mollieApiClient->setApiKey($apiKey);
         $mollieApiClient->addVersionString('Magento/' . $this->config->getMagentoVersion());

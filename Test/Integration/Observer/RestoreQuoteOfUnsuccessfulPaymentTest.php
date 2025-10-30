@@ -1,12 +1,17 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
-namespace Mollie\Payment\Test\Integration\Observer\ControllerActionPredispatchCheckoutIndexIndex;
+declare(strict_types=1);
+
+namespace Mollie\Payment\Test\Integration\Observer;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Event\Observer;
 use Magento\OfflinePayments\Model\Checkmo;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order;
 use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex\RestoreQuoteOfUnsuccessfulPayment;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;

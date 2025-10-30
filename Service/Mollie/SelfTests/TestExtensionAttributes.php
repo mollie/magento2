@@ -1,12 +1,15 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
- *  * See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\SelfTests;
 
-use Magento\Framework\App\ObjectManager;
+use DOMElement;
+use DOMXPath;
 use Magento\Framework\Module\Dir\Reader;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\Xml\Parser;
@@ -18,30 +21,11 @@ use Magento\Framework\Xml\Parser;
  */
 class TestExtensionAttributes extends AbstractSelfTest
 {
-    /**
-     * @var Reader
-     */
-    private $dirReader;
-
-    /**
-     * @var Parser
-     */
-    private $xmlParser;
-
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
-
     public function __construct(
-        Reader $dirReader,
-        Parser $xmlParser,
-        ObjectManagerInterface $objectManager
-    ) {
-        $this->dirReader = $dirReader;
-        $this->xmlParser = $xmlParser;
-        $this->objectManager = $objectManager;
-    }
+        private Reader $dirReader,
+        private Parser $xmlParser,
+        private ObjectManagerInterface $objectManager
+    ) {}
 
     public function execute(): void
     {
@@ -51,7 +35,7 @@ class TestExtensionAttributes extends AbstractSelfTest
         }
     }
 
-    private function allExtensionAttributesExists()
+    private function allExtensionAttributesExists(): bool
     {
         $interfaces = $this->getExtensionAttributesList();
 
@@ -74,16 +58,16 @@ class TestExtensionAttributes extends AbstractSelfTest
     /**
      * @return array
      */
-    private function getExtensionAttributesList()
+    private function getExtensionAttributesList(): array
     {
         $output = [];
         $path = $this->dirReader->getModuleDir('etc', 'Mollie_Payment') . '/extension_attributes.xml';
         $dom = $this->xmlParser->load($path)->getDom();
-        $xpath = new \DOMXPath($dom);
+        $xpath = new DOMXPath($dom);
 
         $elements = $xpath->query('//config/extension_attributes');
 
-        /** @var \DOMElement $element */
+        /** @var DOMElement $element */
         foreach ($elements as $element) {
             $for = $element->getAttribute('for');
             $output[$for] = $this->getAttributes($element);
@@ -93,10 +77,10 @@ class TestExtensionAttributes extends AbstractSelfTest
     }
 
     /**
-     * @param \DOMElement $element
+     * @param DOMElement $element
      * @return array
      */
-    private function getAttributes(\DOMElement $element): array
+    private function getAttributes(DOMElement $element): array
     {
         $attributes = $element->childNodes;
         $codes = [];
@@ -105,12 +89,14 @@ class TestExtensionAttributes extends AbstractSelfTest
                 continue;
             }
 
+            // @phpstan-ignore-next-line
             $codes[] = $attribute->getAttribute('code');
         }
+
         return $codes;
     }
 
-    private function allMethodsExists($extensionAttributesInstance, $attributes)
+    private function allMethodsExists($extensionAttributesInstance, $attributes): bool
     {
         foreach ($attributes as $attribute) {
             if (!method_exists($extensionAttributesInstance, $this->convertToMethodName($attribute))) {

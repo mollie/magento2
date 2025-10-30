@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -10,28 +14,16 @@ use Mollie\Payment\Config;
 
 class PointOfSaleAvailability
 {
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var Session
-     */
-    private $customerSession;
-
     public function __construct(
-        Config $config,
-        Session $customerSession
-    ) {
-        $this->config = $config;
-        $this->customerSession = $customerSession;
-    }
+        private Config $config,
+        private Session $customerSession
+    ) {}
 
     public function isAvailable(CartInterface $cart): bool
     {
-        $storeId = (int)$cart->getStoreId();
+        $storeId = storeId($cart->getStoreId());
 
-        return $this->isAvailableForCustomerGroupId((int)$this->customerSession->getCustomerGroupId(), $storeId);
+        return $this->isAvailableForCustomerGroupId((int) $this->customerSession->getCustomerGroupId(), $storeId);
     }
 
     public function isAvailableForCustomerGroupId(int $customerGroupId, int $storeId): bool
@@ -39,8 +31,8 @@ class PointOfSaleAvailability
         $allowedGroups = explode(',', $this->config->pointofsaleAllowedCustomerGroups($storeId));
 
         return in_array(
-            (string)$customerGroupId,
-            $allowedGroups
+            (string) $customerGroupId,
+            $allowedGroups,
         );
     }
 }

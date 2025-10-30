@@ -1,19 +1,27 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Controller\ApplePay;
 
+use Exception;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\GuestCartRepositoryInterface;
+use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\QuoteManagement;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -22,75 +30,28 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Service\PaymentToken\Generate;
 use Mollie\Payment\Service\Quote\SetRegionFromApplePayAddress;
 
-class PlaceOrder extends Action
+class PlaceOrder extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var GuestCartRepositoryInterface
-     */
-    private $guestCartRepository;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
-    /**
-     * @var QuoteManagement
-     */
-    private $quoteManagement;
-
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
-
     /**
      * @var PaymentTokenRequestInterface
      */
     private $paymentTokenRequest;
 
-    /**
-     * @var Generate
-     */
-    private $paymentToken;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-    /**
-     * @var SetRegionFromApplePayAddress
-     */
-    private $setRegionFromApplePayAddress;
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
         Context $context,
-        GuestCartRepositoryInterface $guestCartRepository,
-        CartRepositoryInterface $cartRepository,
-        QuoteManagement $quoteManagement,
-        Session $checkoutSession,
-        Generate $paymentToken,
-        SetRegionFromApplePayAddress $setRegionFromApplePayAddress,
-        OrderRepositoryInterface $orderRepository,
-        Config $config
+        private GuestCartRepositoryInterface $guestCartRepository,
+        private CartRepositoryInterface $cartRepository,
+        private QuoteManagement $quoteManagement,
+        private Session $checkoutSession,
+        private Generate $paymentToken,
+        private SetRegionFromApplePayAddress $setRegionFromApplePayAddress,
+        private OrderRepositoryInterface $orderRepository,
+        private Config $config,
     ) {
         parent::__construct($context);
-
-        $this->guestCartRepository = $guestCartRepository;
-        $this->cartRepository = $cartRepository;
-        $this->quoteManagement = $quoteManagement;
-        $this->checkoutSession = $checkoutSession;
-        $this->paymentToken = $paymentToken;
-        $this->orderRepository = $orderRepository;
-        $this->setRegionFromApplePayAddress = $setRegionFromApplePayAddress;
-        $this->config = $config;
     }
 
-    public function execute()
+    public function execute(): Json
     {
         $cart = $this->getCart();
 
@@ -106,8 +67,8 @@ class PlaceOrder extends Action
                 str_replace(
                     '__SPLIT__',
                     '_',
-                    $this->getRequest()->getParam('shippingMethod')['identifier']
-                )
+                    $this->getRequest()->getParam('shippingMethod')['identifier'],
+                ),
             );
         }
 
@@ -123,7 +84,7 @@ class PlaceOrder extends Action
         try {
             /** @var OrderInterface $order */
             $order = $this->quoteManagement->submit($cart);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->config->addToLog('error', [
                 'message' => 'Error while try place Apple Pay order',
                 'quote_id' => $cart->getId(),
@@ -136,7 +97,7 @@ class PlaceOrder extends Action
 
         $order->getPayment()->setAdditionalInformation(
             'applepay_payment_token',
-            $this->getRequest()->getParam('applePayPaymentToken')
+            $this->getRequest()->getParam('applePayPaymentToken'),
         );
 
         $this->orderRepository->save($order);
@@ -157,7 +118,7 @@ class PlaceOrder extends Action
         return $response->setData(['url' => $url, 'error' => false, 'error_message' => '']);
     }
 
-    private function updateAddress(AddressInterface $address, array $input)
+    private function updateAddress(AddressInterface $address, array $input): void
     {
         $address->addData([
             AddressInterface::KEY_STREET => implode(PHP_EOL, $input['addressLines']),
@@ -174,14 +135,14 @@ class PlaceOrder extends Action
             $address->setTelephone($input['phoneNumber']);
         }
 
-        if ($address->getAddressType() == \Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_BILLING) {
+        if ($address->getAddressType() == Address::ADDRESS_TYPE_BILLING) {
             $input = $this->getRequest()->getParam('shippingAddress');
             $address->setTelephone($input['phoneNumber']);
         }
     }
 
     /**
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      * @return CartInterface
      */
     public function getCart(): CartInterface

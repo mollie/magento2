@@ -1,8 +1,10 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex;
 
@@ -15,25 +17,12 @@ use Mollie\Payment\Model\Mollie;
 
 class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
 {
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Session $checkoutSession,
-        Config $config
-    ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->config = $config;
-    }
+        private Session $checkoutSession,
+        private Config $config
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var OrderInterface $order */
         $order = $this->checkoutSession->getLastRealOrder();

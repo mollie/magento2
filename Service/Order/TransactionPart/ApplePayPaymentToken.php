@@ -1,19 +1,19 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
- *  * See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class ApplePayPaymentToken implements TransactionPartInterface
 {
-    public function process(OrderInterface $order, $apiMethod, array $transaction)
+    public function process(OrderInterface $order, array $transaction): array
     {
         $additionalData = $order->getPayment()->getAdditionalInformation();
 
@@ -21,13 +21,7 @@ class ApplePayPaymentToken implements TransactionPartInterface
             return $transaction;
         }
 
-        if ($apiMethod == Payments::CHECKOUT_TYPE) {
-            $transaction['applePayPaymentToken'] = $additionalData['applepay_payment_token'];
-        }
-
-        if ($apiMethod == Orders::CHECKOUT_TYPE) {
-            $transaction['payment']['applePayPaymentToken'] = $additionalData['applepay_payment_token'];
-        }
+        $transaction['applePayPaymentToken'] = $additionalData['applepay_payment_token'];
 
         return $transaction;
     }

@@ -4,22 +4,19 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration;
 
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
+use StdClass;
 
 class MolliePaymentBuilder
 {
-    /**
-     * @var Payment
-     */
-    private $payment;
+    private Payment $payment;
 
-    /**
-     * @var MollieApiClient
-     */
-    private $client;
+    private MollieApiClient $client;
 
     public function __construct()
     {
@@ -29,7 +26,7 @@ class MolliePaymentBuilder
 
     public function setAmount(float $value, $currency = 'EUR'): void
     {
-        $this->payment->amount = new \StdClass();
+        $this->payment->amount = new StdClass();
         $this->payment->amount->value = $value;
         $this->payment->amount->currency = $currency;
     }

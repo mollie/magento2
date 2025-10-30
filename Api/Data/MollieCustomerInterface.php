@@ -1,8 +1,11 @@
 <?php
-/**
+
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Api\Data;
 
@@ -10,9 +13,9 @@ use Magento\Framework\Api\ExtensibleDataInterface;
 
 interface MollieCustomerInterface extends ExtensibleDataInterface
 {
-    const ENTITY_ID = 'entity_id';
-    const CUSTOMER_ID = 'customer_id';
-    const MOLLIE_CUSTOMER_ID = 'mollie_customer_id';
+    public const ENTITY_ID = 'entity_id';
+    public const CUSTOMER_ID = 'customer_id';
+    public const MOLLIE_CUSTOMER_ID = 'mollie_customer_id';
 
     /**
      * Get customer_id
@@ -42,7 +45,7 @@ interface MollieCustomerInterface extends ExtensibleDataInterface
 
     /**
      * Get mollie_customer_id
-     * @return text|null
+     * @return string|null
      */
     public function getMollieCustomerId();
 

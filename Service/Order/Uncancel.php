@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Event\ManagerInterface;
@@ -18,50 +20,19 @@ use Mollie\Payment\Service\Order\Uncancel\OrderReservation;
 class Uncancel
 {
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var OrderReservation
-     */
-    private $uncancelOrderItemReservation;
-
-    /**
-     * @var ManagerInterface
-     */
-    private $eventManager;
-
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-
-    /**
      * @var bool
      */
     private $isInventorySalesApiEnabled;
 
     public function __construct(
-        Config $config,
-        OrderRepositoryInterface $orderRepository,
-        OrderReservation $uncancelOrderItemReservation,
-        ManagerInterface $eventManager,
-        Manager $moduleManager
-    ) {
-        $this->config = $config;
-        $this->orderRepository = $orderRepository;
-        $this->uncancelOrderItemReservation = $uncancelOrderItemReservation;
-        $this->eventManager = $eventManager;
-        $this->moduleManager = $moduleManager;
-    }
+        private Config $config,
+        private OrderRepositoryInterface $orderRepository,
+        private OrderReservation $uncancelOrderItemReservation,
+        private ManagerInterface $eventManager,
+        private Manager $moduleManager
+    ) {}
 
-    public function execute(OrderInterface $order)
+    public function execute(OrderInterface $order): void
     {
         $this->isInventorySalesApiEnabled = $this->moduleManager->isEnabled('Magento_InventorySalesApi');
 
@@ -72,13 +43,13 @@ class Uncancel
         $this->eventManager->dispatch('sales_order_uncancel', ['order' => $order]);
     }
 
-    private function updateOrder(OrderInterface $order)
+    private function updateOrder(OrderInterface $order): void
     {
         $order->setState(Order::STATE_NEW);
         $order->addStatusToHistory(
-            $this->config->orderStatusPending($order->getStoreId()),
+            $this->config->orderStatusPending(storeId($order->getStoreId())),
             __('Order uncanceled by webhook.'),
-            true
+            true,
         );
 
         $order->setSubtotalCanceled(0);
@@ -97,7 +68,7 @@ class Uncancel
         $order->setBaseTotalCanceled(0);
     }
 
-    private function updateOrderItems(OrderInterface $order)
+    private function updateOrderItems(OrderInterface $order): void
     {
         /** @var OrderItemInterface $item */
         foreach ($order->getAllItems() as $item) {
@@ -109,7 +80,7 @@ class Uncancel
         }
     }
 
-    private function uncancelItem(OrderItemInterface $item)
+    private function uncancelItem(OrderItemInterface $item): void
     {
         $item->setQtyCanceled(0);
         $item->setTaxCanceled(0);

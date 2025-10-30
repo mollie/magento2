@@ -1,8 +1,11 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Api\Data;
 
@@ -10,10 +13,10 @@ use Magento\Framework\Api\ExtensibleDataInterface;
 
 interface PendingPaymentReminderInterface extends ExtensibleDataInterface
 {
-    const ENTITY_ID = 'entity_id';
-    const CUSTOMER_ID = 'customer_id';
-    const HASH = 'hash';
-    const ORDER_ID = 'order_id';
+    public const ENTITY_ID = 'entity_id';
+    public const CUSTOMER_ID = 'customer_id';
+    public const HASH = 'hash';
+    public const ORDER_ID = 'order_id';
 
     /**
      * @param int $id

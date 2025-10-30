@@ -6,14 +6,13 @@
 
 // @codingStandardsIgnoreFile
 /**
- * @var \Mollie\Payment\Block\Info\Base $block
- * @var \Magento\Framework\Escaper $escaper
+ * @var Base $block
+ * @var Escaper $escaper
  */
 
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Info\Base;
 use Mollie\Payment\Model\Methods\Voucher;
-
-// Magento 2.3 compatibility
-isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 
 $specificInfo = $block->getSpecificInformation();
 $status = $block->getPaymentStatus();
@@ -26,9 +25,9 @@ $status = $block->getPaymentStatus();
     <?= $escaper->escapeHtml(__(
         '%1 using Voucher, %2 direct.',
         $block->formatPrice($block->getAmountPaidByVoucher()),
-        $block->formatPrice($block->getRemainderAmount())
+        $block->formatPrice($block->getRemainderAmount()),
     ));
-    ?>
+        ?>
     <?php endif; ?>
 
     <table class="data-table admin__table-secondary">

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Logger;
 
 use Monolog\Handler\StreamHandler;
@@ -17,26 +19,12 @@ use Monolog\Logger;
  */
 class MollieLogger
 {
-    /**
-     * @var Logger
-     */
-    private $logger;
-    /**
-     * @var StreamHandler
-     */
-    private $handler;
-    /**
-     * @var Logger
-     */
-    private $instance;
+    private ?Logger $instance = null;
 
     public function __construct(
-        Logger $logger,
-        StreamHandler $handler
-    ) {
-        $this->logger = $logger;
-        $this->handler = $handler;
-    }
+        private Logger $logger,
+        private StreamHandler $handler
+    ) {}
 
     private function getLogger(): Logger
     {
@@ -56,7 +44,7 @@ class MollieLogger
      * @param $type
      * @param $data
      */
-    public function addInfoLog($type, $data)
+    public function addInfoLog(string $type, $data): void
     {
         // The level class doesn't exist in older monolog versions, which are used by older Magento versions
         $level = class_exists(Level::class) ? Level::Info : 200;
@@ -76,7 +64,7 @@ class MollieLogger
      * @param $type
      * @param $data
      */
-    public function addErrorLog($type, $data)
+    public function addErrorLog(string $type, $data): void
     {
         // The level class doesn't exist in older monolog versions, which are used by older Magento versions
         $level = class_exists(Level::class) ? Level::Error : 400;

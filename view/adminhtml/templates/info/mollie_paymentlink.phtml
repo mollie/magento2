@@ -6,13 +6,13 @@
 
 /**
  * @var \Mollie\Payment\Block\Info\Base $block
- * @var \Magento\Framework\Escaper $escaper
+ * @var Escaper $escaper
  */
+
+use Magento\Framework\Escaper;
+
 $specificInfo = $block->getSpecificInformation();
 $status = $block->getPaymentStatus();
-
-// Magento 2.3 compatibility
-isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
 <div class="mollie-method">
     <img src="<?= $escaper->escapeHtmlAttr($escaper->escapeUrl($block->getViewFileUrl('Mollie_Payment::images/' . $block->getPaymentImage()))) ?>"/>

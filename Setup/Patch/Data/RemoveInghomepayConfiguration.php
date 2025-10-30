@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Setup\Patch\Data;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
@@ -13,23 +15,10 @@ use Magento\Store\Model\StoreManagerInterface;
 
 class RemoveInghomepayConfiguration implements DataPatchInterface
 {
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var WriterInterface
-     */
-    private $configWriter;
-
     public function __construct(
-        StoreManagerInterface $storeManager,
-        WriterInterface $configWriter
-    ) {
-        $this->storeManager = $storeManager;
-        $this->configWriter = $configWriter;
-    }
+        private StoreManagerInterface $storeManager,
+        private WriterInterface $configWriter
+    ) {}
 
     public function apply()
     {

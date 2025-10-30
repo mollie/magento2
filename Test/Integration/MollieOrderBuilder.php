@@ -4,11 +4,14 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration;
 
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
+use StdClass;
 
 class MollieOrderBuilder
 {
@@ -17,10 +20,7 @@ class MollieOrderBuilder
      */
     private $order;
 
-    /**
-     * @var MollieApiClient
-     */
-    private $client;
+    private MollieApiClient $client;
 
     public function __construct()
     {
@@ -34,12 +34,12 @@ class MollieOrderBuilder
             return;
         }
 
-        $this->order->_embedded = new \StdClass;
+        $this->order->_embedded = new StdClass();
     }
 
     public function setAmount(float $value, $currency = 'EUR'): void
     {
-        $this->order->amount = new \StdClass();
+        $this->order->amount = new StdClass();
         $this->order->amount->value = $value;
         $this->order->amount->currency = $currency;
     }
@@ -75,8 +75,8 @@ class MollieOrderBuilder
         }
 
         $payment = $this->order->_embedded->payments[0];
-        $payment->_links = new \StdClass();
-        $payment->_links->chargebacks = new \StdClass();
+        $payment->_links = new StdClass();
+        $payment->_links->chargebacks = new StdClass();
     }
 
     public function build(): Order

@@ -1,11 +1,12 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\PaymentFee\Types;
+declare(strict_types=1);
 
+namespace Mollie\Payment\Service\PaymentFee\Types;
 
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote\Address\Total;
@@ -14,35 +15,13 @@ use Mollie\Payment\Service\PaymentFee\ResultFactory;
 
 class FixedAmountAndPercentage implements TypeInterface
 {
-    /**
-     * @var ResultFactory
-     */
-    private $resultFactory;
-
-    /**
-     * @var FixedAmount
-     */
-    private $fixedAmount;
-
-    /**
-     * @var Percentage
-     */
-    private $percentage;
-
     public function __construct(
-        ResultFactory $resultFactory,
-        FixedAmount $fixedAmount,
-        Percentage $percentage
-    ) {
-        $this->fixedAmount = $fixedAmount;
-        $this->percentage = $percentage;
-        $this->resultFactory = $resultFactory;
-    }
+        private ResultFactory $resultFactory,
+        private FixedAmount $fixedAmount,
+        private Percentage $percentage
+    ) {}
 
-    /**
-     * @inheritDoc
-     */
-    public function calculate(CartInterface $cart, Total $total)
+    public function calculate(CartInterface $cart, Total $total): Result
     {
         $percentage = $this->percentage->calculate($cart, $total);
         $fixedAmount = $this->fixedAmount->calculate($cart, $total);

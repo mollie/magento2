@@ -4,12 +4,14 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Checkout;
 
+use Exception;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
 use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\PaymentToken\Generate;
@@ -25,7 +27,7 @@ class ProcessTransactionTest extends GraphQLTestCase
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testResetsTheCartWhenPending()
+    public function testResetsTheCartWhenPending(): void
     {
         /** @var CartInterface $cart */
         $cart = $this->objectManager->create(Quote::class);
@@ -43,7 +45,7 @@ class ProcessTransactionTest extends GraphQLTestCase
         $fake = $this->objectManager->create(ProcessTransactionFake::class);
         $fake->setResponse($this->objectManager->create(
             GetMollieStatusResult::class,
-            ['status' => 'failed', 'method' => 'ideal']
+            ['status' => 'failed', 'method' => 'ideal'],
         ));
         $this->objectManager->addSharedInstance($fake, ProcessTransaction::class);
 
@@ -57,14 +59,14 @@ class ProcessTransactionTest extends GraphQLTestCase
 
         $newCart = $this->objectManager->create(CartRepositoryInterface::class)->get($tokenModel->getCartId());
         $newCart->load('test01', 'reserved_order_id');
-        $this->assertTrue((bool)$newCart->getIsActive());
+        $this->assertTrue((bool) $newCart->getIsActive());
     }
 
     /**
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testDoesNotReactivateTheCartWhenTheStatusIsPending()
+    public function testDoesNotReactivateTheCartWhenTheStatusIsPending(): void
     {
         /** @var CartInterface $cart */
         $cart = $this->objectManager->create(Quote::class);
@@ -82,7 +84,7 @@ class ProcessTransactionTest extends GraphQLTestCase
         $fake = $this->objectManager->create(ProcessTransactionFake::class);
         $fake->setResponse($this->objectManager->create(
             GetMollieStatusResult::class,
-            ['status' => 'pending', 'method' => 'ideal']
+            ['status' => 'pending', 'method' => 'ideal'],
         ));
         $this->objectManager->addSharedInstance($fake, ProcessTransaction::class);
 
@@ -96,16 +98,16 @@ class ProcessTransactionTest extends GraphQLTestCase
 
         $newCart = $this->objectManager->create(CartRepositoryInterface::class)->get($tokenModel->getCartId());
         $newCart->load('test01', 'reserved_order_id');
-        $this->assertFalse((bool)$newCart->getIsActive());
+        $this->assertFalse((bool) $newCart->getIsActive());
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      * @magentoAppArea graphql
      */
-    public function testThrowsANotFoundExceptionWhenTokenDoesNotExists()
+    public function testThrowsANotFoundExceptionWhenTokenDoesNotExists(): void
     {
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $this->expectExceptionMessage('GraphQL response contains errors: No order found with token "non-existing-payment-token"');
 
         $this->graphQlQuery('mutation {

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -8,40 +9,25 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\ApplePay;
 
+use Exception;
 use Magento\Framework\App\CacheInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\HTTP\ClientInterface;
 use Mollie\Payment\Config;
 
 class Certificate
 {
-    const CACHE_IDENTIFIER_PREFIX = 'mollie_payment_apple_pay_certificate';
-
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var CacheInterface
-     */
-    private $cache;
-    /**
-     * @var ClientInterface
-     */
-    private $client;
+    public const CACHE_IDENTIFIER_PREFIX = 'mollie_payment_apple_pay_certificate';
 
     public function __construct(
-        Config $config,
-        CacheInterface $cache,
-        ClientInterface $client
-    ) {
-        $this->cache = $cache;
-        $this->client = $client;
-        $this->config = $config;
-    }
+        private Config $config,
+        private CacheInterface $cache,
+        private ClientInterface $client
+    ) {}
 
     /**
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
     public function execute(): string
     {
@@ -58,7 +44,7 @@ class Certificate
             $certificate,
             $identifier,
             ['mollie_payment', 'mollie_payment_apple_pay_certificate'],
-            7 * 24 * 60 * 60 // Cache for 1 week
+            7 * 24 * 60 * 60, // Cache for 1 week
         );
 
         return $certificate;
@@ -69,7 +55,7 @@ class Certificate
         $this->client->get('https://www.mollie.com/.well-known/apple-developer-merchantid-domain-association');
 
         if ($this->client->getStatus() !== 200) {
-            throw new \Exception('Unable to retrieve Apple Pay certificate from www.mollie.com');
+            throw new LocalizedException(__('Unable to retrieve Apple Pay certificate from www.mollie.com'));
         }
 
         return $this->client->getBody();

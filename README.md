@@ -94,4 +94,4 @@ These modules are tested and known to be working with the Mollie Payment extensi
 
 ## License
 [BSD (Berkeley Software Distribution) License](http://www.opensource.org/licenses/bsd-license.php).
-Copyright (c) 2011-2020, Mollie B.V.
+Copyright (c) 2011-2025, Mollie B.V.

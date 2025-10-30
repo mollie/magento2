@@ -1,17 +1,19 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Test\Ingegration\Plugin\Email\Model\Template;
+declare(strict_types=1);
+
+namespace Mollie\Payment\Test\Integration\Plugin\Email\Model\Template;
 
 use Mollie\Payment\Plugin\Email\Model\Template\Config;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class ConfigTest extends IntegrationTestCase
 {
-    public function replacesAllValues()
+    public function replacesAllValues(): array
     {
         return [
             ['payment_mollie_mollie_general_second_chance_email_template'],
@@ -24,7 +26,7 @@ class ConfigTest extends IntegrationTestCase
      * @param $input
      * @dataProvider replacesAllValues
      */
-    public function testReplacesAllValues($input)
+    public function testReplacesAllValues(string $input): void
     {
         /** @var Config $instance */
         $instance = $this->objectManager->create(Config::class);
@@ -33,7 +35,7 @@ class ConfigTest extends IntegrationTestCase
 
         $this->assertEquals(
             'payment_other_mollie_mollie_general_second_chance_email_template',
-            $instance->beforeGetTemplateLabel($subject, $input)[0]
+            $instance->beforeGetTemplateLabel($subject, $input)[0],
         );
     }
 }

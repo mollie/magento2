@@ -4,8 +4,11 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Controller\Checkout;
 
+use Exception;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Message\MessageInterface;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -20,7 +23,7 @@ use Mollie\Payment\Test\Fakes\Service\Mollie\ProcessTransactionFake;
 
 class ProcessTest extends AbstractController
 {
-    public function testDoesRedirectsToCartWhenNoIdProvided()
+    public function testDoesRedirectsToCartWhenNoIdProvided(): void
     {
         $this->dispatch('mollie/checkout/process');
 
@@ -28,12 +31,12 @@ class ProcessTest extends AbstractController
         $this->assertSessionMessages($this->equalTo(['Invalid return from Mollie.']), MessageInterface::TYPE_NOTICE);
     }
 
-    public function testRedirectsToCartOnException()
+    public function testRedirectsToCartOnException(): void
     {
         $this->fakeValidation(['123' => 'abc']);
 
         $mollieModel = $this->createMock(Mollie::class);
-        $mollieModel->method('processTransaction')->willThrowException(new \Exception('[TEST] Transaction failed. Please verify your billing information and payment method, and try again.'));
+        $mollieModel->method('processTransaction')->willThrowException(new Exception('[TEST] Transaction failed. Please verify your billing information and payment method, and try again.'));
 
         $this->_objectManager->addSharedInstance($mollieModel, Mollie::class);
 
@@ -42,22 +45,22 @@ class ProcessTest extends AbstractController
         $this->assertRedirect($this->stringContains('checkout/cart'));
         $this->assertSessionMessages(
             $this->equalTo(['There was an error checking the transaction status.']),
-            MessageInterface::TYPE_ERROR
+            MessageInterface::TYPE_ERROR,
         );
     }
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testUsesOrderIdParameter()
+    public function testUsesOrderIdParameter(): void
     {
         $order = $this->loadOrderById('100000001');
-        $this->fakeValidation([(string)$order->getId() => 'abc']);
+        $this->fakeValidation([(string) $order->getId() => 'abc']);
 
         $fake = $this->_objectManager->create(ProcessTransactionFake::class);
         $fake->setResponse($this->_objectManager->create(
             GetMollieStatusResult::class,
-            ['status' => 'paid', 'method' => 'ideal']
+            ['status' => 'paid', 'method' => 'ideal'],
         ));
 
         $this->_objectManager->addSharedInstance($fake, ProcessTransaction::class);
@@ -70,7 +73,7 @@ class ProcessTest extends AbstractController
     /**
      * @magentoDataFixture Magento/Sales/_files/order_list.php
      */
-    public function testUsesOrderIdsParameter()
+    public function testUsesOrderIdsParameter(): void
     {
         $order1 = $this->loadOrderById('100000001');
         $order2 = $this->loadOrderById('100000002');
@@ -78,16 +81,16 @@ class ProcessTest extends AbstractController
         $order4 = $this->loadOrderById('100000004');
 
         $this->fakeValidation([
-            (string)$order1->getId() => 'abc',
-            (string)$order2->getId() => 'def',
-            (string)$order3->getId() => 'ghi',
-            (string)$order4->getId() => 'jkl',
+            (string) $order1->getId() => 'abc',
+            (string) $order2->getId() => 'def',
+            (string) $order3->getId() => 'ghi',
+            (string) $order4->getId() => 'jkl',
         ]);
 
         $fake = $this->_objectManager->create(ProcessTransactionFake::class);
         $fake->setResponse($this->_objectManager->create(
             GetMollieStatusResult::class,
-            ['status' => 'paid', 'method' => 'ideal']
+            ['status' => 'paid', 'method' => 'ideal'],
         ));
 
         $this->_objectManager->addSharedInstance($fake, ProcessTransaction::class);
@@ -108,7 +111,7 @@ class ProcessTest extends AbstractController
      * @param $orderId
      * @return OrderInterface
      */
-    private function loadOrderById($orderId)
+    private function loadOrderById(string $orderId)
     {
         $repository = $this->_objectManager->get(OrderRepositoryInterface::class);
         $builder = $this->_objectManager->create(SearchCriteriaBuilder::class);

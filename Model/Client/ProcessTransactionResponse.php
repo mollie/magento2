@@ -4,40 +4,18 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Client;
 
 class ProcessTransactionResponse
 {
-    /**
-     * @var bool
-     */
-    private $success;
-
-    /**
-     * @var string
-     */
-    private $status;
-
-    /**
-     * @var string
-     */
-    private $order_id;
-
-    /**
-     * @var string
-     */
-    private $type;
-
     public function __construct(
-        bool $success,
-        string $status,
-        string $order_id,
-        string $type
+        private bool $success,
+        private string $status,
+        private string $order_id,
+        private string $type,
     ) {
-        $this->success = $success;
-        $this->status = $status;
-        $this->order_id = $order_id;
-        $this->type = $type;
     }
 
     /**

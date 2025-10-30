@@ -1,20 +1,28 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Model;
 
+use Exception;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
-use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Model\OrderLines;
+use Mollie\Payment\Model\OrderLinesFactory;
+use Mollie\Payment\Model\ResourceModel\OrderLines\Collection;
+use Mollie\Payment\Service\Order\Lines\Order as OrderOrderLines;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class OrderLinesTest extends IntegrationTestCase
 {
-    public function testGetCreditmemoOrderLines()
+    public function testGetCreditmemoOrderLines(): void
     {
         $creditmemo = $this->objectManager->get(CreditmemoInterface::class);
 
@@ -25,9 +33,9 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertCount(0, $result['lines']);
     }
 
-    public function testGetCreditmemoOrderLinesIncludesTheStoreCredit()
+    public function testGetCreditmemoOrderLinesIncludesTheStoreCredit(): void
     {
-        $orderLine = $this->objectManager->get(\Mollie\Payment\Model\OrderLinesFactory::class)->create();
+        $orderLine = $this->objectManager->get(OrderLinesFactory::class)->create();
         $orderLine->setOrderId(999);
         $orderLine->setLineId('ord_abc123');
         $orderLine->setType('store_credit');
@@ -47,10 +55,10 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertEquals(1, $line['quantity']);
     }
 
-    public function testCreditmemoUsesTheDiscount()
+    public function testCreditmemoUsesTheDiscount(): void
     {
         /** @var OrderLines $orderLine */
-        $orderLine = $this->objectManager->get(\Mollie\Payment\Model\OrderLinesFactory::class)->create();
+        $orderLine = $this->objectManager->get(OrderLinesFactory::class)->create();
         $orderLine->setItemId(999);
         $orderLine->setLineId('ord_abc123');
         $orderLine->save();
@@ -84,7 +92,7 @@ class OrderLinesTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/shipment.php
      */
-    public function testGetShipmentOrderLines()
+    public function testGetShipmentOrderLines(): void
     {
         if (getenv('CI')) {
             $this->markTestSkipped('Does not work on CI for some reason');
@@ -100,7 +108,7 @@ class OrderLinesTest extends IntegrationTestCase
 
         foreach ($shipment->getItems() as $item) {
             /** @var OrderLines $orderLine */
-            $orderLine = $this->objectManager->get(\Mollie\Payment\Model\OrderLines::class);
+            $orderLine = $this->objectManager->get(OrderLines::class);
             $orderLine->setItemId($item->getOrderItemId());
             $orderLine->setLineId('ord_abc123');
             $orderLine->save();
@@ -119,7 +127,7 @@ class OrderLinesTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/shipment.php
      */
-    public function testGetShipmentOrderLinesAddsAnAmountWhenTheOrderHasAnDiscount()
+    public function testGetShipmentOrderLinesAddsAnAmountWhenTheOrderHasAnDiscount(): void
     {
         if (getenv('CI')) {
             $this->markTestSkipped('Does not work on CI for some reason');
@@ -138,7 +146,7 @@ class OrderLinesTest extends IntegrationTestCase
 
         foreach ($shipment->getItems() as $item) {
             /** @var OrderLines $orderLine */
-            $orderLine = $this->objectManager->create(\Mollie\Payment\Model\OrderLines::class);
+            $orderLine = $this->objectManager->create(OrderLines::class);
             $orderLine->setItemId($item->getOrderItemId());
             $orderLine->setLineId('ord_abc123');
             $orderLine->save();
@@ -171,9 +179,9 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertEquals(18.2, $result['lines'][0]['amount']['value']);
     }
 
-    public function tearDownWithoutVoid()
+    public function tearDownWithoutVoid(): void
     {
-        $collection = $this->objectManager->create(\Mollie\Payment\Model\ResourceModel\OrderLines\Collection::class);
+        $collection = $this->objectManager->create(Collection::class);
 
         foreach ($collection as $creditmemo) {
             $creditmemo->delete();
@@ -184,9 +192,9 @@ class OrderLinesTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @magentoDataFixture Magento/Catalog/_files/product_simple.php
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function testHandlesNegativeDiscountAmounts()
+    public function testHandlesNegativeDiscountAmounts(): void
     {
         /** @var OrderItemInterface $orderItem */
         $orderItem = $this->objectManager->create(OrderItemInterface::class);
@@ -200,10 +208,10 @@ class OrderLinesTest extends IntegrationTestCase
         $order->setBaseCurrencyCode('EUR');
         $order->setItems([$orderItem]);
 
-        /** @var OrderLines $instance */
-        $instance = $this->objectManager->get(OrderLines::class);
+        /** @var OrderOrderLines $instance */
+        $instance = $this->objectManager->get(OrderOrderLines::class);
 
-        $result = $instance->getOrderLines($order);
+        $result = $instance->get($order);
 
         $productLine = $result[0];
         $this->assertEquals(0.01, $productLine['discountAmount']['value']);

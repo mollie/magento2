@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -13,48 +14,29 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\NotFoundException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\Order\IsPaymentLinkExpired;
+use Mollie\Payment\Service\Mollie\StartTransaction;
 
 class PaymentLinkRedirect
 {
     /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-    /**
-     * @var Mollie
-     */
-    private $mollie;
-    /**
      * @var PaymentLinkRedirectResultFactory
      */
     private $paymentLinkRedirectResultFactory;
-    /**
-     * @var IsPaymentLinkExpired
-     */
-    private $isPaymentLinkExpired;
 
     public function __construct(
-        EncryptorInterface $encryptor,
-        OrderRepositoryInterface $orderRepository,
-        Mollie $mollie,
+        private EncryptorInterface $encryptor,
+        private OrderRepositoryInterface $orderRepository,
+        private StartTransaction $startTransaction,
         PaymentLinkRedirectResultFactory $paymentLinkRedirectResultFactory,
-        IsPaymentLinkExpired $isPaymentLinkExpired
+        private IsPaymentLinkExpired $isPaymentLinkExpired,
     ) {
-        $this->encryptor = $encryptor;
-        $this->orderRepository = $orderRepository;
-        $this->mollie = $mollie;
         $this->paymentLinkRedirectResultFactory = $paymentLinkRedirectResultFactory;
-        $this->isPaymentLinkExpired = $isPaymentLinkExpired;
     }
 
     public function execute(string $orderId): PaymentLinkRedirectResult
     {
+        // @phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
         $id = $this->encryptor->decrypt(base64_decode($orderId));
 
         if (empty($id)) {
@@ -84,7 +66,7 @@ class PaymentLinkRedirect
         }
 
         return $this->paymentLinkRedirectResultFactory->create([
-            'redirectUrl' => $this->mollie->startTransaction($order),
+            'redirectUrl' => $this->startTransaction->execute($order),
             'isExpired' => false,
             'alreadyPaid' => false,
         ]);

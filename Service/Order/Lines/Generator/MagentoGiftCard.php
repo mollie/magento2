@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order\Lines\Generator;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -12,16 +14,9 @@ use Mollie\Payment\Helper\General;
 
 class MagentoGiftCard implements GeneratorInterface
 {
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
     public function __construct(
-        General $mollieHelper
-    ) {
-        $this->mollieHelper = $mollieHelper;
-    }
+        private General $mollieHelper
+    ) {}
 
     public function process(OrderInterface $order, array $orderLines): array
     {
@@ -29,7 +24,7 @@ class MagentoGiftCard implements GeneratorInterface
             return $orderLines;
         }
 
-        $forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
+        $forceBaseCurrency = (bool) $this->mollieHelper->useBaseCurrency(storeId($order->getStoreId()));
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $amount = $order->getData(($forceBaseCurrency ? 'base_' : '') . 'gift_cards_amount');
 
@@ -38,8 +33,8 @@ class MagentoGiftCard implements GeneratorInterface
         }
 
         $orderLines[] = [
-            'type' => OrderLineType::TYPE_GIFT_CARD,
-            'name' => __('Magento Gift Card'),
+            'type' => OrderLineType::GIFT_CARD,
+            'description' => __('Magento Gift Card'),
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($currency, -$amount),
             'totalAmount' => $this->mollieHelper->getAmountArray($currency, -$amount),

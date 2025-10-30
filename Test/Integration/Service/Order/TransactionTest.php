@@ -4,8 +4,11 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Order;
 
+use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Encryption\EncryptorInterface;
@@ -18,7 +21,7 @@ class TransactionTest extends IntegrationTestCase
     /**
      * @magentoConfigFixture current_store payment/mollie_general/use_custom_redirect_url 0
      */
-    public function testRedirectUrlWithoutCustomUrl()
+    public function testRedirectUrlWithoutCustomUrl(): void
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
@@ -36,7 +39,7 @@ class TransactionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/use_custom_redirect_url 1
      * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url
      */
-    public function testRedirectUrlWithEmptyCustomUrl()
+    public function testRedirectUrlWithEmptyCustomUrl(): void
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
@@ -54,7 +57,7 @@ class TransactionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/use_custom_redirect_url 1
      * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url https://www.mollie.com
      */
-    public function testRedirectUrlWithFilledCustomUrl()
+    public function testRedirectUrlWithFilledCustomUrl(): void
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
@@ -72,14 +75,14 @@ class TransactionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/use_custom_redirect_url 1
      * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url https://www.mollie.com/?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&increment_id={{INCREMENT_ID}}&short_base_url={{base_url}}&unsecure_base_url={{unsecure_base_url}}&secure_base_url={{secure_base_url}}
      */
-    public function testAppendsTheParamsToTheUrl()
+    public function testAppendsTheParamsToTheUrl(): void
     {
         $configMock = $this->createMock(ScopeConfigInterface::class);
 
         $callIndex = 0;
         $configMock
             ->method('getValue')
-            ->willReturnCallback( function ($path) use (&$callIndex) {
+            ->willReturnCallback(function (string $path) use (&$callIndex): string {
                 $callIndex++;
                 if ($callIndex == 1 && $path == 'web/unsecure/base_url') {
                     return 'http://base_url.test/';
@@ -93,7 +96,7 @@ class TransactionTest extends IntegrationTestCase
                     return 'https://secure_base_url.test/';
                 }
 
-                throw new \Exception('Unexpected path: ' . $path . ' ' . $callIndex);
+                throw new Exception('Unexpected path: ' . $path . ' ' . $callIndex);
             });
 
         /** @var Transaction $instance */
@@ -120,9 +123,9 @@ class TransactionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/use_custom_redirect_url 1
      * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url https://www.mollie.com/?order_id={{order_id}}&payment_token={{payment_token}}&increment_id={{increment_id}}&short_base_url={{base_url}}&unsecure_base_url={{unsecure_base_url}}&secure_base_url={{secure_base_url}}
      */
-    public function testTheVariablesAreCaseInsensitive()
+    public function testTheVariablesAreCaseInsensitive(): void
     {
-       $this->testAppendsTheParamsToTheUrl();
+        $this->testAppendsTheParamsToTheUrl();
     }
 
     /**
@@ -131,7 +134,7 @@ class TransactionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url_hash dummyhashfortest
      * @magentoConfigFixture current_store payment/mollie_general/custom_redirect_url https://www.mollie.com/?hash={{ORDER_HASH}}
      */
-    public function testHashesTheOrderId()
+    public function testHashesTheOrderId(): void
     {
         /** @var Encryptor $encryptor */
         $encryptor = $this->objectManager->get(Encryptor::class);
@@ -156,7 +159,7 @@ class TransactionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/type live
      * @magentoConfigFixture current_store payment/mollie_general/use_webhooks enabled
      */
-    public function testReturnsTheDefaultWebhookUrl()
+    public function testReturnsTheDefaultWebhookUrl(): void
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
@@ -169,7 +172,7 @@ class TransactionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/type live
      * @magentoConfigFixture current_store payment/mollie_general/use_webhooks disabled
      */
-    public function testIgnoresTheDisabledFlagWhenInLiveMode()
+    public function testIgnoresTheDisabledFlagWhenInLiveMode(): void
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
@@ -183,7 +186,7 @@ class TransactionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/use_webhooks disabled
      * @magentoConfigFixture current_store payment/mollie_general/custom_webhook_url custom_url_for_test
      */
-    public function testReturnsNothingWhenDisabledAndInTestMode()
+    public function testReturnsNothingWhenDisabledAndInTestMode(): void
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
@@ -197,7 +200,7 @@ class TransactionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/use_webhooks custom_url
      * @magentoConfigFixture current_store payment/mollie_general/custom_webhook_url custom_url_for_test
      */
-    public function testReturnsTheCustomWebhookUrl()
+    public function testReturnsTheCustomWebhookUrl(): void
     {
         /** @var Transaction $instance */
         $instance = $this->objectManager->create(Transaction::class);
@@ -215,7 +218,7 @@ class TransactionTest extends IntegrationTestCase
         $this->assertEquals(99999, $id);
     }
 
-    public function testAllowsToManuallySetAnUrl()
+    public function testAllowsToManuallySetAnUrl(): void
     {
         $order = $this->objectManager->create(OrderInterface::class);
 

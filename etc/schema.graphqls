@@ -1,7 +1,6 @@
 # For more information on how to use these, see this wiki page:
 # https://github.com/mollie/magento2/wiki/GraphQL-integration
 type Mutation {
-    createMollieTransaction(input: MollieTransactionInput): MollieTransactionOutput @resolver(class: "\\Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\CreateMollieTransaction") @deprecated(reason: "Using the Order.mollie_redirect_url attribuut")
     mollieRestoreCart(input: MollieResetCartInput): MollieResetCartOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\ResetCart")
     mollieProcessTransaction(input: MollieProcessTransactionInput): MollieProcessTransactionOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\ProcessTransaction")
     mollieApplePayValidation(
@@ -90,10 +89,6 @@ type MolliePaymentMethodsOutput {
     methods: [MolliePaymentMethod]
 }
 
-type MollieTransactionOutput {
-    checkout_url: String
-}
-
 type MollieProcessTransactionOutput {
     paymentStatus: PaymentStatusEnum
     cart: Cart @doc(description: "The cart is only available when the payment status is failed, canceled or expired.")
@@ -123,11 +118,6 @@ input PaymentMethodInput {
     mollie_card_token: String @doc(description: "The card token provided by Mollie Components")
     mollie_selected_issuer: String @doc(description: "Provided the issuer chosen by the end-user")
     mollie_selected_terminal: String @doc(description: "Provided the terminal chosen")
-}
-
-input MollieTransactionInput {
-    payment_token: String!
-    issuer: String
 }
 
 input MolliePaymentMethodsInput {

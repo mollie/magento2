@@ -1,11 +1,14 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model;
 
+use Exception;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
@@ -25,85 +28,8 @@ use Mollie\Payment\Model\ResourceModel\PendingPaymentReminder\CollectionFactory 
 
 class PendingPaymentReminderRepository implements PendingPaymentReminderRepositoryInterface
 {
-    /**
-     * @var ResourcePendingPaymentReminder
-     */
-    protected $resource;
-
-    /**
-     * @var PendingPaymentReminderFactory
-     */
-    protected $pendingPaymentReminderFactory;
-
-    /**
-     * @var PendingPaymentReminderCollectionFactory
-     */
-    protected $pendingPaymentReminderCollectionFactory;
-
-    /**
-     * @var PendingPaymentReminderSearchResultsInterfaceFactory
-     */
-    protected $searchResultsFactory;
-
-    /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
-     * @var DataObjectProcessor
-     */
-    protected $dataObjectProcessor;
-
-    /**
-     * @var PendingPaymentReminderInterfaceFactory
-     */
-    protected $dataPendingPaymentReminderFactory;
-
-    /**
-     * @var JoinProcessorInterface
-     */
-    protected $extensionAttributesJoinProcessor;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
-     * @var ExtensibleDataObjectConverter
-     */
-    protected $extensibleDataObjectConverter;
-
-    public function __construct(
-        ResourcePendingPaymentReminder $resource,
-        PendingPaymentReminderFactory $pendingPaymentReminderFactory,
-        PendingPaymentReminderInterfaceFactory $dataPendingPaymentReminderFactory,
-        PendingPaymentReminderCollectionFactory $pendingPaymentReminderCollectionFactory,
-        PendingPaymentReminderSearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager,
-        CollectionProcessorInterface $collectionProcessor,
-        JoinProcessorInterface $extensionAttributesJoinProcessor,
-        ExtensibleDataObjectConverter $extensibleDataObjectConverter
-    ) {
-        $this->resource = $resource;
-        $this->pendingPaymentReminderFactory = $pendingPaymentReminderFactory;
-        $this->pendingPaymentReminderCollectionFactory = $pendingPaymentReminderCollectionFactory;
-        $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataPendingPaymentReminderFactory = $dataPendingPaymentReminderFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->storeManager = $storeManager;
-        $this->collectionProcessor = $collectionProcessor;
-        $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
-        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
+    public function __construct(protected ResourcePendingPaymentReminder $resource, protected PendingPaymentReminderFactory $pendingPaymentReminderFactory, protected PendingPaymentReminderInterfaceFactory $dataPendingPaymentReminderFactory, protected PendingPaymentReminderCollectionFactory $pendingPaymentReminderCollectionFactory, protected PendingPaymentReminderSearchResultsInterfaceFactory $searchResultsFactory, protected DataObjectHelper $dataObjectHelper, protected DataObjectProcessor $dataObjectProcessor, private StoreManagerInterface $storeManager, private CollectionProcessorInterface $collectionProcessor, protected JoinProcessorInterface $extensionAttributesJoinProcessor, protected ExtensibleDataObjectConverter $extensibleDataObjectConverter)
+    {
     }
 
     /**
@@ -119,19 +45,20 @@ class PendingPaymentReminderRepository implements PendingPaymentReminderReposito
         $pendingPaymentReminderData = $this->extensibleDataObjectConverter->toNestedArray(
             $pendingPaymentReminder,
             [],
-            PendingPaymentReminderInterface::class
+            PendingPaymentReminderInterface::class,
         );
 
         $pendingPaymentReminderModel = $this->pendingPaymentReminderFactory->create()->setData($pendingPaymentReminderData);
 
         try {
             $this->resource->save($pendingPaymentReminderModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the pendingPaymentReminder: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return $pendingPaymentReminderModel->getDataModel();
     }
 
@@ -145,6 +72,7 @@ class PendingPaymentReminderRepository implements PendingPaymentReminderReposito
         if (!$pendingPaymentReminder->getId()) {
             throw new NoSuchEntityException(__('PendingPaymentReminder with id "%1" does not exist.', $id));
         }
+
         return $pendingPaymentReminder->getDataModel();
     }
 
@@ -158,6 +86,7 @@ class PendingPaymentReminderRepository implements PendingPaymentReminderReposito
         if (!$pendingPaymentReminder->getId()) {
             throw new NoSuchEntityException(__('PendingPaymentReminder with id "%1" does not exist.', $id));
         }
+
         return $pendingPaymentReminder->getDataModel();
     }
 
@@ -170,7 +99,7 @@ class PendingPaymentReminderRepository implements PendingPaymentReminderReposito
 
         $this->extensionAttributesJoinProcessor->process(
             $collection,
-            PendingPaymentReminderInterface::class
+            PendingPaymentReminderInterface::class,
         );
 
         $this->collectionProcessor->process($criteria, $collection);
@@ -185,31 +114,33 @@ class PendingPaymentReminderRepository implements PendingPaymentReminderReposito
 
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
+
         return $searchResults;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(PendingPaymentReminderInterface $pendingPaymentReminder)
+    public function delete(PendingPaymentReminderInterface $pendingPaymentReminder): bool
     {
         try {
             $pendingPaymentReminderModel = $this->pendingPaymentReminderFactory->create();
             $this->resource->load($pendingPaymentReminderModel, $pendingPaymentReminder->getEntityId());
             $this->resource->delete($pendingPaymentReminderModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the PendingPaymentReminder: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteById(int $id)
+    public function deleteById(int $id): bool
     {
         return $this->delete($this->get($id));
     }
@@ -217,7 +148,7 @@ class PendingPaymentReminderRepository implements PendingPaymentReminderReposito
     /**
      * {@inheritDoc}
      */
-    public function deleteByOrderId(int $id)
+    public function deleteByOrderId(int $id): bool
     {
         return $this->delete($this->getByOrderId($id));
     }

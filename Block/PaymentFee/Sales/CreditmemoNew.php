@@ -1,34 +1,31 @@
 <?php
-/**
+
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\PaymentFee\Sales;
 
 use Magento\Framework\DataObject;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 use Magento\Sales\Block\Adminhtml\Order\Creditmemo\Totals;
 use Mollie\Payment\Service\Order\Creditmemo as CreditmemoService;
 
 class CreditmemoNew extends Template
 {
-    /**
-     * @var CreditmemoService
-     */
-    private $creditmemoService;
-
     public function __construct(
-        Template\Context $context,
-        CreditmemoService $creditmemoService,
-        array $data = []
+        Context $context,
+        private CreditmemoService $creditmemoService,
+        array $data = [],
     ) {
         parent::__construct($context, $data);
-
-        $this->creditmemoService = $creditmemoService;
     }
 
-    public function initTotals()
+    public function initTotals(): void
     {
         /** @var Totals $parentBlock */
         $parentBlock = $this->getParentBlock();

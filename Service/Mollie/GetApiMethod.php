@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -14,22 +15,10 @@ use Mollie\Payment\Service\Order\MethodCode;
 
 class GetApiMethod
 {
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var MethodCode
-     */
-    private $methodCode;
-
     public function __construct(
-        Config $config,
-        MethodCode $methodCode
-    ) {
-        $this->methodCode = $methodCode;
-        $this->config = $config;
-    }
+        private Config $config,
+        private MethodCode $methodCode
+    ) {}
 
     /**
      * @param OrderInterface $order
@@ -38,7 +27,8 @@ class GetApiMethod
     public function execute(OrderInterface $order): string
     {
         $method = $this->methodCode->execute($order);
-        $storeId = $order->getStoreId() == null ? null : (int)$order->getStoreId();
+        $storeId = storeId($order->getStoreId());
+
         return $this->config->getApiMethod($method, $storeId);
     }
 }

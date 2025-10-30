@@ -4,11 +4,12 @@
  * See COPYING.txt for license details.
  */
 
-/** @var \Mollie\Payment\Block\Adminhtml\System\Config\Form\Apikey\Result $block */
-/** @var \Magento\Framework\Escaper $escaper */
+/** @var Result $block */
+/** @var Escaper $escaper */
 
-// Magento 2.3 compatibility
-isset($escaper) || $escaper = $block; // @phpstan-ignore-line
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Adminhtml\System\Config\Form\Extension\Result;
+
 ?>
 <span id="result_apikey">
     <img class="connecting" hidden="hidden" style="margin:0 5px" src="<?= $escaper->escapeHtmlAttr($block->getViewFileUrl('images/process_spinner.gif')) ?>"/>

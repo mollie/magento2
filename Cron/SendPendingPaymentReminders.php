@@ -1,11 +1,16 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Cron;
 
+use DateInterval;
+use DateTimeImmutable;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Api\SortOrderFactory;
@@ -14,56 +19,20 @@ use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Order\PaymentReminder;
+use Throwable;
 
 class SendPendingPaymentReminders
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var PendingPaymentReminderRepositoryInterface
-     */
-    private $paymentReminderRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $builder;
-
-    /**
-     * @var SortOrderFactory
-     */
-    private $sortOrderFactory;
-
-    /**
-     * @var DateTime
-     */
-    private $dateTime;
-
-    /**
-     * @var PaymentReminder
-     */
-    private $paymentReminder;
-
     public function __construct(
-        Config $config,
-        PendingPaymentReminderRepositoryInterface $paymentReminderRepository,
-        SearchCriteriaBuilder $builder,
-        SortOrderFactory $sortOrderFactory,
-        DateTime $dateTime,
-        PaymentReminder $paymentReminder
-    ) {
-        $this->config = $config;
-        $this->paymentReminderRepository = $paymentReminderRepository;
-        $this->builder = $builder;
-        $this->sortOrderFactory = $sortOrderFactory;
-        $this->dateTime = $dateTime;
-        $this->paymentReminder = $paymentReminder;
-    }
+        private Config $config,
+        private PendingPaymentReminderRepositoryInterface $paymentReminderRepository,
+        private SearchCriteriaBuilder $builder,
+        private SortOrderFactory $sortOrderFactory,
+        private DateTime $dateTime,
+        private PaymentReminder $paymentReminder
+    ) {}
 
-    public function execute()
+    public function execute(): void
     {
         if (!$this->config->automaticallySendSecondChanceEmails()) {
             return;
@@ -76,7 +45,7 @@ class SendPendingPaymentReminders
             $sortOrder->setDirection(SortOrder::SORT_ASC);
 
             $delay = $this->config->secondChanceEmailDelay();
-            $date = (new \DateTimeImmutable($this->dateTime->gmtDate()))->sub(new \DateInterval('PT' . $delay . 'H'));
+            $date = (new DateTimeImmutable($this->dateTime->gmtDate()))->sub(new DateInterval('PT' . $delay . 'H'));
             $this->builder->addFilter(Order::CREATED_AT, $date, 'lt');
             $this->builder->addSortOrder($sortOrder);
             $this->builder->setPageSize(200);
@@ -86,9 +55,9 @@ class SendPendingPaymentReminders
             foreach ($result->getItems() as $item) {
                 $this->paymentReminder->send($item);
             }
-        } catch (\Throwable $exception) {
+        } catch (Throwable $exception) {
             $this->config->addToLog('error', 'Error while running ' . static::class);
-            $this->config->addToLog('error', (string)$exception);
+            $this->config->addToLog('error', (string) $exception);
 
             throw $exception;
         }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -13,12 +14,9 @@ use Mollie\Payment\Service\Mollie\ProcessTransaction;
 
 class ProcessTransactionFake extends ProcessTransaction
 {
-    private $timesCalled = 0;
+    private int $timesCalled = 0;
 
-    /**
-     * @var GetMollieStatusResult|null
-     */
-    private $response = null;
+    private ?GetMollieStatusResult $response = null;
 
     public function getTimesCalled(): int
     {

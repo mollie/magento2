@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\PaymentFee\Quote\Address\Total;
 
@@ -27,24 +29,10 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Exceptions\UnknownPaymentFeeType;
 use Mollie\Payment\Service\PaymentFee\Calculate;
 use Mollie\Payment\Service\PaymentFee\Result;
+use ReflectionClass;
 
 class PaymentFeeTax extends CommonTaxCollector
 {
-    /**
-     * @var PriceCurrencyInterface
-     */
-    private $priceCurrency;
-
-    /**
-     * @var Calculate
-     */
-    private $calculate;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
         TaxConfig $taxConfig,
         TaxCalculationInterface $taxCalculationService,
@@ -53,14 +41,14 @@ class PaymentFeeTax extends CommonTaxCollector
         TaxClassKeyInterfaceFactory $taxClassKeyDataObjectFactory,
         CustomerAddressFactory $customerAddressFactory,
         CustomerAddressRegionFactory $customerAddressRegionFactory,
-        Calculate $calculate,
-        PriceCurrencyInterface $priceCurrency,
-        Config $config,
+        private Calculate $calculate,
+        private PriceCurrencyInterface $priceCurrency,
+        private Config $config,
         ?TaxHelper $taxHelper = null,
         ?QuoteDetailsItemExtensionInterfaceFactory $quoteDetailsItemExtensionInterfaceFactory = null,
-        ?CustomerAccountManagement $customerAccountManagement = null
+        ?CustomerAccountManagement $customerAccountManagement = null,
     ) {
-        $parent = new \ReflectionClass(parent::class);
+        $parent = new ReflectionClass(parent::class);
         $parentConstructor = $parent->getConstructor();
 
         // The parent call fails when running setup:di:compile in 2.4.3 and lower due to an extra parameter.
@@ -75,7 +63,7 @@ class PaymentFeeTax extends CommonTaxCollector
                 $customerAddressFactory,
                 $customerAddressRegionFactory,
                 $taxHelper,
-                $quoteDetailsItemExtensionInterfaceFactory
+                $quoteDetailsItemExtensionInterfaceFactory,
             );
         } else {
             // @phpstan-ignore-next-line
@@ -89,13 +77,9 @@ class PaymentFeeTax extends CommonTaxCollector
                 $customerAddressRegionFactory,
                 $taxHelper,
                 $quoteDetailsItemExtensionInterfaceFactory,
-                $customerAccountManagement
+                $customerAccountManagement,
             );
         }
-
-        $this->calculate = $calculate;
-        $this->priceCurrency = $priceCurrency;
-        $this->config = $config;
     }
 
     /**
@@ -109,6 +93,7 @@ class PaymentFeeTax extends CommonTaxCollector
     {
         if (!$shippingAssignment->getItems()) {
             parent::collect($quote, $shippingAssignment, $total);
+
             return $this;
         }
 
@@ -129,13 +114,13 @@ class PaymentFeeTax extends CommonTaxCollector
         $feeDataObject->setTaxClassKey(
             $this->taxClassKeyDataObjectFactory->create()
                 ->setType(TaxClassKeyInterface::TYPE_ID)
-                ->setValue(4)
+                ->setValue(4),
         );
         $feeDataObject->setIsTaxIncluded(true);
 
         $quoteDetails = $this->prepareQuoteDetails($shippingAssignment, [$feeDataObject]);
 
-        $this->taxCalculationService->calculateTax($quoteDetails, $quote->getStoreId());
+        $this->taxCalculationService->calculateTax($quoteDetails, storeId($quote->getStoreId()));
 
         parent::collect($quote, $shippingAssignment, $total);
 
@@ -155,7 +140,7 @@ class PaymentFeeTax extends CommonTaxCollector
      * @param Result $result
      * @param Quote $quote
      */
-    private function addAssociatedTaxable(ShippingAssignmentInterface $shippingAssignment, Result $result, Quote $quote)
+    private function addAssociatedTaxable(ShippingAssignmentInterface $shippingAssignment, Result $result, Quote $quote): void
     {
         $fullAmount = $this->priceCurrency->convert($result->getRoundedAmount());
 
@@ -163,7 +148,7 @@ class PaymentFeeTax extends CommonTaxCollector
         $associatedTaxables = $address->getAssociatedTaxables();
 
         $method = $quote->getPayment()->getMethod();
-        $taxClass = $this->config->paymentSurchargeTaxClass($method, $quote->getStoreId());
+        $taxClass = $this->config->paymentSurchargeTaxClass($method, storeId($quote->getStoreId()));
 
         $associatedTaxables[] = [
             CommonTaxCollector::KEY_ASSOCIATED_TAXABLE_TYPE => 'mollie_payment_fee_tax',

@@ -98,7 +98,7 @@ $magentoConfig['scopes'] = [
             'name' => 'Sweden',
             'sort_order' => '3',
             'is_active' => '1'
-        ]
+        ],
     ]
 ];
 

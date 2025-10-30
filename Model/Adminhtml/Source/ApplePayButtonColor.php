@@ -4,17 +4,19 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 
 class ApplePayButtonColor implements OptionSourceInterface
 {
-    const BLACK = 'black';
-    const WHITE = 'white';
-    const WHITE_OUTLINE = 'white-outline';
+    public const BLACK = 'black';
+    public const WHITE = 'white';
+    public const WHITE_OUTLINE = 'white-outline';
 
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         return [
             [

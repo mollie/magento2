@@ -1,59 +1,41 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Webapi;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Api\Webapi\StartTransactionRequestInterface;
 use Mollie\Payment\Service\Order\Transaction;
 
 class StartTransaction implements StartTransactionRequestInterface
 {
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
-    /**
-     * @var Transaction
-     */
-    private $transaction;
-
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        Transaction $transaction
-    ) {
-        $this->orderRepository = $orderRepository;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->transaction = $transaction;
-    }
+        private OrderRepositoryInterface $orderRepository,
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private Transaction $transaction,
+        private \Mollie\Payment\Service\Mollie\StartTransaction $startTransaction
+    ) {}
 
     /**
      * @param string $token
      * @return string
      * @throws LocalizedException
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
-    public function execute(string $token)
+    public function execute(string $token): string
     {
         $model = $this->paymentTokenRepository->getByToken($token);
         $order = $this->orderRepository->get($model->getOrderId());
 
-        /** @var \Mollie\Payment\Model\Mollie $instance */
-        $instance = $order->getPayment()->getMethodInstance();
-
-        $checkoutUrl = $instance->startTransaction($order);
+        $checkoutUrl = $this->startTransaction->execute($order);
         if ($checkoutUrl !== null) {
             return $checkoutUrl;
         }
@@ -62,7 +44,7 @@ class StartTransaction implements StartTransactionRequestInterface
         // we need to redirect to the success page. As the order is instantly paid.
         return $this->transaction->getRedirectUrl(
             $order,
-            $token
+            $token,
         );
     }
 }

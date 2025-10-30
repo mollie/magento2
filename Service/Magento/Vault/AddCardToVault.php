@@ -4,60 +4,41 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Magento\Vault;
 
+use DateInterval;
+use DateTimeZone;
 use Magento\Framework\Intl\DateTimeFactory;
+use Magento\Sales\Api\Data\OrderPaymentExtension;
+use Magento\Sales\Api\Data\OrderPaymentExtensionInterface;
 use Magento\Sales\Api\Data\OrderPaymentExtensionInterfaceFactory;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Vault\Api\Data\PaymentTokenFactoryInterface;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
-use Mollie\Api\Resources\Order;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Config;
 
 class AddCardToVault
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var OrderPaymentExtensionInterfaceFactory
-     */
-    private $paymentExtensionFactory;
-
-    /**
-     * @var PaymentTokenFactoryInterface
-     */
-    private $paymentTokenFactory;
-
-    /**
-     * @var DateTimeFactory
-     */
-    private $dateTimeFactory;
-
     public function __construct(
-        Config $config,
-        OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
-        PaymentTokenFactoryInterface $paymentTokenFactory,
-        DateTimeFactory $dateTimeFactory
-    ) {
-        $this->config = $config;
-        $this->paymentExtensionFactory = $paymentExtensionFactory;
-        $this->paymentTokenFactory = $paymentTokenFactory;
-        $this->dateTimeFactory = $dateTimeFactory;
-    }
+        private Config $config,
+        private OrderPaymentExtensionInterfaceFactory $paymentExtensionFactory,
+        private PaymentTokenFactoryInterface $paymentTokenFactory,
+        private DateTimeFactory $dateTimeFactory
+    ) {}
 
-    public function forPayment(OrderPaymentInterface $payment, Order $mollieOrder)
+    public function forPayment(OrderPaymentInterface $payment, Payment $molliePayment): void
     {
-        if (!$this->config->isMagentoVaultEnabled($payment->getOrder()->getStoreId()) ||
+        if (
+            !$this->config->isMagentoVaultEnabled(storeId($payment->getOrder()->getStoreId())) ||
             $payment->getMethod() !== 'mollie_methods_creditcard'
         ) {
             return;
         }
 
-        $paymentToken = $this->getPaymentToken($mollieOrder);
+        $paymentToken = $this->getPaymentToken($molliePayment);
         $extensionAttributes = $this->getExtensionAttributes($payment);
 
         if ($paymentToken === null || $extensionAttributes->getVaultPaymentToken() !== null) {
@@ -67,10 +48,8 @@ class AddCardToVault
         $extensionAttributes->setVaultPaymentToken($paymentToken);
     }
 
-    private function getPaymentToken(Order $mollieOrder): ?PaymentTokenInterface
+    private function getPaymentToken(Payment $molliePayment): ?PaymentTokenInterface
     {
-        /** @var Payment $molliePayment */
-        $molliePayment = $mollieOrder->payments()->offsetGet(0);
         $details = $molliePayment->details;
 
         if (!$details || !isset($details->cardLabel) || !isset($details->cardNumber)) {
@@ -93,7 +72,7 @@ class AddCardToVault
 
     /**
      * @param OrderPaymentInterface $payment
-     * @return \Magento\Sales\Api\Data\OrderPaymentExtension|\Magento\Sales\Api\Data\OrderPaymentExtensionInterface|null
+     * @return OrderPaymentExtension|OrderPaymentExtensionInterface|null
      */
     private function getExtensionAttributes(OrderPaymentInterface $payment)
     {
@@ -102,13 +81,15 @@ class AddCardToVault
             $extensionAttributes = $this->paymentExtensionFactory->create();
             $payment->setExtensionAttributes($extensionAttributes);
         }
+
         return $extensionAttributes;
     }
 
     private function getExpirationDate(): string
     {
-        $expDate = $this->dateTimeFactory->create('now', new \DateTimeZone('UTC'));
-        $expDate->add(new \DateInterval('P1Y'));
+        $expDate = $this->dateTimeFactory->create('now', new DateTimeZone('UTC'));
+        $expDate->add(new DateInterval('P1Y'));
+
         return $expDate->format('Y-m-d 00:00:00');
     }
 
@@ -117,13 +98,6 @@ class AddCardToVault
         $cardsToCode = [
             'american express' => 'amex',
             'carta si' => 'cartasi',
-//            'carte bleue' => '',
-//            'dankort' => '',
-//            'diners club' => '',
-//            'discover' => '',
-//            'jcb' => '',
-//            'laser' => '',
-//            'unionpay' => '',
         ];
 
         $label = strtolower($label);

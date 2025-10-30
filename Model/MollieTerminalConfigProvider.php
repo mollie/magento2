@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -12,28 +16,11 @@ use Mollie\Payment\Service\Mollie\PointOfSaleAvailability;
 
 class MollieTerminalConfigProvider implements ConfigProviderInterface
 {
-    /**
-     * @var PointOfSaleAvailability
-     */
-    private $pointOfSaleAvailability;
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
-
     public function __construct(
-        PointOfSaleAvailability $pointOfSaleAvailability,
-        MollieApiClient $mollieApiClient,
-        Session $checkoutSession
-    ) {
-        $this->pointOfSaleAvailability = $pointOfSaleAvailability;
-        $this->mollieApiClient = $mollieApiClient;
-        $this->checkoutSession = $checkoutSession;
-    }
+        private PointOfSaleAvailability $pointOfSaleAvailability,
+        private MollieApiClient $mollieApiClient,
+        private Session $checkoutSession
+    ) {}
 
     public function getConfig(): array
     {
@@ -43,7 +30,7 @@ class MollieTerminalConfigProvider implements ConfigProviderInterface
             return [];
         }
 
-        $mollieApiClient = $this->mollieApiClient->loadByStore($cart->getStoreId());
+        $mollieApiClient = $this->mollieApiClient->loadByStore(storeId($cart->getStoreId()));
         $terminals = $mollieApiClient->terminals->page();
 
         $output = [];
@@ -66,8 +53,8 @@ class MollieTerminalConfigProvider implements ConfigProviderInterface
             'payment' => [
                 'mollie' => [
                     'terminals' => $output,
-                ]
-            ]
+                ],
+            ],
         ];
     }
 }

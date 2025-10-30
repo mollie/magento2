@@ -8,6 +8,8 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="mollie_methods_paymentlink" translate="label" type="text" sortOrder="270" showInDefault="1" showInWebsite="1"
            showInStore="1">
+        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\GroupFrontendModel</frontend_model>
+
         <label>Payment Link / Admin Payment</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
@@ -34,7 +36,7 @@
         </field>
         <field id="allow_mark_as_paid" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
                showInStore="1">
-            <label>Allow to manually mark as paid?</label>
+            <label>Allow orders to be marked as paid manually?</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_paymentlink/allow_mark_as_paid</config_path>
             <depends>
@@ -46,7 +48,7 @@
             <label>Payment Message / Link</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_paymentlink/message</config_path>
-            <comment><![CDATA[Use %link% for paymentlink.]]></comment>
+            <comment><![CDATA[Use %link% for the payment link.]]></comment>
             <depends>
                 <field id="active">1</field>
                 <field id="add_message">1</field>
@@ -130,7 +132,7 @@
                showInStore="1">
             <label>Payment Surcharge limit</label>
             <config_path>payment/mollie_methods_paymentlink/payment_surcharge_limit</config_path>
-            <comment><![CDATA[Enter the maximum amount of payment surchage to should be charged to the customer.]]></comment>
+            <comment><![CDATA[Enter the maximum amount of payment surcharge that should be charged to the customer.]]></comment>
             <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
             <frontend_class>validate-not-negative-number</frontend_class>
             <depends>
@@ -156,17 +158,6 @@
             <depends>
                 <field id="active">1</field>
             </depends>
-        </field>
-        <field id="days_before_expire" translate="label" type="text" sortOrder="170" showInDefault="1" showInWebsite="1"
-               showInStore="1">
-            <label>Days to expire</label>
-            <frontend_class>validate-digits-range digits-range-1-365</frontend_class>
-            <config_path>payment/mollie_methods_paymentlink/days_before_expire</config_path>
-            <depends>
-                <field id="active">1</field>
-                <field id="method">order</field>
-            </depends>
-            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
         </field>
     </group>
 </include>

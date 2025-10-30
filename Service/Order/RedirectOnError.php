@@ -4,8 +4,9 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Order;
+declare(strict_types=1);
 
+namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\UrlInterface;
 use Mollie\Payment\Config;
@@ -13,23 +14,10 @@ use Mollie\Payment\Model\Adminhtml\Source\RedirectUserWhenTransactionFails;
 
 class RedirectOnError
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-
     public function __construct(
-        Config $config,
-        UrlInterface $urlBuilder
-    ) {
-        $this->config = $config;
-        $this->urlBuilder = $urlBuilder;
-    }
+        private Config $config,
+        private UrlInterface $urlBuilder
+    ) {}
 
     public function getUrl(): string
     {

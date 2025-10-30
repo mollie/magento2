@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\Wrapper;
 
@@ -32,7 +38,8 @@ trait ApiKeyFallbackTrait
             return false;
         }
 
-        $this->client->setApiKey($fallbackKey);
+        $this->setApiKey($fallbackKey);
+
         return true;
     }
 

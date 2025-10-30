@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\Wrapper;
 
@@ -12,44 +18,13 @@ use Mollie\Payment\Config;
 
 class FetchFallbackApiKeys
 {
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var SortOrderFactory
-     */
-    private $sortOrderFactory;
-
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
-    /**
-     * @var ApiKeyFallbackRepositoryInterface
-     */
-    private $apiKeyFallbackRepository;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        SortOrderFactory $sortOrderFactory,
-        EncryptorInterface $encryptor,
-        Config $config,
-        ApiKeyFallbackRepositoryInterface $apiKeyFallbackRepository
-    ) {
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->sortOrderFactory = $sortOrderFactory;
-        $this->encryptor = $encryptor;
-        $this->config = $config;
-        $this->apiKeyFallbackRepository = $apiKeyFallbackRepository;
-    }
+        private SearchCriteriaBuilder $searchCriteriaBuilder,
+        private SortOrderFactory $sortOrderFactory,
+        private EncryptorInterface $encryptor,
+        private Config $config,
+        private ApiKeyFallbackRepositoryInterface $apiKeyFallbackRepository
+    ) {}
 
     public function retrieve(): array
     {

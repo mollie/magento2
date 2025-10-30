@@ -5,15 +5,17 @@
  */
 
 /**
- * @var \Mollie\Payment\Block\Form\Pointofsale $block
- * @var \Magento\Framework\Escaper $escaper
+ * @var Pointofsale $block
+ * @var Escaper $escaper
  */
+
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Form\Pointofsale;
+
 $code = $block->getMethodCode();
 $first = true;
-
-// Magento 2.3 compatibility
-isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
+
 <fieldset class="admin__fieldset payment-method" id="payment_form_<?= $escaper->escapeHtmlAttr($code); ?>" style="display:none">
     <div class="mollie-admin-method">
         <div class="field admin__field">

@@ -30,9 +30,6 @@
     "mybank",
     "kbc",
     "klarna",
-    "klarnapaylater",
-    "klarnapaynow",
-    "klarnasliceit",
     "pay by bank",
     "paypal",
     "paysafecard",
@@ -64,7 +61,7 @@
     "magento 2"
   ],
   "require": {
-    "mollie/mollie-api-php": "^2.65",
+    "mollie/mollie-api-php": "^3.3",
     "magento/framework": ">=102.0.3",
     "magento/module-backend": ">=100.3.3",
     "magento/module-catalog": ">=100.3.3",
@@ -80,7 +77,7 @@
     "magento/module-tax": ">=100.3.3",
     "magento/module-ui": ">=100.3.3",
     "magento/module-vault": ">=100.3.3",
-    "php": ">=7.3",
+    "php": ">=8.1",
     "ext-json": "*"
   },
   "type": "magento2-module",
@@ -92,7 +89,8 @@
     "files": [
       "registration.php",
       "GraphQL/Replaces/AdditionalDataProviderInterface.php",
-      "Service/InstantPurchase/AvailabilityCheckerInterface.php"
+      "Service/InstantPurchase/AvailabilityCheckerInterface.php",
+      "Service/storeid.php"
     ],
     "psr-4": {
       "Mollie\\Payment\\": ""

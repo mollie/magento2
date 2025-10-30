@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -13,16 +14,9 @@ use Mollie\Api\Resources\Terminal;
 
 class AvailableTerminals
 {
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-
     public function __construct(
-        MollieApiClient $mollieApiClient
-    ) {
-        $this->mollieApiClient = $mollieApiClient;
-    }
+        private MollieApiClient $mollieApiClient
+    ) {}
 
     /**
      * @return array{

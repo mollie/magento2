@@ -1,8 +1,10 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
@@ -15,7 +17,6 @@ use Magento\Framework\Data\OptionSourceInterface;
  */
 class ApiKey implements OptionSourceInterface
 {
-
     /**
      * Options array
      *
@@ -28,14 +29,15 @@ class ApiKey implements OptionSourceInterface
      *
      * @return array
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         if (!$this->options) {
             $this->options = [
                 ['value' => 'live', 'label' => __('Live')],
-                ['value' => 'test', 'label' => __('Test')]
+                ['value' => 'test', 'label' => __('Test')],
             ];
         }
+
         return $this->options;
     }
 }

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Order\Lines\Generator;
 
 use Mollie\Payment\Service\Order\Lines\Generator\MageWorxRewardPoints;
@@ -14,7 +16,7 @@ class MageWorxRewardPointsTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testDoesnothingWhenNotApplicable()
+    public function testDoesnothingWhenNotApplicable(): void
     {
         $order = $this->loadOrder('100000001');
 
@@ -27,7 +29,7 @@ class MageWorxRewardPointsTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testReturnsANegativeValue()
+    public function testReturnsANegativeValue(): void
     {
         $order = $this->loadOrder('100000001');
         $order->setMwRwrdpointsAmnt(99);

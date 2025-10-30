@@ -1,28 +1,22 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Controller\Checkout;
 
+use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use Magento\Checkout\Model\Session;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\ResponseInterface;
 
-/**
- * Class Success
- *
- * @package Mollie\Payment\Controller\Checkout
- */
-class Restart extends Action
+class Restart extends Action implements HttpGetActionInterface
 {
-
-    /**
-     * @var Session
-     */
-    protected $checkoutSession;
-
     /**
      * Success constructor.
      *
@@ -31,19 +25,19 @@ class Restart extends Action
      */
     public function __construct(
         Context $context,
-        Session $checkoutSession
+        protected Session $checkoutSession,
     ) {
-        $this->checkoutSession = $checkoutSession;
         parent::__construct($context);
     }
 
     /**
      * Return from loading page after back button.
      */
-    public function execute()
+    public function execute(): ResponseInterface
     {
         $this->messageManager->addNoticeMessage(__('Payment cancelled, please try again.'));
         $this->checkoutSession->restoreQuote();
+
         return $this->_redirect('checkout/cart');
     }
 }

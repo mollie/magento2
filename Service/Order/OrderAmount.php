@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
@@ -15,42 +17,15 @@ use Mollie\Payment\Helper\General;
 
 class OrderAmount
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $searchCriteriaBuilderFactory;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
     public function __construct(
-        Config $config,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        OrderRepositoryInterface $orderRepository,
-        General $mollieHelper
-    ) {
-        $this->config = $config;
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
-        $this->orderRepository = $orderRepository;
-        $this->mollieHelper = $mollieHelper;
-    }
+        private Config $config,
+        private SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
+        private OrderRepositoryInterface $orderRepository,
+        private General $mollieHelper
+    ) {}
 
     /**
-     * @param string $transactionId
      * @throws LocalizedException
-     * @return array
      */
     public function getByTransactionId(string $transactionId): array
     {
@@ -58,7 +33,7 @@ class OrderAmount
         $currencies = [];
         $orders = $this->getOrders($transactionId);
         foreach ($orders->getItems() as $order) {
-            if ($this->config->useBaseCurrency($order->getStoreId())) {
+            if ($this->config->useBaseCurrency(storeId($order->getStoreId()))) {
                 $currencies[] = $order->getBaseCurrencyCode();
                 $amount += $order->getBaseGrandTotal();
             } else {
@@ -89,7 +64,7 @@ class OrderAmount
         if (count(array_unique($currencies)) > 1) {
             throw new LocalizedException(__(
                 'The orders have different currencies (%1)',
-                implode(', ', array_unique($currencies))
+                implode(', ', array_unique($currencies)),
             ));
         }
     }

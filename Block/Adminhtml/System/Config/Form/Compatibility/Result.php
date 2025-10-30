@@ -1,13 +1,17 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility;
 
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 
 /**
@@ -17,13 +21,12 @@ use Magento\Framework\Data\Form\Element\AbstractElement;
  */
 class Result extends Field
 {
-
     /**
      * @var string
      */
     protected $_template = 'Mollie_Payment::system/config/fieldset/result_compatibility.phtml';
     /**
-     * @var \Magento\Framework\App\RequestInterface
+     * @var RequestInterface
      */
     private $request;
 
@@ -35,7 +38,7 @@ class Result extends Field
      */
     public function __construct(
         Context $context,
-        array $data = []
+        array $data = [],
     ) {
         $this->request = $context->getRequest();
         parent::__construct($context, $data);

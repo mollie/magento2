@@ -1,14 +1,20 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Controller\Checkout;
 
+use Exception;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Encryption\EncryptorInterface;
@@ -19,66 +25,24 @@ use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\OrderLockService;
 
-/**
- * Class Webhook
- *
- * @package Mollie\Payment\Controller\Checkout
- */
-class Webhook extends Action
+class Webhook extends Action implements HttpGetActionInterface, HttpPostActionInterface
 {
-    /**
-     * @var Session
-     */
-    protected $checkoutSession;
     /**
      * @var ResultFactory
      */
     protected $resultFactory;
-    /**
-     * @var MollieModel
-     */
-    protected $mollieModel;
-    /**
-     * @var MollieHelper
-     */
-    protected $mollieHelper;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-    /**
-     * @var OrderLockService
-     */
-    private $orderLockService;
-    /**
-     * @var ProcessTransaction
-     */
-    private $processTransaction;
 
     public function __construct(
         Context $context,
-        Session $checkoutSession,
-        MollieModel $mollieModel,
-        MollieHelper $mollieHelper,
-        OrderRepositoryInterface $orderRepository,
-        EncryptorInterface $encryptor,
-        OrderLockService $orderLockService,
-        ProcessTransaction $processTransaction
+        protected Session $checkoutSession,
+        protected MollieModel $mollieModel,
+        protected MollieHelper $mollieHelper,
+        private OrderRepositoryInterface $orderRepository,
+        private EncryptorInterface $encryptor,
+        private OrderLockService $orderLockService,
+        private ProcessTransaction $processTransaction,
     ) {
-        $this->checkoutSession = $checkoutSession;
         $this->resultFactory = $context->getResultFactory();
-        $this->mollieModel = $mollieModel;
-        $this->mollieHelper = $mollieHelper;
-        $this->orderRepository = $orderRepository;
-        $this->encryptor = $encryptor;
-        $this->orderLockService = $orderLockService;
-        $this->processTransaction = $processTransaction;
         parent::__construct($context);
     }
 
@@ -102,22 +66,30 @@ class Webhook extends Action
                 return $this->getErrorResponse(200, 'No orders found');
             }
 
-            foreach ($orders as $order) {
-                // If this returns true, it means that the order is just created but did go straight to "paid".
-                // That can happen for Apple Pay and Credit Card. In that case, Mollie immediately sends a webhook,
-                // but we are not ready to process it yet.
-                if ($this->orderLockService->isLocked($order)) {
-                    throw new \Exception('Order is locked, skipping webhook', 425);
-                }
-
-                $this->processTransaction->execute((int)$order->getEntityId(), $transactionId);
-            }
+            $this->processOrders($orders);
 
             return $this->getOkResponse();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
 
             return $this->getErrorResponse($e->getCode() ?: 503);
+        }
+    }
+
+    public function processOrders(array $orders): void
+    {
+        $transactionId = $this->getRequest()->getParam('id');
+
+        foreach ($orders as $order) {
+            // If this returns true, it means that the order is just created but did go straight to "paid".
+            // That can happen for Apple Pay and Credit Card. In that case, Mollie immediately sends a webhook,
+            // but we are not ready to process it yet.
+            if ($this->orderLockService->isLocked($order)) {
+                // @phpcs:ignore Magento2.Exceptions.DirectThrow.FoundDirectThrow
+                throw new Exception('Order is locked, skipping webhook', 425);
+            }
+
+            $this->processTransaction->execute((int) $order->getEntityId(), $transactionId);
         }
     }
 
@@ -126,6 +98,7 @@ class Webhook extends Action
         $result = $this->resultFactory->create(ResultFactory::TYPE_RAW);
         $result->setHeader('content-type', 'text/plain');
         $result->setContents('OK');
+
         return $result;
     }
 
@@ -163,6 +136,7 @@ class Webhook extends Action
         // Fallback to order ids from the URL.
         $orderIds = $this->getRequest()->getParam('orderId', []);
         foreach ($orderIds as $id) {
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
             $id = $this->encryptor->decrypt(base64_decode($id));
             $orders[] = $this->orderRepository->get($id);
         }

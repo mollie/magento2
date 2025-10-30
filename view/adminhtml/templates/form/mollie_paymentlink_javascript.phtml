@@ -4,8 +4,10 @@
  * See COPYING.txt for license details.
  */
 
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
 
+/** @var Escaper $escaper */
 /** @var SecureHtmlRenderer $secureRenderer */
 
 $scriptString = '
@@ -45,17 +47,30 @@ $scriptString = '
         saveSelectedMethods();
         setSelectedMethods();
 
-        document.getElementById(\'order-billing_method\').addEventListener(\'DOMSubtreeModified\', () => {
-            saveSelectedMethods();
-            setSelectedMethods();
-        })
+        const targetNode = document.getElementById(\'order-billing_method\');
+
+        if (targetNode) {
+          const observer = new MutationObserver((mutationsList) => {
+            for (const mutation of mutationsList) {
+              if (mutation.type === \'childList\' || mutation.type === \'subtree\') {
+                saveSelectedMethods();
+                setSelectedMethods();
+              }
+            }
+          });
+
+          observer.observe(targetNode, {
+            childList: true,
+            subtree: true
+          });
+        }
     });
 ';
 
 // @phpstan-ignore-next-line
 if (isset($secureRenderer)) {
-    echo $secureRenderer->renderTag('script', [], $scriptString, false);
+    ?><?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); // @phpcs:ignore?><?php
     return;
 }
-
-echo '<script>' . /* @noEscape */ $scriptString . '</script>';
+?>
+echo '<script>' . /* @noEscape @phpcs:ignore */ $scriptString . '</script>';

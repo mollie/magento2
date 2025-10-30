@@ -1,0 +1,65 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Mollie\Payment\Block\Adminhtml\System\Config\Form\Extension\Checker;
+
+/** @see Checker */
+/** @var Checker $block */
+/** @var SecureHtmlRenderer $secureRenderer */
+/** @var Escaper $escaper */
+
+$scriptString = '
+    require([
+        \'jquery\',
+        \'prototype\'
+    ], function (jQuery) {
+        var resultSpan = jQuery(\'#result_apikey\');
+        jQuery(\'#apikey_button\').click(function () {
+            var params = {
+                "test_key": jQuery("#mollie_general_api_details_apikey_test").val(),
+                "live_key": jQuery("#mollie_general_api_details_apikey_live").val()
+            	};
+            new Ajax.Request(\'' . $block->getAjaxUrl() . '\', {
+                parameters: params,
+                loaderArea: false,
+                asynchronous: true,
+                onCreate: function () {
+                    resultSpan.find(\'.connecting\').show();
+                    resultSpan.find(\'.result\').hide();
+                },
+                onSuccess: function (response) {
+                    resultSpan.find(\'.connecting\').hide();
+                    var resultText = \'\';
+                    if (response.status > 200) {
+                        resultText = response.statusText;
+                    } else {
+                        var json = response.responseJSON;
+                        if (typeof json.msg != \'undefined\') {
+                            resultText = json.msg;
+                        }
+                    }
+                    resultSpan.find(\'.result\').show();
+                    resultSpan.find(\'.result\').html(resultText);
+                }
+            });
+        });
+    });
+';
+
+// @phpstan-ignore-next-line
+if (isset($secureRenderer)) {
+    ?><?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?><?php
+}
+
+// @phpstan-ignore-next-line
+if (!isset($secureRenderer)) {
+    ?><script><?= /* @noEscape */ $scriptString ?></script><?php
+}
+
+echo $block->getApiKeyButtonHtml();
+echo $block->getSelfTestButtonHtml();

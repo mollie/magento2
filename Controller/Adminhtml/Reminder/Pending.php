@@ -1,34 +1,35 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  * See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\Adminhtml\Reminder;
 
-use Magento\Backend\App\AbstractAction;
 use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Backend\Model\View\Result\Page;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\View\Result\PageFactory;
 
-class Pending extends AbstractAction
+class Pending extends Action implements HttpGetActionInterface
 {
-    const ADMIN_RESOURCE = 'Mollie_Payment::pending_payment_reminders';
-
-    /**
-     * @var PageFactory
-     */
-    private $pageFactory;
+    public const ADMIN_RESOURCE = 'Mollie_Payment::pending_payment_reminders';
 
     public function __construct(
-        PageFactory $pageFactory,
-        Action\Context $context
+        private PageFactory $pageFactory,
+        Context $context,
     ) {
         parent::__construct($context);
-        $this->pageFactory = $pageFactory;
     }
 
-    public function execute()
+    public function execute(): ResponseInterface
     {
+        /** @var Page $resultPage */
         $resultPage = $this->pageFactory->create();
         $resultPage->setActiveMenu('Mollie_Payment::pending_payment_reminders');
         $resultPage->getConfig()->getTitle()->prepend(__('Pending Payment Reminders'));

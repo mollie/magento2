@@ -1,31 +1,26 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class CaptureMode implements TransactionPartInterface
 {
-    /**
-     * @var CanUseManualCapture
-     */
-    private $canUseManualCapture;
-
     public function __construct(
-        CanUseManualCapture $canUseManualCapture
+        private CanUseManualCapture $canUseManualCapture,
     ) {
-        $this->canUseManualCapture = $canUseManualCapture;
     }
 
-    public function process(OrderInterface $order, $apiMethod, array $transaction)
+    public function process(OrderInterface $order, array $transaction): array
     {
-        if ($apiMethod == Orders::CHECKOUT_TYPE) {
-            return $transaction;
-        }
-
         if (!$this->canUseManualCapture->execute($order)) {
             return $transaction;
         }

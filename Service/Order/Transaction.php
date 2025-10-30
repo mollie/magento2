@@ -1,11 +1,14 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order;
 
+use InvalidArgumentException;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Encryption\Encryptor;
@@ -18,40 +21,19 @@ use Mollie\Payment\Model\Adminhtml\Source\WebhookUrlOptions;
 class Transaction
 {
     /**
-     * @var Config
-     */
-    private $config;
-
-    /**
      * @var UrlInterface
      */
     private $urlBuilder;
 
-    /**
-     * @var Encryptor
-     */
-    private $encryptor;
-
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    /**
-     * @var string
-     */
-    private $redirectUrl;
+    private ?string $redirectUrl = null;
 
     public function __construct(
-        Config $config,
+        private Config $config,
         Context $context,
-        Encryptor $encryptor,
-        ScopeConfigInterface $scopeConfig
+        private Encryptor $encryptor,
+        private ScopeConfigInterface $scopeConfig,
     ) {
-        $this->config = $config;
         $this->urlBuilder = $context->getUrlBuilder();
-        $this->encryptor = $encryptor;
-        $this->scopeConfig = $scopeConfig;
     }
 
     public function setRedirectUrl(string $url): void
@@ -66,7 +48,7 @@ class Transaction
      */
     public function getRedirectUrl(OrderInterface $order, string $paymentToken): string
     {
-        $storeId = $order->getStoreId();
+        $storeId = storeId($order->getStoreId());
         $useCustomUrl = $this->config->useCustomRedirectUrl($storeId);
         $customUrl = $this->config->customRedirectUrl($storeId);
 
@@ -74,12 +56,13 @@ class Transaction
             return $this->addParametersToCustomUrl($order, $paymentToken, $storeId);
         }
 
-        $parameters = 'order_id=' . intval($order->getId()) . '&payment_token=' . $paymentToken . '&utm_nooverride=1';
+        $parameters = 'order_id=' . (int) $order->getId() . '&payment_token=' . $paymentToken . '&utm_nooverride=1';
 
         $this->urlBuilder->setScope($storeId);
+
         return $this->urlBuilder->getUrl(
             'mollie/checkout/process/',
-            ['_query' => $parameters]
+            ['_query' => $parameters],
         );
     }
 
@@ -87,19 +70,21 @@ class Transaction
     {
         foreach ($orders as $order) {
             if (!$order instanceof OrderInterface) {
-                throw new \InvalidArgumentException('Invalid order');
+                throw new InvalidArgumentException('Invalid order');
             }
         }
 
         $firstOrder = reset($orders);
-        $storeId = $firstOrder->getStoreId();
-        if (!$this->config->isProductionMode($storeId) &&
-            $this->config->useWebhooks($storeId) == WebhookUrlOptions::DISABLED) {
+        $storeId = storeId($firstOrder->getStoreId());
+        if (
+            !$this->config->isProductionMode($storeId) &&
+            $this->config->useWebhooks($storeId) == WebhookUrlOptions::DISABLED
+        ) {
             return '';
         }
 
-        $orderIds = array_map(function (OrderInterface $order) {
-            return 'orderId[]=' . base64_encode($this->encryptor->encrypt((string)$order->getId()));
+        $orderIds = array_map(function (OrderInterface $order): string {
+            return 'orderId[]=' . base64_encode($this->encryptor->encrypt((string) $order->getId()));
         }, $orders);
 
         if ($this->config->useWebhooks($storeId) == WebhookUrlOptions::CUSTOM_URL) {
@@ -114,13 +99,13 @@ class Transaction
         ]);
     }
 
-    private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, ?int $storeId = null)
+    private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, ?int $storeId = null): string|array
     {
         $replacements = [
             '{{order_id}}' => $order->getId(),
             '{{increment_id}}' => $order->getIncrementId(),
             '{{payment_token}}' => $paymentToken,
-            '{{order_hash}}' => base64_encode($this->encryptor->encrypt((string)$order->getId())),
+            '{{order_hash}}' => base64_encode($this->encryptor->encrypt((string) $order->getId())),
             '{{base_url}}' => $this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
             '{{unsecure_base_url}}' => $this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
             '{{secure_base_url}}' => $this->scopeConfig->getValue('web/secure/base_url', StoreScope::SCOPE_STORE, $storeId),
@@ -134,7 +119,7 @@ class Transaction
         $customUrl = str_ireplace(
             array_keys($replacements),
             array_values($replacements),
-            $customUrl
+            $customUrl,
         );
 
         return $customUrl;

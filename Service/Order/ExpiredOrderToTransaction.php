@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order;
 
@@ -10,22 +16,10 @@ use Mollie\Payment\Model\TransactionToOrderRepository;
 
 class ExpiredOrderToTransaction
 {
-    /**
-     * @var TransactionToOrderRepository
-     */
-    private $transactionToOrderRepository;
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $criteriaBuilderFactory;
-
     public function __construct(
-        TransactionToOrderRepository $transactionToOrderRepository,
-        SearchCriteriaBuilderFactory $criteriaBuilderFactory
-    ) {
-        $this->transactionToOrderRepository = $transactionToOrderRepository;
-        $this->criteriaBuilderFactory = $criteriaBuilderFactory;
-    }
+        private TransactionToOrderRepository $transactionToOrderRepository,
+        private SearchCriteriaBuilderFactory $criteriaBuilderFactory
+    ) {}
 
     public function hasMultipleTransactions(OrderInterface $order): bool
     {
@@ -48,7 +42,7 @@ class ExpiredOrderToTransaction
         $items = $result->getItems();
 
         if (empty($items)) {
-            throw new NoSuchEntityException(__("Transaction with ID %1 not found", $transactionId));
+            throw new NoSuchEntityException(__('Transaction with ID %1 not found', $transactionId));
         }
 
         return array_shift($items);
@@ -62,7 +56,7 @@ class ExpiredOrderToTransaction
     public function markTransactionAsSkipped(string $transactionId): void
     {
         $transaction = $this->getByTransactionId($transactionId);
-        $transaction->setSkipped(true);
+        $transaction->setSkipped(1);
 
         $this->transactionToOrderRepository->save($transaction);
     }

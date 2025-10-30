@@ -1,8 +1,6 @@
 <?php
-/**
- * Copyright Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\PaymentFee\Order\Pdf\Total;
 
@@ -18,21 +16,14 @@ use Magento\Tax\Model\ResourceModel\Sales\Order\Tax\CollectionFactory;
  */
 class PaymentFee extends DefaultTotal
 {
-    /**
-     * @var PriceCurrencyInterface
-     */
-    private $currency;
-
     public function __construct(
         Data $taxHelper,
         Calculation $taxCalculation,
         CollectionFactory $ordersFactory,
-        PriceCurrencyInterface $currency,
-        array $data = []
+        private PriceCurrencyInterface $currency,
+        array $data = [],
     ) {
         parent::__construct($taxHelper, $taxCalculation, $ordersFactory, $data);
-
-        $this->currency = $currency;
     }
 
     public function getTotalsForDisplay()
@@ -50,9 +41,9 @@ class PaymentFee extends DefaultTotal
                 'amount' => $this->currency->format(
                     $amount,
                     false,
-                    \Magento\Framework\Pricing\PriceCurrencyInterface::DEFAULT_PRECISION,
+                    PriceCurrencyInterface::DEFAULT_PRECISION,
                     null,
-                    $sourceDataCurrency
+                    $sourceDataCurrency,
                 ),
                 'label' => __('Payment Fee'),
                 'font_size' => $this->getFontSize() ? $this->getFontSize() : 7,

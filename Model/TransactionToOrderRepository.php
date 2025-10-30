@@ -1,7 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model;
 
+use Exception;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
@@ -9,7 +16,6 @@ use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Mollie\Payment\Api\Data\TransactionToOrderInterface;
-use Mollie\Payment\Api\Data\TransactionToOrderInterfaceFactory;
 use Mollie\Payment\Api\Data\TransactionToOrderSearchResultsInterface;
 use Mollie\Payment\Api\Data\TransactionToOrderSearchResultsInterfaceFactory;
 use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
@@ -18,51 +24,14 @@ use Mollie\Payment\Model\ResourceModel\TransactionToOrder\CollectionFactory as T
 
 class TransactionToOrderRepository implements TransactionToOrderRepositoryInterface
 {
-    /**
-     * @var ResourceTransactionToOrder
-     */
-    private $resource;
-
-    /**
-     * @var TransactionToOrderFactory
-     */
-    private $transactionToOrderFactory;
-
-    /**
-     * @var TransactionToOrderCollectionFactory
-     */
-    private $transactionToOrderCollectionFactory;
-
-    /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
-     * @var TransactionToOrderSearchResultsInterfaceFactory
-     */
-    private $searchResultsFactory;
-
-    /**
-     * @var JoinProcessorInterface
-     */
-    private $extensionAttributesJoinProcessor;
-
     public function __construct(
-        ResourceTransactionToOrder $resource,
-        TransactionToOrderFactory $transactionToOrderFactory,
-        TransactionToOrderCollectionFactory $transactionToOrderCollectionFactory,
-        CollectionProcessorInterface $collectionProcessor,
-        TransactionToOrderSearchResultsInterfaceFactory $searchResultsFactory,
-        JoinProcessorInterface $extensionAttributesJoinProcessor
-    ) {
-        $this->resource = $resource;
-        $this->transactionToOrderFactory = $transactionToOrderFactory;
-        $this->transactionToOrderCollectionFactory = $transactionToOrderCollectionFactory;
-        $this->collectionProcessor = $collectionProcessor;
-        $this->searchResultsFactory = $searchResultsFactory;
-        $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
-    }
+        private ResourceTransactionToOrder $resource,
+        private TransactionToOrderFactory $transactionToOrderFactory,
+        private TransactionToOrderCollectionFactory $transactionToOrderCollectionFactory,
+        private CollectionProcessorInterface $collectionProcessor,
+        private TransactionToOrderSearchResultsInterfaceFactory $searchResultsFactory,
+        private JoinProcessorInterface $extensionAttributesJoinProcessor
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -71,12 +40,13 @@ class TransactionToOrderRepository implements TransactionToOrderRepositoryInterf
     {
         try {
             $this->resource->save($entity);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the transactionToOrder: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return $entity;
     }
 
@@ -90,6 +60,7 @@ class TransactionToOrderRepository implements TransactionToOrderRepositoryInterf
         if (!$transactionToOrder->getId()) {
             throw new NoSuchEntityException(__('TransactionToOrder with id "%1" does not exist.', $id));
         }
+
         return $transactionToOrder->getDataModel();
     }
 
@@ -102,7 +73,7 @@ class TransactionToOrderRepository implements TransactionToOrderRepositoryInterf
 
         $this->extensionAttributesJoinProcessor->process(
             $collection,
-            TransactionToOrderInterface::class
+            TransactionToOrderInterface::class,
         );
 
         $this->collectionProcessor->process($criteria, $collection);
@@ -117,6 +88,7 @@ class TransactionToOrderRepository implements TransactionToOrderRepositoryInterf
 
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
+
         return $searchResults;
     }
 
@@ -129,12 +101,13 @@ class TransactionToOrderRepository implements TransactionToOrderRepositoryInterf
             $transactionToOrderModel = $this->transactionToOrderFactory->create();
             $this->resource->load($transactionToOrderModel, $entity->getEntityId());
             $this->resource->delete($transactionToOrderModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the TransactionToOrder: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return true;
     }
 

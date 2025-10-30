@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Mollie;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -14,7 +16,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class TransactionDescriptionTest extends IntegrationTestCase
 {
-    public function returnsTheCorrectDescriptionForRegularTransactionsProvider()
+    public function returnsTheCorrectDescriptionForRegularTransactionsProvider(): array
     {
         return [
             ['{ordernumber}', '0000025'],
@@ -30,7 +32,7 @@ class TransactionDescriptionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store general/store_information/name My Test Store
      * @dataProvider returnsTheCorrectDescriptionForRegularTransactionsProvider
      */
-    public function testReturnsTheCorrectDescriptionForRegularTransactions($description, $expected)
+    public function testReturnsTheCorrectDescriptionForRegularTransactions(string $description, string $expected): void
     {
         $configMock = $this->createMock(Config::class);
         $configMock->method('paymentMethodDescription')->willReturn($description);

@@ -4,12 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Controller\Adminhtml\Action;
 
-use Magento\Framework\Encryption\Encryptor;
-use Mollie\Api\Endpoints\MethodEndpoint;
+use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Requests\GetEnabledMethodsRequest;
+use Mollie\Api\Http\Requests\GetPaginatedTerminalsRequest;
+use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Helper\Tests;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Test\Integration\BackendControllerTestCase;
 
 class ApikeyTest extends BackendControllerTestCase
@@ -18,6 +21,7 @@ class ApikeyTest extends BackendControllerTestCase
     {
         $this->mockMollieMethodsEndpointForRequestKeys('test_apikey123456789101112131415161718', '');
 
+        $this->getRequest()->setMethod('POST');
         $this->dispatch('backend/mollie/action/apikey');
 
         $result = json_decode($this->getResponse()->getContent(), true);
@@ -31,6 +35,7 @@ class ApikeyTest extends BackendControllerTestCase
     {
         $this->mockMollieMethodsEndpointForRequestKeys('', 'live_apikey123456789101112131415161718');
 
+        $this->getRequest()->setMethod('POST');
         $this->dispatch('backend/mollie/action/apikey');
 
         $result = json_decode($this->getResponse()->getContent(), true);
@@ -48,6 +53,7 @@ class ApikeyTest extends BackendControllerTestCase
     {
         $this->mockMollieMethodsEndpointForConfigurationKeys('test_apikey123456789101112131415161718', '');
 
+        $this->getRequest()->setMethod('POST');
         $this->dispatch('backend/mollie/action/apikey');
 
         $result = json_decode($this->getResponse()->getContent(), true);
@@ -63,10 +69,9 @@ class ApikeyTest extends BackendControllerTestCase
      */
     public function testFallsBackOnTheConfigurationForLive(): void
     {
-        $count = 0;
-
         $this->mockMollieMethodsEndpointForConfigurationKeys('', 'live_apikey123456789101112131415161718');
 
+        $this->getRequest()->setMethod('POST');
         $this->dispatch('backend/mollie/action/apikey');
 
         $result = json_decode($this->getResponse()->getContent(), true);
@@ -78,19 +83,18 @@ class ApikeyTest extends BackendControllerTestCase
 
     protected function mockMollieMethodsEndpointForRequestKeys(string $testApiKey, string $liveApiKey): void
     {
-        $mollieModel = $this->_objectManager->get(Mollie::class);
-        $mollieModelMock = $this->createMock(Mollie::class);
+        $mollieModelMock = $this->createMock(\Mollie\Payment\Service\Mollie\MollieApiClient::class);
         foreach (array_filter([$testApiKey, $liveApiKey]) as $key) {
-            $api = $mollieModel->loadMollieApi($key);
+            $client = MollieApiClient::fake([
+                GetEnabledMethodsRequest::class => MockResponse::ok('method-list'),
+                GetPaginatedTerminalsRequest::class => MockResponse::ok('terminal-list'),
+            ]);
 
-            $api->methods = $this->createMock(MethodEndpoint::class);
-            $api->methods->method('all')->willReturn([]);
-
-            $mollieModelMock->method('loadMollieApi')->with($key)->willReturn($api);
+            $mollieModelMock->method('loadByApiKey')->with($key)->willReturn($client);
         }
 
         $tests = $this->_objectManager->create(Tests::class, [
-            'mollieModel' => $mollieModelMock,
+            'mollieApiClient' => $mollieModelMock,
             'tests' => [],
         ]);
 
@@ -104,19 +108,18 @@ class ApikeyTest extends BackendControllerTestCase
 
     protected function mockMollieMethodsEndpointForConfigurationKeys(string $testApiKey, string $liveApiKey): void
     {
-        $mollieModel = $this->_objectManager->get(Mollie::class);
-        $mollieModelMock = $this->createMock(Mollie::class);
+        $mollieModelMock = $this->createMock(\Mollie\Payment\Service\Mollie\MollieApiClient::class);
         foreach (array_filter([$testApiKey, $liveApiKey]) as $key) {
-            $api = $mollieModel->loadMollieApi($key);
+            $client = MollieApiClient::fake([
+                GetEnabledMethodsRequest::class => MockResponse::ok('method-list'),
+                GetPaginatedTerminalsRequest::class => MockResponse::ok('terminal-list'),
+            ]);
 
-            $api->methods = $this->createMock(MethodEndpoint::class);
-            $api->methods->method('all')->willReturn([]);
-
-            $mollieModelMock->method('loadMollieApi')->with($key)->willReturn($api);
+            $mollieModelMock->method('loadByApiKey')->with($key)->willReturn($client);
         }
 
         $tests = $this->_objectManager->create(Tests::class, [
-            'mollieModel' => $mollieModelMock,
+            'mollieApiClient' => $mollieModelMock,
             'tests' => [],
         ]);
 

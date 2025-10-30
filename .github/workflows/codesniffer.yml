@@ -1,5 +1,5 @@
-name: Codesniffer with the Magento EcgM2 standard
-on: [push, pull_request]
+name: Codesniffer with the Magento2 standard
+on: [push, pull_request, workflow_dispatch]
 
 jobs:
   build:
@@ -12,5 +12,6 @@ jobs:
           docker run
           --volume $(pwd)/:/app/workdir
           michielgerritsen/magento-coding-standard:latest
-          --severity=10
+          --severity=9
+          --standard=/app/workdir/phpcs.xml
           -s

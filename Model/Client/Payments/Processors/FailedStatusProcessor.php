@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Client\Payments\Processors;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -17,55 +19,30 @@ use Mollie\Payment\Service\Order\TransactionProcessor;
 
 class FailedStatusProcessor implements PaymentProcessorInterface
 {
-    /**
-     * @var CancelOrder
-     */
-    private $cancelOrder;
-
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
-    /**
-     * @var TransactionProcessor
-     */
-    private $transactionProcessor;
-
-    /**
-     * @var ProcessTransactionResponseFactory
-     */
-    private $processTransactionResponseFactory;
-
     public function __construct(
-        CancelOrder $cancelOrder,
-        General $mollieHelper,
-        TransactionProcessor $transactionProcessor,
-        ProcessTransactionResponseFactory $processTransactionResponseFactory
-    ) {
-        $this->cancelOrder = $cancelOrder;
-        $this->mollieHelper = $mollieHelper;
-        $this->transactionProcessor = $transactionProcessor;
-        $this->processTransactionResponseFactory = $processTransactionResponseFactory;
-    }
+        private CancelOrder $cancelOrder,
+        private General $mollieHelper,
+        private TransactionProcessor $transactionProcessor,
+        private ProcessTransactionResponseFactory $processTransactionResponseFactory
+    ) {}
 
     public function process(
         OrderInterface $magentoOrder,
         Payment $molliePayment,
         string $type,
-        ProcessTransactionResponse $response
+        ProcessTransactionResponse $response,
     ): ?ProcessTransactionResponse {
         $status = $molliePayment->status;
         if ($type == 'webhook') {
             $this->cancelOrder->execute($magentoOrder, $status);
-            $this->transactionProcessor->process($magentoOrder, null, $molliePayment);
+            $this->transactionProcessor->process($magentoOrder, $molliePayment);
         }
 
         $message = [
             'success' => false,
             'status' => $status,
             'order_id' => $magentoOrder->getEntityId(),
-            'type' => $type
+            'type' => $type,
         ];
 
         $this->mollieHelper->addTolog('success', $message);

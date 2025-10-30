@@ -7,12 +7,11 @@ services:
     environment:
       - VIRTUAL_HOST=magento.test
       - MOLLIE_API_KEY_TEST
+      - NO_API_KEY_TEST
     volumes:
       - ../../../magento-logs:/data/var/log
       - ./magento/configure-mollie.sh:/data/configure-mollie.sh
       - ./magento/merge-config.php.stub:/data/merge-config.php
-    depends_on:
-      - ngrok
 
   nginx-proxy:
     image: jwilder/nginx-proxy
@@ -21,30 +20,10 @@ services:
       - ./nginx-proxy/magento.test.crt:/etc/nginx/certs/magento.test.crt
       - ./nginx-proxy/magento.test.key:/etc/nginx/certs/magento.test.key
       - /var/run/docker.sock:/tmp/docker.sock:ro
+    ports:
+      - 80:80
+      - 443:443
 
-  ngrok:
-    image: ngrok/ngrok:latest
-    command: http http://magento
-    environment:
-      - NGROK_AUTHTOKEN
-
-  e2e:
-    build: ./e2e
-    container_name: e2e
-    links:
-      - "nginx-proxy:magento.test"
-    environment:
-      - NO_API_KEY_TEST
-      - MAGENTO_VERSION
-      - CYPRESS_TESTRAIL_DOMAIN
-      - CYPRESS_TESTRAIL_USERNAME
-      - CYPRESS_TESTRAIL_PASSWORD
-      - CYPRESS_TESTRAIL_PROJECT_ID
-      - CYPRESS_TESTRAIL_MILESTONE_ID
-      - CYPRESS_TESTRAIL_RUN_NAME
-      - CYPRESS_TESTRAIL_RUN_CLOSE
-      - CYPRESS_baseUrl=https://magento.test
-    volumes:
-      - ./../../../Test/End-2-end/cypress:/e2e/cypress
-      - ./../../../Test/End-2-end/cypress.config.js:/e2e/cypress.config.js
-      - ./../../../Test/End-2-end/webpack.config.js:/e2e/webpack.config.js
+  tunnel:
+    image: cloudflare/cloudflared
+    command: tunnel --loglevel debug --url http://magento/

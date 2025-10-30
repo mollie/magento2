@@ -40,8 +40,8 @@ $scriptString = '
 
 // @phpstan-ignore-next-line
 if (isset($secureRenderer)) {
-    echo $secureRenderer->renderTag('script', [], $scriptString, false);
+    ?><?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?><?php
     return;
 }
-
-echo '<script>' . /* @noEscape */ $scriptString . '</script>';
+?>
+<script><?= /* @noEscape */ $scriptString; ?></script>

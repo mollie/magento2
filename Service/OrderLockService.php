@@ -1,7 +1,14 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service;
 
+use Exception;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -11,37 +18,12 @@ use Mollie\Payment\Config;
 
 class OrderLockService
 {
-    /**
-     * @var OrderRepositoryInterfaceFactory
-     */
-    private $orderRepositoryFactory;
-
-    /**
-     * @var LockService
-     */
-    private $lockService;
-
-    /**
-     * @var ResourceConnection
-     */
-    private $resourceConnection;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        OrderRepositoryInterfaceFactory $orderRepositoryFactory,
-        LockService $lockService,
-        ResourceConnection $resourceConnection,
-        Config $config
-    ) {
-        $this->orderRepositoryFactory = $orderRepositoryFactory;
-        $this->lockService = $lockService;
-        $this->resourceConnection = $resourceConnection;
-        $this->config = $config;
-    }
+        private OrderRepositoryInterfaceFactory $orderRepositoryFactory,
+        private LockService $lockService,
+        private ResourceConnection $resourceConnection,
+        private Config $config
+    ) {}
 
     public function execute(OrderInterface $originalOrder, callable $callback)
     {
@@ -78,7 +60,7 @@ class OrderLockService
 
             // Update the original order with the new data.
             $originalOrder->setData($order->getData());
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $connection->rollBack();
             throw $e;
         } finally {

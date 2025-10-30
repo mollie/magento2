@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Vipps;
 
 class VippsMethodTest extends AbstractTestMethod
 {
-    protected $instance = Vipps::class;
+    protected ?string $instance = Vipps::class;
 
-    protected $code = 'vipps';
+    protected ?string $code = 'vipps';
 }

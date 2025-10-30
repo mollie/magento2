@@ -1,8 +1,11 @@
 <?php
-/**
+
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\PaymentFee\Sales;
 
@@ -12,13 +15,13 @@ use Magento\Sales\Block\Adminhtml\Order\Creditmemo\Totals;
 
 class Creditmemo extends Template
 {
-    public function initTotals()
+    public function initTotals(): void
     {
         /** @var Totals $parentBlock */
         $parentBlock = $this->getParentBlock();
         $creditmemo = $parentBlock->getCreditmemo();
 
-        if (!(int)$creditmemo->getBaseMolliePaymentFee()) {
+        if (!(int) $creditmemo->getBaseMolliePaymentFee()) {
             return;
         }
 

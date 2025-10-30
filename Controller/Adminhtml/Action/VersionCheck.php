@@ -1,56 +1,37 @@
 <?php
-/**
- * Copyright © Magmodules.eu. All rights reserved.
+
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\Adminhtml\Action;
 
+use Exception;
 use Magento\Backend\App\Action;
+use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Serialize\Serializer\Json as JsonSerializer;
 use Mollie\Payment\Config;
 
-class VersionCheck extends Action
+class VersionCheck extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var JsonFactory
-     */
-    private $resultJsonFactory;
-
-    /**
-     * @var JsonSerializer
-     */
-    private $json;
-
-    /**
-     * @var File
-     */
-    private $file;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Action\Context $context,
-        JsonFactory $resultJsonFactory,
-        JsonSerializer $json,
-        Config $config,
-        File $file
+        Context $context,
+        private JsonFactory $resultJsonFactory,
+        private JsonSerializer $json,
+        private Config $config,
+        private File $file,
     ) {
         parent::__construct($context);
-
-        $this->resultJsonFactory = $resultJsonFactory;
-        $this->json = $json;
-        $this->file = $file;
-        $this->config = $config;
     }
 
-    public function execute()
+    public function execute(): Json
     {
         $resultJson = $this->resultJsonFactory->create();
         $result = $this->getVersions();
@@ -64,7 +45,7 @@ class VersionCheck extends Action
                     break;
                 }
                 $changeLog[] = [
-                    $release['tag_name'] => $release['body']
+                    $release['tag_name'] => $release['body'],
                 ];
             }
         }
@@ -78,7 +59,7 @@ class VersionCheck extends Action
         return $resultJson->setData(['result' => $data]);
     }
 
-    private function getVersions()
+    private function getVersions(): string
     {
         try {
             // Github required a User-Agent
@@ -86,17 +67,18 @@ class VersionCheck extends Action
                 'http' => [
                     'method' => 'GET',
                     'header' => [
-                        'User-Agent: PHP'
-                    ]
-                ]
+                        'User-Agent: PHP',
+                    ],
+                ],
             ];
 
             return $this->file->fileGetContents(
                 'https://api.github.com/repos/mollie/magento2/releases',
                 null,
-                stream_context_create($options)
+                // @phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
+                stream_context_create($options),
             );
-        } catch (\Exception $exception) {
+        } catch (Exception) {
             return '';
         }
     }

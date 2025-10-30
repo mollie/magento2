@@ -4,22 +4,23 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Observer\CheckoutSubmitAllAfter;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Module\Manager;
 use Magento\InstantPurchase\Model\QuoteManagement\PaymentConfiguration;
-use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Methods\CreditcardVault;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPurchaseOrders;
+use Mollie\Payment\Service\Mollie\StartTransaction;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class StartTransactionForInstantPurchaseOrdersTest extends IntegrationTestCase
 {
-    protected function setUpWithoutVoid()
+    protected function setUp(): void
     {
-        parent::setUpWithoutVoid();
+        parent::setUp();
 
         /** @var Manager $moduleManager */
         $moduleManager = $this->objectManager->get(Manager::class);
@@ -31,10 +32,10 @@ class StartTransactionForInstantPurchaseOrdersTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testCallsTheStartTransactionMethod()
+    public function testCallsTheStartTransactionMethod(): void
     {
-        $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->expects($this->once())->method('startTransaction');
+        $startTransactionMock = $this->createMock(StartTransaction::class);
+        $startTransactionMock->expects($this->once())->method('execute');
 
         $order = $this->loadOrderById('100000001');
 
@@ -49,7 +50,7 @@ class StartTransactionForInstantPurchaseOrdersTest extends IntegrationTestCase
 
         /** @var StartTransactionForInstantPurchaseOrders $instance */
         $instance = $this->objectManager->create(StartTransactionForInstantPurchaseOrders::class, [
-            'mollie' => $mollieMock,
+            'startTransaction' => $startTransactionMock,
         ]);
 
         $instance->execute($observer);
@@ -58,7 +59,7 @@ class StartTransactionForInstantPurchaseOrdersTest extends IntegrationTestCase
     /**
      * @doesNotPerformAssertions
      */
-    public function testDoesNothingWhenTheOrderIsNotPresent()
+    public function testDoesNothingWhenTheOrderIsNotPresent(): void
     {
         // Create observer but don't add an order.
         $observer = $this->objectManager->create(Observer::class);

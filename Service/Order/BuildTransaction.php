@@ -1,31 +1,29 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Service\Order;
+declare(strict_types=1);
 
+namespace Mollie\Payment\Service\Order;
 
 use Magento\Sales\Api\Data\OrderInterface;
 
 class BuildTransaction
 {
-    /**
-     * @var TransactionPartInterface[]
-     */
-    private $parts;
-
     public function __construct(
-        array $parts
+        /**
+         * @var TransactionPartInterface[]
+         */
+        private array $parts,
     ) {
-        $this->parts = $parts;
     }
 
-    public function execute(OrderInterface $order, $apiMethod, array $transaction)
+    public function execute(OrderInterface $order, array $transaction): array
     {
         foreach ($this->parts as $part) {
-            $transaction = $part->process($order, $apiMethod, $transaction);
+            $transaction = $part->process($order, $transaction);
         }
 
         return $transaction;

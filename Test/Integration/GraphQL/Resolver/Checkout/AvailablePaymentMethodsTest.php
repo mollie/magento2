@@ -4,10 +4,12 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Checkout;
 
+use Exception;
 use Magento\Framework\Encryption\Encryptor;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\GraphQl\Quote\GetMaskedQuoteIdByReservedOrderId;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
@@ -18,13 +20,13 @@ class AvailablePaymentMethodsTest extends GraphQLTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @throws \Exception
+     * @throws Exception
      * @magentoAppArea graphql
      *
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
      * @magentoConfigFixture default_store payment/mollie_methods_creditcard_vault/active 1
      */
-    public function testHidesTheVaultMethod()
+    public function testHidesTheVaultMethod(): void
     {
         $encryptorMock = $this->createMock(Encryptor::class);
         $encryptorMock->method('decrypt')->willReturn('test_dummyapikeywhichmustbe30characterslong');
@@ -59,7 +61,7 @@ class AvailablePaymentMethodsTest extends GraphQLTestCase
 
         $this->assertFalse(in_array(
             'mollie_methods_creditcard_vault',
-            array_column($result['cart']['available_payment_methods'], 'code')
+            array_column($result['cart']['available_payment_methods'], 'code'),
         ));
     }
 }

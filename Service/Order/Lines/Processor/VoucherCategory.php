@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\Lines\Processor;
 
@@ -13,18 +15,11 @@ use Mollie\Payment\Config;
 
 class VoucherCategory implements ProcessorInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
-    public function process($orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array
+    public function process(array $orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array
     {
         if (!$orderItem || !$order->getPayment() || $order->getPayment()->getMethod() != 'mollie_methods_voucher') {
             return $orderLine;
@@ -40,7 +35,7 @@ class VoucherCategory implements ProcessorInterface
 
     private function getCategoryValue(OrderInterface $order, OrderItemInterface $orderItem)
     {
-        $category = $this->config->getVoucherCategory($order->getStoreId());
+        $category = $this->config->getVoucherCategory(storeId($order->getStoreId()));
         if ($category != 'custom_attribute') {
             return $category;
         }

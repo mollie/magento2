@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Observer\SalesOrderInvoicePay;
 
@@ -10,44 +16,26 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class MarkVirtualItemsAsShipped implements ObserverInterface
 {
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-
-    /**
-     * @var OrderLines
-     */
-    private $orderLines;
-
     public function __construct(
-        MollieApiClient $mollieApiClient,
-        OrderLines $orderLines
-    ) {
-        $this->mollieApiClient = $mollieApiClient;
-        $this->orderLines = $orderLines;
-    }
+        private MollieApiClient $mollieApiClient,
+        private OrderLines $orderLines
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var InvoiceInterface $invoice */
         $invoice = $observer->getData('invoice');
         $transactionId = $invoice->getOrder()->getMollieTransactionId();
-
-        // Check if the Orders API is used.
-        if (!$transactionId || substr($transactionId, 0, 3) !== 'ord') {
-            return;
-        }
 
         $orderLines = $this->getOrderLines($invoice);
         if ($orderLines === null) {
             return;
         }
 
-        $orderLines = array_map(function (OrderLines $orderLine) {
+        $orderLines = array_map(function (OrderLines $orderLine): array {
             return [
                 'id' => $orderLine->getLineId(),
-                'quantity' => $orderLine->getQtyOrdered()
+                'quantity' => $orderLine->getQtyOrdered(),
             ];
         }, $orderLines);
 
@@ -64,7 +52,7 @@ class MarkVirtualItemsAsShipped implements ObserverInterface
             return null;
         }
 
-        $orderLines = array_filter($orderLines, function (OrderLines $orderLine) {
+        $orderLines = array_filter($orderLines, function (OrderLines $orderLine): bool {
             return $orderLine->getType() == 'digital';
         });
 

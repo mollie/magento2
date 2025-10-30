@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Order;
 
 use Magento\Framework\Exception\LocalizedException;
@@ -16,7 +18,7 @@ class OrderAmountTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order_list.php
      */
-    public function testCalculatesTheRightsAmount()
+    public function testCalculatesTheRightsAmount(): void
     {
         $transactionId = 'test_transaction_id';
 
@@ -45,7 +47,7 @@ class OrderAmountTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order_list.php
      */
-    public function testThrowsExceptionWhenMixingCurrencies()
+    public function testThrowsExceptionWhenMixingCurrencies(): void
     {
         $transactionId = 'test_transaction_id';
 

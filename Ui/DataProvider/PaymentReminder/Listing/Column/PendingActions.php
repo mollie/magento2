@@ -1,31 +1,27 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  * See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Ui\DataProvider\PaymentReminder\Listing\Column;
 
-use Magento\Backend\Model\UrlInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\UiComponent\ContextInterface;
 use Magento\Framework\View\Element\UiComponentFactory;
 use Magento\Ui\Component\Listing\Columns\Column;
 
 class PendingActions extends Column
 {
-    /**
-     * @var UrlInterface
-     */
-    protected $urlBuilder;
-
     public function __construct(
         ContextInterface $context,
         UiComponentFactory $uiComponentFactory,
-        \Magento\Framework\UrlInterface $urlBuilder,
+        protected UrlInterface $urlBuilder,
         array $components = [],
-        array $data = []
+        array $data = [],
     ) {
-        $this->urlBuilder = $urlBuilder;
         parent::__construct($context, $uiComponentFactory, $components, $data);
     }
 
@@ -47,20 +43,20 @@ class PendingActions extends Column
             }
 
             $name = $this->getData('name');
-            $item[$name]['delete']   = [
-                'href'  => $this->urlBuilder->getUrl(
+            $item[$name]['delete'] = [
+                'href' => $this->urlBuilder->getUrl(
                     'mollie/reminder/deletePending',
-                    ['id' => $item['entity_id']]
+                    ['id' => $item['entity_id']],
                 ),
-                'label' => __('Delete')
+                'label' => __('Delete'),
             ];
 
-            $item[$name]['send_now']   = [
-                'href'  => $this->urlBuilder->getUrl(
+            $item[$name]['send_now'] = [
+                'href' => $this->urlBuilder->getUrl(
                     'mollie/reminder/sendNow',
-                    ['id' => $item['entity_id']]
+                    ['id' => $item['entity_id']],
                 ),
-                'label' => __('Send now')
+                'label' => __('Send now'),
             ];
         }
 

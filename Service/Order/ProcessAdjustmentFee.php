@@ -1,39 +1,27 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Api\MollieApiClient;
-use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 
 class ProcessAdjustmentFee
 {
-    /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-
-    /**
-     * @var RefundUsingPayment
-     */
-    private $refundUsingPayment;
-
-    /**
-     * @var bool
-     */
-    private $doNotRefundInMollie = false;
+    private bool $doNotRefundInMollie = false;
 
     public function __construct(
-        MollieHelper $mollieHelper,
-        RefundUsingPayment $refundUsingPayment
-    ) {
-        $this->mollieHelper = $mollieHelper;
-        $this->refundUsingPayment = $refundUsingPayment;
-    }
+        private RefundUsingPayment $refundUsingPayment
+    ) {}
 
-    public function handle(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo)
+    public function handle(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo): void
     {
         if ($creditmemo->getAdjustment() > 0) {
             $this->positive($mollieApi, $order, $creditmemo);
@@ -44,12 +32,12 @@ class ProcessAdjustmentFee
         }
     }
 
-    public function doNotRefundInMollie()
+    public function doNotRefundInMollie(): bool
     {
         return $this->doNotRefundInMollie;
     }
 
-    private function positive(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo)
+    private function positive(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo): void
     {
         $this->doNotRefundInMollie = false;
 
@@ -57,11 +45,11 @@ class ProcessAdjustmentFee
             $mollieApi,
             $order->getMollieTransactionId(),
             $order->getOrderCurrencyCode(),
-            $creditmemo->getAdjustment()
+            $creditmemo->getAdjustment(),
         );
     }
 
-    private function negative(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo)
+    private function negative(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo): void
     {
         $this->doNotRefundInMollie = true;
 
@@ -69,7 +57,7 @@ class ProcessAdjustmentFee
             $mollieApi,
             $order->getMollieTransactionId(),
             $order->getOrderCurrencyCode(),
-            $creditmemo->getGrandTotal()
+            $creditmemo->getGrandTotal(),
         );
     }
 }

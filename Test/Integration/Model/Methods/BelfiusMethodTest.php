@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Belfius;
 
 class BelfiusMethodTest extends AbstractTestMethod
 {
-    protected $instance = Belfius::class;
+    protected ?string $instance = Belfius::class;
 
-    protected $code = 'belfius';
+    protected ?string $code = 'belfius';
 }

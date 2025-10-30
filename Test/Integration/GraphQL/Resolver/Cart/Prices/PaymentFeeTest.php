@@ -1,7 +1,14 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\GraphQL\Resolver\Cart\Prices;
 
+use Exception;
 use Mollie\Payment\Test\Integration\GraphQLTestCase;
 
 class PaymentFeeTest extends GraphQLTestCase
@@ -44,7 +51,7 @@ class PaymentFeeTest extends GraphQLTestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      * @return mixed
      */
     public function callGraphQlQuery(): array

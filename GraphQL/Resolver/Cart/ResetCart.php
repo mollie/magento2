@@ -1,12 +1,14 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\GraphQL\Resolver\Cart;
 
-use Magento\Framework\App\ObjectManager;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
@@ -15,27 +17,13 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\MaskedQuoteIdToQuoteIdInterface;
-use Magento\QuoteGraphQl\Model\Cart\GetCartForUser;
 
 class ResetCart implements ResolverInterface
 {
-    /**
-     * @var MaskedQuoteIdToQuoteIdInterface
-     */
-    private $maskedQuoteIdToQuoteId;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
     public function __construct(
-        MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId,
-        CartRepositoryInterface $cartRepository
-    ) {
-        $this->maskedQuoteIdToQuoteId = $maskedQuoteIdToQuoteId;
-        $this->cartRepository = $cartRepository;
-    }
+        private MaskedQuoteIdToQuoteIdInterface $maskedQuoteIdToQuoteId,
+        private CartRepositoryInterface $cartRepository
+    ) {}
 
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
@@ -62,7 +50,7 @@ class ResetCart implements ResolverInterface
 
     private function validateCartOwnership(CartInterface $cart, int $customerId, string $cartHash): void
     {
-        $cartCustomerId = (int)$cart->getCustomerId();
+        $cartCustomerId = (int) $cart->getCustomerId();
         /* Guest cart, allow operations */
         if (0 === $cartCustomerId && (null === $customerId || 0 === $customerId)) {
             return;
@@ -72,8 +60,8 @@ class ResetCart implements ResolverInterface
             throw new GraphQlAuthorizationException(
                 __(
                     'The current user cannot perform operations on cart "%masked_cart_id"',
-                    ['masked_cart_id' => $cartHash]
-                )
+                    ['masked_cart_id' => $cartHash],
+                ),
             );
         }
     }

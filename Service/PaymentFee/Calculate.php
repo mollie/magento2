@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\PaymentFee;
 
@@ -17,56 +19,16 @@ use Mollie\Payment\Service\PaymentFee\Types\Percentage;
 
 class Calculate
 {
-    /**
-     * @var ResultFactory
-     */
-    private $resultFactory;
-
-    /**
-     * @var MaximumSurcharge
-     */
-    private $maximumSurcharge;
-
-    /**
-     * @var PaymentFee
-     */
-    private $config;
-
-    /**
-     * @var FixedAmount
-     */
-    private $fixedAmount;
-
-    /**
-     * @var Percentage
-     */
-    private $percentage;
-
-    /**
-     * @var FixedAmountAndPercentage
-     */
-    private $fixedAmountAndPercentage;
-
-    /**
-     * @var array
-     */
-    private $cache = [];
+    private array $cache = [];
 
     public function __construct(
-        ResultFactory $resultFactory,
-        MaximumSurcharge $maximumSurcharge,
-        PaymentFee $config,
-        FixedAmount $fixedAmount,
-        Percentage $percentage,
-        FixedAmountAndPercentage $fixedAmountAndPercentage
-    ) {
-        $this->maximumSurcharge = $maximumSurcharge;
-        $this->config = $config;
-        $this->fixedAmount = $fixedAmount;
-        $this->percentage = $percentage;
-        $this->fixedAmountAndPercentage = $fixedAmountAndPercentage;
-        $this->resultFactory = $resultFactory;
-    }
+        private ResultFactory $resultFactory,
+        private MaximumSurcharge $maximumSurcharge,
+        private PaymentFee $config,
+        private FixedAmount $fixedAmount,
+        private Percentage $percentage,
+        private FixedAmountAndPercentage $fixedAmountAndPercentage
+    ) {}
 
     /**
      * @param CartInterface $cart
@@ -89,6 +51,7 @@ class Calculate
         $this->maximumSurcharge->calculate($cart, $result);
 
         $this->cache[$key] = $result;
+
         return $result;
     }
 
@@ -98,7 +61,7 @@ class Calculate
      * @return Result
      * @throws UnknownPaymentFeeType
      */
-    private function calculatePaymentFee(CartInterface $cart, Total $total)
+    private function calculatePaymentFee(CartInterface $cart, Total $total): Result
     {
         $paymentFeeType = $this->config->getType($cart);
         if ($paymentFeeType == PaymentFeeType::FIXED_FEE) {

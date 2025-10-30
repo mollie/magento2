@@ -1,12 +1,15 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Controller\Checkout;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -20,9 +23,9 @@ class SecondChanceTest extends AbstractController
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testThrowsNotFoundExceptionWhenTheTokenIsIncorrect()
+    public function testThrowsNotFoundExceptionWhenTheTokenIsIncorrect(): void
     {
-        $this->expectException(\Magento\Framework\Exception\NoSuchEntityException::class);
+        $this->expectException(NoSuchEntityException::class);
 
         $order = $this->loadOrder('100000001');
 
@@ -36,7 +39,7 @@ class SecondChanceTest extends AbstractController
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testRedirectsToTheCheckoutUrl()
+    public function testRedirectsToTheCheckoutUrl(): void
     {
         $cart = $this->_objectManager->create(Quote::class);
         $cart->load('test01', 'reserved_order_id');
@@ -63,7 +66,7 @@ class SecondChanceTest extends AbstractController
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testRecreatesTheOrder()
+    public function testRecreatesTheOrder(): void
     {
         $order = $this->loadOrder('100000001');
 
@@ -94,7 +97,7 @@ class SecondChanceTest extends AbstractController
      * @param $incrementId
      * @return OrderInterface
      */
-    private function loadOrder($incrementId)
+    private function loadOrder(string $incrementId): mixed
     {
         /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
         $searchCriteriaBuilder = $this->_objectManager->create(SearchCriteriaBuilder::class);

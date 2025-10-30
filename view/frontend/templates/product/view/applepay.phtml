@@ -4,11 +4,11 @@
  * See COPYING.txt for license details.
  */
 
-/** @var \Magento\Framework\Escaper $escaper */
-/** @var \Mollie\Payment\Block\Product\View\ApplePay $block */
+/** @var Escaper $escaper */
+/** @var ApplePay $block */
 
-// Magento 2.3 compatibility
-isset($escaper) || $escaper = $block; // @phpstan-ignore-line
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Product\View\ApplePay;
 
 if (!$block->isEnabled()) {
     return;

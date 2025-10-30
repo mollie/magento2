@@ -4,12 +4,12 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Helper;
 
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Locale\Resolver;
-use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Store\Api\StoreRepositoryInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -19,12 +19,12 @@ class GeneralTest extends IntegrationTestCase
     /**
      * @magentoConfigFixture default_store payment/mollie_general/locale en_US
      */
-    public function testGetLocaleCodeWithFixedLocale()
+    public function testGetLocaleCodeWithFixedLocale(): void
     {
         /** @var General $instance */
         $instance = $this->objectManager->get(General::class);
 
-        $result = $instance->getLocaleCode(null, 'order');
+        $result = $instance->getLocaleCode(null);
 
         $this->assertEquals('en_US', $result);
     }
@@ -32,7 +32,7 @@ class GeneralTest extends IntegrationTestCase
     /**
      * @magentoConfigFixture default_store payment/mollie_general/locale
      */
-    public function testGetLocaleCodeWithAutomaticDetectionAndAValidLocale()
+    public function testGetLocaleCodeWithAutomaticDetectionAndAValidLocale(): void
     {
         /** @var Resolver $localeResolver */
         $localeResolver = $this->objectManager->get(Resolver::class);
@@ -41,15 +41,15 @@ class GeneralTest extends IntegrationTestCase
         /** @var General $instance */
         $instance = $this->objectManager->get(General::class);
 
-        $result = $instance->getLocaleCode(null, 'order');
+        $result = $instance->getLocaleCode(null);
 
-        $this->assertEquals('en_US', $result);
+        $this->assertNull($result);
     }
 
     /**
      * @magentoConfigFixture default_store payment/mollie_general/locale
      */
-    public function testGetLocaleCodeWithAutomaticDetectionAndAInvalidLocale()
+    public function testGetLocaleCodeWithAutomaticDetectionAndAInvalidLocale(): void
     {
         /** @var Resolver $localeResolver */
         $localeResolver = $this->objectManager->get(Resolver::class);
@@ -58,15 +58,15 @@ class GeneralTest extends IntegrationTestCase
         /** @var General $instance */
         $instance = $this->objectManager->get(General::class);
 
-        $result = $instance->getLocaleCode(null, 'order');
+        $result = $instance->getLocaleCode(null);
 
-        $this->assertEquals('en_US', $result);
+        $this->assertNull($result);
     }
 
     /**
      * @magentoConfigFixture default_store payment/mollie_general/locale store
      */
-    public function testGetLocaleCodeBasedOnTheStoreLocaleWithAValidValue()
+    public function testGetLocaleCodeBasedOnTheStoreLocaleWithAValidValue(): void
     {
         /** @var Resolver $localeResolver */
         $localeResolver = $this->objectManager->get(Resolver::class);
@@ -75,15 +75,15 @@ class GeneralTest extends IntegrationTestCase
         /** @var General $instance */
         $instance = $this->objectManager->get(General::class);
 
-        $result = $instance->getLocaleCode(null, 'order');
+        $result = $instance->getLocaleCode(null);
 
-        $this->assertEquals('en_US', $result);
+        $this->assertNull($result);
     }
 
     /**
      * @magentoConfigFixture default_store payment/mollie_general/locale
      */
-    public function testGetLocaleCanReturnNull()
+    public function testGetLocaleCanReturnNull(): void
     {
         /** @var Resolver $localeResolver */
         $localeResolver = $this->objectManager->get(Resolver::class);
@@ -92,24 +92,9 @@ class GeneralTest extends IntegrationTestCase
         /** @var General $instance */
         $instance = $this->objectManager->get(General::class);
 
-        $result = $instance->getLocaleCode(null, 'payment');
+        $result = $instance->getLocaleCode(null);
 
         $this->assertNull($result);
-    }
-
-    public function testIsPaidUsingMollieOrdersApiCatchesExceptions()
-    {
-        $order = $this->objectManager->create(OrderInterface::class);
-
-        $payment = $this->objectManager->create(OrderPaymentInterface::class);
-        $payment->setMethod('non-existing-method');
-        $order->setPayment($payment);
-
-        /** @var General $instance */
-        $instance = $this->objectManager->create(General::class);
-        $result = $instance->isPaidUsingMollieOrdersApi($order);
-
-        $this->assertFalse($result);
     }
 
     /**
@@ -117,7 +102,7 @@ class GeneralTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_general/apikey_test keyA
      * @magentoConfigFixture fixture_second_store_store payment/mollie_general/apikey_test keyB
      */
-    public function testGetApiKeyGivesAUniqueKeyPerStore()
+    public function testGetApiKeyGivesAUniqueKeyPerStore(): void
     {
         $storeA = $this->objectManager->get(StoreRepositoryInterface::class)->get('default')->getId();
         $storeB = $this->objectManager->get(StoreRepositoryInterface::class)->get('fixture_second_store')->getId();
@@ -134,7 +119,7 @@ class GeneralTest extends IntegrationTestCase
         $this->assertEquals('keyB', $instance->getApiKey($storeB));
     }
 
-    public function getMethodCodeDataProvider()
+    public function getMethodCodeDataProvider(): array
     {
         return [
             'paymentlink' => ['mollie_methods_paymentlink', ''],
@@ -159,9 +144,6 @@ class GeneralTest extends IntegrationTestCase
             'in3' => ['mollie_methods_in3', 'in3'],
             'kbc' => ['mollie_methods_kbc', 'kbc'],
             'klarna' => ['mollie_methods_klarna', 'klarna'],
-            'klarnapaylater' => ['mollie_methods_klarnapaylater', 'klarnapaylater'],
-            'klarnapaynow' => ['mollie_methods_klarnapaynow', 'klarnapaynow'],
-            'klarnasliceit' => ['mollie_methods_klarnasliceit', 'klarnasliceit'],
             'voucher' => ['mollie_methods_voucher', 'voucher'],
             'mbway' => ['mollie_methods_mbway', 'mbway'],
             'mobilepay' => ['mollie_methods_mobilepay', 'mobilepay'],
@@ -181,26 +163,5 @@ class GeneralTest extends IntegrationTestCase
             'twint' => ['mollie_methods_twint', 'twint'],
             'vipps' => ['mollie_methods_vipps', 'vipps'],
         ];
-    }
-
-    /**
-     * @dataProvider getMethodCodeDataProvider
-     */
-    public function testGetMethodCode($input, $expected)
-    {
-        /** @var OrderInterface $order */
-        $order = $this->objectManager->create(OrderInterface::class);
-
-        /** @var OrderPaymentInterface $payment */
-        $payment = $this->objectManager->create(OrderPaymentInterface::class);
-        $order->setPayment($payment);
-
-        $payment->setMethod($input);
-
-        /** @var General $instance */
-        $instance = $this->objectManager->create(General::class);
-        $result = $instance->getMethodCode($order);
-
-        $this->assertEquals($expected, $result);
     }
 }

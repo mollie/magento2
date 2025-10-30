@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\Order;
 
@@ -8,30 +14,17 @@ use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 
 class LinkTransactionToOrder
 {
-    /**
-     * @var TransactionToOrderRepositoryInterface
-     */
-    private $transactionToOrderRepository;
-
-    /**
-     * @var TransactionToOrderInterfaceFactory
-     */
-    private $transactionToOrderFactory;
-
     public function __construct(
-        TransactionToOrderRepositoryInterface $transactionToOrderRepository,
-        TransactionToOrderInterfaceFactory $transactionToOrderFactory
-    ) {
-        $this->transactionToOrderRepository = $transactionToOrderRepository;
-        $this->transactionToOrderFactory = $transactionToOrderFactory;
-    }
+        private TransactionToOrderRepositoryInterface $transactionToOrderRepository,
+        private TransactionToOrderInterfaceFactory $transactionToOrderFactory
+    ) {}
 
     public function execute(string $transactionId, OrderInterface $order): void
     {
         $this->transactionToOrderRepository->save(
             $this->transactionToOrderFactory->create()
                 ->setTransactionId($transactionId)
-                ->setOrderId($order->getEntityId())
+                ->setOrderId((int)$order->getEntityId()),
         );
 
         $order->setMollieTransactionId($transactionId);

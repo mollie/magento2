@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Cronjob;
 
 use Magento\Sales\Model\ResourceModel\Order\Collection;
@@ -20,7 +22,7 @@ class CleanExpiredOrdersCollection extends Collection
             ->join(
                 ['payment' => $this->getTable('sales_order_payment')],
                 'main_table.entity_id = payment.parent_id',
-                []
+                [],
             )
             ->where('payment.method != ?', Banktransfer::CODE);
 

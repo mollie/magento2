@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Plugin\Sales\Api;
 
@@ -8,21 +14,14 @@ use Mollie\Payment\Service\LockService;
 
 class OrderManagementPlugin
 {
-    /**
-     * @var LockService
-     */
-    private $lockService;
-
     public function __construct(
-        LockService $lockService
-    ) {
-        $this->lockService = $lockService;
-    }
+        private LockService $lockService
+    ) {}
 
     public function aroundCancel(
         OrderManagementInterface $subject,
         callable $proceed,
-        $orderId
+        string $orderId,
     ) {
         // Lock the order, so we are sure that there are no other operations running on the order at the same time.
         $key = 'mollie.order.' . $orderId;

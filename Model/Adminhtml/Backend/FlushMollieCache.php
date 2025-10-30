@@ -1,11 +1,12 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Model\Adminhtml\Backend;
+declare(strict_types=1);
 
+namespace Mollie\Payment\Model\Adminhtml\Backend;
 
 use Magento\Framework\App\Config\Value;
 

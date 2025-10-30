@@ -1,13 +1,19 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order;
 
+use Magento\Framework\Mail\Address;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\TestFramework\Mail\Template\TransportBuilderMock;
 use Mollie\Payment\Service\Order\SecondChanceEmail;
-use Mollie\Payment\Service\PaymentToken\Generate;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class SecondChanceEmailTest extends IntegrationTestCase
@@ -35,7 +41,7 @@ class SecondChanceEmailTest extends IntegrationTestCase
         if (method_exists($message, 'getBcc')) {
             $addresses = [];
             $bccs = $message->getBcc();
-            /** @var \Magento\Framework\Mail\Address $address */
+            /** @var Address $address */
             foreach ($bccs as $address) {
                 $addresses[] = $address->getEmail();
             }
