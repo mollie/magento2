@@ -58,6 +58,21 @@ class BuyNowValidation extends Action implements HttpPostActionInterface
         parent::__construct($context, $customerSession, $customerRepository, $accountManagement);
     }
 
+    protected function _initProduct(): ?ProductInterface
+    {
+        $productId = (int) $this->getRequest()->getParam('product');
+        if ($productId) {
+            $storeId = $this->storeManager->getStore()->getId();
+            try {
+                return $this->productRepository->getById($productId, false, $storeId);
+            } catch (NoSuchEntityException $e) {
+                return null;
+            }
+        }
+
+        return null;
+    }
+
     public function execute(): ResponseInterface|Json
     {
         if (!$this->formKeyValidator->validate($this->getRequest())) {
@@ -145,26 +160,6 @@ class BuyNowValidation extends Action implements HttpPostActionInterface
         ]);
 
         return $response;
-    }
-
-    /**
-     * Initialize product instance from request data
-     *
-     * @return ProductInterface|false
-     */
-    protected function _initProduct()
-    {
-        $productId = (int) $this->getRequest()->getParam('product');
-        if ($productId) {
-            $storeId = $this->storeManager->getStore()->getId();
-            try {
-                return $this->productRepository->getById($productId, false, $storeId);
-            } catch (NoSuchEntityException $e) {
-                return false;
-            }
-        }
-
-        return false;
     }
 
     private function getLiveApiKey(int $storeId): string

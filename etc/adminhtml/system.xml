@@ -308,27 +308,6 @@
                     </depends>
                 </field>
             </group>
-
-            <group id="advanced" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1"
-                   showInStore="1">
-                <label>Advanced</label>
-
-                <field id="encrypt_payment_details" translate="label" type="select" sortOrder="10" showInDefault="1"
-                       showInWebsite="0" showInStore="1" canRestore="1">
-                    <label>Encrypt payment details</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>payment/mollie_general/encrypt_payment_details</config_path>
-                    <comment><![CDATA[Each order has extra information, name of the card, etc. When setting this option to Yes, this information will be encrypted before it is being saved.]]></comment>
-                </field>
-
-                <field id="create_invoice" translate="label" type="select" sortOrder="20" showInDefault="1"
-                       showInWebsite="0" showInStore="1" canRestore="1">
-                    <label>Create invoice on successful payment</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <config_path>payment/mollie_general/create_invoice</config_path>
-                    <comment><![CDATA[Disable this option if you create your invoices externally.]]></comment>
-                </field>
-            </group>
         </section>
 
         <section id="mollie_second_chance_email" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40" translate="label">

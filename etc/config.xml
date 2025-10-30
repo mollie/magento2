@@ -17,6 +17,7 @@
                 <invoice_moment>authorize</invoice_moment>
                 <invoice_notify>1</invoice_notify>
                 <invoice_notify_klarna>1</invoice_notify_klarna>
+                <debug>1</debug>
                 <model>Mollie\Payment\Model\Methods\General</model>
                 <currency>1</currency>
                 <cancel_failed_orders>0</cancel_failed_orders>
