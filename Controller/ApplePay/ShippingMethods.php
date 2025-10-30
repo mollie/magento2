@@ -34,7 +34,8 @@ class ShippingMethods extends Action implements HttpPostActionInterface
         private CheckoutSession $checkoutSession,
         private GuestCartRepositoryInterface $guestCartRepository,
         private ChangeShippingMethodForQuote $changeShippingMethodForQuote,
-    ) {
+    )
+    {
         parent::__construct($context);
     }
 
@@ -101,8 +102,8 @@ class ShippingMethods extends Action implements HttpPostActionInterface
     }
 
     /**
-     * @throws NoSuchEntityException
      * @return CartInterface
+     * @throws NoSuchEntityException
      */
     public function getCart(): CartInterface
     {
