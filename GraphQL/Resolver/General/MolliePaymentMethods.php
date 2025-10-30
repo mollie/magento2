@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\GraphQL\Resolver\General;
 
 use Magento\Framework\GraphQl\Config\Element\Field;
@@ -11,44 +13,18 @@ use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Quote\Api\Data\CartInterfaceFactory;
 use Mollie\Api\Resources\Method;
-use Mollie\Api\Resources\MethodCollection;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\MethodParameters;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class MolliePaymentMethods implements ResolverInterface
 {
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-
-    /**
-     * @var MethodParameters
-     */
-    private $methodParameters;
-
-    /**
-     * @var CartInterfaceFactory
-     */
-    private $cartFactory;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        MollieApiClient $mollieApiClient,
-        MethodParameters $methodParameters,
-        CartInterfaceFactory $cartFactory,
-        Config $config
-    ) {
-        $this->mollieApiClient = $mollieApiClient;
-        $this->methodParameters = $methodParameters;
-        $this->cartFactory = $cartFactory;
-        $this->config = $config;
-    }
+        private MollieApiClient $mollieApiClient,
+        private MethodParameters $methodParameters,
+        private CartInterfaceFactory $cartFactory,
+        private Config $config
+    ) {}
 
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
@@ -63,7 +39,7 @@ class MolliePaymentMethods implements ResolverInterface
             $currency = $args['input']['currency'];
         }
 
-        $storeId = $context->getExtensionAttributes()->getStore()->getId();
+        $storeId = storeId($context->getExtensionAttributes()->getStore()->getId());
         $apiMethods = $this->getMethods($amount, $currency, $storeId) ?? [];
 
         $methods = [];
@@ -80,7 +56,7 @@ class MolliePaymentMethods implements ResolverInterface
             ];
         }
 
-        usort($methods, function ($a, $b) {
+        usort($methods, function (array $a, array $b): int {
             // Lowercase as iDeal would be sorted last because of the lower I.
             return strtolower($a['name']) <=> strtolower($b['name']);
         });
@@ -95,8 +71,8 @@ class MolliePaymentMethods implements ResolverInterface
         $mollieApiClient = $this->mollieApiClient->loadByStore($storeId);
 
         if ($currency === null) {
-            $available = $mollieApiClient->methods->allAvailable();
-            $available = array_filter((array)$available, function (Method $method) {
+            $available = $mollieApiClient->methods->allEnabled();
+            $available = array_filter((array) $available, function (Method $method): bool {
                 return $method->status == 'activated';
             });
 
@@ -110,8 +86,8 @@ class MolliePaymentMethods implements ResolverInterface
             'includeWallets' => 'applepay',
         ];
 
-        return (array)$mollieApiClient->methods->allActive(
-            $this->methodParameters->enhance($parameters, $this->cartFactory->create())
+        return (array) $mollieApiClient->methods->allActive(
+            $this->methodParameters->enhance($parameters, $this->cartFactory->create()),
         );
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,6 +13,7 @@ use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Service\Mollie\Order\CanRegisterCaptureNotification;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use stdClass;
 
 class CanRegisterCaptureNotificationTest extends IntegrationTestCase
 {
@@ -29,7 +31,7 @@ class CanRegisterCaptureNotificationTest extends IntegrationTestCase
 
         $molliePayment = new Payment(new MollieApiClient());
         $molliePayment->status = 'paid';
-        $molliePayment->amountCaptured = new \stdClass();
+        $molliePayment->amountCaptured = new stdClass();
         $molliePayment->amountCaptured->value = -999;
 
         $this->assertTrue($instance->execute($order, $molliePayment));
@@ -50,14 +52,15 @@ class CanRegisterCaptureNotificationTest extends IntegrationTestCase
 
         $molliePayment = new Payment(new MollieApiClient());
         $molliePayment->status = 'paid';
-        $molliePayment->amountCaptured = new \stdClass();
+        $molliePayment->amountCaptured = new stdClass();
         $molliePayment->amountCaptured->value = -999;
 
         $this->assertTrue($instance->execute($order, $molliePayment));
     }
 
     /**
-     * @magentoConfigFixture default_store payment/mollie_general/enable_manual_capture 1
+     * @magentoConfigFixture default_store payment/mollie_methods_applepay/capture_mode manual
+     * @magentoConfigFixture default_store payment/mollie_methods_creditcard/capture_mode manual
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @return void
      */
@@ -72,7 +75,7 @@ class CanRegisterCaptureNotificationTest extends IntegrationTestCase
 
         $molliePayment = new Payment(new MollieApiClient());
         $molliePayment->status = 'paid';
-        $molliePayment->amountCaptured = new \stdClass();
+        $molliePayment->amountCaptured = new stdClass();
         $molliePayment->amountCaptured->value = -999;
 
         $this->assertFalse($instance->execute($order, $molliePayment));

@@ -1,12 +1,18 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
-namespace Mollie\Payment\Test\Integration\Observer\ControllerActionPredispatchCheckoutIndexIndex;
+declare(strict_types=1);
+
+namespace Mollie\Payment\Test\Integration\Observer;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Event\Observer;
 use Magento\OfflinePayments\Model\Checkmo;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order;
+use Magento\Sales\Api\OrderManagementInterface;
 use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex\RestoreQuoteOfUnsuccessfulPayment;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -100,5 +106,39 @@ class RestoreQuoteOfUnsuccessfulPaymentTest extends IntegrationTestCase
         ]);
 
         $instance->execute(new Observer([]));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_general/cancel_order_on_checkout_return 1
+     * @return void
+     */
+    public function testCancelsTheOrderWhenEnabled(): void
+    {
+        $order = $this->loadOrderById('100000001');
+
+        $payment = $order->getPayment();
+        $payment->setMethod(Ideal::CODE);
+        $payment->setAdditionalInformation('mollie_success', false);
+
+        $orderManagementMock = $this->createMock(OrderManagementInterface::class);
+        $orderManagementMock->expects($spy = $this->any())->method('cancel');
+
+        $sessionMock = $this->createMock(Session::class);
+        $sessionMock->method('getLastRealOrder')->willReturn($order);
+
+        $instance = $this->objectManager->create(RestoreQuoteOfUnsuccessfulPayment::class, [
+            'checkoutSession' => $sessionMock,
+            'orderManagement' => $orderManagementMock,
+        ]);
+
+        $instance->execute(new Observer([]));
+
+        // PHPUnit 12 vs 9.
+        $numberOfInvocations = method_exists($spy, 'numberOfInvocations') ?
+            $spy->numberOfInvocations() :
+            $spy->getInvocationCount();
+
+        $this->assertEquals(1, $numberOfInvocations);
     }
 }

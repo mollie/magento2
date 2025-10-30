@@ -1,36 +1,28 @@
 <?php
-/**
+
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\Checkout;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 use Mollie\Payment\Config;
 
 class CheckoutConfig extends Template
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
-
     public function __construct(
-        Template\Context $context,
-        Config $config,
-        Session $checkoutSession,
-        array $data = []
+        Context $context,
+        private Config $config,
+        private Session $checkoutSession,
+        array $data = [],
     ) {
         parent::__construct($context, $data);
-        $this->config = $config;
-        $this->checkoutSession = $checkoutSession;
     }
 
     public function getDefaultSelectedMethod(): ?string
@@ -40,6 +32,6 @@ class CheckoutConfig extends Template
             return $method;
         }
 
-        return $this->config->getDefaultSelectedMethod($this->_storeManager->getStore()->getId());
+        return $this->config->getDefaultSelectedMethod(storeId($this->_storeManager->getStore()->getId()));
     }
 }

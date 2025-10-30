@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -17,16 +18,9 @@ use Mollie\Payment\Service\Magento\PaymentLinkRedirect as PaymentLinkRedirectSer
 
 class PaymentLinkRedirect implements ResolverInterface
 {
-    /**
-     * @var PaymentLinkRedirectService
-     */
-    private $paymentLinkRedirect;
-
     public function __construct(
-        PaymentLinkRedirectService $paymentLinkRedirect
-    ) {
-        $this->paymentLinkRedirect = $paymentLinkRedirect;
-    }
+        private PaymentLinkRedirectService $paymentLinkRedirect
+    ) {}
 
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {

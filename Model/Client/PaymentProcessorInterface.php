@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Client;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -15,6 +17,6 @@ interface PaymentProcessorInterface
         OrderInterface $magentoOrder,
         Payment $molliePayment,
         string $type,
-        ProcessTransactionResponse $response
+        ProcessTransactionResponse $response,
     ): ?ProcessTransactionResponse;
 }

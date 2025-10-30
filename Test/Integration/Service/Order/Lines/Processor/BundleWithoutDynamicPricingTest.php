@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order\Lines\Processor;
 
@@ -10,8 +16,10 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class BundleWithoutDynamicPricingTest extends IntegrationTestCase
 {
-    protected function setUpWithoutVoid()
+    protected function setUp(): void
     {
+        parent::setUp();
+
         if (getenv('CI')) {
             $this->markTestSkipped('Does not work on CI for several reasons');
         }
@@ -35,7 +43,7 @@ class BundleWithoutDynamicPricingTest extends IntegrationTestCase
             'totalAmount' => [
                 'value' => 100,
                 'currency' => 'EUR',
-            ]
+            ],
         ];
 
         $result = $instance->process($orderLine, $order, $bundleItem);
@@ -65,7 +73,7 @@ class BundleWithoutDynamicPricingTest extends IntegrationTestCase
             'totalAmount' => [
                 'value' => 100,
                 'currency' => 'EUR',
-            ]
+            ],
         ];
 
         $result = $instance->process($orderLine, $order, $bundleItem);

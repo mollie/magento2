@@ -4,20 +4,20 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Order\TransactionPart;
 
 use Magento\Customer\Model\Session;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
-use Mollie\Payment\Model\Client\Payments;
-use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Payment\Service\Order\OrderContainsSubscriptionProduct;
 use Mollie\Payment\Service\Order\TransactionPart\SequenceType;
+use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class SequenceTypeTest extends IntegrationTestCase
 {
-    public function testDoesNothingWhenTheCartDoesNotContainARecurringProduct()
+    public function testDoesNothingWhenTheCartDoesNotContainARecurringProduct(): void
     {
         $orderContainsSubscriptionProductMock = $this->createMock(OrderContainsSubscriptionProduct::class);
         $orderContainsSubscriptionProductMock->method('check')->willReturn(false);
@@ -28,14 +28,13 @@ class SequenceTypeTest extends IntegrationTestCase
         ]);
         $result = $instance->process(
             $this->objectManager->create(OrderInterface::class),
-            Payments::CHECKOUT_TYPE,
-            ['empty' => true]
+            ['empty' => true],
         );
 
         $this->assertEquals(['empty' => true], $result);
     }
 
-    public function testIncludesTheSequenceTypeForThePaymentsApi()
+    public function testIncludesTheSequenceTypeForThePaymentsApi(): void
     {
         $orderContainsSubscriptionProductMock = $this->createMock(OrderContainsSubscriptionProduct::class);
         $orderContainsSubscriptionProductMock->method('check')->willReturn(true);
@@ -46,36 +45,17 @@ class SequenceTypeTest extends IntegrationTestCase
         ]);
         $result = $instance->process(
             $this->objectManager->create(OrderInterface::class),
-            Payments::CHECKOUT_TYPE,
-            ['empty' => false]
+            ['empty' => false],
         );
 
         $this->assertEquals(['empty' => false, 'sequenceType' => 'first'], $result);
-    }
-
-    public function testIncludesTheSequenceTypeForTheOrdersApi()
-    {
-        $orderContainsSubscriptionProductMock = $this->createMock(OrderContainsSubscriptionProduct::class);
-        $orderContainsSubscriptionProductMock->method('check')->willReturn(true);
-
-        /** @var SequenceType $instance */
-        $instance = $this->objectManager->create(SequenceType::class, [
-            'orderContainsSubscriptionProduct' => $orderContainsSubscriptionProductMock,
-        ]);
-        $result = $instance->process(
-            $this->objectManager->create(OrderInterface::class),
-            Orders::CHECKOUT_TYPE,
-            ['empty' => false, 'payment' => []]
-        );
-
-        $this->assertEquals(['empty' => false, 'payment' => ['sequenceType' => 'first']], $result);
     }
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @magentoConfigFixture default_store payment/mollie_methods_creditcard/enable_customers_api 0
      */
-    public function testIncludesNothingWhenTheCustomersApiIsDisabled()
+    public function testIncludesNothingWhenTheCustomersApiIsDisabled(): void
     {
         /** @var OrderInterface $order */
         $order = $this->loadOrderById('100000001');
@@ -86,8 +66,7 @@ class SequenceTypeTest extends IntegrationTestCase
 
         $result = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            ['empty' => false, 'payment' => []]
+            ['empty' => false, 'payment' => []],
         );
 
         $this->assertEquals(['empty' => false, 'payment' => []], $result);
@@ -96,7 +75,7 @@ class SequenceTypeTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testDoesNothingWhenLoggedIn()
+    public function testDoesNothingWhenLoggedIn(): void
     {
         /** @var OrderInterface $order */
         $order = $this->loadOrderById('100000001');
@@ -108,8 +87,7 @@ class SequenceTypeTest extends IntegrationTestCase
         $instance = $this->objectManager->create(SequenceType::class);
         $result = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            ['empty' => false, 'payment' => []]
+            ['empty' => false, 'payment' => []],
         );
 
         $this->assertEquals(['empty' => false, 'payment' => []], $result);

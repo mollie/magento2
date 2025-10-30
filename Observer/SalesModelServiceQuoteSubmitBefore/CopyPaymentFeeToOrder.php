@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Observer\SalesModelServiceQuoteSubmitBefore;
 
@@ -16,7 +18,7 @@ class CopyPaymentFeeToOrder implements ObserverInterface
     /**
      * @param Observer $observer
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /* @var OrderInterface $order */
         $order = $observer->getEvent()->getData('order');

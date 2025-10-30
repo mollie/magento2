@@ -1,12 +1,16 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\Form;
 
 use Magento\Framework\View\Element\Template\Context;
+use Magento\Payment\Block\Form;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
 
 /**
@@ -14,28 +18,22 @@ use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
  *
  * @package Mollie\Payment\Block\Form
  */
-class Paymentlink extends \Magento\Payment\Block\Form
+class Paymentlink extends Form
 {
     /**
      * @var string
      */
     protected $_template = 'Mollie_Payment::form/mollie_paymentlink.phtml';
 
-    /**
-     * @var Expires
-     */
-    private $expires;
-
     public function __construct(
         Context $context,
-        Expires $expires,
-        array $data = []
+        private Expires $expires,
+        array $data = [],
     ) {
         parent::__construct($context, $data);
-        $this->expires = $expires;
     }
 
-    public function getExpiresAt()
+    public function getExpiresAt(): ?string
     {
         $storeId = $this->getRequest()->getParam('store_id');
 

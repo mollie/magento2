@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -15,7 +17,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class CreditcardVaultTest extends IntegrationTestCase
 {
-    public function testDoesNotSendEmailsWhenPlacingAnOrder()
+    public function testDoesNotSendEmailsWhenPlacingAnOrder(): void
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
@@ -30,7 +32,7 @@ class CreditcardVaultTest extends IntegrationTestCase
 
         $tokenManagementMock = $this->createMock(PaymentTokenManagementInterface::class);
         $tokenManagementMock->method('getByPublicHash')->willReturn(
-            $this->objectManager->create(PaymentTokenInterface::class)
+            $this->objectManager->create(PaymentTokenInterface::class),
         );
 
         /** @var CreditcardVault $instance */

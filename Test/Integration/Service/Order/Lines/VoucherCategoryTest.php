@@ -4,8 +4,12 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Order\Lines;
 
+use Magento\Catalog\Model\Product;
+use Magento\Eav\Setup\EavSetup;
 use Mollie\Payment\Service\Order\Lines\Processor\VoucherCategory;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -16,7 +20,7 @@ class VoucherCategoryTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_methods_voucher/category custom_attribute
      * @magentoConfigFixture default_store payment/mollie_methods_voucher/custom_attribute voucher_category
      */
-    public function testHandlesCustomAttributeWithNoneValue()
+    public function testHandlesCustomAttributeWithNoneValue(): void
     {
         $this->createAttribute();
 
@@ -37,22 +41,22 @@ class VoucherCategoryTest extends IntegrationTestCase
         $this->assertArrayNotHasKey('category', $result);
     }
 
-    private function createAttribute()
+    private function createAttribute(): void
     {
-        $eavSetup = $this->objectManager->create(\Magento\Eav\Setup\EavSetup::class);
+        $eavSetup = $this->objectManager->create(EavSetup::class);
         $eavSetup->addAttribute(
-            \Magento\Catalog\Model\Product::ENTITY,
+            Product::ENTITY,
             'voucher_category',
             [
-                'type'         => 'varchar',
-                'label'        => 'Voucher Category',
-                'input'        => 'text',
-                'required'     => false,
-                'visible'      => true,
+                'type' => 'varchar',
+                'label' => 'Voucher Category',
+                'input' => 'text',
+                'required' => false,
+                'visible' => true,
                 'user_defined' => true,
-                'position'     => 999,
-                'system'       => 0,
-            ]
+                'position' => 999,
+                'system' => 0,
+            ],
         );
     }
 }

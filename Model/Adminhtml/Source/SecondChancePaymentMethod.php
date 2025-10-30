@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
@@ -8,16 +14,9 @@ class SecondChancePaymentMethod implements OptionSourceInterface
 {
     public const USE_PREVIOUS_METHOD = 'use_method_of_original_order';
 
-    /**
-     * @var EnabledMolliePaymentMethod
-     */
-    private $enabledMolliePaymentMethod;
-
     public function __construct(
-        EnabledMolliePaymentMethod $enabledMolliePaymentMethod
-    ) {
-        $this->enabledMolliePaymentMethod = $enabledMolliePaymentMethod;
-    }
+        private EnabledMolliePaymentMethod $enabledMolliePaymentMethod
+    ) {}
 
     public function toOptionArray(): array
     {

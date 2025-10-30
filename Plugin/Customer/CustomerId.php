@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Plugin\Customer;
 
@@ -15,29 +17,16 @@ use Mollie\Payment\Api\MollieCustomerRepositoryInterface;
 
 class CustomerId
 {
-    /**
-     * @var MollieCustomerRepositoryInterface
-     */
-    private $repository;
-
-    /**
-     * @var MollieCustomerInterfaceFactory
-     */
-    private $mollieCustomerFactory;
-
     public function __construct(
-        MollieCustomerRepositoryInterface $repository,
-        MollieCustomerInterfaceFactory $mollieCustomerFactory
-    ) {
-        $this->repository = $repository;
-        $this->mollieCustomerFactory = $mollieCustomerFactory;
-    }
+        private MollieCustomerRepositoryInterface $repository,
+        private MollieCustomerInterfaceFactory $mollieCustomerFactory
+    ) {}
 
     public function aroundSave(
         CustomerRepositoryInterface $subject,
         callable $proceed,
         CustomerInterface $customer,
-        $passwordHash = null
+        $passwordHash = null,
     ) {
         $extensionAttributes = $customer->getExtensionAttributes();
         if (!$extensionAttributes) {
@@ -59,21 +48,21 @@ class CustomerId
         return $result;
     }
 
-    public function afterGet(CustomerRepositoryInterface $subject, CustomerInterface $customer)
+    public function afterGet(CustomerRepositoryInterface $subject, CustomerInterface $customer): CustomerInterface
     {
         $this->retrieveForCustomer($customer);
 
         return $customer;
     }
 
-    public function afterGetById(CustomerRepositoryInterface $subject, CustomerInterface $customer)
+    public function afterGetById(CustomerRepositoryInterface $subject, CustomerInterface $customer): CustomerInterface
     {
         $this->retrieveForCustomer($customer);
 
         return $customer;
     }
 
-    public function afterGetList(CustomerRepositoryInterface $subject, SearchResults $result)
+    public function afterGetList(CustomerRepositoryInterface $subject, SearchResults $result): SearchResults
     {
         /** @var CustomerInterface $customer */
         foreach ($result->getItems() as $customer) {
@@ -100,7 +89,7 @@ class CustomerId
         return $mollieCustomer;
     }
 
-    private function retrieveForCustomer(CustomerInterface $customer)
+    private function retrieveForCustomer(CustomerInterface $customer): void
     {
         $extensionAttributes = $customer->getExtensionAttributes();
         if (!$extensionAttributes) {

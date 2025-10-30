@@ -4,41 +4,47 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model;
 
+use Exception;
 use Magento\Framework\DataObject;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use Mollie\Api\Endpoints\MethodEndpoint;
-use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Requests\CreatePaymentRefundRequest;
+use Mollie\Api\Http\Requests\CreatePaymentRequest;
+use Mollie\Api\Http\Requests\GetPaymentRequest;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Helper\General;
-use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Methods\Ideal;
+use Mollie\Payment\Model\Methods\Pointofsale;
 use Mollie\Payment\Model\Mollie;
-use Mollie\Payment\Test\Fakes\Model\Client\Orders\ProcessTransactionFake;
+use Mollie\Payment\Service\Mollie\StartTransaction;
+use Mollie\Payment\Test\Fakes\Model\Client\Payments\ProcessTransactionFake as PaymentsProcessTransactionFake;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MollieTest extends IntegrationTestCase
 {
-    protected function setUpWithoutVoid()
+    protected function setUp(): void
     {
+        parent::setUp();
+
         // The OrderLockService interferes with the tests, so we replace it with a fake.
         $this->loadFakeOrderLockService();
     }
 
-    public function processTransactionUsesTheCorrectApiProvider()
+    public function processTransactionUsesTheCorrectApiProvider(): array
     {
         return [
-            'orders' => ['ord_abcdefg', 'orders'],
             'payments' => ['tr_abcdefg', 'payments'],
         ];
     }
@@ -49,7 +55,7 @@ class MollieTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      * @magentoConfigFixture default_store payment/mollie_general/type test
      */
-    public function testProcessTransactionUsesTheCorrectApi($orderId, $type)
+    public function testProcessTransactionUsesTheCorrectApi(string $orderId, string $type): void
     {
         $order = $this->loadOrder('100000001');
         $order->setMollieTransactionId($orderId);
@@ -59,63 +65,21 @@ class MollieTest extends IntegrationTestCase
         $mollieHelperMock->method('getApiKey')->willReturn('test_TEST_API_KEY_THAT_IS_LONG_ENOUGH');
 
         $paymentsApiMock = $this->createMock(Payments::class);
-        $orderProcessTransactionFake = $this->objectManager->create(ProcessTransactionFake::class);
+        $paymentsProcessTransactionFake = $this->objectManager->create(PaymentsProcessTransactionFake::class);
+        $paymentsProcessTransactionFake->disableParentCall();
 
         $mollieApiMock = $this->createMock(\Mollie\Payment\Service\Mollie\MollieApiClient::class);
-        $mollieApiMock->method('loadByStore')->willReturn(new \Mollie\Api\MollieApiClient);
-
-        if ($type == 'orders') {
-            $orderProcessTransactionFake->disableParentCall();
-        }
-
-        if ($type == 'payments') {
-            $paymentsApiMock->expects($this->once())->method('processTransaction')->willReturn(['success' => true]);
-        }
+        $mollieApiMock->method('loadByStore')->willReturn(new MollieApiClient());
 
         /** @var Mollie $instance */
         $instance = $this->objectManager->create(Mollie::class, [
             'paymentsApi' => $paymentsApiMock,
             'mollieHelper' => $mollieHelperMock,
-            'ordersProcessTransaction' => $orderProcessTransactionFake,
+            'paymentsProcessTransaction' => $paymentsProcessTransactionFake,
             'mollieApiClient' => $mollieApiMock,
         ]);
 
         $instance->processTransaction($order->getEntityId());
-
-        if ($type == 'orders') {
-            $this->assertEquals(1, $orderProcessTransactionFake->getTimesCalled());
-        }
-    }
-
-    /**
-     * @magentoConfigFixture default_store payment/mollie_methods_ideal/method order
-     * @magentoConfigFixture default_store payment/mollie_general/mode test
-     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
-     */
-    public function testStartTransactionWithMethodOrder()
-    {
-        /** @var OrderInterface $order */
-        $order = $this->objectManager->create(OrderInterface::class);
-        $order->setEntityId(1);
-        $payment = $this->objectManager->create(OrderPaymentInterface::class);
-        $payment->setMethod('mollie_methods_ideal');
-        $order->setPayment($payment);
-
-        $ordersApiMock = $this->createMock(Orders::class);
-        $ordersApiMock->method('startTransaction')->willReturn('order');
-
-        $paymentsApiMock = $this->createMock(Payments::class);
-        $paymentsApiMock->expects($this->never())->method('startTransaction');
-
-        /** @var Mollie $instance */
-        $instance = $this->objectManager->create(Mollie::class, [
-            'ordersApi' => $ordersApiMock,
-            'paymentsApi' => $paymentsApiMock,
-        ]);
-
-        $result = $instance->startTransaction($order);
-
-        $this->assertEquals('order', $result);
     }
 
     /**
@@ -123,7 +87,7 @@ class MollieTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/mode test
      * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      */
-    public function testStartTransactionWithMethodPayment()
+    public function testStartTransactionWithMethodPayment(): void
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
@@ -132,19 +96,19 @@ class MollieTest extends IntegrationTestCase
         $payment->setMethod('mollie_methods_ideal');
         $order->setPayment($payment);
 
-        $ordersApiMock = $this->createMock(Orders::class);
-        $ordersApiMock->expects($this->never())->method('startTransaction');
-
         $paymentsApiMock = $this->createMock(Payments::class);
         $paymentsApiMock->method('startTransaction')->willReturn('payment');
 
-        /** @var Mollie $instance */
-        $instance = $this->objectManager->create(Mollie::class, [
-            'ordersApi' => $ordersApiMock,
+        $apiClient = $this->objectManager->create(FakeMollieApiClient::class);
+        $apiClient->setInstance(new MollieApiClient());
+
+        /** @var StartTransaction $instance */
+        $instance = $this->objectManager->create(StartTransaction::class, [
             'paymentsApi' => $paymentsApiMock,
+            'mollieApiClient' => $apiClient,
         ]);
 
-        $result = $instance->startTransaction($order);
+        $result = $instance->execute($order);
 
         $this->assertEquals('payment', $result);
     }
@@ -154,7 +118,7 @@ class MollieTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/mode test
      * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      */
-    public function testRetriesOnACurlTimeout()
+    public function testRetriesOnACurlTimeout(): void
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
@@ -163,42 +127,44 @@ class MollieTest extends IntegrationTestCase
         $payment->setMethod('mollie_methods_ideal');
         $order->setPayment($payment);
 
-        $ordersApiMock = $this->createMock(Orders::class);
-        $ordersApiMock->expects($this->exactly(3))->method('startTransaction')->willThrowException(
-            new ApiException(
-                'cURL error 28: Connection timed out after 10074 milliseconds ' .
-                '(see http://curl.haxx.se/libcurl/c/libcurl-errors.html)'
-            )
-        );
-
-        $paymentsApiMock = $this->createMock(Payments::class);
-        $paymentsApiMock->expects($this->once())->method('startTransaction')->willReturn('payment');
-
-        /** @var Mollie $instance */
-        $instance = $this->objectManager->create(Mollie::class, [
-            'ordersApi' => $ordersApiMock,
-            'paymentsApi' => $paymentsApiMock,
+        $client = MollieApiClient::fake([
+            CreatePaymentRequest::class => MockResponse::ok(),
         ]);
 
-        $result = $instance->startTransaction($order);
+        $paymentsApiMock = $this->createMock(Payments::class);
+        $paymentsApiMock->method('startTransaction')->willReturnOnConsecutiveCalls(
+            $this->throwException(new Exception('cURL error 28')),
+            'payment',
+        );
+
+        $apiClient = $this->objectManager->create(FakeMollieApiClient::class);
+        $apiClient->setInstance($client);
+
+        /** @var StartTransaction $instance */
+        $instance = $this->objectManager->create(StartTransaction::class, [
+            'paymentsApi' => $paymentsApiMock,
+            'mollieApiClient' => $apiClient,
+        ]);
+
+        $result = $instance->execute($order);
 
         $this->assertEquals('payment', $result);
     }
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
-    public function testAssignsIssuerId()
+    public function testAssignsIssuerId(): void
     {
-        $data = new DataObject;
+        $data = new DataObject();
         $data->setAdditionalData(['selected_issuer' => 'TESTBANK']);
 
         $order = $this->loadOrder('100000001');
         $payment = $order->getPayment();
 
         /** @var Mollie $instance */
-        $instance = $this->objectManager->create(\Mollie\Payment\Model\Methods\Ideal::class);
+        $instance = $this->objectManager->create(Ideal::class);
         $instance->setInfoInstance($payment);
         $instance->assignData($data);
 
@@ -207,18 +173,18 @@ class MollieTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
-    public function testAssignsTerminalId()
+    public function testAssignsTerminalId(): void
     {
-        $data = new DataObject;
+        $data = new DataObject();
         $data->setAdditionalData(['selected_terminal' => 'term_randomstringid']);
 
         $order = $this->loadOrder('100000001');
         $payment = $order->getPayment();
 
         /** @var Mollie $instance */
-        $instance = $this->objectManager->create(\Mollie\Payment\Model\Methods\Pointofsale::class);
+        $instance = $this->objectManager->create(Pointofsale::class);
         $instance->setInfoInstance($payment);
         $instance->assignData($data);
 
@@ -227,75 +193,22 @@ class MollieTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
-    public function testAssignsCardToken()
+    public function testAssignsCardToken(): void
     {
-        $data = new DataObject;
+        $data = new DataObject();
         $data->setAdditionalData(['card_token' => 'abc123']);
 
         $order = $this->loadOrder('100000001');
         $payment = $order->getPayment();
 
         /** @var Mollie $instance */
-        $instance = $this->objectManager->create(\Mollie\Payment\Model\Methods\Ideal::class);
+        $instance = $this->objectManager->create(Ideal::class);
         $instance->setInfoInstance($payment);
         $instance->assignData($data);
 
         $this->assertEquals('abc123', $payment->getAdditionalInformation()['card_token']);
-    }
-
-    /**
-     * @magentoDataFixture Magento/Sales/_files/order.php
-     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
-     */
-    public function testDoesNotFallbackOnPaymentsApiForSpecificMethods()
-    {
-        $this->expectException(LocalizedException::class);
-
-        $encryptorMock = $this->createMock(EncryptorInterface::class);
-        $encryptorMock->method('decrypt')->willReturn('test_dummyapikeywhichmustbe30characterslong');
-
-        $mollieHelper = $this->objectManager->create(General::class, ['encryptor' => $encryptorMock]);
-
-        $order = $this->loadOrder('100000001');
-        $order->getPayment()->setMethod('mollie_methods_voucher');
-
-        $ordersApi = $this->createMock(Orders::class);
-        $ordersApi->expects($this->once())->method('startTransaction')->willThrowException(
-            new \Exception('[test] Error while starting transaction')
-        );
-
-        $paymentsApi = $this->createMock(Payments::class);
-        $paymentsApi->expects($this->never())->method('startTransaction');
-
-        /** @var Mollie $instance */
-        $instance = $this->objectManager->create(Mollie::class, [
-            'ordersApi' => $ordersApi,
-            'paymentsApi' => $paymentsApi,
-            'mollieHelper' => $mollieHelper,
-        ]);
-
-        $instance->startTransaction($order);
-    }
-
-    public function testGetIssuersHasAnSequentialIndex()
-    {
-        $response = new \stdClass();
-        $response->issuers = [
-            ['id' => 'ZZissuer', 'name' => 'ZZissuer'],
-            ['id' => 'AAissuer', 'name' => 'AAissuer'],
-        ];
-
-        $methodEndpointMock = $this->createMock(MethodEndpoint::class);
-        $methodEndpointMock->method('get')->willReturn($response);
-
-        /** @var Mollie $instance */
-        $instance = $this->objectManager->create(Mollie::class);
-
-        $result = $instance->getIssuers('mollie_methods_ideal', 'radio');
-
-        $this->assertSame(array_values($result), $result);
     }
 
     /**
@@ -316,15 +229,22 @@ class MollieTest extends IntegrationTestCase
         $order = $this->loadOrder('100000001');
         $order->setMollieTransactionId('tr_12345');
 
+        $client = MollieApiClient::fake([
+            GetPaymentRequest::class => MockResponse::ok('payment'),
+            CreatePaymentRefundRequest::class => MockResponse::ok('refund'),
+        ]);
+
         $paymentMock = $this->createMock(Payment::class);
-        $paymentMock->method('refund')->with($this->callback(function ($parameters) {
+        $paymentMock->method('refund')->with($this->callback(function (array $parameters): bool {
             $this->assertEquals(56.78, $parameters['amount']['value']);
 
             return true;
         }));
 
-        $client = $this->loadFakeMollieApiClient();
-        $client->returnFakePayment($paymentMock);
+        $mollieApiMock = $this->objectManager->create(FakeMollieApiClient::class);
+        $mollieApiMock->setInstance($client);
+
+        $this->objectManager->addSharedInstance($mollieApiMock, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
 
         /** @var Mollie $instance */
         $instance = $this->objectManager->create(Mollie::class);
@@ -351,7 +271,7 @@ class MollieTest extends IntegrationTestCase
     {
         $this->loadFakeEncryptor()->addReturnValue(
             'test_dummyapikeywhichmustbe30characterslong',
-            'test_dummyapikeywhichmustbe30characterslong'
+            'test_dummyapikeywhichmustbe30characterslong',
         );
 
         /** @var Ideal $instance */

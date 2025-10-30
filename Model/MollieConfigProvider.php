@@ -1,22 +1,26 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model;
 
+use Exception;
 use Magento\Checkout\Model\ConfigProviderInterface;
-use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Locale\Resolver;
-use Magento\Framework\View\Asset\Repository as AssetRepository;
-use Magento\Payment\Helper\Data as PaymentHelper;
+use Magento\Framework\View\Asset\Repository;
+use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Config;
-use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 use Mollie\Payment\Service\Mollie\MethodParameters;
@@ -30,90 +34,23 @@ use Mollie\Payment\Service\Mollie\PaymentMethods;
  */
 class MollieConfigProvider implements ConfigProviderInterface
 {
-    /**
-     * @var array
-     */
-    private $methods = [];
-    /**
-     * @var AssetRepository
-     */
-    private $assetRepository;
-    /**
-     * @var Http
-     */
-    private $request;
-    /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-    /**
-     * @var PaymentHelper
-     */
-    private $paymentHelper;
-    /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
-    /**
-     * @var array|null
-     */
-    private $methodData;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var Resolver
-     */
-    private $localeResolver;
-    /**
-     * @var GetIssuers
-     */
-    private $getIssuers;
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-    /**
-     * @var MethodParameters
-     */
-    private $methodParameters;
-    /**
-     * @var SupportedNetworks
-     */
-    private $supportedNetworks;
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
+    private array $methods = [];
+    private ?array $methodData = null;
 
     public function __construct(
-        Http $request,
-        MollieHelper $mollieHelper,
-        PaymentHelper $paymentHelper,
-        CheckoutSession $checkoutSession,
-        AssetRepository $assetRepository,
-        Resolver $localeResolver,
-        Config $config,
-        GetIssuers $getIssuers,
-        StoreManagerInterface $storeManager,
-        MethodParameters $methodParameters,
-        SupportedNetworks $supportedNetworks,
-        MollieApiClient $mollieApiClient
+        private Http $request,
+        private General $mollieHelper,
+        private Data $paymentHelper,
+        private Session $checkoutSession,
+        private Repository $assetRepository,
+        private Resolver $localeResolver,
+        private Config $config,
+        private GetIssuers $getIssuers,
+        private StoreManagerInterface $storeManager,
+        private MethodParameters $methodParameters,
+        private SupportedNetworks $supportedNetworks,
+        private MollieApiClient $mollieApiClient,
     ) {
-        $this->request = $request;
-        $this->mollieHelper = $mollieHelper;
-        $this->paymentHelper = $paymentHelper;
-        $this->checkoutSession = $checkoutSession;
-        $this->assetRepository = $assetRepository;
-        $this->config = $config;
-        $this->localeResolver = $localeResolver;
-        $this->getIssuers = $getIssuers;
-        $this->storeManager = $storeManager;
-        $this->methodParameters = $methodParameters;
-        $this->supportedNetworks = $supportedNetworks;
-        $this->mollieApiClient = $mollieApiClient;
-
         foreach (PaymentMethods::METHODS as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
         }
@@ -127,8 +64,9 @@ class MollieConfigProvider implements ConfigProviderInterface
     {
         try {
             return $this->paymentHelper->getMethodInstance($code);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', 'Function: getMethodInstance: ' . $e->getMessage());
+
             return null;
         }
     }
@@ -146,7 +84,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
 
         $store = $this->storeManager->getStore();
-        $storeId = $store->getId();
+        $storeId = (int) $store->getId();
         $storeName = $store->getFrontendName();
 
         $config = [];
@@ -155,7 +93,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['mollie']['locale'] = $this->getLocale($storeId);
         $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
         $config['payment']['mollie']['applepay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
-        $config['payment']['mollie']['applepay']['supported_networks'] = $this->supportedNetworks->execute((int)$storeId);
+        $config['payment']['mollie']['applepay']['supported_networks'] = $this->supportedNetworks->execute((int) $storeId);
         $config['payment']['mollie']['store']['name'] = $storeName;
         $config['payment']['mollie']['store']['currency'] = $this->config->getStoreCurrency($storeId);
         $config['payment']['mollie']['vault']['enabled'] = $this->config->isMagentoVaultEnabled($storeId);
@@ -173,7 +111,8 @@ class MollieConfigProvider implements ConfigProviderInterface
                 $config['payment']['image'][$code] = $url;
             }
 
-            if (in_array($code, ['mollie_methods_kbc', 'mollie_methods_giftcard']) &&
+            if (
+                in_array($code, ['mollie_methods_kbc', 'mollie_methods_giftcard']) &&
                 $this->methods[$code]->isActive() &&
                 $this->isMethodActive($code)
             ) {
@@ -201,19 +140,19 @@ class MollieConfigProvider implements ConfigProviderInterface
                 'amount[value]' => $amount['value'],
                 'amount[currency]' => $amount['currency'],
                 'resource' => 'orders',
-                'includeWallets' => 'applepay',
+                'includeWallets' => ['applepay'],
                 'billingCountry' => $cart->getBillingAddress()->getCountry(),
             ];
 
             $this->methodData = [];
-            $apiMethods = $mollieApi->methods->allActive($this->methodParameters->enhance($parameters, $cart));
+            $apiMethods = $mollieApi->methods->allEnabled($this->methodParameters->enhance($parameters, $cart));
             foreach ($apiMethods as $method) {
                 $methodId = 'mollie_methods_' . $method->id;
                 $this->methodData[$methodId] = [
-                    'image' => $method->image->size2x
+                    'image' => $method->image->size2x,
                 ];
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('info', 'Function: getActiveMethods: ' . $e->getMessage());
             $this->methodData = [];
         }
@@ -223,12 +162,16 @@ class MollieConfigProvider implements ConfigProviderInterface
 
     private function getIssuers(string $code, array $config): array
     {
-        $issuerListType = $this->config->getIssuerListType($code, $this->storeManager->getStore()->getId());
+        $issuerListType = $this->config->getIssuerListType(
+            $code,
+            storeId($this->storeManager->getStore()->getId()),
+        );
+
         $config['payment']['issuersListType'][$code] = $issuerListType;
 
         try {
             $config['payment']['issuers'][$code] = $this->getIssuers->execute($code, $issuerListType);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->config->addTolog('error', 'Unable to load issuers: ' . $exception->getMessage());
             $config['payment']['issuers'][$code] = [];
         }
@@ -240,7 +183,7 @@ class MollieConfigProvider implements ConfigProviderInterface
      * @param int $storeId
      * @return string
      */
-    private function getLocale($storeId)
+    private function getLocale(?int $storeId)
     {
         $locale = $this->config->getLocale($storeId);
 

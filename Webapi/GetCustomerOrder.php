@@ -1,11 +1,14 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
- *  * See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Webapi;
 
+use Exception;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\Webapi\GetCustomerOrderInterface;
@@ -14,36 +17,21 @@ use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
 
 class GetCustomerOrder implements GetCustomerOrderInterface
 {
-    /**
-     * @var Encryptor
-     */
-    private $encryptor;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-    /**
-     * @var GetMollieStatus
-     */
-    private $getMollieStatus;
-
     public function __construct(
-        Encryptor $encryptor,
-        OrderRepositoryInterface $orderRepository,
-        GetMollieStatus $getMollieStatus
-    ) {
-        $this->encryptor = $encryptor;
-        $this->orderRepository = $orderRepository;
-        $this->getMollieStatus = $getMollieStatus;
-    }
+        private Encryptor $encryptor,
+        private OrderRepositoryInterface $orderRepository,
+        private GetMollieStatus $getMollieStatus
+    ) {}
 
     /**
+     *
      * @param string $hash
      * @return mixed[]
-     * @throws \Exception
+     * @throws Exception
      */
     public function byHash(string $hash): array
     {
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
         $decodedHash = base64_decode($hash);
 
         $orderId = $this->encryptor->decrypt($decodedHash);
@@ -58,7 +46,7 @@ class GetCustomerOrder implements GetCustomerOrderInterface
                 'created_at' => $order->getCreatedAt(),
                 'grand_total' => $order->getGrandTotal(),
                 'status' => $this->mapMollieStatusToMagentoStatus($mollieResult),
-            ]
+            ],
         ];
     }
 

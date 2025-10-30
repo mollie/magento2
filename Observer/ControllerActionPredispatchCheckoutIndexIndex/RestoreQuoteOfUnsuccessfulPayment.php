@@ -1,8 +1,10 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Observer\ControllerActionPredispatchCheckoutIndexIndex;
 
@@ -10,30 +12,20 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderManagementInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
 
 class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
 {
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Session $checkoutSession,
-        Config $config
+        private readonly OrderManagementInterface $orderManagement,
+        private readonly Session $checkoutSession,
+        private readonly Config $config,
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->config = $config;
     }
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var OrderInterface $order */
         $order = $this->checkoutSession->getLastRealOrder();
@@ -45,6 +37,10 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
         $mollieSucces = $payment->getAdditionalInformation('mollie_success');
         if ($mollieSucces === null || $mollieSucces === true) {
             return;
+        }
+
+        if ($this->config->cancelOrderOnCheckoutReturn(storeId($order->getStoreId()))) {
+            $this->orderManagement->cancel($order->getEntityId());
         }
 
         $this->checkoutSession->restoreQuote();

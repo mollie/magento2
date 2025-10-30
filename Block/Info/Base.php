@@ -4,9 +4,12 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Block\Info;
 
 use Exception;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\Stdlib\DateTime;
@@ -18,9 +21,6 @@ use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Billie;
 use Mollie\Payment\Model\Methods\In3;
 use Mollie\Payment\Model\Methods\Klarna;
-use Mollie\Payment\Model\Methods\Klarnapaylater;
-use Mollie\Payment\Model\Methods\Klarnapaynow;
-use Mollie\Payment\Model\Methods\Klarnasliceit;
 use Mollie\Payment\Model\Methods\Riverty;
 use Mollie\Payment\Service\Magento\PaymentLinkUrl;
 
@@ -31,45 +31,20 @@ class Base extends Info
      */
     protected $_template = 'Mollie_Payment::info/mollie_base.phtml';
     /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-    /**
      * @var DateTime\TimezoneInterface
      */
     private $timezone;
-    /**
-     * @var Registry
-     */
-    private $registry;
-    /**
-     * @var PriceCurrencyInterface
-     */
-    private $price;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var PaymentLinkUrl
-     */
-    private $paymentLinkUrl;
 
     public function __construct(
         Context $context,
-        Config $config,
-        MollieHelper $mollieHelper,
-        Registry $registry,
-        PriceCurrencyInterface $price,
-        PaymentLinkUrl $paymentLinkUrl
+        private Config $config,
+        private MollieHelper $mollieHelper,
+        private Registry $registry,
+        private PriceCurrencyInterface $price,
+        private PaymentLinkUrl $paymentLinkUrl,
     ) {
         parent::__construct($context);
-        $this->mollieHelper = $mollieHelper;
         $this->timezone = $context->getLocaleDate();
-        $this->registry = $registry;
-        $this->price = $price;
-        $this->config = $config;
-        $this->paymentLinkUrl = $paymentLinkUrl;
     }
 
     public function getCheckoutType(): ?string
@@ -78,6 +53,7 @@ class Base extends Info
             return $this->getInfo()->getAdditionalInformation('checkout_type');
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+
             return null;
         }
     }
@@ -104,13 +80,13 @@ class Base extends Info
         return str_replace(
             '%link%',
             $this->getPaymentLinkUrl(),
-            $this->config->paymentLinkMessage($storeId)
+            $this->config->paymentLinkMessage($storeId),
         );
     }
 
     public function getPaymentLinkUrl(): string
     {
-        return $this->paymentLinkUrl->execute((int)$this->getInfo()->getParentId());
+        return $this->paymentLinkUrl->execute((int) $this->getInfo()->getParentId());
     }
 
     public function getCheckoutUrl(): ?string
@@ -119,6 +95,7 @@ class Base extends Info
             return $this->getInfo()->getAdditionalInformation('checkout_url');
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+
             return null;
         }
     }
@@ -129,6 +106,7 @@ class Base extends Info
             return $this->getInfo()->getAdditionalInformation('payment_status');
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+
             return null;
         }
     }
@@ -139,6 +117,7 @@ class Base extends Info
             return $this->getInfo()->getAdditionalInformation('dashboard_url');
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+
             return null;
         }
     }
@@ -158,6 +137,7 @@ class Base extends Info
             return $details['paypalReference'];
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+
             return null;
         }
     }
@@ -165,7 +145,7 @@ class Base extends Info
     public function getChangePaymentStatusUrl(): ?string
     {
         try {
-            return (string)$this->getInfo()->getAdditionalInformation('mollie_change_payment_state_url');
+            return (string) $this->getInfo()->getAdditionalInformation('mollie_change_payment_state_url');
         } catch (Exception $exception) {
             return null;
         }
@@ -177,6 +157,7 @@ class Base extends Info
             return $this->getInfo()->getAdditionalInformation('mollie_id');
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+
             return null;
         }
     }
@@ -192,9 +173,6 @@ class Base extends Info
                 Billie::CODE,
                 In3::CODE,
                 Klarna::CODE,
-                Klarnapaylater::CODE,
-                Klarnasliceit::CODE,
-                Klarnapaynow::CODE,
                 Riverty::CODE,
             ];
 
@@ -209,7 +187,7 @@ class Base extends Info
     }
 
     /**
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
     public function getPaymentImage(): string
     {
@@ -227,11 +205,12 @@ class Base extends Info
             return $this->getInfo()->getParentId();
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
+
             return null;
         }
     }
 
-    public function getAmountPaidByVoucher()
+    public function getAmountPaidByVoucher(): false|int|float
     {
         if (!$this->getOrder()) {
             return false;

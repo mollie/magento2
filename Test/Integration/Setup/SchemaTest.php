@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Setup;
 
@@ -7,7 +13,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class SchemaTest extends IntegrationTestCase
 {
-    public function addedColumnsHaveIndexesProvider()
+    public function addedColumnsHaveIndexesProvider(): array
     {
         return [
             ['sales_order', 'mollie_transaction_id'],
@@ -18,7 +24,7 @@ class SchemaTest extends IntegrationTestCase
     /**
      * @dataProvider addedColumnsHaveIndexesProvider
      */
-    public function testAddedColumnsHaveIndexes($tableName, $columnName)
+    public function testAddedColumnsHaveIndexes(string $tableName, string $columnName): void
     {
         /** @var ResourceConnection $resource */
         $resource = $this->objectManager->get(ResourceConnection::class);
@@ -38,7 +44,7 @@ class SchemaTest extends IntegrationTestCase
         $this->fail('There was no index found for `' . $columnName . '` in `' . $tableName . '`');
     }
 
-    public function thePaymentFeeColumnsExistsProvider()
+    public function thePaymentFeeColumnsExistsProvider(): array
     {
         return [
             ['quote'],
@@ -52,7 +58,7 @@ class SchemaTest extends IntegrationTestCase
     /**
      * @dataProvider thePaymentFeeColumnsExistsProvider
      */
-    public function testThePaymentFeeColumnsExists($tableName)
+    public function testThePaymentFeeColumnsExists(string $tableName): void
     {
         /** @var ResourceConnection $resource */
         $resource = $this->objectManager->get(ResourceConnection::class);
@@ -61,25 +67,25 @@ class SchemaTest extends IntegrationTestCase
         $tableName = $resource->getTableName($tableName);
         $columns = $connection->fetchAll('SHOW COLUMNS FROM ' . $tableName);
 
-        $columns = array_map( function ($column) {
+        $columns = array_map(function (array $column) {
             return $column['Field'];
         }, $columns);
 
         $this->assertTrue(
             in_array('mollie_payment_fee', $columns),
-            sprintf('The "%s" table should have the "mollie_payment_fee" column', $tableName)
+            sprintf('The "%s" table should have the "mollie_payment_fee" column', $tableName),
         );
         $this->assertTrue(
             in_array('base_mollie_payment_fee', $columns),
-            sprintf('The "%s" table should have the "base_mollie_payment_fee" column', $tableName)
+            sprintf('The "%s" table should have the "base_mollie_payment_fee" column', $tableName),
         );
         $this->assertTrue(
             in_array('mollie_payment_fee_tax', $columns),
-            sprintf('The "%s" table should have the "mollie_payment_fee_tax" column', $tableName)
+            sprintf('The "%s" table should have the "mollie_payment_fee_tax" column', $tableName),
         );
         $this->assertTrue(
             in_array('base_mollie_payment_fee_tax', $columns),
-            sprintf('The "%s" table should have the "base_mollie_payment_fee_tax" column', $tableName)
+            sprintf('The "%s" table should have the "base_mollie_payment_fee_tax" column', $tableName),
         );
     }
 
@@ -144,7 +150,7 @@ class SchemaTest extends IntegrationTestCase
                     'cart_id',
                     'order_id',
                     'token',
-                ]
+                ],
             ],
             [
                 'table' => 'mollie_payment_customer',
@@ -152,7 +158,7 @@ class SchemaTest extends IntegrationTestCase
                     'entity_id',
                     'customer_id',
                     'mollie_customer_id',
-                ]
+                ],
             ],
             [
                 'table' => 'mollie_pending_payment_reminder',
@@ -187,14 +193,14 @@ class SchemaTest extends IntegrationTestCase
         $tableName = $resource->getTableName($table);
         $rows = $connection->fetchAll('DESCRIBE ' . $tableName);
 
-        $columns = array_map( function ($column) {
+        $columns = array_map(function (array $column) {
             return $column['Field'];
         }, $rows);
 
         foreach ($expectedColumns as $column) {
             $this->assertTrue(
                 in_array($column, $columns),
-                sprintf('mollie_order_lines should contain the `%s` column', $column)
+                sprintf('mollie_order_lines should contain the `%s` column', $column),
             );
         }
     }

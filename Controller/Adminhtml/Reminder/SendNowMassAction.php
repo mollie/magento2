@@ -1,56 +1,35 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\Adminhtml\Reminder;
 
-use Magento\Backend\App\AbstractAction;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Ui\Component\MassAction\Filter;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Model\PendingPaymentReminder;
 use Mollie\Payment\Model\ResourceModel\PendingPaymentReminder\CollectionFactory;
 use Mollie\Payment\Service\Order\PaymentReminder;
 
-class SendNowMassAction extends AbstractAction
+class SendNowMassAction extends Action implements HttpPostActionInterface
 {
-    const ADMIN_RESOURCE = 'Mollie_Payment::sent_payment_reminders';
-
-    /**
-     * @var PaymentReminder
-     */
-    private $paymentReminder;
-
-    /**
-     * @var PendingPaymentReminderRepositoryInterface
-     */
-    private $pendingPaymentReminderRepository;
-
-    /**
-     * @var Filter
-     */
-    private $filter;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
+    public const ADMIN_RESOURCE = 'Mollie_Payment::sent_payment_reminders';
 
     public function __construct(
         Context $context,
-        PaymentReminder $paymentReminder,
-        PendingPaymentReminderRepositoryInterface $pendingPaymentReminderRepository,
-        Filter $filter,
-        CollectionFactory $collectionFactory
+        private PaymentReminder $paymentReminder,
+        private PendingPaymentReminderRepositoryInterface $pendingPaymentReminderRepository,
+        private Filter $filter,
+        private CollectionFactory $collectionFactory,
     ) {
         parent::__construct($context);
-
-        $this->paymentReminder = $paymentReminder;
-        $this->pendingPaymentReminderRepository = $pendingPaymentReminderRepository;
-        $this->filter = $filter;
-        $this->collectionFactory = $collectionFactory;
     }
 
     public function execute()
@@ -63,7 +42,7 @@ class SendNowMassAction extends AbstractAction
         }
 
         $this->messageManager->addSuccessMessage(
-            __('The payment reminder for %1 order(s) has been sent', count($collection->getItems()))
+            __('The payment reminder for %1 order(s) has been sent', count($collection->getItems())),
         );
 
         return $this->_redirect('mollie/reminder/pending');

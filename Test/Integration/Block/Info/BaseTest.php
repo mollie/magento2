@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Block\Info;
 
@@ -12,7 +14,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class BaseTest extends IntegrationTestCase
 {
-    public function testReturnsTheDashboardUrl()
+    public function testReturnsTheDashboardUrl(): void
     {
         /** @var Info $info */
         $info = $this->objectManager->create(Info::class);
@@ -24,7 +26,7 @@ class BaseTest extends IntegrationTestCase
         $this->assertEquals('http://example.com/dashboard', $instance->getDashboardUrl());
     }
 
-    public function testReturnsTheMollieId()
+    public function testReturnsTheMollieId(): void
     {
         /** @var Info $info */
         $info = $this->objectManager->create(Info::class);
@@ -36,7 +38,7 @@ class BaseTest extends IntegrationTestCase
         $this->assertEquals('ord_123abc', $instance->getMollieId());
     }
 
-    public function returnsNullWhenInfoIsNotAvailable()
+    public function returnsNullWhenInfoIsNotAvailable(): array
     {
         return [
             ['getDashboardUrl'],
@@ -47,14 +49,14 @@ class BaseTest extends IntegrationTestCase
     /**
      * @dataProvider returnsNullWhenInfoIsNotAvailable
      */
-    public function testReturnsNullWhenInfoIsNotAvailable($method)
+    public function testReturnsNullWhenInfoIsNotAvailable(string $method): void
     {
         /** @var Base $instance */
         $instance = $this->objectManager->create(Base::class);
         $this->assertNull($instance->{$method}());
     }
 
-    public function testReturnsTheRemainderAmount()
+    public function testReturnsTheRemainderAmount(): void
     {
         /** @var Info $info */
         $info = $this->objectManager->create(Info::class);

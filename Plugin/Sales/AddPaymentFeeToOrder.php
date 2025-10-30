@@ -1,33 +1,30 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Plugin\Sales;
 
+use Magento\Sales\Api\Data\OrderExtension;
 use Magento\Sales\Api\Data\OrderExtensionFactory;
+use Magento\Sales\Api\Data\OrderExtensionInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 
 class AddPaymentFeeToOrder
 {
-    /**
-     * @var OrderExtensionFactory
-     */
-    private $orderExtensionFactory;
-
     public function __construct(
-        OrderExtensionFactory $orderExtensionFactory
-    ) {
-        $this->orderExtensionFactory = $orderExtensionFactory;
-    }
+        private OrderExtensionFactory $orderExtensionFactory
+    ) {}
 
     public function afterGetList(
         OrderRepositoryInterface $subject,
-        OrderSearchResultInterface $searchCriteria
-    ) {
+        OrderSearchResultInterface $searchCriteria,
+    ): OrderSearchResultInterface {
         foreach ($searchCriteria->getItems() as $entity) {
             $this->addMolliePaymentFeeTo($entity);
         }
@@ -37,8 +34,8 @@ class AddPaymentFeeToOrder
 
     public function afterGet(
         OrderRepositoryInterface $subject,
-        OrderInterface $order
-    ) {
+        OrderInterface $order,
+    ): OrderInterface {
         $this->addMolliePaymentFeeTo($order);
 
         return $order;
@@ -47,7 +44,7 @@ class AddPaymentFeeToOrder
     /**
      * @param OrderInterface $entity
      */
-    private function addMolliePaymentFeeTo(OrderInterface $entity)
+    private function addMolliePaymentFeeTo(OrderInterface $entity): void
     {
         $extensionAttributes = $this->getExtensionAttributes($entity);
         $extensionAttributes->setMolliePaymentFee($entity->getData('mollie_payment_fee'));
@@ -59,7 +56,7 @@ class AddPaymentFeeToOrder
 
     /**
      * @param OrderInterface $entity
-     * @return \Magento\Sales\Api\Data\OrderExtension|\Magento\Sales\Api\Data\OrderExtensionInterface|null
+     * @return OrderExtension|OrderExtensionInterface|null
      */
     private function getExtensionAttributes(OrderInterface $entity)
     {

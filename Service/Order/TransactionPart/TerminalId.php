@@ -1,35 +1,32 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class TerminalId implements TransactionPartInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function process(OrderInterface $order, $apiMethod, array $transaction): array
+    public function process(OrderInterface $order, array $transaction): array
     {
         if ($order->getPayment()->getMethod() != 'mollie_methods_pointofsale') {
             return $transaction;
         }
 
         $value = $this->getSelectedTerminal($order);
-        if ($value && $apiMethod == Orders::CHECKOUT_TYPE) {
-            $transaction['payment']['terminalId'] = $value;
+        if (!$value) {
+            return $transaction;
         }
 
-        if ($value && $apiMethod == Payments::CHECKOUT_TYPE) {
-            $transaction['terminalId'] = $value;
-        }
+        $additional = $transaction['additional'] ?? [];
+        $additional['terminalId'] = $value;
+        $transaction['additional'] = $additional;
 
         return $transaction;
     }

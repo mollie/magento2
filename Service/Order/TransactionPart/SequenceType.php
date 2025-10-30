@@ -4,57 +4,32 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
 use Magento\Customer\Model\Session;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Vault\Model\Ui\VaultConfigProvider;
 use Mollie\Payment\Config;
-use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\OrderContainsSubscriptionProduct;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class SequenceType implements TransactionPartInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var OrderContainsSubscriptionProduct
-     */
-    private $orderContainsSubscriptionProduct;
-
-    /**
-     * @var Session
-     */
-    private $customerSession;
-
     public function __construct(
-        Config $config,
-        OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
-        Session $customerSession
-    ) {
-        $this->config = $config;
-        $this->orderContainsSubscriptionProduct = $orderContainsSubscriptionProduct;
-        $this->customerSession = $customerSession;
-    }
+        private Config $config,
+        private OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
+        private Session $customerSession
+    ) {}
 
-    public function process(OrderInterface $order, $apiMethod, array $transaction): array
+    public function process(OrderInterface $order, array $transaction): array
     {
         if (!$this->shouldAddSequenceType($order)) {
             return $transaction;
         }
 
-        if ($apiMethod == Payments::CHECKOUT_TYPE) {
-            $transaction['sequenceType'] = 'first';
-        }
-
-        if ($apiMethod == Orders::CHECKOUT_TYPE) {
-            $transaction['payment']['sequenceType'] = 'first';
-        }
+        $transaction['sequenceType'] = 'first';
 
         return $transaction;
     }
@@ -69,7 +44,8 @@ class SequenceType implements TransactionPartInterface
             return false;
         }
 
-        if ($this->config->isMagentoVaultEnabled($order->getStoreId()) &&
+        if (
+            $this->config->isMagentoVaultEnabled(storeId($order->getStoreId())) &&
             $order->getPayment()->getAdditionalInformation(VaultConfigProvider::IS_ACTIVE_CODE) &&
             $order->getPayment()->getMethod() == 'mollie_methods_creditcard'
         ) {

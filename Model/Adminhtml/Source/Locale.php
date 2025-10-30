@@ -1,8 +1,10 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
@@ -16,7 +18,6 @@ use Mollie\Payment\Helper\General as MollieHelper;
  */
 class Locale implements OptionSourceInterface
 {
-
     /**
      * Options array
      *
@@ -27,23 +28,24 @@ class Locale implements OptionSourceInterface
     /**
      * @return array
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         if (!$this->options) {
             $this->options = [
                 [
                     'value' => '',
-                    'label' => __('Autodetect')
+                    'label' => __('Autodetect'),
                 ],
                 [
                     'value' => 'store',
-                    'label' => __('Store Locale')
-                ]
+                    'label' => __('Store Locale'),
+                ],
             ];
             foreach (MollieHelper::SUPPORTED_LOCAL as $local) {
                 $this->options[] = ['value' => $local, 'label' => __($local)];
             }
         }
+
         return $this->options;
     }
 }

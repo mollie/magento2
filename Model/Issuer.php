@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,28 +13,11 @@ use Mollie\Payment\Api\Data\IssuerInterface;
 
 class Issuer implements IssuerInterface
 {
-    /**
-     * @var string
-     */
-    private $id;
-    /**
-     * @var string
-     */
-    private $name;
-    /**
-     * @var array
-     */
-    private $images;
-
     public function __construct(
-        string $id,
-        string $name,
-        array $images
-    ) {
-        $this->id = $id;
-        $this->name = $name;
-        $this->images = $images;
-    }
+        private string $id,
+        private string $name,
+        private array $images
+    ) {}
 
     public function getId(): string
     {

@@ -54,12 +54,12 @@ $scriptString = '
 
 // @phpstan-ignore-next-line
 if (isset($secureRenderer)) {
-    echo $secureRenderer->renderTag('script', [], $scriptString, false);
+    ?><?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); ?><?php
 }
 
 // @phpstan-ignore-next-line
 if (!isset($secureRenderer)) {
-    echo '<script>' . $scriptString . '</script>';
+    ?><?= /* @noEscape */ '<script>' . $scriptString . '</script>'; ?><?php
 }
 
 echo $block->getButtonHtml();

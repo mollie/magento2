@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Backend;
 
@@ -12,25 +18,11 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Api\ApiKeyFallbackRepositoryInterface;
-use Mollie\Payment\Api\Data\ApiKeyFallbackInterfaceFactory;
 use Mollie\Payment\Api\Data\ApiKeyFallbackInterface;
+use Mollie\Payment\Api\Data\ApiKeyFallbackInterfaceFactory;
 
 class SaveApiKey extends Encrypted
 {
-    /**
-     * @var ApiKeyFallbackRepositoryInterface
-     */
-    private $apiKeyFallbackRepository;
-
-    /**
-     * @var ApiKeyFallbackInterfaceFactory
-     */
-    private $apiKeyFallbackFactory;
-    /**
-     * @var UpdateProfileId
-     */
-    private $updateProfileId;
-
     /**
      * @var bool|string
      */
@@ -42,12 +34,12 @@ class SaveApiKey extends Encrypted
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
         EncryptorInterface $encryptor,
-        ApiKeyFallbackRepositoryInterface $apiKeyFallbackRepository,
-        ApiKeyFallbackInterfaceFactory $apiKeyFallbackFactory,
-        UpdateProfileId $updateProfileId,
+        private ApiKeyFallbackRepositoryInterface $apiKeyFallbackRepository,
+        private ApiKeyFallbackInterfaceFactory $apiKeyFallbackFactory,
+        private UpdateProfileId $updateProfileId,
         ?AbstractResource $resource = null,
         ?AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
     ) {
         parent::__construct(
             $context,
@@ -57,18 +49,14 @@ class SaveApiKey extends Encrypted
             $encryptor,
             $resource,
             $resourceCollection,
-            $data
+            $data,
         );
-
-        $this->apiKeyFallbackRepository = $apiKeyFallbackRepository;
-        $this->apiKeyFallbackFactory = $apiKeyFallbackFactory;
-        $this->updateProfileId = $updateProfileId;
     }
 
     public function beforeSave()
     {
         // Save the unencrypted value so we can test it.
-        $value = (string)$this->getValue();
+        $value = (string) $this->getValue();
 
         parent::beforeSave();
 

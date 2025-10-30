@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -16,20 +17,14 @@ use Magento\Tax\Api\OrderTaxManagementInterface;
 
 class DataPlugin
 {
-    /**
-     * @var OrderTaxManagementInterface
-     */
-    private $orderTaxManagement;
-
     public function __construct(
-        OrderTaxManagementInterface $orderTaxManagement
-    ) {
-        $this->orderTaxManagement = $orderTaxManagement;
-    }
+        private OrderTaxManagementInterface $orderTaxManagement
+    ) {}
 
     public function afterGetCalculatedTaxes(object $callable, array $result, $source): array
     {
-        if (!$source instanceof InvoiceInterface &&
+        if (
+            !$source instanceof InvoiceInterface &&
             !$source instanceof CreditmemoInterface
         ) {
             return $result;
@@ -38,7 +33,7 @@ class DataPlugin
         $order = $source->getOrder();
         $orderTaxDetails = $this->orderTaxManagement->getOrderTaxDetails($order->getId());
 
-        $items = array_filter($orderTaxDetails->getItems(), function (Item $item) {
+        $items = array_filter($orderTaxDetails->getItems(), function (Item $item): bool {
             return $item->getType() == 'mollie_payment_fee_tax';
         });
 
@@ -61,7 +56,7 @@ class DataPlugin
      * @param $ratio
      * @return array
      */
-    private function aggregateTaxes($taxClassAmount, OrderTaxDetailsItemInterface $itemTaxDetail, $ratio)
+    private function aggregateTaxes(array $taxClassAmount, OrderTaxDetailsItemInterface $itemTaxDetail, int $ratio): array
     {
         $itemAppliedTaxes = $itemTaxDetail->getAppliedTaxes();
         foreach ($itemAppliedTaxes as $itemAppliedTax) {
@@ -91,7 +86,7 @@ class DataPlugin
      * @param string $name
      * @return string|int
      */
-    private function getKeyByName(array $taxClassAmount, string $name)
+    private function getKeyByName(array $taxClassAmount, string $name): int|string
     {
         foreach ($taxClassAmount as $key => $tax) {
             if ($tax['title'] === $name) {

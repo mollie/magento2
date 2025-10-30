@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
- *  * See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
@@ -10,11 +12,11 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class WebhookUrlOptions implements OptionSourceInterface
 {
-    const ENABLED = 'enabled';
-    const CUSTOM_URL = 'custom_url';
-    const DISABLED = 'disabled';
+    public const ENABLED = 'enabled';
+    public const CUSTOM_URL = 'custom_url';
+    public const DISABLED = 'disabled';
 
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         return [
             [

@@ -1,28 +1,23 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\GraphQL\Resolver\Cart;
 
-use Mollie\Payment\Service\Mollie\GetIssuers;
-use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Config\Element\Field;
+use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Mollie\Payment\Service\Mollie\GetIssuers;
 
 class AvailableIssuersForMethod implements ResolverInterface
 {
-    /**
-     * @var GetIssuers
-     */
-    private $getIssuers;
-
     public function __construct(
-        GetIssuers $getIssuers
-    ) {
-        $this->getIssuers = $getIssuers;
-    }
+        private GetIssuers $getIssuers
+    ) {}
 
     /**
      * @inheritDoc

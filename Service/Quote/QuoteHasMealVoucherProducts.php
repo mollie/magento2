@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Quote;
 
 use Magento\Catalog\Api\Data\ProductInterface;
@@ -13,16 +15,9 @@ use Mollie\Payment\Config;
 
 class QuoteHasMealVoucherProducts
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
     public function check(CartInterface $cart): bool
     {
@@ -30,7 +25,7 @@ class QuoteHasMealVoucherProducts
             return false;
         }
 
-        $itemsWithCategories = array_filter($cart->getItems(), function (CartItemInterface $cartItem) {
+        $itemsWithCategories = array_filter($cart->getItems(), function (CartItemInterface $cartItem): bool {
             $category = $this->getProductCategory($cartItem->getProduct());
 
             return $category && $category != 'none';

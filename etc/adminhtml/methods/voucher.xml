@@ -8,6 +8,8 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="mollie_methods_voucher" translate="label" type="text" sortOrder="380" showInDefault="1"
            showInWebsite="1" showInStore="1">
+        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\GroupFrontendModel</frontend_model>
+
         <label>Voucher</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
@@ -28,7 +30,6 @@
             <config_path>payment/mollie_methods_voucher/payment_description</config_path>
             <comment model="Mollie\Payment\Model\Adminhtml\Comment\AvailableDescriptionVariables"/>
             <depends>
-                <field id="method">payment</field>
                 <field id="active">1</field>
             </depends>
         </field>
@@ -51,17 +52,6 @@
                 <field id="active">1</field>
                 <field id="category">custom_attribute</field>
             </depends>
-        </field>
-        <field id="days_before_expire" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1"
-               showInStore="1">
-            <label>Days to expire</label>
-            <frontend_class>validate-digits-range digits-range-1-365</frontend_class>
-            <config_path>payment/mollie_methods_voucher/days_before_expire</config_path>
-            <depends>
-                <field id="active">1</field>
-                <field id="method">order</field>
-            </depends>
-            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
         </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="70" showInDefault="1"
                showInWebsite="1" showInStore="1">
@@ -133,7 +123,7 @@
                showInStore="1">
             <label>Payment Surcharge limit</label>
             <config_path>payment/mollie_methods_voucher/payment_surcharge_limit</config_path>
-            <comment><![CDATA[Enter the maximum amount of payment surchage to should be charged to the customer.]]></comment>
+            <comment><![CDATA[Enter the maximum amount of payment surcharge that should be charged to the customer.]]></comment>
             <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
             <frontend_class>validate-not-negative-number</frontend_class>
             <depends>

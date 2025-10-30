@@ -1,8 +1,10 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Observer\MollieProcessTransactionEnd;
 
@@ -15,30 +17,17 @@ use Mollie\Payment\Service\Order\DeletePaymentReminder;
 
 class RemoveCompletedOrdersFromPendingPaymentTable implements ObserverInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var DeletePaymentReminder
-     */
-    private $deletePaymentReminder;
-
     public function __construct(
-        Config $config,
-        DeletePaymentReminder $deletePaymentReminder
-    ) {
-        $this->config = $config;
-        $this->deletePaymentReminder = $deletePaymentReminder;
-    }
+        private Config $config,
+        private DeletePaymentReminder $deletePaymentReminder
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var OrderInterface $order */
         $order = $observer->getData('order');
 
-        if (!$this->config->automaticallySendSecondChanceEmails($order->getStoreId())) {
+        if (!$this->config->automaticallySendSecondChanceEmails(storeId($order->getStoreId()))) {
             return;
         }
 

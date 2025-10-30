@@ -4,8 +4,11 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration;
 
+use Exception;
 use Magento\Framework\GraphQl\Query\Fields as QueryFields;
 use Magento\Framework\Module\Manager;
 use Magento\Framework\Serialize\SerializerInterface;
@@ -24,8 +27,10 @@ class GraphQLTestCase extends IntegrationTestCase
      */
     protected $graphQlRequest;
 
-    protected function setUpWithoutVoid()
+    protected function setUp(): void
     {
+        parent::setUp();
+
         /** @var Manager $moduleManager */
         $moduleManager = $this->objectManager->get(Manager::class);
         if (!$moduleManager->isEnabled('Magento_GraphQl')) {
@@ -39,7 +44,7 @@ class GraphQLTestCase extends IntegrationTestCase
     /**
      * @param $query
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
     protected function graphQlQuery($query)
     {
@@ -56,9 +61,9 @@ class GraphQLTestCase extends IntegrationTestCase
 
     /**
      * @param $body
-     * @throws \Exception
+     * @throws Exception
      */
-    private function processErrors($body)
+    private function processErrors(array $body): void
     {
         $errorMessage = '';
         foreach ($body['errors'] as $error) {
@@ -72,10 +77,10 @@ class GraphQLTestCase extends IntegrationTestCase
             }
         }
 
-        throw new \Exception('GraphQL response contains errors: ' . $errorMessage);
+        throw new Exception('GraphQL response contains errors: ' . $errorMessage);
     }
 
-    private function resetGraphQlCache()
+    private function resetGraphQlCache(): void
     {
         $this->objectManager->removeSharedInstance(GraphQl::class);
         $this->objectManager->removeSharedInstance(QueryFields::class);
@@ -85,7 +90,7 @@ class GraphQLTestCase extends IntegrationTestCase
     protected function prepareCustomerCart(?string $paymentMethod = 'mollie_methods_ideal'): string
     {
         $cartId = $this->graphQlQuery(
-            'mutation {createEmptyCart}'
+            'mutation {createEmptyCart}',
         )['createEmptyCart'];
 
         $this->graphQlQuery('

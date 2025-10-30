@@ -1,12 +1,16 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\PaymentFee\Quote\Address\Total;
 
 use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
@@ -20,7 +24,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentFeeTaxTest extends IntegrationTestCase
 {
-    public function testDoesNotApplyIfTheMethodIsNotSupported()
+    public function testDoesNotApplyIfTheMethodIsNotSupported(): void
     {
         /** @var PaymentFeeTax $instance */
         $instance = $this->objectManager->create(PaymentFeeTax::class);
@@ -51,10 +55,10 @@ class PaymentFeeTaxTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_payment_saved.php
-     * @magentoConfigFixture current_store payment/mollie_methods_klarnapaylater/payment_surcharge 1,95
-     * @magentoConfigFixture current_store payment/mollie_methods_klarnasliceit/payment_surcharge_tax_class 2
+     * @magentoConfigFixture current_store payment/mollie_methods_klarna/payment_surcharge 1,95
+     * @magentoConfigFixture current_store payment/mollie_methods_klarna/payment_surcharge_tax_class 2
      */
-    public function testDoesApplyIfTheMethodIsSupported()
+    public function testDoesApplyIfTheMethodIsSupported(): void
     {
         /** @var Result $result */
         $result = $this->objectManager->create(Result::class);
@@ -77,7 +81,7 @@ class PaymentFeeTaxTest extends IntegrationTestCase
             $this->objectManager->create(CartItemInterface::class),
         ]);
 
-        $quote = $this->getQuote('mollie_methods_klarnapaylater');
+        $quote = $this->getQuote('mollie_methods_klarna');
         $extensionAttributes = $quote->getExtensionAttributes();
 
         $this->assertEquals(0, $total->getTotalAmount('tax'));
@@ -119,12 +123,12 @@ class PaymentFeeTaxTest extends IntegrationTestCase
     /**
      * @param null $method
      * @return CartInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     private function getQuote($method = null)
     {
-        /** @var $session \Magento\Checkout\Model\Session  */
+        /** @var $session Session */
         $session = $this->objectManager->create(Session::class);
         $quote = $session->getQuote();
 

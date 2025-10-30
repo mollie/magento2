@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Setup\Patch\Data;
 
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigReaderFactory;
@@ -12,28 +14,15 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 class RenameMealVoucherToVoucher implements DataPatchInterface
 {
-    /**
-     * @var ConfigReaderFactory
-     */
-    private $configReaderFactory;
-
-    /**
-     * @var WriterInterface
-     */
-    private $configWriter;
-
     public function __construct(
-        ConfigReaderFactory $configReaderFactory,
-        WriterInterface $configWriter
-    ) {
-        $this->configReaderFactory = $configReaderFactory;
-        $this->configWriter = $configWriter;
-    }
+        private ConfigReaderFactory $configReaderFactory,
+        private WriterInterface $configWriter
+    ) {}
 
     public function apply()
     {
         $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
-            'eq' => 'payment/mollie_methods_mealvoucher/category'
+            'eq' => 'payment/mollie_methods_mealvoucher/category',
         ]);
 
         $replacements = [
@@ -46,14 +35,14 @@ class RenameMealVoucherToVoucher implements DataPatchInterface
             $value = str_replace(
                 array_keys($replacements),
                 array_values($replacements),
-                $item->getData('value')
+                $item->getData('value'),
             );
 
             $this->configWriter->save(
                 'payment/mollie_methods_mealvoucher/category',
                 $value,
                 $item->getData('scope'),
-                $item->getData('scope_id')
+                $item->getData('scope_id'),
             );
         }
 
@@ -79,14 +68,14 @@ class RenameMealVoucherToVoucher implements DataPatchInterface
         foreach ($paths as $path) {
             $this->changeConfigPath(
                 sprintf($path, 'mealvoucher'),
-                sprintf($path, 'voucher')
+                sprintf($path, 'voucher'),
             );
         }
 
         return $this;
     }
 
-    private function changeConfigPath($oldPath, $newPath)
+    private function changeConfigPath(string $oldPath, string $newPath): void
     {
         $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
             'eq' => $oldPath,

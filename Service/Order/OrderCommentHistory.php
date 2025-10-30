@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Phrase;
@@ -14,23 +16,10 @@ use Magento\Sales\Model\Order\Status\HistoryFactory;
 
 class OrderCommentHistory
 {
-    /**
-     * @var HistoryFactory
-     */
-    private $historyFactory;
-
-    /**
-     * @var OrderStatusHistoryRepositoryInterface
-     */
-    private $historyRepository;
-
     public function __construct(
-        HistoryFactory $historyFactory,
-        OrderStatusHistoryRepositoryInterface $historyRepository
-    ) {
-        $this->historyFactory = $historyFactory;
-        $this->historyRepository = $historyRepository;
-    }
+        private HistoryFactory $historyFactory,
+        private OrderStatusHistoryRepositoryInterface $historyRepository
+    ) {}
 
     public function add(OrderInterface $order, Phrase $message, bool $isCustomerNotified = false): void
     {

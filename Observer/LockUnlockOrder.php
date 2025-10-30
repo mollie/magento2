@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Observer;
 
 use Magento\Framework\Event\Observer;
@@ -15,23 +17,13 @@ use Mollie\Payment\Service\LockService;
 
 class LockUnlockOrder implements ObserverInterface
 {
-    /**
-     * @var LockService
-     */
-    private $lockService;
-
-    /**
-     * @var string
-     */
-    private $reason = '';
+    private string $reason = '';
 
     public function __construct(
-        LockService $lockService
-    ) {
-        $this->lockService = $lockService;
-    }
+        private LockService $lockService
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         $name = $observer->getEvent()->getName();
         $order = $this->getOrder($name, $observer);
@@ -57,11 +49,13 @@ class LockUnlockOrder implements ObserverInterface
 
         if ($shipment) {
             $this->reason = 'shipment';
+
             return $shipment->getOrder();
         }
 
         $this->reason = 'shipment tracking';
         $track = $observer->getEvent()->getData('track');
+
         return $track->getShipment()->getOrder();
     }
 }

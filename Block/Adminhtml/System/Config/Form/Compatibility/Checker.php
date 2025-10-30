@@ -1,13 +1,18 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Block\Adminhtml\System\Config\Form\Compatibility;
 
+use Exception;
 use Magento\Backend\Block\Template\Context;
 use Magento\Config\Block\System\Config\Form\Field;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Data\Form\Element\AbstractElement;
 use Mollie\Payment\Helper\General as MollieHelper;
 
@@ -18,19 +23,14 @@ use Mollie\Payment\Helper\General as MollieHelper;
  */
 class Checker extends Field
 {
-
     /**
      * @var string
      */
     protected $_template = 'Mollie_Payment::system/config/button/compatibility.phtml';
     /**
-     * @var \Magento\Framework\App\RequestInterface
+     * @var RequestInterface
      */
     private $request;
-    /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
 
     /**
      * Checker constructor.
@@ -41,11 +41,10 @@ class Checker extends Field
      */
     public function __construct(
         Context $context,
-        MollieHelper $mollieHelper,
-        array $data = []
+        private MollieHelper $mollieHelper,
+        array $data = [],
     ) {
         $this->request = $context->getRequest();
-        $this->mollieHelper = $mollieHelper;
         parent::__construct($context, $data);
     }
 
@@ -76,7 +75,8 @@ class Checker extends Field
      */
     public function getAjaxUrl()
     {
-        $storeId = (int)$this->request->getParam('store', 0);
+        $storeId = (int) $this->request->getParam('store', 0);
+
         return $this->getUrl('mollie/action/compatibility/store/' . $storeId);
     }
 
@@ -88,8 +88,9 @@ class Checker extends Field
         try {
             $buttonData = ['id' => 'compatibility_button', 'label' => __('Self Test')];
             $button = $this->getLayout()->createBlock('Magento\Backend\Block\Widget\Button')->setData($buttonData);
+
             return $button->toHtml();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
         }
     }

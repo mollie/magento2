@@ -4,12 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Methods;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Gateway\Command\CommandManagerInterface;
@@ -18,20 +21,18 @@ use Magento\Payment\Gateway\Config\ValueHandlerPoolInterface;
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Payment\Gateway\Validator\ValidatorPoolInterface;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\OrderRepository;
-use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderFactory;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
-use Mollie\Payment\Model\Client\Orders as OrdersApi;
-use Mollie\Payment\Model\Client\Orders\ProcessTransaction;
 use Mollie\Payment\Model\Client\Payments as PaymentsApi;
+use Mollie\Payment\Model\Client\Payments\ProcessTransaction as PaymentsProcessTransaction;
 use Mollie\Payment\Model\Mollie;
-use Mollie\Payment\Service\Mollie\GetApiMethod;
-use Mollie\Payment\Service\Mollie\LogException;
-use Mollie\Payment\Service\OrderLockService;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
-use Mollie\Payment\Service\Mollie\Timeout;
+use Mollie\Payment\Service\OrderLockService;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -46,12 +47,8 @@ class Reorder extends Mollie
      *
      * @var string
      */
-    const CODE = 'mollie_methods_reorder';
-
-    /**
-     * @var RequestInterface
-     */
-    private $request;
+    public const CODE = 'mollie_methods_reorder';
+    private OrderRepository $orderRepository;
 
     public function __construct(
         ManagerInterface $eventManager,
@@ -59,28 +56,23 @@ class Reorder extends Mollie
         PaymentDataObjectFactory $paymentDataObjectFactory,
         Registry $registry,
         OrderRepository $orderRepository,
-        OrderFactory $orderFactory,
-        OrdersApi $ordersApi,
         PaymentsApi $paymentsApi,
         MollieHelper $mollieHelper,
         CheckoutSession $checkoutSession,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         AssetRepository $assetRepository,
         Config $config,
-        Timeout $timeout,
-        ProcessTransaction $ordersProcessTransaction,
+        PaymentsProcessTransaction $paymentsProcessTransaction,
         OrderLockService $orderLockService,
         MollieApiClient $mollieApiClient,
         TransactionToOrderRepositoryInterface $transactionToOrderRepository,
-        GetApiMethod $getApiMethod,
-        LogException $logException,
-        RequestInterface $request,
+        private RequestInterface $request,
         $formBlockType,
         $infoBlockType,
         ?CommandPoolInterface $commandPool = null,
         ?ValidatorPoolInterface $validatorPool = null,
         ?CommandManagerInterface $commandExecutor = null,
-        ?LoggerInterface $logger = null
+        ?LoggerInterface $logger = null,
     ) {
         parent::__construct(
             $eventManager,
@@ -88,55 +80,45 @@ class Reorder extends Mollie
             $paymentDataObjectFactory,
             $registry,
             $orderRepository,
-            $orderFactory,
-            $ordersApi,
             $paymentsApi,
             $mollieHelper,
             $checkoutSession,
             $searchCriteriaBuilder,
             $assetRepository,
             $config,
-            $timeout,
-            $ordersProcessTransaction,
+            $paymentsProcessTransaction,
             $orderLockService,
             $mollieApiClient,
             $transactionToOrderRepository,
-            $getApiMethod,
-            $logException,
             $formBlockType,
             $infoBlockType,
             $commandPool,
             $validatorPool,
             $commandExecutor,
-            $logger
+            $logger,
         );
-
-        $this->request = $request;
+        $this->orderRepository = $orderRepository;
     }
 
     /**
      * @param string $paymentAction
      * @param object $stateObject
      *
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws LocalizedException
+     * @throws ApiException
      */
-    public function initialize($paymentAction, $stateObject)
+    public function initialize($paymentAction, $stateObject): void
     {
-        /** @var \Magento\Sales\Model\Order\Payment $payment */
+        /** @var Payment $payment */
         $payment = $this->getInfoInstance();
 
-        /** @var \Magento\Sales\Model\Order $order */
+        /** @var Order $order */
         $order = $payment->getOrder();
         $order->setCanSendNewEmailFlag(false);
-        $order->save();
+        $this->orderRepository->save($order);
     }
 
-    /**
-     * @param CartInterface|null $quote
-     * @return bool
-     */
-    public function isAvailable(?CartInterface $quote = null)
+    public function isAvailable(?CartInterface $quote = null): bool
     {
         return $this->request->getModuleName() == 'mollie' && $this->request->getActionName() == 'markAsPaid';
     }

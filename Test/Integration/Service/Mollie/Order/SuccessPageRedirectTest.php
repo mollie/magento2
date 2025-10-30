@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -8,6 +9,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Mollie\Order;
 
+use Laminas\Http\Headers;
 use Magento\Framework\App\ResponseInterface;
 use Mollie\Payment\Api\Data\TransactionToOrderInterface;
 use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
@@ -27,7 +29,7 @@ class SuccessPageRedirectTest extends IntegrationTestCase
         $order->setMollieTransactionId($transactionId);
 
         $transactionToOrder = $this->objectManager->create(TransactionToOrderInterface::class);
-        $transactionToOrder->setOrderId((int)$order->getEntityId());
+        $transactionToOrder->setOrderId((int) $order->getEntityId());
         $transactionToOrder->setTransactionId($transactionId);
         $transactionToOrder->setRedirected(0); // This is the default but being explicit
         $this->objectManager->get(TransactionToOrderRepositoryInterface::class)->save($transactionToOrder);
@@ -37,12 +39,12 @@ class SuccessPageRedirectTest extends IntegrationTestCase
 
         /** @var ResponseInterface $response */
         $response = $this->objectManager->get(ResponseInterface::class);
-        /** @var \Laminas\Http\Headers $headers */
+        /** @var Headers $headers */
         $headers = $response->getHeaders();
 
         $this->assertStringContainsString(
             'checkout/onepage/success',
-            $headers->get('Location')->getFieldValue()
+            $headers->get('Location')->getFieldValue(),
         );
     }
     /**
@@ -56,7 +58,7 @@ class SuccessPageRedirectTest extends IntegrationTestCase
         $order->setMollieTransactionId($transactionId);
 
         $transactionToOrder = $this->objectManager->create(TransactionToOrderInterface::class);
-        $transactionToOrder->setOrderId((int)$order->getEntityId());
+        $transactionToOrder->setOrderId((int) $order->getEntityId());
         $transactionToOrder->setTransactionId($transactionId);
 
         // Mark it as already redirected
@@ -69,12 +71,12 @@ class SuccessPageRedirectTest extends IntegrationTestCase
 
         /** @var ResponseInterface $response */
         $response = $this->objectManager->get(ResponseInterface::class);
-        /** @var \Laminas\Http\Headers $headers */
+        /** @var Headers $headers */
         $headers = $response->getHeaders();
 
         $this->assertStringContainsString(
             'checkout/cart',
-            $headers->get('Location')->getFieldValue()
+            $headers->get('Location')->getFieldValue(),
         );
     }
 }

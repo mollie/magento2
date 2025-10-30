@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order\Lines\Generator;
 
 use Magento\Framework\Serialize\SerializerInterface;
@@ -13,37 +15,21 @@ use Mollie\Payment\Helper\General;
 
 class WeeeFeeGenerator implements GeneratorInterface
 {
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
-    /**
-     * @var bool
-     */
-    private $forceBaseCurrency;
+    private ?bool $forceBaseCurrency = null;
 
     /**
      * @var string|null
      */
     private $currency;
 
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
     public function __construct(
-        General $mollieHelper,
-        SerializerInterface $serializer
-    ) {
-        $this->mollieHelper = $mollieHelper;
-        $this->serializer = $serializer;
-    }
+        private General $mollieHelper,
+        private SerializerInterface $serializer
+    ) {}
 
     public function process(OrderInterface $order, array $orderLines): array
     {
-        $this->forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
+        $this->forceBaseCurrency = (bool) $this->mollieHelper->useBaseCurrency(storeId($order->getStoreId()));
         $this->currency = $this->forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
 
         if ($orderLine = $this->getWeeeFeeOrderLine($order)) {
@@ -72,7 +58,7 @@ class WeeeFeeGenerator implements GeneratorInterface
 
         return [
             'type' => 'surcharge',
-            'name' => $this->getTitle($weeeItems),
+            'description' => $this->getTitle($weeeItems),
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $total),
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $total),

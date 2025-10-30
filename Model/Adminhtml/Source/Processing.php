@@ -1,12 +1,15 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Sales\Model\Config\Source\Order\Status;
+use Magento\Sales\Model\Order;
 
 /**
  * Class Processing
@@ -15,16 +18,15 @@ use Magento\Sales\Model\Config\Source\Order\Status;
  */
 class Processing extends Status
 {
-
     /**
      * @var string
      */
-    protected $_stateStatuses = \Magento\Sales\Model\Order::STATE_PROCESSING;
+    protected $_stateStatuses = Order::STATE_PROCESSING;
 
     /**
      * @return array
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         $statuses = $this->_stateStatuses
             ? $this->_orderConfig->getStateStatuses($this->_stateStatuses)
@@ -34,6 +36,7 @@ class Processing extends Status
         foreach ($statuses as $code => $label) {
             $options[] = ['value' => $code, 'label' => $label];
         }
+
         return $options;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -16,20 +17,13 @@ class PublishTransactionToProcess
     /**
      * @var string
      */
-    const TOPIC_NAME = 'mollie.transaction.process';
-
-    /**
-     * @var PublisherInterface
-     */
-    protected $publisher;
+    public const TOPIC_NAME = 'mollie.transaction.process';
 
     /**
      * @param PublisherInterface  $publisher
      */
-    public function __construct(
-        PublisherInterface $publisher
-    ) {
-        $this->publisher = $publisher;
+    public function __construct(protected PublisherInterface $publisher)
+    {
     }
 
     public function publish(TransactionToProcessInterface $data): void

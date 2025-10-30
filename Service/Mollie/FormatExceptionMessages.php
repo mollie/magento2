@@ -1,27 +1,34 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie;
 
+use Exception;
 use Magento\Payment\Model\MethodInterface;
 
 class FormatExceptionMessages
 {
-    private $allowedErrorMessages = [
+    private array $allowedErrorMessages = [
         'The billing country is not supported for this payment method.',
         'A billing organization name is required for this payment method.',
     ];
 
-    private $convertErrorMessages = [
+    private array $convertErrorMessages = [
         'The webhook URL is invalid because it is unreachable from Mollie\'s point of view' => 'The webhook URL is invalid because it is unreachable from Mollie\'s point of view. View this article for more information: https://github.com/mollie/magento2/wiki/Webhook-Communication-between-your-Magento-webshop-and-Mollie',
     ];
 
     public function __construct(
-        array $allowedErrorMessages = []
+        array $allowedErrorMessages = [],
     ) {
         $this->allowedErrorMessages = array_merge($this->allowedErrorMessages, $allowedErrorMessages);
     }
 
-    public function execute(\Exception $exception, ?MethodInterface $methodInstance = null): string
+    public function execute(Exception $exception, ?MethodInterface $methodInstance = null): string
     {
         // Make sure this can be picked up by bin/magento i18n:collect-phrases
         // __('The billing country is not supported for this payment method.')
@@ -43,7 +50,7 @@ class FormatExceptionMessages
             return __(
                 'A Timeout while connecting to %1 occurred, this could be the result of an outage. ' .
                 'Please try again or select another payment method.',
-                $methodInstance->getTitle()
+                $methodInstance->getTitle(),
             )->render();
         }
 

@@ -1,28 +1,25 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Config;
+use stdClass;
 
 class ValidateMetadata
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var bool
-     */
-    private $skipValidation = false;
+    private bool $skipValidation = false;
 
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
     public function skipValidation(): void
     {
@@ -32,7 +29,7 @@ class ValidateMetadata
     /**
      * @throws LocalizedException
      */
-    public function execute(?\stdClass $metadata = null, ?OrderInterface $order = null): void
+    public function execute(?stdClass $metadata = null, ?OrderInterface $order = null): void
     {
         if ($this->skipValidation || $order === null) {
             return;
@@ -40,11 +37,13 @@ class ValidateMetadata
 
         if (isset($metadata->order_id)) {
             $this->validateSingleOrder($metadata, $order);
+
             return;
         }
 
         if (isset($metadata->order_ids)) {
             $this->validateMulitpleOrders($metadata, $order);
+
             return;
         }
 
@@ -52,21 +51,21 @@ class ValidateMetadata
         throw new LocalizedException(__('No metadata found for order %1', $order->getEntityId()));
     }
 
-    private function validateSingleOrder(\stdClass $metadata, OrderInterface $order)
+    private function validateSingleOrder(stdClass $metadata, OrderInterface $order): void
     {
         // Single order
         if ($metadata->order_id != $order->getEntityId()) {
             $this->config->addTolog(
                 'error',
                 'Order ID does not match. Mollie: ' . $metadata->order_id . ' ' .
-                'Magento: ' . $order->getEntityId()
+                'Magento: ' . $order->getEntityId(),
             );
 
             throw new LocalizedException(__('Order ID does not match'));
         }
     }
 
-    private function validateMulitpleOrders(\stdClass $metadata, OrderInterface $order)
+    private function validateMulitpleOrders(stdClass $metadata, OrderInterface $order): void
     {
         // Multiple orders (Multishipping)
         $orderIds = explode(', ', $metadata->order_ids);
@@ -74,7 +73,7 @@ class ValidateMetadata
             $this->config->addTolog(
                 'error',
                 'Order ID does not match. Mollie: ' . $metadata->order_ids . ' ' .
-                'Magento: ' . $order->getEntityId()
+                'Magento: ' . $order->getEntityId(),
             );
 
             throw new LocalizedException(__('Order ID does not match'));

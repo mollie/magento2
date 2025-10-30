@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
@@ -12,30 +14,17 @@ use Mollie\Payment\Service\Mollie\PaymentMethods;
 
 class EnabledMolliePaymentMethod implements OptionSourceInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var PaymentMethods
-     */
-    private $methods;
-
     public function __construct(
-        Config $config,
-        PaymentMethods $methods
-    ) {
-        $this->methods = $methods;
-        $this->config = $config;
-    }
+        private Config $config,
+        private PaymentMethods $methods
+    ) {}
 
     /**
      * @inheritDoc
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
-        return array_filter($this->methods->getCodeswithTitle(), function ($method) {
+        return array_filter($this->methods->getCodeswithTitle(), function (array $method): bool {
             return $this->config->isMethodActive($method['value']);
         });
     }

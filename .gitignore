@@ -4,5 +4,7 @@
 view/adminhtml/web/css/styles.css
 view/frontend/web/css/styles.css
 Test/End-2-end/node_modules
-Test/End-2-end/cypress/videos
-Test/End-2-end/cypress/screenshots
+Test/End-2-end/videos
+Test/End-2-end/screenshots
+Test/End-2-end/playwright-report
+Test/End-2-end/.auth/

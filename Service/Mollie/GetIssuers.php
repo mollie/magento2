@@ -4,56 +4,27 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\App\CacheInterface;
-use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Framework\Locale\Resolver;
-use Mollie\Api\MollieApiClient;
+use Magento\Framework\Serialize\SerializerInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie as MollieModel;
 
 class GetIssuers
 {
-    const CACHE_IDENTIFIER_PREFIX = 'mollie_payment_issuers_';
-
-    /**
-     * @var CacheInterface
-     */
-    private $cache;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
-    /**
-     * @var MollieModel
-     */
-    private $mollieModel;
-
-    /**
-     * @var Resolver
-     */
-    private $resolver;
-    /**
-     * @var Config
-     */
-    private $config;
+    public const CACHE_IDENTIFIER_PREFIX = 'mollie_payment_issuers_';
 
     public function __construct(
-        CacheInterface $cache,
-        SerializerInterface $serializer,
-        MollieModel $mollieModel,
-        Resolver $resolver,
-        Config $config
-    ) {
-        $this->cache = $cache;
-        $this->serializer = $serializer;
-        $this->mollieModel = $mollieModel;
-        $this->resolver = $resolver;
-        $this->config = $config;
-    }
+        private CacheInterface $cache,
+        private SerializerInterface $serializer,
+        private MollieModel $mollieModel,
+        private Resolver $resolver,
+        private Config $config
+    ) {}
 
     /**
      * @param string $method
@@ -70,7 +41,7 @@ class GetIssuers
 
         $result = $this->mollieModel->getIssuers(
             $method,
-            $type
+            $type,
         );
 
         // If the result is false-y, don't cache it.
@@ -85,7 +56,7 @@ class GetIssuers
             $this->serializer->serialize($result),
             $identifier,
             ['mollie_payment', 'mollie_payment_issuers'],
-            60 * 60 // Cache for 1 hour
+            60 * 60, // Cache for 1 hour
         );
 
         return $result;
@@ -100,7 +71,7 @@ class GetIssuers
     {
         $issuers = $this->execute(
             $method,
-            $this->config->getIssuerListType($method)
+            $this->config->getIssuerListType($method),
         );
 
         if (!$issuers) {
@@ -112,7 +83,7 @@ class GetIssuers
             if (!array_key_exists('image', $issuer)) {
                 $output[] = [
                     'name' => $issuer['name'],
-                    'code' => $issuer['id']
+                    'code' => $issuer['id'],
                 ];
                 continue;
             }

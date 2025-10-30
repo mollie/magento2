@@ -1,11 +1,14 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model;
 
+use Exception;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
@@ -30,115 +33,33 @@ use Mollie\Payment\Model\ResourceModel\PaymentToken\CollectionFactory as Payment
 
 class PaymentTokenRepository implements PaymentTokenRepositoryInterface
 {
-    /**
-     * @var ResourcePaymentToken
-     */
-    protected $resource;
-
-    /**
-     * @var PaymentTokenFactory
-     */
-    protected $paymentTokenFactory;
-
-    /**
-     * @var PaymentTokenCollectionFactory
-     */
-    protected $paymentTokenCollectionFactory;
-
-    /**
-     * @var SearchResultsInterface
-     */
-    protected $searchResultsFactory;
-
-    /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
-    /**
-     * @var DataObjectProcessor
-     */
-    protected $dataObjectProcessor;
-
-    /**
-     * @var PaymentTokenInterfaceFactory
-     */
-    protected $dataPaymentTokenFactory;
-
-    /**
-     * @var JoinProcessorInterface
-     */
-    protected $extensionAttributesJoinProcessor;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
-     * @var ExtensibleDataObjectConverter
-     */
-    protected $extensibleDataObjectConverter;
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $criteriaBuilderFactory;
-
-    public function __construct(
-        ResourcePaymentToken $resource,
-        PaymentTokenFactory $paymentTokenFactory,
-        PaymentTokenInterfaceFactory $dataPaymentTokenFactory,
-        PaymentTokenCollectionFactory $paymentTokenCollectionFactory,
-        SearchResultsInterfaceFactory $searchResultsFactory,
-        DataObjectHelper $dataObjectHelper,
-        DataObjectProcessor $dataObjectProcessor,
-        StoreManagerInterface $storeManager,
-        CollectionProcessorInterface $collectionProcessor,
-        JoinProcessorInterface $extensionAttributesJoinProcessor,
-        ExtensibleDataObjectConverter $extensibleDataObjectConverter,
-        SearchCriteriaBuilderFactory $criteriaBuilderFactory
-    ) {
-        $this->resource = $resource;
-        $this->paymentTokenFactory = $paymentTokenFactory;
-        $this->paymentTokenCollectionFactory = $paymentTokenCollectionFactory;
-        $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
-        $this->dataPaymentTokenFactory = $dataPaymentTokenFactory;
-        $this->dataObjectProcessor = $dataObjectProcessor;
-        $this->storeManager = $storeManager;
-        $this->collectionProcessor = $collectionProcessor;
-        $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
-        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
-        $this->criteriaBuilderFactory = $criteriaBuilderFactory;
+    public function __construct(protected ResourcePaymentToken $resource, protected PaymentTokenFactory $paymentTokenFactory, protected PaymentTokenInterfaceFactory $dataPaymentTokenFactory, protected PaymentTokenCollectionFactory $paymentTokenCollectionFactory, protected SearchResultsInterfaceFactory $searchResultsFactory, protected DataObjectHelper $dataObjectHelper, protected DataObjectProcessor $dataObjectProcessor, private StoreManagerInterface $storeManager, private CollectionProcessorInterface $collectionProcessor, protected JoinProcessorInterface $extensionAttributesJoinProcessor, protected ExtensibleDataObjectConverter $extensibleDataObjectConverter, private SearchCriteriaBuilderFactory $criteriaBuilderFactory)
+    {
     }
 
     /**
      * {@inheritdoc}
      */
     public function save(
-        PaymentTokenInterface $paymentToken
+        PaymentTokenInterface $paymentToken,
     ) {
         $paymentTokenData = $this->extensibleDataObjectConverter->toNestedArray(
             $paymentToken,
             [],
-            PaymentTokenInterface::class
+            PaymentTokenInterface::class,
         );
 
         $paymentTokenModel = $this->paymentTokenFactory->create()->setData($paymentTokenData);
 
         try {
             $this->resource->save($paymentTokenModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotSaveException(__(
                 'Could not save the paymentToken: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return $paymentTokenModel->getDataModel();
     }
 
@@ -205,7 +126,7 @@ class PaymentTokenRepository implements PaymentTokenRepositoryInterface
 
         $this->extensionAttributesJoinProcessor->process(
             $collection,
-            PaymentTokenInterface::class
+            PaymentTokenInterface::class,
         );
 
         $this->collectionProcessor->process($criteria, $collection);
@@ -221,6 +142,7 @@ class PaymentTokenRepository implements PaymentTokenRepositoryInterface
 
         $searchResults->setItems($items);
         $searchResults->setTotalCount($collection->getSize());
+
         return $searchResults;
     }
 
@@ -228,25 +150,26 @@ class PaymentTokenRepository implements PaymentTokenRepositoryInterface
      * {@inheritdoc}
      */
     public function delete(
-        PaymentTokenInterface $paymentToken
-    ) {
+        PaymentTokenInterface $paymentToken,
+    ): bool {
         try {
             $paymentTokenModel = $this->paymentTokenFactory->create();
             $this->resource->load($paymentTokenModel, $paymentToken->getPaymenttokenId());
             $this->resource->delete($paymentTokenModel);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the PaymentToken: %1',
-                $exception->getMessage()
+                $exception->getMessage(),
             ));
         }
+
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteById($paymentTokenId)
+    public function deleteById($paymentTokenId): bool
     {
         return $this->delete($this->get($paymentTokenId));
     }

@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Ideal;
 
 class IdealMethodTest extends AbstractTestMethod
 {
-    protected $instance = Ideal::class;
+    protected ?string $instance = Ideal::class;
 
-    protected $code = 'ideal';
+    protected ?string $code = 'ideal';
 }

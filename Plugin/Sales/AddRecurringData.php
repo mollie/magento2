@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Plugin\Sales;
 
 use Magento\Sales\Api\Data\OrderItemInterface;
@@ -11,7 +13,7 @@ use Magento\Sales\Api\Data\OrderSearchResultInterface;
 
 class AddRecurringData
 {
-    public function afterGetList($subject, OrderSearchResultInterface $result)
+    public function afterGetList($subject, OrderSearchResultInterface $result): OrderSearchResultInterface
     {
         return $this->handleItems($result);
     }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -17,34 +18,12 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class GetTransactionId
 {
-    /**
-     * @var TransactionToOrderManagementInterface
-     */
-    private $transactionToOrderManagement;
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        TransactionToOrderManagementInterface $transactionToOrderManagement,
-        MollieApiClient $mollieApiClient,
-        General $mollieHelper,
-        Config $config
-    ) {
-        $this->transactionToOrderManagement = $transactionToOrderManagement;
-        $this->mollieApiClient = $mollieApiClient;
-        $this->mollieHelper = $mollieHelper;
-        $this->config = $config;
-    }
+        private TransactionToOrderManagementInterface $transactionToOrderManagement,
+        private MollieApiClient $mollieApiClient,
+        private General $mollieHelper,
+        private Config $config
+    ) {}
 
     /**
      * Sometimes an order gets multiple transactions. If that's the case, this code will return the first
@@ -58,9 +37,9 @@ class GetTransactionId
      */
     public function forOrder(OrderInterface $order): ?string
     {
-        $transactions = array_map(function (TransactionToOrderInterface $transactionToOrder) {
+        $transactions = array_map(function (TransactionToOrderInterface $transactionToOrder): ?string {
             return $transactionToOrder->getTransactionId();
-        }, $this->transactionToOrderManagement->getForOrder((int)$order->getEntityId()));
+        }, $this->transactionToOrderManagement->getForOrder((int) $order->getEntityId()));
 
         if (!$transactions) {
             return null;
@@ -72,13 +51,14 @@ class GetTransactionId
 
         $this->config->addToLog('warning', [
             'Multiple transactions found for order #' . $order->getIncrementId() . '/' . $order->getEntityId(),
-            $transactions
+            $transactions,
         ]);
 
         $statuses = $this->getTransactionStatuses($order, $transactions);
         foreach ($statuses as $transactionId => $status) {
             if ($status === 'paid') {
                 $order->setMollieTransactionId($transactionId);
+
                 return $transactionId;
             }
         }
@@ -89,22 +69,12 @@ class GetTransactionId
     public function getTransactionStatuses(OrderInterface $order, array $transactions): array
     {
         $results = [];
-        $isPaidUsingOrdersApi = $this->mollieHelper->isPaidUsingMollieOrdersApi($order);
-        $mollieApi = $this->mollieApiClient->loadByStore((int)$order->getStoreId());
+        $mollieApi = $this->mollieApiClient->loadByStore(storeId($order->getStoreId()));
         foreach ($transactions as $mollieTransactionId) {
-            $results[$mollieTransactionId] = $isPaidUsingOrdersApi ?
-                $this->getOrdersApiStatus($mollieApi, $mollieTransactionId) :
-                $this->getPaymentsApiStatus($mollieApi, $mollieTransactionId);
+            $results[$mollieTransactionId] = $this->getPaymentsApiStatus($mollieApi, $mollieTransactionId);
         }
 
         return $results;
-    }
-
-    private function getOrdersApiStatus(\Mollie\Api\MollieApiClient $mollieApiClient, string $transactionId): string
-    {
-        $order = $mollieApiClient->orders->get($transactionId);
-
-        return $order->status ?? 'unknown';
     }
 
     private function getPaymentsApiStatus(\Mollie\Api\MollieApiClient $mollieApiClient, string $transactionId): string

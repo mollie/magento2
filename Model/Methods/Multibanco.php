@@ -1,17 +1,17 @@
 <?php
-/*
- * Copyright Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Methods;
 
-class Multibanco extends \Mollie\Payment\Model\Mollie
+use Mollie\Payment\Model\Mollie;
+
+class Multibanco extends Mollie
 {
     /**
      * Payment method code
      *
      * @var string
      */
-    const CODE = 'mollie_methods_multibanco';
+    public const CODE = 'mollie_methods_multibanco';
 }

@@ -1,49 +1,33 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Webapi;
 
-use Magento\Quote\Api\Data\CartInterface;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Model\QuoteIdMaskFactory;
+use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Api\GuestCartRepositoryInterface;
 use Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface;
 use Mollie\Payment\Service\PaymentToken\Generate;
 
 class PaymentToken implements PaymentTokenRequestInterface
 {
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
-    /**
-     * @var QuoteIdMaskFactory
-     */
-    private $quoteIdMaskFactory;
-
-    /**
-     * @var Generate
-     */
-    private $paymentToken;
-
     public function __construct(
-        CartRepositoryInterface $cartRepository,
-        QuoteIdMaskFactory $quoteIdMaskFactory,
-        Generate $paymentToken
-    ) {
-        $this->quoteIdMaskFactory = $quoteIdMaskFactory;
-        $this->cartRepository = $cartRepository;
-        $this->paymentToken = $paymentToken;
-    }
+        private CartRepositoryInterface $cartRepository,
+        private GuestCartRepositoryInterface $guestCartRepository,
+        private Generate $paymentToken
+    ) {}
 
     /**
      * @param CartInterface $cart
      * @return string
      */
-    public function generate(CartInterface $cart)
+    public function generate(CartInterface $cart): string
     {
         $token = $this->paymentToken->forCart($cart);
 
@@ -53,9 +37,9 @@ class PaymentToken implements PaymentTokenRequestInterface
     /**
      * @param string $cartId
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
-    public function generateForCustomer($cartId)
+    public function generateForCustomer(string $cartId): string
     {
         $cart = $this->cartRepository->get($cartId);
 
@@ -65,12 +49,11 @@ class PaymentToken implements PaymentTokenRequestInterface
     /**
      * @param string $cartId
      * @return string
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
-    public function generateForGuest($cartId)
+    public function generateForGuest(string $cartId): string
     {
-        $quoteIdMask = $this->quoteIdMaskFactory->create()->load($cartId, 'masked_id');
-        $cart = $this->cartRepository->get($quoteIdMask->getQuoteId());
+        $cart = $this->guestCartRepository->get($cartId);
 
         return $this->generate($cart);
     }

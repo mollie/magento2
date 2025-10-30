@@ -4,13 +4,17 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Client\Payments\Processors;
 
 use Magento\Quote\Api\Data\PaymentInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Invoice;
 use Mollie\Api\Resources\Payment;
+use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\PaymentProcessorInterface;
 use Mollie\Payment\Model\Client\Payments;
@@ -25,88 +29,36 @@ use Mollie\Payment\Service\Order\Uncancel;
 
 class SuccessfulPayment implements PaymentProcessorInterface
 {
-    /**
-     * @var ProcessTransactionResponseFactory
-     */
-    private $processTransactionResponseFactory;
-
-    /**
-     * @var OrderAmount
-     */
-    private $orderAmount;
-
-    /**
-     * @var Uncancel
-     */
-    private $uncancel;
-
-    /**
-     * @var TransactionProcessor
-     */
-    private $transactionProcessor;
-
-    /**
-     * @var OrderCommentHistory
-     */
-    private $orderCommentHistory;
-
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var SendOrderEmails
-     */
-    private $sendOrderEmails;
-
-    /**
-     * @var CanRegisterCaptureNotification
-     */
-    private $canRegisterCaptureNotification;
-
     public function __construct(
-        ProcessTransactionResponseFactory $processTransactionResponseFactory,
-        OrderAmount $orderAmount,
-        Uncancel $uncancel,
-        TransactionProcessor $transactionProcessor,
-        OrderCommentHistory $orderCommentHistory,
-        General $mollieHelper,
-        OrderRepositoryInterface $orderRepository,
-        SendOrderEmails $sendOrderEmails,
-        CanRegisterCaptureNotification $canRegisterCaptureNotification
+        private readonly Config $config,
+        private readonly ProcessTransactionResponseFactory $processTransactionResponseFactory,
+        private readonly OrderAmount $orderAmount,
+        private readonly Uncancel $uncancel,
+        private readonly TransactionProcessor $transactionProcessor,
+        private readonly OrderCommentHistory $orderCommentHistory,
+        private readonly General $mollieHelper,
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly SendOrderEmails $sendOrderEmails,
+        private readonly CanRegisterCaptureNotification $canRegisterCaptureNotification,
     ) {
-        $this->processTransactionResponseFactory = $processTransactionResponseFactory;
-        $this->orderAmount = $orderAmount;
-        $this->uncancel = $uncancel;
-        $this->transactionProcessor = $transactionProcessor;
-        $this->orderCommentHistory = $orderCommentHistory;
-        $this->mollieHelper = $mollieHelper;
-        $this->orderRepository = $orderRepository;
-        $this->sendOrderEmails = $sendOrderEmails;
-        $this->canRegisterCaptureNotification = $canRegisterCaptureNotification;
     }
 
     public function process(
         OrderInterface $magentoOrder,
         Payment $molliePayment,
         string $type,
-        ProcessTransactionResponse $response
+        ProcessTransactionResponse $response,
     ): ?ProcessTransactionResponse {
         $amount = $molliePayment->amount->value;
         $currency = $molliePayment->amount->currency;
 
         if ($molliePayment->hasChargebacks()) {
-            $this->orderCommentHistory->add($magentoOrder,
+            $this->orderCommentHistory->add(
+                $magentoOrder,
                 __(
                     'Mollie: Received a chargeback with an amount of %1',
-                    $magentoOrder->getBaseCurrency()->formatTxt($molliePayment->getAmountChargedBack())
-                )
+                    $magentoOrder->getBaseCurrency()->formatTxt($molliePayment->getAmountChargedBack()),
+                ),
             );
 
             return $this->processTransactionResponseFactory->create([
@@ -123,7 +75,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
                 'success' => false,
                 'status' => 'paid',
                 'order_id' => $magentoOrder->getId(),
-                'type' => $type
+                'type' => $type,
             ]);
         }
 
@@ -134,7 +86,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
                 'success' => true,
                 'status' => 'paid',
                 'order_id' => $magentoOrder->getId(),
-                'type' => $type
+                'type' => $type,
             ]);
         }
 
@@ -148,7 +100,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
 
         /** @var Order\Invoice|null $invoice */
         $invoice = $payment->getCreatedInvoice();
-        $sendInvoice = $this->mollieHelper->sendInvoice($magentoOrder->getStoreId());
+        $sendInvoice = $this->config->sendInvoiceEmail((int) $magentoOrder->getStoreId());
 
         $this->sendOrderConfirmationEmail($magentoOrder);
         if ($invoice) {
@@ -159,7 +111,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
             'success' => true,
             'status' => 'paid',
             'order_id' => $magentoOrder->getId(),
-            'type' => $type
+            'type' => $type,
         ]);
     }
 
@@ -171,43 +123,44 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $payment->setTransactionId($magentoOrder->getMollieTransactionId());
         $payment->setIsTransactionClosed(true);
 
-        if ($this->canRegisterCaptureNotification->execute($magentoOrder, $molliePayment) &&
+        if (
+            $this->canRegisterCaptureNotification->execute($magentoOrder, $molliePayment) &&
             $type != Payments::TRANSACTION_TYPE_SUBSCRIPTION
         ) {
-            if ($molliePayment->getAmountCaptured() != 0.0) {
-                $magentoOrder->addCommentToStatusHistory(
-                    __(
-                        'Successfully captured amount of %1.',
-                        $magentoOrder->getBaseCurrency()->formatTxt($molliePayment->getAmountCaptured())
-                    )
-                );
-            }
-
-            $payment->registerCaptureNotification($magentoOrder->getBaseGrandTotal(), true);
+            $this->registerCaptureNotification($molliePayment, $magentoOrder);
         }
 
-        $magentoOrder->setState(Order::STATE_PROCESSING);
-        $this->transactionProcessor->process($magentoOrder, null, $molliePayment);
+        $this->updateOrderStatus($magentoOrder);
+        $this->transactionProcessor->process($magentoOrder, $molliePayment);
 
         if ($molliePayment->settlementAmount !== null) {
             if ($molliePayment->amount->currency != $molliePayment->settlementAmount->currency) {
                 $message = __(
                     'Mollie: Captured %1, Settlement Amount %2',
                     $molliePayment->amount->currency . ' ' . $molliePayment->amount->value,
-                    $molliePayment->settlementAmount->currency . ' ' . $molliePayment->settlementAmount->value
+                    $molliePayment->settlementAmount->currency . ' ' . $molliePayment->settlementAmount->value,
                 );
                 $this->orderCommentHistory->add($magentoOrder, $message);
             }
         }
 
-        if (!$magentoOrder->getIsVirtual()) {
-            $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($magentoOrder->getStoreId());
-            if ($defaultStatusProcessing && ($defaultStatusProcessing != $magentoOrder->getStatus())) {
-                $magentoOrder->setStatus($defaultStatusProcessing);
-            }
+        $this->orderRepository->save($magentoOrder);
+    }
+
+    private function registerCaptureNotification(Payment $molliePayment, OrderInterface $magentoOrder): void
+    {
+        if ($molliePayment->getAmountCaptured() != 0.0) {
+            $magentoOrder->addCommentToStatusHistory(
+                __(
+                    'Successfully captured amount of %1.',
+                    $magentoOrder->getBaseCurrency()->formatTxt($molliePayment->getAmountCaptured()),
+                ),
+            );
         }
 
-        $this->orderRepository->save($magentoOrder);
+        if ($this->config->createInvoice(storeId($magentoOrder->getStoreId()))) {
+            $magentoOrder->getPayment()->registerCaptureNotification($magentoOrder->getBaseGrandTotal(), true);
+        }
     }
 
     /**
@@ -222,12 +175,35 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $this->sendOrderEmails->sendOrderConfirmation($order);
     }
 
-    private function sendInvoiceEmail(Order\Invoice $invoice, bool $sendInvoice, OrderInterface $order): void
+    private function sendInvoiceEmail(Invoice $invoice, bool $sendInvoice, OrderInterface $order): void
     {
         if ($invoice->getEmailSent() || !$sendInvoice) {
             return;
         }
 
         $this->sendOrderEmails->sendInvoiceEmail($invoice);
+    }
+
+    private function updateOrderStatus(OrderInterface $order): void
+    {
+        $payment = $order->getPayment();
+
+        /** @var null|int $statusUpdated */
+        $statusUpdated = $payment->getAdditionalInformation('mollie_status_updated');
+        if ($statusUpdated !== null && $statusUpdated === 1) {
+            return;
+        }
+
+        $payment->setAdditionalInformation('mollie_status_updated', 1);
+        $order->setState(Order::STATE_PROCESSING);
+
+        if ($order->getIsVirtual()) {
+            return;
+        }
+
+        $defaultStatusProcessing = $this->config->orderStatusProcessing(storeId($order->getStoreId()));
+        if ($defaultStatusProcessing && ($defaultStatusProcessing != $order->getStatus())) {
+            $order->setStatus($defaultStatusProcessing);
+        }
     }
 }

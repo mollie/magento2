@@ -1,26 +1,21 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\Lines;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
-use Mollie\Payment\Service\Order\Lines\Processor\ProcessorInterface;
 
 class OrderLinesProcessor
 {
-    /**
-     * @var ProcessorInterface
-     */
-    private $processors;
-
     public function __construct(
-        $processors = []
+        private array $processors = [],
     ) {
-        $this->processors = $processors;
     }
 
     public function process(array $orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array

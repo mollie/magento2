@@ -4,18 +4,19 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Gateway;
 
 use Magento\Payment\Gateway\Data\PaymentDataObjectFactory;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order\Payment;
-use Magento\Sales\Model\Order\Payment\Info;
 use Mollie\Payment\Gateway\Handler\OrderHandler;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class OrderHandlerTest extends IntegrationTestCase
 {
-    public function testMarksThePamentAsPending()
+    public function testMarksThePamentAsPending(): void
     {
         /** @var OrderHandler $instance */
         $instance = $this->objectManager->create(OrderHandler::class);

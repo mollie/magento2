@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,9 +13,9 @@ use Mollie\Payment\Config;
 
 class ConfigFake extends Config
 {
-    private $loggedMessages = [];
+    private array $loggedMessages = [];
 
-    public function addTolog($type, $message)
+    public function addTolog(string $type, $message): void
     {
         parent::addToLog($type, $message);
 

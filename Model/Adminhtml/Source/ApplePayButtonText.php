@@ -4,29 +4,31 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 
 class ApplePayButtonText implements OptionSourceInterface
 {
-    const BUY = 'buy';
-    const DONATE = 'donate';
-    const PLAIN = 'plain';
-    const BOOK = 'book';
-    const CHECK_OUT = 'check-out';
-    const SUBSCRIBE = 'subscribe';
-    const ADD_MONEY = 'add-money';
-    const CONTRIBUTE = 'contribute';
-    const ORDER = 'order';
-    const RELOAD = 'reload';
-    const RENT = 'rent';
-    const SUPPORT = 'support';
-    const TIP = 'tip';
-    const TOP_UP = 'top-up';
-    const NONE = '';
+    public const BUY = 'buy';
+    public const DONATE = 'donate';
+    public const PLAIN = 'plain';
+    public const BOOK = 'book';
+    public const CHECK_OUT = 'check-out';
+    public const SUBSCRIBE = 'subscribe';
+    public const ADD_MONEY = 'add-money';
+    public const CONTRIBUTE = 'contribute';
+    public const ORDER = 'order';
+    public const RELOAD = 'reload';
+    public const RENT = 'rent';
+    public const SUPPORT = 'support';
+    public const TIP = 'tip';
+    public const TOP_UP = 'top-up';
+    public const NONE = '';
 
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         return [
             [

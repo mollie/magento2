@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Quote;
 
 use Magento\Framework\Serialize\SerializerInterface;
@@ -11,24 +13,19 @@ use Magento\Quote\Api\Data\CartInterface;
 
 class CartContainsRecurringProduct
 {
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
     public function __construct(
-        SerializerInterface $serializer
-    ) {
-        $this->serializer = $serializer;
-    }
+        private SerializerInterface $serializer
+    ) {}
 
     public function execute(CartInterface $cart): bool
     {
         $items = $cart->getItemsCollection()->getItems();
         foreach ($items as $item) {
             $buyRequest = $item->getOptionByCode('info_buyRequest');
-            if ($buyRequest && strstr($buyRequest->getValue(), 'is_recurring') !== false &&
-                $this->jsonContainsRecurringValue($buyRequest->getValue())) {
+            if (
+                $buyRequest && strstr($buyRequest->getValue(), 'is_recurring') !== false &&
+                $this->jsonContainsRecurringValue($buyRequest->getValue())
+            ) {
                 return true;
             }
         }

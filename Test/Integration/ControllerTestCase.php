@@ -4,20 +4,12 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration;
 
 use Magento\TestFramework\TestCase\AbstractController;
 
 class ControllerTestCase extends AbstractController
 {
-    protected function setUp(): void
-    {
-        parent::setup();
-
-        $this->setUpWithoutVoid();
-    }
-
-    protected function setUpWithoutVoid()
-    {
-    }
 }

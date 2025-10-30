@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -11,7 +12,7 @@ namespace Mollie\Payment\Test\Integration\Webapi;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\Webapi\GetPaymentLinkRedirectInterface;
-use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\StartTransaction;
 use Mollie\Payment\Webapi\GetPaymentLinkRedirect;
 
 class GetPaymentLinkRedirectTestWebApi extends AbstractTestWebApi
@@ -36,13 +37,13 @@ class GetPaymentLinkRedirectTestWebApi extends AbstractTestWebApi
         $order->setState(Order::STATE_PENDING_PAYMENT);
         $order->save();
 
-        $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('startTransaction')->willReturn('https://www.mollie.com');
-        $this->objectManager->addSharedInstance($mollieMock, Mollie::class);
+        $startTransactionMock = $this->createMock(StartTransaction::class);
+        $startTransactionMock->method('execute')->willReturn('https://www.mollie.com');
+        $this->objectManager->addSharedInstance($startTransactionMock, StartTransaction::class);
 
         $encryptor = $this->objectManager->get(EncryptorInterface::class);
 
-        $hash = base64_encode($encryptor->encrypt((string)$order->getEntityId()));
+        $hash = base64_encode($encryptor->encrypt((string) $order->getEntityId()));
 
         $instance = $this->objectManager->create(GetPaymentLinkRedirect::class);
         $result = $instance->byHash($hash);
@@ -62,7 +63,7 @@ class GetPaymentLinkRedirectTestWebApi extends AbstractTestWebApi
         $order->save();
 
         $encryptor = $this->objectManager->get(EncryptorInterface::class);
-        $hash = base64_encode($encryptor->encrypt((string)$order->getEntityId()));
+        $hash = base64_encode($encryptor->encrypt((string) $order->getEntityId()));
 
         $instance = $this->objectManager->create(GetPaymentLinkRedirect::class);
         $result = $instance->byHash($hash);

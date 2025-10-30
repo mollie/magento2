@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\PaymentToken;
 
@@ -17,7 +19,7 @@ class GenerateTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testGeneratesTokenForOrder()
+    public function testGeneratesTokenForOrder(): void
     {
         $cart = $this->objectManager->create(Quote::class);
         $cart->load('test01', 'reserved_order_id');

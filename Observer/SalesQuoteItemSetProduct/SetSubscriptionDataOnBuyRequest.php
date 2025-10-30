@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Observer\SalesQuoteItemSetProduct;
 
@@ -12,18 +18,11 @@ use Magento\Quote\Api\Data\CartItemInterface;
 
 class SetSubscriptionDataOnBuyRequest implements ObserverInterface
 {
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
     public function __construct(
-        SerializerInterface $serializer
-    ) {
-        $this->serializer = $serializer;
-    }
+        private SerializerInterface $serializer
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var ProductInterface $product */
         $product = $observer->getData('product');

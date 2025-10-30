@@ -1,14 +1,17 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\ResourceModel;
 
-class PendingPaymentReminder extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
-{
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
+class PendingPaymentReminder extends AbstractDb
+{
     /**
      * Define resource model
      *
@@ -19,4 +22,3 @@ class PendingPaymentReminder extends \Magento\Framework\Model\ResourceModel\Db\A
         $this->_init('mollie_pending_payment_reminder', 'entity_id');
     }
 }
-

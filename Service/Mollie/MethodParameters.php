@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Quote\Api\Data\CartInterface;
@@ -12,17 +14,11 @@ use Mollie\Payment\Service\Mollie\Parameters\ParameterPartInterface;
 class MethodParameters
 {
     /**
-     * @var ParameterPartInterface[]
-     */
-    private $parametersParts;
-
-    /**
      * @param ParameterPartInterface[] $parametersParts
      */
-    public function __construct(array $parametersParts)
-    {
-        $this->parametersParts = $parametersParts;
-    }
+    public function __construct(
+        private array $parametersParts
+    ) {}
 
     public function enhance(array $parameters, CartInterface $cart): array
     {

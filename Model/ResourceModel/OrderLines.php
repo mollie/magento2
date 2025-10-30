@@ -1,13 +1,15 @@
 <?php
-/**
- *  Copyright © 2018 Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\ResourceModel;
 
-use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 /**
  * Class OrderLines
@@ -16,11 +18,10 @@ use Magento\Framework\Model\AbstractModel;
  */
 class OrderLines extends AbstractDb
 {
-
     /**
      *
      */
-    public function _construct()
+    public function _construct(): void
     {
         $this->_init('mollie_order_lines', 'id');
     }
@@ -37,18 +38,18 @@ class OrderLines extends AbstractDb
         }
 
         if ($unitPrice = $object->getData('unitPrice')) {
-            $unitPriceValue = isset($unitPrice['value']) ? $unitPrice['value'] : '';
+            $unitPriceValue = isset($unitPrice->value) ? $unitPrice->value : '';
             $object->setData('unit_price', $unitPriceValue);
         }
 
         if ($discountAmount = $object->getData('discountAmount')) {
-            $discountAmountValue = isset($discountAmount['value']) ? $discountAmount['value'] : '';
+            $discountAmountValue = isset($discountAmount->value) ? $discountAmount->value : '';
             $object->setData('discount_amount', $discountAmountValue);
         }
 
         if ($totalAmount = $object->getData('totalAmount')) {
-            $totalAmountValue = isset($totalAmount['value']) ? $totalAmount['value'] : '';
-            $totalAmountCurrency = isset($totalAmount['currency']) ? $totalAmount['currency'] : '';
+            $totalAmountValue = isset($totalAmount->value) ? $totalAmount->value : '';
+            $totalAmountCurrency = isset($totalAmount->currency) ? $totalAmount->currency : '';
             $object->setData('total_amount', $totalAmountValue);
             $object->setData('currency', $totalAmountCurrency);
         }
@@ -58,7 +59,7 @@ class OrderLines extends AbstractDb
         }
 
         if ($vatAmount = $object->getData('vatAmount')) {
-            $vatAmountValue = isset($vatAmount['value']) ? $vatAmount['value'] : '';
+            $vatAmountValue = isset($vatAmount->value) ? $vatAmount->value : '';
             $object->setData('vat_amount', $vatAmountValue);
         }
 

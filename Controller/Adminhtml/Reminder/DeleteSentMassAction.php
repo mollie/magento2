@@ -1,51 +1,37 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\Adminhtml\Reminder;
 
-use Magento\Backend\App\AbstractAction;
+use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Ui\Component\MassAction\Filter;
 use Mollie\Payment\Api\SentPaymentReminderRepositoryInterface;
 use Mollie\Payment\Model\ResourceModel\SentPaymentReminder\CollectionFactory;
 use Mollie\Payment\Model\SentPaymentReminder;
 
-class DeleteSentMassAction extends AbstractAction
+class DeleteSentMassAction extends Action implements HttpPostActionInterface
 {
-    const ADMIN_RESOURCE = 'Mollie_Payment::sent_payment_reminders';
-
-    /**
-     * @var SentPaymentReminderRepositoryInterface
-     */
-    private $sentPaymentReminderRepository;
-
-    /**
-     * @var Filter
-     */
-    private $filter;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
+    public const ADMIN_RESOURCE = 'Mollie_Payment::sent_payment_reminders';
 
     public function __construct(
         Context $context,
-        SentPaymentReminderRepositoryInterface $sentPaymentReminderRepository,
-        Filter $filter,
-        CollectionFactory $collectionFactory
+        private SentPaymentReminderRepositoryInterface $sentPaymentReminderRepository,
+        private Filter $filter,
+        private CollectionFactory $collectionFactory,
     ) {
         parent::__construct($context);
-
-        $this->sentPaymentReminderRepository = $sentPaymentReminderRepository;
-        $this->filter = $filter;
-        $this->collectionFactory = $collectionFactory;
     }
 
-    public function execute()
+    public function execute(): ResponseInterface
     {
         $collection = $this->filter->getCollection($this->collectionFactory->create());
 

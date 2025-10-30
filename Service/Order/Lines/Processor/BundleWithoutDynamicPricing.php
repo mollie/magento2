@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\Lines\Processor;
 
@@ -14,18 +16,11 @@ use Mollie\Payment\Helper\General;
 
 class BundleWithoutDynamicPricing implements ProcessorInterface
 {
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
     public function __construct(
-        General $mollieHelper
-    ) {
-        $this->mollieHelper = $mollieHelper;
-    }
+        private General $mollieHelper
+    ) {}
 
-    public function process($orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array
+    public function process(array $orderLine, OrderInterface $order, ?OrderItemInterface $orderItem = null): array
     {
         if (
             !$orderItem ||
@@ -36,7 +31,7 @@ class BundleWithoutDynamicPricing implements ProcessorInterface
             return $orderLine;
         }
 
-        $forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
+        $forceBaseCurrency = (bool) $this->mollieHelper->useBaseCurrency(storeId($order->getStoreId()));
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
 
         $discountAmount = $this->getDiscountAmountWithTax($orderItem, $forceBaseCurrency);
@@ -55,7 +50,7 @@ class BundleWithoutDynamicPricing implements ProcessorInterface
         $orderLine['unitPrice'] = $this->mollieHelper->getAmountArray($currency, $unitPrice);
         $orderLine['totalAmount'] = $this->mollieHelper->getAmountArray(
             $currency,
-            ($quantity * $unitPrice) - $discountAmount
+            ($quantity * $unitPrice) - $discountAmount,
         );
         $orderLine['vatAmount'] = $this->mollieHelper->getAmountArray($currency, $newVatAmount);
         $orderLine['discountAmount'] = $this->mollieHelper->getAmountArray($currency, $discountAmount);
@@ -63,7 +58,7 @@ class BundleWithoutDynamicPricing implements ProcessorInterface
         return $orderLine;
     }
 
-    private function getDiscountAmountWithTax(OrderItemInterface $item, bool $forceBaseCurrency)
+    private function getDiscountAmountWithTax(OrderItemInterface $item, bool $forceBaseCurrency): float|int
     {
         if ($forceBaseCurrency) {
             return abs($item->getBaseDiscountAmount());

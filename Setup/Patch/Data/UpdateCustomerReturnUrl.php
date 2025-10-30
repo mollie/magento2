@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Setup\Patch\Data;
 
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory as ConfigReaderFactory;
@@ -12,23 +14,10 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 class UpdateCustomerReturnUrl implements DataPatchInterface
 {
-    /**
-     * @var ConfigReaderFactory
-     */
-    private $configReaderFactory;
-
-    /**
-     * @var WriterInterface
-     */
-    private $configWriter;
-
     public function __construct(
-        ConfigReaderFactory $configReaderFactory,
-        WriterInterface $configWriter
-    ) {
-        $this->configReaderFactory = $configReaderFactory;
-        $this->configWriter = $configWriter;
-    }
+        private ConfigReaderFactory $configReaderFactory,
+        private WriterInterface $configWriter
+    ) {}
 
     /**
      * The return url is changed. Before this params where added by default, but now you can now add placeholders in
@@ -37,21 +26,21 @@ class UpdateCustomerReturnUrl implements DataPatchInterface
     public function apply()
     {
         $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
-            'eq' => 'payment/mollie_general/custom_redirect_url'
+            'eq' => 'payment/mollie_general/custom_redirect_url',
         ]);
 
         foreach ($collection as $configItem) {
             $this->updateCustomerReturnUrlForScope(
                 $configItem->getData('scope'),
                 $configItem->getData('scope_id'),
-                $configItem->getData('value')
+                $configItem->getData('value'),
             );
         }
 
         return $this;
     }
 
-    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId, ?string $currentValue = null)
+    private function updateCustomerReturnUrlForScope(string $scope, int $scopeId, ?string $currentValue = null): void
     {
         $append = '?order_id={{ORDER_ID}}&payment_token={{PAYMENT_TOKEN}}&utm_nooverride=1';
 
@@ -66,7 +55,7 @@ class UpdateCustomerReturnUrl implements DataPatchInterface
             'payment/mollie_general/custom_redirect_url',
             $newValue,
             $scope,
-            $scopeId
+            $scopeId,
         );
     }
 

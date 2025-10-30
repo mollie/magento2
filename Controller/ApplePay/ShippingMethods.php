@@ -1,14 +1,19 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\ApplePay;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -20,46 +25,20 @@ use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\Quote\Address\Total as AddressTotal;
 use Mollie\Payment\Service\Magento\ChangeShippingMethodForQuote;
 
-class ShippingMethods extends Action
+class ShippingMethods extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-    /**
-     * @var GuestCartRepositoryInterface
-     */
-    private $guestCartRepository;
-    /**
-     * @var ShippingMethodManagementInterface
-     */
-    private $shippingMethodManagement;
-    /**
-     * @var CheckoutSession
-     */
-    private $checkoutSession;
-    /**
-     * @var ChangeShippingMethodForQuote
-     */
-    private $changeShippingMethodForQuote;
-
     public function __construct(
         Context $context,
-        CartRepositoryInterface $cartRepository,
-        ShippingMethodManagementInterface $shippingMethodManagement,
-        CheckoutSession $checkoutSession,
-        GuestCartRepositoryInterface $guestCartRepository,
-        ChangeShippingMethodForQuote $changeShippingMethodForQuote
+        private CartRepositoryInterface $cartRepository,
+        private ShippingMethodManagementInterface $shippingMethodManagement,
+        private CheckoutSession $checkoutSession,
+        private GuestCartRepositoryInterface $guestCartRepository,
+        private ChangeShippingMethodForQuote $changeShippingMethodForQuote,
     ) {
         parent::__construct($context);
-        $this->shippingMethodManagement = $shippingMethodManagement;
-        $this->guestCartRepository = $guestCartRepository;
-        $this->cartRepository = $cartRepository;
-        $this->checkoutSession = $checkoutSession;
-        $this->changeShippingMethodForQuote = $changeShippingMethodForQuote;
     }
 
-    public function execute()
+    public function execute(): Json
     {
         $cart = $this->getCart();
 
@@ -74,7 +53,7 @@ class ShippingMethods extends Action
         if ($this->getRequest()->getParam('shippingMethod')) {
             $this->changeShippingMethodForQuote->execute(
                 $address,
-                $this->getRequest()->getParam('shippingMethod')['identifier']
+                $this->getRequest()->getParam('shippingMethod')['identifier'],
             );
         }
 

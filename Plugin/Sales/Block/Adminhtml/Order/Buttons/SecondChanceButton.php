@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons;
 
@@ -13,30 +15,17 @@ use Mollie\Payment\Config;
 
 class SecondChanceButton implements ButtonInterface
 {
-    /**
-     * @var UrlInterface
-     */
-    private $url;
-
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config,
-        UrlInterface $url
-    ) {
-        $this->url = $url;
-        $this->config = $config;
-    }
+        private Config $config,
+        private UrlInterface $url
+    ) {}
 
     /**
      * @inheritDoc
      */
-    public function add(View $view)
+    public function add(View $view): void
     {
-        if (!$this->config->isSecondChanceEmailEnabled($view->getOrder()->getStoreId())) {
+        if (!$this->config->isSecondChanceEmailEnabled(storeId($view->getOrder()->getStoreId()))) {
             return;
         }
 
@@ -49,12 +38,12 @@ class SecondChanceButton implements ButtonInterface
             'mollie_payment_second_chance_email',
             [
                 'label' => __('Send Payment Reminder'),
-                'onclick' => 'setLocation("' . $this->getUrl($view->getOrderId()) . '")',
-            ]
+                'onclick' => 'setLocation("' . $this->getUrl((string)$view->getOrderId()) . '")',
+            ],
         );
     }
 
-    private function getUrl($orderId)
+    private function getUrl(string $orderId)
     {
         return $this->url->getUrl('mollie/action/sendSecondChanceEmail/id/' . $orderId);
     }

@@ -4,8 +4,11 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Cart;
 
+use Exception;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\QuoteIdToMaskedQuoteIdInterface;
@@ -31,7 +34,7 @@ class ResetCartTest extends GraphQLTestCase
         $result = $this->graphQlQuery('
             mutation {
                 mollieRestoreCart(input: {
-                  cart_id: "' . $quoteIdToMaskedQuoteId->execute($cart->getId()) . '"
+                  cart_id: "' . $quoteIdToMaskedQuoteId->execute((int)$cart->getId()) . '"
                 }) {
                     cart {
                         items {
@@ -62,7 +65,7 @@ class ResetCartTest extends GraphQLTestCase
             $this->graphQlQuery('
                 mutation {
                     mollieRestoreCart(input: {
-                        cart_id: "' . $quoteIdToMaskedQuoteId->execute($cart->getId()) . '"
+                        cart_id: "' . $quoteIdToMaskedQuoteId->execute((int)$cart->getId()) . '"
                     }) {
                         cart {
                             email
@@ -72,10 +75,10 @@ class ResetCartTest extends GraphQLTestCase
             ');
 
             $this->fail('We expect that an exception is thrown.');
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->assertStringContainsString(
                 'The current user cannot perform operations on cart',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
         }
     }

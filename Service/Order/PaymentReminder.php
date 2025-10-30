@@ -1,8 +1,10 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order;
 
@@ -20,58 +22,15 @@ use Mollie\Payment\Logger\MollieLogger;
 
 class PaymentReminder
 {
-    /**
-     * @var MollieLogger
-     */
-    private $logger;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var SentPaymentReminderInterfaceFactory
-     */
-    private $sentPaymentReminderFactory;
-
-    /**
-     * @var SentPaymentReminderRepositoryInterface
-     */
-    private $sentPaymentReminderRepository;
-
-    /**
-     * @var PendingPaymentReminderRepositoryInterface
-     */
-    private $pendingPaymentReminderRepository;
-
-    /**
-     * @var SecondChanceEmail
-     */
-    private $secondChanceEmail;
-
-    /**
-     * @var DeletePaymentReminder
-     */
-    private $deletePaymentReminder;
-
     public function __construct(
-        MollieLogger $logger,
-        OrderRepositoryInterface $orderRepository,
-        SentPaymentReminderInterfaceFactory $sentPaymentReminderFactory,
-        SentPaymentReminderRepositoryInterface $sentPaymentReminderRepository,
-        PendingPaymentReminderRepositoryInterface $pendingPaymentReminderRepository,
-        SecondChanceEmail $secondChanceEmail,
-        DeletePaymentReminder $deletePaymentReminder
-    ) {
-        $this->logger = $logger;
-        $this->orderRepository = $orderRepository;
-        $this->sentPaymentReminderFactory = $sentPaymentReminderFactory;
-        $this->sentPaymentReminderRepository = $sentPaymentReminderRepository;
-        $this->pendingPaymentReminderRepository = $pendingPaymentReminderRepository;
-        $this->secondChanceEmail = $secondChanceEmail;
-        $this->deletePaymentReminder = $deletePaymentReminder;
-    }
+        private MollieLogger $logger,
+        private OrderRepositoryInterface $orderRepository,
+        private SentPaymentReminderInterfaceFactory $sentPaymentReminderFactory,
+        private SentPaymentReminderRepositoryInterface $sentPaymentReminderRepository,
+        private PendingPaymentReminderRepositoryInterface $pendingPaymentReminderRepository,
+        private SecondChanceEmail $secondChanceEmail,
+        private DeletePaymentReminder $deletePaymentReminder,
+    ) {}
 
     public function send(PendingPaymentReminderInterface $pendingPaymentReminder): OrderInterface
     {
@@ -80,7 +39,7 @@ class PaymentReminder
         if (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE])) {
             $this->logger->addInfoLog(
                 'info',
-                sprintf('Order #%s is already completed, not sending payment reminder', $order->getIncrementId())
+                sprintf('Order #%s is already completed, not sending payment reminder', $order->getIncrementId()),
             );
 
             $this->pendingPaymentReminderRepository->delete($pendingPaymentReminder);
@@ -93,8 +52,8 @@ class PaymentReminder
                 'info',
                 sprintf(
                     'On or more products from order #%s are not stock, not sending payment reminder',
-                    $order->getIncrementId()
-                )
+                    $order->getIncrementId(),
+                ),
             );
 
             $this->pendingPaymentReminderRepository->delete($pendingPaymentReminder);
@@ -104,14 +63,14 @@ class PaymentReminder
 
         $this->logger->addInfoLog(
             'info',
-            sprintf('Preparing to send the payment reminder for order #%s', $order->getIncrementId())
+            sprintf('Preparing to send the payment reminder for order #%s', $order->getIncrementId()),
         );
 
         $this->moveReminderFromPendingToSent($order, $pendingPaymentReminder);
 
         $this->logger->addInfoLog(
             'info',
-            sprintf('Payment reminder record moved to sent table for order #%s', $order->getIncrementId())
+            sprintf('Payment reminder record moved to sent table for order #%s', $order->getIncrementId()),
         );
 
         $this->secondChanceEmail->send($order);
@@ -119,11 +78,12 @@ class PaymentReminder
         return $order;
     }
 
-    private function moveReminderFromPendingToSent(OrderInterface $order, PendingPaymentReminderInterface $pendingPaymentReminder)
+    private function moveReminderFromPendingToSent(OrderInterface $order, PendingPaymentReminderInterface $pendingPaymentReminder): void
     {
         if ($this->isAlreadySend($order)) {
             // Already sent, so delete the pending payment reminder.
             $this->pendingPaymentReminderRepository->delete($pendingPaymentReminder);
+
             return;
         }
 
@@ -142,6 +102,7 @@ class PaymentReminder
             // The next line throws an exception if the order does not exists
             $this->sentPaymentReminderRepository->getByOrderId($order->getEntityId());
             $this->deletePaymentReminder->delete($order->getCustomerId() ?: $order->getCustomerEmail());
+
             return true;
         } catch (NoSuchEntityException $exception) {
             return false;

@@ -4,51 +4,51 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
-use Mollie\Api\Endpoints\MethodEndpoint;
+use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Requests\GetEnabledMethodsRequest;
 use Mollie\Api\MollieApiClient;
-use Mollie\Api\Resources\Method;
-use Mollie\Api\Resources\MethodCollection;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\MollieConfigProvider;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use ReflectionClass;
 
 abstract class AbstractTestMethod extends IntegrationTestCase
 {
     /**
      * The class to test.
-     *
-     * @var Object
      */
-    protected $instance;
+    protected ?string $instance = null;
 
     /**
      * @var string
      */
-    protected $code = '';
+    protected ?string $code = '';
 
-    public function testHasAnExistingModel()
+    public function testHasAnExistingModel(): void
     {
         $this->assertTrue(class_exists($this->instance), 'We expect that the class ' . $this->instance . ' exists');
     }
 
-    public function testHasTheCorrectCode()
+    public function testHasTheCorrectCode(): void
     {
         /**
          * The parent constructor of this class calls the ObjectManager, which isn't available in unit tests. So skip
          * the constructor.
          */
-        $reflection = new \ReflectionClass($this->instance);
+        $reflection = new ReflectionClass($this->instance);
         $instance = $reflection->newInstanceWithoutConstructor();
 
         $this->assertEquals('mollie_methods_' . $this->code, $instance->getCode());
     }
 
-    public function testIsListedAsActiveMethod()
+    public function testIsListedAsActiveMethod(): void
     {
         $scopeConfig = $this->createMock(ScopeConfigInterface::class);
         $scopeConfig->method('getValue')->willReturn(1);
@@ -66,37 +66,25 @@ abstract class AbstractTestMethod extends IntegrationTestCase
 
         if ($this->code == 'paymentlink') {
             $this->assertArrayNotHasKey('mollie_methods_' . $this->code, $methods);
+
             return;
         }
 
         $this->assertArrayHasKey('mollie_methods_' . $this->code, $methods);
     }
 
-    public function testThatTheMethodIsActive()
+    public function testThatTheMethodIsActive(): void
     {
-        $mollieHelperMock = $this->createMock(\Mollie\Payment\Helper\General::class);
+        $mollieHelperMock = $this->createMock(MollieHelper::class);
         $mollieHelperMock->method('getOrderAmountByQuote')->willReturn(['value' => 100, 'currency' => 'EUR']);
 
-        /** @var Method $method */
-        $method = $this->objectManager->create(Method::class);
-        $method->id = $this->code;
-        $method->image = new \stdClass();
-        $method->image->size2x = 'http://www.example.com/image.png';
-
-        /** @var MethodCollection $methodCollection */
-        $methodCollection = $this->objectManager->create(MethodCollection::class, ['count' => 0, '_links' => 0]);
-        $methodCollection[] = $method;
-
-        $methodsEndpointMock = $this->createMock(MethodEndpoint::class);
-        $methodsEndpointMock->method('allActive')->willReturn($methodCollection);
-        $methodsEndpointMock->method('allAvailable')->willReturn($methodCollection);
-
-        $mollieApiMock = $this->createMock(MollieApiClient::class);
-        $mollieApiMock->methods = $methodsEndpointMock;
+        $client = MollieApiClient::fake([
+            GetEnabledMethodsRequest::class => MockResponse::ok($this->getMethodListResponse()),
+        ]);
 
         /** @var FakeMollieApiClient $fakeMollieApiClient */
         $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
-        $fakeMollieApiClient->setInstance($mollieApiMock);
+        $fakeMollieApiClient->setInstance($client);
         $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
 
         /** @var MollieConfigProvider $instance */
@@ -106,6 +94,69 @@ abstract class AbstractTestMethod extends IntegrationTestCase
         $methods = $instance->getActiveMethods();
 
         $this->assertArrayHasKey('mollie_methods_' . $this->code, $methods);
-        $this->assertEquals($method->image->size2x, $methods['mollie_methods_' . $this->code]['image']);
+        $this->assertEquals(
+            'https://mollie.com/external/icons/payment-methods/' . $this->code . '%402x.png',
+            $methods['mollie_methods_' . $this->code]['image'],
+        );
+    }
+
+    private function getMethodListResponse(): string
+    {
+        return '{
+  "count": 2,
+  "_embedded": {
+    "methods": [
+      {
+        "resource": "method",
+        "id": "ideal",
+        "description": "iDEAL",
+        "minimumAmount": {
+          "value": "0.01",
+          "currency": "EUR"
+        },
+        "maximumAmount": {
+          "value": "50000.00",
+          "currency": "EUR"
+        },
+        "image": {
+          "size1x": "https://mollie.com/external/icons/payment-methods/ideal.png",
+          "size2x": "https://mollie.com/external/icons/payment-methods/ideal%402x.png",
+          "svg": "https://mollie.com/external/icons/payment-methods/ideal.svg"
+        },
+        "status": "activated"
+      },
+      {
+        "resource": "method",
+        "id": "' . $this->code . '",
+        "description": "Credit card",
+        "minimumAmount": {
+          "value": "0.01",
+          "currency": "EUR"
+        },
+        "maximumAmount": {
+          "value": "2000.00",
+          "currency": "EUR"
+        },
+        "image": {
+          "size1x": "https://mollie.com/external/icons/payment-methods/' . $this->code . '.png",
+          "size2x": "https://mollie.com/external/icons/payment-methods/' . $this->code . '%402x.png",
+          "svg": "https://mollie.com/external/icons/payment-methods/' . $this->code . '.svg"
+        },
+        "status": "activated"
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "...",
+      "type": "application/hal+json"
+    },
+    "documentation": {
+      "href": "...",
+      "type": "text/html"
+    }
+  }
+}
+';
     }
 }

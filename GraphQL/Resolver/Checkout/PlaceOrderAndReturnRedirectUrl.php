@@ -1,48 +1,29 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\GraphQL\Resolver\Checkout;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\GraphQl\Config\Element\Field;
-use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
-use Magento\Framework\GraphQl\Query\Resolver\Value;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
-use Mollie\Payment\Model\Mollie;
-use Mollie\Payment\Service\PaymentToken\Generate;
+use Mollie\Payment\Service\Mollie\StartTransaction;
 
 class PlaceOrderAndReturnRedirectUrl implements ResolverInterface
 {
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var Mollie
-     */
-    private $mollie;
-
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        Mollie $mollie
-    ) {
-        $this->orderRepository = $orderRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->mollie = $mollie;
-    }
+        private OrderRepositoryInterface $orderRepository,
+        private SearchCriteriaBuilder $searchCriteriaBuilder,
+        private StartTransaction $startTransaction
+    ) {}
 
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
@@ -59,16 +40,10 @@ class PlaceOrderAndReturnRedirectUrl implements ResolverInterface
             return $order->getPayment()->getAdditionalInformation('checkout_url');
         }
 
-        $this->mollie->startTransaction($order);
-
-        return $order->getPayment()->getAdditionalInformation('checkout_url');
+        return $this->startTransaction->execute($order);
     }
 
-    /**
-     * @param string $incrementId
-     * @return \Magento\Sales\Api\Data\OrderInterface|null
-     */
-    private function getOrderByIncrementId($incrementId)
+    private function getOrderByIncrementId(string $incrementId): ?OrderInterface
     {
         $this->searchCriteriaBuilder->addFilter('increment_id', $incrementId);
 

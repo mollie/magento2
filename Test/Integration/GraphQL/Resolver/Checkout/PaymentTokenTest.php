@@ -1,11 +1,14 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Checkout;
 
+use Exception;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Test\Integration\GraphQLTestCase;
@@ -40,7 +43,7 @@ class PaymentTokenTest extends GraphQLTestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      * @return array
      */
     public function placeOrder(): array

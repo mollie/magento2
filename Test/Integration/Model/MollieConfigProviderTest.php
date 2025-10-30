@@ -4,10 +4,13 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model;
 
-use Mollie\Api\Endpoints\MethodEndpoint;
-use Mollie\Api\Resources\MethodCollection;
+use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Requests\GetEnabledMethodsRequest;
+use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\MollieConfigProvider;
@@ -25,7 +28,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_methods_kbc/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_giftcard/active 1
      */
-    public function testGetConfig()
+    public function testGetConfig(): void
     {
         $mollieHelperMock = $this->createMock(General::class);
         $mollieHelperMock->method('getApiKey')->willReturn('test_TEST_API_KEY_THAT_IS_LONG_ENOUGH');
@@ -37,8 +40,8 @@ class MollieConfigProviderTest extends IntegrationTestCase
 
         $result = $instance->getConfig();
 
-//        $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['issuersListType']);
-//        $this->assertArrayHasKey('mollie_methods_giftcard', $result['payment']['issuersListType']);
+        //        $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['issuersListType']);
+        //        $this->assertArrayHasKey('mollie_methods_giftcard', $result['payment']['issuersListType']);
 
         $this->assertArrayHasKey('mollie_methods_applepay', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_alma', $result['payment']['image']);
@@ -58,9 +61,6 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertArrayHasKey('mollie_methods_in3', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_kbc', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_klarna', $result['payment']['image']);
-        $this->assertArrayHasKey('mollie_methods_klarnapaylater', $result['payment']['image']);
-        $this->assertArrayHasKey('mollie_methods_klarnapaynow', $result['payment']['image']);
-        $this->assertArrayHasKey('mollie_methods_klarnasliceit', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_mbway', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_mobilepay', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_multibanco', $result['payment']['image']);
@@ -80,18 +80,18 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertArrayHasKey('mollie_methods_vipps', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_voucher', $result['payment']['image']);
 
-//        $this->assertEquals([], $result['payment']['issuers']['mollie_methods_kbc']);
-//        $this->assertEquals([], $result['payment']['issuers']['mollie_methods_giftcard']);
+        //        $this->assertEquals([], $result['payment']['issuers']['mollie_methods_kbc']);
+        //        $this->assertEquals([], $result['payment']['issuers']['mollie_methods_giftcard']);
     }
 
-    public function testConfigContainsTheUseComponentsValue()
+    public function testConfigContainsTheUseComponentsValue(): void
     {
         $configMock = $this->createMock(Config::class);
-        $useComponents = (bool)rand(0, 1);
+        $useComponents = (bool) rand(0, 1);
         $configMock->method('isModuleEnabled')->willReturn(true);
         $configMock->method('creditcardUseComponents')->willReturn($useComponents);
 
-        $api = new \Mollie\Api\MollieApiClient;
+        $api = new MollieApiClient();
 
         /** @var FakeMollieApiClient $fakeMollieApiClient */
         $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
@@ -109,10 +109,10 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertSame($useComponents, $result['payment']['mollie']['creditcard']['use_components']);
     }
 
-    public function configContainsGeneralSettingsProvider()
+    public function configContainsGeneralSettingsProvider(): array
     {
         return [
-            ['testmode', 'isTestMode', rand(0, 1) ? 'live' : 'test'],
+            ['testmode', 'isTestMode', (bool) rand(0, 1)],
             ['profile_id', 'getProfileId', 'ProfileId' . uniqid()],
         ];
     }
@@ -120,7 +120,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
     /**
      * @dataProvider configContainsGeneralSettingsProvider
      */
-    public function testConfigContainsGeneralSettings($key, $method, $expected)
+    public function testConfigContainsGeneralSettings(string $key, string $method, bool|string $expected): void
     {
         $configMock = $this->createMock(Config::class);
         $configMock->method('isModuleEnabled')->willReturn(true);
@@ -140,7 +140,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
      * @magentoConfigFixture default_store payment/mollie_general/locale nl_NL
      */
-    public function testContainsTheLocale()
+    public function testContainsTheLocale(): void
     {
         /** @var MollieConfigProvider $instance */
         $instance = $this->objectManager->create(MollieConfigProvider::class);
@@ -152,17 +152,15 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertSame('nl_NL', $result['payment']['mollie']['locale']);
     }
 
-    public function testWhenNoActiveMethodsAvailableTheResultIsAnEmptyArray()
+    public function testWhenNoActiveMethodsAvailableTheResultIsAnEmptyArray(): void
     {
-        $methodMock = $this->createMock(MethodEndpoint::class);
-        $methodMock->method('allActive')->willReturn(new MethodCollection(0, new \stdClass));
-
-        $api = new \Mollie\Api\MollieApiClient;
-        $api->methods = $methodMock;
+        $client = MollieApiClient::fake([
+            GetEnabledMethodsRequest::class => MockResponse::ok('{}'),
+        ]);
 
         /** @var FakeMollieApiClient $fakeMollieApiClient */
         $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
-        $fakeMollieApiClient->setInstance($api);
+        $fakeMollieApiClient->setInstance($client);
         $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
 
         /** @var MollieConfigProvider $instance */

@@ -4,10 +4,13 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\PaymentToken;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Quote\Model\Quote;
+use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Service\PaymentToken\Generate;
 use Mollie\Payment\Service\PaymentToken\PaymentTokenForOrder;
@@ -19,7 +22,7 @@ class PaymentTokenForOrderTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testReturnsAnExistingToken()
+    public function testReturnsAnExistingToken(): void
     {
         $order = $this->getOrder();
 
@@ -39,7 +42,7 @@ class PaymentTokenForOrderTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testCreatesANewTokenWhenNotAlreadyAvailable()
+    public function testCreatesANewTokenWhenNotAlreadyAvailable(): void
     {
         $order = $this->getOrder();
 
@@ -63,15 +66,16 @@ class PaymentTokenForOrderTest extends IntegrationTestCase
     }
 
     /**
-     * @return \Magento\Sales\Api\Data\OrderInterface
+     * @return OrderInterface
      */
-    private function getOrder(): \Magento\Sales\Api\Data\OrderInterface
+    private function getOrder(): OrderInterface
     {
         $cart = $this->objectManager->create(Quote::class);
         $cart->load('test01', 'reserved_order_id');
 
         $order = $this->loadOrder('100000001');
         $order->setQuoteId($cart->getId());
+
         return $order;
     }
 }

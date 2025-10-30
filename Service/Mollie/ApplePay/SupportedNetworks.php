@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -9,24 +10,19 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Mollie\ApplePay;
 
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Adminhtml\Source\CaptureMode;
+use Mollie\Payment\Model\Methods\Creditcard;
 
 class SupportedNetworks
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
     public function execute(?int $storeId = null): array
     {
         $output = ['amex', 'masterCard', 'visa'];
-        if (!$this->config->useManualCapture($storeId)) {
+        if ($this->config->captureMode(Creditcard::CODE, $storeId) == CaptureMode::AUTOMATIC) {
             $output[] = 'maestro';
             $output[] = 'vPay';
         }

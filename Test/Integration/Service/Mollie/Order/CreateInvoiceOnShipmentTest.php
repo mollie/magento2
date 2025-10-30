@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Mollie\Order;
 
 use Mollie\Payment\Model\Methods\Bancontact;
@@ -11,9 +13,6 @@ use Mollie\Payment\Model\Methods\Banktransfer;
 use Mollie\Payment\Model\Methods\Billie;
 use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Model\Methods\In3;
-use Mollie\Payment\Model\Methods\Klarnapaylater;
-use Mollie\Payment\Model\Methods\Klarnapaynow;
-use Mollie\Payment\Model\Methods\Klarnasliceit;
 use Mollie\Payment\Model\Methods\Riverty;
 use Mollie\Payment\Service\Mollie\Order\CreateInvoiceOnShipment;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -101,9 +100,6 @@ class CreateInvoiceOnShipmentTest extends IntegrationTestCase
         return [
             [Billie::CODE],
             [In3::CODE],
-            [Klarnapaylater::CODE],
-            [Klarnapaynow::CODE],
-            [Klarnasliceit::CODE],
             [Riverty::CODE],
         ];
     }

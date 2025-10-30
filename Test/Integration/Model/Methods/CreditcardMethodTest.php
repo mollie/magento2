@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -12,11 +14,11 @@ use Mollie\Payment\Model\Methods\Creditcard;
 
 class CreditcardMethodTest extends AbstractTestMethod
 {
-    protected $instance = Creditcard::class;
+    protected ?string $instance = Creditcard::class;
 
-    protected $code = 'creditcard';
+    protected ?string $code = 'creditcard';
 
-    public function testDoesNotSendEmailsWhenPlacingAnOrder()
+    public function testDoesNotSendEmailsWhenPlacingAnOrder(): void
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);

@@ -1,8 +1,11 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\Form;
 
@@ -18,23 +21,16 @@ use Mollie\Payment\Service\Mollie\AvailableTerminals;
 class Pointofsale extends Form
 {
     /**
-     * @var AvailableTerminals
-     */
-    private $availableTerminals;
-
-    /**
      * @var string
      */
     protected $_template = 'Mollie_Payment::form/pointofsale.phtml';
 
     public function __construct(
         Context $context,
-        AvailableTerminals $availableTerminals,
-        array $data = []
+        private AvailableTerminals $availableTerminals,
+        array $data = [],
     ) {
         parent::__construct($context, $data);
-
-        $this->availableTerminals = $availableTerminals;
     }
 
     /**
@@ -50,6 +46,6 @@ class Pointofsale extends Form
     {
         $storeId = $this->_storeManager->getStore()->getId();
 
-        return $this->availableTerminals->execute((int)$storeId);
+        return $this->availableTerminals->execute((int) $storeId);
     }
 }

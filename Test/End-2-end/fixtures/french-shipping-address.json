@@ -1,0 +1,15 @@
+{
+  "type": {
+    "username": "jeandupont@mollie.com",
+    "firstname": "Jean",
+    "company": "Entreprise Générique SA",
+    "lastname": "Dupont",
+    "street[0]": "Rue Exemple 1",
+    "city": "Paris",
+    "postcode": "75001",
+    "telephone": "+33 1 42 86 82 00"
+  },
+  "select": {
+    "country_id": "FR"
+  }
+}

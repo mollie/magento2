@@ -1,8 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Methods;
 
@@ -23,7 +21,7 @@ class CreditcardVault extends Vault
      *
      * @var string
      */
-    const CODE = 'mollie_methods_creditcard_vault';
+    public const CODE = 'mollie_methods_creditcard_vault';
 
     public function order(InfoInterface $payment, $amount)
     {

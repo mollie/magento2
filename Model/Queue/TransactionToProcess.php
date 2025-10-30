@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,20 +13,11 @@ use Mollie\Payment\Api\Data\TransactionToProcessInterface;
 
 class TransactionToProcess implements TransactionToProcessInterface
 {
-    /**
-     * @var string
-     */
-    private $transactionId = null;
+    private ?string $transactionId = null;
 
-    /**
-     * @var int
-     */
-    private $orderId = null;
+    private ?int $orderId = null;
 
-    /**
-     * @var null | string
-     */
-    private $type = null;
+    private ?string $type = null;
 
     public function setTransactionId(string $id): TransactionToProcessInterface
     {

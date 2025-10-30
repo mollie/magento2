@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -20,7 +23,7 @@ class MakeRecurringProductsUniqueInCartTest extends IntegrationTestCase
         $result = rand(0, 1) === 1;
         $outcome = $instance->afterRepresentProduct(
             $this->objectManager->create(CartItemInterface::class),
-            $result
+            $result,
         );
 
         $this->assertEquals($result, $outcome);

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Client\Payments;
 
 use Magento\Framework\Exception\LocalizedException;
@@ -16,40 +18,22 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 
 class PaymentProcessors
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var ProcessTransactionResponseFactory
-     */
-    private $processTransactionResponseFactory;
-
-    /**
-     * @var array
-     */
-    private $processors;
-
     public function __construct(
-        Config $config,
-        ProcessTransactionResponseFactory $processTransactionResponseFactory,
-        array $processors
-    ) {
-        $this->config = $config;
-        $this->processTransactionResponseFactory = $processTransactionResponseFactory;
-        $this->processors = $processors;
-    }
+        private Config $config,
+        private ProcessTransactionResponseFactory $processTransactionResponseFactory,
+        private array $processors
+    ) {}
 
     public function process(
         string $event,
         OrderInterface $magentoOrder,
         Payment $molliePayment,
         string $type,
-        ProcessTransactionResponse $response
+        ProcessTransactionResponse $response,
     ): ?ProcessTransactionResponse {
         if (!isset($this->processors[$event])) {
             $this->config->addToLog('success', $response->toArray());
+
             return $response;
         }
 
@@ -66,6 +50,7 @@ class PaymentProcessors
         }
 
         $this->config->addToLog('success', $response->toArray());
+
         return $response;
     }
 

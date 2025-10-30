@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -10,24 +11,15 @@ namespace Mollie\Payment\Service\Mollie;
 
 class GetMollieStatusResult
 {
-    /**
-     * @var string
-     */
-    private $status;
-    /**
-     * @var string|null
-     */
-    private $method;
+    private ?string $method;
 
     public function __construct(
-        string $status,
-        ?string $method = null
+        private string $status,
+        ?string $method = null,
     ) {
         if ($method !== null) {
             $method = str_replace('mollie_methods_', '', $method);
         }
-
-        $this->status = $status;
         $this->method = $method;
     }
 

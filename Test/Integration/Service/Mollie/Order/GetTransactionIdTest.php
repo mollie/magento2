@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -8,7 +9,9 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Mollie\Order;
 
-use Mollie\Api\Resources\Payment;
+use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Fake\SequenceMockResponse;
+use Mollie\Api\Http\Requests\GetPaymentRequest;
 use Mollie\Payment\Api\Data\TransactionToOrderInterface;
 use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
@@ -31,7 +34,7 @@ class GetTransactionIdTest extends IntegrationTestCase
 
         $this->assertNull(
             $order->getMollieTransactionId(),
-            'Transaction ID should not be set when no transaction is available'
+            'Transaction ID should not be set when no transaction is available',
         );
     }
 
@@ -44,19 +47,18 @@ class GetTransactionIdTest extends IntegrationTestCase
     {
         $order = $this->loadOrderById('100000001');
 
-        $payments = [];
+        $responses = [];
         foreach ($transactions as $transaction) {
-            $payments[] = $this->addMollieTransactionToOrder((int)$order->getId(), $transaction[0], $transaction[1]);
+            $this->addMollieTransactionToOrder((int) $order->getId(), $transaction[0], $transaction[1]);
+            $responses[] = MockResponse::ok('{"id":"' . $transaction[0] . '","status":"' . $transaction[1] . '"}');
         }
 
+        $client = \Mollie\Api\MollieApiClient::fake([
+            GetPaymentRequest::class => new SequenceMockResponse(...$responses),
+        ]);
         /** @var FakeMollieApiClient $fakeMollieApiClient */
         $fakeMollieApiClient = $this->objectManager->create(FakeMollieApiClient::class);
-        $fakeMollieApiClient->setInstance(new \Mollie\Api\MollieApiClient);
-        $fakeMollieApiClient->returnFakePayment($payments[0]);
-
-        foreach ($payments as $payment) {
-            $fakeMollieApiClient->loadByStore()->payments->setFakePayment($payment);
-        }
+        $fakeMollieApiClient->setInstance($client);
 
         $this->objectManager->addSharedInstance($fakeMollieApiClient, MollieApiClient::class);
 
@@ -65,7 +67,7 @@ class GetTransactionIdTest extends IntegrationTestCase
 
         $this->assertEquals(
             $paid,
-            $order->getMollieTransactionId()
+            $order->getMollieTransactionId(),
         );
     }
 
@@ -78,19 +80,19 @@ class GetTransactionIdTest extends IntegrationTestCase
         $order = $this->loadOrderById('100000001');
         $order->setMollieTransactionId('tr_aaa111');
 
-        $payments = [];
-        $payments[] = $this->addMollieTransactionToOrder((int)$order->getId(), 'tr_abc123', 'pending');
-        $payments[] = $this->addMollieTransactionToOrder((int)$order->getId(), 'tr_def456', 'pending');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_abc123');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_def456');
+
+        $client = \Mollie\Api\MollieApiClient::fake([
+            GetPaymentRequest::class => new SequenceMockResponse(
+                MockResponse::ok('{"id":"tr_abc13","status":"pending"}'),
+                MockResponse::ok('{"id":"tr_def456","status":"pending"}'),
+            ),
+        ]);
 
         /** @var FakeMollieApiClient $fakeMollieApiClient */
         $fakeMollieApiClient = $this->objectManager->create(FakeMollieApiClient::class);
-        $fakeMollieApiClient->setInstance(new \Mollie\Api\MollieApiClient);
-        $fakeMollieApiClient->returnFakePayment($payments[0]);
-
-        foreach ($payments as $payment) {
-            $fakeMollieApiClient->loadByStore()->payments->setFakePayment($payment);
-        }
-
+        $fakeMollieApiClient->setInstance($client);
         $this->objectManager->addSharedInstance($fakeMollieApiClient, MollieApiClient::class);
 
         $instance = $this->objectManager->create(GetTransactionId::class);
@@ -98,7 +100,7 @@ class GetTransactionIdTest extends IntegrationTestCase
 
         $this->assertEquals(
             'tr_aaa111',
-            $order->getMollieTransactionId()
+            $order->getMollieTransactionId(),
         );
     }
 
@@ -124,7 +126,7 @@ class GetTransactionIdTest extends IntegrationTestCase
         ];
     }
 
-    private function addMollieTransactionToOrder(int $orderId, string $transactionId, string $status): Payment
+    private function addMollieTransactionToOrder(int $orderId, string $transactionId): void
     {
         /** @var TransactionToOrderInterface $model */
         $model = $this->objectManager->create(TransactionToOrderInterface::class);
@@ -132,11 +134,5 @@ class GetTransactionIdTest extends IntegrationTestCase
         $model->setOrderId($orderId);
 
         $this->objectManager->get(TransactionToOrderRepositoryInterface::class)->save($model);
-
-        $payment = new Payment(new \Mollie\Api\MollieApiClient());
-        $payment->id = $transactionId;
-        $payment->status = $status;
-
-        return $payment;
     }
 }

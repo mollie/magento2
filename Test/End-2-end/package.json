@@ -1,11 +1,17 @@
 {
-  "dependencies": {
-    "@cypress/webpack-preprocessor": "^5.17.0",
-    "cypress": "^12.0.2",
-    "webpack": "^5.76.0"
-  },
+  "name": "newnew",
+  "version": "1.0.0",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "devDependencies": {
-    "cypress-mollie": "^1.3.0",
-    "cypress-testrail": "^2.4.0"
+    "@playwright/test": "^1.47.2",
+    "@types/node": "^22.7.4",
+    "junit-report-merger": "^7.0.0"
+  },
+  "scripts": {
+    "merge-reports": "jrm ./test-results/combined.xml ./test-results/junit-report.xml"
   }
 }

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Client\Payments\Processors;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -42,7 +44,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
 
         /** @var MolliePaymentBuilder $paymentBuilder */
         $paymentBuilder = $this->objectManager->create(MolliePaymentBuilder::class);
-        $paymentBuilder->setAmount($order->getBaseGrandTotal(), $order->getBaseCurrencyCode());
+        $paymentBuilder->setAmount((float)$order->getBaseGrandTotal(), (float)$order->getBaseCurrencyCode());
 
         /** @var SuccessfulPayment $instance */
         $instance = $this->objectManager->create(SuccessfulPayment::class);
@@ -55,7 +57,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
                 'status' => 'paid',
                 'order_id' => $order->getIncrementId(),
                 'type' => 'webhook',
-            ])
+            ]),
         );
 
         $freshOrder = $this->objectManager->get(OrderInterface::class)->load($order->getId(), 'entity_id');
@@ -67,10 +69,10 @@ class SuccessfulPaymentTest extends IntegrationTestCase
             [
                 Order::STATE_PROCESSING,
                 Order::STATE_COMPLETE,
-            ]
+            ],
         ), sprintf(
             'We expect the order status to be "processing" or "complete". Instead we got %s',
-            $freshOrder->getState()
+            $freshOrder->getState(),
         ));
     }
 }

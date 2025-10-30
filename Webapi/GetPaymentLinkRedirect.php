@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Webapi;
 
 use Mollie\Payment\Api\Data\PaymentLinkRedirectResultInterface;
@@ -12,16 +14,9 @@ use Mollie\Payment\Service\Magento\PaymentLinkRedirect as PaymentLinkRedirectSer
 
 class GetPaymentLinkRedirect implements GetPaymentLinkRedirectInterface
 {
-    /**
-     * @var PaymentLinkRedirectService
-     */
-    private $paymentLinkRedirect;
-
     public function __construct(
-        PaymentLinkRedirectService $paymentLinkRedirect
-    ) {
-        $this->paymentLinkRedirect = $paymentLinkRedirect;
-    }
+        private PaymentLinkRedirectService $paymentLinkRedirect
+    ) {}
 
     public function byHash(string $hash): PaymentLinkRedirectResultInterface
     {

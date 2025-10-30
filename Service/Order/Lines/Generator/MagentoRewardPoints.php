@@ -1,6 +1,12 @@
 <?php
 
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 declare(strict_types=1);
+
 
 namespace Mollie\Payment\Service\Order\Lines\Generator;
 
@@ -9,16 +15,9 @@ use Mollie\Payment\Helper\General;
 
 class MagentoRewardPoints implements GeneratorInterface
 {
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
     public function __construct(
-        General $mollieHelper
-    ) {
-        $this->mollieHelper = $mollieHelper;
-    }
+        private General $mollieHelper
+    ) {}
 
     public function process(OrderInterface $order, array $orderLines): array
     {
@@ -33,7 +32,7 @@ class MagentoRewardPoints implements GeneratorInterface
             return $orderLines;
         }
 
-        $forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
+        $forceBaseCurrency = (bool) $this->mollieHelper->useBaseCurrency(storeId($order->getStoreId()));
         if ($forceBaseCurrency) {
             $amount = $extensionAttributes->getBaseRewardCurrencyAmount();
         }
@@ -42,7 +41,7 @@ class MagentoRewardPoints implements GeneratorInterface
 
         $orderLines[] = [
             'type' => 'surcharge',
-            'name' => 'Reward Points',
+            'description' => 'Reward Points',
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($currency, -$amount),
             'totalAmount' => $this->mollieHelper->getAmountArray($currency, -$amount),

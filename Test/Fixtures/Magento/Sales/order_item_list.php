@@ -1,4 +1,15 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
+
+use Magento\Catalog\Model\Product;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Item;
+use Magento\TestFramework\Helper\Bootstrap;
 
 /**
  * Copyright © Magento, Inc. All rights reserved.
@@ -13,9 +24,9 @@ $configurableProduct = $product;
 
 require 'Magento/Sales/_files/order.php';
 
-/** @var \Magento\Catalog\Model\Product $product */
-/** @var \Magento\Sales\Model\Order $order */
-$objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+/** @var Product $product */
+/** @var Order $order */
+$objectManager = Bootstrap::getObjectManager();
 
 $orderItems = [
     [
@@ -28,14 +39,14 @@ $orderItems = [
         'product_type' => 'simple',
         'tax_percent' => 21,
         'qty_ordered' => 2,
-    ]
+    ],
 ];
 
 /** @var array $orderItemData */
 foreach ($orderItems as $orderItemData) {
-    /** @var $orderItem \Magento\Sales\Model\Order\Item */
-    $orderItem = \Magento\TestFramework\Helper\Bootstrap::getObjectManager()->create(
-        \Magento\Sales\Model\Order\Item::class
+    /** @var $orderItem Item */
+    $orderItem = Bootstrap::getObjectManager()->create(
+        Item::class,
     );
     $orderItem
         ->setData($orderItemData)

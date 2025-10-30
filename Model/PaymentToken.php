@@ -1,31 +1,23 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model;
 
+use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
 use Mollie\Payment\Api\Data\PaymentTokenInterface;
 use Mollie\Payment\Api\Data\PaymentTokenInterfaceFactory;
-use Magento\Framework\Api\DataObjectHelper;
 use Mollie\Payment\Model\ResourceModel\PaymentToken\Collection;
 
 class PaymentToken extends AbstractModel
 {
-    /**
-     * @var PaymentTokenInterfaceFactory
-     */
-    protected $paymenttokenDataFactory;
-
-    /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
     /**
      * @var string
      */
@@ -43,16 +35,13 @@ class PaymentToken extends AbstractModel
     public function __construct(
         Context $context,
         Registry $registry,
-        PaymentTokenInterfaceFactory $paymenttokenDataFactory,
-        DataObjectHelper $dataObjectHelper,
+        protected PaymentTokenInterfaceFactory $paymenttokenDataFactory,
+        protected DataObjectHelper $dataObjectHelper,
         ResourceModel\PaymentToken $resource,
         Collection $resourceCollection,
-        array $data = []
+        array $data = [],
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-
-        $this->paymenttokenDataFactory = $paymenttokenDataFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
     }
 
     /**
@@ -67,7 +56,7 @@ class PaymentToken extends AbstractModel
         $this->dataObjectHelper->populateWithArray(
             $paymenttokenDataObject,
             $paymenttokenData,
-            PaymentTokenInterface::class
+            PaymentTokenInterface::class,
         );
 
         return $paymenttokenDataObject;

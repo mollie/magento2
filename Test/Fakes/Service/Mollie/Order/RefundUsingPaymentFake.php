@@ -25,7 +25,7 @@ class RefundUsingPaymentFake extends RefundUsingPayment
         return $this->calls;
     }
 
-    public function execute(MollieApiClient $mollieApi, $transactionId, $currencyCode, $amount)
+    public function execute(MollieApiClient $mollieApi, $transactionId, ?string $currencyCode, ?float $amount): void
     {
         $this->calls[] = [
             'transactionId' => $transactionId,

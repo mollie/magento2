@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\App\ResourceConnection;
@@ -17,58 +19,15 @@ use Mollie\Payment\Service\Magento\Order\CancelRewardPoints;
 
 class CancelOrder
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var CancelRewardPoints
-     */
-    private $cancelRewardPoints;
-
-    /**
-     * @var OrderCommentHistory
-     */
-    private $orderCommentHistory;
-
-    /**
-     * @var OrderManagementInterface
-     */
-    private $orderManagement;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var StatusResolver
-     */
-    private $statusResolver;
-    /**
-     * @var ResourceConnection
-     */
-    private $resource;
-
     public function __construct(
-        Config $config,
-        CancelRewardPoints $cancelRewardPoints,
-        OrderCommentHistory $orderCommentHistory,
-        OrderManagementInterface $orderManagement,
-        OrderRepositoryInterface $orderRepository,
-        StatusResolver $statusResolver,
-        ResourceConnection $resource
-    )
-    {
-        $this->config = $config;
-        $this->cancelRewardPoints = $cancelRewardPoints;
-        $this->orderCommentHistory = $orderCommentHistory;
-        $this->orderManagement = $orderManagement;
-        $this->orderRepository = $orderRepository;
-        $this->statusResolver = $statusResolver;
-        $this->resource = $resource;
-    }
+        private Config $config,
+        private CancelRewardPoints $cancelRewardPoints,
+        private OrderCommentHistory $orderCommentHistory,
+        private OrderManagementInterface $orderManagement,
+        private OrderRepositoryInterface $orderRepository,
+        private StatusResolver $statusResolver,
+        private ResourceConnection $resource
+    ) {}
 
     public function execute(OrderInterface $order, $reason = null): bool
     {

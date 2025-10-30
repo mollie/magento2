@@ -4,8 +4,11 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Webapi;
 
+use Exception;
 use Magento\Webapi\Model\Config\ClassReflector;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -21,10 +24,10 @@ abstract class AbstractTestWebApi extends IntegrationTestCase
      */
     protected $methods;
 
-    public function testValidatesForSwagger()
+    public function testValidatesForSwagger(): void
     {
         if (!$this->class || !$this->methods) {
-            throw new \Exception('Please set the $class and $method variables');
+            throw new Exception('Please set the $class and $method variables');
         }
 
         /** @var ClassReflector $reflector */

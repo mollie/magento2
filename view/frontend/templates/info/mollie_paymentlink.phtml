@@ -1,14 +1,17 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
 // @codingStandardsIgnoreFile
 /**
- * @var \Mollie\Payment\Block\Info\Base $block
- * @see \Mollie\Payment\Block\Info\Base
+ * @var Base $block
+ * @see Base
  */
+
+use Mollie\Payment\Block\Info\Base;
+
 $specificInfo = $block->getSpecificInformation();
 $title = $block->escapeHtml($block->getMethod()->getTitle());
 ?>

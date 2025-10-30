@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,16 +13,9 @@ use Magento\Framework\Module\Manager;
 
 class AreHyvaModulesInstalled extends AbstractSelfTest
 {
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-
     public function __construct(
-        Manager $moduleManager
-    ) {
-        $this->moduleManager = $moduleManager;
-    }
+        private Manager $moduleManager
+    ) {}
 
     public function execute(): void
     {
@@ -33,7 +27,8 @@ class AreHyvaModulesInstalled extends AbstractSelfTest
             $this->addMessage('error', __('The <a href="https://github.com/mollie/magento2-hyva-compatibility" target="_blank">Mollie Hyvä Compatibility</a> module is not installed. Please install this module to use Mollie with the Hyvä Theme.'));
         }
 
-        if ($this->moduleManager->isEnabled('Hyva_Checkout') &&
+        if (
+            $this->moduleManager->isEnabled('Hyva_Checkout') &&
             !$this->moduleManager->isEnabled('Mollie_HyvaCheckout')
         ) {
             $this->addMessage('error', __('You have installed the Hyvä Checkout module, but not the Mollie Hyvä Checkout module. Please install this module to use Mollie with the Hyvä Checkout.'));

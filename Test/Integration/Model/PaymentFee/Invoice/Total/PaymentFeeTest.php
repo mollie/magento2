@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Model\PaymentFee\Invoice\Total;
 
@@ -13,7 +15,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentFeeTest extends IntegrationTestCase
 {
-    public function testAddsTheFeeCorrect()
+    public function testAddsTheFeeCorrect(): void
     {
         /** @var PaymentFee $instance */
         $instance = $this->objectManager->create(PaymentFee::class);

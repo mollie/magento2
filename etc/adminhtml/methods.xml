@@ -22,9 +22,6 @@
     <include path="Mollie_Payment::methods/in3.xml"/>
     <include path="Mollie_Payment::methods/kbc.xml"/>
     <include path="Mollie_Payment::methods/klarna.xml"/>
-    <include path="Mollie_Payment::methods/klarnapaylater.xml"/>
-    <include path="Mollie_Payment::methods/klarnapaynow.xml"/>
-    <include path="Mollie_Payment::methods/klarnasliceit.xml"/>
     <include path="Mollie_Payment::methods/mbway.xml"/>
     <include path="Mollie_Payment::methods/mobilepay.xml"/>
     <include path="Mollie_Payment::methods/multibanco.xml"/>

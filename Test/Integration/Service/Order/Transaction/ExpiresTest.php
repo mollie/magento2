@@ -1,11 +1,15 @@
 <?php
-/**
- * Copyright © 2019 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Order\Transaction;
 
+use DateInterval;
+use DateTimeImmutable;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
@@ -16,7 +20,7 @@ class ExpiresTest extends IntegrationTestCase
     /**
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire
      */
-    public function testReturnsFalseWhenNoExpireIsSet()
+    public function testReturnsFalseWhenNoExpireIsSet(): void
     {
         /** @var Expires $instance */
         $instance = $this->objectManager->create(Expires::class);
@@ -27,7 +31,7 @@ class ExpiresTest extends IntegrationTestCase
     /**
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 5
      */
-    public function testReturnsTrueWhenNoExpireIsSet()
+    public function testReturnsTrueWhenNoExpireIsSet(): void
     {
         /** @var Expires $instance */
         $instance = $this->objectManager->create(Expires::class);
@@ -38,10 +42,10 @@ class ExpiresTest extends IntegrationTestCase
     /**
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 5
      */
-    public function testReturnsTheCorrectDate()
+    public function testReturnsTheCorrectDate(): void
     {
         $now = $this->objectManager->create(TimezoneInterface::class)->scopeDate(null);
-        $expected = $now->add(new \DateInterval('P5D'));
+        $expected = $now->add(new DateInterval('P5D'));
 
         /** @var Expires $instance */
         $instance = $this->objectManager->create(Expires::class);
@@ -49,7 +53,7 @@ class ExpiresTest extends IntegrationTestCase
         $this->assertEquals($expected->format('Y-m-d'), $instance->atDateForMethod('ideal'));
     }
 
-    public function testIsAvailableWhenSetInTheRequest()
+    public function testIsAvailableWhenSetInTheRequest(): void
     {
         /** @var RequestInterface $request */
         $request = $this->objectManager->get(RequestInterface::class);
@@ -64,13 +68,13 @@ class ExpiresTest extends IntegrationTestCase
         $this->assertTrue($instance->availableForMethod());
     }
 
-    public function testUsesTheValueInTheRequest()
+    public function testUsesTheValueInTheRequest(): void
     {
         /** @var RequestInterface $request */
         $request = $this->objectManager->get(RequestInterface::class);
 
-        $now = new \DateTimeImmutable('now');
-        $expected = $now->add(new \DateInterval('P10D'));
+        $now = new DateTimeImmutable('now');
+        $expected = $now->add(new DateInterval('P10D'));
 
         $request->setParams([
             'payment' => ['days_before_expire' => $expected->format('Y-m-d')],

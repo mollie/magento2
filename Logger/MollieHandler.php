@@ -1,13 +1,15 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Logger;
 
-use Monolog\Logger;
 use Magento\Framework\Logger\Handler\Base;
+use Monolog\Logger;
 
 /**
  * Class MollieHandler
@@ -16,7 +18,6 @@ use Magento\Framework\Logger\Handler\Base;
  */
 class MollieHandler extends Base
 {
-
     /**
      * @var int
      */

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Observer\CheckoutSubmitAllAfter;
 
 use Magento\Framework\Event\Observer;
@@ -12,32 +14,16 @@ use Magento\Framework\Module\Manager;
 use Magento\InstantPurchase\Model\QuoteManagement\PaymentConfiguration;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Methods\CreditcardVault;
-use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\StartTransaction;
 
 class StartTransactionForInstantPurchaseOrders implements ObserverInterface
 {
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-
-    /**
-     * @var Mollie
-     */
-    private $mollie;
-
-    /**
-     * @var null|string
-     */
-    private $redirectUrl = null;
+    private ?string $redirectUrl = null;
 
     public function __construct(
-        Manager $moduleManager,
-        Mollie $mollie
-    ) {
-        $this->moduleManager = $moduleManager;
-        $this->mollie = $mollie;
-    }
+        private Manager $moduleManager,
+        private StartTransaction $startTransaction
+    ) {}
 
     public function getRedirectUrl(): ?string
     {
@@ -68,6 +54,6 @@ class StartTransactionForInstantPurchaseOrders implements ObserverInterface
             return;
         }
 
-        $this->redirectUrl = $this->mollie->startTransaction($order);
+        $this->redirectUrl = $this->startTransaction->execute($order);
     }
 }

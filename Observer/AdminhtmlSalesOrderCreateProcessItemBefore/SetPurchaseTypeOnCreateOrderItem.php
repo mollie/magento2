@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -16,23 +17,17 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 class SetPurchaseTypeOnCreateOrderItem implements ObserverInterface
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private $productRepository;
-
     public function __construct(
-        ProductRepositoryInterface $productRepository
-    ) {
-        $this->productRepository = $productRepository;
-    }
+        private ProductRepositoryInterface $productRepository
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var RequestInterface $request */
         $request = $observer->getData('request_model');
 
-        if ($request->has('item') && !$request->getPost('update_items')
+        if (
+            $request->has('item') && !$request->getPost('update_items')
         ) {
             $itemsChanged = false;
             $items = $request->getPost('item');

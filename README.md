@@ -1,11 +1,23 @@
 <p align="center">
-  <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/24823946/391587636-d0f8dbe3-9736-4642-aeb3-d31cb7f5a433.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20241202%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20241202T144300Z&X-Amz-Expires=300&X-Amz-Signature=01b3c3e15683b8f9080d375e152f3734a39932eed8d6b8c2890d3e2ca1c537e4&X-Amz-SignedHeaders=host" />
-  
+  <img src="mollie-logo.svg" />
 </p>
-<h1 align="center">Mollie for Magento 2.3.3 and higher</h1>
+
+<h1 align="center">Mollie for Magento 2.4.5 and higher</h1>
 
 > **Magento 1.x** users check out our [Mollie Magento 1 plugin](https://github.com/mollie/Magento).
 
+## Version 3.0
+
+We recently released version 3.0 of the Mollie Payment extension. Some of the highlights of this release are:
+
+- PHP 8.1 and Magento 2.4.5 or higher are required.
+- Removed Orders API integration
+- Queue-based transaction processing enabled by default.
+- Handle refunds from external sources
+- Optional invoices
+- Cancel order on manual checkout return
+
+For more information, see this wiki page: [Version 3.0](https://github.com/mollie/magento2/wiki/V3)
 
 ## Installation & Update the Mollie Payments plugin
 
@@ -94,4 +106,4 @@ These modules are tested and known to be working with the Mollie Payment extensi
 
 ## License
 [BSD (Berkeley Software Distribution) License](http://www.opensource.org/licenses/bsd-license.php).
-Copyright (c) 2011-2020, Mollie B.V.
+Copyright (c) 2011-2025, Mollie B.V.

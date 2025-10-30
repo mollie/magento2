@@ -4,21 +4,17 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Fakes;
 
 use Magento\Framework\Encryption\Encryptor;
 
 class FakeEncryptor extends Encryptor
 {
-    /**
-     * @var array
-     */
-    private $returnValues = [];
+    private array $returnValues = [];
 
-    /**
-     * @var bool
-     */
-    private $disableDecryption = false;
+    private bool $disableDecryption = false;
 
     public function addReturnValue(string $input, string $output): void
     {

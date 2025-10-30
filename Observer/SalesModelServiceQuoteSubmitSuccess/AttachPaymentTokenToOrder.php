@@ -1,16 +1,20 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Observer\SalesModelServiceQuoteSubmitSuccess;
 
+use Exception;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Api\Data\PaymentTokenInterface;
@@ -19,44 +23,19 @@ use Mollie\Payment\Model\PaymentTokenFactory;
 
 class AttachPaymentTokenToOrder implements ObserverInterface
 {
-    /**
-     * @var ExtensibleDataObjectConverter
-     */
-    private $extensibleDataObjectConverter;
-
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
-    /**
-     * @var TransactionFactory
-     */
-    private $transactionFactory;
-
-    /**
-     * @var PaymentTokenFactory
-     */
-    private $paymentTokenFactory;
-
     public function __construct(
-        ExtensibleDataObjectConverter $extensibleDataObjectConverter,
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        TransactionFactory $transactionFactory,
-        PaymentTokenFactory $paymentTokenFactory
-    ) {
-        $this->extensibleDataObjectConverter = $extensibleDataObjectConverter;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->transactionFactory = $transactionFactory;
-        $this->paymentTokenFactory = $paymentTokenFactory;
-    }
+        private ExtensibleDataObjectConverter $extensibleDataObjectConverter,
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private TransactionFactory $transactionFactory,
+        private PaymentTokenFactory $paymentTokenFactory
+    ) {}
 
     /**
      * @param Observer $observer
      * @return void
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws LocalizedException
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /* @var OrderInterface $order */
         $order = $observer->getEvent()->getData('order');
@@ -79,9 +58,9 @@ class AttachPaymentTokenToOrder implements ObserverInterface
     /**
      * @param SearchResultsInterface $tokens
      * @param OrderInterface $order
-     * @throws \Exception
+     * @throws Exception
      */
-    private function updateModels(SearchResultsInterface $tokens, OrderInterface $order)
+    private function updateModels(SearchResultsInterface $tokens, OrderInterface $order): void
     {
         $transaction = $this->transactionFactory->create();
 
@@ -92,7 +71,7 @@ class AttachPaymentTokenToOrder implements ObserverInterface
             $paymentTokenData = $this->extensibleDataObjectConverter->toNestedArray(
                 $paymentToken,
                 [],
-                PaymentTokenInterface::class
+                PaymentTokenInterface::class,
             );
 
             $paymentTokenModel = $this->paymentTokenFactory->create()->setData($paymentTokenData);

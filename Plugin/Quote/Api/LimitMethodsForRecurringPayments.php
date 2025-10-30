@@ -4,17 +4,17 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Plugin\Quote\Api;
 
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Quote\Api\Data\CartInterface;
-use Magento\Quote\Api\Data\PaymentMethodInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
 use Mollie\Payment\Service\Quote\CartContainsRecurringProduct;
 
 class LimitMethodsForRecurringPayments
 {
-    const ALLOWED_METHODS = [
+    public const ALLOWED_METHODS = [
         'mollie_methods_bancontact',
         'mollie_methods_belfius',
         'mollie_methods_creditcard',
@@ -30,23 +30,10 @@ class LimitMethodsForRecurringPayments
         'mollie_methods_twint',
     ];
 
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
-    /**
-     * @var CartContainsRecurringProduct
-     */
-    private $cartContainsRecurringProduct;
-
     public function __construct(
-        CartRepositoryInterface $cartRepository,
-        CartContainsRecurringProduct $cartContainsRecurringProduct
-    ) {
-        $this->cartRepository = $cartRepository;
-        $this->cartContainsRecurringProduct = $cartContainsRecurringProduct;
-    }
+        private CartRepositoryInterface $cartRepository,
+        private CartContainsRecurringProduct $cartContainsRecurringProduct
+    ) {}
 
     public function afterGetList(PaymentMethodManagementInterface $subject, $result, $cartId): array
     {
@@ -56,7 +43,7 @@ class LimitMethodsForRecurringPayments
             return $result;
         }
 
-        return array_filter($result, function ($method) {
+        return array_filter($result, function ($method): bool {
             return in_array($method->getCode(), static::ALLOWED_METHODS);
         });
     }

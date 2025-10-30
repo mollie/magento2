@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -19,30 +20,17 @@ use Mollie\Payment\Config;
 
 class ChangeApiMode extends Value
 {
-    /**
-     * @var Config
-     */
-    private $mollieConfig;
-    /**
-     * @var FlushMollieCache
-     */
-    private $flushMollieCache;
-    /**
-     * @var UpdateProfileId
-     */
-    private $updateProfileId;
-
     public function __construct(
         Context $context,
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        Config $mollieConfig,
-        FlushMollieCache $flushMollieCache,
-        UpdateProfileId $updateProfileId,
+        private Config $mollieConfig,
+        private FlushMollieCache $flushMollieCache,
+        private UpdateProfileId $updateProfileId,
         ?AbstractResource $resource = null,
         ?AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
     ) {
         parent::__construct(
             $context,
@@ -51,12 +39,8 @@ class ChangeApiMode extends Value
             $cacheTypeList,
             $resource,
             $resourceCollection,
-            $data
+            $data,
         );
-
-        $this->mollieConfig = $mollieConfig;
-        $this->flushMollieCache = $flushMollieCache;
-        $this->updateProfileId = $updateProfileId;
     }
 
     public function beforeSave(): self
@@ -70,7 +54,7 @@ class ChangeApiMode extends Value
     {
         $apiKey = $this->getApiKey($this->getValue());
         if ($apiKey) {
-            $this->updateProfileId->execute($apiKey, $this->getScope(), (int)$this->getScopeId());
+            $this->updateProfileId->execute($apiKey, $this->getScope(), (int) $this->getScopeId());
         }
 
         return parent::afterSave();
@@ -79,9 +63,9 @@ class ChangeApiMode extends Value
     private function getApiKey(string $mode): string
     {
         if ($mode === 'live') {
-            return $this->mollieConfig->getLiveApiKey((int)$this->getScopeId());
+            return $this->mollieConfig->getLiveApiKey((int) $this->getScopeId());
         }
 
-        return $this->mollieConfig->getTestApiKey((int)$this->getScopeId());
+        return $this->mollieConfig->getTestApiKey((int) $this->getScopeId());
     }
 }

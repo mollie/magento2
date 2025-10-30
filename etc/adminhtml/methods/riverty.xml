@@ -8,6 +8,8 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="mollie_methods_riverty" translate="label" type="text" sortOrder="320" showInDefault="1" showInWebsite="1"
            showInStore="1">
+        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\GroupFrontendModel</frontend_model>
+
         <label>Riverty</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
@@ -93,7 +95,7 @@
                showInStore="1">
             <label>Payment Surcharge limit</label>
             <config_path>payment/mollie_methods_riverty/payment_surcharge_limit</config_path>
-            <comment><![CDATA[Enter the maximum amount of payment surchage to should be charged to the customer.]]></comment>
+            <comment><![CDATA[Enter the maximum amount of payment surcharge that should be charged to the customer.]]></comment>
             <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
             <frontend_class>validate-not-negative-number</frontend_class>
             <depends>
@@ -119,17 +121,6 @@
             <depends>
                 <field id="active">1</field>
             </depends>
-        </field>
-        <field id="days_before_expire" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1"
-               showInStore="1">
-            <label>Days to expire</label>
-            <frontend_class>validate-digits-range digits-range-1-365</frontend_class>
-            <config_path>payment/mollie_methods_riverty/days_before_expire</config_path>
-            <depends>
-                <field id="active">1</field>
-                <field id="method">order</field>
-            </depends>
-            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
         </field>
     </group>
 </include>

@@ -1,17 +1,17 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Methods;
 
-class ApplePay extends \Mollie\Payment\Model\Mollie
+use Mollie\Payment\Model\Mollie;
+
+class ApplePay extends Mollie
 {
     /**
      * Payment method code
      *
      * @var string
      */
-    const CODE = 'mollie_methods_applepay';
+    public const CODE = 'mollie_methods_applepay';
 }

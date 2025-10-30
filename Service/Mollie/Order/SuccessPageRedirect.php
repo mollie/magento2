@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -22,58 +23,16 @@ use Mollie\Payment\Config;
 
 class SuccessPageRedirect
 {
-    /**
-     * @var RequestInterface
-     */
-    private $request;
-    /**
-     * @var ResponseInterface
-     */
-    private $response;
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
-    /**
-     * @var ManagerInterface
-     */
-    private $eventManager;
-    /**
-     * @var RedirectInterface
-     */
-    private $redirect;
-    /**
-     * @var TransactionToOrderRepositoryInterface
-     */
-    private $transactionToOrderRepository;
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        RedirectInterface $redirect,
-        RequestInterface $request,
-        ResponseInterface $response,
-        Session $checkoutSession,
-        ManagerInterface $eventManager,
-        TransactionToOrderRepositoryInterface $transactionToOrderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        Config $config
-    ) {
-        $this->request = $request;
-        $this->response = $response;
-        $this->checkoutSession = $checkoutSession;
-        $this->eventManager = $eventManager;
-        $this->redirect = $redirect;
-        $this->transactionToOrderRepository = $transactionToOrderRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->config = $config;
-    }
+        private RedirectInterface $redirect,
+        private RequestInterface $request,
+        private ResponseInterface $response,
+        private Session $checkoutSession,
+        private ManagerInterface $eventManager,
+        private TransactionToOrderRepositoryInterface $transactionToOrderRepository,
+        private SearchCriteriaBuilder $searchCriteriaBuilder,
+        private Config $config
+    ) {}
 
     /**
      * This function has a few responsibilities:
@@ -94,6 +53,7 @@ class SuccessPageRedirect
                 'order_id' => $order->getEntityId(),
             ]);
             $this->redirectToSuccessPage($order, $orderIds);
+
             return;
         }
 
@@ -104,6 +64,7 @@ class SuccessPageRedirect
         if ($item->getRedirected() == 1) {
             // The user has already been redirected to the success page.
             $this->redirect->redirect($this->response, 'checkout/cart');
+
             return;
         }
 
@@ -143,7 +104,7 @@ class SuccessPageRedirect
             [
                 '_query' => $redirect->getData('query'),
                 '_use_rewrite' => false,
-            ]
+            ],
         );
     }
 }

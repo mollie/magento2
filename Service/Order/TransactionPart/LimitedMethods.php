@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -13,7 +14,7 @@ use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class LimitedMethods implements TransactionPartInterface
 {
-    public function process(OrderInterface $order, $apiMethod, array $transaction): array
+    public function process(OrderInterface $order, array $transaction): array
     {
         $additionalData = $order->getPayment()->getAdditionalInformation();
 

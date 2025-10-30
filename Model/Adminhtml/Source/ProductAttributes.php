@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
@@ -15,32 +17,13 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class ProductAttributes implements OptionSourceInterface
 {
-    /**
-     * @var AttributeRepositoryInterface
-     */
-    private $repository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $builder;
-
-    /**
-     * @var SortOrderFactory
-     */
-    private $sortOrderFactory;
-
     public function __construct(
-        AttributeRepositoryInterface $repository,
-        SearchCriteriaBuilder $builder,
-        SortOrderFactory $sortOrderFactory
-    ) {
-        $this->repository = $repository;
-        $this->builder = $builder;
-        $this->sortOrderFactory = $sortOrderFactory;
-    }
+        private AttributeRepositoryInterface $repository,
+        private SearchCriteriaBuilder $builder,
+        private SortOrderFactory $sortOrderFactory
+    ) {}
 
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         /** @var SortOrder $sortOrder */
         $sortOrder = $this->sortOrderFactory->create();
@@ -51,7 +34,7 @@ class ProductAttributes implements OptionSourceInterface
 
         $result = $this->repository->getList(
             ProductAttributeInterface::ENTITY_TYPE_CODE,
-            $this->builder->create()
+            $this->builder->create(),
         );
 
         $output = [];

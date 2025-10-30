@@ -1,8 +1,11 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\Product\View;
 
@@ -10,35 +13,20 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
 
 class ApplePay extends Template
 {
-    /**
-     * @var Registry
-     */
-    private $registry;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var SupportedNetworks
-     */
-    private $supportedNetworks;
-
     public function __construct(
-        Template\Context $context,
-        Registry $registry,
-        Config $config,
-        SupportedNetworks $supportedNetworks,
-        array $data = []
+        Context $context,
+        private Registry $registry,
+        private Config $config,
+        private SupportedNetworks $supportedNetworks,
+        array $data = [],
     ) {
         parent::__construct($context, $data);
-        $this->registry = $registry;
-        $this->config = $config;
-        $this->supportedNetworks = $supportedNetworks;
     }
 
     public function getProductName(): string
@@ -73,7 +61,7 @@ class ApplePay extends Template
             $this->config->applePayEnableBuyNowButton();
     }
 
-    public function getButtonClasses()
+    public function getButtonClasses(): string
     {
         $classes = [];
         $classes[] = 'mollie-product-page-apple-pay-button';
@@ -89,6 +77,6 @@ class ApplePay extends Template
 
     public function getSupportedNetworks(): array
     {
-        return $this->supportedNetworks->execute((int)$this->_storeManager->getStore()->getId());
+        return $this->supportedNetworks->execute((int) $this->_storeManager->getStore()->getId());
     }
 }

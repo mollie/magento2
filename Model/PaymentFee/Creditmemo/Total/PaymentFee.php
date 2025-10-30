@@ -1,27 +1,18 @@
 <?php
-/**
- * Copyright Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\PaymentFee\Creditmemo\Total;
 
 use Magento\Sales\Model\Order\Creditmemo;
 use Magento\Sales\Model\Order\Creditmemo\Total\AbstractTotal;
-use Mollie\Payment\Service\Order\Creditmemo as CreditmemoService;
 
 class PaymentFee extends AbstractTotal
 {
-    /**
-     * @var CreditmemoService
-     */
-    private $creditmemoService;
-
     public function __construct(
-        CreditmemoService $creditmemoService,
-        array $data = []
+        private \Mollie\Payment\Service\Order\Creditmemo $creditmemoService,
+        array $data = [],
     ) {
-        $this->creditmemoService = $creditmemoService;
         parent::__construct($data);
     }
 

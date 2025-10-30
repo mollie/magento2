@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "Services/*": ["support/services/*"],
+      "Actions/*": ["support/actions/*"],
+      "CompositeActions/*": ["support/actions/composite/*"],
+      "Pages/*": ["support/pages/*"],
+      "Fixtures/*": ["fixtures/*"]
+    }
+  }
+}

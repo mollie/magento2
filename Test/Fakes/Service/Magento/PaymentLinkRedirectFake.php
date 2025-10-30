@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -10,11 +11,11 @@ namespace Mollie\Payment\Test\Fakes\Service\Magento;
 
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Magento\PaymentLinkRedirect;
 use Mollie\Payment\Service\Magento\PaymentLinkRedirectResult;
 use Mollie\Payment\Service\Magento\PaymentLinkRedirectResultFactory;
 use Mollie\Payment\Service\Mollie\Order\IsPaymentLinkExpired;
+use Mollie\Payment\Service\Mollie\StartTransaction;
 
 class PaymentLinkRedirectFake extends PaymentLinkRedirect
 {
@@ -30,16 +31,16 @@ class PaymentLinkRedirectFake extends PaymentLinkRedirect
     public function __construct(
         EncryptorInterface $encryptor,
         OrderRepositoryInterface $orderRepository,
-        Mollie $mollie,
+        StartTransaction $startTransaction,
         PaymentLinkRedirectResultFactory $paymentLinkRedirectResultFactory,
-        IsPaymentLinkExpired $isPaymentLinkExpired
+        IsPaymentLinkExpired $isPaymentLinkExpired,
     ) {
         parent::__construct(
             $encryptor,
             $orderRepository,
-            $mollie,
+            $startTransaction,
             $paymentLinkRedirectResultFactory,
-            $isPaymentLinkExpired
+            $isPaymentLinkExpired,
         );
 
         $this->paymentLinkRedirectResultFactory = $paymentLinkRedirectResultFactory;

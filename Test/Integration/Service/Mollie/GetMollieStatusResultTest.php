@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -67,8 +68,8 @@ class GetMollieStatusResultTest extends IntegrationTestCase
             'paid, ideal' => ['paid', 'ideal'],
             'paid, mollie_methods_ideal' => ['paid', 'mollie_methods_ideal'],
             'pending, ideal' => ['pending', 'ideal'],
-            'authorized, klarnapaylater' => ['authorized', 'klarnapaylater'],
-            'authorized, mollie_methods_klarnapaylater' => ['authorized', 'mollie_methods_klarnapaylater'],
+            'authorized, klarna' => ['authorized', 'klarna'],
+            'authorized, mollie_methods_klarna' => ['authorized', 'mollie_methods_klarna'],
         ];
     }
 }

@@ -1,31 +1,28 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Block\Customer;
 
 use Magento\Framework\View\Asset\Repository;
-use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 use Magento\Vault\Api\Data\PaymentTokenInterface;
 use Magento\Vault\Block\AbstractTokenRenderer;
 use Mollie\Payment\Model\Methods\Creditcard;
 
 class CardRenderer extends AbstractTokenRenderer
 {
-    /**
-     * @var Repository
-     */
-    private $assetRepository;
-
     public function __construct(
-        Template\Context $context,
-        Repository $assetRepository,
-        array $data = []
+        Context $context,
+        private Repository $assetRepository,
+        array $data = [],
     ) {
         parent::__construct($context, $data);
-        $this->assetRepository = $assetRepository;
     }
 
     /**

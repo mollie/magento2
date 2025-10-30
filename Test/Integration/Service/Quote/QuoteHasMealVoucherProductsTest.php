@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Quote;
 
 use Magento\Quote\Api\Data\CartInterface;
@@ -11,7 +13,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class QuoteHasMealVoucherProductsTest extends IntegrationTestCase
 {
-    public function testGetItemsCanReturnNull()
+    public function testGetItemsCanReturnNull(): void
     {
         $cartMock = $this->createMock(CartInterface::class);
         $cartMock->method('getItems')->willReturn(null);

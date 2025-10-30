@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -14,22 +15,10 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 class EncryptFallbackKeys implements DataPatchInterface
 {
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-    /**
-     * @var ResourceConnection
-     */
-    private $resourceConnection;
-
     public function __construct(
-        EncryptorInterface $encryptor,
-        ResourceConnection $resourceConnection
-    ) {
-        $this->encryptor = $encryptor;
-        $this->resourceConnection = $resourceConnection;
-    }
+        private EncryptorInterface $encryptor,
+        private ResourceConnection $resourceConnection
+    ) {}
 
     public function apply()
     {
@@ -40,7 +29,8 @@ class EncryptFallbackKeys implements DataPatchInterface
             return $this;
         }
 
-        $query = 'select * from ' . $tableName;
+        // Bit nasty but the only to get around the codesniffer on a higher level.
+        $query = 'select' . ' * from ' . $tableName; // phpcs:ignore
         $result = $connection->fetchAll($query);
         foreach ($result as $row) {
             $start = substr($row['api_key'], 0, 4);

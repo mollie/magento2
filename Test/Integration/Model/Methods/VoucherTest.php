@@ -1,11 +1,15 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
+use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\Data\CartInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Methods\Voucher;
@@ -13,16 +17,16 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class VoucherTest extends IntegrationTestCase
 {
-    protected $instance = Voucher::class;
+    protected ?string $instance = Voucher::class;
 
-    protected $code = 'voucher';
+    protected ?string $code = 'voucher';
 
     /**
      * @magentoConfigFixture default_store payment/mollie_methods_voucher/category null
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
-    public function testIsNotAvailableWhenTheCategoryIsNotSet()
+    public function testIsNotAvailableWhenTheCategoryIsNotSet(): void
     {
         /** @var CartInterface $cart */
         $cart = $this->objectManager->create(CartInterface::class);
@@ -38,8 +42,8 @@ class VoucherTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/enabled 1
      * @magentoConfigFixture default_store payment/mollie_general/mode test
      * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
      */
     public function testIsAvailableWhenTheCategoryIsSet(): void
     {
@@ -58,7 +62,7 @@ class VoucherTest extends IntegrationTestCase
     /**
      * @magentoConfigFixture default_store payment/mollie_methods_voucher/category
      */
-    public function testIsAvailableWhenNoCategoryIsAvailable()
+    public function testIsAvailableWhenNoCategoryIsAvailable(): void
     {
         /** @var Voucher $instance */
         $instance = $this->objectManager->create(Voucher::class);

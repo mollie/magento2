@@ -64,10 +64,6 @@ class ParseAdditionalData
         return $this->additionalDataFactory->create(['details' => $details]);
     }
 
-    /**
-     * @param OrderPaymentInterface $payment
-     * @return array|mixed|null
-     */
     public function getDetails(OrderPaymentInterface $payment): ?Details
     {
         $details = $payment->getAdditionalInformation('details');

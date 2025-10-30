@@ -1,8 +1,10 @@
 <?php
-/**
- *  Copyright © 2018 Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model;
 
@@ -17,12 +19,11 @@ use Magento\Sales\Api\Data\CreditmemoItemInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Model\Order;
-use Magento\Sales\Model\ResourceModel\Order\Handler\State;
+use Magento\Sales\Model\Order\Shipment\Item;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\ResourceModel\OrderLines\Collection as OrderLinesCollection;
 use Mollie\Payment\Model\ResourceModel\OrderLines\CollectionFactory as OrderLinesCollectionFactory;
 use Mollie\Payment\Service\Order\Creditmemo as CreditmemoService;
-use Mollie\Payment\Service\Order\Lines\Order as OrderOrderLines;
 
 /**
  * @method int getId()
@@ -43,31 +44,6 @@ use Mollie\Payment\Service\Order\Lines\Order as OrderOrderLines;
 class OrderLines extends AbstractModel
 {
     /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-    /**
-     * @var OrderLinesFactory
-     */
-    private $orderLinesFactory;
-    /**
-     * @var OrderLinesCollectionFactory
-     */
-    private $orderLinesCollection;
-    /**
-     * @var CreditmemoService
-     */
-    private $creditmemoService;
-    /**
-     * @var State
-     */
-    private $orderState;
-    /**
-     * @var OrderOrderLines
-     */
-    private $orderOrderLines;
-
-    /**
      * OrderLines constructor.
      *
      * @param MollieHelper                $mollieHelper
@@ -76,43 +52,22 @@ class OrderLines extends AbstractModel
      * @param Context                     $context
      * @param Registry                    $registry
      * @param CreditmemoService           $creditmemoService
-     * @param OrderOrderLines             $orderOrderLines
      * @param AbstractResource|null       $resource
      * @param AbstractDb|null             $resourceCollection
      * @param array                       $data
      */
     public function __construct(
-        MollieHelper $mollieHelper,
-        OrderLinesFactory $orderLinesFactory,
-        OrderLinesCollectionFactory $orderLinesCollection,
+        private MollieHelper $mollieHelper,
+        private OrderLinesFactory $orderLinesFactory,
+        private OrderLinesCollectionFactory $orderLinesCollection,
         Context $context,
         Registry $registry,
-        CreditmemoService $creditmemoService,
-        OrderOrderLines $orderOrderLines,
+        private CreditmemoService $creditmemoService,
         ?AbstractResource $resource = null,
         ?AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
     ) {
-        $this->mollieHelper = $mollieHelper;
-        $this->orderLinesFactory = $orderLinesFactory;
-        $this->orderLinesCollection = $orderLinesCollection;
-        $this->creditmemoService = $creditmemoService;
-        $this->orderOrderLines = $orderOrderLines;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-    }
-
-    /**
-     * Get Order lines of Order
-     *
-     * @param OrderInterface $order
-     *
-     * @return array
-     * @deprecated since v1.9.0
-     * @see \Mollie\Payment\Service\Order\Lines\Order
-     */
-    public function getOrderLines(OrderInterface $order)
-    {
-        return $this->orderOrderLines->get($order);
     }
 
     /**
@@ -121,7 +76,7 @@ class OrderLines extends AbstractModel
      *
      * @throws LocalizedException
      */
-    public function linkOrderLines($orderLines, Order $order)
+    public function linkOrderLines($orderLines, OrderInterface $order): void
     {
         $key = 0;
         $orderLinesCollection = $this->getOrderLinesByOrderId($order->getId());
@@ -136,6 +91,7 @@ class OrderLines extends AbstractModel
                 throw new LocalizedException(__('Could not save Order Lines. Error: sku\'s do not match'));
             }
 
+            // @phpstan-ignore-next-line TODO: Make a proper repository for this
             $orderLineRow->setLineId($orderLines[$key]->id)->save();
             $key++;
         }
@@ -155,7 +111,7 @@ class OrderLines extends AbstractModel
      * @param array $orderLines
      * @param bool $paid
      */
-    public function updateOrderLinesByWebhook(array $orderLines, bool $paid = false)
+    public function updateOrderLinesByWebhook(array $orderLines, bool $paid = false): void
     {
         foreach ($orderLines as $line) {
             $orderLineRow = $this->getOrderLineByLineId($line->id);
@@ -164,6 +120,7 @@ class OrderLines extends AbstractModel
                 $orderLineRow->setQtyPaid($line->quantity);
             }
 
+            // @phpstan-ignore-next-line TODO: Make a proper repository for this
             $orderLineRow->setQtyShipped($line->quantityShipped)
                 ->setQtyCanceled($line->quantityCanceled)
                 ->setQtyRefunded($line->quantityRefunded)
@@ -178,13 +135,14 @@ class OrderLines extends AbstractModel
      */
     public function getOrderLineByLineId($lineId)
     {
+        // @phpstan-ignore-next-line TODO: Make a proper repository for this
         return $this->orderLinesFactory->create()->load($lineId, 'line_id');
     }
 
     /**
      * @param Order\Shipment $shipment
      */
-    public function shipAllOrderLines($shipment)
+    public function shipAllOrderLines($shipment): void
     {
         $orderId = $shipment->getOrderId();
         $orderLinesCollection = $this->getOrderLinesByOrderId($orderId);
@@ -206,7 +164,7 @@ class OrderLines extends AbstractModel
         $order = $shipment->getOrder();
         $orderHasDiscount = abs($order->getDiscountAmount() ?? 0) > 0;
 
-        /** @var \Magento\Sales\Model\Order\Shipment\Item $item */
+        /** @var Item $item */
         foreach ($shipment->getItemsCollection() as $item) {
             if (!$item->getQty()) {
                 continue;
@@ -225,7 +183,7 @@ class OrderLines extends AbstractModel
 
                 $line['amount'] = $this->mollieHelper->getAmountArray(
                     $order->getBaseCurrencyCode(),
-                    (($rowTotal) / $orderItem->getQtyOrdered()) * $item->getQty()
+                    (($rowTotal) / $orderItem->getQtyOrdered()) * $item->getQty(),
                 );
             }
 
@@ -368,7 +326,7 @@ class OrderLines extends AbstractModel
      *
      * @return int
      */
-    public function getOpenForShipmentQty($orderId)
+    public function getOpenForShipmentQty($orderId): float|int
     {
         $qty = 0;
         $orderLinesCollection = $this->orderLinesCollection->create()
@@ -377,7 +335,7 @@ class OrderLines extends AbstractModel
             ->addExpressionFieldToSelect(
                 'open',
                 'SUM(qty_ordered - qty_shipped - qty_refunded)',
-                ['qty_ordered', 'qty_shipped', 'qty_refunded']
+                ['qty_ordered', 'qty_shipped', 'qty_refunded'],
             );
         $orderLinesCollection->getSelect()->group('order_id');
 
@@ -395,7 +353,7 @@ class OrderLines extends AbstractModel
      *
      * @return int
      */
-    public function getOpenForRefundQty($orderId)
+    public function getOpenForRefundQty($orderId): float|int
     {
         $qty = 0;
         $orderLinesCollection = $this->orderLinesCollection->create()
@@ -404,7 +362,7 @@ class OrderLines extends AbstractModel
             ->addExpressionFieldToSelect(
                 'open',
                 'SUM(qty_ordered - qty_refunded)',
-                ['qty_ordered', 'qty_refunded']
+                ['qty_ordered', 'qty_refunded'],
             );
         $orderLinesCollection->getSelect()->group('order_id');
 
@@ -420,7 +378,7 @@ class OrderLines extends AbstractModel
     /**
      *
      */
-    public function _construct()
+    public function _construct(): void
     {
         $this->_init('Mollie\Payment\Model\ResourceModel\OrderLines');
     }
@@ -443,7 +401,7 @@ class OrderLines extends AbstractModel
      * @param int $forceBaseCurrency
      * @return array
      */
-    private function getOrderDiscount(OrderInterface $order, $forceBaseCurrency)
+    private function getOrderDiscount(OrderInterface $order, $forceBaseCurrency): array
     {
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $amount = $forceBaseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();

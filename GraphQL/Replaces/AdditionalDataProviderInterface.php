@@ -1,8 +1,14 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 /**
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 declare(strict_types=1);
 
 namespace Magento\QuoteGraphQl\Model\Cart\Payment;
@@ -13,5 +19,7 @@ namespace Magento\QuoteGraphQl\Model\Cart\Payment;
  * for class generation in the setup:di:compile process.
  */
 if (!interface_exists(AdditionalDataProviderInterface::class)) {
-    interface AdditionalDataProviderInterface {}
+    interface AdditionalDataProviderInterface
+    {
+    }
 }

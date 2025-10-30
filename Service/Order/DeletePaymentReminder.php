@@ -1,45 +1,26 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Stdlib\DateTime\DateTime;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\Data\PendingPaymentReminderInterface;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
-use Mollie\Payment\Config;
 
 class DeletePaymentReminder
 {
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $criteriaBuilderFactory;
-    /**
-     * @var PendingPaymentReminderRepositoryInterface
-     */
-    private $paymentReminderRepository;
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
     public function __construct(
-        EncryptorInterface $encryptor,
-        SearchCriteriaBuilderFactory $criteriaBuilderFactory,
-        PendingPaymentReminderRepositoryInterface $paymentReminderRepository
-    ) {
-        $this->criteriaBuilderFactory = $criteriaBuilderFactory;
-        $this->paymentReminderRepository = $paymentReminderRepository;
-        $this->encryptor = $encryptor;
-    }
+        private EncryptorInterface $encryptor,
+        private SearchCriteriaBuilderFactory $criteriaBuilderFactory,
+        private PendingPaymentReminderRepositoryInterface $paymentReminderRepository
+    ) {}
 
     /**
      * Delete payment reminders by reference
@@ -47,7 +28,7 @@ class DeletePaymentReminder
      *
      * @param string|int|null $reference
      */
-    public function delete($reference)
+    public function delete($reference): void
     {
         if (empty($reference)) {
             return;

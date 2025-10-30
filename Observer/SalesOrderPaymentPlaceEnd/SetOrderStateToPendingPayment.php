@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Observer\SalesOrderPaymentPlaceEnd;
 
@@ -8,22 +14,14 @@ use Magento\Quote\Api\Data\PaymentInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\StatusResolver;
-use Mollie\Payment\Model\Mollie;
 
 class SetOrderStateToPendingPayment implements ObserverInterface
 {
-    /**
-     * @var StatusResolver
-     */
-    private $statusResolver;
-
     public function __construct(
-        StatusResolver $statusResolver
-    ) {
-        $this->statusResolver = $statusResolver;
-    }
+        private StatusResolver $statusResolver
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var PaymentInterface $payment */
         $payment = $observer->getData('payment');
@@ -31,7 +29,8 @@ class SetOrderStateToPendingPayment implements ObserverInterface
         /** @var OrderInterface $order */
         $order = $payment->getOrder();
 
-        if (substr($payment->getMethod(), 0, strlen('mollie_methods_')) !== 'mollie_methods_' ||
+        if (
+            substr($payment->getMethod(), 0, strlen('mollie_methods_')) !== 'mollie_methods_' ||
             $order->getState() != Order::STATE_PAYMENT_REVIEW
         ) {
             return;

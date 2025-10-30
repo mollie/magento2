@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -18,34 +19,12 @@ use Mollie\Payment\Service\Magento\PaymentLinkRedirect;
 
 class PaymentLink implements HttpGetActionInterface
 {
-    /**
-     * @var RequestInterface
-     */
-    private $request;
-    /**
-     * @var ResultFactory
-     */
-    private $resultFactory;
-    /**
-     * @var ManagerInterface
-     */
-    private $messageManager;
-    /**
-     * @var PaymentLinkRedirect
-     */
-    private $paymentLinkRedirect;
-
     public function __construct(
-        RequestInterface $request,
-        ResultFactory $resultFactory,
-        ManagerInterface $messageManager,
-        PaymentLinkRedirect $paymentLinkRedirect
-    ) {
-        $this->request = $request;
-        $this->resultFactory = $resultFactory;
-        $this->messageManager = $messageManager;
-        $this->paymentLinkRedirect = $paymentLinkRedirect;
-    }
+        private RequestInterface $request,
+        private ResultFactory $resultFactory,
+        private ManagerInterface $messageManager,
+        private PaymentLinkRedirect $paymentLinkRedirect
+    ) {}
 
     public function execute()
     {

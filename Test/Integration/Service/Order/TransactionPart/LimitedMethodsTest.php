@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -24,7 +25,7 @@ class LimitedMethodsTest extends IntegrationTestCase
         /** @var LimitedMethods $instance */
         $instance = $this->objectManager->create(LimitedMethods::class);
 
-        $result = $instance->process($order, 'orders', ['method' => 'creditcard']);
+        $result = $instance->process($order, ['method' => 'creditcard']);
 
         $this->assertArrayHasKey('method', $result);
         $this->assertEquals(['ideal', 'bancontact'], $result['method']);
@@ -41,7 +42,7 @@ class LimitedMethodsTest extends IntegrationTestCase
         /** @var LimitedMethods $instance */
         $instance = $this->objectManager->create(LimitedMethods::class);
 
-        $result = $instance->process($order, 'orders', ['method' => 'creditcard']);
+        $result = $instance->process($order, ['method' => 'creditcard']);
 
         $this->assertEquals('creditcard', $result['method']);
     }
@@ -56,7 +57,7 @@ class LimitedMethodsTest extends IntegrationTestCase
         /** @var LimitedMethods $instance */
         $instance = $this->objectManager->create(LimitedMethods::class);
 
-        $result = $instance->process($order, 'orders', ['method' => 'creditcard']);
+        $result = $instance->process($order, ['method' => 'creditcard']);
 
         $this->assertEquals('creditcard', $result['method']);
     }

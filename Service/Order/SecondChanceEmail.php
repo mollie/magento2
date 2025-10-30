@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order;
 
@@ -21,85 +23,24 @@ use Mollie\Payment\Service\PaymentToken\Generate;
 
 class SecondChanceEmail
 {
-    const UTM_TAG = '?utm_source=second_chance_email&utm_medium=mollie_second_chance&utm_campaign=second_chance_order';
-
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var SenderResolverInterface
-     */
-    private $senderResolver;
-
-    /**
-     * @var TransportBuilder
-     */
-    private $transportBuilder;
-
-    /**
-     * @var IdentityInterface
-     */
-    private $identityContainer;
-
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
-    /**
-     * @var Generate
-     */
-    private $paymentToken;
-
-    /**
-     * @var UrlInterface
-     */
-    private $url;
-
-    /**
-     * @var MollieLogger
-     */
-    private $logger;
-
-    /**
-     * @var ManagerInterface
-     */
-    private $eventManager;
+    public const UTM_TAG = '?utm_source=second_chance_email&utm_medium=mollie_second_chance&utm_campaign=second_chance_order';
 
     public function __construct(
-        Config $config,
-        SenderResolverInterface $senderResolver,
-        TransportBuilder $transportBuilder,
-        IdentityInterface $identityContainer,
-        StoreManagerInterface $storeManager,
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        Generate $paymentToken,
-        UrlInterface $url,
-        MollieLogger $logger,
-        ManagerInterface $eventManager
-    ) {
-        $this->config = $config;
-        $this->senderResolver = $senderResolver;
-        $this->transportBuilder = $transportBuilder;
-        $this->identityContainer = $identityContainer;
-        $this->storeManager = $storeManager;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->paymentToken = $paymentToken;
-        $this->url = $url;
-        $this->logger = $logger;
-        $this->eventManager = $eventManager;
-    }
+        private Config $config,
+        private SenderResolverInterface $senderResolver,
+        private TransportBuilder $transportBuilder,
+        private IdentityInterface $identityContainer,
+        private StoreManagerInterface $storeManager,
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private Generate $paymentToken,
+        private UrlInterface $url,
+        private MollieLogger $logger,
+        private ManagerInterface $eventManager
+    ) {}
 
-    public function send(OrderInterface $order)
+    public function send(OrderInterface $order): void
     {
-        $storeId = $order->getStoreId();
+        $storeId = storeId($order->getStoreId());
         $templateId = $this->config->secondChanceEmailTemplate($storeId);
 
         $customerName = $order->getCustomerName();
@@ -122,7 +63,7 @@ class SecondChanceEmail
 
         $this->logger->addInfoLog(
             'info',
-            sprintf('Sending second chance email for order #%s', $order->getIncrementId())
+            sprintf('Sending second chance email for order #%s', $order->getIncrementId()),
         );
 
         $transport = $builder->getTransport();
@@ -133,7 +74,7 @@ class SecondChanceEmail
         $this->logger->addInfoLog('info', sprintf('Second chance email for order #%s sent', $order->getIncrementId()));
     }
 
-    private function getTemplateVars(OrderInterface $order)
+    private function getTemplateVars(OrderInterface $order): array
     {
         $token = $this->paymentTokenRepository->getByOrder($order);
 
@@ -149,7 +90,7 @@ class SecondChanceEmail
             ],
             'order' => $order,
             'order_id' => $order->getEntityId(),
-            'store' => $this->storeManager->getStore($order->getStoreId()),
+            'store' => $this->storeManager->getStore(storeId($order->getStoreId())),
             'payment_token' => $token->getToken(),
         ];
     }
@@ -159,16 +100,16 @@ class SecondChanceEmail
      * @param $token
      * @return string
      */
-    private function getUrl(OrderInterface $order, $token)
+    private function getUrl(OrderInterface $order, $token): string
     {
         return $this->url->getUrl('mollie/checkout/secondChance/', [
-            '_scope' => $order->getStoreId(),
+            '_scope' => storeId($order->getStoreId()),
             'order_id' => $order->getEntityId(),
-            'payment_token' => $token->getToken()
+            'payment_token' => $token->getToken(),
         ]) . static::UTM_TAG;
     }
 
-    private function setFrom(TransportBuilder $builder, int $storeId)
+    private function setFrom(TransportBuilder $builder, int $storeId): void
     {
         $emailIdentity = $this->identityContainer->getEmailIdentity();
 
@@ -176,6 +117,7 @@ class SecondChanceEmail
         // @see https://github.com/mollie/magento2/issues/367#issuecomment-805840292
         if (method_exists($builder, 'setFromByScope')) {
             $builder->setFromByScope($emailIdentity, $storeId);
+
             return;
         }
 

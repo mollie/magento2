@@ -4,17 +4,19 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 
 class RedirectUserWhenTransactionFails implements OptionSourceInterface
 {
-    const REDIRECT_TO_CART = 'redirect_to_cart';
-    const REDIRECT_TO_CHECKOUT_SHIPPING = 'redirect_to_checkout_shipping';
-    const REDIRECT_TO_CHECKOUT_PAYMENT = 'redirect_to_checkout_payment';
+    public const REDIRECT_TO_CART = 'redirect_to_cart';
+    public const REDIRECT_TO_CHECKOUT_SHIPPING = 'redirect_to_checkout_shipping';
+    public const REDIRECT_TO_CHECKOUT_PAYMENT = 'redirect_to_checkout_payment';
 
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         return [
             [

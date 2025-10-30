@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -13,9 +14,9 @@ use Mollie\Payment\Queue\Publisher\PublishTransactionToProcess;
 
 class PublishTransactionToProcessFake extends PublishTransactionToProcess
 {
-    private $timesCalled = 0;
+    private int $timesCalled = 0;
 
-    private $publish = true;
+    private bool $publish = true;
 
     public function getTimesCalled(): int
     {

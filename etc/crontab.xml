@@ -2,8 +2,7 @@
 <!--
   ~ Copyright Magmodules.eu. All rights reserved.
   ~ See COPYING.txt for license details.
--->
-
+  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="default">
         <job instance="Mollie\Payment\Cron\SendPendingPaymentReminders" method="execute" name="mollie_send_pending_payment_reminders">

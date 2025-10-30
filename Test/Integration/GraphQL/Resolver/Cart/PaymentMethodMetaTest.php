@@ -4,8 +4,11 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\Cart;
 
+use Exception;
 use Mollie\Payment\Test\Integration\GraphQLTestCase;
 
 /**
@@ -38,7 +41,7 @@ class PaymentMethodMetaTest extends GraphQLTestCase
 
         $this->assertStringContainsString(
             'Mollie_Payment/images/methods/ideal.svg',
-            $result['mollie_meta']['image']
+            $result['mollie_meta']['image'],
         );
     }
 
@@ -58,7 +61,7 @@ class PaymentMethodMetaTest extends GraphQLTestCase
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      * @return array
      */
     public function getMethodFromCart(string $method): array

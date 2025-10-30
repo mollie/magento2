@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Ui\DataProvider\PaymentReminder\Listing\Pending;
 
 use Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult;
@@ -17,15 +19,15 @@ class Collection extends SearchResult
 
         $this->getSelect()->joinLeft(
             [
-                'sales_order' => $this->getTable('sales_order')
+                'sales_order' => $this->getTable('sales_order'),
             ],
             'main_table.order_id = sales_order.entity_id',
             [
                 'increment_id',
                 'customer_firstname',
                 'customer_lastname',
-                'customer_email'
-            ]
+                'customer_email',
+            ],
         );
     }
 }

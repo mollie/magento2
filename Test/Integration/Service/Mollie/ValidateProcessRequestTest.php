@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -164,6 +165,7 @@ class ValidateProcessRequestTest extends IntegrationTestCase
 
         $order = $this->loadOrder($orderId);
         $order->setQuoteId($cart->getId());
+
         return $order;
     }
 }

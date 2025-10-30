@@ -1,46 +1,31 @@
 <?php
-/**
- * Copyright © 2019 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Mollie\Order\Transaction;
 
+use DateInterval;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class Expires
 {
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $config;
-
-    /**
-     * @var TimezoneInterface
-     */
-    private $timezone;
-
-    /**
-     * @var RequestInterface
-     */
-    private $request;
-
     public function __construct(
-        ScopeConfigInterface $config,
-        TimezoneInterface $timezone,
-        RequestInterface $request
-    ) {
-        $this->config = $config;
-        $this->timezone = $timezone;
-        $this->request = $request;
-    }
+        private ScopeConfigInterface $config,
+        private TimezoneInterface $timezone,
+        private RequestInterface $request
+    ) {}
 
     public function availableForMethod(?string $method = null, $storeId = null): bool
     {
         $value = $this->getExpiresAtForMethod($method, $storeId);
-        return (bool)$value;
+
+        return (bool) $value;
     }
 
     public function atDateForMethod(?string $method = null, $storeId = null): string
@@ -52,15 +37,15 @@ class Expires
         }
 
         $date = $this->timezone->scopeDate($storeId);
-        $date->add(new \DateInterval('P' . $days . 'D'));
+        $date->add(new DateInterval('P' . $days . 'D'));
 
         return $date->format('Y-m-d');
     }
 
     /**
-     * @param string $method
-     * @param $storeId
-     * @return mixed
+     * @param string|null $method
+     * @param int|string|null $storeId
+     * @return string|null
      */
     public function getExpiresAtForMethod(?string $method = null, $storeId = null): ?string
     {
@@ -73,17 +58,14 @@ class Expires
         return $this->config->getValue($path, 'store', $storeId);
     }
 
-    /**
-     * @return mixed
-     */
     private function getValueFromRequest(): ?string
     {
         $payment = $this->request->getParam('payment');
 
         if (!$payment || !isset($payment['days_before_expire'])) {
-            return false;
+            return null;
         }
 
-        return $payment['days_before_expire'];
+        return (string)$payment['days_before_expire'];
     }
 }

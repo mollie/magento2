@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Order\Lines\Generator;
 
 use Mollie\Payment\Service\Order\Lines\Generator\WeeeFeeGenerator;
@@ -14,7 +16,7 @@ class WeeFeeGeneratorTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testDoesNothingWhenNotWeee()
+    public function testDoesNothingWhenNotWeee(): void
     {
         $order = $this->loadOrder('100000001');
 
@@ -29,7 +31,7 @@ class WeeFeeGeneratorTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testReturnsWeeeItems()
+    public function testReturnsWeeeItems(): void
     {
         $order = $this->loadOrder('100000001');
         $order->setBaseCurrencyCode('EUR');

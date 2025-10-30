@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -15,50 +16,30 @@ use Mollie\Payment\Config;
 
 class PaymentLinkUrl
 {
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-    /**
-     * @var UrlInterface
-     */
-    private $urlBuilder;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        EncryptorInterface $encryptor,
-        UrlInterface $urlBuilder,
-        OrderRepositoryInterface $orderRepository,
-        Config $config
+        private EncryptorInterface $encryptor,
+        private UrlInterface $urlBuilder,
+        private OrderRepositoryInterface $orderRepository,
+        private Config $config,
     ) {
-        $this->encryptor = $encryptor;
-        $this->urlBuilder = $urlBuilder;
-        $this->orderRepository = $orderRepository;
-        $this->config = $config;
     }
 
     public function execute(int $orderId): string
     {
         $order = $this->orderRepository->get($orderId);
-        $orderId = base64_encode($this->encryptor->encrypt((string)$orderId));
-        if ($this->config->useCustomPaymentLinkUrl($order->getStoreId())) {
-            return $this->generateCustomUrl($orderId, $order->getStoreId());
+        $orderId = base64_encode($this->encryptor->encrypt((string) $orderId));
+        $storeId = storeId($order->getStoreId());
+        if ($this->config->useCustomPaymentLinkUrl($storeId)) {
+            return $this->generateCustomUrl($orderId, $storeId);
         }
 
         return $this->urlBuilder->getUrl('mollie/checkout/paymentlink', [
             'order' => $orderId,
-            '_scope' => $order->getStoreId()
+            '_scope' => $storeId,
         ]);
     }
 
-    private function generateCustomUrl(string $order, $storeId = null)
+    private function generateCustomUrl(string $order, ?int $storeId = null): string
     {
         $url = $this->config->customPaymentLinkUrl($storeId);
 

@@ -4,31 +4,24 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Config;
-use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class UseSavedPaymentMethod implements TransactionPartInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
-    public function process(OrderInterface $order, $apiMethod, array $transaction)
+    public function process(OrderInterface $order, array $transaction): array
     {
         if (
-            !$this->config->isMagentoVaultEnabled($order->getStoreId()) ||
+            !$this->config->isMagentoVaultEnabled(storeId(storeId($order->getStoreId()))) ||
             !$order->getPayment() ||
             !$order->getPayment()->getExtensionAttributes() ||
             !$order->getPayment()->getExtensionAttributes()->getVaultPaymentToken()
@@ -41,15 +34,8 @@ class UseSavedPaymentMethod implements TransactionPartInterface
             return $transaction;
         }
 
-        if ($apiMethod == Payments::CHECKOUT_TYPE) {
-            $transaction['sequenceType'] = 'oneoff';
-            $transaction['mandateId'] = $paymentToken->getGatewayToken();
-        }
-
-        if ($apiMethod == Orders::CHECKOUT_TYPE) {
-            $transaction['payment']['sequenceType'] = 'oneoff';
-            $transaction['payment']['mandateId'] = $paymentToken->getGatewayToken();
-        }
+        $transaction['sequenceType'] = 'oneoff';
+        $transaction['mandateId'] = $paymentToken->getGatewayToken();
 
         return $transaction;
     }

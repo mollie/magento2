@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -8,7 +9,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Mollie;
 
-use Mollie\Api\Exceptions\ApiException;
+use Exception;
 use Mollie\Payment\Service\Mollie\LogException;
 use Mollie\Payment\Test\Fakes\ConfigFake;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -17,7 +18,7 @@ class LogExceptionTest extends IntegrationTestCase
 {
     public function testLogsMessages(): void
     {
-        $exception = new ApiException('This is a test exception triggered in ' . __FILE__);
+        $exception = new Exception('This is a test exception triggered in ' . __FILE__);
 
         $configFake = $this->objectManager->create(ConfigFake::class);
 
@@ -32,7 +33,7 @@ class LogExceptionTest extends IntegrationTestCase
 
     public function testSkipsSomeMessages(): void
     {
-        $exception = new ApiException('The \'billingAddress.familyName\' field contains characters that are not allowed');
+        $exception = new Exception('The \'billingAddress.familyName\' field contains characters that are not allowed');
 
         $configFake = $this->objectManager->create(ConfigFake::class);
 
@@ -47,7 +48,7 @@ class LogExceptionTest extends IntegrationTestCase
 
     public function testCanAddOwnExceptions(): void
     {
-        $exception = new ApiException('Some random message');
+        $exception = new Exception('Some random message');
 
         $configFake = $this->objectManager->create(ConfigFake::class);
 

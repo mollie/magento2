@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
@@ -13,23 +15,13 @@ use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 
 class ProcessAdjustmentFee
 {
-    /**
-     * @var RefundUsingPayment
-     */
-    private $refundUsingPayment;
-
-    /**
-     * @var bool
-     */
-    private $doNotRefundInMollie = false;
+    private bool $doNotRefundInMollie = false;
 
     public function __construct(
-        RefundUsingPayment $refundUsingPayment
-    ) {
-        $this->refundUsingPayment = $refundUsingPayment;
-    }
+        private readonly RefundUsingPayment $refundUsingPayment
+    ) {}
 
-    public function handle(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo)
+    public function handle(MollieApiClient $mollieApi, OrderInterface $order, CreditmemoInterface $creditmemo): void
     {
         $this->doNotRefundInMollie = false;
 
@@ -55,7 +47,7 @@ class ProcessAdjustmentFee
             $mollieApi,
             $order->getMollieTransactionId(),
             $order->getOrderCurrencyCode(),
-            $creditmemo->getAdjustment()
+            $creditmemo->getAdjustment(),
         );
     }
 
@@ -67,7 +59,7 @@ class ProcessAdjustmentFee
             $mollieApi,
             $order->getMollieTransactionId(),
             $order->getOrderCurrencyCode(),
-            $creditmemo->getGrandTotal()
+            $creditmemo->getGrandTotal(),
         );
     }
 }
