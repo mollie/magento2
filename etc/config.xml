@@ -7,7 +7,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v2.48.0</version>
+                <version>v3.0.0-RC1</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
