@@ -3,7 +3,9 @@
   ~ Copyright Magmodules.eu. All rights reserved.
   ~ See COPYING.txt for license details.
   -->
-<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <include path="Mollie_Payment::methods/applepay.xml"/>
     <include path="Mollie_Payment::methods/alma.xml"/>
     <include path="Mollie_Payment::methods/bancontact.xml"/>
@@ -16,6 +18,13 @@
     <include path="Mollie_Payment::methods/creditcard.xml"/>
     <include path="Mollie_Payment::methods/directdebit.xml"/>
     <include path="Mollie_Payment::methods/eps.xml"/>
+    <!--
+    Express components are only available by enabling them through the CLI:
+
+    payment/mollie_methods_expresscomponents/title Express Components
+    php bin/magento config:set payment/mollie_methods_expresscomponents/active 1
+    -->
+    <include path="Mollie_Payment::methods/expresscomponents.xml"/>
     <include path="Mollie_Payment::methods/giftcard.xml"/>
     <include path="Mollie_Payment::methods/googlepay.xml"/>
     <include path="Mollie_Payment::methods/ideal.xml"/>

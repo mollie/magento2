@@ -25,6 +25,7 @@ class PaymentMethods
         'mollie_methods_creditcard',
         'mollie_methods_directdebit',
         'mollie_methods_eps',
+        'mollie_methods_expresscomponents',
         'mollie_methods_giftcard',
         'mollie_methods_googlepay',
         'mollie_methods_ideal',

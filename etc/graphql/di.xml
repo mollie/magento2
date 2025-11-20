@@ -19,6 +19,8 @@
                 <item name="mollie_methods_creditcard" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_directdebit" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_eps" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
+                <item name="mollie_methods_expresscomponents" xsi:type="object">Mollie\Payment\GraphQL\DataProvider
+                </item>
                 <item name="mollie_methods_giftcard" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_googlepay" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>
                 <item name="mollie_methods_ideal" xsi:type="object">Mollie\Payment\GraphQL\DataProvider</item>

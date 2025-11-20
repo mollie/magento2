@@ -112,8 +112,9 @@
     </type>
 
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
-        <plugin name="mollie_payment_fee_order" type="Mollie\Payment\Plugin\Sales\AddPaymentFeeToOrder" />
-        <plugin name="mollie_payment_add_subscription_data" type="Mollie\Payment\Plugin\Sales\AddRecurringData" />
+        <plugin name="mollie_payment_fee_order" type="Mollie\Payment\Plugin\Sales\AddPaymentFeeToOrder"/>
+        <plugin name="mollie_sendcloud_data" type="Mollie\Payment\Plugin\Sales\AddSendcloudDataToOrder"/>
+        <plugin name="mollie_payment_add_subscription_data" type="Mollie\Payment\Plugin\Sales\AddRecurringData"/>
     </type>
 
     <type name="Magento\Sales\Api\OrderManagementInterface">
@@ -383,6 +384,24 @@
     <type name="Magento\Sales\Model\CronJob\CleanExpiredOrders">
         <arguments>
             <argument name="collectionFactory" xsi:type="object">CleanExpiredOrdersCollectionFactory</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Controller\Express\CreateSession">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <preference for="Mollie\Payment\Api\Data\SendcloudPartnerInterface"
+                type="Mollie\Payment\Model\Data\SendcloudPartner"/>
+
+    <type name="Mollie\Payment\Plugin\Sales\AddSendcloudDataToOrder">
+        <arguments>
+            <argument name="partnerData" xsi:type="array">
+                <item name="name" xsi:type="string">Mollie-SnelBestellen</item>
+                <item name="partnerId" xsi:type="string">16f2f5c8-3935-4b12-8c4c-f2252aa38a9a</item>
+            </argument>
         </arguments>
     </type>
 
@@ -1064,6 +1083,53 @@
     <virtualType name="MollieEpsCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
             <argument name="config" xsi:type="object">MollieEpsConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Expresscomponents -->
+    <type name="Mollie\Payment\Model\Methods\Expresscomponents">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieExpresscomponentsValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieExpresscomponentsValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieExpresscomponentsValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieExpresscomponentsConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieExpresscomponentsConfigValueHandler"
+                 type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieExpresscomponentsConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieExpresscomponentsConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Expresscomponents::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieExpresscomponentsValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieExpresscomponentsCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieExpresscomponentsCountryValidator"
+                 type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieExpresscomponentsConfig</argument>
         </arguments>
     </virtualType>
 

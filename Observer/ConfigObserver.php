@@ -16,9 +16,9 @@ use Mollie\Api\Resources\Method;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Directdebit;
+use Mollie\Payment\Model\Methods\Expresscomponents;
 use Mollie\Payment\Model\Methods\GooglePay;
 use Mollie\Payment\Model\Methods\Pointofsale;
-use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 /**
@@ -30,7 +30,6 @@ class ConfigObserver implements ObserverInterface
 {
     public function __construct(
         private ManagerInterface $messageManager,
-        private MollieModel $mollieModel,
         private MollieHelper $mollieHelper,
         private MollieApiClient $mollieApiClient,
         private Config $config
@@ -94,7 +93,7 @@ class ConfigObserver implements ObserverInterface
         $activeMethods = $this->mollieHelper->getAllActiveMethods($storeId);
 
         $methods = [];
-        $apiMethods = array_filter((array) $apiMethods, function (Method $method): bool {
+        $apiMethods = array_filter((array)$apiMethods, function (Method $method): bool {
             return $method->status == 'activated';
         });
 
@@ -103,7 +102,7 @@ class ConfigObserver implements ObserverInterface
         }
 
         $disabledMethods = [];
-        $doNotCheckMethods = [Pointofsale::CODE, Directdebit::CODE, GooglePay::CODE];
+        $doNotCheckMethods = [Pointofsale::CODE, Directdebit::CODE, GooglePay::CODE, Expresscomponents::CODE];
         foreach ($activeMethods as $method) {
             $code = $method['code'];
             if (!in_array('mollie_methods_' . $code, $doNotCheckMethods) && !isset($methods[$code])) {

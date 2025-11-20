@@ -35,17 +35,24 @@
         </resources>
     </route>
 
-    <route url="/V1/mollie/get-order/:hash" method="GET">
+    <route url="/V1/mollie/get-order/by-hash/:hash" method="GET">
         <service class="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" method="byHash"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="anonymous"/>
         </resources>
     </route>
 
-    <route url="/V1/mollie/get-order/:hash" method="POST">
+    <route url="/V1/mollie/get-order/by-hash/:hash" method="POST">
         <service class="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" method="byHash"/>
         <resources>
-            <resource ref="anonymous" />
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/mollie/get-order/by-payment-token/:token" method="POST">
+        <service class="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" method="byPaymentToken"/>
+        <resources>
+            <resource ref="anonymous"/>
         </resources>
     </route>
 

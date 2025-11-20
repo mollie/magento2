@@ -25,24 +25,9 @@ class GroupFrontendModel extends Fieldset
         Js $jsHelper,
         private readonly Config $config,
         array $data = [],
-    ) {
-        parent::__construct($context, $authSession, $jsHelper, $data);
-    }
-
-    protected function _getFrontendClass($element): string
+    )
     {
-        $parent = parent::_getFrontendClass($element);
-
-        if (
-            !$element->getData('original_data') ||
-            !isset($element->getData('original_data')['id'])
-        ) {
-            return $parent;
-        }
-
-        $id = $element->getData('original_data')['id'];
-
-        return $parent . ' mollie-method-card ' . $this->getMethodClass($id);
+        parent::__construct($context, $authSession, $jsHelper, $data);
     }
 
     public function render(AbstractElement $element): string
@@ -69,6 +54,22 @@ class GroupFrontendModel extends Fieldset
         return $output;
     }
 
+    protected function _getFrontendClass($element): string
+    {
+        $parent = parent::_getFrontendClass($element);
+
+        if (
+            !$element->getData('original_data') ||
+            !isset($element->getData('original_data')['id'])
+        ) {
+            return $parent;
+        }
+
+        $id = $element->getData('original_data')['id'];
+
+        return $parent . ' mollie-method-card ' . $this->getMethodClass($id);
+    }
+
     protected function _getHeaderTitleHtml($element)
     {
         return '<a id="' . $element->getHtmlId() . '-head"
@@ -79,7 +80,12 @@ class GroupFrontendModel extends Fieldset
 
     private function getMethodClass(string $id): string
     {
-        if ($this->config->isMethodActive($id)) {
+        $isMethodActive = $this->config->isMethodActive($id);
+        if (!$isMethodActive && $id == 'mollie_methods_expresscomponents') {
+            return 'hidden';
+        }
+
+        if ($isMethodActive) {
             return 'mollie-configuration-method-active';
         }
 

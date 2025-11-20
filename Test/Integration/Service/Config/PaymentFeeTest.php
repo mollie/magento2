@@ -34,6 +34,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_creditcard', true],
             ['mollie_methods_directdebit', true],
             ['mollie_methods_eps', true],
+            ['mollie_methods_expresscomponents', true],
             ['mollie_methods_giftcard', true],
             ['mollie_methods_googlepay', true],
             ['mollie_methods_ideal', true],

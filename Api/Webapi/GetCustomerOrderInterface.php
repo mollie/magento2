@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -16,4 +15,10 @@ interface GetCustomerOrderInterface
      * @return mixed[]
      */
     public function byHash(string $hash): array;
+
+    /**
+     * @param string $token
+     * @return mixed[]
+     */
+    public function byPaymentToken(string $token): array;
 }
