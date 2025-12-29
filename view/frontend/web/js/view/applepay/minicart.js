@@ -140,18 +140,21 @@ define([
                     },
                     success: function (result) {
                         if (!this.session) {
+                            $('body').loader('hide');
                             console.warn('Payment canceled');
                             return;
                         }
 
                         if (result.error) {
                             this.sendMessage(result.error_message);
+                            $('body').loader('hide');
                             this.session.abort()
                             return;
                         }
 
                         if (!result.url) {
                             this.sendMessage('Something went wrong, please try again later.');
+                            $('body').loader('hide');
                             this.session.abort()
                             return;
                         }
@@ -182,9 +185,11 @@ define([
             }.bind(this);
 
             this.session.oncancel = function () {
+                $('body').loader('hide');
                 this.session = null;
             }.bind(this);
 
+            $('body').loader('show');
             this.session.begin();
         },
 
