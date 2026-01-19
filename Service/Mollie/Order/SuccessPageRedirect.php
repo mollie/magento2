@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,10 +11,10 @@ namespace Mollie\Payment\Service\Mollie\Order;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\RequestInterface;
-use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
+use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Api\Data\TransactionToOrderInterface;
 use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
@@ -24,14 +23,14 @@ use Mollie\Payment\Config;
 class SuccessPageRedirect
 {
     public function __construct(
-        private RedirectInterface $redirect,
-        private RequestInterface $request,
-        private ResponseInterface $response,
-        private Session $checkoutSession,
-        private ManagerInterface $eventManager,
-        private TransactionToOrderRepositoryInterface $transactionToOrderRepository,
-        private SearchCriteriaBuilder $searchCriteriaBuilder,
-        private Config $config
+        readonly private RequestInterface $request,
+        readonly private ResponseInterface $response,
+        readonly private Session $checkoutSession,
+        readonly private ManagerInterface $eventManager,
+        readonly private TransactionToOrderRepositoryInterface $transactionToOrderRepository,
+        readonly private SearchCriteriaBuilder $searchCriteriaBuilder,
+        readonly private Config $config,
+        readonly private UrlInterface $urlBuilder,
     ) {}
 
     /**
@@ -40,7 +39,7 @@ class SuccessPageRedirect
      * - If not, mark as redirected and actually redirect.
      * - If already redirected, redirect to the cart page.
      */
-    public function execute(OrderInterface $order, array $orderIds): void
+    public function execute(OrderInterface $order, array $orderIds): ResponseInterface
     {
         $this->searchCriteriaBuilder->addFilter('transaction_id', $order->getMollieTransactionId());
         $this->searchCriteriaBuilder->addFilter('order_id', $order->getEntityId());
@@ -52,9 +51,8 @@ class SuccessPageRedirect
                 'message' => 'Transaction not found in the transaction to order table. Redirecting to success page.',
                 'order_id' => $order->getEntityId(),
             ]);
-            $this->redirectToSuccessPage($order, $orderIds);
 
-            return;
+            return $this->redirectToSuccessPage($order, $orderIds);
         }
 
         $items = $result->getItems();
@@ -63,23 +61,18 @@ class SuccessPageRedirect
 
         if ($item->getRedirected() == 1) {
             // The user has already been redirected to the success page.
-            $this->redirect->redirect($this->response, 'checkout/cart');
+            $this->response->setRedirect($this->urlBuilder->getUrl('checkout/cart'));
 
-            return;
+            return $this->response;
         }
 
         $item->setRedirected(1);
         $this->transactionToOrderRepository->save($item);
 
-        $this->redirectToSuccessPage($order, $orderIds);
+        return $this->redirectToSuccessPage($order, $orderIds);
     }
 
-    /**
-     * @param OrderInterface $order
-     * @param array $orderIds
-     * @return void
-     */
-    private function redirectToSuccessPage(OrderInterface $order, array $orderIds): void
+    private function redirectToSuccessPage(OrderInterface $order, array $orderIds): ResponseInterface
     {
         $this->checkoutSession->setLastOrderId($order->getId());
         $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
@@ -98,13 +91,15 @@ class SuccessPageRedirect
             'response' => $this->response,
         ]);
 
-        $this->redirect->redirect(
-            $this->response,
-            $redirect->getData('path'),
-            [
-                '_query' => $redirect->getData('query'),
-                '_use_rewrite' => false,
-            ],
+        $this->response->setRedirect(
+            $this->urlBuilder->getUrl(
+                $redirect->getData('path'), [
+                    '_query' => $redirect->getData('query'),
+                    '_use_rewrite' => false,
+                ]
+            )
         );
+
+        return $this->response;
     }
 }

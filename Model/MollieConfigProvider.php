@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -50,77 +49,11 @@ class MollieConfigProvider implements ConfigProviderInterface
         private MethodParameters $methodParameters,
         private SupportedNetworks $supportedNetworks,
         private MollieApiClient $mollieApiClient,
-    ) {
+    )
+    {
         foreach (PaymentMethods::METHODS as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
         }
-    }
-
-    /**
-     * @param $code
-     * @return MethodInterface|null
-     */
-    public function getMethodInstance($code)
-    {
-        try {
-            return $this->paymentHelper->getMethodInstance($code);
-        } catch (Exception $e) {
-            $this->mollieHelper->addTolog('error', 'Function: getMethodInstance: ' . $e->getMessage());
-
-            return null;
-        }
-    }
-
-    /**
-     * Config Data for checkout
-     *
-     * @return array
-     */
-    public function getConfig(): array
-    {
-        // Do not load the config when on the cart page.
-        if (!$this->config->isModuleEnabled() || $this->request->getControllerName() === 'cart') {
-            return [];
-        }
-
-        $store = $this->storeManager->getStore();
-        $storeId = (int) $store->getId();
-        $storeName = $store->getFrontendName();
-
-        $config = [];
-        $config['payment']['mollie']['testmode'] = $this->config->isTestMode($storeId);
-        $config['payment']['mollie']['profile_id'] = $this->config->getProfileId($storeId);
-        $config['payment']['mollie']['locale'] = $this->getLocale($storeId);
-        $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
-        $config['payment']['mollie']['applepay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
-        $config['payment']['mollie']['applepay']['supported_networks'] = $this->supportedNetworks->execute((int) $storeId);
-        $config['payment']['mollie']['store']['name'] = $storeName;
-        $config['payment']['mollie']['store']['currency'] = $this->config->getStoreCurrency($storeId);
-        $config['payment']['mollie']['vault']['enabled'] = $this->config->isMagentoVaultEnabled($storeId);
-        $useImage = $this->mollieHelper->useImage();
-
-        foreach (PaymentMethods::METHODS as $code) {
-            if (empty($this->methods[$code])) {
-                continue;
-            }
-
-            $config['payment']['image'][$code] = '';
-            if ($useImage) {
-                $cleanCode = str_replace('mollie_methods_', '', $code);
-                $url = $this->assetRepository->getUrl('Mollie_Payment::images/methods/' . $cleanCode . '.svg');
-                $config['payment']['image'][$code] = $url;
-            }
-
-            if (
-                in_array($code, ['mollie_methods_kbc', 'mollie_methods_giftcard']) &&
-                $this->methods[$code]->isActive() &&
-                $this->isMethodActive($code)
-            ) {
-                $config = $this->getIssuers($code, $config);
-            }
-        }
-
-        return $config;
     }
 
     public function getActiveMethods(?CartInterface $cart = null): array
@@ -160,6 +93,70 @@ class MollieConfigProvider implements ConfigProviderInterface
         return $this->methodData;
     }
 
+    /**
+     * Config Data for checkout
+     *
+     * @return array
+     */
+    public function getConfig(): array
+    {
+        // Do not load the config when on the cart page.
+        if (!$this->config->isModuleEnabled() || $this->request->getControllerName() === 'cart') {
+            return [];
+        }
+
+        $store = $this->storeManager->getStore();
+        $storeId = (int)$store->getId();
+        $storeName = $store->getFrontendName();
+
+        $config = [];
+        $config['payment']['mollie']['testmode'] = $this->config->isTestMode($storeId);
+        $config['payment']['mollie']['profile_id'] = $this->config->getProfileId($storeId);
+        $config['payment']['mollie']['locale'] = $this->getLocale($storeId);
+        $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
+        $config['payment']['mollie']['applepay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
+        $config['payment']['mollie']['applepay']['supported_networks'] = $this->supportedNetworks->execute((int)$storeId);
+        $config['payment']['mollie']['store']['name'] = $storeName;
+        $config['payment']['mollie']['store']['currency'] = $this->config->getStoreCurrency($storeId);
+        $config['payment']['mollie']['vault']['enabled'] = $this->config->isMagentoVaultEnabled($storeId);
+        $config['payment']['mollie']['expresscomponents']['enabled'] = $this->getMethodInstance('mollie_methods_expresscomponents')->isAvailable();
+        $useImage = $this->mollieHelper->useImage();
+
+        foreach (PaymentMethods::METHODS as $code) {
+            if (empty($this->methods[$code])) {
+                continue;
+            }
+
+            $config['payment']['image'][$code] = '';
+            if ($useImage) {
+                $cleanCode = str_replace('mollie_methods_', '', $code);
+                $url = $this->assetRepository->getUrl('Mollie_Payment::images/methods/' . $cleanCode . '.svg');
+                $config['payment']['image'][$code] = $url;
+            }
+
+            if (
+                in_array($code, ['mollie_methods_kbc', 'mollie_methods_giftcard']) &&
+                $this->methods[$code]->isActive() &&
+                $this->isMethodActive($code)
+            ) {
+                $config = $this->getIssuers($code, $config);
+            }
+        }
+
+        return $config;
+    }
+
+    public function getMethodInstance($code): ?MethodInterface
+    {
+        try {
+            return $this->paymentHelper->getMethodInstance($code);
+        } catch (Exception $e) {
+            $this->mollieHelper->addTolog('error', 'Function: getMethodInstance: ' . $e->getMessage());
+
+            return null;
+        }
+    }
+
     private function getIssuers(string $code, array $config): array
     {
         $issuerListType = $this->config->getIssuerListType(
@@ -179,11 +176,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         return $config;
     }
 
-    /**
-     * @param int $storeId
-     * @return string
-     */
-    private function getLocale(?int $storeId)
+    private function getLocale(?int $storeId): string
     {
         $locale = $this->config->getLocale($storeId);
 

@@ -73,7 +73,8 @@ class Mollie extends Adapter
         ?ValidatorPoolInterface $validatorPool = null,
         ?CommandManagerInterface $commandExecutor = null,
         ?LoggerInterface $logger = null,
-    ) {
+    )
+    {
         parent::__construct(
             $eventManager,
             $valueHandlerPool,
@@ -89,9 +90,164 @@ class Mollie extends Adapter
         $this->eventManager = $eventManager;
     }
 
+    /**
+     * @param DataObject $data
+     *
+     * @return $this
+     * @throws LocalizedException
+     */
+    public function assignData(DataObject $data)
+    {
+        parent::assignData($data);
+
+        $additionalData = $data->getAdditionalData();
+        if (isset($additionalData['applepay_payment_token'])) {
+            $this->getInfoInstance()->setAdditionalInformation('applepay_payment_token', $additionalData['applepay_payment_token']);
+        }
+
+        if (isset($additionalData['card_token'])) {
+            $this->getInfoInstance()->setAdditionalInformation('card_token', $additionalData['card_token']);
+        }
+
+        if (isset($additionalData['selected_issuer'])) {
+            $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $additionalData['selected_issuer']);
+        }
+
+        if (isset($additionalData['selected_terminal'])) {
+            $this->getInfoInstance()->setAdditionalInformation('selected_terminal', $additionalData['selected_terminal']);
+        }
+
+        return $this;
+    }
+
     public function getCode()
     {
         return static::CODE;
+    }
+
+    public function getOrderIdsByTransactionId(string $transactionId): array
+    {
+        $this->searchCriteriaBuilder->addFilter('transaction_id', $transactionId);
+        $orders = $this->transactionToOrderRepository->getList($this->searchCriteriaBuilder->create());
+
+        if (!$orders->getTotalCount()) {
+            $this->mollieHelper->addTolog('error', __('No order(s) found for transaction id %1', $transactionId));
+
+            return [];
+        }
+
+        return array_map(function (TransactionToOrderInterface $transactionToOrder): ?int {
+            return $transactionToOrder->getOrderId();
+        }, $orders->getItems());
+    }
+
+    /**
+     * Get list of Issuers from API
+     */
+    public function getIssuers(string $method, string $issuerListType, int $count = 0): ?array
+    {
+        $issuers = [];
+        // iDeal 2.0 does not have issuers anymore.
+        if ($issuerListType == 'none' || $method == 'mollie_methods_ideal') {
+            return $issuers;
+        }
+
+        $mollieApi = $this->mollieApiClient->loadByStore();
+        $methodCode = str_replace('mollie_methods_', '', $method);
+        try {
+            $issuers = $mollieApi->methods->get($methodCode, ['include' => 'issuers'])->issuers;
+
+            // If the list can't be retrieved for some reason, try again.
+            if (!$issuers && $count == 0) {
+                $this->mollieHelper->addTolog(
+                    'error',
+                    'Retrieving method issuers gave an issue. Retrying.' . var_export($issuers, true),
+                );
+
+                return $this->getIssuers($method, $issuerListType, 1);
+            }
+
+            if (!$issuers) {
+                return null;
+            }
+        } catch (Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+
+        if ($this->mollieHelper->addQrOption() && $methodCode == 'ideal') {
+            $issuers[] = [
+                'resource' => 'issuer',
+                'id' => '',
+                'name' => __('QR Code'),
+                'image' => [
+                    'size2x' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area' => 'frontend'],
+                    ),
+                    'svg' => $this->assetRepository->getUrlWithParams(
+                        'Mollie_Payment::images/qr-select.svg',
+                        ['area' => 'frontend'],
+                    ),
+                ],
+            ];
+        }
+
+        // Sort the list by name
+        uasort($issuers, function ($a, $b): int {
+            $a = (array)$a;
+            $b = (array)$b;
+
+            return strcmp(strtolower($a['name']), strtolower($b['name']));
+        });
+
+        if ($issuers && $issuerListType == 'dropdown') {
+            array_unshift($issuers, [
+                'resource' => 'issuer',
+                'id' => '',
+                'name' => __('-- Please Select --'),
+            ]);
+        }
+
+        return array_values($issuers);
+    }
+
+    /**
+     * @param $storeId
+     * @return MollieApiClient|null
+     */
+    public function getMollieApi($storeId = null): ?MollieApiClient
+    {
+        $apiKey = $this->mollieHelper->getApiKey($storeId);
+
+        try {
+            return $this->loadMollieApi($apiKey);
+        } catch (Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+
+            return null;
+        }
+    }
+
+    /**
+     * @param string $paymentAction
+     * @param object $stateObject
+     *
+     * @return void
+     * @throws LocalizedException
+     */
+    public function initialize($paymentAction, $stateObject): void
+    {
+        /** @var Payment $payment */
+        $payment = $this->getInfoInstance();
+
+        /** @var Order $order */
+        $order = $payment->getOrder();
+        $order->setCanSendNewEmailFlag(false);
+
+        $status = $this->mollieHelper->getStatusPending(storeId($order->getStoreId()));
+        $stateObject->setState(Order::STATE_NEW);
+        $stateObject->setStatus($status);
+        $stateObject->setIsNotified(false);
     }
 
     /**
@@ -124,28 +280,6 @@ class Mollie extends Adapter
     }
 
     /**
-     * @param string $paymentAction
-     * @param object $stateObject
-     *
-     * @return void
-     * @throws LocalizedException
-     */
-    public function initialize($paymentAction, $stateObject): void
-    {
-        /** @var Payment $payment */
-        $payment = $this->getInfoInstance();
-
-        /** @var Order $order */
-        $order = $payment->getOrder();
-        $order->setCanSendNewEmailFlag(false);
-
-        $status = $this->mollieHelper->getStatusPending(storeId($order->getStoreId()));
-        $stateObject->setState(Order::STATE_NEW);
-        $stateObject->setStatus($status);
-        $stateObject->setIsNotified(false);
-    }
-
-    /**
      * @param $apiKey
      *
      * @return MollieApiClient
@@ -159,45 +293,40 @@ class Mollie extends Adapter
         return $this->mollieApiClient->loadByApiKey($apiKey);
     }
 
-    /**
-     * @param $storeId
-     * @return MollieApiClient|null
-     */
-    public function getMollieApi($storeId = null): ?MollieApiClient
+    public function orderHasUpdate(string $orderId): bool
     {
-        $apiKey = $this->mollieHelper->getApiKey($storeId);
+        $order = $this->orderRepository->get($orderId);
 
-        try {
-            return $this->loadMollieApi($apiKey);
-        } catch (Exception $e) {
-            $this->mollieHelper->addTolog('error', $e->getMessage());
-
-            return null;
+        if (!$order->getMollieTransactionId()) {
+            throw new LocalizedException(__('Transaction ID not found'));
         }
+
+        $mollieApi = $this->mollieApiClient->loadByStore(storeId($order->getStoreId()));
+
+        return $this->paymentsApi->orderHasUpdate($order, $mollieApi);
     }
 
     /**
      * @param        $orderId
      * @param string $type
-     * @param null   $paymentToken
      *
      * @return ProcessTransactionResponse
      * @throws LocalizedException
      * @throws ApiException
      */
-    public function processTransaction($orderId, string $type = 'webhook', ?string $paymentToken = null): ProcessTransactionResponse
+    public function processTransaction($orderId, string $type = 'webhook'): ProcessTransactionResponse
     {
         /** @var Order $order */
         $order = $this->orderRepository->get($orderId);
 
-        return $this->processTransactionForOrder($order, $type, $paymentToken);
+        return $this->processTransactionForOrder($order, $type);
     }
 
     public function processTransactionForOrder(
         OrderInterface $order,
         string $type = 'webhook',
-        ?string $paymentToken = null,
-    ): ProcessTransactionResponse {
+    ): ProcessTransactionResponse
+    {
         $this->eventManager->dispatch('mollie_process_transaction_start', ['order' => $order]);
 
         $output = $this->orderLockService->execute($order, function (OrderInterface $order) use ($type): array {
@@ -219,49 +348,6 @@ class Mollie extends Adapter
         $this->eventManager->dispatch('mollie_process_transaction_end', ['order' => $order]);
 
         return $result;
-    }
-
-    public function orderHasUpdate(string $orderId): bool
-    {
-        $order = $this->orderRepository->get($orderId);
-
-        if (!$order->getMollieTransactionId()) {
-            throw new LocalizedException(__('Transaction ID not found'));
-        }
-
-        $mollieApi = $this->mollieApiClient->loadByStore(storeId($order->getStoreId()));
-
-        return $this->paymentsApi->orderHasUpdate($order, $mollieApi);
-    }
-
-    /**
-     * @param DataObject $data
-     *
-     * @return $this
-     * @throws LocalizedException
-     */
-    public function assignData(DataObject $data)
-    {
-        parent::assignData($data);
-
-        $additionalData = $data->getAdditionalData();
-        if (isset($additionalData['applepay_payment_token'])) {
-            $this->getInfoInstance()->setAdditionalInformation('applepay_payment_token', $additionalData['applepay_payment_token']);
-        }
-
-        if (isset($additionalData['card_token'])) {
-            $this->getInfoInstance()->setAdditionalInformation('card_token', $additionalData['card_token']);
-        }
-
-        if (isset($additionalData['selected_issuer'])) {
-            $this->getInfoInstance()->setAdditionalInformation('selected_issuer', $additionalData['selected_issuer']);
-        }
-
-        if (isset($additionalData['selected_terminal'])) {
-            $this->getInfoInstance()->setAdditionalInformation('selected_terminal', $additionalData['selected_terminal']);
-        }
-
-        return $this;
     }
 
     /**
@@ -338,91 +424,5 @@ class Mollie extends Adapter
         }
 
         return $this;
-    }
-
-    public function getOrderIdsByTransactionId(string $transactionId): array
-    {
-        $this->searchCriteriaBuilder->addFilter('transaction_id', $transactionId);
-        $orders = $this->transactionToOrderRepository->getList($this->searchCriteriaBuilder->create());
-
-        if (!$orders->getTotalCount()) {
-            $this->mollieHelper->addTolog('error', __('No order(s) found for transaction id %1', $transactionId));
-
-            return [];
-        }
-
-        return array_map(function (TransactionToOrderInterface $transactionToOrder): ?int {
-            return $transactionToOrder->getOrderId();
-        }, $orders->getItems());
-    }
-
-    /**
-     * Get list of Issuers from API
-     */
-    public function getIssuers(string $method, string $issuerListType, int $count = 0): ?array
-    {
-        $issuers = [];
-        // iDeal 2.0 does not have issuers anymore.
-        if ($issuerListType == 'none' || $method == 'mollie_methods_ideal') {
-            return $issuers;
-        }
-
-        $mollieApi = $this->mollieApiClient->loadByStore();
-        $methodCode = str_replace('mollie_methods_', '', $method);
-        try {
-            $issuers = $mollieApi->methods->get($methodCode, ['include' => 'issuers'])->issuers;
-
-            // If the list can't be retrieved for some reason, try again.
-            if (!$issuers && $count == 0) {
-                $this->mollieHelper->addTolog(
-                    'error',
-                    'Retrieving method issuers gave an issue. Retrying.' . var_export($issuers, true),
-                );
-
-                return $this->getIssuers($method, $issuerListType, 1);
-            }
-
-            if (!$issuers) {
-                return null;
-            }
-        } catch (Exception $e) {
-            $this->mollieHelper->addTolog('error', $e->getMessage());
-        }
-
-        if ($this->mollieHelper->addQrOption() && $methodCode == 'ideal') {
-            $issuers[] = [
-                'resource' => 'issuer',
-                'id' => '',
-                'name' => __('QR Code'),
-                'image' => [
-                    'size2x' => $this->assetRepository->getUrlWithParams(
-                        'Mollie_Payment::images/qr-select.svg',
-                        ['area' => 'frontend'],
-                    ),
-                    'svg' => $this->assetRepository->getUrlWithParams(
-                        'Mollie_Payment::images/qr-select.svg',
-                        ['area' => 'frontend'],
-                    ),
-                ],
-            ];
-        }
-
-        // Sort the list by name
-        uasort($issuers, function ($a, $b): int {
-            $a = (array) $a;
-            $b = (array) $b;
-
-            return strcmp(strtolower($a['name']), strtolower($b['name']));
-        });
-
-        if ($issuers && $issuerListType == 'dropdown') {
-            array_unshift($issuers, [
-                'resource' => 'issuer',
-                'id' => '',
-                'name' => __('-- Please Select --'),
-            ]);
-        }
-
-        return array_values($issuers);
     }
 }

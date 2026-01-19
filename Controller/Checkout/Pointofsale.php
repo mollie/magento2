@@ -1,5 +1,4 @@
 <?php
-
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -53,7 +52,7 @@ class Pointofsale implements HttpGetActionInterface
         $block = $resultPage->getLayout()->getBlock('mollie.pointofsale.wait');
         $block->setData(
             'status_url',
-            '/rest/' . $this->storeManager->getStore()->getCode() . '/V1/mollie/get-order/' . $token,
+            '/rest/' . $this->storeManager->getStore()->getCode() . '/V1/mollie/get-order/by-hash/' . $token,
         );
         $block->setData(
             'reset_url',

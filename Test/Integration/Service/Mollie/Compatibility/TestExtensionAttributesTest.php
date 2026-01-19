@@ -20,27 +20,23 @@ class TestExtensionAttributesTest extends IntegrationTestCase
             public function getExtensionAttributes(): object
             {
                 return new class() {
-                    public function getMolliePaymentFee(): void
-                    {
-                    }
-                    public function getBaseMolliePaymentFee(): void
-                    {
-                    }
-                    public function getMolliePaymentFeeTax(): void
-                    {
-                    }
-                    public function getBaseMolliePaymentFeeTax(): void
-                    {
-                    }
-                    public function getMollieCustomerId(): void
-                    {
-                    }
-                    public function getMollieRecurringType(): void
-                    {
-                    }
-                    public function getMollieRecurringData(): void
-                    {
-                    }
+                    public function getMolliePaymentFee(): void {}
+
+                    public function getBaseMolliePaymentFee(): void {}
+
+                    public function getMolliePaymentFeeTax(): void {}
+
+                    public function getBaseMolliePaymentFeeTax(): void {}
+
+                    public function getMollieCustomerId(): void {}
+
+                    public function getMollieRecurringType(): void {}
+
+                    public function getMollieRecurringData(): void {}
+
+                    public function getSendcloudCheckoutPayload(): void {}
+
+                    public function getSendcloudPartner(): void {}
                 };
             }
         };
@@ -64,9 +60,7 @@ class TestExtensionAttributesTest extends IntegrationTestCase
          * We create a fake class that will not return any extension attributes, and fail because of that.
          */
         $fakeClass = new class() {
-            public function getExtensionAttributes(): void
-            {
-            }
+            public function getExtensionAttributes(): void {}
         };
 
         $objectManagerMock = $this->createMock(ObjectManagerInterface::class);

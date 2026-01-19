@@ -13,6 +13,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\UrlInterface;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\ScopeInterface as StoreScope;
 use Mollie\Payment\Config;
@@ -32,20 +33,34 @@ class Transaction
         Context $context,
         private Encryptor $encryptor,
         private ScopeConfigInterface $scopeConfig,
-    ) {
+    )
+    {
         $this->urlBuilder = $context->getUrlBuilder();
     }
 
-    public function setRedirectUrl(string $url): void
+    public function getExpressRedirectUrl(CartInterface $cart, string $paymentToken): string
     {
-        $this->redirectUrl = $url;
+        $storeId = $cart->getStoreId();
+        $this->urlBuilder->setScope($storeId);
+        return $this->urlBuilder->getUrl(
+            'mollie/express/process/',
+            ['_query' => 'paymentToken=' . $paymentToken . '&utm_nooverride=1']
+        );
     }
 
-    /**
-     * @param OrderInterface $order
-     * @param string $paymentToken
-     * @return string
-     */
+    public function getExpressWebhookUrl(CartInterface $cart): string
+    {
+        $storeId = $cart->getStoreId();
+        if (!$this->config->isProductionMode($storeId) &&
+            $this->config->useWebhooks($storeId) == WebhookUrlOptions::DISABLED) {
+            return '';
+        }
+
+        return $this->urlBuilder->getUrl('mollie/express/webhook/', [
+            '_query' => 'quoteId=' . $cart->getEntityId(),
+        ]);
+    }
+
     public function getRedirectUrl(OrderInterface $order, string $paymentToken): string
     {
         $storeId = storeId($order->getStoreId());
@@ -56,7 +71,7 @@ class Transaction
             return $this->addParametersToCustomUrl($order, $paymentToken, $storeId);
         }
 
-        $parameters = 'order_id=' . (int) $order->getId() . '&payment_token=' . $paymentToken . '&utm_nooverride=1';
+        $parameters = 'order_id=' . (int)$order->getId() . '&payment_token=' . $paymentToken . '&utm_nooverride=1';
 
         $this->urlBuilder->setScope($storeId);
 
@@ -64,6 +79,11 @@ class Transaction
             'mollie/checkout/process/',
             ['_query' => $parameters],
         );
+    }
+
+    public function setRedirectUrl(string $url): void
+    {
+        $this->redirectUrl = $url;
     }
 
     public function getWebhookUrl(array $orders): string
@@ -84,7 +104,7 @@ class Transaction
         }
 
         $orderIds = array_map(function (OrderInterface $order): string {
-            return 'orderId[]=' . base64_encode($this->encryptor->encrypt((string) $order->getId()));
+            return 'orderId[]=' . base64_encode($this->encryptor->encrypt((string)$order->getId()));
         }, $orders);
 
         if ($this->config->useWebhooks($storeId) == WebhookUrlOptions::CUSTOM_URL) {
@@ -105,7 +125,7 @@ class Transaction
             '{{order_id}}' => $order->getId(),
             '{{increment_id}}' => $order->getIncrementId(),
             '{{payment_token}}' => $paymentToken,
-            '{{order_hash}}' => base64_encode($this->encryptor->encrypt((string) $order->getId())),
+            '{{order_hash}}' => base64_encode($this->encryptor->encrypt((string)$order->getId())),
             '{{base_url}}' => $this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
             '{{unsecure_base_url}}' => $this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
             '{{secure_base_url}}' => $this->scopeConfig->getValue('web/secure/base_url', StoreScope::SCOPE_STORE, $storeId),
