@@ -114,6 +114,8 @@ class Payments
 
     public function getAddressLine(OrderAddressInterface $address): array
     {
+        // Phone is added in \Mollie\Payment\Service\Order\TransactionPart\PhoneNumber
+
         $output = [
             'givenName' => $address->getFirstname(),
             'familyName' => $address->getLastname(),
@@ -121,7 +123,6 @@ class Payments
             'streetAndNumber' => rtrim(implode(' ', $address->getStreet()), ' '),
             'postalCode' => $address->getPostcode(),
             'email' => $address->getEmail(),
-            'telephone' => $address->getTelephone(),
             'city' => $address->getCity(),
             'region' => $address->getRegion(),
             'country' => $address->getCountryId(),
