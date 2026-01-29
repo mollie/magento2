@@ -2,9 +2,9 @@
 
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
+use InvalidArgumentException;
+use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Payment\Model\Client\Payments;
-use Mollie\Payment\Model\Methods\In3;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class PhoneNumber implements TransactionPartInterface
@@ -261,35 +261,43 @@ class PhoneNumber implements TransactionPartInterface
 
     public function process(OrderInterface $order, $apiMethod, array $transaction)
     {
-        if ($order->getPayment()->getMethod() != In3::CODE) {
-            return $transaction;
-        }
+        $transaction['billingAddress'] = $this->formatForAddress(
+            $order->getBillingAddress(),
+            $transaction['billingAddress'],
+        );
 
-        if ($apiMethod == Payments::CHECKOUT_TYPE) {
-            return $transaction;
-        }
+        $transaction['shippingAddress'] = $this->formatForAddress(
+            $order->getShippingAddress(),
+            $transaction['shippingAddress'],
+        );
 
-        $address = $order->getBillingAddress();
+        return $transaction;
+    }
+
+    private function formatForAddress(OrderAddressInterface $address, array $transactionAddress): array
+    {
         $countryCode = $address->getCountryId();
         $phoneNumber = $address->getTelephone();
 
-        if (empty($phoneNumber)) {
-            return $transaction;
+        if (!$countryCode || !$phoneNumber) {
+            return $transactionAddress;
         }
 
         try {
-            $transaction['billingAddress']['phone'] = $this->formatInE164($countryCode, $phoneNumber);
-        } catch (\InvalidArgumentException $exception) {
+            $transactionAddress['phone'] = $this->formatInE164($countryCode, $phoneNumber);
+
+            return $transactionAddress;
+        } catch (InvalidArgumentException $exception) {
             // Silently ignore the exception
         }
 
-        return $transaction;
+        return $transactionAddress;
     }
 
     private function formatInE164(string $countryCodeIso2, string $phoneNumber): string
     {
         if (!array_key_exists($countryCodeIso2, self::COUNTRY_CODE_MAPPING)) {
-            throw new \InvalidArgumentException(sprintf('Country code "%s" is not supported', $countryCodeIso2));
+            throw new InvalidArgumentException(sprintf('Country code "%s" is not supported', $countryCodeIso2));
         }
 
         $countryCode = self::COUNTRY_CODE_MAPPING[$countryCodeIso2];
@@ -306,7 +314,7 @@ class PhoneNumber implements TransactionPartInterface
         $formattedNumber = '+' . $countryCode . $formattedNumber;
 
         if (strlen($formattedNumber) <= 3 || !preg_match('/^\+[1-9]\d{1,14}$/', $formattedNumber)) {
-            throw new \InvalidArgumentException(__('Phone number "%s" is not valid', $formattedNumber));
+            throw new InvalidArgumentException(__('Phone number "%s" is not valid', $formattedNumber));
         }
 
         return $formattedNumber;

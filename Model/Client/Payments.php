@@ -202,10 +202,10 @@ class Payments extends AbstractModel
 
     /**
      * @param OrderInterface $order
-     * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param MollieApiClient $mollieApi
      *
      * @return string
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
     public function startTransaction(OrderInterface $order, $mollieApi)
     {
@@ -267,6 +267,8 @@ class Payments extends AbstractModel
 
     public function getAddressLine(OrderAddressInterface $address): array
     {
+        // Phone is added in \Mollie\Payment\Service\Order\TransactionPart\PhoneNumber
+
         $output = [
             'givenName' => $address->getFirstname(),
             'familyName' => $address->getLastname(),
@@ -277,7 +279,6 @@ class Payments extends AbstractModel
             'region' => $address->getRegion(),
             'country' => $address->getCountryId(),
             'email' => $address->getEmail(),
-            'telephone' => $address->getTelephone(),
         ];
 
         if ($address->getAddressType() == Address::TYPE_BILLING) {
@@ -336,13 +337,13 @@ class Payments extends AbstractModel
 
     /**
      * @param Order                       $order
-     * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param MollieApiClient $mollieApi
      * @param string                      $type
      * @param null                        $paymentToken
      *
      * @return array
      * @throws LocalizedException
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
     public function processTransaction(Order $order, $mollieApi, $type = 'webhook', $paymentToken = null)
     {
