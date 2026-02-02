@@ -12,7 +12,6 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Model\Client\PaymentProcessorInterface;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
-use Mollie\Payment\Service\Magento\Vault\AddCardToVault;
 use Mollie\Payment\Service\Mollie\DashboardUrl;
 use Mollie\Payment\Service\Order\SaveAdditionalInformationDetails;
 
@@ -21,7 +20,6 @@ class AddAdditionalInformation implements PaymentProcessorInterface
     public function __construct(
         private DashboardUrl $dashboardUrl,
         private SaveAdditionalInformationDetails $saveAdditionalInformationDetails,
-        private AddCardToVault $addCardToVault
     ) {}
 
     public function process(
@@ -44,8 +42,6 @@ class AddAdditionalInformation implements PaymentProcessorInterface
         if ($molliePayment->details !== null) {
             $this->saveAdditionalInformationDetails->execute($magentoPayment, $molliePayment->details);
         }
-
-        $this->addCardToVault->forPayment($magentoPayment, $molliePayment);
 
         return $response;
     }

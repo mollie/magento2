@@ -71,10 +71,6 @@ class CustomerId implements TransactionPartInterface
         }
 
         $storeId = storeId($order->getStoreId());
-        if ($this->config->isMagentoVaultEnabled($storeId)) {
-            return true;
-        }
-
         if ($order->getPayment()->getMethod() != 'mollie_methods_creditcard') {
             return false;
         }

@@ -75,7 +75,6 @@
     "magento/module-store": ">=100.3.3",
     "magento/module-tax": ">=100.3.3",
     "magento/module-ui": ">=100.3.3",
-    "magento/module-vault": ">=100.3.3",
     "php": ">=8.1",
     "ext-json": "*"
   },
@@ -88,7 +87,6 @@
     "files": [
       "registration.php",
       "GraphQL/Replaces/AdditionalDataProviderInterface.php",
-      "Service/InstantPurchase/AvailabilityCheckerInterface.php",
       "Service/storeid.php"
     ],
     "psr-4": {

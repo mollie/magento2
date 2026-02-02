@@ -18,7 +18,6 @@
             <module name="Magento_SalesRule" />
             <module name="Magento_Store" />
             <module name="Magento_Ui"/>
-            <module name="Magento_Vault"/>
             <module name="Magento_Tax" />
             <module name="Magento_MessageQueue"/>
         </sequence>

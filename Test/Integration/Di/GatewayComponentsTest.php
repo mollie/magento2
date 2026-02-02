@@ -13,7 +13,6 @@ use Magento\Payment\Block\Form;
 use Magento\TestFramework\ObjectManager\Config;
 use Mollie\Payment\Block\Form\Paymentlink;
 use Mollie\Payment\Block\Form\Pointofsale;
-use Mollie\Payment\Model\Methods\CreditcardVault;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use ReflectionObject;
 
@@ -89,10 +88,6 @@ class GatewayComponentsTest extends IntegrationTestCase
         ];
 
         foreach ($this->getMethods() as $method) {
-            if ($method['name'] == 'CreditcardVault') {
-                continue;
-            }
-
             $class = $method['class'];
             $name = $method['name'];
             $classArguments = $arguments[$class];
@@ -102,15 +97,6 @@ class GatewayComponentsTest extends IntegrationTestCase
             $this->assertArrayHasKey('formBlockType', $classArguments, $name . ' does not have a formBlockType');
             $this->assertEquals($expected, $classArguments['formBlockType'], $name . ' have an incorrect formBlockType');
         }
-    }
-
-    public function testCreditcardVaultDoesNotHaveFormBlockType(): void
-    {
-        $arguments = $this->getObjectManagerArguments();
-
-        $classArguments = $arguments[CreditcardVault::class];
-
-        $this->assertArrayNotHasKey('formBlockType', $classArguments, 'CreditcardVault does have a formBlockType');
     }
 
     private function getObjectManagerArguments(): array

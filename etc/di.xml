@@ -141,8 +141,6 @@
                 <item name="customerId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CustomerId</item>
                 <item name="issuer" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\Issuer</item>
                 <item name="applePayPaymentToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\ApplePayPaymentToken</item>
-                <item name="sequenceTypeForVault" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\SequenceType</item>
-                <item name="UseSavedPaymentMethod" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\UseSavedPaymentMethod</item>
                 <item name="PhoneNumber" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\PhoneNumber</item>
                 <item name="DateOfBirth" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\DateOfBirth</item>
                 <item name="CaptureMode" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureMode</item>
@@ -907,18 +905,10 @@
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieCreditcardValueHandlerPool</argument>
-            <argument name="commandPool" xsi:type="object">MollieCreditcardCommandPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
             <argument name="validatorPool" xsi:type="object">MollieCreditcardValidatorPool</argument>
         </arguments>
     </type>
-
-    <virtualType name="MollieCreditcardCommandPool" type="MollieCommandPool">
-        <arguments>
-            <argument name="commands" xsi:type="array">
-                <item name="vault_authorize" xsi:type="string">MollieCreditcardVaultAuthorizeCommand</item>
-            </argument>
-        </arguments>
-    </virtualType>
 
     <virtualType name="MollieCreditcardValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
@@ -952,48 +942,6 @@
         <arguments>
             <argument name="config" xsi:type="object">MollieCreditcardConfig</argument>
         </arguments>
-    </virtualType>
-
-    <!-- Creditcard Vault -->
-    <type name="Mollie\Payment\Model\Methods\CreditcardVault">
-        <arguments>
-            <argument name="config" xsi:type="object">MollieCreditcardVaultConfig</argument>
-            <argument name="valueHandlerPool" xsi:type="object">MollieCreditcardVaultValueHandlerPool</argument>
-            <argument name="vaultProvider" xsi:type="object">Mollie\Payment\Model\Methods\Creditcard</argument>
-            <argument name="code" xsi:type="const">Mollie\Payment\Model\Methods\CreditcardVault::CODE</argument>
-            <argument name="validatorPool" xsi:type="object">MollieCreditcardVaultValidatorPool</argument>
-        </arguments>
-    </type>
-
-    <virtualType name="MollieCreditcardVaultValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
-        <arguments>
-            <argument name="handlers" xsi:type="array">
-                <item name="default" xsi:type="string">MollieCreditcardConfigValueHandler</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieCreditcardVaultConfig" type="Mollie\Payment\Model\Data\CreditcardVaultConfig">
-        <arguments>
-            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Creditcard::CODE</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieCreditcardVaultValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
-        <arguments>
-            <argument name="validators" xsi:type="array">
-                <item name="country" xsi:type="string">MollieCreditcardVaultCountryValidator</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieCreditcardVaultCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
-        <arguments>
-            <argument name="config" xsi:type="object">MollieCreditcardVaultConfig</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieCreditcardVaultAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
     </virtualType>
 
     <!-- Directdebit -->
@@ -2330,7 +2278,6 @@
             <argument name="commands" xsi:type="array">
                 <item name="order" xsi:type="string">MollieOrderCommand</item>
                 <item name="authorize" xsi:type="string">MollieInitializeCommand</item>
-                <item name="vault_authorize" xsi:type="string">MollieInitializeCommand</item>
             </argument>
         </arguments>
     </virtualType>

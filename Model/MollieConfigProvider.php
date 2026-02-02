@@ -118,7 +118,6 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['mollie']['applepay']['supported_networks'] = $this->supportedNetworks->execute((int)$storeId);
         $config['payment']['mollie']['store']['name'] = $storeName;
         $config['payment']['mollie']['store']['currency'] = $this->config->getStoreCurrency($storeId);
-        $config['payment']['mollie']['vault']['enabled'] = $this->config->isMagentoVaultEnabled($storeId);
         $config['payment']['mollie']['expresscomponents']['enabled'] = $this->getMethodInstance('mollie_methods_expresscomponents')->isAvailable();
         $useImage = $this->mollieHelper->useImage();
 
