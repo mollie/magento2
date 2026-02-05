@@ -28,7 +28,7 @@
         <field id="capture_mode" translate="label comment" type="select" sortOrder="50" showInDefault="1"
                showInWebsite="1" showInStore="1" canRestore="1">
             <label>Capture method</label>
-            <config_path>payment/mollie_methods_creditcard/capture_mode</config_path>
+            <config_path>payment/mollie_methods_klarna/capture_mode</config_path>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\CaptureMode</source_model>
             <depends>
                 <field id="active">1</field>
