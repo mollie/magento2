@@ -8,12 +8,12 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Fakes\Service\Mollie;
 
-use Exception;
-use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class FakeMollieApiClient extends MollieApiClient
 {
+    private bool $disableApiCall = true;
+
     private ?\Mollie\Api\MollieApiClient $instance = null;
 
     public function setInstance(\Mollie\Api\MollieApiClient $instance): void
@@ -46,10 +46,8 @@ class FakeMollieApiClient extends MollieApiClient
         return parent::loadByApiKey($apiKey);
     }
 
-    public function returnFakePayment(?Payment $payment = null): ?Payment
+    public function fake(array $expectedResponses = [], bool $retainRequests = false): void
     {
-        $this->loadInstance();
-
-        throw new Exception('TODO: Implement this');
+        $this->instance = \Mollie\Api\MollieApiClient::fake($expectedResponses, $retainRequests);
     }
 }

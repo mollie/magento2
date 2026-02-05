@@ -10,7 +10,6 @@ namespace Mollie\Payment\Model;
 
 use Exception;
 use Magento\Checkout\Model\Session;
-use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
@@ -31,8 +30,6 @@ use Magento\Sales\Model\Order\Payment;
 use Magento\Sales\Model\OrderRepository;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
-use Mollie\Payment\Api\Data\TransactionToOrderInterface;
-use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\Payments;
@@ -60,21 +57,18 @@ class Mollie extends Adapter
         private Payments $paymentsApi,
         private General $mollieHelper,
         private Session $checkoutSession,
-        private SearchCriteriaBuilder $searchCriteriaBuilder,
         private Repository $assetRepository,
         protected Config $config,
         private ProcessTransaction $paymentsProcessTransaction,
         private OrderLockService $orderLockService,
         private \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
-        private TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         $formBlockType,
         $infoBlockType,
         ?CommandPoolInterface $commandPool = null,
         ?ValidatorPoolInterface $validatorPool = null,
         ?CommandManagerInterface $commandExecutor = null,
         ?LoggerInterface $logger = null,
-    )
-    {
+    ) {
         parent::__construct(
             $eventManager,
             $valueHandlerPool,
@@ -123,22 +117,6 @@ class Mollie extends Adapter
     public function getCode()
     {
         return static::CODE;
-    }
-
-    public function getOrderIdsByTransactionId(string $transactionId): array
-    {
-        $this->searchCriteriaBuilder->addFilter('transaction_id', $transactionId);
-        $orders = $this->transactionToOrderRepository->getList($this->searchCriteriaBuilder->create());
-
-        if (!$orders->getTotalCount()) {
-            $this->mollieHelper->addTolog('error', __('No order(s) found for transaction id %1', $transactionId));
-
-            return [];
-        }
-
-        return array_map(function (TransactionToOrderInterface $transactionToOrder): ?int {
-            return $transactionToOrder->getOrderId();
-        }, $orders->getItems());
     }
 
     /**

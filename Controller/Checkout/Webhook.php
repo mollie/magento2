@@ -22,6 +22,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Mollie as MollieModel;
+use Mollie\Payment\Service\Magento\GetOrderIdsByTransactionId;
 use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\OrderLockService;
 
@@ -41,6 +42,7 @@ class Webhook extends Action implements HttpGetActionInterface, HttpPostActionIn
         private EncryptorInterface $encryptor,
         private OrderLockService $orderLockService,
         private ProcessTransaction $processTransaction,
+        private GetOrderIdsByTransactionId $getOrderIdsByTransactionId,
     ) {
         $this->resultFactory = $context->getResultFactory();
         parent::__construct($context);
@@ -123,7 +125,7 @@ class Webhook extends Action implements HttpGetActionInterface, HttpPostActionIn
     {
         $orders = [];
         $transactionId = $this->getRequest()->getParam('id');
-        $orderIds = $this->mollieModel->getOrderIdsByTransactionId($transactionId);
+        $orderIds = $this->getOrderIdsByTransactionId->execute($transactionId);
 
         foreach ($orderIds as $id) {
             $orders[] = $this->orderRepository->get($id);

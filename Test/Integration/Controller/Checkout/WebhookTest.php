@@ -11,17 +11,24 @@ namespace Mollie\Payment\Test\Integration\Controller\Checkout;
 use Exception;
 use Magento\TestFramework\Request;
 use Magento\TestFramework\TestCase\AbstractController as ControllerTestCase;
-use Mollie\Payment\Model\Mollie;
+use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Requests\GetPaymentRequest;
+use Mollie\Payment\Service\Magento\GetOrderIdsByTransactionId;
+use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 
 class WebhookTest extends ControllerTestCase
 {
     public function testSetsTheStatusCodeTo503WhenTheOrderProcessFails(): void
     {
-        $mollieModel = $this->createMock(Mollie::class);
-        $mollieModel->method('getOrderIdsByTransactionId')->willReturn([123]);
-        $mollieModel->method('processTransaction')->willThrowException(new Exception('[TEST] Transaction failed. Please verify your billing information and payment method, and try again.'));
+        $getOrdersByTransactionId = $this->createMock(GetOrderIdsByTransactionId::class);
+        $getOrdersByTransactionId
+            ->method('execute')
+            ->willThrowException(new Exception(
+                '[TEST] Transaction failed. Please verify your billing information and payment method, and try again.'
+            ));
 
-        $this->_objectManager->addSharedInstance($mollieModel, Mollie::class);
+        $this->_objectManager->addSharedInstance($getOrdersByTransactionId, GetOrderIdsByTransactionId::class);
 
         $this->getRequest()->setMethod(Request::METHOD_POST);
         $this->getRequest()->setParams([
@@ -51,6 +58,11 @@ class WebhookTest extends ControllerTestCase
 
     public function testReturns200IfAnInvalidTransactionIdIsProvided(): void
     {
+        /** @var FakeMollieApiClient $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->_objectManager->get(FakeMollieApiClient::class);
+        $fakeMollieApiClient->fake([GetPaymentRequest::class => MockResponse::ok()]);
+        $this->_objectManager->addSharedInstance($fakeMollieApiClient, MollieApiClient::class);
+
         $this->getRequest()->setParam('id', 'NON_EXISTING');
 
         $this->dispatch('mollie/checkout/webhook');
