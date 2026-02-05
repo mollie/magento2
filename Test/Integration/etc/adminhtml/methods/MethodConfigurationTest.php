@@ -6,6 +6,7 @@ use Exception;
 use Magento\Framework\Filesystem\Driver\File;
 use Magento\Framework\Module\Dir;
 use Magento\Framework\Simplexml\Config;
+use Magento\Framework\Simplexml\Element;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MethodConfigurationTest extends IntegrationTestCase
@@ -46,9 +47,9 @@ class MethodConfigurationTest extends IntegrationTestCase
         }
     }
 
-    private function validateMethod(mixed $file, int|string $method): void
+    private function validateMethod(Element $file, string $method): void
     {
-        foreach ($file->descend('group')->getChildren()->field as $field) {
+        foreach ($file->group->field as $field) {
             $id = $field->attributes()->id->__toString();
 
             $expectedPath = 'payment/mollie_methods_' . $method . '/' . $id;

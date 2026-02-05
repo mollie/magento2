@@ -9,9 +9,9 @@ jobs:
               - PHP_VERSION: php81-fpm
                 MAGENTO_VERSION: 2.4.6-p4
               - PHP_VERSION: php84-fpm
-                MAGENTO_VERSION: 2.4.8
+                MAGENTO_VERSION: 2.4.8-p3
               - PHP_VERSION: php84-fpm
-                MAGENTO_VERSION: 2.4.8
+                MAGENTO_VERSION: 2.4.8-p3
                 PHPSTAN_LEVEL: 3
 
         name: PHP ${{ matrix.PHP_VERSION }} Magento ${{ matrix.MAGENTO_VERSION }}${{ matrix.PHPSTAN_LEVEL && format(' Level {0}', matrix.PHPSTAN_LEVEL) || '' }}

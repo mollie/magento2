@@ -42,8 +42,8 @@ jobs:
             NO_API_KEY_TEST: false
             SHARD_INDEX: 2
             SHARD_TOTAL: 3
-          - PHP_VERSION: php83-fpm
-            MAGENTO_VERSION: 2.4.7-p3
+          - PHP_VERSION: php84-fpm
+            MAGENTO_VERSION: 2.4.8-p3
             NO_API_KEY_TEST: false
             SHARD_INDEX: 3
             SHARD_TOTAL: 3

@@ -95,34 +95,6 @@ class FetchOrderStatusTest extends AbstractBackendController
         );
     }
 
-    public function testReturnsA503WhenAnErrorIsPresent(): void
-    {
-        $mollieHelperMock = $this->createMock(MollieHelper::class);
-        $mollieHelperMock->method('orderHasUpdate')->willReturn(true);
-        $mollieHelperMock->expects($this->once())
-            ->method('processTransaction')
-            ->with('999', 'webhook')
-            ->willReturn($this->_objectManager->create(ProcessTransactionResponse::class, [
-                'success' => false,
-                'status' => '[TEST] Test unsuccessful',
-                'order_id' => -999,
-                'type' => 'webhook',
-            ]));
-
-        $this->_objectManager->addSharedInstance($mollieHelperMock, MollieHelper::class);
-
-        $this->getRequest()->setParams(['order_id' => '999']);
-
-        $this->getRequest()->setMethod('POST');
-        $this->dispatch('backend/mollie/action/fetchOrderStatus');
-
-        $json = json_decode($this->getResponse()->getContent(), true);
-
-        $this->assertEquals(503, $this->getResponse()->getStatusCode());
-        $this->assertTrue($json['error']);
-        $this->assertEquals('[TEST] Test unsuccessful', $json['msg']);
-    }
-
     public function testDoesNothingWhenUpdateNotNeeded(): void
     {
         $mollieHelperMock = $this->createMock(MollieHelper::class);

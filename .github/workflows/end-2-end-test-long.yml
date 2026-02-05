@@ -49,7 +49,7 @@ jobs:
       matrix:
         include:
           - PHP_VERSION: php84-fpm
-            MAGENTO_VERSION: 2.4.8
+            MAGENTO_VERSION: 2.4.8-p3
             NO_API_KEY_TEST: false
           - PHP_VERSION: php81-fpm
             MAGENTO_VERSION: 2.4.6-p13

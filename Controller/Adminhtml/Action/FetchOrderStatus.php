@@ -15,8 +15,6 @@ use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\Exception\LocalizedException;
-use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Mollie;
 
 class FetchOrderStatus extends Action implements HttpPostActionInterface
@@ -43,7 +41,6 @@ class FetchOrderStatus extends Action implements HttpPostActionInterface
             }
 
             $message = $this->mollieModel->processTransaction($orderId, 'webhook');
-            $this->throwExceptionIfErrorPresent($message);
 
             $this->messageManager->addSuccessMessage(__('The latest status from Mollie has been retrieved'));
 
@@ -56,14 +53,5 @@ class FetchOrderStatus extends Action implements HttpPostActionInterface
                 'msg' => $exception->getMessage(),
             ]);
         }
-    }
-
-    private function throwExceptionIfErrorPresent(ProcessTransactionResponse $message): void
-    {
-        if ($message->isSuccess()) {
-            return;
-        }
-
-        throw new LocalizedException(__($message->getStatus()));
     }
 }
