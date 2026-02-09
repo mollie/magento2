@@ -45,7 +45,7 @@ class ConvertComponentsPaymentToOrder
         $cart->setStoreId($baseCart->getStoreId());
         $cart->setCustomer($this->getCustomer($baseCart, $payment));
 
-        $this->setAddressesOnCart->execute($cart, $payment);
+        $this->setAddressesOnCart->execute($baseCart, $cart, $payment);
         $this->setShippingOnCart->execute($cart, $payment);
         $this->cartRepository->save($cart);
 
