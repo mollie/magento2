@@ -22,7 +22,8 @@ class SupportedNetworks
     public function execute(?int $storeId = null): array
     {
         $output = ['amex', 'masterCard', 'visa'];
-        if ($this->config->captureMode(Creditcard::CODE, $storeId) == CaptureMode::AUTOMATIC) {
+        $mode = $this->config->captureMode(Creditcard::CODE, storeId($storeId));
+        if ($mode == CaptureMode::AUTOMATIC) {
             $output[] = 'maestro';
             $output[] = 'vPay';
         }

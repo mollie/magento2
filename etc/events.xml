@@ -57,4 +57,18 @@
     <event name="backend_block_widget_grid_prepare_grid_before">
         <observer name="mollie_add_additional_data_to_collection" instance="Mollie\Payment\Observer\BackendBlockWidgetGridPrepareGridBefore\AddAdditionalInformationToCollection" />
     </event>
+    <event name="sales_order_shipment_save_before">
+        <!-- Order of execution is important -->
+        <observer name="mollie_aaaa_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
+        <observer name="mollie_capture_shipment" instance="Mollie\Payment\Observer\SalesOrderShipmentSaveBefore\CaptureShipment"/>
+    </event>
+    <event name="sales_order_shipment_save_after">
+        <observer name="mollie_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
+    </event>
+    <event name="sales_order_shipment_track_save_before">
+        <observer name="mollie_aaaa_lock_unlock_order" instance="Mollie\Payment\Observer\LockUnlockOrder" />
+    </event>
+    <event name="order_cancel_after">
+        <observer name="mollie_release_authorization" instance="Mollie\Payment\Observer\OrderCancelAfter\ReleaseAuthorization" />
+    </event>
 </config>
