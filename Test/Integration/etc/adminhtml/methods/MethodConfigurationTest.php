@@ -1,46 +1,31 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 namespace Mollie\Payment\Test\Integration\etc\adminhtml\methods;
 
-use Exception;
-use Magento\Framework\Filesystem\Driver\File;
-use Magento\Framework\Module\Dir;
-use Magento\Framework\Simplexml\Config;
 use Magento\Framework\Simplexml\Element;
-use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-class MethodConfigurationTest extends IntegrationTestCase
+class MethodConfigurationTest extends AbstractXmlConfigurationTest
 {
-    public function getXmlFiles(): array
+    public function testHasCaptureModeAvailable(): void
     {
-        $file = $this->objectManager->get(File::class);
-        $xmlReader = $this->objectManager->get(Config::class);
+        $xmlFiles = $this->getMethodXmlFiles();
 
-        $moduleDir = $this->objectManager->get(Dir::class);
-
-        $etcPath = $moduleDir->getDir('Mollie_Payment', Dir::MODULE_ETC_DIR);
-        $methodsPath = $etcPath . '/adminhtml/methods/';
-
-        if (!$file->isDirectory($methodsPath)) {
-            throw new Exception('Methods path does not exist: ' . $methodsPath);
-        }
-
-        $xmlFiles = [];
-        $files = $file->readDirectory($methodsPath);
-        foreach ($files as $path) {
-            if ($file->isFile($path) && pathinfo($path, PATHINFO_EXTENSION) === 'xml') {
-                $filename = basename($path, '.xml');
-                $xmlReader->loadFile($path);
-                $xmlFiles[$filename] = $xmlReader->getNode();
+        foreach ($xmlFiles as $method => $file) {
+            if (!$this->hasField($file, 'capture_mode')) {
+                $this->fail(sprintf('Method "%s" does not have the capture_mode field', $method));
             }
-        }
 
-        return $xmlFiles;
+            $this->addToAssertionCount(1);
+        }
     }
 
     public function testHasValidConfigPaths(): void
     {
-        $xmlFiles = $this->getXmlFiles();
+        $xmlFiles = $this->getMethodXmlFiles();
 
         foreach ($xmlFiles as $method => $file) {
             $this->validateMethod($file, $method);

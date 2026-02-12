@@ -47,10 +47,53 @@ class Base extends Info
         $this->timezone = $context->getLocaleDate();
     }
 
-    public function getCheckoutType(): ?string
+    public function formatPrice($amount)
+    {
+        return $this->price->format($amount);
+    }
+
+    public function getAmountPaidByVoucher(): false|int|float
+    {
+        if (!$this->getOrder()) {
+            return false;
+        }
+
+        return $this->getOrder()->getGrandTotal() - $this->getRemainderAmount();
+    }
+
+    public function getCaptureBefore(): ?string
     {
         try {
-            return $this->getInfo()->getAdditionalInformation('checkout_type');
+            return $this->getInfo()->getAdditionalInformation('mollie_capture_before');
+        } catch (Exception) {
+            return null;
+        }
+    }
+
+    public function getChangePaymentStatusUrl(): ?string
+    {
+        try {
+            return (string) $this->getInfo()->getAdditionalInformation('mollie_change_payment_state_url');
+        } catch (Exception $exception) {
+            return null;
+        }
+    }
+
+    public function getCheckoutUrl(): ?string
+    {
+        try {
+            return $this->getInfo()->getAdditionalInformation('checkout_url');
+        } catch (Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+
+            return null;
+        }
+    }
+
+    public function getDashboardUrl(): ?string
+    {
+        try {
+            return $this->getInfo()->getAdditionalInformation('dashboard_url');
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
 
@@ -71,28 +114,10 @@ class Base extends Info
         return null;
     }
 
-    public function getPaymentLink($storeId = null): ?string
-    {
-        if (!$this->config->addPaymentLinkMessage($storeId)) {
-            return null;
-        }
-
-        return str_replace(
-            '%link%',
-            $this->getPaymentLinkUrl(),
-            $this->config->paymentLinkMessage($storeId),
-        );
-    }
-
-    public function getPaymentLinkUrl(): string
-    {
-        return $this->paymentLinkUrl->execute((int) $this->getInfo()->getParentId());
-    }
-
-    public function getCheckoutUrl(): ?string
+    public function getMollieId(): ?string
     {
         try {
-            return $this->getInfo()->getAdditionalInformation('checkout_url');
+            return $this->getInfo()->getAdditionalInformation('mollie_id');
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
 
@@ -100,21 +125,10 @@ class Base extends Info
         }
     }
 
-    public function getPaymentStatus(): ?string
+    public function getOrderId(): ?string
     {
         try {
-            return $this->getInfo()->getAdditionalInformation('payment_status');
-        } catch (Exception $e) {
-            $this->mollieHelper->addTolog('error', $e->getMessage());
-
-            return null;
-        }
-    }
-
-    public function getDashboardUrl(): ?string
-    {
-        try {
-            return $this->getInfo()->getAdditionalInformation('dashboard_url');
+            return $this->getInfo()->getParentId();
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
 
@@ -142,24 +156,57 @@ class Base extends Info
         }
     }
 
-    public function getChangePaymentStatusUrl(): ?string
+    /**
+     * @throws LocalizedException
+     */
+    public function getPaymentImage(): string
     {
-        try {
-            return (string) $this->getInfo()->getAdditionalInformation('mollie_change_payment_state_url');
-        } catch (Exception $exception) {
-            return null;
+        $code = $this->getInfo()->getMethod();
+        if (strpos($code, 'mollie_methods_') !== false) {
+            $code = str_replace('mollie_methods_', '', $code);
         }
+
+        return $code . '.svg';
     }
 
-    public function getMollieId(): ?string
+    public function getPaymentLink($storeId = null): ?string
+    {
+        if (!$this->config->addPaymentLinkMessage($storeId)) {
+            return null;
+        }
+
+        return str_replace(
+            '%link%',
+            $this->getPaymentLinkUrl(),
+            $this->config->paymentLinkMessage($storeId),
+        );
+    }
+
+    public function getPaymentLinkUrl(): string
+    {
+        return $this->paymentLinkUrl->execute((int) $this->getInfo()->getParentId());
+    }
+
+    public function getPaymentStatus(): ?string
     {
         try {
-            return $this->getInfo()->getAdditionalInformation('mollie_id');
+            return $this->getInfo()->getAdditionalInformation('payment_status');
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
 
             return null;
         }
+    }
+
+    public function getRemainderAmount()
+    {
+        try {
+            return $this->getInfo()->getAdditionalInformation('remainder_amount');
+        } catch (Exception $e) {
+            $this->mollieHelper->addTolog('error', $e->getMessage());
+        }
+
+        return false;
     }
 
     /**
@@ -184,55 +231,6 @@ class Base extends Info
         }
 
         return false;
-    }
-
-    /**
-     * @throws LocalizedException
-     */
-    public function getPaymentImage(): string
-    {
-        $code = $this->getInfo()->getMethod();
-        if (strpos($code, 'mollie_methods_') !== false) {
-            $code = str_replace('mollie_methods_', '', $code);
-        }
-
-        return $code . '.svg';
-    }
-
-    public function getOrderId(): ?string
-    {
-        try {
-            return $this->getInfo()->getParentId();
-        } catch (Exception $e) {
-            $this->mollieHelper->addTolog('error', $e->getMessage());
-
-            return null;
-        }
-    }
-
-    public function getAmountPaidByVoucher(): false|int|float
-    {
-        if (!$this->getOrder()) {
-            return false;
-        }
-
-        return $this->getOrder()->getGrandTotal() - $this->getRemainderAmount();
-    }
-
-    public function getRemainderAmount()
-    {
-        try {
-            return $this->getInfo()->getAdditionalInformation('remainder_amount');
-        } catch (Exception $e) {
-            $this->mollieHelper->addTolog('error', $e->getMessage());
-        }
-
-        return false;
-    }
-
-    public function formatPrice($amount)
-    {
-        return $this->price->format($amount);
     }
 
     private function getOrder(): ?OrderInterface

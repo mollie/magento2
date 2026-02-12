@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Config;
 
 use Magento\Quote\Api\Data\CartInterface;
-use Magento\Tax\Model\Calculation;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType;
 
@@ -17,7 +16,6 @@ class PaymentFee
 {
     public function __construct(
         private Config $config,
-        private Calculation $taxCalculation
     ) {}
 
     /**

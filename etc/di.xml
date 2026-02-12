@@ -310,6 +310,7 @@
             <argument name="processors" xsi:type="array">
                 <item name="preprocess" xsi:type="array">
                     <item name="add_additional_data" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\AddAdditionalInformation</item>
+                    <item name="save_capture_before_date" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SaveCaptureBeforeDate</item>
                 </item>
                 <item name="failed" xsi:type="array">
                     <item name="failed" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\FailedStatusProcessor</item>

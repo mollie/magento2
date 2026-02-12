@@ -15,7 +15,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 class SupportedNetworksTest extends IntegrationTestCase
 {
     /**
-     * @magentoConfigFixture default_store payment/mollie_general/enable_manual_capture 0
+     * @magentoConfigFixture default_store payment/mollie_methods_creditcard/capture_mode automatic
      * @return void
      */
     public function testDoesReturnAllNetworksWhenManualCaptureIsDisabled(): void

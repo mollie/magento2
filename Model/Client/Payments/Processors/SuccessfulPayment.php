@@ -163,6 +163,15 @@ class SuccessfulPayment implements PaymentProcessorInterface
         }
     }
 
+    private function sendInvoiceEmail(Invoice $invoice, bool $sendInvoice, OrderInterface $order): void
+    {
+        if ($invoice->getEmailSent() || !$sendInvoice) {
+            return;
+        }
+
+        $this->sendOrderEmails->sendInvoiceEmail($invoice);
+    }
+
     /**
      * @param OrderInterface|Order $order
      */
@@ -175,22 +184,16 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $this->sendOrderEmails->sendOrderConfirmation($order);
     }
 
-    private function sendInvoiceEmail(Invoice $invoice, bool $sendInvoice, OrderInterface $order): void
-    {
-        if ($invoice->getEmailSent() || !$sendInvoice) {
-            return;
-        }
-
-        $this->sendOrderEmails->sendInvoiceEmail($invoice);
-    }
-
     private function updateOrderStatus(OrderInterface $order): void
     {
         $payment = $order->getPayment();
 
         /** @var null|int $statusUpdated */
         $statusUpdated = $payment->getAdditionalInformation('mollie_status_updated');
-        if ($statusUpdated !== null && $statusUpdated === 1) {
+        if ($statusUpdated !== null &&
+            $statusUpdated === 1 &&
+            $order->getState() !== Order::STATE_PAYMENT_REVIEW
+        ) {
             return;
         }
 

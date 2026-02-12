@@ -10,16 +10,18 @@ namespace Mollie\Payment\Model\Client\Payments;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Sales\Api\Data\InvoiceInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
-class CapturePayment
+class CapturePaymentForInvoice
 {
     public function __construct(
         private MollieApiClient $mollieApiClient,
         private General $mollieHelper,
         private PriceCurrencyInterface $price,
+        private OrderRepositoryInterface $orderRepository,
     ) {
     }
 
@@ -57,5 +59,7 @@ class CapturePayment
             ),
             $status,
         );
+
+        $this->orderRepository->save($order);
     }
 }

@@ -4,27 +4,25 @@
  * See COPYING.txt for license details.
  */
 
-declare(strict_types=1);
-
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
 use Magento\Framework\Data\OptionSourceInterface;
 
-class CaptureMode implements OptionSourceInterface
+class CaptureMoment implements OptionSourceInterface
 {
-    public const AUTOMATIC = 'automatic';
-    public const MANUAL = 'manual';
+    public const ON_INVOICE = 'invoice';
+    public const ON_SHIPMENT = 'shipment';
 
     public function toOptionArray(): array
     {
         return [
             [
-                'value' => static::AUTOMATIC,
-                'label' => __('Autocapture'),
+                'value' => static::ON_INVOICE,
+                'label' => __('On invoice'),
             ],
             [
-                'value' => static::MANUAL,
-                'label' => __('Manual capture'),
+                'value' => static::ON_SHIPMENT,
+                'label' => __('On shipment'),
             ],
         ];
     }

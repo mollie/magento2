@@ -1,0 +1,39 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var CaptureExpirationWindow $block
+ * @var Escaper $escaper
+ */
+
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Adminhtml\System\Config\Form\Field\CaptureExpirationWindow;
+
+?>
+
+<?php if ($block->getPaymentMethod() == 'creditcard') : ?>
+    <p><?= $escaper->escapeHtml(__('An authorized payment is a guaranteed amount, yet authorizations are generally not meant to remain open for a longer period. The exact allowed authorization window depends on the type of card your customer used.')); ?></p>
+
+    <strong>Mastercard</strong>: <?= $escaper->escapeHtml(__('30 days')); ?><br>
+    <strong>Visa</strong>: <?= $escaper->escapeHtml(__('7 days')); ?><br>
+    <strong>American Express</strong>: <?= $escaper->escapeHtml(__('7 days')); ?><br>
+    <strong>Cartes Bancaires</strong>: <?= $escaper->escapeHtml(__('30 days')); ?><br>
+<?php endif; ?>
+
+<?php if ($block->getPaymentMethod() != 'creditcard') : ?>
+    <?= $escaper->escapeHtml(__(
+        'An authorized payment is a guaranteed amount, yet authorizations are generally not meant to remain open for a longer period. The exact allowed authorization for %1 is <strong>%2</strong>',
+        ucfirst($block->getPaymentMethod()),
+        match($block->getPaymentMethod()) {
+            'klarna' => __('28 days'),
+            'billie' => __('28 days'),
+            'riverty' => __('30 days'),
+            'vipps' => __('180 days'),
+            'mobilepay' => __('14 days'),
+            default => __('Not specified for this method'),
+        }
+    ), ['strong']); ?>
+<?php endif; ?>
