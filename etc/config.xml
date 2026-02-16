@@ -340,7 +340,7 @@
             <mollie_methods_ideal>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Ideal</model>
-                <title>iDeal</title>
+                <title>iDEAL | Wero</title>
                 <payment_description>{ordernumber}</payment_description>
                 <method>payment</method>
                 <issuer_list_type>radio</issuer_list_type>

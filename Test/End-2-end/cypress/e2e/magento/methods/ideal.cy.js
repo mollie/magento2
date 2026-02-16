@@ -31,7 +31,7 @@ if (Cypress.env('mollie_available_methods').includes('ideal')) {
 
         cy.intercept('mollie/checkout/redirect/paymentToken/*').as('mollieRedirect');
 
-        checkoutPaymentPage.selectPaymentMethod('iDeal');
+        checkoutPaymentPage.selectPaymentMethod('iDEAL | Wero');
         checkoutPaymentPage.placeOrder();
 
         mollieHostedPaymentPage.selectFirstIssuer();
