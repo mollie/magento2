@@ -17,7 +17,7 @@ export default class PlaceOrderComposite {
     placeOrder() {
         visitCheckoutPaymentCompositeAction.visit();
 
-        checkoutPaymentsPage.selectPaymentMethod('iDeal');
+        checkoutPaymentsPage.selectPaymentMethod('iDEAL | Wero');
         checkoutPaymentsPage.placeOrder();
 
         mollieHostedPaymentPage.selectFirstIssuer();
