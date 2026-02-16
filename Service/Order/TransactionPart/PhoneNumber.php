@@ -297,7 +297,7 @@ class PhoneNumber implements TransactionPartInterface
             // Silently ignore the exception
         }
 
-        return [];
+        return $transactionAddress;
     }
 
     private function formatInE164(string $countryCodeIso2, string $phoneNumber): string

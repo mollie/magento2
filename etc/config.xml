@@ -32,7 +32,6 @@
                 <second_chance_email_delay>1</second_chance_email_delay>
                 <second_chance_use_payment_method>use_method_of_original_order</second_chance_use_payment_method>
                 <redirect_when_transaction_fails_to>redirect_to_cart</redirect_when_transaction_fails_to>
-                <enable_magento_vault>0</enable_magento_vault>
                 <apikey_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <apikey_live backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <encrypt_payment_details>0</encrypt_payment_details>
@@ -253,10 +252,6 @@
                 <can_change_capture_method>1</can_change_capture_method>
                 <when_to_capture>invoice</when_to_capture>
             </mollie_methods_creditcard>
-            <mollie_methods_creditcard_vault>
-                <title>Stored Card (Mollie)</title>
-                <model>Mollie\Payment\Model\Methods\CreditcardVault</model>
-            </mollie_methods_creditcard_vault>
             <mollie_methods_directdebit>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Directdebit</model>

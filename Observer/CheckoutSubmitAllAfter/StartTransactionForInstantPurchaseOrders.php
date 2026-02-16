@@ -13,7 +13,6 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Module\Manager;
 use Magento\InstantPurchase\Model\QuoteManagement\PaymentConfiguration;
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Payment\Model\Methods\CreditcardVault;
 use Mollie\Payment\Service\Mollie\StartTransaction;
 
 class StartTransactionForInstantPurchaseOrders implements ObserverInterface
@@ -46,11 +45,6 @@ class StartTransactionForInstantPurchaseOrders implements ObserverInterface
         $payment = $order->getPayment();
         $instantPurchase = $payment->getAdditionalInformation(PaymentConfiguration::MARKER);
         if (!$instantPurchase || $instantPurchase != 'true') {
-            return;
-        }
-
-        $method = $payment->getMethodInstance();
-        if (!$method instanceof CreditcardVault) {
             return;
         }
 

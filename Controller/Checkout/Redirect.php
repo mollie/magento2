@@ -24,7 +24,6 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Config;
-use Mollie\Payment\Model\Methods\CreditcardVault;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\FormatExceptionMessages;
 use Mollie\Payment\Service\Mollie\Order\RedirectUrl;
@@ -128,12 +127,6 @@ class Redirect extends Action implements HttpGetActionInterface
 
     private function getMethodInstance(string $method): MethodInterface
     {
-        $methodInstance = $this->paymentHelper->getMethodInstance($method);
-
-        if ($methodInstance instanceof CreditcardVault) {
-            return $this->paymentHelper->getMethodInstance('mollie_methods_creditcard');
-        }
-
-        return $methodInstance;
+        return $this->paymentHelper->getMethodInstance($method);
     }
 }
