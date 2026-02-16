@@ -25,13 +25,33 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="capture_mode" translate="label comment" type="select" sortOrder="50" showInDefault="1"
+        <field id="capture_mode" translate="label comment" type="select" sortOrder="30" showInDefault="1"
                showInWebsite="1" showInStore="1" canRestore="1">
             <label>Capture method</label>
             <config_path>payment/mollie_methods_klarna/capture_mode</config_path>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\CaptureMode</source_model>
+            <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Field\LockCaptureMode</frontend_model>
             <depends>
                 <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="capture_expiration_window" translate="label comment" type="text" sortOrder="40" showInDefault="1"
+               showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Capture expiration window</label>
+            <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Field\CaptureExpirationWindow</frontend_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="capture_mode">manual</field>
+            </depends>
+        </field>
+        <field id="when_to_capture" translate="label comment" type="select" sortOrder="50" showInDefault="1"
+               showInWebsite="1" showInStore="1" canRestore="1">
+            <label>When to capture?</label>
+            <config_path>payment/mollie_methods_klarna/when_to_capture</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\CaptureMoment</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="capture_mode">manual</field>
             </depends>
         </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="60" showInDefault="1"

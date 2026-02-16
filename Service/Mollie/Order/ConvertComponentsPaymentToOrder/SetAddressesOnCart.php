@@ -18,8 +18,15 @@ class SetAddressesOnCart
         private readonly AddressInterfaceFactory $addressFactory,
     ) {}
 
-    public function execute(CartInterface $cart, Payment $payment): void
+    public function execute(CartInterface $baseCart, CartInterface $cart, Payment $payment): void
     {
+        $cart->setShippingAddress($baseCart->getShippingAddress());
+        $cart->setBillingAddress($baseCart->getShippingAddress());
+
+        if ($baseCart->getBillingAddress() !== null) {
+            $cart->setBillingAddress($baseCart->getBillingAddress());
+        }
+
         if ($payment->shippingAddress !== null) {
             $this->setAddressOnCart(Address::ADDRESS_TYPE_SHIPPING, $cart, $payment->shippingAddress);
             $cart->setCustomerEmail($payment->shippingAddress->email);

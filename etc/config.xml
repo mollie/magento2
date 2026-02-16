@@ -190,7 +190,8 @@
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
-                <capture_mode>automatic</capture_mode>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>shipment</when_to_capture>
             </mollie_methods_billie>
             <mollie_methods_bizum>
                 <active>1</active>
@@ -249,7 +250,8 @@
                     <supported>1</supported>
                     <available>Mollie\Payment\Service\InstantPurchase\AvailabilityCheck</available>
                 </instant_purchase>
-                <capture_mode>automatic</capture_mode>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>invoice</when_to_capture>
             </mollie_methods_creditcard>
             <mollie_methods_creditcard_vault>
                 <title>Stored Card (Mollie)</title>
@@ -421,7 +423,8 @@
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
-                <capture_mode>automatic</capture_mode>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>shipment</when_to_capture>
             </mollie_methods_klarna>
             <mollie_methods_mbway>
                 <active>1</active>
@@ -459,7 +462,8 @@
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
-                <capture_mode>automatic</capture_mode>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>invoice</when_to_capture>
             </mollie_methods_mobilepay>
             <mollie_methods_multibanco>
                 <active>1</active>
@@ -753,7 +757,8 @@
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
-                <capture_mode>automatic</capture_mode>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>invoice</when_to_capture>
             </mollie_methods_vipps>
             <mollie_methods_reorder>
                 <active>1</active>

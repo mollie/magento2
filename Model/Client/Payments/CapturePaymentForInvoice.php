@@ -14,7 +14,7 @@ use Magento\Sales\Model\Order;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
-class CapturePayment
+class CapturePaymentForInvoice
 {
     public function __construct(
         private MollieApiClient $mollieApiClient,

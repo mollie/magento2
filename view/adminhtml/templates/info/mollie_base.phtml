@@ -46,12 +46,6 @@ $status = $block->getPaymentStatus();
 
     <table class="data-table admin__table-secondary">
         <tbody>
-            <?php if ($block->getCheckoutType()): ?>
-                <tr>
-                    <th><?= $escaper->escapeHtml(__('Checkout Type')); ?></th>
-                    <td class="mollie-checkout-type"><?= $escaper->escapeHtml(ucfirst($block->getCheckoutType())); ?></td>
-                </tr>
-            <?php endif; ?>
             <?php if ($block->getCheckoutUrl() && $status == 'created'): ?>
                 <tr class="mollie-checkout-url">
                     <th><?= $escaper->escapeHtml(__('Checkout Url')); ?></th>
@@ -70,6 +64,12 @@ $status = $block->getPaymentStatus();
                 <tr>
                     <th><?= $escaper->escapeHtml(__('Valid Until')); ?></th>
                     <td><?= $escaper->escapeHtml($block->getExpiresAt()); ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($block->getCaptureBefore()): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Capture Before')); ?></th>
+                    <td><?= $escaper->escapeHtml($block->getCaptureBefore()); ?></td>
                 </tr>
             <?php endif; ?>
             <?php if ($block->getPaymentStatus()): ?>

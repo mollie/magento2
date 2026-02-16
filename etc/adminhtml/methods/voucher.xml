@@ -33,7 +33,17 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="category" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1"
+        <field id="capture_mode" translate="label comment" type="select" sortOrder="40" showInDefault="1"
+               showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Capture method</label>
+            <config_path>payment/mollie_methods_voucher/capture_mode</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\CaptureMode</source_model>
+            <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Field\LockCaptureMode</frontend_model>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="category" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Category</label>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\VoucherCategory</source_model>
@@ -42,7 +52,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="custom_attribute" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1"
+        <field id="custom_attribute" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Product attribute</label>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\ProductAttributes</source_model>

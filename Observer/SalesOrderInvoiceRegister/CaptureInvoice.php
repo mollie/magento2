@@ -13,14 +13,16 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Payment\Model\Client\Payments\CapturePayment;
+use Mollie\Payment\Model\Client\Payments\CapturePaymentForInvoice;
 use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
+use Mollie\Payment\Service\Mollie\Order\WhenToCapture;
 
 class CaptureInvoice implements ObserverInterface
 {
     public function __construct(
-        private readonly CapturePayment $capturePayment,
+        private readonly CapturePaymentForInvoice $capturePayment,
         private readonly CanUseManualCapture $canUseManualCapture,
+        private readonly WhenToCapture $whenToCapture,
     ) {
     }
 
@@ -29,6 +31,11 @@ class CaptureInvoice implements ObserverInterface
         /** @var OrderInterface $order */
         $order = $observer->getData('order');
         if (!$this->canUseManualCapture->execute($order)) {
+            return;
+        }
+
+        $method = $order->getPayment()->getMethod();
+        if (!$this->whenToCapture->onInvoice($method, storeId($order->getStoreId()))) {
             return;
         }
 
