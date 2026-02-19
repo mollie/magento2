@@ -20,6 +20,7 @@ class LockCaptureMode extends Field
         $canChangeCaptureMethod = $this->_scopeConfig->getValue($configPath);
 
         if ($canChangeCaptureMethod !== '1') {
+            $element->setDisabled(true);
             $element->setReadonly(true);
         }
 

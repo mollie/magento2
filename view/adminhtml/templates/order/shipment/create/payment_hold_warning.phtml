@@ -6,13 +6,17 @@
 
 declare(strict_types=1);
 
+use Magento\Framework\Escaper;
 use Magento\Framework\View\Helper\SecureHtmlRenderer;
+use Mollie\Payment\Block\Adminhtml\Sales\Order\PaymentHoldWarning;
 
+/** @var PaymentHoldWarning $block */
 /** @var SecureHtmlRenderer $secureRenderer */
+/** @var Escaper $escaper */
 ?>
 <div class="mollie-manual-capture-warning message message-warning">
-    Please note: You are creating a partial shipment, but it's only possible to capture the payment once.
-    Please double-check you are shipping the correct items.
+    <?= $escaper->escapeHtml(__('Please note: You are creating a partial shipment, but it\'s only possible to capture the payment once.')); ?>
+    <?= $escaper->escapeHtml(__('Please double-check you are shipping the correct items.')); ?>
 </div>
 
 <?php

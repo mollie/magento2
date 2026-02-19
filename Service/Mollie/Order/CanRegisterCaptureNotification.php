@@ -25,6 +25,6 @@ class CanRegisterCaptureNotification
             return true;
         }
 
-        return $molliePayment->isPaid() && $molliePayment->getAmountCaptured() !== 0.0;
+        return $molliePayment->getAmountCaptured() !== 0.0;
     }
 }
