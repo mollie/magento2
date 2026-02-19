@@ -71,9 +71,20 @@ class ParseAdditionalData
     public function getDetails(OrderPaymentInterface $payment): ?Details
     {
         $details = $payment->getAdditionalInformation('details');
-        if ($this->config->encryptPaymentDetails()) {
-            $details = $this->encryptor->decrypt($details);
-        }
+
+ 	if ($this->config->encryptPaymentDetails() && is_string($details) && $details !== '') {
+     	    $trimmed = ltrim($details);
+     	    $looksLikeJson = ($trimmed !== '' && ($trimmed[0] === '{' || $trimmed[0] === '['));
+
+     	    if (!$looksLikeJson) {
+         	try {
+             	    $details = $this->encryptor->decrypt($details);
+          	} catch (\Exception $e) {
+              	    // Keep original value when decryption fails
+          	}
+      	    }
+  	}
+
         if (is_string($details)) {
             $details = json_decode($details, true);
         }
