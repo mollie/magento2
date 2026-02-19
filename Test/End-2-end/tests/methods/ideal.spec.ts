@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-import { test, expect } from '@playwright/test';
+import {expect, test} from '@playwright/test';
 import CheckoutPaymentPage from "Pages/frontend/CheckoutPaymentPage";
 import VisitCheckoutPaymentCompositeAction from "CompositeActions/VisitCheckoutPaymentCompositeAction";
 import MollieHostedPaymentPage from "Pages/mollie/MollieHostedPaymentPage";
@@ -19,20 +19,20 @@ const ordersPage = new OrdersPage();
 const cartPage = new CartPage();
 
 const testCases = [
-  {status: 'paid', orderStatus: 'Processing', title: '[C3043] Validate the submission of an order with iDEAL as payment method and payment mark as "Paid"'},
-  {status: 'open', orderStatus: 'Pending Payment', title: '[C3044] Validate the submission of an order with iDEAL as payment method and payment mark as "Open"'},
-  {status: 'failed', orderStatus: 'Canceled', title: '[C3045] Validate the submission of an order with iDEAL as payment method and payment mark as "Failed"'},
-  {status: 'expired', orderStatus: 'Canceled', title: '[C3046] Validate the submission of an order with iDEAL as payment method and payment mark as "Expired"'},
-  {status: 'canceled', orderStatus: 'Canceled', title: '[C3047] Validate the submission of an order with iDEAL as payment method and payment mark as "Cancelled"'},
+  {status: 'paid', orderStatus: 'Processing', title: '[C3043] Validate the submission of an order with iDEAL | Wero as payment method and payment mark as "Paid"'},
+  {status: 'open', orderStatus: 'Pending Payment', title: '[C3044] Validate the submission of an order with iDEAL | Wero as payment method and payment mark as "Open"'},
+  {status: 'failed', orderStatus: 'Canceled', title: '[C3045] Validate the submission of an order with iDEAL | Wero as payment method and payment mark as "Failed"'},
+  {status: 'expired', orderStatus: 'Canceled', title: '[C3046] Validate the submission of an order with iDEAL | Wero as payment method and payment mark as "Expired"'},
+  {status: 'canceled', orderStatus: 'Canceled', title: '[C3047] Validate the submission of an order with iDEAL | Wero as payment method and payment mark as "Cancelled"'},
 ];
 
 for (const testCase of testCases) {
   test(testCase.title, async ({ page }) => {
-    test.skip(!process.env.mollie_available_methods.includes('ideal'), 'Skipping test as iDeal is not available');
+    test.skip(!process.env.mollie_available_methods.includes('ideal'), 'Skipping test as iDEAL | Wero is not available');
 
     await visitCheckoutPayment.visit(page);
 
-    await checkoutPaymentPage.selectPaymentMethod(page, 'iDeal');
+    await checkoutPaymentPage.selectPaymentMethod(page, 'iDEAL | Wero');
     await checkoutPaymentPage.placeOrder(page);
 
     await mollieHostedPaymentPage.selectFirstIssuer(page);

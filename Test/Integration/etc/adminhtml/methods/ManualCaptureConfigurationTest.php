@@ -6,7 +6,7 @@
 
 namespace Mollie\Payment\Test\Integration\etc\adminhtml\methods;
 
-class ManualCaptureConfigurationTest extends AbstractXmlConfigurationTest
+class ManualCaptureConfigurationTest extends AbstractXmlConfiguration
 {
     public function testManualCaptureMethodHaveCaptureWhenOptionAvailable(): void
     {

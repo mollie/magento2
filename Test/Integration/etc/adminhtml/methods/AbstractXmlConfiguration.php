@@ -13,7 +13,7 @@ use Magento\Framework\Simplexml\Config;
 use Magento\Framework\Simplexml\Element;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
-abstract class AbstractXmlConfigurationTest extends IntegrationTestCase
+abstract class AbstractXmlConfiguration extends IntegrationTestCase
 {
     protected function getField(Element $file, string $name): Element
     {

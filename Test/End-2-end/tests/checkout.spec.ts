@@ -21,7 +21,7 @@ const ordersPage = new OrdersPage();
 test('[C849728] Validate that each payment methods have a specific CSS class', async ({ page }) => {
   await visitCheckoutPayment.visit(page);
 
-  await checkoutPaymentPage.selectPaymentMethod(page, 'iDeal');
+  await checkoutPaymentPage.selectPaymentMethod(page, 'iDEAL | Wero');
 
   await expect(page.locator('.payment-method._active')).toHaveClass(/payment-method-mollie_methods_ideal/);
 
@@ -45,7 +45,7 @@ test('[C849728] Validate that each payment methods have a specific CSS class', a
 test('[C849662] Validate that the quote is restored when using the back button ', async ({ page }) => {
   await visitCheckoutPayment.visit(page);
 
-  await checkoutPaymentPage.selectPaymentMethod(page, 'iDeal');
+  await checkoutPaymentPage.selectPaymentMethod(page, 'iDEAL | Wero');
 
   await checkoutPaymentPage.placeOrder(page);
 
@@ -60,7 +60,7 @@ test('[C849662] Validate that the quote is restored when using the back button '
 test('[C2530311] Validate that the success page can only be visited once', async ({ page }) => {
   await visitCheckoutPayment.visit(page);
 
-  await checkoutPaymentPage.selectPaymentMethod(page, 'iDeal');
+  await checkoutPaymentPage.selectPaymentMethod(page, 'iDEAL | Wero');
 
   await checkoutPaymentPage.placeOrder(page);
 

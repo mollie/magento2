@@ -8,7 +8,7 @@ namespace Mollie\Payment\Test\Integration\etc\adminhtml\methods;
 
 use Magento\Framework\Simplexml\Element;
 
-class MethodConfigurationTest extends AbstractXmlConfigurationTest
+class MethodConfigurationTest extends AbstractXmlConfiguration
 {
     public function testHasCaptureModeAvailable(): void
     {
@@ -31,43 +31,6 @@ class MethodConfigurationTest extends AbstractXmlConfigurationTest
             $this->validateMethod($file, $method);
         }
     }
-
-    public function testHasCaptureModeAvailable(): void
-    {
-        $xmlFiles = $this->getXmlFiles();
-
-        foreach ($xmlFiles as $method => $file) {
-            if (!$this->hasField($file, 'capture_mode')) {
-                $this->fail(sprintf('Method "%s" does not have the capture_mode field', $method));
-            }
-
-            $this->addToAssertionCount(1);
-        }
-    }
-
-    private function hasField(Element $file, string $name): bool
-    {
-        try {
-            $this->getField($file, $name);
-            return true;
-        } catch (Exception $e) {
-            return false;
-        }
-    }
-
-    private function getField(Element $file, string $name): Element
-    {
-        foreach ($file->group->field as $field) {
-            $id = $field->attributes()->id->__toString();
-
-            if ($id === $name) {
-                return $field;
-            }
-        }
-
-        throw new \Exception(sprintf('Field "%s" not found', $name));
-    }
-
 
     private function validateMethod(Element $file, string $method): void
     {

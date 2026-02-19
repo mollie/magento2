@@ -76,7 +76,7 @@ class CanRegisterCaptureNotificationTest extends IntegrationTestCase
         $molliePayment = new Payment(new MollieApiClient());
         $molliePayment->status = 'paid';
         $molliePayment->amountCaptured = new stdClass();
-        $molliePayment->amountCaptured->value = -999;
+        $molliePayment->amountCaptured->value = 0;
 
         $this->assertFalse($instance->execute($order, $molliePayment));
     }
