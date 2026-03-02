@@ -270,8 +270,7 @@ class SuccessfulPayment implements OrderProcessorInterface
     private function setOrderStatus($order): void
     {
         $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($order->getStoreId());
-        if (!$order->getIsVirtual() &&
-            $defaultStatusProcessing &&
+        if ($defaultStatusProcessing &&
             $defaultStatusProcessing != $order->getStatus()
         ) {
             $order->setStatus($defaultStatusProcessing);

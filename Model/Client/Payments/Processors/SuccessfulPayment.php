@@ -200,11 +200,9 @@ class SuccessfulPayment implements PaymentProcessorInterface
             }
         }
 
-        if (!$magentoOrder->getIsVirtual()) {
-            $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($magentoOrder->getStoreId());
-            if ($defaultStatusProcessing && ($defaultStatusProcessing != $magentoOrder->getStatus())) {
-                $magentoOrder->setStatus($defaultStatusProcessing);
-            }
+        $defaultStatusProcessing = $this->mollieHelper->getStatusProcessing($magentoOrder->getStoreId());
+        if ($defaultStatusProcessing && ($defaultStatusProcessing != $magentoOrder->getStatus())) {
+            $magentoOrder->setStatus($defaultStatusProcessing);
         }
 
         $this->orderRepository->save($magentoOrder);
