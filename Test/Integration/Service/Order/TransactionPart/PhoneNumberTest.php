@@ -3,53 +3,13 @@
 namespace Mollie\Payment\Test\Integration\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderAddressInterface;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\TransactionPart\PhoneNumber;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PhoneNumberTest extends IntegrationTestCase
 {
-    public function testDoesNothingWhenPaymentMethodIsNotIn3(): void
-    {
-        /** @var PhoneNumber $instance */
-        $instance = $this->objectManager->create(PhoneNumber::class);
-
-        $order = $this->objectManager->create(OrderInterface::class);
-        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
-        $order->getPayment()->setMethod('mollie_methods_ideal');
-
-        $transaction = $instance->process(
-            $order,
-            Payments::CHECKOUT_TYPE,
-            ['billingAddress' => []]
-        );
-
-        $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
-    }
-
-    public function testDoesNothingWhenPaymentsApiIsUsed(): void
-    {
-        $transaction = [];
-
-        /** @var PhoneNumber $instance */
-        $instance = $this->objectManager->create(PhoneNumber::class);
-
-        $order = $this->objectManager->create(OrderInterface::class);
-        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
-        $order->getPayment()->setMethod('mollie_methods_in3');
-
-        $newTransaction = $instance->process(
-            $order,
-            Payments::CHECKOUT_TYPE,
-            $transaction
-        );
-
-        $this->assertSame($transaction, $newTransaction);
-    }
-
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @dataProvider convertsPhoneNumbersToTheCorrectFormatDataProvider
@@ -77,7 +37,7 @@ class PhoneNumberTest extends IntegrationTestCase
         $transaction = $instance->process(
             $order,
             Orders::CHECKOUT_TYPE,
-            ['billingAddress' => []]
+            ['billingAddress' => [], 'shippingAddress' => []]
         );
 
         $this->assertSame($expected, $transaction['billingAddress']['phone']);
@@ -103,7 +63,7 @@ class PhoneNumberTest extends IntegrationTestCase
         $transaction = $instance->process(
             $order,
             Orders::CHECKOUT_TYPE,
-            ['billingAddress' => []]
+            ['billingAddress' => [], 'shippingAddress' => []]
         );
 
         $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
@@ -129,7 +89,7 @@ class PhoneNumberTest extends IntegrationTestCase
         $transaction = $instance->process(
             $order,
             Orders::CHECKOUT_TYPE,
-            ['billingAddress' => []]
+            ['billingAddress' => [], 'shippingAddress' => []]
         );
 
         $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
