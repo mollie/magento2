@@ -10,6 +10,7 @@ use Exception;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -69,6 +70,10 @@ class PlaceOrder extends Action
      * @var Config
      */
     private $config;
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
 
     public function __construct(
         Context $context,
@@ -79,7 +84,8 @@ class PlaceOrder extends Action
         Generate $paymentToken,
         SetRegionFromApplePayAddress $setRegionFromApplePayAddress,
         OrderRepositoryInterface $orderRepository,
-        Config $config
+        Config $config,
+        ScopeConfigInterface $scopeConfig
     ) {
         parent::__construct($context);
 
@@ -91,6 +97,7 @@ class PlaceOrder extends Action
         $this->orderRepository = $orderRepository;
         $this->setRegionFromApplePayAddress = $setRegionFromApplePayAddress;
         $this->config = $config;
+        $this->scopeConfig = $scopeConfig;
     }
 
     public function execute()
@@ -134,7 +141,8 @@ class PlaceOrder extends Action
                 'trace' => $exception->getTraceAsString(),
             ]);
 
-            return $response->setData(['error' => true, 'error_message' => $exception->getMessage()]);
+            $response->setHttpResponseCode(400);
+            return $response->setData(['error' => true, 'message' => $exception->getMessage()]);
         }
 
         $order->getPayment()->setAdditionalInformation(
@@ -160,10 +168,35 @@ class PlaceOrder extends Action
         return $response->setData(['url' => $url, 'error' => false, 'error_message' => '']);
     }
 
+    /**
+     * @throws NoSuchEntityException
+     * @return CartInterface
+     */
+    public function getCart(): CartInterface
+    {
+        if ($cartId = $this->getRequest()->getParam('cartId')) {
+            return $this->guestCartRepository->get($cartId);
+        }
+
+        return $this->checkoutSession->getQuote();
+    }
+
+    private function getAddressLines($addressLines): string
+    {
+        $maxLinesCount = $this->scopeConfig->getValue('customer/address/street_lines');
+        $linesCount = count($addressLines);
+
+        if ($linesCount > $maxLinesCount) {
+            return implode(', ', $addressLines);
+        }
+
+        return implode(PHP_EOL, $addressLines);
+    }
+
     private function updateAddress(AddressInterface $address, array $input)
     {
         $address->addData([
-            AddressInterface::KEY_STREET => implode(PHP_EOL, $input['addressLines']),
+            AddressInterface::KEY_STREET => $this->getAddressLines($input['addressLines']),
             AddressInterface::KEY_COUNTRY_ID => strtoupper($input['countryCode']),
             // Sometimes the familyName may be empty, fall back to -- in that case.
             AddressInterface::KEY_LASTNAME => $input['familyName'] ?: '--',
@@ -178,22 +211,9 @@ class PlaceOrder extends Action
             $address->setTelephone($input['phoneNumber']);
         }
 
-        if ($address->getAddressType() == \Magento\Quote\Model\Quote\Address::ADDRESS_TYPE_BILLING) {
+        if ($address->getAddressType() == Address::ADDRESS_TYPE_BILLING) {
             $input = $this->getRequest()->getParam('shippingAddress');
             $address->setTelephone($input['phoneNumber']);
         }
-    }
-
-    /**
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @return CartInterface
-     */
-    public function getCart(): CartInterface
-    {
-        if ($cartId = $this->getRequest()->getParam('cartId')) {
-            return $this->guestCartRepository->get($cartId);
-        }
-
-        return $this->checkoutSession->getQuote();
     }
 }

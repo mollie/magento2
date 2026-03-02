@@ -189,26 +189,23 @@ define([
 
                         this.session.completePayment(ApplePaySession.STATUS_SUCCESS);
 
+                        console.info('ApplePay Payment completed successfully, redirecting', result);
                         setTimeout( function () {
                             location.href = result.url
                         }, 1000);
                     }.bind(this),
                     error: this.handleAjaxError
                 })
-
-                try {
-                    this.placeOrder(this);
-                } catch {
-                    this.session.completePayment(ApplePaySession.STATUS_ERROR);
-                }
             }.bind(this);
 
             this.session.oncancel = function (event) {
+                $('body').loader('hide');
                 this.session = null;
                 this.shippingMethods = null;
                 this.selectedShippingMethod = null;
             }.bind(this);
 
+            $('body').loader('show');
             this.session.begin();
         },
 
@@ -241,7 +238,9 @@ define([
         },
 
         handleAjaxError: function (response) {
+            $('body').loader('hide');
             this.session.abort();
+            this.session = null;
 
             var customerMessages = customerData.get('messages')() || {},
                 messages = customerMessages.messages || [];
