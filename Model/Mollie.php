@@ -377,6 +377,10 @@ class Mollie extends Adapter
                 $amount = $payment->getCreditMemo()->getGrandTotal();
             }
 
+            if (is_string($amount)) {
+                $amount = (float)$amount;
+            }
+
             $mollieApi = $this->loadMollieApi($apiKey);
             $payment = $mollieApi->payments->get($transactionId);
 

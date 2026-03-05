@@ -18,13 +18,10 @@ class SetAddressesOnCart
         private readonly AddressInterfaceFactory $addressFactory,
     ) {}
 
-    public function execute(CartInterface $baseCart, CartInterface $cart, Payment $payment): void
+    public function execute(CartInterface $oldCart, CartInterface $cart, Payment $payment): void
     {
-        $cart->setShippingAddress($baseCart->getShippingAddress());
-        $cart->setBillingAddress($baseCart->getShippingAddress());
-
-        if ($baseCart->getBillingAddress() !== null) {
-            $cart->setBillingAddress($baseCart->getBillingAddress());
+        if ($payment->shippingAddress === null || $payment->billingAddress === null) {
+            $this->copyAddressesFromOldCart($oldCart, $cart);
         }
 
         if ($payment->shippingAddress !== null) {
@@ -64,5 +61,22 @@ class SetAddressesOnCart
         if ($type == Address::ADDRESS_TYPE_SHIPPING) {
             $cart->setShippingAddress($cartAddress);
         }
+    }
+
+    private function copyAddressesFromOldCart(CartInterface $oldCart, CartInterface $cart): void
+    {
+        $shipping = $oldCart->getShippingAddress();
+        $cartAddress = $this->addressFactory->create();
+        $data = $shipping->getData();
+        unset($data['address_id'], $data['quote_id'], $data['created_at'], $data['updated_at']);
+        $cartAddress->setData($data);
+        $cart->setShippingAddress($shipping);
+
+        $billing = $oldCart->getBillingAddress();
+        $cartAddress = $this->addressFactory->create();
+        $data = $billing->getData();
+        unset($data['address_id'], $data['quote_id'], $data['created_at'], $data['updated_at']);
+        $cartAddress->setData($data);
+        $cart->setBillingAddress($billing);
     }
 }
