@@ -146,7 +146,7 @@ define([
                         }
 
                         if (result.error) {
-                            this.sendMessage(result.error_message);
+                            this.sendMessage(result.message);
                             $('body').loader('hide');
                             this.session.abort()
                             return;

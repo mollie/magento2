@@ -165,7 +165,7 @@ class PlaceOrder extends Action
             ->setLastRealOrderId($order->getIncrementId())
             ->setLastOrderId($order->getId());
 
-        return $response->setData(['url' => $url, 'error' => false, 'error_message' => '']);
+        return $response->setData(['url' => $url, 'error' => false, 'message' => '']);
     }
 
     /**
