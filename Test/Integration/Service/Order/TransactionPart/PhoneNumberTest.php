@@ -70,7 +70,7 @@ class PhoneNumberTest extends IntegrationTestCase
     }
 
     /**
-     * @magentoDataFixture Magento/Sales/_files/order_info.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
      * @return void
      */
     public function testHandlePhoneNumbersForVirtualProductOrders(): void {
