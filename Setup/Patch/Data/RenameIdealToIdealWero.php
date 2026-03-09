@@ -42,7 +42,7 @@ class RenameIdealToIdealWero implements DataPatchInterface
 
     private function updateMethodTitle(string $scope, int $scopeId, ?string $currentValue = null)
     {
-        // Some merchant might have iDeal + €1 or something similar, don't update those
+        // Some merchant might have iDEAL + €1 or something similar, don't update those
         if (strtolower($currentValue) !== 'ideal') {
             return;
         }

@@ -14,7 +14,7 @@ const creditMemoPage = new CreditMemoPage();
 const placeOrderComposite = new PlaceOrderComposite();
 
 describe('Check that refunds behave as excepted', () => {
-    it('Can do a refund on an iDeal order', () => {
+    it('Can do a refund on an iDEAL order', () => {
         placeOrderComposite.placeOrder();
 
         cy.get('@order-id').then(orderId => {
