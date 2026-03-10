@@ -11,7 +11,6 @@ use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Quote\Api\Data\CartInterfaceFactory;
 use Mollie\Api\Resources\Method;
-use Mollie\Api\Resources\MethodCollection;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\MethodParameters;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
@@ -81,7 +80,7 @@ class MolliePaymentMethods implements ResolverInterface
         }
 
         usort($methods, function ($a, $b) {
-            // Lowercase as iDeal would be sorted last because of the lower I.
+            // Lowercase as iDEAL would be sorted last because of the lower I.
             return strtolower($a['name']) <=> strtolower($b['name']);
         });
 

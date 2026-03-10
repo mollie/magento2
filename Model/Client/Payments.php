@@ -15,6 +15,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\OrderRepository;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
@@ -201,10 +202,10 @@ class Payments extends AbstractModel
 
     /**
      * @param OrderInterface $order
-     * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param MollieApiClient $mollieApi
      *
      * @return string
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
     public function startTransaction(OrderInterface $order, $mollieApi)
     {
@@ -266,7 +267,12 @@ class Payments extends AbstractModel
 
     public function getAddressLine(OrderAddressInterface $address): array
     {
+        // Phone is added in \Mollie\Payment\Service\Order\TransactionPart\PhoneNumber
+
         $output = [
+            'givenName' => $address->getFirstname(),
+            'familyName' => $address->getLastname(),
+            'organizationName' => $address->getCompany(),
             'streetAndNumber' => rtrim(implode(' ', $address->getStreet()), ' '),
             'postalCode' => $address->getPostcode(),
             'city' => $address->getCity(),
@@ -331,13 +337,13 @@ class Payments extends AbstractModel
 
     /**
      * @param Order                       $order
-     * @param \Mollie\Api\MollieApiClient $mollieApi
+     * @param MollieApiClient $mollieApi
      * @param string                      $type
      * @param null                        $paymentToken
      *
      * @return array
      * @throws LocalizedException
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws ApiException
      */
     public function processTransaction(Order $order, $mollieApi, $type = 'webhook', $paymentToken = null)
     {

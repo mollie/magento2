@@ -22,7 +22,7 @@ describe('Checkout usage', () => {
   it('C849728: Validate that each payment methods have a specific CSS class', () => {
     visitCheckoutPayment.visit();
 
-    checkoutPaymentPage.selectPaymentMethod('iDeal');
+    checkoutPaymentPage.selectPaymentMethod('iDEAL | Wero');
 
     cy.get('.payment-method._active').should('have.class', 'payment-method-mollie_methods_ideal');
 
@@ -64,7 +64,7 @@ describe('Checkout usage', () => {
   it('C849662: Validate that the quote is restored when using the back button ', () => {
     visitCheckoutPayment.visit();
 
-    checkoutPaymentPage.selectPaymentMethod('iDeal');
+    checkoutPaymentPage.selectPaymentMethod('iDEAL | Wero');
 
     checkoutPaymentPage.placeOrder();
 
@@ -78,11 +78,11 @@ describe('Checkout usage', () => {
   });
 
   it('C2183249: Validate that submitting an order with a discount works through the Orders API', () => {
-    configuration.setValue('Payment Methods', 'iDeal', 'Method', 'order');
+    configuration.setValue('Payment Methods', 'iDEAL | Wero', 'Method', 'order');
 
     visitCheckoutPayment.visit('NL', 1, 15);
 
-    checkoutPaymentPage.selectPaymentMethod('iDeal');
+    checkoutPaymentPage.selectPaymentMethod('iDEAL | Wero');
 
     checkoutPaymentPage.enterCouponCode();
 
@@ -105,7 +105,7 @@ describe('Checkout usage', () => {
   it('C2530311: Validate that the success page can only be visited once', () => {
     visitCheckoutPayment.visit();
 
-    checkoutPaymentPage.selectPaymentMethod('iDeal');
+    checkoutPaymentPage.selectPaymentMethod('iDEAL | Wero');
 
     cy.intercept('mollie/checkout/process/*').as('processAction');
 

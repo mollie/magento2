@@ -28,7 +28,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         $result = $this->callEndpoint([
             $this->arrayToObject([
                 'id' => 'ideal',
-                'description' => 'iDeal',
+                'description' => 'iDEAL',
                 'image' => ['svg' => 'ideal.svg'],
             ])
         ]);
@@ -48,7 +48,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         $result = $this->callEndpoint([
             $this->arrayToObject([
                 'id' => 'ideal',
-                'description' => 'iDeal',
+                'description' => 'iDEAL',
                 'image' => ['svg' => 'ideal.svg'],
             ]),
             $this->arrayToObject([
@@ -66,7 +66,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
      * @magentoConfigFixture default_store payment/mollie_methods_eps/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_eps/title EPS
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_ideal/title iDeal
+     * @magentoConfigFixture default_store payment/mollie_methods_ideal/title iDEAL
      * @magentoConfigFixture default_store payment/mollie_methods_kbc/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_kbc/title KBC/CBC
      * @return void
@@ -78,7 +78,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         $result = $this->callEndpoint([
             $this->arrayToObject([
                 'id' => 'ideal',
-                'description' => 'iDeal',
+                'description' => 'iDEAL',
                 'image' => ['svg' => 'ideal.svg'],
             ]),
             $this->arrayToObject([
@@ -95,7 +95,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
 
         $this->assertCount(3, $result);
         $this->assertEquals('EPS', $result[0]['name']);
-        $this->assertEquals('iDeal', $result[1]['name']);
+        $this->assertEquals('iDEAL', $result[1]['name']);
         $this->assertEquals('KBC/CBC', $result[2]['name']);
     }
 
@@ -122,7 +122,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         $result = $this->callEndpoint([
             $this->arrayToObject([
                 'id' => 'ideal',
-                'description' => 'iDeal',
+                'description' => 'iDEAL',
                 'image' => ['svg' => 'ideal.svg'],
             ]),
         ]);
@@ -133,7 +133,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         $result = $this->callEndpoint([
             $this->arrayToObject([
                 'id' => 'ideal',
-                'description' => 'iDeal',
+                'description' => 'iDEAL',
                 'image' => ['svg' => 'ideal.svg'],
             ]),
             $this->arrayToObject([
