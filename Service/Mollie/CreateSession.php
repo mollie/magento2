@@ -4,6 +4,7 @@ namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\UrlInterface;
+use Magento\Quote\Api\CartTotalRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use Mollie\Api\Http\Data\Money;
@@ -22,6 +23,7 @@ class CreateSession
         private readonly UrlInterface $urlBuilder,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly General $mollieHelper,
+        private readonly CartTotalRepositoryInterface $cartTotalRepository,
     ) {
     }
 
@@ -29,12 +31,13 @@ class CreateSession
     {
         $mollie = $this->mollieApiClient->loadByStore($cart->getStoreId());
         $paymentToken = $this->paymentTokenForQuote->execute($cart);
+        $totals = $this->cartTotalRepository->get($cart->getId());
 
         /** @var Session $session */
         $session = $mollie->send(new CreateSessionRequest(
             $this->transaction->getExpressRedirectUrl($cart, $paymentToken),
             $this->urlBuilder->getUrl('checkout/cart'),
-            new Money($cart->getQuoteCurrencyCode(), number_format((float)$cart->getSubtotal(), 2)),
+            new Money($cart->getQuoteCurrencyCode(), number_format((float)($totals->getSubtotalInclTax()), 2)),
             $this->scopeConfig->getValue('general/store_information/name') ?? __('Unnamed webshop')->render(),
             $this->getLines($cart),
             ['webhookUrl' => $this->transaction->getExpressWebhookUrl($cart)],
@@ -54,8 +57,8 @@ class CreateSession
             $lines[] = [
                 'description' => '[' . $item->getSku() . '] ' . $item->getName(),
                 'quantity' => (int)$item->getQty(),
-                'unitPrice' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPrice()),
-                'totalAmount' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPrice() * (int)$item->getQty()),
+                'unitPrice' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax()),
+                'totalAmount' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax() * (int)$item->getQty()),
                 'totalWeight' => [
                     'value' => $this->getWeightInGrams($item),
                     'unit' => 'g',

@@ -14,17 +14,17 @@ use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\Result\JsonFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
-use Magento\Quote\Model\Quote;
 
 class CreateSession implements HttpPostActionInterface
 {
     public function __construct(
-        readonly private Session $checkoutSession,
-        readonly private JsonFactory $jsonFactory,
-        readonly private CartRepositoryInterface $cartRepository,
-        readonly private RequestInterface $request,
-        readonly private \Mollie\Payment\Service\Mollie\CreateSession $createSession,
-    ) {}
+        private readonly Session $checkoutSession,
+        private readonly JsonFactory $jsonFactory,
+        private readonly CartRepositoryInterface $cartRepository,
+        private readonly RequestInterface $request,
+        private readonly \Mollie\Payment\Service\Mollie\CreateSession $createSession,
+    ) {
+    }
 
     public function execute()
     {
@@ -41,7 +41,8 @@ class CreateSession implements HttpPostActionInterface
         ]);
     }
 
-    private function setEmailOnCart(CartInterface|Quote $cart): void {
+    private function setEmailOnCart(CartInterface $cart): void
+    {
         $email = $this->request->getParam('email');
 
         if (!$email) {
