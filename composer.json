@@ -1,10 +1,6 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-<<<<<<< HEAD
-=======
-  "version": "2.50.0",
->>>>>>> master
   "keywords": [
     "mollie",
     "payment",
