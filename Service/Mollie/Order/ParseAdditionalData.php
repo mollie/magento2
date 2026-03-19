@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Service\Mollie\Order;
 
+use Exception;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Mollie\Payment\Config;
@@ -68,7 +69,9 @@ class ParseAdditionalData
     {
         $details = $payment->getAdditionalInformation('details');
         if ($this->config->encryptPaymentDetails()) {
-            $details = $this->encryptor->decrypt($details);
+            try {
+                $details = $this->encryptor->decrypt($details);
+            } catch (Exception $e) {}
         }
         if (is_string($details)) {
             $details = json_decode($details, true);

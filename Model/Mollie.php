@@ -125,7 +125,7 @@ class Mollie extends Adapter
     public function getIssuers(string $method, string $issuerListType, int $count = 0): ?array
     {
         $issuers = [];
-        // iDeal 2.0 does not have issuers anymore.
+        // iDEAL 2.0 does not have issuers anymore.
         if ($issuerListType == 'none' || $method == 'mollie_methods_ideal') {
             return $issuers;
         }

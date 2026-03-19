@@ -272,10 +272,12 @@ class PhoneNumber implements TransactionPartInterface
             $transaction['billingAddress'],
         );
 
-        $transaction['shippingAddress'] = $this->formatForAddress(
-            $order->getShippingAddress(),
-            $transaction['shippingAddress'],
-        );
+        if (array_key_exists('shippingAddress', $transaction) && $order->getShippingAddress()) {
+            $transaction['shippingAddress'] = $this->formatForAddress(
+                $order->getShippingAddress(),
+                $transaction['shippingAddress'],
+            );
+        }
 
         return $transaction;
     }

@@ -9,7 +9,7 @@
     <group id="mollie_methods_ideal" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
            showInStore="1">
         <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\GroupFrontendModel</frontend_model>
-        <label>iDeal | Wero</label>
+        <label>iDEAL | Wero</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Enabled</label>

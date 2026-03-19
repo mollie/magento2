@@ -18,7 +18,7 @@ export default class PlaceOrderComposite {
   async placeOrder(page): Promise<string> {
     await visitCheckoutPaymentCompositeAction.visit(page);
 
-    await checkoutPaymentsPage.selectPaymentMethod(page, 'iDeal');
+    await checkoutPaymentsPage.selectPaymentMethod(page, 'iDEAL | Wero');
     await checkoutPaymentsPage.placeOrder(page);
 
     await mollieHostedPaymentPage.selectFirstIssuer(page);

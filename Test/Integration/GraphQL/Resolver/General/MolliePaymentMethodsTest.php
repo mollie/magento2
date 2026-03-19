@@ -45,7 +45,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         }
 
         if (!$found) {
-            throw new Exception('The result didn\'t include iDeal');
+            throw new Exception('The result didn\'t include iDEAL | Wero');
         }
     }
 
@@ -66,7 +66,9 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
      * @magentoConfigFixture default_store payment/mollie_methods_creditcard/active 1
      * @magentoConfigFixture default_store payment/mollie_methods_creditcard/title CREDITCARD
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/active 1
-     * @magentoConfigFixture default_store payment/mollie_methods_ideal/title iDeal
+     * @magentoConfigFixture default_store payment/mollie_methods_ideal/title iDEAL
+     * @magentoConfigFixture default_store payment/mollie_methods_kbc/active 1
+     * @magentoConfigFixture default_store payment/mollie_methods_kbc/title KBC/CBC
      * @return void
      */
     public function testSortsMethodsByName(): void
@@ -77,7 +79,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
 
         $this->assertCount(2, $result);
         $this->assertEquals('CREDITCARD', $result[0]['name']);
-        $this->assertEquals('iDeal', $result[1]['name']);
+        $this->assertEquals('iDEAL', $result[1]['name']);
     }
 
     private function callEndpoint(): array

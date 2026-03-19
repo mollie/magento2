@@ -14,8 +14,10 @@ use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
@@ -25,28 +27,23 @@ use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\QuoteManagement;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\PaymentToken\Generate;
 use Mollie\Payment\Service\Quote\SetRegionFromApplePayAddress;
 
 class PlaceOrder extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var PaymentTokenRequestInterface
-     */
-    private $paymentTokenRequest;
-
     public function __construct(
         Context $context,
-        private GuestCartRepositoryInterface $guestCartRepository,
-        private CartRepositoryInterface $cartRepository,
-        private QuoteManagement $quoteManagement,
-        private Session $checkoutSession,
-        private Generate $paymentToken,
-        private SetRegionFromApplePayAddress $setRegionFromApplePayAddress,
-        private OrderRepositoryInterface $orderRepository,
-        private Config $config,
+        private readonly GuestCartRepositoryInterface $guestCartRepository,
+        private readonly CartRepositoryInterface $cartRepository,
+        private readonly QuoteManagement $quoteManagement,
+        private readonly Session $checkoutSession,
+        private readonly Generate $paymentToken,
+        private readonly SetRegionFromApplePayAddress $setRegionFromApplePayAddress,
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly Config $config,
+        private readonly ScopeConfigInterface $scopeConfig,
     ) {
         parent::__construct($context);
     }
@@ -92,7 +89,8 @@ class PlaceOrder extends Action implements HttpPostActionInterface
                 'trace' => $exception->getTraceAsString(),
             ]);
 
-            return $response->setData(['error' => true, 'error_message' => $exception->getMessage()]);
+            $response->setHttpResponseCode(400);
+            return $response->setData(['error' => true, 'message' => $exception->getMessage()]);
         }
 
         $order->getPayment()->setAdditionalInformation(
@@ -115,13 +113,38 @@ class PlaceOrder extends Action implements HttpPostActionInterface
             ->setLastRealOrderId($order->getIncrementId())
             ->setLastOrderId($order->getId());
 
-        return $response->setData(['url' => $url, 'error' => false, 'error_message' => '']);
+        return $response->setData(['url' => $url, 'error' => false, 'message' => '']);
+    }
+
+    /**
+     * @return CartInterface
+     * @throws LocalizedException
+     * @throws NoSuchEntityException*/
+    private function getCart(): CartInterface
+    {
+        if ($cartId = $this->getRequest()->getParam('cartId')) {
+            return $this->guestCartRepository->get($cartId);
+        }
+
+        return $this->checkoutSession->getQuote();
+    }
+
+    private function getAddressLines($addressLines): string
+    {
+        $maxLinesCount = $this->scopeConfig->getValue('customer/address/street_lines');
+        $linesCount = count($addressLines);
+
+        if ($linesCount > $maxLinesCount) {
+            return implode(', ', $addressLines);
+        }
+
+        return implode(PHP_EOL, $addressLines);
     }
 
     private function updateAddress(AddressInterface $address, array $input): void
     {
         $address->addData([
-            AddressInterface::KEY_STREET => implode(PHP_EOL, $input['addressLines']),
+            AddressInterface::KEY_STREET => $this->getAddressLines($input['addressLines']),
             AddressInterface::KEY_COUNTRY_ID => strtoupper($input['countryCode']),
             // Sometimes the familyName may be empty, fall back to -- in that case.
             AddressInterface::KEY_LASTNAME => $input['familyName'] ?: '--',
@@ -140,18 +163,5 @@ class PlaceOrder extends Action implements HttpPostActionInterface
             $input = $this->getRequest()->getParam('shippingAddress');
             $address->setTelephone($input['phoneNumber']);
         }
-    }
-
-    /**
-     * @throws NoSuchEntityException
-     * @return CartInterface
-     */
-    public function getCart(): CartInterface
-    {
-        if ($cartId = $this->getRequest()->getParam('cartId')) {
-            return $this->guestCartRepository->get($cartId);
-        }
-
-        return $this->checkoutSession->getQuote();
     }
 }

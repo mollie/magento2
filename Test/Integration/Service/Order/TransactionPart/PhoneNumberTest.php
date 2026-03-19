@@ -92,6 +92,34 @@ class PhoneNumberTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @return void
      */
+    public function testHandlePhoneNumbersForVirtualProductOrders(): void {
+        $order = $this->loadOrder('100000001');
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+        $order->getPayment()->setMethod('mollie_methods_in3');
+
+        $billingAddress = $order->getBillingAddress();
+        $billingAddress->setCountryId('NL');
+        $billingAddress->setTelephone('06 1234 5678');
+
+        /** @var PhoneNumber $instance */
+        $instance = $this->objectManager->create(PhoneNumber::class);
+
+        $transaction = $instance->process(
+            $order,
+            [
+                'billingAddress' => [],
+            // Virtual orders don't have a shipping address
+//                'shippingAddress' => [],
+            ]
+        );
+
+        $this->assertSame('+31612345678', $transaction['billingAddress']['phone']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @return void
+     */
     public function testHandlesNullAsPhonenumber(): void
     {
         $order = $this->loadOrder('100000001');

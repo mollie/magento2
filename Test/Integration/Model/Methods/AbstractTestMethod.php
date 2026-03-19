@@ -109,7 +109,7 @@ abstract class AbstractTestMethod extends IntegrationTestCase
       {
         "resource": "method",
         "id": "ideal",
-        "description": "iDEAL",
+        "description": "iDEAL | Wero",
         "minimumAmount": {
           "value": "0.01",
           "currency": "EUR"

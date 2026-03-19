@@ -57,7 +57,7 @@ class MolliePaymentMethods implements ResolverInterface
         }
 
         usort($methods, function (array $a, array $b): int {
-            // Lowercase as iDeal would be sorted last because of the lower I.
+            // Lowercase as iDEAL would be sorted last because of the lower I.
             return strtolower($a['name']) <=> strtolower($b['name']);
         });
 

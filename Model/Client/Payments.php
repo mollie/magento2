@@ -52,6 +52,8 @@ class Payments
     /**
      * @throws ApiException
      * @throws PaymentAborted
+     *
+     * @return string
      */
     public function startTransaction(OrderInterface $order, MollieApiClient $mollieApi): ?string
     {

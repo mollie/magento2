@@ -16,7 +16,7 @@ const creditMemoPage = new CreditMemoPage(expect);
 const placeOrderComposite = new PlaceOrderComposite();
 const ordersPage = new OrdersPage();
 
-test('[C3111] Can do a refund on an iDeal order', async ({page}) => {
+test('[C3111] Can do a refund on an iDEAL | Wero order', async ({page}) => {
   const incrementId = await placeOrderComposite.placeOrder(page);
 
   await ordersPage.openByIncrementId(page, incrementId);
