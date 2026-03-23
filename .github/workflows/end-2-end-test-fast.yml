@@ -158,7 +158,7 @@ jobs:
 
   merge-reports:
     # Merge reports after playwright-tests, even if some shards have failed
-    if: ${{ !cancelled() }}
+    if: ${{ needs.secrets-gate.outputs.is-secret-set == 'true' && !cancelled() }}
     needs: [e2e-tests]
 
     runs-on: ubuntu-latest
