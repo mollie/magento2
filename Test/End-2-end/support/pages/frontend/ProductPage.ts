@@ -20,9 +20,13 @@ export default class ProductPage {
 
         await page.locator('#search').focus();
 
-        await page.locator('.action.tocart.primary').click();
+        await Promise.all([
+            page.waitForResponse(
+                response => response.url().includes('customer/section/load') && response.ok()
+            ),
+            page.locator('.action.tocart.primary').click(),
+        ]);
 
-        await page.locator('[data-block="minicart"] [data-role="loader"]').waitFor({ state: 'hidden' });
         await page.locator('[data-block="minicart"] .counter.qty').waitFor({ state: 'visible' });
         await page.locator('[data-block="minicart"] .counter.qty').innerText().then(text => {
             if (!text.includes(quantity.toString())) {
