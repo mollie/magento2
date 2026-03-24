@@ -13,6 +13,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\Resources\Payment;
+use stdClass;
 
 class GetCustomerFromPayment
 {
@@ -47,8 +48,12 @@ class GetCustomerFromPayment
         return $this->customerRepository->save($customer);
     }
 
-    private function getEmail(CartInterface $oldCart, ?\stdClass $billingAddress): string
+    private function getEmail(CartInterface $oldCart, ?stdClass $billingAddress): string
     {
+        if ($oldCart->getCustomerEmail()) {
+            return $oldCart->getCustomerEmail();
+        }
+
         if (is_object($billingAddress) && property_exists($billingAddress, 'email')) {
             return $billingAddress->email;
         }
