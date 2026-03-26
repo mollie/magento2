@@ -6,6 +6,7 @@
 
 namespace Mollie\Payment\Service\Order;
 
+use Magento\Framework\App\CacheInterface;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
@@ -14,9 +15,15 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\StatusResolver;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Magento\Order\CancelRewardPoints;
+use Psr\Log\LoggerInterface;
 
 class CancelOrder
 {
+    /**
+     * @var CacheInterface
+     */
+    private $cache;
+    
     /**
      * @var Config
      */
@@ -27,6 +34,11 @@ class CancelOrder
      */
     private $cancelRewardPoints;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+    
     /**
      * @var OrderCommentHistory
      */
@@ -52,8 +64,10 @@ class CancelOrder
     private $resource;
 
     public function __construct(
+        CacheInterface $cache,
         Config $config,
         CancelRewardPoints $cancelRewardPoints,
+        LoggerInterface $logger,
         OrderCommentHistory $orderCommentHistory,
         OrderManagementInterface $orderManagement,
         OrderRepositoryInterface $orderRepository,
@@ -61,8 +75,10 @@ class CancelOrder
         ResourceConnection $resource
     )
     {
+        $this->cache = $cache;
         $this->config = $config;
         $this->cancelRewardPoints = $cancelRewardPoints;
+        $this->logger = $logger;
         $this->orderCommentHistory = $orderCommentHistory;
         $this->orderManagement = $orderManagement;
         $this->orderRepository = $orderRepository;
@@ -72,6 +88,26 @@ class CancelOrder
 
     public function execute(OrderInterface $order, $reason = null): bool
     {
+        $lockName = sprintf('cancel_order_%s', $order->getIncrementId());
+
+        $lockExists = $this->cache->load($lockName);
+        $lockSet = false;
+
+        if (!$lockExists) {
+            $lockSet = $this->cache->save(1, $lockName, [], 100);
+        }
+
+        if ($lockExists || $lockSet) {
+            $this->logger->info(
+                sprintf('Cannot cancel order %s. The lock is set ', $order->getIncrementId())
+            );
+        }
+
+        if (!$lockSet && $lockExists) {
+            sleep(5);
+            return $this->execute($order, $reason);
+        }
+
         if (!$order->getId() || $order->getState() == Order::STATE_CANCELED) {
             return false;
         }
@@ -93,6 +129,8 @@ class CancelOrder
 
         $this->orderManagement->cancel($order->getId());
         $this->cancelRewardPoints->execute($order);
+
+        $this->cache->remove($lockName);
 
         return true;
     }
