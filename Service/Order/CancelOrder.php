@@ -64,17 +64,15 @@ class CancelOrder
     private $resource;
 
     public function __construct(
+        CacheInterface $cache,
         Config $config,
         CancelRewardPoints $cancelRewardPoints,
+        LoggerInterface $logger,
         OrderCommentHistory $orderCommentHistory,
         OrderManagementInterface $orderManagement,
         OrderRepositoryInterface $orderRepository,
         StatusResolver $statusResolver,
-        ResourceConnection $resource,
-        // BEGIN PATCH
-        LoggerInterface $logger,
-        CacheInterface $cache
-        // END PATCH
+        ResourceConnection $resource
     )
     {
         $this->cache = $cache;
