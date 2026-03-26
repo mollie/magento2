@@ -99,7 +99,7 @@ class CancelOrder
 
         if ($lockExists || $lockSet) {
             $this->logger->info(
-                sprintf('Cannot cancel order %s. DB lock is set ', $order->getIncrementId())
+                sprintf('Cannot cancel order %s. The lock is set ', $order->getIncrementId())
             );
         }
 
