@@ -58,14 +58,9 @@ jobs:
 
       - name: Start the Magento container
         run: |
-          openssl req -x509 -newkey rsa:4096 -keyout .github/workflows/templates/nginx-proxy/magento.test.key -out .github/workflows/templates/nginx-proxy/magento.test.crt -days 365 -nodes -subj "/CN=magento.test" && \
-          # Start tunnel as first as it has some extra startup time
-          docker compose -f .github/workflows/templates/docker-compose.yml up -d --quiet-pull tunnel
-          # Start the rest of the containers
+          openssl req -x509 -newkey rsa:4096 -keyout .github/workflows/templates/nginx-proxy/magento.test.key -out .github/workflows/templates/nginx-proxy/magento.test.crt -days 365 -nodes -subj "/CN=magento.test"
           docker compose -f .github/workflows/templates/docker-compose.yml up -d --quiet-pull
-          # Get the URL from Cloudflare
-          tunnelOutput=$(docker compose -f .github/workflows/templates/docker-compose.yml logs tunnel)
-          MAGENTO_URL=$(echo "$tunnelOutput" | grep -oP 'https://\S*trycloudflare\.com' | head -n 1)
+          MAGENTO_URL=$(.github/workflows/templates/get-tunnel-url.sh .github/workflows/templates/docker-compose.yml)
           echo "Magento URL: $MAGENTO_URL"
           echo "magento_url=$MAGENTO_URL" >> $GITHUB_ENV
 
