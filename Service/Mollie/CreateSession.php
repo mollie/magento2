@@ -48,7 +48,7 @@ class CreateSession
         $session = $mollie->send(new CreateSessionRequest(
             $this->transaction->getExpressRedirectUrl($cart, $paymentToken),
             $this->urlBuilder->getUrl('checkout/cart'),
-            new Money($cart->getQuoteCurrencyCode(), number_format($total, 2)),
+            new Money($cart->getQuoteCurrencyCode(), number_format($total, 2, '.', '')),
             $this->scopeConfig->getValue('general/store_information/name') ?? __('Unnamed webshop')->render(),
             $this->getLines($isExpressCheckout),
             ['webhookUrl' => $this->transaction->getExpressWebhookUrl($cart)],
