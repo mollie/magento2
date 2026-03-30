@@ -27,8 +27,8 @@ export default class ProductPage {
             page.locator('.action.tocart.primary').click(),
         ]);
 
-        await page.locator('[data-block="minicart"] .counter.qty').waitFor({ state: 'visible' });
-        await page.locator('[data-block="minicart"] .counter.qty').innerText().then(text => {
+        await page.locator('[data-block="minicart"] .counter.qty:not(.empty)').waitFor({ state: 'visible' });
+        await page.locator('[data-block="minicart"] .counter.qty:not(.empty)').innerText().then(text => {
             if (!text.includes(quantity.toString())) {
                 throw new Error(`Expected counter to contain ${quantity}, but it contains ${text}`);
             }
