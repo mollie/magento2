@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
 export default class ProductPage {
     /**
@@ -20,6 +20,7 @@ export default class ProductPage {
 
         await page.locator('#search').focus();
 
+        await expect(page.locator('.action.tocart.primary')).toBeEnabled();
         await page.locator('.action.tocart.primary').click();
 
         await page.waitForFunction(
@@ -27,7 +28,8 @@ export default class ProductPage {
                 const counter = document.querySelector('[data-block="minicart"] .counter.qty');
                 return counter?.textContent?.includes(String(qty));
             },
-            quantity
+            quantity,
+            { timeout: 20000 }
         );
     }
 }
