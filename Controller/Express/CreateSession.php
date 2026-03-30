@@ -31,7 +31,8 @@ class CreateSession implements HttpPostActionInterface
         $cart = $this->checkoutSession->getQuote();
         $this->setEmailOnCart($cart);
 
-        $accessToken = $this->createSession->execute($cart);
+        $isExpressCheckout = $this->request->getParam('type') !== 'checkout';
+        $accessToken = $this->createSession->execute($cart, $isExpressCheckout);
 
         $cart->collectTotals();
         $this->cartRepository->save($cart);

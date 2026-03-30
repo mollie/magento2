@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-import { Page } from '@playwright/test';
+import { Page, expect } from '@playwright/test';
 
 export default class ProductPage {
     /**
@@ -20,14 +20,16 @@ export default class ProductPage {
 
         await page.locator('#search').focus();
 
+        await expect(page.locator('.action.tocart.primary')).toBeEnabled();
         await page.locator('.action.tocart.primary').click();
 
-        await page.locator('[data-block="minicart"] [data-role="loader"]').waitFor({ state: 'hidden' });
-        await page.locator('[data-block="minicart"] .counter.qty').waitFor({ state: 'visible' });
-        await page.locator('[data-block="minicart"] .counter.qty').innerText().then(text => {
-            if (!text.includes(quantity.toString())) {
-                throw new Error(`Expected counter to contain ${quantity}, but it contains ${text}`);
-            }
-        });
+        await page.waitForFunction(
+            (qty) => {
+                const counter = document.querySelector('[data-block="minicart"] .counter.qty');
+                return counter?.textContent?.includes(String(qty));
+            },
+            quantity,
+            { timeout: 20000 }
+        );
     }
 }
