@@ -76,7 +76,7 @@ class SaveApiKey extends Encrypted
     public function afterSave()
     {
         if ($this->shouldUpdateProfileId !== false) {
-            $this->updateProfileId->execute($this->shouldUpdateProfileId, $this->getScope(), $this->getScopeId());
+            $this->updateProfileId->execute($this->shouldUpdateProfileId, $this->getScope(), (int)$this->getScopeId());
         }
 
         return parent::afterSave();
