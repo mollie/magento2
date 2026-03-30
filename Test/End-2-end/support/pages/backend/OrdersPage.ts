@@ -47,7 +47,7 @@ export default class OrdersPage {
     }
 
     async callFetchStatus(page, attempt = 0) {
-      await expect(await page.getByRole('button', { name: 'Fetch Status' })).toBeVisible();
+      await expect(page.getByRole('button', { name: 'Fetch Status' })).toBeVisible();
 
       try {
         await page.locator('.fetch-mollie-payment-status').click({timeout: 5000});
@@ -57,14 +57,16 @@ export default class OrdersPage {
         }
 
         await page.reload();
+        await page.waitForLoadState('load');
         await this.callFetchStatus(page, attempt + 1);
         return;
       }
 
-      await expect(await page.locator('.fetch-mollie-payment-status')).toContainText('Fetching...');
-      await expect(await page.locator('.fetch-mollie-payment-status')).toContainText('Fetch Status', {timeout: 15000});
+      await expect(page.locator('.fetch-mollie-payment-status')).toContainText('Fetching...');
+      await expect(page.locator('.fetch-mollie-payment-status')).toContainText('Fetch Status', {timeout: 15000});
 
-      await page.reload();
+      await page.waitForLoadState('networkidle');
+      await page.reload({waitUntil: 'load'});
     }
 
     async assertOrderStatusIs(page, status: string, maxRetries = 90) {
@@ -76,8 +78,8 @@ export default class OrdersPage {
           await expect(orderStatusLocator).toContainText(status, { timeout: 100 });
           return;
         }
-        await page.reload();
-        await page.waitForTimeout(1000);
+        await page.reload({waitUntil: 'load'});
+        await page.waitForLoadState('domcontentloaded');
       }
 
       throw new Error(`Order status "${status}" was not found after ${maxRetries} retries.`);

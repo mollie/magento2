@@ -13,6 +13,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Invoice;
+use Magento\Sales\Model\Order\Payment\Transaction;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
@@ -21,6 +22,7 @@ use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Service\Mollie\Order\CanRegisterCaptureNotification;
+use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\SendOrderEmails;
@@ -40,6 +42,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly SendOrderEmails $sendOrderEmails,
         private readonly CanRegisterCaptureNotification $canRegisterCaptureNotification,
+        private readonly CanUseManualCapture $canUseManualCapture,
     ) {
     }
 
@@ -121,13 +124,20 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $payment = $magentoOrder->getPayment();
         $payment->setCurrencyCode($magentoOrder->getBaseCurrencyCode());
         $payment->setTransactionId($magentoOrder->getMollieTransactionId());
-        $payment->setIsTransactionClosed(true);
+
+        // Don't close the transaction if the payment method is using manual capture.
+        $usesManualCapture = $this->canUseManualCapture->execute($magentoOrder);
+        $payment->setIsTransactionClosed(!$usesManualCapture);
 
         if (
             $this->canRegisterCaptureNotification->execute($magentoOrder, $molliePayment) &&
             $type != Payments::TRANSACTION_TYPE_SUBSCRIPTION
         ) {
             $this->registerCaptureNotification($molliePayment, $magentoOrder);
+        }
+
+        if ($usesManualCapture) {
+            $payment->addTransaction(Transaction::TYPE_AUTH);
         }
 
         $this->updateOrderStatus($magentoOrder);

@@ -51,7 +51,7 @@ define([
                     context: this,
                     type: 'POST',
                     data: data,
-                    url: url.build('mollie/express/createSession'),
+                    url: url.build('mollie/express/createSession/type/checkout'),
                     success: function (result) {
                         this.initializeExpressComponent(result);
                     }.bind(this),

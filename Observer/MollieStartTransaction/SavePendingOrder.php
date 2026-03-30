@@ -45,7 +45,7 @@ class SavePendingOrder implements ObserverInterface
 
         try {
             // If this succeeds there already exists a reminder.
-            $this->repository->getByOrderId($order->getEntityId());
+            $this->repository->getByOrderId((int)$order->getEntityId());
 
             return;
         } catch (NoSuchEntityException $exception) {
@@ -55,10 +55,10 @@ class SavePendingOrder implements ObserverInterface
         try {
             /** @var PendingPaymentReminderInterface $reminder */
             $reminder = $this->reminderFactory->create();
-            $reminder->setOrderId($order->getEntityId());
+            $reminder->setOrderId((int)$order->getEntityId());
 
             if ($order->getCustomerId()) {
-                $reminder->setCustomerId($order->getCustomerId());
+                $reminder->setCustomerId((int)$order->getCustomerId());
             }
 
             if (!$order->getCustomerId() && $order->getCustomerEmail()) {
