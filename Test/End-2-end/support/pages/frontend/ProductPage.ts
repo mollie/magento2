@@ -20,18 +20,14 @@ export default class ProductPage {
 
         await page.locator('#search').focus();
 
-        await Promise.all([
-            page.waitForResponse(
-                response => response.url().includes('customer/section/load') && response.ok()
-            ),
-            page.locator('.action.tocart.primary').click(),
-        ]);
+        await page.locator('.action.tocart.primary').click();
 
-        await page.locator('[data-block="minicart"] .counter.qty:not(.empty)').waitFor({ state: 'visible' });
-        await page.locator('[data-block="minicart"] .counter.qty:not(.empty)').innerText().then(text => {
-            if (!text.includes(quantity.toString())) {
-                throw new Error(`Expected counter to contain ${quantity}, but it contains ${text}`);
-            }
-        });
+        await page.waitForFunction(
+            (qty) => {
+                const counter = document.querySelector('[data-block="minicart"] .counter.qty');
+                return counter?.textContent?.includes(String(qty));
+            },
+            quantity
+        );
     }
 }
