@@ -18,7 +18,6 @@ use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 class Config
 {
     public const EXTENSION_CODE = 'Mollie_Payment';
-    public const ADVANCED_INVOICE_MOMENT = 'payment/mollie_general/invoice_moment';
     public const ADVANCED_ENABLE_METHODS_API = 'payment/mollie_general/enable_methods_api';
     public const GENERAL_ENABLED = 'payment/mollie_general/enabled';
     public const GENERAL_APIKEY_LIVE = 'payment/mollie_general/apikey_live';
@@ -218,11 +217,6 @@ class Config
     public function isDebugMode(?int $storeId = null): bool
     {
         return $this->isSetFlag(static::GENERAL_DEBUG, $storeId);
-    }
-
-    public function getInvoiceMoment(?int $storeId = null): ?string
-    {
-        return $this->getPath(static::ADVANCED_INVOICE_MOMENT, $storeId);
     }
 
     public function captureMode(string $method, ?int $storeId = null): ?string

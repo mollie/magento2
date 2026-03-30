@@ -68,7 +68,6 @@ class General extends AbstractHelper
     public const XML_PATH_DEBUG = 'payment/mollie_general/debug';
     public const XML_PATH_STATUS_PROCESSING = 'payment/mollie_general/order_status_processing';
     public const XML_PATH_BANKTRANSFER_DUE_DAYS = 'payment/mollie_methods_banktransfer/due_days';
-    public const XML_PATH_INVOICE_MOMENT = 'payment/mollie_general/invoice_moment';
     public const XML_PATH_LOCALE = 'payment/mollie_general/locale';
     public const XML_PATH_IMAGES = 'payment/mollie_general/payment_images';
     public const XML_PATH_USE_BASE_CURRENCY = 'payment/mollie_general/currency';
@@ -267,16 +266,6 @@ class General extends AbstractHelper
     public function getRestartUrl()
     {
         return $this->urlBuilder->getUrl('mollie/checkout/restart/');
-    }
-
-    /**
-     * @see \Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment
-     * @param int $storeId
-     * @return string
-     */
-    public function getInvoiceMoment($storeId = 0)
-    {
-        return $this->getStoreConfig(static::XML_PATH_INVOICE_MOMENT, $storeId);
     }
 
     /**
