@@ -252,7 +252,6 @@ class Payments extends AbstractModel
 
         $paymentData = $this->buildTransaction->execute($order, static::CHECKOUT_TYPE, $paymentData);
 
-        $paymentData = $this->mollieHelper->validatePaymentData($paymentData);
         $this->mollieHelper->addTolog('request', $paymentData);
         $payment = $mollieApi->payments->create($paymentData);
         $this->processResponse($order, $payment);
