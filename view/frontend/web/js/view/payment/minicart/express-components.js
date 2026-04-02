@@ -41,7 +41,10 @@ define([
             }, this, 'beforeChange');
 
             this.cartTotal.subscribe((newPrice) => {
-                document.getElementById(this.elementId).innerHTML = '';
+                const expressElement = document.getElementById(this.elementId);
+                if (expressElement) {
+                    expressElement.innerHTML = '';
+                }
 
                 if (parseInt(newPrice) === 0) {
                     return;
