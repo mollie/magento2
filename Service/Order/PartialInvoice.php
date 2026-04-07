@@ -8,17 +8,10 @@ use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\InvoiceRepository;
 use Magento\Sales\Model\Service\InvoiceService;
-use Mollie\Payment\Helper\General as MollieHelper;
-use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Service\Mollie\Order\CreateInvoiceOnShipment;
 
 class PartialInvoice
 {
-    /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-
     /**
      * @var CreateInvoiceOnShipment
      */
@@ -35,12 +28,10 @@ class PartialInvoice
     private $invoiceRepository;
 
     public function __construct(
-        MollieHelper $mollieHelper,
         CreateInvoiceOnShipment $createInvoiceOnShipment,
         InvoiceService $invoiceService,
         InvoiceRepository $invoiceRepository
     ) {
-        $this->mollieHelper = $mollieHelper;
         $this->invoiceService = $invoiceService;
         $this->invoiceRepository = $invoiceRepository;
         $this->createInvoiceOnShipment = $createInvoiceOnShipment;
@@ -52,6 +43,10 @@ class PartialInvoice
         $order = $shipment->getOrder();
 
         if (!$this->createInvoiceOnShipment->execute($order)) {
+            return null;
+        }
+
+        if (!$order->canInvoice()) {
             return null;
         }
 
