@@ -23,6 +23,7 @@ use Mollie\Payment\Model\Methods\CreditcardVault;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\FormatExceptionMessages;
 use Mollie\Payment\Service\Mollie\Order\RedirectUrl;
+use Mollie\Payment\Service\OrderLockService;
 
 /**
  * Class Redirect
@@ -64,6 +65,10 @@ class Redirect extends Action
      * @var FormatExceptionMessages
      */
     private $formatExceptionMessages;
+    /**
+     * @var OrderLockService
+     */
+    private $orderLockService;
 
     /**
      * Redirect constructor.
@@ -77,6 +82,7 @@ class Redirect extends Action
      * @param OrderRepositoryInterface $orderRepository
      * @param RedirectUrl $redirectUrl
      * @param FormatExceptionMessages $formatExceptionMessages
+     * @param OrderLockService $orderLockService
      */
     public function __construct(
         Context $context,
@@ -87,7 +93,8 @@ class Redirect extends Action
         PaymentTokenRepositoryInterface $paymentTokenRepository,
         OrderRepositoryInterface $orderRepository,
         RedirectUrl $redirectUrl,
-        FormatExceptionMessages $formatExceptionMessages
+        FormatExceptionMessages $formatExceptionMessages,
+        OrderLockService $orderLockService
     ) {
         $this->checkoutSession = $checkoutSession;
         $this->paymentHelper = $paymentHelper;
@@ -97,6 +104,7 @@ class Redirect extends Action
         $this->orderRepository = $orderRepository;
         $this->redirectUrl = $redirectUrl;
         $this->formatExceptionMessages = $formatExceptionMessages;
+        $this->orderLockService = $orderLockService;
         parent::__construct($context);
     }
 
@@ -147,16 +155,18 @@ class Redirect extends Action
         }
 
         try {
-            $historyMessage = __('Canceled because an error occurred while redirecting the customer to Mollie');
-            if ($message) {
-                $historyMessage .= ':<br>' . PHP_EOL . $message;
-            }
+            $this->orderLockService->execute($order, function (OrderInterface $order) use ($message) {
+                $historyMessage = __('Canceled because an error occurred while redirecting the customer to Mollie');
+                if ($message) {
+                    $historyMessage .= ':<br>' . PHP_EOL . $message;
+                }
 
-            $order->setState(Order::STATE_PENDING_PAYMENT);
-            $this->orderManagement->cancel($order->getEntityId());
-            $order->addCommentToStatusHistory($order->getEntityId(), $historyMessage);
+                $order->setState(Order::STATE_PENDING_PAYMENT);
+                $this->orderManagement->cancel($order->getEntityId());
+                $order->addCommentToStatusHistory($order->getEntityId(), $historyMessage);
 
-            $this->config->addToLog('info', sprintf('Canceled order %s', $order->getIncrementId()));
+                $this->config->addToLog('info', sprintf('Canceled order %s', $order->getIncrementId()));
+            });
         } catch (Exception $e) {
             $message = sprintf('Cannot cancel order %s: %s', $order->getIncrementId(), $e->getMessage());
             $this->config->addToLog('error', $message);

@@ -79,6 +79,11 @@ class Reorder
      */
     private $shouldEmailInvoice;
 
+    /**
+     * @var CopyOriginalOrderItemData
+     */
+    private $copyOriginalOrderItemData;
+
     public function __construct(
         Config $config,
         Create $orderCreate,
@@ -89,7 +94,8 @@ class Reorder
         Session $checkoutSession,
         Product $productHelper,
         DisableCheckForAdminOrders $disableCheckForAdminOrders,
-        ShouldEmailInvoice $shouldEmailInvoice
+        ShouldEmailInvoice $shouldEmailInvoice,
+        CopyOriginalOrderItemData $copyOriginalOrderItemData
     ) {
         $this->config = $config;
         $this->orderCreate = $orderCreate;
@@ -101,6 +107,7 @@ class Reorder
         $this->productHelper = $productHelper;
         $this->disableCheckForAdminOrders = $disableCheckForAdminOrders;
         $this->shouldEmailInvoice = $shouldEmailInvoice;
+        $this->copyOriginalOrderItemData = $copyOriginalOrderItemData;
     }
 
     public function create(OrderInterface $originalOrder): OrderInterface
@@ -174,6 +181,7 @@ class Reorder
         $this->productHelper->setSkipSaleableCheck(true);
         $this->orderCreate->setData('account', ['email' => $originalOrder->getCustomerEmail()]);
         $this->orderCreate->initFromOrder($originalOrder);
+        $this->copyOriginalOrderItemData->execute($originalOrder, $this->orderCreate->getQuote());
 
         $customerGroupId = $originalOrder->getCustomerGroupId() ?? 0;
         $this->orderCreate->getQuote()->getCustomer()->setGroupId($customerGroupId);
