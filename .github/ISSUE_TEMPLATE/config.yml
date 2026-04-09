@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://www.mollie.com/en/responsible-disclosure
+    about: Please review our security policy for reporting vulnerabilities
+  - name: General support
+    url: https://www.mollie.com/contact/merchants
+    about: For general questions, contact Mollie support
