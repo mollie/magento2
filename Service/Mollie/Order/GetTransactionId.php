@@ -63,11 +63,11 @@ class GetTransactionId
         }, $this->transactionToOrderManagement->getForOrder((int)$order->getEntityId()));
 
         if (!$transactions) {
-            return null;
+            return $order->getMollieTransactionId();
         }
 
         if (count($transactions) === 1) {
-            return $order->getMollieTransactionId();
+            return reset($transactions);
         }
 
         $this->config->addToLog('warning', [
