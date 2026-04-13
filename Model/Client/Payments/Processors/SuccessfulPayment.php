@@ -172,7 +172,8 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $payment->setIsTransactionClosed(true);
 
         if ($this->canRegisterCaptureNotification->execute($magentoOrder, $molliePayment) &&
-            $type != Payments::TRANSACTION_TYPE_SUBSCRIPTION
+            $type != Payments::TRANSACTION_TYPE_SUBSCRIPTION &&
+            $magentoOrder->getInvoiceCollection()->count() === 0
         ) {
             if ($molliePayment->getAmountCaptured() != 0.0) {
                 $magentoOrder->addCommentToStatusHistory(
