@@ -84,6 +84,10 @@
                        showInWebsite="1" showInStore="1">
                     <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Extension\Result</frontend_model>
                 </field>
+                <field id="other_modules" translate="label" type="text" sortOrder="110" showInDefault="1"
+                       showInStore="1" showInWebsite="1">
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\OtherModules</frontend_model>
+                </field>
             </group>
 
             <group id="settings" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1"
