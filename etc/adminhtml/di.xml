@@ -43,6 +43,7 @@
                 <item name="isHyvaThemesJsonCorrect" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\IsHyvaThemesJsonCorrect</item>
                 <item name="areQueuesConfiguredCorrectly" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\AreQueuesConfiguredCorrectlyTest</item>
                 <item name="webhookEndpoint" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestWebhookEndpoint</item>
+                <item name="geoIpModuleEnabled" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestGeoIpModuleEnabled</item>
             </argument>
         </arguments>
     </type>
