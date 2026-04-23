@@ -71,6 +71,8 @@ class Config
     public const PAYMENT_METHOD_PAYMENT_DESCRIPTION = 'payment/mollie_methods_%s/payment_description';
     public const PAYMENT_METHOD_CAPTURE_MODE = 'payment/mollie_methods_%s/capture_mode';
     public const PAYMENT_METHOD_WHEN_TO_CAPTURE = 'payment/mollie_methods_%s/when_to_capture';
+    public const PAYMENT_METHOD_CAPTURE_DELAY = 'payment/mollie_methods_%s/capture_delay';
+    public const PAYMENT_METHOD_CAPTURE_DELAY_UNIT = 'payment/mollie_methods_%s/capture_delay_unit';
     public const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     public const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
     public const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
@@ -227,6 +229,16 @@ class Config
     public function whenToCapture(string $method, ?int $storeId = null): ?string
     {
         return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_WHEN_TO_CAPTURE, $method), $storeId);
+    }
+
+    public function captureDelay(string $method, ?int $storeId = null): ?string
+    {
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_CAPTURE_DELAY, $method), $storeId);
+    }
+
+    public function captureDelayUnit(string $method, ?int $storeId = null): ?string
+    {
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_CAPTURE_DELAY_UNIT, $method), $storeId);
     }
 
     public function isMethodsApiEnabled(?int $storeId = null): bool
