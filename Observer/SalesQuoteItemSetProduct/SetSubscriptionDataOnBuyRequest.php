@@ -45,6 +45,10 @@ class SetSubscriptionDataOnBuyRequest implements ObserverInterface
         $data = $this->serializer->unserialize($table);
         $default = $this->getDefault($data);
 
+        if (!is_array($default) || !is_scalar($default['identifier'] ?? null)) {
+            return;
+        }
+
         $value['mollie_metadata'] = [
             'purchase' => 'subscription',
             'recurring_metadata' => [
@@ -55,15 +59,17 @@ class SetSubscriptionDataOnBuyRequest implements ObserverInterface
         $buyRequest->setValue($this->serializer->serialize($value));
     }
 
-    private function getDefault(array $data): array
+    private function getDefault(array $data): ?array
     {
         foreach ($data as $row) {
-            if (isset($row['isDefault']) && $row['isDefault']) {
+            if (is_array($row) && isset($row['isDefault']) && $row['isDefault']) {
                 return $row;
             }
         }
 
-        return array_shift($data);
+        $default = array_shift($data);
+
+        return is_array($default) ? $default : null;
     }
 
     private function getBuyRequest(CartItemInterface $item): OptionInterface
