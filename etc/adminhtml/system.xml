@@ -479,6 +479,14 @@
                     <config_path>payment/mollie_general/enable_methods_api</config_path>
                     <comment><![CDATA[Display only payment methods that are applicable based on the customer's country and the total value of the products in the cart. Disabling this will save you an API call in the checkout, but requires you to configure this manually.]]></comment>
                 </field>
+                <field id="tracking_cookies" translate="label comment" sortOrder="50" showInDefault="1"
+                       showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Tracking cookies</label>
+                    <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Field\TrackingCookies</frontend_model>
+                    <backend_model>Mollie\Payment\Model\Adminhtml\Backend\TrackingCookies</backend_model>
+                    <config_path>payment/mollie_general/tracking_cookies</config_path>
+                    <comment><![CDATA[Cookies captured at checkout submission. The raw cookie value is forwarded as-is under the given alias as a query parameter on the Mollie redirect URL, and persisted on the success page so JavaScript on that page can read it.]]></comment>
+                </field>
             </group>
         </section>
 

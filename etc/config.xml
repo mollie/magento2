@@ -43,6 +43,7 @@
                 <create_invoice>1</create_invoice>
                 <debug>1</debug>
                 <anonymize_debug_requests>1</anonymize_debug_requests>
+                <tracking_cookies>{"_1":{"cookie_name":"_ga","alias":"clientId"}}</tracking_cookies>
             </mollie_general>
             <mollie_methods_general>
                 <model>Mollie\Payment\Model\Methods\General</model>
