@@ -17,10 +17,6 @@
         <attribute code="base_mollie_payment_fee" type="float"/>
         <attribute code="mollie_payment_fee_tax" type="float"/>
         <attribute code="base_mollie_payment_fee_tax" type="float"/>
-
-        <!-- Express components -->
-        <attribute code="sendcloud_partner" type="Mollie\Payment\Api\Data\SendcloudPartnerInterface"/>
-        <attribute code="sendcloud_checkout_payload" type="string"/>
     </extension_attributes>
 
     <extension_attributes for="Magento\Sales\Api\Data\OrderItemInterface">
