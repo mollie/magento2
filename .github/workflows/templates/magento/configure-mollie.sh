@@ -60,6 +60,9 @@ bin/magento config:set payment/mollie_general/process_transactions_in_the_queue 
 # Enable Components
 bin/magento config:set payment/mollie_methods_creditcard/use_components 1
 
+# Enable Customers API (required for saved cards)
+bin/magento config:set payment/mollie_methods_creditcard/enable_customers_api 1
+
 # Configure currency for the swiss store view
 bin/magento config:set currency/options/allow EUR,CHF,PLN,SEK
 

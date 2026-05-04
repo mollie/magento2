@@ -17,6 +17,41 @@
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
 
+        <!-- ko if: isSavedCardsEnabled() && getSavedMandates().length > 0 -->
+        <div class="mollie-saved-cards mollie-saved-cards-list">
+            <p class="mollie-saved-cards__heading" data-bind="i18n: 'Use a saved card'"></p>
+            <!-- ko foreach: getSavedMandates() -->
+            <div class="field choice">
+                <input type="radio"
+                       class="radio"
+                       data-bind="
+                           attr: {id: 'mollie-mandate-' + mandate_id, value: mandate_id},
+                           checked: $parent.selectedMandateId"/>
+                <label data-bind="attr: {for: 'mollie-mandate-' + mandate_id}" class="label">
+                    <!-- ko if: $parent.getCardLogoUrl($data) -->
+                    <img data-bind="attr: {src: $parent.getCardLogoUrl($data), alt: card_label}" class="mollie-card-logo" width="38" height="24"/>
+                    <!--/ko-->
+                    <span data-bind="text: card_label + ' •••• ' + card_number_last4"></span>
+                    <!-- ko if: card_expiry_date -->
+                    <span data-bind="text: ' – ' + $t('Expires %1').replace('%1', card_expiry_date)"></span>
+                    <!--/ko-->
+                </label>
+            </div>
+            <!--/ko-->
+            <div class="field choice">
+                <input type="radio"
+                       id="mollie-new-card"
+                       class="radio"
+                       value=""
+                       data-bind="checked: selectedMandateId"/>
+                <label for="mollie-new-card" class="label">
+                    <span data-bind="i18n: 'Use a new card'"></span>
+                </label>
+            </div>
+        </div>
+        <!--/ko-->
+
+        <!-- ko if: !isSavedCardsEnabled() || !selectedMandateId() -->
         <div class="card-container">
             <label for="card-holder" data-bind="i18n: 'Name on card'"></label>
             <div id="card-holder"></div>
@@ -34,6 +69,26 @@
             <div id="verification-code"></div>
             <div id="verification-code-error" class="component-error"></div>
         </div>
+
+        <!-- ko if: isSavedCardsEnabled() && getConsentText() -->
+        <div class="mollie-save-card">
+            <div class="field choice">
+                <input type="checkbox"
+                       id="mollie-save-card"
+                       class="checkbox"
+                       data-bind="checked: saveCard"/>
+                <label for="mollie-save-card" class="label">
+                    <span data-bind="i18n: 'Save your card for faster checkout'"></span>
+                </label>
+            </div>
+        </div>
+        <!-- ko if: saveCard() -->
+        <div class="mollie-save-card-consent">
+            <p class="mollie-save-card-consent__text" data-bind="html: getConsentText()"></p>
+        </div>
+        <!--/ko-->
+        <!--/ko-->
+        <!--/ko-->
 
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->

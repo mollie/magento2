@@ -76,4 +76,18 @@
             <resource ref="Magento_Sales::actions_view" />
         </resources>
     </route>
+
+    <route url="/V1/mollie/customer/me/saved-cards" method="GET">
+        <service class="Mollie\Payment\Api\Webapi\SavedCardsInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/mollie/customer/me/saved-cards/:mandateId" method="DELETE">
+        <service class="Mollie\Payment\Api\Webapi\SavedCardsInterface" method="delete"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
 </routes>

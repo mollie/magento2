@@ -162,5 +162,17 @@
         "constraint": {
             "PRIMARY": true
         }
+    },
+    "mollie_saved_card_consent": {
+        "column": {
+            "entity_id": true,
+            "order_id": true,
+            "store_id": true,
+            "consent_timestamp": true
+        },
+        "constraint": {
+            "MOLLIE_SAVED_CARD_CONSENT_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
+            "PRIMARY": true
+        }
     }
 }
