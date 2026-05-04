@@ -98,7 +98,6 @@
 "An offline refund has been created, please make sure to also create this refund on mollie.com/dashboard or use the online refund option.","A fost creată o rambursare fizică, vă rugăm să vă asigurați că creați acestă rambursare și pe mollie.com/dashboard sau folosiți opțiunea de rambursare online."
 "Order can only be refunded after Klarna has been captured (after shipment)","Comanda poate fi rambursată doar după ce Klarna a fost încasată (după expediere)"
 "Can not create online refund, as shipping costs do not match","Nu se poate crea o rambursare online, deoarece costurile de expediere nu corespund"
-"Mollie: Captured %1, Settlement Amount %2","Mollie: Încasat %1, Suma de decontare %2"
 "Order not found","Comanda nu a fost găsită"
 "API Key not found","API key-ul nu a fost găsit"
 "Error: not possible to create an online refund: %1","Eroare: nu este posibil să se creeze o rambursare online: %1"

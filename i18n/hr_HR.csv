@@ -98,7 +98,6 @@
 "An offline refund has been created, please make sure to also create this refund on mollie.com/dashboard or use the online refund option.","Stvoren je offline povrat. Molimo vas da povrat zabilježite i na mollie.com/dashboard ili upotrijebite opciju za online povrat."
 "Order can only be refunded after Klarna has been captured (after shipment)","Narudžbu je moguće refundirati tek nakon što Klarna bude naplaćena"
 "Can not create online refund, as shipping costs do not match","Nije moguće stvoriti online povrat jer se troškovi dostave ne podudaraju"
-"Mollie: Captured %1, Settlement Amount %2","Mollie: Naplaćeno %1, Iznos za poravnanje %2"
 "Order not found","Narudžba nije pronađena"
 "API Key not found","API ključ nije pronađen"
 "Error: not possible to create an online refund: %1","Pogreška: nije moguće stvoriti online povrat: %1"

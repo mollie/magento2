@@ -99,7 +99,6 @@
 "Order can only be refunded after Klarna has been captured (after shipment)","Objednávku je možné vrátiť až po tom, čo bola zachytená spoločnosťou Klarna (po odoslaní zásielky).
 "
 "Can not create online refund, as shipping costs do not match","Nie je možné vytvoriť online vrátenie platby, pretože náklady na dopravu sa nezhodujú"
-"Mollie: Captured %1, Settlement Amount %2","Mollie: Zachytené %1, Vyrovnaná suma %2"
 "Order not found","Objednávka nebola nájdená"
 "API Key not found","API kľúč nebol nájdený"
 "Error: not possible to create an online refund: %1","Chyba: nie je možné vykonať online refundáciu: %1"

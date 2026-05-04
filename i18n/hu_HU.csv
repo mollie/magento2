@@ -99,7 +99,6 @@
 "An offline refund has been created, please make sure to also create this refund on mollie.com/dashboard or use the online refund option.","Offline visszatérítés létrehozva, kérjük, győződjön meg arról, hogy ez a visszatérítés létre legyen hozva a mollie.com/dashboard oldalon, vagy használja az online visszatérítési lehetőséget."
 "Order can only be refunded after Klarna has been captured (after shipment)","A rendelés csak akkor téríthető vissza, ha a Klarna-t már lezárták (szállítás után)"
 "Can not create online refund, as shipping costs do not match","Nem tud online visszatérítést létrehozni, mivel a szállítási költségek nem egyeznek"
-"Mollie: Captured %1, Settlement Amount %2","Mollie: Lezárt %1, Megállapodott összeg %2"
 "Order not found","A rendelés nem található"
 "API Key not found","API-kulcs nem található"
 "Error: not possible to create an online refund: %1","Hiba: nem lehetséges online visszatérítést létrehozni: %1"
