@@ -31,19 +31,20 @@ class Reorder
     /**
      * @var Transaction
      */
-    private $transaction;
+    private Transaction $transaction;
 
     public function __construct(
-        private Config $config,
-        private Create $orderCreate,
-        private InvoiceService $invoiceService,
-        private InvoiceSender $invoiceSender,
-        private OrderCommentHistory $orderCommentHistory,
-        private TransactionFactory $transactionFactory,
-        private Session $checkoutSession,
-        private Product $productHelper,
-        private DisableCheckForAdminOrders $disableCheckForAdminOrders,
-        private ShouldEmailInvoice $shouldEmailInvoice
+        private readonly Config $config,
+        private readonly Create $orderCreate,
+        private readonly InvoiceService $invoiceService,
+        private readonly InvoiceSender $invoiceSender,
+        private readonly OrderCommentHistory $orderCommentHistory,
+        private readonly TransactionFactory $transactionFactory,
+        private readonly Session $checkoutSession,
+        private readonly Product $productHelper,
+        private readonly DisableCheckForAdminOrders $disableCheckForAdminOrders,
+        private readonly ShouldEmailInvoice $shouldEmailInvoice,
+        private readonly CopyOriginalOrderItemData $copyOriginalOrderItemData
     ) {}
 
     public function create(OrderInterface $originalOrder): OrderInterface
@@ -117,6 +118,7 @@ class Reorder
         $this->productHelper->setSkipSaleableCheck(true);
         $this->orderCreate->setData('account', ['email' => $originalOrder->getCustomerEmail()]);
         $this->orderCreate->initFromOrder($originalOrder);
+        $this->copyOriginalOrderItemData->execute($originalOrder, $this->orderCreate->getQuote());
 
         $customerGroupId = $originalOrder->getCustomerGroupId() ?? 0;
         $this->orderCreate->getQuote()->getCustomer()->setGroupId($customerGroupId);
