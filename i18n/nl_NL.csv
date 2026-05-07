@@ -98,7 +98,6 @@
 "An offline refund has been created, please make sure to also create this refund on mollie.com/dashboard or use the online refund option.","Er is een offline terugbetaling aangemaakt, zorg ervoor dat u deze terugbetaling ook aanmaakt op mollie.com/dashboard of gebruik de online terugbetalingsoptie."
 "Order can only be refunded after Klarna has been captured (after shipment)","De bestelling kan alleen worden terugbetaald, nadat Klarna is vastgelegd (na verzending)"
 "Can not create online refund, as shipping costs do not match","Kan geen online terugbetaling aanmaken, omdat de verzendkosten niet overeenkomen"
-"Mollie: Captured %1, Settlement Amount %2","Mollie: vastgelegd %1, betalingsbedrag %2"
 "Order not found","Bestelling niet gevonden"
 "API Key not found","API-sleutel niet gevonden"
 "Error: not possible to create an online refund: %1","Fout: niet mogelijk om een online terugbetaling aan te maken: %1"

@@ -99,7 +99,6 @@
 "An offline refund has been created, please make sure to also create this refund on mollie.com/dashboard or use the online refund option.","Offline-hyvitys on luotu. Muista luoda myös tämä hyvitys osoitteessa mollie.com/dashboard tai käytä online-hyvitysvaihtoehtoa."
 "Order can only be refunded after Klarna has been captured (after shipment)","Tilaus voidaan palauttaa vasta, kun Klarna on veloitettu (lähetyksen jälkeen)"
 "Can not create online refund, as shipping costs do not match","Verkkohyvitystä ei voi luoda, koska toimituskulut eivät täsmää"
-"Mollie: Captured %1, Settlement Amount %2","Mollie: Veloitettu %1, Maksusumma %2"
 "Order not found","Tilausta ei löytynyt"
 "API Key not found","API-avainta ei löytynyt"
 "Error: not possible to create an online refund: %1","Virhe: verkkohyvityksen luominen ei ole mahdollista: %1"

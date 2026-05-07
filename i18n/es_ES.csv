@@ -99,7 +99,6 @@
 "An offline refund has been created, please make sure to also create this refund on mollie.com/dashboard or use the online refund option.","Se ha detectado un reembolso externo, por favor asegúrate de crear también este reembolso en mollie.com/dashboard o utiliza la opción de reembolso en línea."
 "Order can only be refunded after Klarna has been captured (after shipment)","El reembolso es posible una vez el pedido haya sido procesado por Klarna (después del envío)"
 "Can not create online refund, as shipping costs do not match","No se puede crear un reembolso en línea, los gastos de envío no coinciden"
-"Mollie: Captured %1, Settlement Amount %2","Mollie: procesado %1, importe final %2"
 "Order not found","Pedido no encontrado"
 "API Key not found","Clave API no encontrada"
 "Error: not possible to create an online refund: %1","Error: no es posible crear un reembolso en línea: %1"

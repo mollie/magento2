@@ -99,7 +99,6 @@
 "An offline refund has been created, please make sure to also create this refund on mollie.com/dashboard or use the online refund option.","Ustvarjeno je bilo povračilo brez povezave, prosimo, poskrbite, da boste to vračilo ustvarili tudi na mollie.com/dashboard ali uporabite možnost spletnega vračila."
 "Order can only be refunded after Klarna has been captured (after shipment)","Naročilo je mogoče vrniti le po tem, ko je bilo Klarna sprejeta (po pošiljanju)"
 "Can not create online refund, as shipping costs do not match","Ni mogoče ustvariti spletnega vračila, ker se stroški pošiljanja ne ujemajo"
-"Mollie: Captured %1, Settlement Amount %2","Mollie: Zajeto %1, Znesek poravnave %2"
 "Order not found","Naročilo ni bilo najdeno"
 "API Key not found","API ključ ni bil najden"
 "Error: not possible to create an online refund: %1","Napaka: ni mogoče ustvariti spletnega vračila: %1"

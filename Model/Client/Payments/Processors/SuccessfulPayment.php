@@ -143,17 +143,6 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $this->updateOrderStatus($magentoOrder);
         $this->transactionProcessor->process($magentoOrder, $molliePayment);
 
-        if ($molliePayment->settlementAmount !== null) {
-            if ($molliePayment->amount->currency != $molliePayment->settlementAmount->currency) {
-                $message = __(
-                    'Mollie: Captured %1, Settlement Amount %2',
-                    $molliePayment->amount->currency . ' ' . $molliePayment->amount->value,
-                    $molliePayment->settlementAmount->currency . ' ' . $molliePayment->settlementAmount->value,
-                );
-                $this->orderCommentHistory->add($magentoOrder, $message);
-            }
-        }
-
         $this->orderRepository->save($magentoOrder);
     }
 

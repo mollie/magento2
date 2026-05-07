@@ -98,9 +98,6 @@ class PaymentsTest extends IntegrationTestCase
         $payment = new Payment($this->createMock(MollieApiClient::class));
         $payment->id = 'tr_test_transaction';
         $payment->status = $status;
-        $payment->settlementAmount = new stdClass();
-        $payment->settlementAmount->value = 50;
-        $payment->settlementAmount->currency = 'EUR';
 
         $payment->amount = new stdClass();
         $payment->amount->value = 100;

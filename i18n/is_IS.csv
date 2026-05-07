@@ -98,7 +98,6 @@
 "An offline refund has been created, please make sure to also create this refund on mollie.com/dashboard or use the online refund option.","Handvirk endurgreiðsla hefur verið búin til, vinsamlegast gakktu úr skugga um að hún sé skráð á mollie.com/dashboard eða notfærðu þér valkostinn fyrir netendurgreiðslu."
 "Order can only be refunded after Klarna has been captured (after shipment)","Pöntun getur aðeins verið endurgreidd eftir að Klarna hefur verið móttekin (eftir flutning)"
 "Can not create online refund, as shipping costs do not match","Ekki hægt að skapa netendurgreiðslu þar sem flutningskostnaður stemmir ekki"
-"Mollie: Captured %1, Settlement Amount %2","Mollie: Móttekið %1, Uppgjörsfjárhæð %2"
 "Order not found","Pöntun fannst ekki"
 "API Key not found","API lykill fannst ekki"
 "Error: not possible to create an online refund: %1","Villa: ekki hægt að skapa netendurgreiðslu: %1"

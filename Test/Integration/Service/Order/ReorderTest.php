@@ -22,8 +22,10 @@ class ReorderTest extends IntegrationTestCase
      */
     private $instance;
 
-    protected function setUpWithoutVoid()
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->instance = $this->objectManager->create(CopyOriginalOrderItemData::class);
     }
 
