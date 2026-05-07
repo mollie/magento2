@@ -118,6 +118,21 @@
         </constraint>
     </table>
 
+    <table name="mollie_payment_tracking" engine="innodb" resource="default" comment="Mollie tracking cookies captured at checkout">
+        <column name="entity_id" xsi:type="int" identity="true" nullable="false" unsigned="true" comment="Entity ID"/>
+        <column name="cart_id" xsi:type="int" padding="10" nullable="false" unsigned="true" comment="Cart ID"/>
+        <column name="tracking_data" xsi:type="text" nullable="true" comment="JSON map of alias to cookie value"/>
+        <column name="created_at" xsi:type="timestamp" default="CURRENT_TIMESTAMP" nullable="false" comment="Created At"/>
+
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="entity_id"/>
+        </constraint>
+
+        <index referenceId="MOLLIE_PAYMENT_TRACKING_CART_ID" indexType="btree">
+            <column name="cart_id"/>
+        </index>
+    </table>
+
     <table name="mollie_payment_transaction_to_order" engine="innodb" comment="TRANSACTIONTOORDERs">
         <column name="entity_id" xsi:type="int" comment="entity_id" nullable="true" identity="true" unsigned="true" padding="10"/>
         <column name="transaction_id" xsi:type="varchar" comment="transaction_id" nullable="true"/>

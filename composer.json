@@ -79,6 +79,9 @@
     "php": ">=8.1",
     "ext-json": "*"
   },
+  "replace": {
+    "mollie/magento2-analytics": "*"
+  },
   "type": "magento2-module",
   "license": [
     "OSL-3.0",
@@ -100,7 +103,6 @@
       "mollie/magento2-hyva-react-checkout": "Hyvä React Checkout integration for Mollie Payments",
       "mollie/magento2-multishipping": "Multishipping integration for Mollie Payments",
       "mollie/magento2-scandipwa": "ScandiPWA integration for Mollie Payments",
-      "mollie/magento2-analytics": "Analytics integration for Mollie Payments",
       "mollie/magento2-subscriptions": "Subscriptions integration for Mollie Payments"
   }
 }

@@ -81,6 +81,20 @@
             "PRIMARY": true
         }
     },
+    "mollie_payment_tracking": {
+        "column": {
+            "entity_id": true,
+            "cart_id": true,
+            "tracking_data": true,
+            "created_at": true
+        },
+        "index": {
+            "MOLLIE_PAYMENT_TRACKING_CART_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
     "mollie_payment_transaction_to_order": {
         "column": {
             "entity_id": true,

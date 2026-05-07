@@ -14,6 +14,9 @@
     <preference for="Mollie\Payment\Api\PaymentTokenRepositoryInterface" type="Mollie\Payment\Model\PaymentTokenRepository"/>
     <preference for="Mollie\Payment\Api\Data\PaymentTokenInterface" type="Mollie\Payment\Model\Data\PaymentToken"/>
 
+    <preference for="Mollie\Payment\Api\TrackingRepositoryInterface" type="Mollie\Payment\Model\TrackingRepository"/>
+    <preference for="Mollie\Payment\Api\Data\TrackingInterface" type="Mollie\Payment\Model\Tracking"/>
+
     <preference for="Mollie\Payment\Api\MollieCustomerRepositoryInterface" type="Mollie\Payment\Model\MollieCustomerRepository"/>
     <preference for="Mollie\Payment\Api\Data\MollieCustomerInterface" type="Mollie\Payment\Model\Data\MollieCustomer"/>
 
@@ -147,6 +150,7 @@
                 <item name="terminalId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\TerminalId</item>
                 <item name="LimitStreetLength" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitStreetLength</item>
                 <item name="LimitedMethods" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitedMethods</item>
+                <item name="AddTrackingCookiesToRedirectUrl" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\AddTrackingCookiesToRedirectUrl</item>
             </argument>
         </arguments>
     </type>

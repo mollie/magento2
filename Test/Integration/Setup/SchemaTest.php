@@ -97,6 +97,7 @@ class SchemaTest extends IntegrationTestCase
             ['mollie_payment_customer'],
             ['mollie_pending_payment_reminder'],
             ['mollie_sent_payment_reminder'],
+            ['mollie_payment_tracking'],
         ];
     }
 
@@ -173,6 +174,15 @@ class SchemaTest extends IntegrationTestCase
                 'columns' => [
                     'entity_id',
                     'order_id',
+                    'created_at',
+                ],
+            ],
+            [
+                'table' => 'mollie_payment_tracking',
+                'columns' => [
+                    'entity_id',
+                    'cart_id',
+                    'tracking_data',
                     'created_at',
                 ],
             ],
