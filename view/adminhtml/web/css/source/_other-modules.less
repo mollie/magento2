@@ -1,0 +1,116 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+.mollie-other-modules {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+
+    &__header {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: @mm-mollie-color__1;
+        padding: 0.8rem 1.6rem;
+        background: @color-white-fog;
+        border: 1px solid @color-gray90;
+        border-left: 3px solid @bordercolor;
+    }
+}
+
+.mollie-module-row {
+    display: flex;
+    align-items: center;
+    padding: 1.2rem 1.6rem;
+    border-bottom: 1px solid @color-gray90;
+    background: @color-white;
+    gap: 1.2rem;
+    transition: background 0.15s ease;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background: #fafbfc;
+    }
+
+    &__info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    &__name {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #333;
+    }
+
+    &__description {
+        font-size: 1.2rem;
+        color: #888;
+        margin-top: 0.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__status {
+        flex-shrink: 0;
+        text-align: right;
+    }
+
+    &__badge {
+        display: inline-block;
+        font-size: 1.1rem;
+        font-weight: 600;
+        padding: 0.2rem 0.8rem;
+        border-radius: 1rem;
+        white-space: nowrap;
+
+        &--active {
+            background: #e8f5e9;
+            color: @mm-mollie-color__green-dark;
+        }
+
+        &--update {
+            background: #fff3e0;
+            color: @mm-mollie-color__orange;
+        }
+
+        &--not-active {
+            background: #fff8e1;
+            color: #f57f17;
+        }
+
+        &--not-installed {
+            background: @color-gray95;
+            color: #999;
+        }
+    }
+
+    &__version {
+        font-size: 1.1rem;
+        color: #999;
+        margin-top: 0.2rem;
+        white-space: nowrap;
+
+        &--update {
+            color: @mm-mollie-color__orange;
+        }
+    }
+
+    &__link {
+        flex-shrink: 0;
+        font-size: 1.2rem;
+        color: @mm-mollie-color__orange;
+        text-decoration: none;
+        font-weight: 600;
+        white-space: nowrap;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
+}

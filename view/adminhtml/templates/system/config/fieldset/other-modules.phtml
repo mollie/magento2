@@ -1,0 +1,183 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Adminhtml\System\Config\Form\OtherModules;
+
+/** @var OtherModules $block */
+/** @var Escaper $escaper */
+?>
+
+<div>
+    <div class="mollie-other-modules">
+        <div class="mollie-other-modules__header">
+            <?= $escaper->escapeHtml(__('Other Mollie modules')) ?>
+        </div>
+        <?php foreach ($block->getModules() as $module): ?>
+            <?php
+            $installed = $module['currentVersion'] !== null;
+            $enabled = $installed && $block->isModuleEnabled($module['module']);
+
+            if ($installed && $enabled) {
+                $badgeClass = 'active';
+                $badgeLabel = __('Active');
+            } elseif ($installed) {
+                $badgeClass = 'not-active';
+                $badgeLabel = __('Not active');
+            } else {
+                $badgeClass = 'not-installed';
+                $badgeLabel = __('Not installed');
+            }
+            ?>
+            <div class="mollie-module-row"
+                <?php if ($installed): ?>
+                    data-composer="<?= $escaper->escapeHtmlAttr($module['composer']) ?>"
+                    data-current-version="<?= $escaper->escapeHtmlAttr($module['currentVersion']) ?>"
+                <?php endif; ?>
+            >
+                <div class="mollie-module-row__info">
+                    <div class="mollie-module-row__name"><?= $escaper->escapeHtml($module['name']) ?></div>
+                    <div class="mollie-module-row__description">
+                        <?= $escaper->escapeHtml(__($module['description'])) ?>
+                    </div>
+                </div>
+                <div class="mollie-module-row__status">
+                    <span
+                        class="mollie-module-row__badge mollie-module-row__badge--<?= $escaper->escapeHtmlAttr($badgeClass) ?>">
+                        <?= $escaper->escapeHtml($badgeLabel) ?>
+                    </span>
+                    <?php if ($installed): ?>
+                        <div class="mollie-module-row__version">
+                            <?= $escaper->escapeHtml($block->formatVersionNumber($module['currentVersion'])) ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+                <a class="mollie-module-row__link"
+                   href="<?= $escaper->escapeUrl($module['url']) ?>"
+                   target="_blank"
+                   rel="noopener">
+                    <?= $installed ? $escaper->escapeHtml(__('View')) : $escaper->escapeHtml(__('Install')) ?> &rarr;
+                </a>
+            </div>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<script>
+    (function () {
+        let baseUrl = '<?= $escaper->escapeJs($block->getUrl('mollie/action/latestVersion')) ?>';
+        let cacheKey = 'mollie_latest_versions';
+        let cacheTtl = 86400000; // 24 hours in milliseconds.
+        let cache = loadCache();
+        let rows = document.querySelectorAll('.mollie-module-row[data-composer][data-current-version]');
+
+        rows.forEach(function (row) {
+            let currentVersion = row.getAttribute('data-current-version');
+
+            // Dev branches (e.g. "dev-feature/v3-support") should not be checked.
+            if (currentVersion.indexOf('dev-') === 0) {
+                return;
+            }
+
+            let composer = row.getAttribute('data-composer');
+
+            getLatestVersion(composer, function (result) {
+                if (!result || !result.version) {
+                    return;
+                }
+
+                if (compareVersions(currentVersion, result.version) >= 0) {
+                    return;
+                }
+
+                // Update the badge to show "Update available".
+                let badge = row.querySelector('.mollie-module-row__badge');
+                badge.className = 'mollie-module-row__badge mollie-module-row__badge--update';
+                badge.textContent = '<?= $escaper->escapeJs(__('Update available')) ?>';
+
+                // Update the version display to show "current → latest".
+                let versionEl = row.querySelector('.mollie-module-row__version');
+                versionEl.className = 'mollie-module-row__version mollie-module-row__version--update';
+                versionEl.textContent = formatVersion(currentVersion) + ' \u2192 ' + formatVersion(result.version);
+
+                // Link to the specific release on GitHub.
+                let link = row.querySelector('.mollie-module-row__link');
+                link.href = link.href + '/releases/tag/v' + result.tag;
+            });
+        });
+
+        function loadCache() {
+            try {
+                let stored = localStorage.getItem(cacheKey);
+                if (stored) {
+                    return JSON.parse(stored);
+                }
+            } catch (e) {
+            }
+
+            return {};
+        }
+
+        function saveCache() {
+            try {
+                localStorage.setItem(cacheKey, JSON.stringify(cache));
+            } catch (e) {
+            }
+        }
+
+        function getLatestVersion(composer, callback) {
+            let cached = cache[composer];
+            if (cached && cached.timestamp + cacheTtl > Date.now()) {
+                callback({version: cached.version, tag: cached.tag});
+                return;
+            }
+
+            let url = baseUrl + '?package=' + encodeURIComponent(composer);
+
+            fetch(url).then(function (response) {
+                if (!response.ok) {
+                    return;
+                }
+
+                return response.json();
+            }).then(function (data) {
+                if (!data) {
+                    return;
+                }
+
+                let version = data.latest_version || null;
+                let tag = data.latest_version_tag || version;
+
+                cache[composer] = {
+                    version: version,
+                    tag: tag,
+                    timestamp: Date.now()
+                };
+                saveCache();
+
+                callback({version: version, tag: tag});
+            });
+        }
+
+        function formatVersion(version) {
+            // Remove trailing ".0" segments that packagist normalizes (e.g. "1.16.0.0" → "1.16.0").
+            version = version.replace(/(\.0)+$/, '');
+            return 'v' + version;
+        }
+
+        function compareVersions(a, b) {
+            let pa = a.split('.'), pb = b.split('.');
+            let len = Math.max(pa.length, pb.length);
+            for (let i = 0; i < len; i++) {
+                let na = parseInt(pa[i] || '0', 10);
+                let nb = parseInt(pb[i] || '0', 10);
+                if (na > nb) return 1;
+                if (na < nb) return -1;
+            }
+            return 0;
+        }
+    })();
+</script>
