@@ -62,10 +62,17 @@ class Checker extends Field
             ],
         ];
 
-        return $this
+        $button = $this
             ->getLayout()
             ->createBlock(Button::class)
             ->setData($buttonData)
             ->toHtml();
+
+        $modal = $this
+            ->getLayout()
+            ->createBlock(\Mollie\Payment\Block\Adminhtml\System\Config\Button\Selftest::class)
+            ->toHtml();
+
+        return $button . $modal;
     }
 }
