@@ -111,6 +111,18 @@ class Mollie extends Adapter
             $this->getInfoInstance()->setAdditionalInformation('selected_terminal', $additionalData['selected_terminal']);
         }
 
+        if (isset($additionalData['mollie_save_card']) && $additionalData['mollie_save_card'] === '1') {
+            $this->getInfoInstance()->setAdditionalInformation('mollie_save_card', true);
+        }
+
+        if (isset($additionalData['mollie_mandate_id']) && $additionalData['mollie_mandate_id'] !== '') {
+            $this->getInfoInstance()->setAdditionalInformation('mollie_mandate_id', (string)$additionalData['mollie_mandate_id']);
+        }
+
+        if (isset($additionalData['mollie_consent_timestamp']) && $additionalData['mollie_consent_timestamp'] !== '') {
+            $this->getInfoInstance()->setAdditionalInformation('mollie_consent_timestamp', (string)$additionalData['mollie_consent_timestamp']);
+        }
+
         return $this;
     }
 

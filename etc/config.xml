@@ -249,7 +249,7 @@
                 <can_use_internal>0</can_use_internal>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>1</can_authorize_vault>
+                <can_authorize_vault>0</can_authorize_vault>
                 <instant_purchase>
                     <supported>1</supported>
                     <available>Mollie\Payment\Service\InstantPurchase\AvailabilityCheck</available>
@@ -258,6 +258,7 @@
                 <when_to_capture>invoice</when_to_capture>
                 <capture_delay/>
                 <capture_delay_unit>hours</capture_delay_unit>
+                <consent_text>By saving your card, you authorize {{tradingname}} to charge your card for future purchases in accordance with our [privacy policy](https://example.com/privacy-policy). To revoke this authorization, contact us at {{supportcontact}}.</consent_text>
             </mollie_methods_creditcard>
             <mollie_methods_directdebit>
                 <active>0</active>

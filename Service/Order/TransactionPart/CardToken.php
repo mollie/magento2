@@ -16,7 +16,16 @@ class CardToken implements TransactionPartInterface
     public function process(OrderInterface $order, array $transaction): array
     {
         $additionalData = $order->getPayment()->getAdditionalInformation();
-        if ($order->getPayment()->getMethod() != 'mollie_methods_creditcard' || !isset($additionalData['card_token'])) {
+        if ($order->getPayment()->getMethod() !== 'mollie_methods_creditcard') {
+            return $transaction;
+        }
+
+        // When using a saved mandate, MandateId.php populates the request; do not also send cardToken.
+        if (($additionalData['mollie_mandate_id'] ?? '') !== '') {
+            return $transaction;
+        }
+
+        if (!isset($additionalData['card_token'])) {
             return $transaction;
         }
 

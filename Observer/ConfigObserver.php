@@ -41,7 +41,7 @@ class ConfigObserver implements ObserverInterface
     public function execute(EventObserver $observer): void
     {
         $storeId = $observer->getStore();
-        if (empty($storeId)) {
+        if ($storeId === null || $storeId === '') {
             $storeId = 0;
         }
 

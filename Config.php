@@ -64,6 +64,7 @@ class Config
     public const PAYMENT_APPLEPAY_MINICART_BUTTON_TEXT = 'payment/mollie_methods_applepay/minicart_button_text';
     public const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     public const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
+    public const PAYMENT_CREDITCARD_CONSENT_TEXT = 'payment/mollie_methods_creditcard/consent_text';
     public const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
     public const PAYMENT_METHOD_API_METHOD = 'payment/mollie_methods_%s/method';
     public const PAYMENT_METHOD_ISSUER_LIST_TYPE = 'payment/mollie_methods_%s/issuer_list_type';
@@ -381,6 +382,15 @@ class Config
     public function creditcardEnableCustomersApi(?int $storeId = null): bool
     {
         return $this->isSetFlag(static::PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API, $storeId);
+    }
+
+    public function creditcardConsentText(?int $storeId = null): string
+    {
+        return (string)$this->config->getValue(
+            static::PAYMENT_CREDITCARD_CONSENT_TEXT,
+            ScopeInterface::SCOPE_STORE,
+            $storeId,
+        );
     }
 
     public function statusPendingBanktransfer(?int $storeId = null): string

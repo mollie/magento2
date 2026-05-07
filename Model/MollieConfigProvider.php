@@ -11,6 +11,7 @@ namespace Mollie\Payment\Model;
 use Exception;
 use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Checkout\Model\Session;
+use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Request\Http;
 use Magento\Framework\Locale\Resolver;
 use Magento\Framework\View\Asset\Repository;
@@ -21,10 +22,12 @@ use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
+use Mollie\Payment\Service\Mollie\GetCustomerMandates;
 use Mollie\Payment\Service\Mollie\GetIssuers;
 use Mollie\Payment\Service\Mollie\MethodParameters;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\PaymentMethods;
+use Mollie\Payment\Service\Mollie\SavedCardConsentText;
 
 /**
  * Class MollieConfigProvider
@@ -49,6 +52,9 @@ class MollieConfigProvider implements ConfigProviderInterface
         private MethodParameters $methodParameters,
         private SupportedNetworks $supportedNetworks,
         private MollieApiClient $mollieApiClient,
+        private GetCustomerMandates $getCustomerMandates,
+        private SavedCardConsentText $savedCardConsentText,
+        private CustomerSession $customerSession,
     )
     {
         foreach (PaymentMethods::METHODS as $code) {
@@ -121,6 +127,8 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['mollie']['expresscomponents']['enabled'] = $this->getMethodInstance('mollie_methods_expresscomponents')->isAvailable();
         $useImage = $this->mollieHelper->useImage();
 
+        $this->appendSavedCardsConfig($config, $storeId);
+
         foreach (PaymentMethods::METHODS as $code) {
             if (empty($this->methods[$code])) {
                 continue;
@@ -153,6 +161,28 @@ class MollieConfigProvider implements ConfigProviderInterface
             $this->mollieHelper->addTolog('error', 'Function: getMethodInstance: ' . $e->getMessage());
 
             return null;
+        }
+    }
+
+    private function appendSavedCardsConfig(array &$config, int $storeId): void
+    {
+        $enabled = $this->config->creditcardEnableCustomersApi($storeId);
+        $config['payment']['mollie']['creditcard']['saved_cards_enabled'] = $enabled;
+
+        if (!$enabled) {
+            return;
+        }
+
+        try {
+            $customerId = (int)$this->customerSession->getCustomerId();
+            $isLoggedIn = $customerId > 0;
+            $config['payment']['mollie']['creditcard']['saved_mandates'] = $isLoggedIn ? $this->getCustomerMandates->execute($customerId, $storeId) : [];
+            $config['payment']['mollie']['creditcard']['consent_text'] = $isLoggedIn ? $this->savedCardConsentText->execute($storeId) : '';
+            $config['payment']['mollie']['creditcard']['card_logo_base_url'] = $this->assetRepository->getUrl('Mollie_Payment::images/cards/');
+        } catch (Exception $e) {
+            $this->mollieHelper->addTolog('error', 'Unable to load saved cards config: ' . $e->getMessage());
+            $config['payment']['mollie']['creditcard']['saved_mandates'] = [];
+            $config['payment']['mollie']['creditcard']['consent_text'] = '';
         }
     }
 

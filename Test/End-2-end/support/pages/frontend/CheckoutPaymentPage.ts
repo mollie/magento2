@@ -40,6 +40,20 @@ export default class CheckoutPaymentPage {
     await page.locator('.totals.discount').waitFor({ state: 'visible' });
   }
 
+  async checkSaveCard(page) {
+    await page.getByLabel('Save your card for faster checkout').check();
+  }
+
+  async selectSavedCard(page) {
+    await page.locator('.mollie-saved-cards-list [type="radio"]:not(#mollie-new-card)').first().waitFor({ state: 'visible' });
+    await page.locator('.mollie-saved-cards-list [type="radio"]:not(#mollie-new-card)').first().check();
+  }
+
+  async selectNewCard(page) {
+    await page.getByLabel('Use a new card').waitFor({ state: 'visible' });
+    await page.getByLabel('Use a new card').check();
+  }
+
   async placeOrder(page) {
     await this.pressPlaceOrderButton(page);
   }
