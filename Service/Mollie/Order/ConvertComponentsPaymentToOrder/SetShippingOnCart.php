@@ -12,7 +12,6 @@ use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote\Address\Rate;
 use Magento\Quote\Model\Quote\Address\RateFactory;
 use Mollie\Api\Resources\Payment;
-use Mollie\Payment\Service\Mollie\Order\GetSendcloudShippingTitle;
 use stdClass;
 
 class SetShippingOnCart
@@ -20,13 +19,11 @@ class SetShippingOnCart
     public function __construct(
         private readonly ProductRepositoryInterface $productRepository,
         private readonly RateFactory $rateFactory,
-        private readonly GetSendcloudShippingTitle $getSendcloudShippingTitle,
     ) {}
 
     public function execute(CartInterface $cart, Payment $payment): void
     {
         $hasShipping = false;
-        $shippingMethodTitle = $this->getSendcloudShippingTitle->execute($payment);
         foreach ($payment->lines as $line) {
             if ($line->type == 'physical') {
                 $this->addProductToCart($line, $cart);
@@ -34,7 +31,7 @@ class SetShippingOnCart
 
             if ($line->type == 'shipping_fee') {
                 $hasShipping = true;
-                $this->addShippingToQuote($cart, $line, $shippingMethodTitle);
+                $this->addShippingToQuote($cart, $line);
             }
         }
 
@@ -60,7 +57,7 @@ class SetShippingOnCart
         );
     }
 
-    private function addShippingToQuote(CartInterface $cart, stdClass $line, string $shippingMethodTitle): void
+    private function addShippingToQuote(CartInterface $cart, stdClass $line): void
     {
         $shippingMethod = 'flatrate_flatrate';
 
@@ -71,8 +68,8 @@ class SetShippingOnCart
         $shippingRate = $this->rateFactory->create();
         $shippingRate->setCode($shippingMethod);
         $shippingRate->setPrice($amount);
-        $shippingRate->setCarrierTitle('Sendcloud');
-        $shippingRate->setMethodTitle($shippingMethodTitle);
+        $shippingRate->setCarrierTitle('Express');
+        $shippingRate->setMethodTitle($line->description ?? '');
 
         $address->setCollectShippingRates(true)
             ->collectShippingRates()

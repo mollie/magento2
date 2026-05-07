@@ -28,7 +28,6 @@ class ConvertComponentsPaymentToOrder
         private readonly CartManagementInterface $cartManagement,
         private readonly Config $config,
         private readonly Payments $molliePayments,
-        private readonly SaveSendcloudMetadata $saveSendcloudMetadata,
         private readonly GetCustomerFromPayment $getCustomerFromPayment,
         private readonly PaymentTokenRepositoryInterface $paymentTokenRepository,
         private readonly SetAddressesOnCart $setAddressesOnCart,
@@ -53,7 +52,6 @@ class ConvertComponentsPaymentToOrder
         $this->cartRepository->save($cart);
 
         $order = $this->cartManagement->submit($cart);
-        $this->saveSendcloudMetadata->execute($payment, $order);
         $order->setMollieTransactionId($payment->id);
         $this->updatePaymentToken($baseCart, $order->getEntityId());
 

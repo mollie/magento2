@@ -33,10 +33,6 @@ class TestExtensionAttributesTest extends IntegrationTestCase
                     public function getMollieRecurringType(): void {}
 
                     public function getMollieRecurringData(): void {}
-
-                    public function getSendcloudCheckoutPayload(): void {}
-
-                    public function getSendcloudPartner(): void {}
                 };
             }
         };

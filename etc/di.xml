@@ -113,7 +113,6 @@
 
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="mollie_payment_fee_order" type="Mollie\Payment\Plugin\Sales\AddPaymentFeeToOrder"/>
-        <plugin name="mollie_sendcloud_data" type="Mollie\Payment\Plugin\Sales\AddSendcloudDataToOrder"/>
         <plugin name="mollie_payment_add_subscription_data" type="Mollie\Payment\Plugin\Sales\AddRecurringData"/>
     </type>
 
@@ -390,18 +389,6 @@
     <type name="Mollie\Payment\Controller\Express\CreateSession">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-
-    <preference for="Mollie\Payment\Api\Data\SendcloudPartnerInterface"
-                type="Mollie\Payment\Model\Data\SendcloudPartner"/>
-
-    <type name="Mollie\Payment\Plugin\Sales\AddSendcloudDataToOrder">
-        <arguments>
-            <argument name="partnerData" xsi:type="array">
-                <item name="name" xsi:type="string">Mollie-SnelBestellen</item>
-                <item name="partnerId" xsi:type="string">16f2f5c8-3935-4b12-8c4c-f2252aa38a9a</item>
-            </argument>
         </arguments>
     </type>
 
