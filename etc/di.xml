@@ -144,6 +144,7 @@
                 <item name="PhoneNumber" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\PhoneNumber</item>
                 <item name="DateOfBirth" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\DateOfBirth</item>
                 <item name="CaptureMode" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureMode</item>
+                <item name="CaptureDelay" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureDelay</item>
                 <item name="terminalId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\TerminalId</item>
                 <item name="LimitStreetLength" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitStreetLength</item>
                 <item name="LimitedMethods" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitedMethods</item>
