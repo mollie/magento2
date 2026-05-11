@@ -25,7 +25,6 @@ class LimitMethodsForRecurringPayments
         'mollie_methods_paybybank',
         'mollie_methods_paypal',
         'mollie_methods_satispay',
-        'mollie_methods_trustly',
         'mollie_methods_sofort',
         'mollie_methods_twint',
     ];

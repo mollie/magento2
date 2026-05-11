@@ -49,7 +49,6 @@ class MethodsConfigurationTest extends IntegrationTestCase
             ['mollie_methods_satispay'],
             ['mollie_methods_sofort'],
             ['mollie_methods_swish'],
-            ['mollie_methods_trustly'],
             ['mollie_methods_twint'],
             ['mollie_methods_vipps'],
         ];

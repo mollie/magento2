@@ -761,7 +761,7 @@
                 <can_edit>1</can_edit>
             </mollie_methods_swish>
             <mollie_methods_trustly>
-                <active>1</active>
+                <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Trustly</model>
                 <title>Trustly</title>
                 <payment_description>{ordernumber}</payment_description>
