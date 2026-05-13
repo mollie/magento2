@@ -8,10 +8,11 @@ namespace Mollie\Payment\Test\Ingegration\Plugin\Email\Model\Template;
 
 use Mollie\Payment\Plugin\Email\Model\Template\Config;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ConfigTest extends IntegrationTestCase
 {
-    public function replacesAllValues()
+    public static function replacesAllValues()
     {
         return [
             ['payment_mollie_mollie_general_second_chance_email_template'],
@@ -24,6 +25,7 @@ class ConfigTest extends IntegrationTestCase
      * @param $input
      * @dataProvider replacesAllValues
      */
+    #[DataProvider('replacesAllValues')]
     public function testReplacesAllValues($input)
     {
         /** @var Config $instance */

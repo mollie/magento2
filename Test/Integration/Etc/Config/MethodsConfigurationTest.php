@@ -8,10 +8,11 @@ namespace Mollie\Payment\Test\Integration\Etc\Config;
 
 use Magento\Config\Model\Config\Structure;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MethodsConfigurationTest extends IntegrationTestCase
 {
-    public function methods(): array
+    public static function methods(): array
     {
         return [
             ['mollie_methods_applepay'],
@@ -49,7 +50,6 @@ class MethodsConfigurationTest extends IntegrationTestCase
             ['mollie_methods_satispay'],
             ['mollie_methods_sofort'],
             ['mollie_methods_swish'],
-            ['mollie_methods_trustly'],
             ['mollie_methods_twint'],
             ['mollie_methods_vipps'],
         ];
@@ -59,6 +59,7 @@ class MethodsConfigurationTest extends IntegrationTestCase
      * @dataProvider methods
      * @magentoAppArea adminhtml
      */
+    #[DataProvider('methods')]
     public function testHasTheCorrectValidationForExpireDays($method)
     {
         /** @var Structure $config */

@@ -9,10 +9,11 @@ namespace Mollie\Payment\Test\Integration\Plugin\Config;
 use Magento\Config\Model\Config\Loader;
 use Mollie\Payment\Plugin\Config\LoadCorrectGroup;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class LoadCorrectGroupTest extends IntegrationTestCase
 {
-    public function returnsCorrectGroupProvider()
+    public static function returnsCorrectGroupProvider()
     {
         return [
             ['mollie_second_chance_email'],
@@ -26,6 +27,7 @@ class LoadCorrectGroupTest extends IntegrationTestCase
      * @dataProvider returnsCorrectGroupProvider
      * @param string $group
      */
+    #[DataProvider('returnsCorrectGroupProvider')]
     public function testReturnsCorrectGroup($group)
     {
         /** @var LoadCorrectGroup $instance */

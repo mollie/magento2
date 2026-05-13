@@ -8,10 +8,11 @@ namespace Mollie\Payment\Test\Unit\Model\Adminhtml\Source;
 
 use Mollie\Payment\Model\Adminhtml\Source\VoucherCategory;
 use Mollie\Payment\Test\Unit\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class VoucherCategoryTest extends UnitTestCase
 {
-    public function returnsTheRightOptions()
+    public static function returnsTheRightOptions()
     {
         require_once __DIR__ . '/../../../../../Model/Adminhtml/Source/VoucherCategory.php';
 
@@ -27,6 +28,7 @@ class VoucherCategoryTest extends UnitTestCase
     /**
      * @dataProvider returnsTheRightOptions
      */
+    #[DataProvider('returnsTheRightOptions')]
     public function testReturnsTheRightOptions($type)
     {
         /** @var VoucherCategory $instance */

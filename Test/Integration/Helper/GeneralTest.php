@@ -13,6 +13,7 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Store\Api\StoreRepositoryInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class GeneralTest extends IntegrationTestCase
 {
@@ -134,7 +135,7 @@ class GeneralTest extends IntegrationTestCase
         $this->assertEquals('keyB', $instance->getApiKey($storeB));
     }
 
-    public function getMethodCodeDataProvider()
+    public static function getMethodCodeDataProvider()
     {
         return [
             'paymentlink' => ['mollie_methods_paymentlink', ''],
@@ -186,6 +187,7 @@ class GeneralTest extends IntegrationTestCase
     /**
      * @dataProvider getMethodCodeDataProvider
      */
+    #[DataProvider('getMethodCodeDataProvider')]
     public function testGetMethodCode($input, $expected)
     {
         /** @var OrderInterface $order */

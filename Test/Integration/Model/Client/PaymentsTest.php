@@ -20,10 +20,11 @@ use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PaymentsTest extends IntegrationTestCase
 {
-    public function processTransactionProvider(): array
+    public static function processTransactionProvider(): array
     {
         return [
             [
@@ -31,18 +32,18 @@ class PaymentsTest extends IntegrationTestCase
                 OrderStatus::STATUS_PAID,
                 [
                     [
-                        $this->isInstanceOf(OrderInterface::class),
+                        self::isInstanceOf(OrderInterface::class),
                         __('Mollie: Captured %1, Settlement Amount %2', ['USD 100', 'EUR 50']),
                         false
                     ],
                     [
-                        $this->isInstanceOf(OrderInterface::class),
+                        self::isInstanceOf(OrderInterface::class),
                         __('New order email sent'),
                         true
                     ],
                     [
-                        $this->isInstanceOf(OrderInterface::class),
-                        $this->callback( function (Phrase $input) {
+                        self::isInstanceOf(OrderInterface::class),
+                        self::callback( function (Phrase $input) {
                             return $input->getText() == 'Notified customer about invoice #%1';
                         }),
                         true
@@ -63,6 +64,7 @@ class PaymentsTest extends IntegrationTestCase
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
      */
+    #[DataProvider('processTransactionProvider')]
     public function testProcessTransaction(
         string $currency,
         string $mollieOrderStatus,
@@ -128,7 +130,7 @@ class PaymentsTest extends IntegrationTestCase
         return $payment;
     }
 
-    public function checksIfTheOrderHasAnUpdateProvider()
+    public static function checksIfTheOrderHasAnUpdateProvider()
     {
         return [
             [PaymentStatus::STATUS_OPEN, Order::STATE_NEW],
@@ -144,6 +146,7 @@ class PaymentsTest extends IntegrationTestCase
     /**
      * @dataProvider checksIfTheOrderHasAnUpdateProvider
      */
+    #[DataProvider('checksIfTheOrderHasAnUpdateProvider')]
     public function testChecksIfTheOrderHasAnUpdate($mollieStatus, $magentoStatus)
     {
         /** @var OrderInterface $order */

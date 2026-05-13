@@ -15,6 +15,7 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Order\GetTransactionId;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class GetTransactionIdTest extends IntegrationTestCase
 {
@@ -22,17 +23,29 @@ class GetTransactionIdTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @return void
      */
-    public function testDoesNothingWhenNoTransactionIsAvailable(): void
+    public function testReturnsNullWhenNoTransactionIsAvailableAnywhere(): void
     {
         $order = $this->loadOrderById('100000001');
 
         $instance = $this->objectManager->create(GetTransactionId::class);
-        $instance->forOrder($order);
+        $result = $instance->forOrder($order);
 
-        $this->assertNull(
-            $order->getMollieTransactionId(),
-            'Transaction ID should not be set when no transaction is available'
-        );
+        $this->assertNull($result);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @return void
+     */
+    public function testFallsBackToOrderEntityWhenNotInTransactionTable(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->setMollieTransactionId('tr_abc123');
+
+        $instance = $this->objectManager->create(GetTransactionId::class);
+        $result = $instance->forOrder($order);
+
+        $this->assertEquals('tr_abc123', $result);
     }
 
     /**
@@ -40,6 +53,7 @@ class GetTransactionIdTest extends IntegrationTestCase
      * @dataProvider usesTheFirstPaidTransactionDataProvider
      * @return void
      */
+    #[DataProvider('usesTheFirstPaidTransactionDataProvider')]
     public function testUsesTheFirstPaidTransaction(array $transactions, string $paid): void
     {
         $order = $this->loadOrderById('100000001');
@@ -102,7 +116,7 @@ class GetTransactionIdTest extends IntegrationTestCase
         );
     }
 
-    public function usesTheFirstPaidTransactionDataProvider(): array
+    public static function usesTheFirstPaidTransactionDataProvider(): array
     {
         return [
             [

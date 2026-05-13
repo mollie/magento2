@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "2.50.1",
+  "version": "2.51.0",
   "keywords": [
     "mollie",
     "payment",
@@ -48,7 +48,6 @@
     "sofort",
     "sofortbanking",
     "swish",
-    "trustly",
     "twint",
     "vipps",
     "voucher",
