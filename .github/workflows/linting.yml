@@ -31,3 +31,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: prestashop/github-action-php-lint/8.4@v2.3.1
+
+  php-85:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: prestashop/github-action-php-lint/8.5@v2.3.1
