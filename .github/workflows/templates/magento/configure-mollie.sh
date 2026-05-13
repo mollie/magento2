@@ -42,7 +42,6 @@ bin/magento config:set payment/mollie_methods_riverty/active 1
 bin/magento config:set payment/mollie_methods_satispay/active 1
 bin/magento config:set payment/mollie_methods_sofort/active 1
 bin/magento config:set payment/mollie_methods_swish/active 1
-bin/magento config:set payment/mollie_methods_trustly/active 1
 bin/magento config:set payment/mollie_methods_twint/active 1
 bin/magento config:set payment/mollie_methods_vipps/active 1
 

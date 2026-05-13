@@ -57,7 +57,6 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - SEPA Direct Debit
 - SOFORT Banking
 - Swish
-- Trustly
 - TWINT
 - Vipps
 
