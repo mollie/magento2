@@ -17,6 +17,7 @@ use Mollie\Payment\Model\Methods\Klarnasliceit;
 use Mollie\Payment\Model\Methods\Riverty;
 use Mollie\Payment\Service\Mollie\Order\CreateInvoiceOnShipment;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CreateInvoiceOnShipmentTest extends IntegrationTestCase
 {
@@ -27,6 +28,7 @@ class CreateInvoiceOnShipmentTest extends IntegrationTestCase
      * @param string $method
      * @return void
      */
+    #[DataProvider('isEnabledByMethodProvider')]
     public function testIsEnabledByMethod(string $method): void
     {
         $order = $this->loadOrderById('100000001');
@@ -84,6 +86,7 @@ class CreateInvoiceOnShipmentTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/enable_manual_capture 1
      * @return void
      */
+    #[DataProvider('isDisabledWhenTheMethodDoesNotSupportThisProvider')]
     public function testIsDisabledWhenTheMethodDoesNotSupportThis(string $method): void
     {
         $order = $this->loadOrderById('100000001');
@@ -96,7 +99,7 @@ class CreateInvoiceOnShipmentTest extends IntegrationTestCase
         $this->assertFalse($instance->execute($order));
     }
 
-    public function isEnabledByMethodProvider(): array
+    public static function isEnabledByMethodProvider(): array
     {
         return [
             [Billie::CODE],
@@ -108,7 +111,7 @@ class CreateInvoiceOnShipmentTest extends IntegrationTestCase
         ];
     }
 
-    public function isDisabledWhenTheMethodDoesNotSupportThisProvider(): array
+    public static function isDisabledWhenTheMethodDoesNotSupportThisProvider(): array
     {
         return [
             [Bancontact::CODE],

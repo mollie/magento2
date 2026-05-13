@@ -15,6 +15,7 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Order\GetTransactionId;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class GetTransactionIdTest extends IntegrationTestCase
 {
@@ -52,6 +53,7 @@ class GetTransactionIdTest extends IntegrationTestCase
      * @dataProvider usesTheFirstPaidTransactionDataProvider
      * @return void
      */
+    #[DataProvider('usesTheFirstPaidTransactionDataProvider')]
     public function testUsesTheFirstPaidTransaction(array $transactions, string $paid): void
     {
         $order = $this->loadOrderById('100000001');
@@ -114,7 +116,7 @@ class GetTransactionIdTest extends IntegrationTestCase
         );
     }
 
-    public function usesTheFirstPaidTransactionDataProvider(): array
+    public static function usesTheFirstPaidTransactionDataProvider(): array
     {
         return [
             [

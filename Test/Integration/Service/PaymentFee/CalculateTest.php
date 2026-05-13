@@ -17,6 +17,7 @@ use Mollie\Payment\Service\PaymentFee\Types\FixedAmount;
 use Mollie\Payment\Service\PaymentFee\Types\FixedAmountAndPercentage;
 use Mollie\Payment\Service\PaymentFee\Types\Percentage;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CalculateTest extends IntegrationTestCase
 {
@@ -35,7 +36,7 @@ class CalculateTest extends IntegrationTestCase
         $this->assertEquals(0, $result->getAmountIncludingTax());
     }
 
-    public function calculatesTheFixedAmountProvider()
+    public static function calculatesTheFixedAmountProvider()
     {
         return [
             [PaymentFeeType::FIXED_FEE, 'fixedAmount', FixedAmount::class],
@@ -47,6 +48,7 @@ class CalculateTest extends IntegrationTestCase
     /**
      * @dataProvider calculatesTheFixedAmountProvider
      */
+    #[DataProvider('calculatesTheFixedAmountProvider')]
     public function testCalculatesTheFixedAmount($type, $key, $typeCalculatorClass)
     {
         /** @var Result $result */

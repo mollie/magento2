@@ -11,6 +11,7 @@ use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\Order\RefundUsingPayment;
 use Mollie\Payment\Service\Order\ProcessAdjustmentFee;
 use Mollie\Payment\Test\Unit\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ProcessAdjustmentFeeTest extends UnitTestCase
 {
@@ -70,7 +71,7 @@ class ProcessAdjustmentFeeTest extends UnitTestCase
         $this->instance->handle($this->createmock(MollieApiClient::class), $this->getOrderMock(), $creditmemo);
     }
 
-    public function doNotRefundInMollieProvider()
+    public static function doNotRefundInMollieProvider()
     {
         return [
             [123, null, false],
@@ -81,6 +82,7 @@ class ProcessAdjustmentFeeTest extends UnitTestCase
     /**
      * @dataProvider doNotRefundInMollieProvider
      */
+    #[DataProvider('doNotRefundInMollieProvider')]
     public function testDoNotRefundInMollie($getAdjustment, $getAdjustmentNegative, $expected)
     {
         $creditmemo = $this->createMock(CreditmemoInterface::class);

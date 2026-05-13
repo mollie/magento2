@@ -18,6 +18,7 @@ use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use stdClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class OrdersTest extends IntegrationTestCase
 {
@@ -161,6 +162,7 @@ class OrdersTest extends IntegrationTestCase
      *
      * @dataProvider startTransactionIncludesTheExpiresAtParameterProvider
      */
+    #[DataProvider('startTransactionIncludesTheExpiresAtParameterProvider')]
     public function testStartTransactionIncludesTheExpiresAtParameter(
         string $method,
         int $days,
@@ -204,7 +206,7 @@ class OrdersTest extends IntegrationTestCase
         $instance->startTransaction($order, $mollieApiMock);
     }
 
-    public function startTransactionIncludesTheExpiresAtParameterProvider(): array
+    public static function startTransactionIncludesTheExpiresAtParameterProvider(): array
     {
         return [
             'ideal' =>
@@ -216,7 +218,7 @@ class OrdersTest extends IntegrationTestCase
         ];
     }
 
-    public function checksIfTheOrderHasAnUpdateProvider(): array
+    public static function checksIfTheOrderHasAnUpdateProvider(): array
     {
         return [
             [OrderStatus::STATUS_CREATED, Order::STATE_NEW],
@@ -234,6 +236,7 @@ class OrdersTest extends IntegrationTestCase
     /**
      * @dataProvider checksIfTheOrderHasAnUpdateProvider
      */
+    #[DataProvider('checksIfTheOrderHasAnUpdateProvider')]
     public function testChecksIfTheOrderHasAnUpdate($mollieStatus, $magentoStatus)
     {
         /** @var OrderInterface $order */

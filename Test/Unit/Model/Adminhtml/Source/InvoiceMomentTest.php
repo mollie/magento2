@@ -4,10 +4,11 @@ namespace Mollie\Payment\Test\Unit\Model\Adminhtml\Source;
 
 use Mollie\Payment\Model\Adminhtml\Source\InvoiceMoment;
 use Mollie\Payment\Test\Unit\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class InvoiceMomentTest extends UnitTestCase
 {
-    public function containsTheCorrectOptionsProvider()
+    public static function containsTheCorrectOptionsProvider()
     {
         return [
             ['authorize'],
@@ -18,6 +19,7 @@ class InvoiceMomentTest extends UnitTestCase
     /**
      * @dataProvider containsTheCorrectOptionsProvider
      */
+    #[DataProvider('containsTheCorrectOptionsProvider')]
     public function testContainsTheCorrectOptions($expected)
     {
         $instance = $this->objectManager->getObject(InvoiceMoment::class);

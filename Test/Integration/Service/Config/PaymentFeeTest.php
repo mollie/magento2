@@ -11,13 +11,14 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType;
 use Mollie\Payment\Service\Config\PaymentFee;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PaymentFeeTest extends IntegrationTestCase
 {
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_payment_saved.php
      */
-    public function isAvailableForMethodProvider()
+    public static function isAvailableForMethodProvider()
     {
         return [
             ['mollie_methods_applepay', true],
@@ -65,6 +66,7 @@ class PaymentFeeTest extends IntegrationTestCase
     /**
      * @dataProvider isAvailableForMethodProvider
      */
+    #[DataProvider('isAvailableForMethodProvider')]
     public function testIsAvailableForMethod($method, $expected)
     {
         $configMock = $this->createMock(Config::class);

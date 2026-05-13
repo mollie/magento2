@@ -8,10 +8,11 @@ use Magento\TestFramework\ObjectManager;
 use Mollie\Payment\Exceptions\NoStoreCreditFound;
 use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class StoreCreditTest extends IntegrationTestCase
 {
-    public function orderHasStoreCreditProvider()
+    public static function orderHasStoreCreditProvider()
     {
         return [
             ['amstorecredit_amount'],
@@ -22,6 +23,7 @@ class StoreCreditTest extends IntegrationTestCase
     /**
      * @dataProvider orderHasStoreCreditProvider
      */
+    #[DataProvider('orderHasStoreCreditProvider')]
     public function testOrderHasStoreCreditReturnsTrueWhenApplicable($column)
     {
         /** @var OrderInterface $order */
@@ -40,6 +42,7 @@ class StoreCreditTest extends IntegrationTestCase
     /**
      * @dataProvider orderHasStoreCreditProvider
      */
+    #[DataProvider('orderHasStoreCreditProvider')]
     public function testCreditmemoHasStoreCredit($column)
     {
         /** @var CreditmemoInterface $creditmemo */
@@ -105,7 +108,7 @@ class StoreCreditTest extends IntegrationTestCase
         $this->fail('We expected a ' . NoStoreCreditFound::class . ' exception but got none');
     }
 
-    public function createsTheOrderLineProvider()
+    public static function createsTheOrderLineProvider()
     {
         return [
             [['amstorecredit_amount', 'amstorecredit_base_amount']],
@@ -116,6 +119,7 @@ class StoreCreditTest extends IntegrationTestCase
     /**
      * @dataProvider createsTheOrderLineProvider
      */
+    #[DataProvider('createsTheOrderLineProvider')]
     public function testCreatesTheOrderLine($fields)
     {
         /** @var OrderInterface $order */

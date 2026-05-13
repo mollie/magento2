@@ -32,7 +32,9 @@ jobs:
     steps:
       - uses: prestashop/github-action-php-lint/8.4@v2.3.1
 
+  # Pinned to master SHA because 8.5 is not yet included in a tagged release. Switch to a tag once available.
   php-85:
     runs-on: ubuntu-latest
     steps:
-      - uses: prestashop/github-action-php-lint/8.5@v2.3.1
+      - uses: prestashop/github-action-php-lint/8.5@08f47878fdedbcecb581a8c93f507c7d60b2c956
+

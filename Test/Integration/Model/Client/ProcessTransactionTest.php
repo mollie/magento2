@@ -21,10 +21,11 @@ use Mollie\Payment\Service\Mollie\ValidateMetadata;
 use Mollie\Payment\Test\Fakes\Model\Client\Orders\OrderProcessorsFake;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class ProcessTransactionTest extends IntegrationTestCase
 {
-    public function processTransactionProvider(): array
+    public static function processTransactionProvider(): array
     {
         return [
             [
@@ -63,6 +64,7 @@ class ProcessTransactionTest extends IntegrationTestCase
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Mollie\Api\Exceptions\ApiException
      */
+    #[DataProvider('processTransactionProvider')]
     public function testProcessTransaction($currency, $mollieOrderStatus, $orderCommentHistoryMessages)
     {
         $orderLinesMock = $this->createMock(OrderLines::class);
@@ -115,7 +117,7 @@ class ProcessTransactionTest extends IntegrationTestCase
         $this->assertEquals(Order::STATE_PROCESSING, $order->getState());
     }
 
-    public function cancelsTheOrderProvider(): array
+    public static function cancelsTheOrderProvider(): array
     {
         return [
             [OrderStatus::STATUS_CANCELED],
@@ -127,6 +129,7 @@ class ProcessTransactionTest extends IntegrationTestCase
      * @dataProvider cancelsTheOrderProvider
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    #[DataProvider('cancelsTheOrderProvider')]
     public function testCancelsTheOrder(string $state)
     {
         $apiClient = $this->mollieClientMock($state, 'EUR');
@@ -150,7 +153,7 @@ class ProcessTransactionTest extends IntegrationTestCase
         $this->assertEquals(Order::STATE_CANCELED, $order->getState());
     }
 
-    public function callsTheCorrectProcessorProvider(): array
+    public static function callsTheCorrectProcessorProvider(): array
     {
         return [
             [OrderStatus::STATUS_CREATED, 'created'],
@@ -162,6 +165,7 @@ class ProcessTransactionTest extends IntegrationTestCase
      * @dataProvider callsTheCorrectProcessorProvider
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    #[DataProvider('callsTheCorrectProcessorProvider')]
     public function testCallsTheCorrectProcessor(string $state, string $event)
     {
         $apiClient = $this->mollieClientMock($state, 'EUR');

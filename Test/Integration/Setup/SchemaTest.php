@@ -4,10 +4,11 @@ namespace Mollie\Payment\Test\Integration\Setup;
 
 use Magento\Framework\App\ResourceConnection;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SchemaTest extends IntegrationTestCase
 {
-    public function addedColumnsHaveIndexesProvider()
+    public static function addedColumnsHaveIndexesProvider()
     {
         return [
             ['sales_order', 'mollie_transaction_id'],
@@ -18,6 +19,7 @@ class SchemaTest extends IntegrationTestCase
     /**
      * @dataProvider addedColumnsHaveIndexesProvider
      */
+    #[DataProvider('addedColumnsHaveIndexesProvider')]
     public function testAddedColumnsHaveIndexes($tableName, $columnName)
     {
         /** @var ResourceConnection $resource */
@@ -38,7 +40,7 @@ class SchemaTest extends IntegrationTestCase
         $this->fail('There was no index found for `' . $columnName . '` in `' . $tableName . '`');
     }
 
-    public function thePaymentFeeColumnsExistsProvider()
+    public static function thePaymentFeeColumnsExistsProvider()
     {
         return [
             ['quote'],
@@ -52,6 +54,7 @@ class SchemaTest extends IntegrationTestCase
     /**
      * @dataProvider thePaymentFeeColumnsExistsProvider
      */
+    #[DataProvider('thePaymentFeeColumnsExistsProvider')]
     public function testThePaymentFeeColumnsExists($tableName)
     {
         /** @var ResourceConnection $resource */
@@ -83,7 +86,7 @@ class SchemaTest extends IntegrationTestCase
         );
     }
 
-    public function tableExistsDataProvider(): array
+    public static function tableExistsDataProvider(): array
     {
         return [
             ['mollie_order_lines'],
@@ -98,6 +101,7 @@ class SchemaTest extends IntegrationTestCase
      * @dataProvider tableExistsDataProvider
      * @param string $table
      */
+    #[DataProvider('tableExistsDataProvider')]
     public function testTableExists(string $table): void
     {
         /** @var ResourceConnection $resource */
@@ -110,7 +114,7 @@ class SchemaTest extends IntegrationTestCase
         $this->assertEquals(1, count($rows));
     }
 
-    public function tableHasAllRequiredColumns(): array
+    public static function tableHasAllRequiredColumns(): array
     {
         return [
             [
@@ -176,9 +180,10 @@ class SchemaTest extends IntegrationTestCase
     /**
      * @dataProvider tableHasAllRequiredColumns
      * @param string $table
-     * @param array $expectedColumns
+     * @param array $columns
      */
-    public function testTableHasAllRequiredColumns(string $table, array $expectedColumns): void
+    #[DataProvider('tableHasAllRequiredColumns')]
+    public function testTableHasAllRequiredColumns(string $table, array $columns): void
     {
         /** @var ResourceConnection $resource */
         $resource = $this->objectManager->get(ResourceConnection::class);
@@ -187,13 +192,13 @@ class SchemaTest extends IntegrationTestCase
         $tableName = $resource->getTableName($table);
         $rows = $connection->fetchAll('DESCRIBE ' . $tableName);
 
-        $columns = array_map( function ($column) {
+        $actualColumns = array_map(function ($column) {
             return $column['Field'];
         }, $rows);
 
-        foreach ($expectedColumns as $column) {
+        foreach ($columns as $column) {
             $this->assertTrue(
-                in_array($column, $columns),
+                in_array($column, $actualColumns),
                 sprintf('mollie_order_lines should contain the `%s` column', $column)
             );
         }

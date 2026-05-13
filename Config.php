@@ -211,8 +211,8 @@ class Config
     {
         static $keys;
 
-        if (isset($keys[$storeId])) {
-            return $keys[$storeId];
+        if (isset($keys[$storeId ?? ''])) {
+            return $keys[$storeId ?? ''];
         }
 
         if (!$this->isProductionMode($storeId)) {

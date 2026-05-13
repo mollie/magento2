@@ -8,6 +8,7 @@ namespace Mollie\Payment\Test\Integration\Service\Order\Lines;
 
 use Mollie\Payment\Service\Order\Lines\Order as Subject;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class OrderTest extends IntegrationTestCase
 {
@@ -139,6 +140,7 @@ class OrderTest extends IntegrationTestCase
      * @dataProvider adjustmentsDataProvider
      * @magentoDataFixture Magento/Sales/_files/order_with_bundle.php
      */
+    #[DataProvider('adjustmentsDataProvider')]
     public function testAddsAdjustmentsWhenTheTotalIsOff($adjustment)
     {
         $order = $this->loadOrderById('100000001');
@@ -237,7 +239,7 @@ class OrderTest extends IntegrationTestCase
         $this->assertCount(1, $result);
     }
 
-    public function adjustmentsDataProvider(): array
+    public static function adjustmentsDataProvider(): array
     {
         return [
             [-0.05],

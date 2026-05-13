@@ -12,10 +12,11 @@ use Mollie\Api\Resources\Order;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Test\Unit\UnitTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class GeneralTest extends UnitTestCase
 {
-    public function getLastRelevantStatusProvider()
+    public static function getLastRelevantStatusProvider()
     {
         return [
             [['expired'], 'expired'],
@@ -30,6 +31,7 @@ class GeneralTest extends UnitTestCase
      * @param $expected
      * @dataProvider getLastRelevantStatusProvider
      */
+    #[DataProvider('getLastRelevantStatusProvider')]
     public function testGetLastRelevantStatus($statuses, $expected)
     {
         /** @var MollieHelper $instance */
