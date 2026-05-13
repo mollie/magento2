@@ -23,7 +23,7 @@ define(
 
         var creditcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/creditcard';
         var checkoutConfig = window.checkoutConfig.payment.mollie;
-        if (checkoutConfig.profile_id && checkoutConfig.creditcard.use_components) {
+        if (checkoutConfig && checkoutConfig.profile_id && checkoutConfig.creditcard.use_components) {
             creditcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/creditcard-with-components';
         }
 
