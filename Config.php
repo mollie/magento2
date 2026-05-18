@@ -170,22 +170,20 @@ class Config
     {
         static $keys;
 
-        if (isset($keys[$storeId])) {
-            return $keys[$storeId];
+        if (isset($keys[$storeId ?? ''])) {
+            return $keys[$storeId ?? ''];
         }
 
         if (!$this->isProductionMode($storeId)) {
             $apiKey = $this->getTestApiKey($storeId === null ? null : (int) $storeId);
 
-            $keys[$storeId] = $apiKey;
-
+            $keys[$storeId ?? ''] = $apiKey;
             return $apiKey;
         }
 
         $apiKey = $this->getLiveApiKey($storeId === null ? null : (int) $storeId);
 
-        $keys[$storeId] = $apiKey;
-
+        $keys[$storeId ?? ''] = $apiKey;
         return $apiKey;
     }
 

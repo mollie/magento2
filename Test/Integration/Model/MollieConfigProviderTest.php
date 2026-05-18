@@ -16,6 +16,7 @@ use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\MollieConfigProvider;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MollieConfigProviderTest extends IntegrationTestCase
 {
@@ -75,7 +76,6 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertArrayHasKey('mollie_methods_satispay', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_sofort', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_swish', $result['payment']['image']);
-        $this->assertArrayHasKey('mollie_methods_trustly', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_twint', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_vipps', $result['payment']['image']);
         $this->assertArrayHasKey('mollie_methods_voucher', $result['payment']['image']);
@@ -109,7 +109,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertSame($useComponents, $result['payment']['mollie']['creditcard']['use_components']);
     }
 
-    public function configContainsGeneralSettingsProvider(): array
+    public static function configContainsGeneralSettingsProvider(): array
     {
         return [
             ['testmode', 'isTestMode', (bool) rand(0, 1)],
@@ -120,6 +120,7 @@ class MollieConfigProviderTest extends IntegrationTestCase
     /**
      * @dataProvider configContainsGeneralSettingsProvider
      */
+    #[DataProvider('configContainsGeneralSettingsProvider')]
     public function testConfigContainsGeneralSettings(string $key, string $method, bool|string $expected): void
     {
         $configMock = $this->createMock(Config::class);

@@ -13,10 +13,11 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\TransactionDescription;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class TransactionDescriptionTest extends IntegrationTestCase
 {
-    public function returnsTheCorrectDescriptionForRegularTransactionsProvider(): array
+    public static function returnsTheCorrectDescriptionForRegularTransactionsProvider(): array
     {
         return [
             ['{ordernumber}', '0000025'],
@@ -32,6 +33,7 @@ class TransactionDescriptionTest extends IntegrationTestCase
      * @magentoConfigFixture current_store general/store_information/name My Test Store
      * @dataProvider returnsTheCorrectDescriptionForRegularTransactionsProvider
      */
+    #[DataProvider('returnsTheCorrectDescriptionForRegularTransactionsProvider')]
     public function testReturnsTheCorrectDescriptionForRegularTransactions(string $description, string $expected): void
     {
         $configMock = $this->createMock(Config::class);

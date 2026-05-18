@@ -12,6 +12,7 @@ use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Mollie\Payment\Service\Order\TransactionPart\PhoneNumber;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PhoneNumberTest extends IntegrationTestCase
 {
@@ -23,6 +24,7 @@ class PhoneNumberTest extends IntegrationTestCase
      * @param string $expected
      * @return void
      */
+    #[DataProvider('convertsPhoneNumbersToTheCorrectFormatDataProvider')]
     public function testConvertsPhoneNumbersToTheCorrectFormat(
         string $countryCode,
         string $phoneNumber,
@@ -191,7 +193,7 @@ class PhoneNumberTest extends IntegrationTestCase
         $this->assertArrayHasKey('phone', $transaction['shippingAddress']);
     }
 
-    public function convertsPhoneNumbersToTheCorrectFormatDataProvider(): array
+    public static function convertsPhoneNumbersToTheCorrectFormatDataProvider(): array
     {
         return [
             // The Netherlands (NL)

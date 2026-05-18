@@ -13,16 +13,16 @@ use Magento\Framework\Locale\Resolver;
 use Magento\Store\Api\StoreRepositoryInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class GeneralTest extends IntegrationTestCase
 {
-    public function getMethodCodeDataProvider(): array
+    public static function getMethodCodeDataProvider(): array
     {
         return [
             'paymentlink' => ['mollie_methods_paymentlink', ''],
             'checkmo' => ['checkmo', ''],
             'free' => ['free', ''],
-
             'applepay' => ['mollie_methods_applepay', 'applepay'],
             'alma' => ['mollie_methods_alma', 'alma'],
             'bancomatpay' => ['mollie_methods_bancomatpay', 'bancomatpay'],

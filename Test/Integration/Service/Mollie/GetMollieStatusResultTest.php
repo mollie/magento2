@@ -11,6 +11,7 @@ namespace Mollie\Payment\Test\Integration\Service\Mollie;
 
 use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class GetMollieStatusResultTest extends IntegrationTestCase
 {
@@ -28,6 +29,7 @@ class GetMollieStatusResultTest extends IntegrationTestCase
      * @dataProvider returnsTheCorrectStatusForBanktransferProvider
      * @return void
      */
+    #[DataProvider('returnsTheCorrectStatusForBanktransferProvider')]
     public function testReturnsTheCorrectStatusForBanktransfer(string $status, string $method): void
     {
         $instance = $this->objectManager->create(GetMollieStatusResult::class, [
@@ -38,7 +40,7 @@ class GetMollieStatusResultTest extends IntegrationTestCase
         $this->assertTrue($instance->shouldRedirectToSuccessPage());
     }
 
-    public function returnsTheCorrectStatusForBanktransferProvider(): array
+    public static function returnsTheCorrectStatusForBanktransferProvider(): array
     {
         return [
             'created, banktransfer' => ['created', 'banktransfer'],
@@ -52,6 +54,7 @@ class GetMollieStatusResultTest extends IntegrationTestCase
      * @dataProvider returnsToSuccessWhenNotBanktransferButHasTheCorrectStatusProvider
      * @return void
      */
+    #[DataProvider('returnsToSuccessWhenNotBanktransferButHasTheCorrectStatusProvider')]
     public function testReturnsToSuccessWhenNotBanktransferButHasTheCorrectStatus(string $status, string $method): void
     {
         $instance = $this->objectManager->create(GetMollieStatusResult::class, [
@@ -62,7 +65,7 @@ class GetMollieStatusResultTest extends IntegrationTestCase
         $this->assertTrue($instance->shouldRedirectToSuccessPage());
     }
 
-    public function returnsToSuccessWhenNotBanktransferButHasTheCorrectStatusProvider(): array
+    public static function returnsToSuccessWhenNotBanktransferButHasTheCorrectStatusProvider(): array
     {
         return [
             'paid, ideal' => ['paid', 'ideal'],
