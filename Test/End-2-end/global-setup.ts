@@ -6,7 +6,7 @@
 import {type FullConfig} from '@playwright/test';
 
 async function globalSetup(config: FullConfig) {
-  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'; // codeql[js/disabling-certificate-validation]
   const { baseURL } = config.projects[0].use;
 
   if (process.env.NO_API_KEY_TEST === 'true') {
