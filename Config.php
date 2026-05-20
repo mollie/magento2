@@ -64,6 +64,7 @@ class Config
     public const PAYMENT_APPLEPAY_MINICART_BUTTON_TEXT = 'payment/mollie_methods_applepay/minicart_button_text';
     public const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     public const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
+    public const PAYMENT_CREDITCARD_CONSENT_TEXT = 'payment/mollie_methods_creditcard/consent_text';
     public const PAYMENT_BANKTRANSFER_STATUS_PENDING = 'payment/mollie_methods_banktransfer/order_status_pending';
     public const PAYMENT_METHOD_API_METHOD = 'payment/mollie_methods_%s/method';
     public const PAYMENT_METHOD_ISSUER_LIST_TYPE = 'payment/mollie_methods_%s/issuer_list_type';
@@ -71,6 +72,8 @@ class Config
     public const PAYMENT_METHOD_PAYMENT_DESCRIPTION = 'payment/mollie_methods_%s/payment_description';
     public const PAYMENT_METHOD_CAPTURE_MODE = 'payment/mollie_methods_%s/capture_mode';
     public const PAYMENT_METHOD_WHEN_TO_CAPTURE = 'payment/mollie_methods_%s/when_to_capture';
+    public const PAYMENT_METHOD_CAPTURE_DELAY = 'payment/mollie_methods_%s/capture_delay';
+    public const PAYMENT_METHOD_CAPTURE_DELAY_UNIT = 'payment/mollie_methods_%s/capture_delay_unit';
     public const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     public const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
     public const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
@@ -167,22 +170,20 @@ class Config
     {
         static $keys;
 
-        if (isset($keys[$storeId])) {
-            return $keys[$storeId];
+        if (isset($keys[$storeId ?? ''])) {
+            return $keys[$storeId ?? ''];
         }
 
         if (!$this->isProductionMode($storeId)) {
             $apiKey = $this->getTestApiKey($storeId === null ? null : (int) $storeId);
 
-            $keys[$storeId] = $apiKey;
-
+            $keys[$storeId ?? ''] = $apiKey;
             return $apiKey;
         }
 
         $apiKey = $this->getLiveApiKey($storeId === null ? null : (int) $storeId);
 
-        $keys[$storeId] = $apiKey;
-
+        $keys[$storeId ?? ''] = $apiKey;
         return $apiKey;
     }
 
@@ -227,6 +228,16 @@ class Config
     public function whenToCapture(string $method, ?int $storeId = null): ?string
     {
         return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_WHEN_TO_CAPTURE, $method), $storeId);
+    }
+
+    public function captureDelay(string $method, ?int $storeId = null): ?string
+    {
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_CAPTURE_DELAY, $method), $storeId);
+    }
+
+    public function captureDelayUnit(string $method, ?int $storeId = null): ?string
+    {
+        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_CAPTURE_DELAY_UNIT, $method), $storeId);
     }
 
     public function isMethodsApiEnabled(?int $storeId = null): bool
@@ -369,6 +380,15 @@ class Config
     public function creditcardEnableCustomersApi(?int $storeId = null): bool
     {
         return $this->isSetFlag(static::PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API, $storeId);
+    }
+
+    public function creditcardConsentText(?int $storeId = null): string
+    {
+        return (string)$this->config->getValue(
+            static::PAYMENT_CREDITCARD_CONSENT_TEXT,
+            ScopeInterface::SCOPE_STORE,
+            $storeId,
+        );
     }
 
     public function statusPendingBanktransfer(?int $storeId = null): string

@@ -62,6 +62,26 @@
                 <field id="capture_mode">manual</field>
             </depends>
         </field>
+        <field id="capture_delay" translate="label comment" type="text" sortOrder="65" showInDefault="1"
+               showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Capture delay</label>
+            <config_path>payment/mollie_methods_creditcard/capture_delay</config_path>
+            <frontend_class>validate-digits</frontend_class>
+            <depends>
+                <field id="active">1</field>
+                <field id="capture_mode">automatic</field>
+            </depends>
+        </field>
+        <field id="capture_delay_unit" translate="label" type="select" sortOrder="67" showInDefault="1"
+               showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Capture delay unit</label>
+            <config_path>payment/mollie_methods_creditcard/capture_delay_unit</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\CaptureDelayUnit</source_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="capture_mode">automatic</field>
+            </depends>
+        </field>
         <field id="use_components" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Use Mollie Components</label>
@@ -74,15 +94,25 @@
         </field>
         <field id="enable_customers_api" translate="label" type="select" sortOrder="80" showInDefault="1" showInWebsite="1"
                showInStore="1">
-            <label>Enable Single Click Payments</label>
+            <label>Enable saved cards</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_creditcard/enable_customers_api</config_path>
-            <comment><![CDATA[This allows customers to remember their credit card data for their next order using the <a href="https://docs.mollie.com/guides/checkout#single-click-payments-for-returning-customers" target="_blank">Customers API</a>.]]></comment>
+            <comment><![CDATA[Allow logged-in customers to save their card for faster checkout. Uses the <a href="https://docs.mollie.com/docs/saving-a-card-for-returning-customers" target="_blank">Mollie Customers API</a>.]]></comment>
             <depends>
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="90" showInDefault="1"
+        <field id="consent_text" translate="label" type="textarea" sortOrder="90" showInDefault="1" showInWebsite="1"
+               showInStore="1" canRestore="1">
+            <label>Consent text</label>
+            <config_path>payment/mollie_methods_creditcard/consent_text</config_path>
+            <comment model="Mollie\Payment\Model\Adminhtml\Comment\AvailableConsentVariables"/>
+            <depends>
+                <field id="active">1</field>
+                <field id="enable_customers_api">1</field>
+            </depends>
+        </field>
+        <field id="allowspecific" translate="label" type="allowspecific" sortOrder="100" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
             <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
@@ -91,7 +121,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="specificcountry" translate="label" type="multiselect" sortOrder="100" showInDefault="1"
+        <field id="specificcountry" translate="label" type="multiselect" sortOrder="110" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Specific Countries</label>
             <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
@@ -101,7 +131,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="min_order_total" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1"
+        <field id="min_order_total" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Minimum Order Total</label>
             <config_path>payment/mollie_methods_creditcard/min_order_total</config_path>
@@ -109,7 +139,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="max_order_total" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1"
+        <field id="max_order_total" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Maximum Order Total</label>
             <config_path>payment/mollie_methods_creditcard/max_order_total</config_path>
@@ -117,7 +147,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_surcharge_type" translate="label" type="select" sortOrder="130" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_type" translate="label" type="select" sortOrder="140" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge</label>
             <config_path>payment/mollie_methods_creditcard/payment_surcharge_type</config_path>
@@ -126,7 +156,7 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_fixed_amount" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge fixed amount</label>
             <config_path>payment/mollie_methods_creditcard/payment_surcharge_fixed_amount</config_path>
@@ -137,7 +167,7 @@
                 <field id="payment_surcharge_type" separator=",">fixed_fee,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="150" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_percentage" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge percentage</label>
             <config_path>payment/mollie_methods_creditcard/payment_surcharge_percentage</config_path>
@@ -148,7 +178,7 @@
                 <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="160" showInDefault="1" showInWebsite="1"
+        <field id="payment_surcharge_limit" translate="label" type="text" sortOrder="170" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Payment Surcharge limit</label>
             <config_path>payment/mollie_methods_creditcard/payment_surcharge_limit</config_path>
@@ -160,7 +190,7 @@
                 <field id="payment_surcharge_type" separator=",">percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="170" showInDefault="1"
+        <field id="payment_surcharge_tax_class" translate="label" type="select" sortOrder="180" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment Surcharge Tax Class</label>
             <config_path>payment/mollie_methods_creditcard/payment_surcharge_tax_class</config_path>
@@ -170,7 +200,7 @@
                 <field id="payment_surcharge_type" separator=",">fixed_fee,percentage,fixed_fee_and_percentage</field>
             </depends>
         </field>
-        <field id="sort_order" translate="label" type="text" sortOrder="180" showInDefault="1" showInWebsite="1"
+        <field id="sort_order" translate="label" type="text" sortOrder="190" showInDefault="1" showInWebsite="1"
                showInStore="1">
             <label>Sort Order</label>
             <frontend_class>validate-number</frontend_class>

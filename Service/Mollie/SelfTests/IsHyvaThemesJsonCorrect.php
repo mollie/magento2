@@ -16,6 +16,17 @@ use Magento\Framework\Module\Manager;
 
 class IsHyvaThemesJsonCorrect extends AbstractSelfTest
 {
+    private const MODULE_METADATA = [
+        'Mollie_HyvaCompatibility' => [
+            'name' => 'Mollie Hyvä Compatibility',
+            'url' => 'https://github.com/mollie/magento2-hyva-compatibility',
+        ],
+        'Mollie_HyvaCheckout' => [
+            'name' => 'Mollie Hyvä Checkout',
+            'url' => 'https://github.com/mollie/magento2-hyva-checkout',
+        ],
+    ];
+
     public function __construct(
         private Manager $moduleManager,
         private File $file
@@ -66,9 +77,12 @@ class IsHyvaThemesJsonCorrect extends AbstractSelfTest
             }
         }
 
+        $metadata = self::MODULE_METADATA[$module];
+        $link = sprintf('<a href="%s" target="_blank">%s</a>', $metadata['url'], $metadata['name']);
+
         $this->addMessage('error', __(
             'The %1 module is not present in the Hyva Themes configuration file. Please run the command `bin/magento hyva:modules:config:generate` to generate the file.',
-            $module,
+            $link,
         ));
     }
 }

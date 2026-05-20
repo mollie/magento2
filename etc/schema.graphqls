@@ -1,6 +1,23 @@
 # For more information on how to use these, see this wiki page:
 # https://github.com/mollie/magento2/wiki/GraphQL-integration
+type Customer {
+    mollie_saved_cards: [MollieSavedCard!]! @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Customer\\SavedCards") @doc(description: "Saved credit cards (Mollie mandates) for the customer")
+}
+
+type MollieSavedCard @doc(description: "A saved credit card mandate") {
+    mandate_id: String! @doc(description: "Mollie mandate ID")
+    card_label: String! @doc(description: "Card brand (e.g. Visa, Mastercard)")
+    card_number_last4: String! @doc(description: "Last four digits of the card number")
+    card_expiry_date: String @doc(description: "Card expiry date")
+    card_holder: String @doc(description: "Name of the cardholder")
+}
+
+type MollieRevokeSavedCardOutput @doc(description: "Result of revoking a saved card") {
+    success: Boolean!
+}
+
 type Mutation {
+    revokeMollieSavedCard(mandate_id: String!): MollieRevokeSavedCardOutput! @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Customer\\RevokeMandate") @doc(description: "Revoke a saved credit card")
     mollieRestoreCart(input: MollieResetCartInput): MollieResetCartOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Cart\\ResetCart")
     mollieProcessTransaction(input: MollieProcessTransactionInput): MollieProcessTransactionOutput @resolver(class: "Mollie\\Payment\\GraphQL\\Resolver\\Checkout\\ProcessTransaction")
     mollieApplePayValidation(

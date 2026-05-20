@@ -5,6 +5,7 @@
   -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface" type="Mollie\Payment\Webapi\PaymentToken" />
+    <preference for="Mollie\Payment\Api\Webapi\SavedCardsInterface" type="Mollie\Payment\Webapi\SavedCards" />
     <preference for="Mollie\Payment\Api\Webapi\StartTransactionRequestInterface" type="Mollie\Payment\Webapi\StartTransaction" />
     <preference for="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" type="Mollie\Payment\Webapi\GetCustomerOrder" />
     <preference for="Mollie\Payment\Api\Webapi\GetPaymentLinkRedirectInterface" type="Mollie\Payment\Webapi\GetPaymentLinkRedirect" />
@@ -13,6 +14,9 @@
 
     <preference for="Mollie\Payment\Api\PaymentTokenRepositoryInterface" type="Mollie\Payment\Model\PaymentTokenRepository"/>
     <preference for="Mollie\Payment\Api\Data\PaymentTokenInterface" type="Mollie\Payment\Model\Data\PaymentToken"/>
+
+    <preference for="Mollie\Payment\Api\TrackingRepositoryInterface" type="Mollie\Payment\Model\TrackingRepository"/>
+    <preference for="Mollie\Payment\Api\Data\TrackingInterface" type="Mollie\Payment\Model\Tracking"/>
 
     <preference for="Mollie\Payment\Api\MollieCustomerRepositoryInterface" type="Mollie\Payment\Model\MollieCustomerRepository"/>
     <preference for="Mollie\Payment\Api\Data\MollieCustomerInterface" type="Mollie\Payment\Model\Data\MollieCustomer"/>
@@ -113,7 +117,6 @@
 
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
         <plugin name="mollie_payment_fee_order" type="Mollie\Payment\Plugin\Sales\AddPaymentFeeToOrder"/>
-        <plugin name="mollie_sendcloud_data" type="Mollie\Payment\Plugin\Sales\AddSendcloudDataToOrder"/>
         <plugin name="mollie_payment_add_subscription_data" type="Mollie\Payment\Plugin\Sales\AddRecurringData"/>
     </type>
 
@@ -137,6 +140,9 @@
         <arguments>
             <argument name="parts" xsi:type="array">
                 <item name="orderLines" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\OrderLines</item>
+                <item name="sequenceType" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\SequenceType</item>
+                <item name="storeCredentials" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\StoreCredentials</item>
+                <item name="mandateId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\MandateId</item>
                 <item name="cardToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CardToken</item>
                 <item name="customerId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CustomerId</item>
                 <item name="issuer" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\Issuer</item>
@@ -144,9 +150,11 @@
                 <item name="PhoneNumber" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\PhoneNumber</item>
                 <item name="DateOfBirth" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\DateOfBirth</item>
                 <item name="CaptureMode" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureMode</item>
+                <item name="CaptureDelay" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureDelay</item>
                 <item name="terminalId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\TerminalId</item>
                 <item name="LimitStreetLength" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitStreetLength</item>
                 <item name="LimitedMethods" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitedMethods</item>
+                <item name="AddTrackingCookiesToRedirectUrl" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\AddTrackingCookiesToRedirectUrl</item>
             </argument>
         </arguments>
     </type>
@@ -389,18 +397,6 @@
     <type name="Mollie\Payment\Controller\Express\CreateSession">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-
-    <preference for="Mollie\Payment\Api\Data\SendcloudPartnerInterface"
-                type="Mollie\Payment\Model\Data\SendcloudPartner"/>
-
-    <type name="Mollie\Payment\Plugin\Sales\AddSendcloudDataToOrder">
-        <arguments>
-            <argument name="partnerData" xsi:type="array">
-                <item name="name" xsi:type="string">Mollie-SnelBestellen</item>
-                <item name="partnerId" xsi:type="string">16f2f5c8-3935-4b12-8c4c-f2252aa38a9a</item>
-            </argument>
         </arguments>
     </type>
 

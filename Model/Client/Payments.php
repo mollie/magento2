@@ -100,6 +100,7 @@ class Payments
         }
 
         $paymentData = $this->buildTransaction->execute($order, $paymentData);
+
         $this->mollieHelper->addTolog('request', $paymentData);
 
         $payment = $mollieApi->send($this->buildPaymentRequest->execute($paymentData));

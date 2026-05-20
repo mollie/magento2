@@ -11,6 +11,7 @@ namespace Mollie\Payment\Test\Integration\Block\Info;
 use Magento\Sales\Model\Order\Payment\Info;
 use Mollie\Payment\Block\Info\Base;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class BaseTest extends IntegrationTestCase
 {
@@ -38,7 +39,7 @@ class BaseTest extends IntegrationTestCase
         $this->assertEquals('ord_123abc', $instance->getMollieId());
     }
 
-    public function returnsNullWhenInfoIsNotAvailable(): array
+    public static function returnsNullWhenInfoIsNotAvailable()
     {
         return [
             ['getDashboardUrl'],
@@ -49,7 +50,8 @@ class BaseTest extends IntegrationTestCase
     /**
      * @dataProvider returnsNullWhenInfoIsNotAvailable
      */
-    public function testReturnsNullWhenInfoIsNotAvailable(string $method): void
+    #[DataProvider('returnsNullWhenInfoIsNotAvailable')]
+    public function testReturnsNullWhenInfoIsNotAvailable($method)
     {
         /** @var Base $instance */
         $instance = $this->objectManager->create(Base::class);

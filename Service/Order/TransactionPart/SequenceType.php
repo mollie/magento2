@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
-use Magento\Customer\Model\Session;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Service\Order\OrderContainsSubscriptionProduct;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
@@ -17,30 +16,32 @@ class SequenceType implements TransactionPartInterface
 {
     public function __construct(
         private OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
-        private Session $customerSession
     ) {}
 
     public function process(OrderInterface $order, array $transaction): array
     {
-        if (!$this->shouldAddSequenceType($order)) {
+        if ($this->orderContainsSubscriptionProduct->check($order)) {
+            $transaction['sequenceType'] = 'first';
             return $transaction;
         }
 
-        $transaction['sequenceType'] = 'first';
+        $payment = $order->getPayment();
+        if (!$payment) {
+            return $transaction;
+        }
+
+        $info = $payment->getAdditionalInformation();
+
+        if (($info['mollie_mandate_id'] ?? '') !== '') {
+            $transaction['sequenceType'] = 'oneoff';
+            return $transaction;
+        }
+
+        if (($info['mollie_save_card'] ?? null) === true) {
+            $transaction['sequenceType'] = 'first';
+            return $transaction;
+        }
 
         return $transaction;
-    }
-
-    private function shouldAddSequenceType(OrderInterface $order): bool
-    {
-        if ($this->orderContainsSubscriptionProduct->check($order)) {
-            return true;
-        }
-
-        if (!$order->getPayment() || !$this->customerSession->isLoggedIn()) {
-            return false;
-        }
-
-        return false;
     }
 }

@@ -1,0 +1,57 @@
+<?php
+/** @var \Mollie\Payment\Block\Account\SavedCards $block */
+$mandates = $block->getMandates();
+?>
+<div class="block block-mollie-saved-cards">
+    <div class="block-title">
+        <strong><?= $block->escapeHtml(__('Saved cards')) ?></strong>
+    </div>
+    <div class="block-content">
+        <?php if (empty($mandates)): ?>
+            <p class="mollie-saved-cards-empty"><?= $block->escapeHtml(__('You have no saved cards.')) ?></p>
+        <?php else: ?>
+            <table class="data table mollie-saved-cards-table" id="mollie-saved-cards-table">
+                <caption class="table-caption"><?= $block->escapeHtml(__('Saved cards')) ?></caption>
+                <thead>
+                    <tr>
+                        <th scope="col"><?= $block->escapeHtml(__('Card')) ?></th>
+                        <th scope="col"><?= $block->escapeHtml(__('Expires')) ?></th>
+                        <th scope="col"><?= $block->escapeHtml(__('Actions')) ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($mandates as $mandate): ?>
+                    <tr>
+                        <td>
+                            <?php $logoUrl = $block->getCardLogoUrl($mandate['card_label']); ?>
+                            <?php if ($logoUrl): ?>
+                                <img src="<?= $block->escapeUrl($logoUrl) ?>"
+                                     alt="<?= $block->escapeHtmlAttr($mandate['card_label']) ?>"
+                                     class="mollie-card-logo"
+                                     width="38" height="24"/>
+                            <?php endif ?>
+                            <?= $block->escapeHtml($mandate['card_label']) ?>
+                            <?= $block->escapeHtml(__('Card ending in %1', $mandate['card_number_last4'])) ?>
+                        </td>
+                        <td>
+                            <?php if (!empty($mandate['card_expiry_date'])): ?>
+                                <?= $block->escapeHtml(__('Expires %1', $mandate['card_expiry_date'])) ?>
+                            <?php endif ?>
+                        </td>
+                        <td>
+                            <form method="post" action="<?= $block->escapeUrl($block->getDeleteUrl()) ?>">
+                                <input type="hidden" name="form_key" value="<?= $block->escapeHtml($block->getFormKey()) ?>">
+                                <input type="hidden" name="mandate_id" value="<?= $block->escapeHtml($mandate['mandate_id']) ?>">
+                                <button type="submit" class="action delete mollie-saved-cards-delete"
+                                        onclick="return confirm('<?= $block->escapeJs(__('Are you sure you want to remove this saved card?')) ?>')">
+                                    <span><?= $block->escapeHtml(__('Remove saved card')) ?></span>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+        <?php endif ?>
+    </div>
+</div>

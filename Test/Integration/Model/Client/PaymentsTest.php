@@ -26,11 +26,12 @@ use Mollie\Payment\Model\Client\Payments\ProcessTransaction;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use stdClass;
 
 class PaymentsTest extends IntegrationTestCase
 {
-    public function processTransactionProvider(): array
+    public static function processTransactionProvider(): array
     {
         return [
             ['USD'],
@@ -46,6 +47,7 @@ class PaymentsTest extends IntegrationTestCase
      * @throws LocalizedException
      * @throws ApiException
      */
+    #[DataProvider('processTransactionProvider')]
     public function testProcessTransaction(string $currency): void
     {
         $client = MollieApiClient::fake([
@@ -98,9 +100,6 @@ class PaymentsTest extends IntegrationTestCase
         $payment = new Payment($this->createMock(MollieApiClient::class));
         $payment->id = 'tr_test_transaction';
         $payment->status = $status;
-        $payment->settlementAmount = new stdClass();
-        $payment->settlementAmount->value = 50;
-        $payment->settlementAmount->currency = 'EUR';
 
         $payment->amount = new stdClass();
         $payment->amount->value = 100;
@@ -113,7 +112,7 @@ class PaymentsTest extends IntegrationTestCase
         return $payment;
     }
 
-    public function checksIfTheOrderHasAnUpdateProvider(): array
+    public static function checksIfTheOrderHasAnUpdateProvider(): array
     {
         return [
             [PaymentStatus::OPEN, Order::STATE_NEW],
@@ -129,6 +128,7 @@ class PaymentsTest extends IntegrationTestCase
     /**
      * @dataProvider checksIfTheOrderHasAnUpdateProvider
      */
+    #[DataProvider('checksIfTheOrderHasAnUpdateProvider')]
     public function testChecksIfTheOrderHasAnUpdate(string $mollieStatus, string $magentoStatus): void
     {
         /** @var OrderInterface $order */

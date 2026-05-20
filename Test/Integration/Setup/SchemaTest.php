@@ -10,10 +10,11 @@ namespace Mollie\Payment\Test\Integration\Setup;
 
 use Magento\Framework\App\ResourceConnection;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class SchemaTest extends IntegrationTestCase
 {
-    public function addedColumnsHaveIndexesProvider(): array
+    public static function addedColumnsHaveIndexesProvider(): array
     {
         return [
             ['sales_order', 'mollie_transaction_id'],
@@ -24,6 +25,7 @@ class SchemaTest extends IntegrationTestCase
     /**
      * @dataProvider addedColumnsHaveIndexesProvider
      */
+    #[DataProvider('addedColumnsHaveIndexesProvider')]
     public function testAddedColumnsHaveIndexes(string $tableName, string $columnName): void
     {
         /** @var ResourceConnection $resource */
@@ -44,7 +46,7 @@ class SchemaTest extends IntegrationTestCase
         $this->fail('There was no index found for `' . $columnName . '` in `' . $tableName . '`');
     }
 
-    public function thePaymentFeeColumnsExistsProvider(): array
+    public static function thePaymentFeeColumnsExistsProvider(): array
     {
         return [
             ['quote'],
@@ -58,6 +60,7 @@ class SchemaTest extends IntegrationTestCase
     /**
      * @dataProvider thePaymentFeeColumnsExistsProvider
      */
+    #[DataProvider('thePaymentFeeColumnsExistsProvider')]
     public function testThePaymentFeeColumnsExists(string $tableName): void
     {
         /** @var ResourceConnection $resource */
@@ -89,7 +92,7 @@ class SchemaTest extends IntegrationTestCase
         );
     }
 
-    public function tableExistsDataProvider(): array
+    public static function tableExistsDataProvider(): array
     {
         return [
             ['mollie_order_lines'],
@@ -97,6 +100,7 @@ class SchemaTest extends IntegrationTestCase
             ['mollie_payment_customer'],
             ['mollie_pending_payment_reminder'],
             ['mollie_sent_payment_reminder'],
+            ['mollie_payment_tracking'],
         ];
     }
 
@@ -104,6 +108,7 @@ class SchemaTest extends IntegrationTestCase
      * @dataProvider tableExistsDataProvider
      * @param string $table
      */
+    #[DataProvider('tableExistsDataProvider')]
     public function testTableExists(string $table): void
     {
         /** @var ResourceConnection $resource */
@@ -116,7 +121,7 @@ class SchemaTest extends IntegrationTestCase
         $this->assertEquals(1, count($rows));
     }
 
-    public function tableHasAllRequiredColumns(): array
+    public static function tableHasAllRequiredColumns(): array
     {
         return [
             [
@@ -176,15 +181,25 @@ class SchemaTest extends IntegrationTestCase
                     'created_at',
                 ],
             ],
+            [
+                'table' => 'mollie_payment_tracking',
+                'columns' => [
+                    'entity_id',
+                    'cart_id',
+                    'tracking_data',
+                    'created_at',
+                ],
+            ],
         ];
     }
 
     /**
      * @dataProvider tableHasAllRequiredColumns
      * @param string $table
-     * @param array $expectedColumns
+     * @param array $columns
      */
-    public function testTableHasAllRequiredColumns(string $table, array $expectedColumns): void
+    #[DataProvider('tableHasAllRequiredColumns')]
+    public function testTableHasAllRequiredColumns(string $table, array $columns): void
     {
         /** @var ResourceConnection $resource */
         $resource = $this->objectManager->get(ResourceConnection::class);
@@ -193,13 +208,13 @@ class SchemaTest extends IntegrationTestCase
         $tableName = $resource->getTableName($table);
         $rows = $connection->fetchAll('DESCRIBE ' . $tableName);
 
-        $columns = array_map(function (array $column) {
+        $actualColumns = array_map(function (array $column) {
             return $column['Field'];
         }, $rows);
 
-        foreach ($expectedColumns as $column) {
+        foreach ($columns as $column) {
             $this->assertTrue(
-                in_array($column, $columns),
+                in_array($column, $actualColumns),
                 sprintf('mollie_order_lines should contain the `%s` column', $column),
             );
         }

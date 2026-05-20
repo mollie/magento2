@@ -69,7 +69,6 @@ Mollie requires no minimum costs, no fixed contracts, no hidden costs. At Mollie
 - SEPA Direct Debit
 - SOFORT Banking
 - Swish
-- Trustly
 - TWINT
 - Vipps
 
@@ -79,7 +78,8 @@ To extend the functionality of the Mollie Magento 2 plugin, we have developed a 
 
 - [Subscriptions](https://github.com/mollie/magento2-subscriptions) - Create and manage subscriptions in your Magento 2 webshop.
 - [Multi shipping](https://github.com/mollie/magento2-multishipping) - Enable multi shipping in your Magento 2 webshop.
-- [Analytics](https://github.com/mollie/magento2-analytics) - Track your Mollie payments in Google Analytics.
+
+> The former [Analytics](https://github.com/mollie/magento2-analytics) addon is now part of the main module.
 
 ### Support for other alternative frontends
 

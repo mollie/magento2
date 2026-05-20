@@ -129,9 +129,9 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $usesManualCapture = $this->canUseManualCapture->execute($magentoOrder);
         $payment->setIsTransactionClosed(!$usesManualCapture);
 
-        if (
-            $this->canRegisterCaptureNotification->execute($magentoOrder, $molliePayment) &&
-            $type != Payments::TRANSACTION_TYPE_SUBSCRIPTION
+        if ($this->canRegisterCaptureNotification->execute($magentoOrder, $molliePayment) &&
+            $type != Payments::TRANSACTION_TYPE_SUBSCRIPTION &&
+            $magentoOrder->getInvoiceCollection()->count() === 0
         ) {
             $this->registerCaptureNotification($molliePayment, $magentoOrder);
         }
@@ -142,17 +142,6 @@ class SuccessfulPayment implements PaymentProcessorInterface
 
         $this->updateOrderStatus($magentoOrder);
         $this->transactionProcessor->process($magentoOrder, $molliePayment);
-
-        if ($molliePayment->settlementAmount !== null) {
-            if ($molliePayment->amount->currency != $molliePayment->settlementAmount->currency) {
-                $message = __(
-                    'Mollie: Captured %1, Settlement Amount %2',
-                    $molliePayment->amount->currency . ' ' . $molliePayment->amount->value,
-                    $molliePayment->settlementAmount->currency . ' ' . $molliePayment->settlementAmount->value,
-                );
-                $this->orderCommentHistory->add($magentoOrder, $message);
-            }
-        }
 
         $this->orderRepository->save($magentoOrder);
     }

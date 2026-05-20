@@ -31,6 +31,7 @@ use Mollie\Payment\Service\Mollie\StartTransaction;
 use Mollie\Payment\Test\Fakes\Model\Client\Payments\ProcessTransactionFake as PaymentsProcessTransactionFake;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MollieTest extends IntegrationTestCase
 {
@@ -42,7 +43,7 @@ class MollieTest extends IntegrationTestCase
         $this->loadFakeOrderLockService();
     }
 
-    public function processTransactionUsesTheCorrectApiProvider(): array
+    public static function processTransactionUsesTheCorrectApiProvider(): array
     {
         return [
             'payments' => ['tr_abcdefg', 'payments'],
@@ -55,6 +56,7 @@ class MollieTest extends IntegrationTestCase
      * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
      * @magentoConfigFixture default_store payment/mollie_general/type test
      */
+    #[DataProvider('processTransactionUsesTheCorrectApiProvider')]
     public function testProcessTransactionUsesTheCorrectApi(string $orderId, string $type): void
     {
         $order = $this->loadOrder('100000001');

@@ -26,14 +26,12 @@ export default class VisitCheckoutPaymentCompositeAction {
     await checkoutPage.continue(page);
   }
 
-  async visitAsCustomer(page: Page, fixture = 'NL', quantity = 1) {
-    await productPage.openProduct(page, process.env.DEFAULT_PRODUCT_ID);
+  async visitAsCustomer(page: Page, fixture = 'NL', quantity = 1, productId = 4) {
+    await productPage.openProduct(page, productId);
 
     await productPage.addSimpleProductToCart(page, quantity);
 
     await checkoutPage.visit(page);
-
-    await this.fillAddress(page, fixture, true);
 
     await checkoutShippingPage.selectFirstAvailableShippingMethod(page);
     await checkoutPage.continue(page);

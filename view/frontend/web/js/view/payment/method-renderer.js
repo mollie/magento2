@@ -23,7 +23,7 @@ define(
 
         var creditcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/creditcard';
         var checkoutConfig = window.checkoutConfig.payment.mollie;
-        if (checkoutConfig.profile_id && checkoutConfig.creditcard.use_components) {
+        if (checkoutConfig && checkoutConfig.profile_id && checkoutConfig.creditcard.use_components) {
             creditcardComponent = 'Mollie_Payment/js/view/payment/method-renderer/creditcard-with-components';
         }
 
@@ -59,7 +59,6 @@ define(
             {type: 'mollie_methods_satispay', component: defaultComponent},
             {type: 'mollie_methods_sofort', component: defaultComponent},
             {type: 'mollie_methods_swish', component: defaultComponent},
-            {type: 'mollie_methods_trustly', component: defaultComponent},
             {type: 'mollie_methods_twint', component: defaultComponent},
             {type: 'mollie_methods_vipps', component: defaultComponent},
             {type: 'mollie_methods_voucher', component: defaultComponent}

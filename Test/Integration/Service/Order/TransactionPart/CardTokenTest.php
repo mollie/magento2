@@ -64,4 +64,23 @@ class CardTokenTest extends IntegrationTestCase
 
         $this->assertEquals(['method' => 'creditcard'], $transaction);
     }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testDoesNotAddCardTokenWhenMandateIdIsSet(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $payment = $order->getPayment();
+        $payment->setMethod('mollie_methods_creditcard');
+        $payment->setAdditionalInformation('card_token', 'abc123');
+        $payment->setAdditionalInformation('mollie_mandate_id', 'mdt_xyz');
+
+        /** @var CardToken $instance */
+        $instance = $this->objectManager->create(CardToken::class);
+
+        $transaction = $instance->process($order, ['method' => 'creditcard']);
+
+        $this->assertEquals(['method' => 'creditcard'], $transaction);
+    }
 }
