@@ -15,6 +15,7 @@ use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Helper\Data;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -41,6 +42,7 @@ class Process extends Action implements HttpGetActionInterface
         private ProcessTransaction $processTransaction,
         private SuccessPageRedirect $successPageRedirect,
         private AddResultMessage $addResultMessage,
+        private EncryptorInterface $encryptor,
     ) {
         parent::__construct($context);
     }
@@ -82,6 +84,13 @@ class Process extends Action implements HttpGetActionInterface
 
                 return $this->_redirect($this->redirectOnError->getUrl());
             }
+        }
+
+        if ($result !== null && $result->isAwaitingConfirmation()) {
+            // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
+            $token = base64_encode($this->encryptor->encrypt((string) $order->getId()));
+
+            return $this->_redirect('mollie/checkout/processingwait', ['token' => $token]);
         }
 
         return $this->handleNonSuccessResult($result, $orderIds);

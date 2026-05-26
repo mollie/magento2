@@ -18,7 +18,7 @@ class GetMollieStatusResultTest extends IntegrationTestCase
     public function testSetTheMethodCorrect(): void
     {
         $instance = $this->objectManager->create(GetMollieStatusResult::class, [
-            'status' => 'created',
+            'status' => 'open',
             'method' => 'mollie_methods_banktransfer',
         ]);
 
@@ -43,8 +43,6 @@ class GetMollieStatusResultTest extends IntegrationTestCase
     public static function returnsTheCorrectStatusForBanktransferProvider(): array
     {
         return [
-            'created, banktransfer' => ['created', 'banktransfer'],
-            'created, mollie_methods_banktransfer' => ['created', 'mollie_methods_banktransfer'],
             'open, banktransfer' => ['open', 'banktransfer'],
             'open, mollie_methods_banktransfer' => ['open', 'mollie_methods_banktransfer'],
         ];
@@ -73,6 +71,32 @@ class GetMollieStatusResultTest extends IntegrationTestCase
             'pending, ideal' => ['pending', 'ideal'],
             'authorized, klarna' => ['authorized', 'klarna'],
             'authorized, mollie_methods_klarna' => ['authorized', 'mollie_methods_klarna'],
+        ];
+    }
+
+    /**
+     * @dataProvider isAwaitingConfirmationProvider
+     */
+    #[DataProvider('isAwaitingConfirmationProvider')]
+    public function testIsAwaitingConfirmation(string $status, string $method, bool $expected): void
+    {
+        $instance = $this->objectManager->create(GetMollieStatusResult::class, [
+            'status' => $status,
+            'method' => $method,
+        ]);
+
+        $this->assertEquals($expected, $instance->isAwaitingConfirmation());
+    }
+
+    public static function isAwaitingConfirmationProvider(): array
+    {
+        return [
+            'open, paypal' => ['open', 'paypal', true],
+            'open, mollie_methods_paypal' => ['open', 'mollie_methods_paypal', true],
+            'open, banktransfer — not awaiting, goes to success directly' => ['open', 'banktransfer', false],
+            'open, mollie_methods_banktransfer' => ['open', 'mollie_methods_banktransfer', false],
+            'paid, ideal — confirmed, not awaiting' => ['paid', 'ideal', false],
+            'canceled, paypal' => ['canceled', 'paypal', false],
         ];
     }
 }

@@ -32,16 +32,6 @@ class GetMollieStatus
         }
 
         $mollieApi = $this->mollieApiClient->loadByStore(storeId($order->getStoreId()));
-
-        if (substr($transactionId, 0, 4) == 'ord_') {
-            $mollieOrder = $mollieApi->orders->get($transactionId);
-
-            return $this->getMollieStatusResultFactory->create([
-                'status' => $mollieOrder->status,
-                'method' => $mollieOrder->method,
-            ]);
-        }
-
         $molliePayment = $mollieApi->payments->get($transactionId);
 
         return $this->getMollieStatusResultFactory->create([
