@@ -145,4 +145,32 @@ class PaymentsTest extends IntegrationTestCase
 
         $this->assertFalse($instance->orderHasUpdate($order, $client));
     }
+
+    public function testItReturnsFalseForCompletedOrders()
+    {
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setState(Order::STATE_COMPLETE);
+
+        $mollieApi = new MollieApiClient();
+
+        /** @var Payments $instance */
+        $instance = $this->objectManager->create(Payments::class);
+
+        $this->assertFalse($instance->orderHasUpdate($order, $mollieApi));
+    }
+
+    public function testItReturnsFalseForClosedOrders()
+    {
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setState(Order::STATE_CLOSED);
+
+        $mollieApi = new MollieApiClient();
+
+        /** @var Payments $instance */
+        $instance = $this->objectManager->create(Payments::class);
+
+        $this->assertFalse($instance->orderHasUpdate($order, $mollieApi));
+    }
 }
