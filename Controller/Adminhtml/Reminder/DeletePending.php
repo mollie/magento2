@@ -28,7 +28,7 @@ class DeletePending extends Action implements HttpPostActionInterface
 
     public function execute(): ResponseInterface
     {
-        $this->pendingPaymentReminderRepository->deleteById($this->getRequest()->getParam('id'));
+        $this->pendingPaymentReminderRepository->deleteById((int)$this->getRequest()->getParam('id'));
 
         $this->messageManager->addSuccessMessage(__('The payment reminder has been removed'));
 

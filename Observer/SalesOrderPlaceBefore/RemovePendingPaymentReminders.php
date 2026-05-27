@@ -37,6 +37,10 @@ class RemovePendingPaymentReminders implements ObserverInterface
             return;
         }
 
-        $this->deletePaymentReminder->delete($order->getCustomerId() ?: $order->getCustomerEmail());
+        if ($customerId = $order->getCustomerId()) {
+            $this->deletePaymentReminder->deleteByCustomerId((int)$customerId);
+            return;
+        }
+        $this->deletePaymentReminder->deleteByEmail((string)$order->getCustomerEmail());
     }
 }

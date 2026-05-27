@@ -10,8 +10,9 @@ namespace Mollie\Payment\Test\Integration\Observer\SalesOrderPlaceBefore;
 
 use Magento\Framework\Event\Observer;
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Payment\Api\Data\PendingPaymentReminderInterfaceFactory;
+use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Observer\SalesOrderPlaceBefore\RemovePendingPaymentReminders;
-use Mollie\Payment\Service\Order\DeletePaymentReminder;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class RemovePendingPaymentRemindersTest extends IntegrationTestCase
@@ -22,19 +23,23 @@ class RemovePendingPaymentRemindersTest extends IntegrationTestCase
      */
     public function testDoesNothingWhenDisabled(): void
     {
-        $deletePaymentReminderMock = $this->createMock(DeletePaymentReminder::class);
-        $deletePaymentReminderMock->expects($this->never())->method('delete');
+        $repository = $this->objectManager->get(PendingPaymentReminderRepositoryInterface::class);
 
-        /** @var RemovePendingPaymentReminders $instance */
-        $instance = $this->objectManager->create(RemovePendingPaymentReminders::class, [
-            'deletePaymentReminder' => $deletePaymentReminderMock,
-        ]);
+        $reminder = $this->objectManager->get(PendingPaymentReminderInterfaceFactory::class)->create();
+        $reminder->setOrderId(99999);
+        $reminder->setCustomerId(1);
+        $saved = $repository->save($reminder);
 
-        /** @var Observer $observer */
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setCustomerId(1);
+        $order->setCustomerEmail('test@example.com');
+
         $observer = $this->objectManager->create(Observer::class);
-        $observer->setData('order', $this->objectManager->create(OrderInterface::class));
+        $observer->setData('order', $order);
 
-        $instance->execute($observer);
+        $this->objectManager->create(RemovePendingPaymentReminders::class)->execute($observer);
+
+        $this->assertSame($saved->getEntityId(), $repository->get($saved->getEntityId())->getEntityId());
     }
 
     /**
@@ -43,22 +48,22 @@ class RemovePendingPaymentRemindersTest extends IntegrationTestCase
      */
     public function testDoesNothingWhenNoEmailIsAvailable(): void
     {
-        $deletePaymentReminderMock = $this->createMock(DeletePaymentReminder::class);
-        $deletePaymentReminderMock->expects($this->never())->method('delete');
+        $repository = $this->objectManager->get(PendingPaymentReminderRepositoryInterface::class);
 
-        /** @var RemovePendingPaymentReminders $instance */
-        $instance = $this->objectManager->create(RemovePendingPaymentReminders::class, [
-            'deletePaymentReminder' => $deletePaymentReminderMock,
-        ]);
+        $reminder = $this->objectManager->get(PendingPaymentReminderInterfaceFactory::class)->create();
+        $reminder->setOrderId(99999);
+        $reminder->setCustomerId(1);
+        $saved = $repository->save($reminder);
 
-        /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
+        $order->setCustomerId(1);
         $order->setCustomerEmail(null);
 
-        /** @var Observer $observer */
         $observer = $this->objectManager->create(Observer::class);
         $observer->setData('order', $order);
 
-        $instance->execute($observer);
+        $this->objectManager->create(RemovePendingPaymentReminders::class)->execute($observer);
+
+        $this->assertSame($saved->getEntityId(), $repository->get($saved->getEntityId())->getEntityId());
     }
 }

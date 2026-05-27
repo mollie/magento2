@@ -13,7 +13,7 @@ use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Backend\Model\View\Result\Page;
 use Magento\Framework\App\Action\HttpGetActionInterface;
-use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\View\Result\PageFactory;
 
 class Pending extends Action implements HttpGetActionInterface
@@ -27,7 +27,7 @@ class Pending extends Action implements HttpGetActionInterface
         parent::__construct($context);
     }
 
-    public function execute(): ResponseInterface
+    public function execute(): ResultInterface
     {
         /** @var Page $resultPage */
         $resultPage = $this->pageFactory->create();
