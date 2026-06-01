@@ -9,6 +9,8 @@ namespace Mollie\Payment\Model\Client\Orders\Processors;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Invoice;
+use Magento\Sales\Model\Service\InvoiceService;
 use Mollie\Api\Types\OrderStatus;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use Mollie\Payment\Test\Integration\MollieOrderBuilder;
@@ -298,6 +300,47 @@ class SuccessfulPaymentTest extends IntegrationTestCase
         $freshOrder = $this->objectManager->get(OrderInterface::class)->load($order->getId(), 'entity_id');
 
         $this->assertEquals($historyCount + 1, count($freshOrder->getStatusHistories()));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testRegistersCapturNotificationWhenOrderIsProcessingButHasPendingInvoice(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
+        $order->setState(Order::STATE_PROCESSING);
+        $order->getPayment()->setMethod('mollie_methods_creditcard');
+        $order->getPayment()->setIsTransactionPending(true);
+
+        /** @var InvoiceService $invoiceService */
+        $invoiceService = $this->objectManager->get(InvoiceService::class);
+        $invoice = $invoiceService->prepareInvoice($order);
+        $invoice->setRequestedCaptureCase(Invoice::NOT_CAPTURE);
+        $invoice->register();
+        $invoice->save();
+
+        $order->getPayment()->setIsTransactionPending(false);
+
+        $this->assertNull($order->getTotalPaid());
+
+        /** @var MollieOrderBuilder $orderBuilder */
+        $orderBuilder = $this->objectManager->create(MollieOrderBuilder::class);
+        $orderBuilder->setAmount(100);
+        $orderBuilder->addPayment('payment_001');
+        $orderBuilder->setStatus(OrderStatus::STATUS_PAID);
+
+        /** @var SuccessfulPayment $instance */
+        $instance = $this->objectManager->create(SuccessfulPayment::class);
+
+        $instance->process(
+            $order,
+            $orderBuilder->build(),
+            'webhook',
+            $this->createResponse(false)
+        );
+
+        $this->assertEquals(100, $order->getTotalPaid());
     }
 
     private function createResponse(
