@@ -49,7 +49,7 @@ class CapturePaymentForInvoice
         }
 
         $capture = $mollieApi->paymentCaptures->createForId($mollieTransactionId, $data);
-        $payment->setTransactionId($capture->id);
+        $payment->setTransactionId($mollieTransactionId);
 
         $order->addCommentToStatusHistory(
             __(
