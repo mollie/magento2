@@ -53,10 +53,15 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         $cart = $this->getCart();
 
         $shippingAddress = $cart->getShippingAddress();
-        $this->updateAddress($shippingAddress, $this->getRequest()->getParam('shippingAddress'));
-        $this->updateAddress($cart->getBillingAddress(), $this->getRequest()->getParam('billingAddress'));
+        $shippingAddressData = $this->getRequest()->getParam('shippingAddress');
+        $billingAddressData = $this->getRequest()->getParam('billingAddress');
 
-        $cart->setCustomerEmail($this->getRequest()->getParam('shippingAddress')['emailAddress']);
+        $this->updateAddress($shippingAddress, $shippingAddressData);
+        $this->updateAddress($cart->getBillingAddress(), $billingAddressData);
+
+        $cart->setCustomerFirstname($billingAddressData['givenName'] ?? $shippingAddressData['givenName'] ?? '');
+        $cart->setCustomerLastname($billingAddressData['familyName'] ?? $shippingAddressData['familyName'] ?? '--');
+        $cart->setCustomerEmail($billingAddressData['emailAddress'] ?? $shippingAddressData['emailAddress'] ?? '');
 
         // Orders with digital products can't have a shipping method
         if ($this->getRequest()->getParam('shippingMethod')) {
