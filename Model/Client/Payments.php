@@ -183,6 +183,10 @@ class Payments
 
     public function orderHasUpdate(OrderInterface $order, MollieApiClient $mollieApi): bool
     {
+        if (in_array($order->getState(), [Order::STATE_COMPLETE, Order::STATE_CLOSED])) {
+            return false;
+        }
+
         $transactionId = $order->getMollieTransactionId();
         $paymentData = $mollieApi->payments->get($transactionId);
 
