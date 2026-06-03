@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons;
 
+use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -24,7 +25,8 @@ class MarkAsPaidButton implements ButtonInterface
         private OrderRepositoryInterface $orderRepository,
         private PaymentHelper $paymentHelper,
         private Reorder $reorderHelper,
-        private UnavailableProductsProvider $unavailableProductsProvider
+        private UnavailableProductsProvider $unavailableProductsProvider,
+        private AuthorizationInterface $authorization,
     ) {}
 
     /**
@@ -32,6 +34,10 @@ class MarkAsPaidButton implements ButtonInterface
      */
     public function add(View $view): void
     {
+        if (!$this->authorization->isAllowed('Magento_Sales::actions')) {
+            return;
+        }
+
         $order = $view->getOrder();
         if (
             !$this->config->paymentlinkAllowMarkAsPaid(storeId($order->getStoreId())) ||

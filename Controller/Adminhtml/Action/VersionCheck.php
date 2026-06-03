@@ -21,6 +21,8 @@ use Mollie\Payment\Config;
 
 class VersionCheck extends Action implements HttpPostActionInterface
 {
+    public const ADMIN_RESOURCE = 'Mollie_Payment::config';
+
     public function __construct(
         Context $context,
         private JsonFactory $resultJsonFactory,

@@ -32,6 +32,7 @@ require([
     var serviceUrl = '<?= $escaper->escapeJs($block->getData('status_url')); ?>';
     var resetUrl = '<?= $escaper->escapeJs($block->getData('reset_url')); ?>';
     var retryUrl = '<?= $escaper->escapeJs($block->getData('retry_url')); ?>';
+    var successUrl = '<?= $escaper->escapeJs($block->getUrl('checkout/onepage/success')); ?>';
     var statusElement = document.getElementById('mollie-order-status');
     var errorElement = document.getElementById('mollie-order-error');
     var waitTime = 100;
@@ -47,7 +48,7 @@ require([
 
             var status = response[0].status;
             if (status === 'processing') {
-                window.location.href = '/checkout/onepage/success/';
+                window.location.href = successUrl;
                 return;
             }
 

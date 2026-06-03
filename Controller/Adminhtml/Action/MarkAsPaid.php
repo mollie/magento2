@@ -21,6 +21,8 @@ use Mollie\Payment\Service\Order\Reorder;
 
 class MarkAsPaid extends Action implements HttpPostActionInterface
 {
+    public const ADMIN_RESOURCE = 'Magento_Sales::actions';
+
     public function __construct(
         Context $context,
         private OrderRepositoryInterface $orderRepository,

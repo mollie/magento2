@@ -71,7 +71,9 @@ class ParseAdditionalData
         if ($this->config->encryptPaymentDetails()) {
             try {
                 $details = $this->encryptor->decrypt($details);
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+                $this->config->addToLog('error', $e->getMessage());
+            }
         }
         if (is_string($details)) {
             $details = json_decode($details, true);

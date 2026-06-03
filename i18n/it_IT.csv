@@ -238,6 +238,7 @@
 "Mollie ID","ID Mollie"
 "Mollie Payment Fee","Commissione di pagamento Mollie"
 "Mollie Payment Reminders","Promemoria di pagamenti Mollie"
+"Mollie Payment: queue consumer not configured","Mollie Payment: consumer della coda non configurato"
 "Mollie PayPal ID","Mollie PayPal ID"
 "Mollie: Received a chargeback with an amount of %1","Mollie: ricevuto un chargeback di importo %1"
 "Multibanco","Multibanco"
@@ -263,6 +264,7 @@
 "On Shipment","Alla spedizione"
 "Only use this function if you want to integrate the Mollie extension with a PWA storefront.
                     More information can be found <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">here</a>.","Utilizza questa funzione solo se desideri integrare l'estensione Mollie con un negozio PWA.
+"Queue processing is enabled but ""mollie.transaction.processor"" is missing from your cron_consumers_runner/consumers whitelist in env.php. Webhooks will be enqueued but never processed, leaving orders stuck in pending_payment. Add ""mollie.transaction.processor"" to the whitelist, or disable queue processing under Stores > Configuration > Mollie > General.","L'elaborazione della coda è abilitata, ma ""mollie.transaction.processor"" è assente dalla whitelist cron_consumers_runner/consumers in env.php. I webhook verranno messi in coda ma non verranno mai elaborati, lasciando gli ordini bloccati in pending_payment. Aggiungere ""mollie.transaction.processor"" alla whitelist oppure disabilitare l'elaborazione della coda in Negozi > Configurazione > Mollie > Generale."
                     Ulteriori informazioni sono disponibili <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">qui</a>."
 "Order","Ordina"
 "Order %1 has already transaction %1 linked to it. Skipping","L'ordine %1 ha già la transazione %1 collegata. Saltato"

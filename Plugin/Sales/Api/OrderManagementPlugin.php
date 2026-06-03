@@ -29,10 +29,10 @@ class OrderManagementPlugin
             throw new LocalizedException(__('Unable to get lock for %1', $key));
         }
 
-        $result = $proceed($orderId);
-
-        $this->lockService->unlock($key);
-
-        return $result;
+        try {
+            return $proceed($orderId);
+        } finally {
+            $this->lockService->unlock($key);
+        }
     }
 }

@@ -14,7 +14,6 @@ use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Registry;
 use Magento\Framework\View\Asset\Repository;
 use Magento\Payment\Gateway\Command\CommandManagerInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
@@ -52,7 +51,6 @@ class Mollie extends Adapter
         ManagerInterface $eventManager,
         ValueHandlerPoolInterface $valueHandlerPool,
         PaymentDataObjectFactory $paymentDataObjectFactory,
-        private Registry $registry,
         private OrderRepository $orderRepository,
         private Payments $paymentsApi,
         private General $mollieHelper,
@@ -361,15 +359,10 @@ class Mollie extends Adapter
         $order = $payment->getOrder();
         $storeId = storeId($order->getStoreId());
 
-        /**
-         * Order Api does not use amount to refund, but refunds per itemLine
-         * See SalesOrderCreditmemoSaveAfter Observer for logic.
-         */
-        $checkoutType = $this->mollieHelper->getCheckoutType($order);
-        if ($checkoutType == 'order') {
-            $this->registry->register('online_refund', true);
-
-            return $this;
+        if ($this->mollieHelper->getCheckoutType($order) == 'order') {
+            throw new LocalizedException(
+                __('This order was placed using the Mollie Orders API, which is no longer supported in v3. Please process this refund via the Mollie Dashboard.')
+            );
         }
 
         $transactionId = $order->getMollieTransactionId();

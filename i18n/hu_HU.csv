@@ -238,6 +238,7 @@
 "Mollie ID","Mollie azonosító"
 "Mollie Payment Fee","Mollie fizetési díj"
 "Mollie Payment Reminders","Mollie Fizetési Emlékeztetők"
+"Mollie Payment: queue consumer not configured","Mollie Payment: a sorkezelő nincs beállítva"
 "Mollie PayPal ID","Mollie PayPal azonosító"
 "Mollie: Received a chargeback with an amount of %1","Mollie: Visszaterhelés érkezett, összege: %1"
 "Multibanco","Multibanco"
@@ -263,6 +264,7 @@
 "On Shipment","A szállítás során"
 "Only use this function if you want to integrate the Mollie extension with a PWA storefront.
                     More information can be found <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">here</a>.","Ezt a funkciót csak akkor használja, ha a Mollie bővítményt PWA áruházzal szeretné integrálni.
+"Queue processing is enabled but ""mollie.transaction.processor"" is missing from your cron_consumers_runner/consumers whitelist in env.php. Webhooks will be enqueued but never processed, leaving orders stuck in pending_payment. Add ""mollie.transaction.processor"" to the whitelist, or disable queue processing under Stores > Configuration > Mollie > General.","A sorkezelés engedélyezve van, de a ""mollie.transaction.processor"" hiányzik a cron_consumers_runner/consumers engedélyezési listájából az env.php fájlban. A webhookok sorba kerülnek, de soha nem kerülnek feldolgozásra, és a rendelések pending_payment állapotban ragadnak. Adja hozzá a ""mollie.transaction.processor"" elemet az engedélyezési listához, vagy tiltsa le a sorkezelést az Áruházak > Konfiguráció > Mollie > Általános menüpontban."
                     További információ <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">itt</a> található."
 "Order","Megrendelés"
 "Order %1 has already transaction %1 linked to it. Skipping","A(z) %1 rendeléshez már kapcsolódik egy %1 tranzakció. Kihagyás"

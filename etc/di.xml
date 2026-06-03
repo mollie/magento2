@@ -1348,6 +1348,90 @@
         </arguments>
     </virtualType>
 
+    <!-- Legacy stubs added in v3.0. The Orders API was removed in v3, taking the original Klarna method
+         classes with it. Without these stubs, getMethodInstance() throws on any pre-v3 Klarna order.
+         Do not remove these entries. -->
+    <!-- Klarna Pay Later (legacy stub) -->
+    <type name="Mollie\Payment\Model\Methods\KlarnaPayLater">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnaPayLaterValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+    <virtualType name="MollieKlarnaPayLaterValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieKlarnaPayLaterConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MollieKlarnaPayLaterConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieKlarnaPayLaterConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MollieKlarnaPayLaterConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\KlarnaPayLater::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Klarna Pay Now (legacy stub) -->
+    <type name="Mollie\Payment\Model\Methods\KlarnaPayNow">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnaPayNowValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+    <virtualType name="MollieKlarnaPayNowValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieKlarnaPayNowConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MollieKlarnaPayNowConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieKlarnaPayNowConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MollieKlarnaPayNowConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\KlarnaPayNow::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Klarna Slice It (legacy stub) -->
+    <type name="Mollie\Payment\Model\Methods\KlarnaSliceIt">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnaSliceItValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+        </arguments>
+    </type>
+    <virtualType name="MollieKlarnaSliceItValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieKlarnaSliceItConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MollieKlarnaSliceItConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieKlarnaSliceItConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MollieKlarnaSliceItConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\KlarnaSliceIt::CODE</argument>
+        </arguments>
+    </virtualType>
+
     <!-- MbWay -->
     <type name="Mollie\Payment\Model\Methods\MbWay">
         <arguments>

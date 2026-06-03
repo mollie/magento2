@@ -21,6 +21,8 @@ use Mollie\Payment\Config;
 
 class Changelog extends Action implements HttpPostActionInterface
 {
+    public const ADMIN_RESOURCE = 'Mollie_Payment::config';
+
     public function __construct(
         Context $context,
         private JsonFactory $resultJsonFactory,
@@ -47,7 +49,7 @@ class Changelog extends Action implements HttpPostActionInterface
     {
         return $this->file->fileGetContents(
             sprintf(
-                'http://version.magmodules.eu/%s.json',
+                'https://version.magmodules.eu/%s.json',
                 Config::EXTENSION_CODE,
             ),
         );

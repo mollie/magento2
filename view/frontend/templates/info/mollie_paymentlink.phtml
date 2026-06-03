@@ -22,7 +22,7 @@ $title = $block->escapeHtml($block->getMethod()->getTitle());
     </dt>
     <?php if ($url = $block->getPaymentLink()): ?>
         <dt>
-            <?= /* @noEscape */ $url; ?>
+            <?= $block->escapeHtml($url, ['a', 'strong']); ?>
         </dt>
     <?php endif; ?>
     <?php if ($specificInfo): ?>

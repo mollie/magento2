@@ -134,13 +134,18 @@ class BuyNowValidation extends Action implements HttpPostActionInterface
         }
 
         try {
+            $validationUrl = $this->getRequest()->getParam('validationURL');
+            if (!$validationUrl || !preg_match('#^https://apple-pay-gateway[a-z0-9.-]*\.apple\.com/#', $validationUrl)) {
+                throw new LocalizedException(__('Invalid Apple Pay validation URL'));
+            }
+
             $store = $this->storeManager->getStore();
             $api = $this->mollieApiClient->loadByApiKey($this->getLiveApiKey((int) $store->getId()));
             $url = $this->url->getBaseUrl();
 
             $result = $api->wallets->requestApplePayPaymentSession(
                 $this->uri->parse($url)->getHost(),
-                $this->getRequest()->getParam('validationURL'),
+                $validationUrl,
             );
         } catch (Exception $exception) {
             $response->setHttpResponseCode(500);

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Plugin\Sales\Block\Adminhtml\Order\Buttons;
 
+use Magento\Framework\AuthorizationInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as Subject;
 use Magento\Sales\Model\Order;
@@ -25,13 +26,19 @@ class SecondChanceButtonTest extends IntegrationTestCase
         $configMock = $this->createMock(Config::class);
         $configMock->method('isSecondChanceEmailEnabled')->willReturn(true);
 
+        $authorizationMock = $this->createMock(AuthorizationInterface::class);
+        $authorizationMock->method('isAllowed')->willReturn(true);
+
         $subjectMock = $this->createMock(Subject::class);
         $subjectMock->method('getOrder')->willReturn($order);
         $subjectMock->method('getOrderId')->willReturn(-999);
         $subjectMock->expects($this->once())->method('addButton')->with('mollie_payment_second_chance_email');
 
         /** @var SecondChanceButton $instance */
-        $instance = $this->objectManager->create(SecondChanceButton::class, ['config' => $configMock]);
+        $instance = $this->objectManager->create(SecondChanceButton::class, [
+            'config' => $configMock,
+            'authorization' => $authorizationMock,
+        ]);
         $instance->add($subjectMock);
     }
 

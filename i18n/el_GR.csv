@@ -238,6 +238,7 @@
 "Mollie ID","Αναγνωριστικό παραγγελίας Mollie"
 "Mollie Payment Fee","Χρέωση Πληρωμής Mollie"
 "Mollie Payment Reminders","Υπενθυμίσεις πληρωμής Mollie"
+"Mollie Payment: queue consumer not configured","Mollie Payment: ο καταναλωτής ουράς δεν έχει διαμορφωθεί"
 "Mollie PayPal ID","Mollie PayPal ID"
 "Mollie: Received a chargeback with an amount of %1","Mollie: Ελήφθη επιστροφή χρεώσεως ποσού %1"
 "Multibanco","Multibanco"
@@ -263,6 +264,7 @@
 "On Shipment","Κατά την αποστολή"
 "Only use this function if you want to integrate the Mollie extension with a PWA storefront.
                     More information can be found <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">here</a>.","Χρησιμοποιήστε αυτή τη λειτουργία μόνο εάν θέλετε να ενσωματώσετε την επέκταση Mollie με ένα PWA storefront.
+"Queue processing is enabled but ""mollie.transaction.processor"" is missing from your cron_consumers_runner/consumers whitelist in env.php. Webhooks will be enqueued but never processed, leaving orders stuck in pending_payment. Add ""mollie.transaction.processor"" to the whitelist, or disable queue processing under Stores > Configuration > Mollie > General.","Η επεξεργασία ουράς είναι ενεργοποιημένη, αλλά το ""mollie.transaction.processor"" λείπει από τη λίστα επιτρεπόμενων cron_consumers_runner/consumers στο env.php. Τα webhooks θα μπουν στην ουρά αλλά δεν θα επεξεργαστούν ποτέ, αφήνοντας παραγγελίες κολλημένες στο pending_payment. Προσθέστε ""mollie.transaction.processor"" στη λίστα επιτρεπόμενων ή απενεργοποιήστε την επεξεργασία ουράς στα Καταστήματα > Ρύθμιση > Mollie > Γενικά."
                     Περισσότερες πληροφορίες μπορείτε να βρείτε <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">εδώ</a>."
 "Order","Παραγγελία"
 "Order %1 has already transaction %1 linked to it. Skipping","Η παραγγελία %1 έχει ήδη τη συναλλαγή %1 συνδεδεμένη με αυτή. Παράλειψη"

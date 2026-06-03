@@ -12,7 +12,6 @@ use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Framework\Registry;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Gateway\Command\CommandManagerInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
@@ -51,7 +50,6 @@ class Reorder extends Mollie
         ManagerInterface $eventManager,
         ValueHandlerPoolInterface $valueHandlerPool,
         PaymentDataObjectFactory $paymentDataObjectFactory,
-        Registry $registry,
         private OrderRepository $orderRepository,
         PaymentsApi $paymentsApi,
         MollieHelper $mollieHelper,
@@ -73,7 +71,6 @@ class Reorder extends Mollie
             $eventManager,
             $valueHandlerPool,
             $paymentDataObjectFactory,
-            $registry,
             $orderRepository,
             $paymentsApi,
             $mollieHelper,

@@ -13,6 +13,9 @@ use Magento\Payment\Block\Form;
 use Magento\TestFramework\ObjectManager\Config;
 use Mollie\Payment\Block\Form\Paymentlink;
 use Mollie\Payment\Block\Form\Pointofsale;
+use Mollie\Payment\Model\Methods\KlarnaPayLater;
+use Mollie\Payment\Model\Methods\KlarnaPayNow;
+use Mollie\Payment\Model\Methods\KlarnaSliceIt;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use ReflectionObject;
 
@@ -112,7 +115,6 @@ class GatewayComponentsTest extends IntegrationTestCase
 
         $reflectionObject = new ReflectionObject($config);
         $reflectionProperty = $reflectionObject->getProperty('_arguments');
-        $reflectionProperty->setAccessible(true);
 
         $arguments = $reflectionProperty->getValue($config);
 
@@ -124,7 +126,14 @@ class GatewayComponentsTest extends IntegrationTestCase
         $keys = array_keys($this->getObjectManagerArguments());
 
         $methods = array_filter($keys, function (int|string $key): bool {
-            return strpos($key, 'Mollie\\Payment\\Model\\Methods') !== false;
+            if (strpos($key, 'Mollie\\Payment\\Model\\Methods') === false) {
+                return false;
+            }
+
+            // Legacy stubs added in v3.0 to keep pre-v3 Klarna orders viewable in admin.
+            // They are intentionally minimal (no ValidatorPool) since they are never used at checkout.
+            $legacyStubs = [KlarnaPayLater::class, KlarnaPayNow::class, KlarnaSliceIt::class];
+            return !in_array($key, $legacyStubs, true);
         });
 
         return array_map(function (int|string $key): array {

@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Plugin\Sales\Block\Adminhtml\Order\Buttons;
 
+use Magento\Framework\AuthorizationInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as Subject;
 use Magento\Sales\Helper\Reorder;
 use Magento\Sales\Model\Order;
@@ -113,8 +114,13 @@ class MarkAsPaidButtonTest extends IntegrationTestCase
 
         $subjectMock->expects($this->once())->method('addButton');
 
+        $authorizationMock = $this->createMock(AuthorizationInterface::class);
+        $authorizationMock->method('isAllowed')->willReturn(true);
+
         /** @var MarkAsPaidButton $instance */
-        $instance = $this->objectManager->create(MarkAsPaidButton::class);
+        $instance = $this->objectManager->create(MarkAsPaidButton::class, [
+            'authorization' => $authorizationMock,
+        ]);
         $instance->add($subjectMock);
     }
 

@@ -433,6 +433,41 @@
                 <capture_delay/>
                 <capture_delay_unit>hours</capture_delay_unit>
             </mollie_methods_klarna>
+            <!-- Legacy stubs added in v3.0. These methods were removed when the Orders API was dropped.
+                 Keeping them registered (inactive) prevents admin crashes on pre-v3 orders. Do not remove. -->
+            <mollie_methods_klarnapaylater>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\KlarnaPayLater</model>
+                <title>Klarna Pay Later (legacy)</title>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <can_use_checkout>0</can_use_checkout>
+                <can_order>0</can_order>
+                <can_refund>0</can_refund>
+                <can_use_internal>0</can_use_internal>
+            </mollie_methods_klarnapaylater>
+            <mollie_methods_klarnapaynow>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\KlarnaPayNow</model>
+                <title>Klarna Pay Now (legacy)</title>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <can_use_checkout>0</can_use_checkout>
+                <can_order>0</can_order>
+                <can_refund>0</can_refund>
+                <can_use_internal>0</can_use_internal>
+            </mollie_methods_klarnapaynow>
+            <mollie_methods_klarnasliceit>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\KlarnaSliceIt</model>
+                <title>Klarna Slice It (legacy)</title>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <can_use_checkout>0</can_use_checkout>
+                <can_order>0</can_order>
+                <can_refund>0</can_refund>
+                <can_use_internal>0</can_use_internal>
+            </mollie_methods_klarnasliceit>
             <mollie_methods_mbway>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\MbWay</model>

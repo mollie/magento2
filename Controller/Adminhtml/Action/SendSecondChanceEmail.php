@@ -21,6 +21,8 @@ use Mollie\Payment\Service\Order\SecondChanceEmail;
 
 class SendSecondChanceEmail extends Action implements HttpPostActionInterface
 {
+    public const ADMIN_RESOURCE = 'Mollie_Payment::payment_reminders';
+
     public function __construct(
         Context $context,
         private OrderRepositoryInterface $orderRepository,

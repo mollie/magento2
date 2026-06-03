@@ -238,6 +238,7 @@
 "Mollie ID","Mollie ID"
 "Mollie Payment Fee","Poplatok za platbu Mollie"
 "Mollie Payment Reminders","Pripomienky Mollie platieb"
+"Mollie Payment: queue consumer not configured","Mollie Payment: konzument fronty nie je nakonfigurovaný"
 "Mollie PayPal ID","Mollie PayPal ID"
 "Mollie: Received a chargeback with an amount of %1","Mollie: Prijatý chargeback vo výške %1"
 "Multibanco","Multibanco"
@@ -263,6 +264,7 @@
 "On Shipment","Pri odoslaní"
 "Only use this function if you want to integrate the Mollie extension with a PWA storefront.
                     More information can be found <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">here</a>.","Túto funkciu používajte iba v prípade, že chcete integrovať rozšírenie Mollie s PWA storefront.
+"Queue processing is enabled but ""mollie.transaction.processor"" is missing from your cron_consumers_runner/consumers whitelist in env.php. Webhooks will be enqueued but never processed, leaving orders stuck in pending_payment. Add ""mollie.transaction.processor"" to the whitelist, or disable queue processing under Stores > Configuration > Mollie > General.","Spracovanie fronty je povolené, ale ""mollie.transaction.processor"" chýba v zozname povolených cron_consumers_runner/consumers v env.php. Webhooky budú zaradené do fronty, ale nikdy nespracované, čo spôsobí, že objednávky uviaznú v stave pending_payment. Pridajte ""mollie.transaction.processor"" do zoznamu povolených alebo vypnite spracovanie fronty v časti Obchody > Konfigurácia > Mollie > Všeobecné."
                     Viac informácií nájdete <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">tu</a>."
 "Order","Objednať"
 "Order %1 has already transaction %1 linked to it. Skipping","Objednávka %1 má už transakciu %1 prepojenú. Preskakuje sa"

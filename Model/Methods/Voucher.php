@@ -10,7 +10,6 @@ namespace Mollie\Payment\Model\Methods;
 
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\Event\ManagerInterface;
-use Magento\Framework\Registry;
 use Magento\Framework\View\Asset\Repository as AssetRepository;
 use Magento\Payment\Gateway\Command\CommandManagerInterface;
 use Magento\Payment\Gateway\Command\CommandPoolInterface;
@@ -43,7 +42,6 @@ class Voucher extends Mollie
         ManagerInterface $eventManager,
         ValueHandlerPoolInterface $valueHandlerPool,
         PaymentDataObjectFactory $paymentDataObjectFactory,
-        Registry $registry,
         OrderRepository $orderRepository,
         PaymentsApi $paymentsApi,
         MollieHelper $mollieHelper,
@@ -65,7 +63,6 @@ class Voucher extends Mollie
             $eventManager,
             $valueHandlerPool,
             $paymentDataObjectFactory,
-            $registry,
             $orderRepository,
             $paymentsApi,
             $mollieHelper,

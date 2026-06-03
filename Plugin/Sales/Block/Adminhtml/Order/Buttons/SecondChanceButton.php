@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons;
 
+use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Block\Adminhtml\Order\View;
 use Magento\Sales\Model\Order;
@@ -17,7 +18,8 @@ class SecondChanceButton implements ButtonInterface
 {
     public function __construct(
         private Config $config,
-        private UrlInterface $url
+        private UrlInterface $url,
+        private AuthorizationInterface $authorization,
     ) {}
 
     /**
@@ -25,6 +27,10 @@ class SecondChanceButton implements ButtonInterface
      */
     public function add(View $view): void
     {
+        if (!$this->authorization->isAllowed('Mollie_Payment::payment_reminders')) {
+            return;
+        }
+
         if (!$this->config->isSecondChanceEmailEnabled(storeId($view->getOrder()->getStoreId()))) {
             return;
         }

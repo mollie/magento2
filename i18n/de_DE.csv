@@ -238,6 +238,7 @@
 "Mollie ID","Mollie-ID"
 "Mollie Payment Fee","Mollie-Zahlungsgebühr"
 "Mollie Payment Reminders","Mollie-Zahlungserinnerungen"
+"Mollie Payment: queue consumer not configured","Mollie Payment: Warteschlangen-Consumer nicht konfiguriert"
 "Mollie PayPal ID","Mollie PayPal-ID"
 "Mollie: Received a chargeback with an amount of %1","Mollie: Eine Rückbuchung in Höhe von %1 wurde erhalten"
 "Multibanco","Multibanco"
@@ -263,6 +264,7 @@
 "On Shipment","Bei Versand"
 "Only use this function if you want to integrate the Mollie extension with a PWA storefront.
                     More information can be found <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">here</a>.","Verwenden Sie diese Funktion nur, wenn Sie die Mollie-Erweiterung mit einem PWA-Storefront integrieren möchten.
+"Queue processing is enabled but ""mollie.transaction.processor"" is missing from your cron_consumers_runner/consumers whitelist in env.php. Webhooks will be enqueued but never processed, leaving orders stuck in pending_payment. Add ""mollie.transaction.processor"" to the whitelist, or disable queue processing under Stores > Configuration > Mollie > General.","Die Warteschlangenverarbeitung ist aktiviert, aber ""mollie.transaction.processor"" fehlt in der cron_consumers_runner/consumers-Whitelist in env.php. Webhooks werden in die Warteschlange eingereiht, aber nie verarbeitet, sodass Bestellungen im Status pending_payment stecken bleiben. Fügen Sie ""mollie.transaction.processor"" zur Whitelist hinzu oder deaktivieren Sie die Warteschlangenverarbeitung unter Shops > Konfiguration > Mollie > Allgemein."
                     Weitere Informationen finden Sie <a href=""https://github.com/mollie/magento2/wiki/PWA-integration"" target=""_blank"">hier</a>."
 "Order","Bestellen"
 "Order %1 has already transaction %1 linked to it. Skipping","Bestellung %1 hat bereits Transaktion %1 verknüpft. Wird übersprungen"

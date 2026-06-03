@@ -33,9 +33,7 @@ class MollieConfigCollector implements CollectorInterface
         return "- mollie-config.json\n"
             . "  The Mollie-owned configuration rows from your store's core_config_data\n"
             . "  table (all settings under \"payment/mollie*\"), plus a list of configuration\n"
-            . "  paths that are using the built-in defaults. API keys appear only in their\n"
-            . "  encrypted form (prefixed with \"0:3:\" or similar) exactly as stored in the\n"
-            . "  database; they are not decrypted.";
+            . "  paths that are using the built-in defaults. API key values are redacted.";
     }
 
     public function render(): string
@@ -54,7 +52,7 @@ class MollieConfigCollector implements CollectorInterface
     /**
      * Fetches every core_config_data row whose path is Mollie-owned.
      *
-     * Encrypted values (API keys) are returned as stored, without decryption.
+     * API key values are replaced with [REDACTED].
      *
      * @return array<int, array<string, mixed>>
      */
@@ -72,11 +70,12 @@ class MollieConfigCollector implements CollectorInterface
 
         $result = [];
         foreach ($rows as $row) {
+            $path = (string)$row['path'];
             $result[] = [
                 'scope' => (string)$row['scope'],
                 'scope_id' => (int)$row['scope_id'],
-                'path' => (string)$row['path'],
-                'value' => $row['value'],
+                'path' => $path,
+                'value' => str_contains($path, 'apikey') ? '[REDACTED]' : $row['value'],
             ];
         }
 

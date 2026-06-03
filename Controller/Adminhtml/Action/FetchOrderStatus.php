@@ -19,6 +19,8 @@ use Mollie\Payment\Model\Mollie;
 
 class FetchOrderStatus extends Action implements HttpPostActionInterface
 {
+    public const ADMIN_RESOURCE = 'Magento_Sales::actions';
+
     public function __construct(
         Context $context,
         private Mollie $mollieModel,

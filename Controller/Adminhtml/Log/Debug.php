@@ -20,6 +20,7 @@ use Magento\Framework\Filesystem\Driver\File;
 
 class Debug extends Action implements HttpPostActionInterface
 {
+    public const ADMIN_RESOURCE = 'Mollie_Payment::config';
     /**
      * Debug log file path pattern
      */
