@@ -28,7 +28,7 @@ class DeleteSent extends Action implements HttpPostActionInterface
 
     public function execute(): ResponseInterface
     {
-        $this->sentPaymentReminderRepository->deleteById($this->getRequest()->getParam('id'));
+        $this->sentPaymentReminderRepository->deleteById((int)$this->getRequest()->getParam('id'));
 
         $this->messageManager->addSuccessMessage(__('The payment reminder has been removed'));
 

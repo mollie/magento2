@@ -10,7 +10,6 @@ namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Encryption\EncryptorInterface;
-use Magento\Framework\Exception\NoSuchEntityException;
 use Mollie\Payment\Api\Data\PendingPaymentReminderInterface;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 
@@ -19,36 +18,31 @@ class DeletePaymentReminder
     public function __construct(
         private EncryptorInterface $encryptor,
         private SearchCriteriaBuilderFactory $criteriaBuilderFactory,
-        private PendingPaymentReminderRepositoryInterface $paymentReminderRepository
+        private PendingPaymentReminderRepositoryInterface $paymentReminderRepository,
     ) {}
 
-    /**
-     * Delete payment reminders by reference
-     * This reference can be a customer ID or Email Address
-     *
-     * @param string|int|null $reference
-     */
-    public function delete($reference): void
+    public function deleteByCustomerId(int $customerId): void
     {
-        if (empty($reference)) {
+        $criteria = $this->criteriaBuilderFactory->create();
+        $criteria->addFilter(PendingPaymentReminderInterface::CUSTOMER_ID, $customerId);
+
+        foreach ($this->paymentReminderRepository->getList($criteria->create())->getItems() as $reminder) {
+            $this->paymentReminderRepository->delete($reminder);
+        }
+    }
+
+    public function deleteByEmail(string $email): void
+    {
+        if ($email === '') {
             return;
         }
 
         $criteria = $this->criteriaBuilderFactory->create();
-        if (is_numeric($reference)) {
-            $criteria->addFilter(PendingPaymentReminderInterface::CUSTOMER_ID, $reference);
-        } else {
-            $criteria->addFilter(PendingPaymentReminderInterface::CUSTOMER_ID, '', 'null');
-            $criteria->addFilter(PendingPaymentReminderInterface::HASH, $this->encryptor->hash($reference));
-        }
+        $criteria->addFilter(PendingPaymentReminderInterface::CUSTOMER_ID, '', 'null');
+        $criteria->addFilter(PendingPaymentReminderInterface::HASH, $this->encryptor->hash($email));
 
-        $reminders = $this->paymentReminderRepository->getList($criteria->create());
-        foreach ($reminders->getItems() as $reminder) {
-            try {
-                $this->paymentReminderRepository->delete($reminder);
-            } catch (NoSuchEntityException $exception) {
-                // Silence is golden
-            }
+        foreach ($this->paymentReminderRepository->getList($criteria->create())->getItems() as $reminder) {
+            $this->paymentReminderRepository->delete($reminder);
         }
     }
 }

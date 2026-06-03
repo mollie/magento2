@@ -80,29 +80,33 @@ class PaymentReminder
 
     private function moveReminderFromPendingToSent(OrderInterface $order, PendingPaymentReminderInterface $pendingPaymentReminder): void
     {
-        if ($this->isAlreadySend($order)) {
-            // Already sent, so delete the pending payment reminder.
+        if ($this->isAlreadySent($order)) {
             $this->pendingPaymentReminderRepository->delete($pendingPaymentReminder);
-
+            $this->deleteRemindersByOrder($order);
             return;
         }
 
         /** @var SentPaymentReminderInterface $sent */
         $sent = $this->sentPaymentReminderFactory->create();
         $sent->setOrderId($pendingPaymentReminder->getOrderId());
-
         $this->sentPaymentReminderRepository->save($sent);
 
-        $this->deletePaymentReminder->delete($order->getCustomerId() ?: $order->getCustomerEmail());
+        $this->deleteRemindersByOrder($order);
     }
 
-    private function isAlreadySend(OrderInterface $order): bool
+    private function deleteRemindersByOrder(OrderInterface $order): void
+    {
+        if ($customerId = $order->getCustomerId()) {
+            $this->deletePaymentReminder->deleteByCustomerId((int)$customerId);
+            return;
+        }
+        $this->deletePaymentReminder->deleteByEmail((string)$order->getCustomerEmail());
+    }
+
+    private function isAlreadySent(OrderInterface $order): bool
     {
         try {
-            // The next line throws an exception if the order does not exists
-            $this->sentPaymentReminderRepository->getByOrderId($order->getEntityId());
-            $this->deletePaymentReminder->delete($order->getCustomerId() ?: $order->getCustomerEmail());
-
+            $this->sentPaymentReminderRepository->getByOrderId((int)$order->getEntityId());
             return true;
         } catch (NoSuchEntityException $exception) {
             return false;

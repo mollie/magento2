@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Mollie\Payment\Model;
 
 use Exception;
-use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
@@ -17,10 +16,7 @@ use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Reflection\DataObjectProcessor;
-use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Api\Data\SentPaymentReminderInterface;
-use Mollie\Payment\Api\Data\SentPaymentReminderInterfaceFactory;
 use Mollie\Payment\Api\Data\SentPaymentReminderSearchResultsInterfaceFactory;
 use Mollie\Payment\Api\SentPaymentReminderRepositoryInterface;
 use Mollie\Payment\Model\ResourceModel\SentPaymentReminder as ResourceSentPaymentReminder;
@@ -38,27 +34,17 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
      */
     protected $searchResultsFactory;
 
-    /**
-     * @var SentPaymentReminderInterfaceFactory
-     */
-    protected $dataSentPaymentReminderFactory;
-
     public function __construct(
         protected ResourceSentPaymentReminder $resource,
         SentPaymentReminderFactory $sentPaymentReminderFactory,
-        SentPaymentReminderInterfaceFactory $dataSentPaymentReminderFactory,
         protected SentPaymentReminderCollectionFactory $sentPaymentReminderCollectionFactory,
         SentPaymentReminderSearchResultsInterfaceFactory $searchResultsFactory,
-        protected DataObjectHelper $dataObjectHelper,
-        protected DataObjectProcessor $dataObjectProcessor,
-        private StoreManagerInterface $storeManager,
         private CollectionProcessorInterface $collectionProcessor,
         protected JoinProcessorInterface $extensionAttributesJoinProcessor,
         protected ExtensibleDataObjectConverter $extensibleDataObjectConverter,
     ) {
         $this->sentPaymentReminderFactory = $sentPaymentReminderFactory;
         $this->searchResultsFactory = $searchResultsFactory;
-        $this->dataSentPaymentReminderFactory = $dataSentPaymentReminderFactory;
     }
 
     /**
@@ -66,11 +52,6 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
      */
     public function save(SentPaymentReminderInterface $sentPaymentReminder)
     {
-        /* if (empty($sentPaymentReminder->getStoreId())) {
-            $storeId = $this->storeManager->getStore()->getId();
-            $sentPaymentReminder->setStoreId($storeId);
-        } */
-
         $sentPaymentReminderData = $this->extensibleDataObjectConverter->toNestedArray(
             $sentPaymentReminder,
             [],
@@ -153,9 +134,9 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
     public function delete(SentPaymentReminderInterface $sentPaymentReminder): bool
     {
         try {
-            $sentPaymentReminderModel = $this->sentPaymentReminderFactory->create();
-            $this->resource->load($sentPaymentReminderModel, $sentPaymentReminder->getEntityId());
-            $this->resource->delete($sentPaymentReminderModel);
+            $model = $this->sentPaymentReminderFactory->create();
+            $model->setId($sentPaymentReminder->getEntityId());
+            $this->resource->delete($model);
         } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the SentPaymentReminder: %1',
@@ -171,6 +152,20 @@ class SentPaymentReminderRepository implements SentPaymentReminderRepositoryInte
      */
     public function deleteById(int $id): bool
     {
-        return $this->delete($this->get($id));
+        $model = $this->sentPaymentReminderFactory->create();
+        $this->resource->load($model, $id);
+        if (!$model->getId()) {
+            throw new NoSuchEntityException(__('SentPaymentReminder with id "%1" does not exist.', $id));
+        }
+        try {
+            $this->resource->delete($model);
+        } catch (Exception $exception) {
+            throw new CouldNotDeleteException(__(
+                'Could not delete the SentPaymentReminder: %1',
+                $exception->getMessage(),
+            ));
+        }
+
+        return true;
     }
 }

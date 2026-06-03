@@ -12,6 +12,7 @@ namespace Mollie\Payment\Controller\Adminhtml\Reminder;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Ui\Component\MassAction\Filter;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Model\PendingPaymentReminder;
@@ -30,13 +31,13 @@ class DeletePendingMassAction extends Action implements HttpPostActionInterface
         parent::__construct($context);
     }
 
-    public function execute()
+    public function execute(): ResponseInterface
     {
         $collection = $this->filter->getCollection($this->collectionFactory->create());
 
         /** @var PendingPaymentReminder $item */
         foreach ($collection->getItems() as $item) {
-            $this->pendingPaymentReminderRepository->deleteById($item->getData('entity_id'));
+            $this->pendingPaymentReminderRepository->deleteById((int)$item->getData('entity_id'));
         }
 
         $this->messageManager->addSuccessMessage(__('The selected payment reminders have been removed'));

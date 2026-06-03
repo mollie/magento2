@@ -37,7 +37,7 @@ class DeleteSentMassAction extends Action implements HttpPostActionInterface
 
         /** @var SentPaymentReminder $item */
         foreach ($collection->getItems() as $item) {
-            $this->sentPaymentReminderRepository->deleteById($item->getData('entity_id'));
+            $this->sentPaymentReminderRepository->deleteById((int)$item->getData('entity_id'));
         }
 
         $this->messageManager->addSuccessMessage(__('The selected payment reminders have been removed'));

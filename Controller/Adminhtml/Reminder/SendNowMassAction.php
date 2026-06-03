@@ -12,8 +12,8 @@ namespace Mollie\Payment\Controller\Adminhtml\Reminder;
 use Magento\Backend\App\Action;
 use Magento\Backend\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\ResponseInterface;
 use Magento\Ui\Component\MassAction\Filter;
-use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Model\PendingPaymentReminder;
 use Mollie\Payment\Model\ResourceModel\PendingPaymentReminder\CollectionFactory;
 use Mollie\Payment\Service\Order\PaymentReminder;
@@ -25,14 +25,13 @@ class SendNowMassAction extends Action implements HttpPostActionInterface
     public function __construct(
         Context $context,
         private PaymentReminder $paymentReminder,
-        private PendingPaymentReminderRepositoryInterface $pendingPaymentReminderRepository,
         private Filter $filter,
         private CollectionFactory $collectionFactory,
     ) {
         parent::__construct($context);
     }
 
-    public function execute()
+    public function execute(): ResponseInterface
     {
         $collection = $this->filter->getCollection($this->collectionFactory->create());
 

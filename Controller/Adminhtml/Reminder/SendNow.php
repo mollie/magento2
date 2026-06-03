@@ -30,7 +30,7 @@ class SendNow extends Action implements HttpPostActionInterface
 
     public function execute(): ResponseInterface
     {
-        $reminder = $this->pendingPaymentReminderRepository->get($this->getRequest()->getParam('id'));
+        $reminder = $this->pendingPaymentReminderRepository->get((int)$this->getRequest()->getParam('id'));
 
         $order = $this->paymentReminder->send($reminder);
 

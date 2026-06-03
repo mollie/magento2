@@ -49,6 +49,11 @@ class PendingActions extends Column
                     ['id' => $item['entity_id']],
                 ),
                 'label' => __('Delete'),
+                'confirm' => [
+                    'title' => __('Delete payment reminder'),
+                    'message' => __('Are you sure you want to delete this payment reminder?'),
+                ],
+                'post' => true,
             ];
 
             $item[$name]['send_now'] = [
@@ -57,6 +62,11 @@ class PendingActions extends Column
                     ['id' => $item['entity_id']],
                 ),
                 'label' => __('Send now'),
+                'confirm' => [
+                    'title' => __('Send payment reminder'),
+                    'message' => __('Are you sure you want to send this payment reminder now?'),
+                ],
+                'post' => true,
             ];
         }
 

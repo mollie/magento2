@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Mollie\Payment\Model;
 
 use Exception;
-use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
@@ -17,10 +16,7 @@ use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Exception\CouldNotDeleteException;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Reflection\DataObjectProcessor;
-use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Api\Data\PendingPaymentReminderInterface;
-use Mollie\Payment\Api\Data\PendingPaymentReminderInterfaceFactory;
 use Mollie\Payment\Api\Data\PendingPaymentReminderSearchResultsInterfaceFactory;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Model\ResourceModel\PendingPaymentReminder as ResourcePendingPaymentReminder;
@@ -28,8 +24,15 @@ use Mollie\Payment\Model\ResourceModel\PendingPaymentReminder\CollectionFactory 
 
 class PendingPaymentReminderRepository implements PendingPaymentReminderRepositoryInterface
 {
-    public function __construct(protected ResourcePendingPaymentReminder $resource, protected PendingPaymentReminderFactory $pendingPaymentReminderFactory, protected PendingPaymentReminderInterfaceFactory $dataPendingPaymentReminderFactory, protected PendingPaymentReminderCollectionFactory $pendingPaymentReminderCollectionFactory, protected PendingPaymentReminderSearchResultsInterfaceFactory $searchResultsFactory, protected DataObjectHelper $dataObjectHelper, protected DataObjectProcessor $dataObjectProcessor, private StoreManagerInterface $storeManager, private CollectionProcessorInterface $collectionProcessor, protected JoinProcessorInterface $extensionAttributesJoinProcessor, protected ExtensibleDataObjectConverter $extensibleDataObjectConverter)
-    {
+    public function __construct(
+        protected ResourcePendingPaymentReminder $resource,
+        protected PendingPaymentReminderFactory $pendingPaymentReminderFactory,
+        protected PendingPaymentReminderCollectionFactory $pendingPaymentReminderCollectionFactory,
+        protected PendingPaymentReminderSearchResultsInterfaceFactory $searchResultsFactory,
+        private CollectionProcessorInterface $collectionProcessor,
+        protected JoinProcessorInterface $extensionAttributesJoinProcessor,
+        protected ExtensibleDataObjectConverter $extensibleDataObjectConverter,
+    ) {
     }
 
     /**
@@ -37,11 +40,6 @@ class PendingPaymentReminderRepository implements PendingPaymentReminderReposito
      */
     public function save(PendingPaymentReminderInterface $pendingPaymentReminder)
     {
-        /* if (empty($pendingPaymentReminder->getStoreId())) {
-            $storeId = $this->storeManager->getStore()->getId();
-            $pendingPaymentReminder->setStoreId($storeId);
-        } */
-
         $pendingPaymentReminderData = $this->extensibleDataObjectConverter->toNestedArray(
             $pendingPaymentReminder,
             [],
@@ -124,9 +122,9 @@ class PendingPaymentReminderRepository implements PendingPaymentReminderReposito
     public function delete(PendingPaymentReminderInterface $pendingPaymentReminder): bool
     {
         try {
-            $pendingPaymentReminderModel = $this->pendingPaymentReminderFactory->create();
-            $this->resource->load($pendingPaymentReminderModel, $pendingPaymentReminder->getEntityId());
-            $this->resource->delete($pendingPaymentReminderModel);
+            $model = $this->pendingPaymentReminderFactory->create();
+            $model->setId($pendingPaymentReminder->getEntityId());
+            $this->resource->delete($model);
         } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
                 'Could not delete the PendingPaymentReminder: %1',
@@ -142,7 +140,21 @@ class PendingPaymentReminderRepository implements PendingPaymentReminderReposito
      */
     public function deleteById(int $id): bool
     {
-        return $this->delete($this->get($id));
+        $model = $this->pendingPaymentReminderFactory->create();
+        $this->resource->load($model, $id);
+        if (!$model->getId()) {
+            throw new NoSuchEntityException(__('PendingPaymentReminder with id "%1" does not exist.', $id));
+        }
+        try {
+            $this->resource->delete($model);
+        } catch (Exception $exception) {
+            throw new CouldNotDeleteException(__(
+                'Could not delete the PendingPaymentReminder: %1',
+                $exception->getMessage(),
+            ));
+        }
+
+        return true;
     }
 
     /**
