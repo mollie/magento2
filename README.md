@@ -17,19 +17,19 @@ We recently released version 3.0 of the Mollie Payment extension. Some of the hi
 - Optional invoices
 - Cancel order on manual checkout return
 
-For more information, see this wiki page: [Version 3.0](https://github.com/mollie/magento2/wiki/V3)
+For more information, see the upgrade guides in [English](docs/en/UPGRADING.md) and [Dutch](docs/nl/UPGRADING.md).
 
 ## Installation & Update the Mollie Payments plugin
 
-[1. Installation through Magento Marketplace](https://github.com/mollie/magento2/wiki/Installation-using-Marketplace)
+[1. Installation through Magento Marketplace](docs/en/INSTALLATION.md#installation-via-magento-marketplace)
 
-[2. Installation by Composer](https://github.com/mollie/magento2/wiki/Installation-using-Composer)
+[2. Installation by Composer](docs/en/INSTALLATION.md#installation-via-composer)
 
-[3. Update by Composer](https://github.com/mollie/magento2/wiki/Update-through-Composer)
+[3. Update by Composer](docs/en/INSTALLATION.md#update-an-existing-installation)
 
-[- Configuration](https://github.com/mollie/magento2/wiki/Configure-the-extension)
+[- Configuration](docs/en/CONFIGURATION.md)
 
-[- Troubleshooting](https://github.com/mollie/magento2/wiki/Troubleshooting)
+[- Troubleshooting](docs/en/TROUBLESHOOTING.md)
 
 ## About Mollie Payments
 With Mollie, you can accept payments and donations online and expand your customer base internationally with support for all major payment methods through a single integration. No need to spend weeks on paperwork or security compliance procedures. No more lost conversions because you don’t support a shopper’s favourite payment method or because they don’t feel safe. We made our products and API expansive, intuitive, and safe for merchants, customers and developers alike. 
@@ -88,7 +88,7 @@ To extend the functionality of the Mollie Magento 2 plugin, we have developed a 
 - [Scandi PWA](https://github.com/mollie/magento2-scandipwa)
 
 ## Configuration, FAQ and Troubleshooting
-If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension in Magento 2.3.3 and higher, please see our [WIKI Page](https://github.com/mollie/magento2/wiki) or send an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
+If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension, please see the [full documentation](docs/en/README.md) or send an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
 
 ## Compatible modules
 
