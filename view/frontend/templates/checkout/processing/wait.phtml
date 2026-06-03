@@ -1,0 +1,90 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
+
+/** @var Escaper $escaper */
+/** @var Template $block */
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+
+?>
+
+<div id="loading-mask"></div>
+
+<div id="mollie-order-status"><?= $escaper->escapeHtml(__('Current Status: Loading...')); ?></div>
+<div id="mollie-order-error"></div>
+
+<script>
+    require([
+        'jquery',
+        'mage/storage',
+        'mage/translate',
+        'Magento_Customer/js/customer-data',
+        'loader',
+    ], function ($, storage, __, customerData) {
+        var serviceUrl = '<?= $escaper->escapeJs($block->getData('status_url')); ?>';
+        var redirectUrl = '<?= $escaper->escapeJs($block->getData('redirect_url')); ?>';
+        var resetUrl = '<?= $escaper->escapeJs($block->getData('reset_url')); ?>';
+        var cartUrl = '<?= $escaper->escapeJs($block->getData('cart_url')); ?>';
+        var statusElement = document.getElementById('mollie-order-status');
+        var errorElement = document.getElementById('mollie-order-error');
+        var waitTime = 100;
+
+        $('#loading-mask').loader({
+            'icon': '<?= $escaper->escapeUrl($block->getViewFileUrl('images/loader-1.gif')); ?>'
+        }).loader('show');
+
+        var sections = ['cart'];
+        customerData.initStorage();
+        customerData.invalidate(sections);
+        customerData.reload(sections, true);
+
+        function checkOrderStatus() {
+            if (waitTime < 1000) {
+                waitTime += 100;
+            }
+
+            storage.post(serviceUrl).done(function (response) {
+                statusElement.style.display = 'block';
+                errorElement.style.display = 'none';
+
+                var status = response[0].status;
+                if (status === 'processing') {
+                    window.location.href = redirectUrl;
+                    return;
+                }
+
+                statusElement.innerHTML = __('Current Status: %1').replace('%1', status);
+
+                if (status === 'canceled') {
+                    storage.post(resetUrl).done(function () {
+                        window.location.href = cartUrl;
+                    });
+                    return;
+                }
+
+                setTimeout(checkOrderStatus, waitTime);
+            }).fail(function (error) {
+                if (error.status === 404 || error.status === 400) {
+                    setTimeout(checkOrderStatus, waitTime);
+                    return;
+                }
+
+                statusElement.style.display = 'none';
+                errorElement.style.display = 'block';
+                errorElement.innerHTML = __('Something went wrong while fetching order. Retrying...');
+            });
+        }
+
+        checkOrderStatus();
+
+        setTimeout(function () {
+            window.location.href = redirectUrl;
+        }, 60 * 1000);
+    });
+</script>

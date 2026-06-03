@@ -108,6 +108,27 @@ class ProcessTest extends AbstractController
     }
 
     /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testRedirectsToProcessingWaitPageWhenPaymentIsAwaitingConfirmation(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $this->fakeValidation([(string) $order->getId() => 'abc']);
+
+        $fake = $this->_objectManager->create(ProcessTransactionFake::class);
+        $fake->setResponse($this->_objectManager->create(
+            GetMollieStatusResult::class,
+            ['status' => 'open', 'method' => 'paypal'],
+        ));
+
+        $this->_objectManager->addSharedInstance($fake, ProcessTransaction::class);
+
+        $this->dispatch('mollie/checkout/process?order_id=' . $order->getId());
+
+        $this->assertRedirect($this->stringContains('mollie/checkout/processingwait'));
+    }
+
+    /**
      * @param $orderId
      * @return OrderInterface
      */

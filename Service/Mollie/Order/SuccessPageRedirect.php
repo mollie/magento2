@@ -72,7 +72,7 @@ class SuccessPageRedirect
         return $this->redirectToSuccessPage($order, $orderIds);
     }
 
-    private function redirectToSuccessPage(OrderInterface $order, array $orderIds): ResponseInterface
+    public function redirectToSuccessPage(OrderInterface $order, array $orderIds): ResponseInterface
     {
         $this->checkoutSession->setLastOrderId($order->getId());
         $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
