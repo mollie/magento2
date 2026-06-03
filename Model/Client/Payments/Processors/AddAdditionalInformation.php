@@ -29,7 +29,8 @@ class AddAdditionalInformation implements PaymentProcessorInterface
         ProcessTransactionResponse $response,
     ): ?ProcessTransactionResponse {
         $magentoPayment = $order->getPayment();
-        $dashboardUrl = $this->dashboardUrl->forPaymentsApi(storeId($order->getStoreId()), $molliePayment->id);
+        $dashboardUrl = $molliePayment->_links->dashboard->href
+            ?? $this->dashboardUrl->forPaymentsApi(storeId($order->getStoreId()), $molliePayment->id);
         $magentoPayment->setAdditionalInformation('dashboard_url', $dashboardUrl);
         $magentoPayment->setAdditionalInformation('mollie_id', $molliePayment->id);
         $magentoPayment->setAdditionalInformation('method', $molliePayment->method);
