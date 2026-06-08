@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie;
 
@@ -10,32 +12,16 @@ use Mollie\Payment\Config;
 
 class DashboardUrl
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
-    public function forOrdersApi($storeId, string $id): string
+    public function forPaymentsApi(?int $storeId, string $id): string
     {
         return str_replace(
             '{id}',
             $id,
-            $this->config->getDashboardUrlForOrdersApi($storeId)
-        );
-    }
-
-    public function forPaymentsApi($storeId, string $id): string
-    {
-        return str_replace(
-            '{id}',
-            $id,
-            $this->config->getDashboardUrlForPaymentsApi($storeId)
+            $this->config->getDashboardUrlForPaymentsApi($storeId),
         );
     }
 }

@@ -1,12 +1,11 @@
 <?php
-/**
- * Copyright Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Data;
 
 use Magento\Framework\Api\AbstractExtensibleObject;
+use Mollie\Payment\Api\Data\PaymentTokenExtensionInterface;
 use Mollie\Payment\Api\Data\PaymentTokenInterface;
 
 class PaymentToken extends AbstractExtensibleObject implements PaymentTokenInterface
@@ -23,7 +22,7 @@ class PaymentToken extends AbstractExtensibleObject implements PaymentTokenInter
     /**
      * Set entity_id
      * @param string $entityId
-     * @return \Mollie\Payment\Api\Data\PaymentTokenInterface
+     * @return PaymentTokenInterface
      */
     public function setEntityId($entityId)
     {
@@ -42,7 +41,7 @@ class PaymentToken extends AbstractExtensibleObject implements PaymentTokenInter
     /**
      * Set quote_id
      * @param int $cartId
-     * @return \Mollie\Payment\Api\Data\PaymentTokenInterface
+     * @return PaymentTokenInterface
      */
     public function setCartId($cartId)
     {
@@ -61,7 +60,7 @@ class PaymentToken extends AbstractExtensibleObject implements PaymentTokenInter
     /**
      * Set order_id
      * @param int $orderId
-     * @return \Mollie\Payment\Api\Data\PaymentTokenInterface
+     * @return PaymentTokenInterface
      */
     public function setOrderId($orderId)
     {
@@ -80,7 +79,7 @@ class PaymentToken extends AbstractExtensibleObject implements PaymentTokenInter
     /**
      * Set token
      * @param string $token
-     * @return \Mollie\Payment\Api\Data\PaymentTokenInterface
+     * @return PaymentTokenInterface
      */
     public function setToken($token)
     {
@@ -89,7 +88,7 @@ class PaymentToken extends AbstractExtensibleObject implements PaymentTokenInter
 
     /**
      * Retrieve existing extension attributes object or create a new one.
-     * @return \Mollie\Payment\Api\Data\PaymentTokenExtensionInterface|null
+     * @return PaymentTokenExtensionInterface|null
      */
     public function getExtensionAttributes()
     {
@@ -98,11 +97,11 @@ class PaymentToken extends AbstractExtensibleObject implements PaymentTokenInter
 
     /**
      * Set an extension attributes object.
-     * @param \Mollie\Payment\Api\Data\PaymentTokenExtensionInterface $extensionAttributes
+     * @param PaymentTokenExtensionInterface $extensionAttributes
      * @return $this
      */
     public function setExtensionAttributes(
-        \Mollie\Payment\Api\Data\PaymentTokenExtensionInterface $extensionAttributes
+        PaymentTokenExtensionInterface $extensionAttributes,
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

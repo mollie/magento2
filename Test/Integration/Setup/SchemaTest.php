@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Setup;
 
@@ -8,7 +14,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class SchemaTest extends IntegrationTestCase
 {
-    public static function addedColumnsHaveIndexesProvider()
+    public static function addedColumnsHaveIndexesProvider(): array
     {
         return [
             ['sales_order', 'mollie_transaction_id'],
@@ -20,7 +26,7 @@ class SchemaTest extends IntegrationTestCase
      * @dataProvider addedColumnsHaveIndexesProvider
      */
     #[DataProvider('addedColumnsHaveIndexesProvider')]
-    public function testAddedColumnsHaveIndexes($tableName, $columnName)
+    public function testAddedColumnsHaveIndexes(string $tableName, string $columnName): void
     {
         /** @var ResourceConnection $resource */
         $resource = $this->objectManager->get(ResourceConnection::class);
@@ -40,7 +46,7 @@ class SchemaTest extends IntegrationTestCase
         $this->fail('There was no index found for `' . $columnName . '` in `' . $tableName . '`');
     }
 
-    public static function thePaymentFeeColumnsExistsProvider()
+    public static function thePaymentFeeColumnsExistsProvider(): array
     {
         return [
             ['quote'],
@@ -55,7 +61,7 @@ class SchemaTest extends IntegrationTestCase
      * @dataProvider thePaymentFeeColumnsExistsProvider
      */
     #[DataProvider('thePaymentFeeColumnsExistsProvider')]
-    public function testThePaymentFeeColumnsExists($tableName)
+    public function testThePaymentFeeColumnsExists(string $tableName): void
     {
         /** @var ResourceConnection $resource */
         $resource = $this->objectManager->get(ResourceConnection::class);
@@ -64,25 +70,25 @@ class SchemaTest extends IntegrationTestCase
         $tableName = $resource->getTableName($tableName);
         $columns = $connection->fetchAll('SHOW COLUMNS FROM ' . $tableName);
 
-        $columns = array_map( function ($column) {
+        $columns = array_map(function (array $column) {
             return $column['Field'];
         }, $columns);
 
         $this->assertTrue(
             in_array('mollie_payment_fee', $columns),
-            sprintf('The "%s" table should have the "mollie_payment_fee" column', $tableName)
+            sprintf('The "%s" table should have the "mollie_payment_fee" column', $tableName),
         );
         $this->assertTrue(
             in_array('base_mollie_payment_fee', $columns),
-            sprintf('The "%s" table should have the "base_mollie_payment_fee" column', $tableName)
+            sprintf('The "%s" table should have the "base_mollie_payment_fee" column', $tableName),
         );
         $this->assertTrue(
             in_array('mollie_payment_fee_tax', $columns),
-            sprintf('The "%s" table should have the "mollie_payment_fee_tax" column', $tableName)
+            sprintf('The "%s" table should have the "mollie_payment_fee_tax" column', $tableName),
         );
         $this->assertTrue(
             in_array('base_mollie_payment_fee_tax', $columns),
-            sprintf('The "%s" table should have the "base_mollie_payment_fee_tax" column', $tableName)
+            sprintf('The "%s" table should have the "base_mollie_payment_fee_tax" column', $tableName),
         );
     }
 
@@ -94,6 +100,7 @@ class SchemaTest extends IntegrationTestCase
             ['mollie_payment_customer'],
             ['mollie_pending_payment_reminder'],
             ['mollie_sent_payment_reminder'],
+            ['mollie_payment_tracking'],
         ];
     }
 
@@ -148,7 +155,7 @@ class SchemaTest extends IntegrationTestCase
                     'cart_id',
                     'order_id',
                     'token',
-                ]
+                ],
             ],
             [
                 'table' => 'mollie_payment_customer',
@@ -156,7 +163,7 @@ class SchemaTest extends IntegrationTestCase
                     'entity_id',
                     'customer_id',
                     'mollie_customer_id',
-                ]
+                ],
             ],
             [
                 'table' => 'mollie_pending_payment_reminder',
@@ -171,6 +178,15 @@ class SchemaTest extends IntegrationTestCase
                 'columns' => [
                     'entity_id',
                     'order_id',
+                    'created_at',
+                ],
+            ],
+            [
+                'table' => 'mollie_payment_tracking',
+                'columns' => [
+                    'entity_id',
+                    'cart_id',
+                    'tracking_data',
                     'created_at',
                 ],
             ],
@@ -192,14 +208,14 @@ class SchemaTest extends IntegrationTestCase
         $tableName = $resource->getTableName($table);
         $rows = $connection->fetchAll('DESCRIBE ' . $tableName);
 
-        $actualColumns = array_map(function ($column) {
+        $actualColumns = array_map(function (array $column) {
             return $column['Field'];
         }, $rows);
 
         foreach ($columns as $column) {
             $this->assertTrue(
                 in_array($column, $actualColumns),
-                sprintf('mollie_order_lines should contain the `%s` column', $column)
+                sprintf('mollie_order_lines should contain the `%s` column', $column),
             );
         }
     }

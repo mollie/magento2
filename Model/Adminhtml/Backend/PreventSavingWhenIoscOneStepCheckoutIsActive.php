@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Backend;
 
@@ -18,23 +20,17 @@ use Magento\Framework\Registry;
 
 class PreventSavingWhenIoscOneStepCheckoutIsActive extends Value
 {
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-
     public function __construct(
         Context $context,
         Registry $registry,
         ScopeConfigInterface $config,
         TypeListInterface $cacheTypeList,
-        Manager $moduleManager,
+        private Manager $moduleManager,
         ?AbstractResource $resource = null,
         ?AbstractDb $resourceCollection = null,
-        array $data = []
+        array $data = [],
     ) {
         parent::__construct($context, $registry, $config, $cacheTypeList, $resource, $resourceCollection, $data);
-        $this->moduleManager = $moduleManager;
     }
 
     public function afterSave()
@@ -43,8 +39,8 @@ class PreventSavingWhenIoscOneStepCheckoutIsActive extends Value
             throw new LocalizedException(
                 __(
                     'Setting the default method does not work when the One Step Checkout extension is enabled. ' .
-                    'Please see Sales -> OneStepCheckout -> Payment method defaults for the same effect.'
-                )
+                    'Please see Sales -> OneStepCheckout -> Payment method defaults for the same effect.',
+                ),
             );
         }
 

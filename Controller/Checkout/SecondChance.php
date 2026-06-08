@@ -1,68 +1,43 @@
 <?php
-/**
+
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\Checkout;
 
 use Exception;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\ResponseInterface;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Api\Data\PaymentTokenInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
-use Mollie\Payment\Model\Methods\Paymentlink;
 use Mollie\Payment\Service\Order\Reorder;
 use Mollie\Payment\Service\PaymentToken\Generate;
 
-class SecondChance extends Action
+class SecondChance extends Action implements HttpGetActionInterface
 {
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
-    /**
-     * @var Reorder
-     */
-    private $reorder;
-
-    /**
-     * @var Paymentlink
-     */
-    private $paymentlink;
-
-    /**
-     * @var Generate
-     */
-    private $generatePaymentToken;
-
     public function __construct(
         Context $context,
-        OrderRepositoryInterface $orderRepository,
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        Reorder $reorder,
-        Paymentlink $paymentlink,
-        Generate $paymentTokenPaymentToken
+        private OrderRepositoryInterface $orderRepository,
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private Reorder $reorder,
+        private Generate $generatePaymentToken,
     ) {
         parent::__construct($context);
-        $this->orderRepository = $orderRepository;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->reorder = $reorder;
-        $this->paymentlink = $paymentlink;
-        $this->generatePaymentToken = $paymentTokenPaymentToken;
     }
 
-    public function execute()
+    public function execute(): ResponseInterface
     {
         try {
             return $this->reorder();
@@ -70,17 +45,18 @@ class SecondChance extends Action
             throw $exception;
         } catch (Exception $exception) {
             $this->messageManager->addExceptionMessage($exception);
+
             return $this->_redirect('/');
         }
     }
 
     /**
-     * @return \Magento\Framework\App\ResponseInterface
+     * @return ResponseInterface
      * @throws NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Mollie\Api\Exceptions\ApiException
+     * @throws LocalizedException
+     * @throws ApiException
      */
-    private function reorder()
+    private function reorder(): ResponseInterface
     {
         $orderId = $this->getRequest()->getParam('order_id');
         $paymentToken = $this->getRequest()->getParam('payment_token');
@@ -107,8 +83,8 @@ class SecondChance extends Action
 
     /**
      * @param OrderInterface $order
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @return PaymentTokenInterface|null
+     * @throws LocalizedException
+     * @return PaymentTokenInterface
      */
     private function getToken(OrderInterface $order): PaymentTokenInterface
     {

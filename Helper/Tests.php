@@ -1,15 +1,18 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
+/*
+ * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Helper;
 
+use Exception;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Mollie\Api\Exceptions\ApiException;
-use Mollie\Payment\Model\Mollie as MollieModel;
+use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 /**
  * Class Tests
@@ -18,16 +21,10 @@ use Mollie\Payment\Model\Mollie as MollieModel;
  */
 class Tests extends AbstractHelper
 {
-    /**
-     * @var MollieModel
-     */
-    private $mollieModel;
-
     public function __construct(
         Context $context,
-        MollieModel $mollieModel
+        private MollieApiClient $mollieApiClient,
     ) {
-        $this->mollieModel = $mollieModel;
         parent::__construct($context);
     }
 
@@ -37,7 +34,7 @@ class Tests extends AbstractHelper
      *
      * @return array
      */
-    public function getMethods($testKey = null, $liveKey = null)
+    public function getMethods(?string $testKey = null, ?string $liveKey = null): array
     {
         $results = [];
 
@@ -49,8 +46,8 @@ class Tests extends AbstractHelper
             } else {
                 try {
                     $availableMethods = [];
-                    $mollieApi = $this->mollieModel->loadMollieApi($testKey);
-                    $methods = $mollieApi->methods->allAvailable() ?? [];
+                    $mollieApi = $this->mollieApiClient->loadByApiKey($testKey);
+                    $methods = $mollieApi->methods->allEnabled() ?? [];
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
@@ -59,7 +56,8 @@ class Tests extends AbstractHelper
                     try {
                         $mollieApi->terminals->page();
                         $availableMethods[] = 'Point of sale';
-                    } catch (ApiException $exception) {}
+                    } catch (ApiException $exception) {
+                    }
 
                     sort($availableMethods);
 
@@ -72,7 +70,7 @@ class Tests extends AbstractHelper
                     }
 
                     $results[] = '<span class="mollie-success">' . __('Test API-key: Success!') . $methodsMsg . '</span>';
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $results[] = '<span class="mollie-error">' . __('Test API-key: %1', $e->getMessage()) . '</span>';
                 }
             }
@@ -86,8 +84,8 @@ class Tests extends AbstractHelper
             } else {
                 try {
                     $availableMethods = [];
-                    $mollieApi = $this->mollieModel->loadMollieApi($liveKey);
-                    $methods = $mollieApi->methods->allAvailable() ?? [];
+                    $mollieApi = $this->mollieApiClient->loadByApiKey($liveKey);
+                    $methods = $mollieApi->methods->allEnabled() ?? [];
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
@@ -96,7 +94,8 @@ class Tests extends AbstractHelper
                     try {
                         $mollieApi->terminals->page();
                         $availableMethods[] = 'Point of sale';
-                    } catch (ApiException $exception) {}
+                    } catch (ApiException $exception) {
+                    }
 
                     sort($availableMethods);
 
@@ -109,7 +108,7 @@ class Tests extends AbstractHelper
                     }
 
                     $results[] = '<span class="mollie-success">' . __('Live API-key: Success!') . $methodsMsg . '</span>';
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $results[] = '<span class="mollie-error">' . __('Live API-key: %1', $e->getMessage()) . '</span>';
                 }
             }

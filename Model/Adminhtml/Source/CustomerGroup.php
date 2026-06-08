@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -9,16 +13,9 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class CustomerGroup implements OptionSourceInterface
 {
-    /**
-     * @var GroupManagementInterface
-     */
-    private $groupManagement;
-
     public function __construct(
-        GroupManagementInterface $groupManagement
-    ) {
-        $this->groupManagement = $groupManagement;
-    }
+        private GroupManagementInterface $groupManagement
+    ) {}
 
     public function toOptionArray(): array
     {

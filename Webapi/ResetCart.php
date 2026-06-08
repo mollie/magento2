@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -16,39 +17,23 @@ use Mollie\Payment\Api\Webapi\ResetCartInterface;
 
 class ResetCart implements ResetCartInterface
 {
-    /**
-     * @var Encryptor
-     */
-    private $encryptor;
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
-
     public function __construct(
-        Encryptor $encryptor,
-        OrderRepositoryInterface $orderRepository,
-        Session $checkoutSession
-    ) {
-        $this->encryptor = $encryptor;
-        $this->orderRepository = $orderRepository;
-        $this->checkoutSession = $checkoutSession;
-    }
+        private Encryptor $encryptor,
+        private OrderRepositoryInterface $orderRepository,
+        private Session $checkoutSession
+    ) {}
 
     public function byHash(string $hash): void
     {
+        // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
         $decodedHash = base64_decode($hash);
         $orderId = $this->encryptor->decrypt($decodedHash);
 
-        $this->checkIfLastRealOrder((int)$orderId);
+        $this->checkIfLastRealOrder((int) $orderId);
         $this->checkoutSession->restoreQuote();
     }
 
-    private function checkIfLastRealOrder(int $orderId)
+    private function checkIfLastRealOrder(int $orderId): void
     {
         if ($this->checkoutSession->getLastRealOrder()->getId()) {
             return;

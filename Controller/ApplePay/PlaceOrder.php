@@ -1,8 +1,11 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\ApplePay;
 
@@ -10,8 +13,11 @@ use Exception;
 use Magento\Checkout\Model\Session;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
@@ -21,94 +27,41 @@ use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\QuoteManagement;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\PaymentToken\Generate;
 use Mollie\Payment\Service\Quote\SetRegionFromApplePayAddress;
 
-class PlaceOrder extends Action
+class PlaceOrder extends Action implements HttpPostActionInterface
 {
-    /**
-     * @var GuestCartRepositoryInterface
-     */
-    private $guestCartRepository;
-
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
-    /**
-     * @var QuoteManagement
-     */
-    private $quoteManagement;
-
-    /**
-     * @var Session
-     */
-    private $checkoutSession;
-
-    /**
-     * @var PaymentTokenRequestInterface
-     */
-    private $paymentTokenRequest;
-
-    /**
-     * @var Generate
-     */
-    private $paymentToken;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-    /**
-     * @var SetRegionFromApplePayAddress
-     */
-    private $setRegionFromApplePayAddress;
-    /**
-     * @var Config
-     */
-    private $config;
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-
     public function __construct(
         Context $context,
-        GuestCartRepositoryInterface $guestCartRepository,
-        CartRepositoryInterface $cartRepository,
-        QuoteManagement $quoteManagement,
-        Session $checkoutSession,
-        Generate $paymentToken,
-        SetRegionFromApplePayAddress $setRegionFromApplePayAddress,
-        OrderRepositoryInterface $orderRepository,
-        Config $config,
-        ScopeConfigInterface $scopeConfig
+        private readonly GuestCartRepositoryInterface $guestCartRepository,
+        private readonly CartRepositoryInterface $cartRepository,
+        private readonly QuoteManagement $quoteManagement,
+        private readonly Session $checkoutSession,
+        private readonly Generate $paymentToken,
+        private readonly SetRegionFromApplePayAddress $setRegionFromApplePayAddress,
+        private readonly OrderRepositoryInterface $orderRepository,
+        private readonly Config $config,
+        private readonly ScopeConfigInterface $scopeConfig,
     ) {
         parent::__construct($context);
-
-        $this->guestCartRepository = $guestCartRepository;
-        $this->cartRepository = $cartRepository;
-        $this->quoteManagement = $quoteManagement;
-        $this->checkoutSession = $checkoutSession;
-        $this->paymentToken = $paymentToken;
-        $this->orderRepository = $orderRepository;
-        $this->setRegionFromApplePayAddress = $setRegionFromApplePayAddress;
-        $this->config = $config;
-        $this->scopeConfig = $scopeConfig;
     }
 
-    public function execute()
+    public function execute(): Json
     {
         $cart = $this->getCart();
 
         $shippingAddress = $cart->getShippingAddress();
-        $this->updateAddress($shippingAddress, $this->getRequest()->getParam('shippingAddress'));
-        $this->updateAddress($cart->getBillingAddress(), $this->getRequest()->getParam('billingAddress'));
+        $shippingAddressData = $this->getRequest()->getParam('shippingAddress');
+        $billingAddressData = $this->getRequest()->getParam('billingAddress');
 
-        $cart->setCustomerEmail($this->getRequest()->getParam('shippingAddress')['emailAddress']);
+        $this->updateAddress($shippingAddress, $shippingAddressData);
+        $this->updateAddress($cart->getBillingAddress(), $billingAddressData);
+
+        $cart->setCustomerFirstname($billingAddressData['givenName'] ?? $shippingAddressData['givenName'] ?? '');
+        $cart->setCustomerLastname($billingAddressData['familyName'] ?? $shippingAddressData['familyName'] ?? '--');
+        $cart->setCustomerEmail($billingAddressData['emailAddress'] ?? $shippingAddressData['emailAddress'] ?? '');
 
         // Orders with digital products can't have a shipping method
         if ($this->getRequest()->getParam('shippingMethod')) {
@@ -116,8 +69,8 @@ class PlaceOrder extends Action
                 str_replace(
                     '__SPLIT__',
                     '_',
-                    $this->getRequest()->getParam('shippingMethod')['identifier']
-                )
+                    $this->getRequest()->getParam('shippingMethod')['identifier'],
+                ),
             );
         }
 
@@ -147,7 +100,7 @@ class PlaceOrder extends Action
 
         $order->getPayment()->setAdditionalInformation(
             'applepay_payment_token',
-            $this->getRequest()->getParam('applePayPaymentToken')
+            $this->getRequest()->getParam('applePayPaymentToken'),
         );
 
         $this->orderRepository->save($order);
@@ -169,10 +122,10 @@ class PlaceOrder extends Action
     }
 
     /**
-     * @throws NoSuchEntityException
      * @return CartInterface
-     */
-    public function getCart(): CartInterface
+     * @throws LocalizedException
+     * @throws NoSuchEntityException*/
+    private function getCart(): CartInterface
     {
         if ($cartId = $this->getRequest()->getParam('cartId')) {
             return $this->guestCartRepository->get($cartId);
@@ -193,7 +146,7 @@ class PlaceOrder extends Action
         return implode(PHP_EOL, $addressLines);
     }
 
-    private function updateAddress(AddressInterface $address, array $input)
+    private function updateAddress(AddressInterface $address, array $input): void
     {
         $address->addData([
             AddressInterface::KEY_STREET => $this->getAddressLines($input['addressLines']),

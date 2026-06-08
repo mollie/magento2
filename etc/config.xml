@@ -4,11 +4,12 @@
   ~ See COPYING.txt for license details.
   -->
 
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
     <default>
         <payment>
             <mollie_general>
-                <version>v2.51.0</version>
+                <version>v3.0.0</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -18,8 +19,6 @@
                 <invoice_moment>authorize</invoice_moment>
                 <invoice_notify>1</invoice_notify>
                 <invoice_notify_klarna>1</invoice_notify_klarna>
-                <!-- Deprecated option -->
-                <loading_screen>0</loading_screen>
                 <debug>1</debug>
                 <model>Mollie\Payment\Model\Methods\General</model>
                 <currency>1</currency>
@@ -33,14 +32,18 @@
                 <second_chance_email_delay>1</second_chance_email_delay>
                 <second_chance_use_payment_method>use_method_of_original_order</second_chance_use_payment_method>
                 <redirect_when_transaction_fails_to>redirect_to_cart</redirect_when_transaction_fails_to>
-                <enable_magento_vault>0</enable_magento_vault>
                 <apikey_test backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <apikey_live backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <encrypt_payment_details>0</encrypt_payment_details>
-                <enable_manual_capture>0</enable_manual_capture>
                 <enable_methods_api>1</enable_methods_api>
+                <process_transactions_in_the_queue>1</process_transactions_in_the_queue>
                 <enable_pending_order_cron>1</enable_pending_order_cron>
                 <pending_order_cron_batch_size>25</pending_order_cron_batch_size>
+                <encrypt_payment_details>0</encrypt_payment_details>
+                <create_invoice>1</create_invoice>
+                <debug>1</debug>
+                <anonymize_debug_requests>1</anonymize_debug_requests>
+                <tracking_cookies>{"_1":{"cookie_name":"_ga","alias":"clientId"}}</tracking_cookies>
             </mollie_general>
             <mollie_methods_general>
                 <model>Mollie\Payment\Model\Methods\General</model>
@@ -64,7 +67,6 @@
                 <minicart_button_text>check-out</minicart_button_text>
                 <title>Apple Pay</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -78,13 +80,14 @@
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
+                <capture_delay/>
+                <capture_delay_unit>hours</capture_delay_unit>
             </mollie_methods_applepay>
             <mollie_methods_alma>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Alma</model>
                 <title>ALMA</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -103,7 +106,6 @@
                 <model>Mollie\Payment\Model\Methods\Bancontact</model>
                 <title>Bancontact</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -122,7 +124,6 @@
                 <model>Mollie\Payment\Model\Methods\Bancomatpay</model>
                 <title>Bancomat Pay</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -141,7 +142,6 @@
                 <model>Mollie\Payment\Model\Methods\Banktransfer</model>
                 <title>Banktransfer</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <order_status_pending>pending_payment</order_status_pending>
                 <due_days>14</due_days>
                 <payment_action>order</payment_action>
@@ -162,7 +162,6 @@
                 <model>Mollie\Payment\Model\Methods\Belfius</model>
                 <title>Belfius</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -181,7 +180,6 @@
                 <model>Mollie\Payment\Model\Methods\Billie</model>
                 <title>Billie</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -194,6 +192,10 @@
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>shipment</when_to_capture>
+                <capture_delay/>
+                <capture_delay_unit>hours</capture_delay_unit>
             </mollie_methods_billie>
             <mollie_methods_bizum>
                 <active>1</active>
@@ -219,7 +221,6 @@
                 <model>Mollie\Payment\Model\Methods\Blik</model>
                 <title>Blik</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -238,7 +239,6 @@
                 <model>Mollie\Payment\Model\Methods\Creditcard</model>
                 <title>Credit Cards</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>authorize</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -249,22 +249,22 @@
                 <can_use_internal>0</can_use_internal>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>1</can_authorize_vault>
+                <can_authorize_vault>0</can_authorize_vault>
                 <instant_purchase>
                     <supported>1</supported>
                     <available>Mollie\Payment\Service\InstantPurchase\AvailabilityCheck</available>
                 </instant_purchase>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>invoice</when_to_capture>
+                <capture_delay/>
+                <capture_delay_unit>hours</capture_delay_unit>
+                <consent_text>By saving your card, you authorize {{tradingname}} to charge your card for future purchases in accordance with our [privacy policy](https://example.com/privacy-policy). To revoke this authorization, contact us at {{supportcontact}}.</consent_text>
             </mollie_methods_creditcard>
-            <mollie_methods_creditcard_vault>
-                <title>Stored Card (Mollie)</title>
-                <model>Mollie\Payment\Model\Methods\CreditcardVault</model>
-            </mollie_methods_creditcard_vault>
             <mollie_methods_directdebit>
                 <active>0</active>
                 <model>Mollie\Payment\Model\Methods\Directdebit</model>
                 <title>SEPA Direct Debit</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -283,7 +283,6 @@
                 <model>Mollie\Payment\Model\Methods\Eps</model>
                 <title>EPS</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -297,12 +296,30 @@
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_eps>
+            <mollie_methods_expresscomponents>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\Expresscomponents</model>
+                <title>Express Components</title>
+                <payment_description>{ordernumber}</payment_description>
+                <method>payment</method>
+                <payment_action>order</payment_action>
+                <allowspecific>0</allowspecific>
+                <instructions/>
+                <can_use_checkout>1</can_use_checkout>
+                <can_order>1</can_order>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_use_internal>0</can_use_internal>
+                <can_cancel>1</can_cancel>
+                <can_authorize>0</can_authorize>
+                <can_authorize_vault>0</can_authorize_vault>
+                <can_edit>1</can_edit>
+            </mollie_methods_expresscomponents>
             <mollie_methods_giftcard>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Giftcard</model>
                 <title>Giftcard</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <issuer_list_type>dropdown</issuer_list_type>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
@@ -323,7 +340,6 @@
                 <model>Mollie\Payment\Model\Methods\GooglePay</model>
                 <title>Google Pay</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -336,13 +352,14 @@
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
+                <capture_delay/>
+                <capture_delay_unit>hours</capture_delay_unit>
             </mollie_methods_googlepay>
             <mollie_methods_ideal>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Ideal</model>
                 <title>iDEAL | Wero</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <issuer_list_type>radio</issuer_list_type>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
@@ -362,7 +379,6 @@
                 <model>Mollie\Payment\Model\Methods\In3</model>
                 <title>in3</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -381,7 +397,6 @@
                 <model>Mollie\Payment\Model\Methods\Kbc</model>
                 <title>KBC/CBC</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <issuer_list_type>none</issuer_list_type>
                 <allowspecific>0</allowspecific>
@@ -401,7 +416,6 @@
                 <model>Mollie\Payment\Model\Methods\Klarna</model>
                 <title>Pay with Klarna.</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -414,70 +428,51 @@
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>shipment</when_to_capture>
+                <capture_delay/>
+                <capture_delay_unit>hours</capture_delay_unit>
             </mollie_methods_klarna>
+            <!-- Legacy stubs added in v3.0. These methods were removed when the Orders API was dropped.
+                 Keeping them registered (inactive) prevents admin crashes on pre-v3 orders. Do not remove. -->
             <mollie_methods_klarnapaylater>
-                <active>1</active>
-                <model>Mollie\Payment\Model\Methods\Klarnapaylater</model>
-                <title>Klarna Pay Later</title>
-                <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\KlarnaPayLater</model>
+                <title>Klarna Pay Later (legacy)</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions/>
-                <can_use_checkout>1</can_use_checkout>
-                <can_order>1</can_order>
-                <can_refund>1</can_refund>
-                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_use_checkout>0</can_use_checkout>
+                <can_order>0</can_order>
+                <can_refund>0</can_refund>
                 <can_use_internal>0</can_use_internal>
-                <can_cancel>1</can_cancel>
-                <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
-                <can_edit>1</can_edit>
             </mollie_methods_klarnapaylater>
             <mollie_methods_klarnapaynow>
-                <active>1</active>
-                <model>Mollie\Payment\Model\Methods\Klarnapaynow</model>
-                <title>Klarna Pay Now</title>
-                <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\KlarnaPayNow</model>
+                <title>Klarna Pay Now (legacy)</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions/>
-                <can_use_checkout>1</can_use_checkout>
-                <can_order>1</can_order>
-                <can_refund>1</can_refund>
-                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_use_checkout>0</can_use_checkout>
+                <can_order>0</can_order>
+                <can_refund>0</can_refund>
                 <can_use_internal>0</can_use_internal>
-                <can_cancel>1</can_cancel>
-                <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
-                <can_edit>1</can_edit>
             </mollie_methods_klarnapaynow>
             <mollie_methods_klarnasliceit>
-                <active>1</active>
-                <model>Mollie\Payment\Model\Methods\Klarnasliceit</model>
-                <title>Klarna Slice It</title>
-                <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
+                <active>0</active>
+                <model>Mollie\Payment\Model\Methods\KlarnaSliceIt</model>
+                <title>Klarna Slice It (legacy)</title>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
-                <instructions/>
-                <can_use_checkout>1</can_use_checkout>
-                <can_order>1</can_order>
-                <can_refund>1</can_refund>
-                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
+                <can_use_checkout>0</can_use_checkout>
+                <can_order>0</can_order>
+                <can_refund>0</can_refund>
                 <can_use_internal>0</can_use_internal>
-                <can_cancel>1</can_cancel>
-                <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
-                <can_edit>1</can_edit>
             </mollie_methods_klarnasliceit>
             <mollie_methods_mbway>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\MbWay</model>
                 <title>MB Way</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -509,13 +504,16 @@
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>invoice</when_to_capture>
+                <capture_delay/>
+                <capture_delay_unit>hours</capture_delay_unit>
             </mollie_methods_mobilepay>
             <mollie_methods_multibanco>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Multibanco</model>
                 <title>Multibanco</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -534,7 +532,6 @@
                 <model>Mollie\Payment\Model\Methods\MyBank</model>
                 <title>MyBank</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -553,7 +550,6 @@
                 <model>Mollie\Payment\Model\Methods\Paymentlink</model>
                 <title>Mollie: Payment Link</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <message><![CDATA[Click <a href="%link%">here</a> to pay for your purchase.]]></message>
@@ -574,7 +570,6 @@
                 <model>Mollie\Payment\Model\Methods\Paybybank</model>
                 <title>Pay by Bank</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -593,7 +588,6 @@
                 <model>Mollie\Payment\Model\Methods\Paypal</model>
                 <title>PayPal</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -613,7 +607,6 @@
                 <model>Mollie\Payment\Model\Methods\Paysafecard</model>
                 <title>Paysafecard</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -632,7 +625,6 @@
                 <model>Mollie\Payment\Model\Methods\Pointofsale</model>
                 <title>Point Of Sale (POS)</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -651,7 +643,6 @@
                 <model>Mollie\Payment\Model\Methods\Payconiq</model>
                 <title>Payconiq</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -670,7 +661,6 @@
                 <model>Mollie\Payment\Model\Methods\Przelewy24</model>
                 <title>Przelewy24</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -689,7 +679,6 @@
                 <model>Mollie\Payment\Model\Methods\Riverty</model>
                 <title>Riverty</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -702,13 +691,13 @@
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
+                <capture_mode>manual</capture_mode>
             </mollie_methods_riverty>
             <mollie_methods_satispay>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Satispay</model>
                 <title>Satispay</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -727,7 +716,6 @@
                 <model>Mollie\Payment\Model\Methods\Sofort</model>
                 <title>Sofort</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -746,7 +734,6 @@
                 <model>Mollie\Payment\Model\Methods\Swish</model>
                 <title>Swish</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -765,7 +752,6 @@
                 <model>Mollie\Payment\Model\Methods\Trustly</model>
                 <title>Trustly</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -784,7 +770,6 @@
                 <model>Mollie\Payment\Model\Methods\Twint</model>
                 <title>TWINT</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>payment</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
@@ -816,13 +801,16 @@
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
+                <can_change_capture_method>1</can_change_capture_method>
+                <when_to_capture>invoice</when_to_capture>
+                <capture_delay/>
+                <capture_delay_unit>hours</capture_delay_unit>
             </mollie_methods_vipps>
             <mollie_methods_reorder>
                 <active>1</active>
                 <model>Mollie\Payment\Model\Methods\Reorder</model>
                 <title>Mollie: Reorder</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <can_initialize>1</can_initialize>
@@ -841,7 +829,6 @@
                 <model>Mollie\Payment\Model\Methods\Voucher</model>
                 <title>Voucher</title>
                 <payment_description>{ordernumber}</payment_description>
-                <method>order</method>
                 <category>null</category>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>

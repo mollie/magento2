@@ -1,8 +1,6 @@
 <?php
-/*
- * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Data;
 
@@ -101,7 +99,7 @@ class PendingPaymentReminder extends AbstractExtensibleObject implements Pending
      * @return $this
      */
     public function setExtensionAttributes(
-        PendingPaymentReminderExtensionInterface $extensionAttributes
+        PendingPaymentReminderExtensionInterface $extensionAttributes,
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

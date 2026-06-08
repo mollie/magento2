@@ -4,11 +4,14 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Plugin\Quote\Api;
 
 use Magento\Checkout\Model\Session;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Api\PaymentMethodManagementInterface;
+use Magento\Quote\Model\Quote;
 use Mollie\Payment\Model\Methods\ApplePay;
 use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Plugin\Quote\Api\LimitMethodsForRecurringPayments;
@@ -19,9 +22,9 @@ class LimitMethodsForRecurringPaymentsTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_simple_product_and_custom_option.php
      */
-    public function testLimitsListWhenTheCartHasARecurringProduct()
+    public function testLimitsListWhenTheCartHasARecurringProduct(): void
     {
-        /** @var \Magento\Quote\Model\Quote $cart */
+        /** @var Quote $cart */
         $cart = $this->objectManager->create(Session::class)->getQuote();
 
         $items = $cart->getItems();
@@ -46,7 +49,7 @@ class LimitMethodsForRecurringPaymentsTest extends IntegrationTestCase
         $result = $instance->afterGetList(
             $this->objectManager->create(PaymentMethodManagementInterface::class),
             $methods,
-            $cart->getId()
+            $cart->getId(),
         );
 
         $this->assertCount(1, $result);
@@ -56,9 +59,9 @@ class LimitMethodsForRecurringPaymentsTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_simple_product_and_custom_option.php
      */
-    public function testDoesNotLimitsTheListWhenNotARecurringCart()
+    public function testDoesNotLimitsTheListWhenNotARecurringCart(): void
     {
-        /** @var \Magento\Quote\Model\Quote $cart */
+        /** @var Quote $cart */
         $cart = $this->objectManager->create(Session::class)->getQuote();
 
         /** @var LimitMethodsForRecurringPayments $instance */
@@ -72,7 +75,7 @@ class LimitMethodsForRecurringPaymentsTest extends IntegrationTestCase
         $result = $instance->afterGetList(
             $this->objectManager->create(PaymentMethodManagementInterface::class),
             $methods,
-            $cart->getId()
+            $cart->getId(),
         );
 
         $this->assertCount(2, $result);

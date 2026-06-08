@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Riverty;
 
 class RivertyMethodTest extends AbstractTestMethod
 {
-    protected $instance = Riverty::class;
+    protected ?string $instance = Riverty::class;
 
-    protected $code = 'riverty';
+    protected ?string $code = 'riverty';
 }

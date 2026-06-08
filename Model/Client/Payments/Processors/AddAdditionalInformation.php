@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Client\Payments\Processors;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -15,32 +17,20 @@ use Mollie\Payment\Service\Order\SaveAdditionalInformationDetails;
 
 class AddAdditionalInformation implements PaymentProcessorInterface
 {
-    /**
-     * @var DashboardUrl
-     */
-    private $dashboardUrl;
-
-    /**
-     * @var SaveAdditionalInformationDetails
-     */
-    private $saveAdditionalInformationDetails;
-
     public function __construct(
-        DashboardUrl $dashboardUrl,
-        SaveAdditionalInformationDetails $saveAdditionalInformationDetails
-    ) {
-        $this->dashboardUrl = $dashboardUrl;
-        $this->saveAdditionalInformationDetails = $saveAdditionalInformationDetails;
-    }
+        private DashboardUrl $dashboardUrl,
+        private SaveAdditionalInformationDetails $saveAdditionalInformationDetails,
+    ) {}
 
     public function process(
         OrderInterface $order,
         Payment $molliePayment,
         string $type,
-        ProcessTransactionResponse $response
+        ProcessTransactionResponse $response,
     ): ?ProcessTransactionResponse {
         $magentoPayment = $order->getPayment();
-        $dashboardUrl = $this->dashboardUrl->forPaymentsApi($order->getStoreId(), $molliePayment->id);
+        $dashboardUrl = $molliePayment->_links->dashboard->href
+            ?? $this->dashboardUrl->forPaymentsApi(storeId($order->getStoreId()), $molliePayment->id);
         $magentoPayment->setAdditionalInformation('dashboard_url', $dashboardUrl);
         $magentoPayment->setAdditionalInformation('mollie_id', $molliePayment->id);
         $magentoPayment->setAdditionalInformation('method', $molliePayment->method);

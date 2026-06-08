@@ -41,7 +41,16 @@
                 <item name="isDateofbirthEnabled" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestIsDobEnabled</item>
                 <item name="areHyvaModulesInstalled" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\AreHyvaModulesInstalled</item>
                 <item name="isHyvaThemesJsonCorrect" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\IsHyvaThemesJsonCorrect</item>
+                <item name="areQueuesConfiguredCorrectly" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\AreQueuesConfiguredCorrectlyTest</item>
+                <item name="webhookEndpoint" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestWebhookEndpoint</item>
+                <item name="geoIpModuleEnabled" xsi:type="object">Mollie\Payment\Service\Mollie\SelfTests\TestGeoIpModuleEnabled</item>
             </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Service\Mollie\SelfTests\TestWebhookEndpoint">
+        <arguments>
+            <argument name="urlBuilder" xsi:type="object">Magento\Framework\Url</argument>
         </arguments>
     </type>
 
@@ -65,6 +74,25 @@
     <type name="Mollie\Payment\Service\Magento\PaymentLinkUrl">
         <arguments>
             <argument name="urlBuilder" xsi:type="object">Magento\Framework\Url</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Service\Config\Debug\DebugBundleGenerator">
+        <arguments>
+            <argument name="collectors" xsi:type="array">
+                <item name="environment" xsi:type="object">Mollie\Payment\Service\Config\Debug\EnvironmentCollector</item>
+                <item name="modules" xsi:type="object">Mollie\Payment\Service\Config\Debug\ModulesCollector</item>
+                <item name="cacheStatus" xsi:type="object">Mollie\Payment\Service\Config\Debug\CacheStatusCollector</item>
+                <item name="indexerStatus" xsi:type="object">Mollie\Payment\Service\Config\Debug\IndexerStatusCollector</item>
+                <item name="mollieConfig" xsi:type="object">Mollie\Payment\Service\Config\Debug\MollieConfigCollector</item>
+                <item name="env" xsi:type="object">Mollie\Payment\Service\Config\Debug\EnvCollector</item>
+                <item name="cronSchedule" xsi:type="object">Mollie\Payment\Service\Config\Debug\CronScheduleCollector</item>
+                <item name="logs" xsi:type="object">Mollie\Payment\Service\Config\Debug\LogCollector</item>
+                <item name="composer" xsi:type="object">Mollie\Payment\Service\Config\Debug\ComposerCollector</item>
+                <item name="database" xsi:type="object">Mollie\Payment\Service\Config\Debug\DatabaseCollector</item>
+                <item name="storeUrls" xsi:type="object">Mollie\Payment\Service\Config\Debug\StoreUrlsCollector</item>
+                <item name="paymentMethods" xsi:type="object">Mollie\Payment\Service\Config\Debug\PaymentMethodsCollector</item>
+            </argument>
         </arguments>
     </type>
 </config>

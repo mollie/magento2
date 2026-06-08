@@ -1,4 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Api\Data;
 
@@ -6,10 +12,10 @@ use Magento\Framework\Api\ExtensibleDataInterface;
 
 interface ApiKeyFallbackInterface extends ExtensibleDataInterface
 {
-    const ENTITY_ID = 'entity_id';
-    const APIKEY = 'apikey';
-    const MODE = 'mode';
-    const CREATED_AT = 'created_at';
+    public const ENTITY_ID = 'entity_id';
+    public const APIKEY = 'apikey';
+    public const MODE = 'mode';
+    public const CREATED_AT = 'created_at';
 
     /**
      * @return int|null

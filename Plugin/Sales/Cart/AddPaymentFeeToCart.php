@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Plugin\Sales\Cart;
 
@@ -14,20 +16,13 @@ use Magento\Quote\Api\Data\CartInterface;
 class AddPaymentFeeToCart
 {
     /**
-     * @var CartExtensionInterfaceFactory
-     */
-    private $factory;
-
-    /**
      * @var int[]
      */
-    private $cartsProcessed = [];
+    private array $cartsProcessed = [];
 
     public function __construct(
-        CartExtensionInterfaceFactory $factory
-    ) {
-        $this->factory = $factory;
-    }
+        private CartExtensionInterfaceFactory $factory
+    ) {}
 
     public function afterGet(CartRepositoryInterface $subject, CartInterface $result)
     {
@@ -36,7 +31,7 @@ class AddPaymentFeeToCart
         return $result;
     }
 
-    public function afterGetList(CartRepositoryInterface $subject, SearchResultsInterface $result)
+    public function afterGetList(CartRepositoryInterface $subject, SearchResultsInterface $result): SearchResultsInterface
     {
         $items = $result->getItems();
         foreach ($items as $id => $item) {
@@ -52,7 +47,7 @@ class AddPaymentFeeToCart
      * @param CartInterface $cart
      * @return CartInterface
      */
-    private function processCart(CartInterface $cart)
+    private function processCart(CartInterface $cart): CartInterface
     {
         // This code sometimes collides with other extensions. When the cart is loaded during the totals processing,
         // it will overwrite the calculated values with the values from the database. This code will prevent this.
@@ -70,6 +65,7 @@ class AddPaymentFeeToCart
         $cart->setExtensionAttributes($extensionAttributes);
 
         $this->cartsProcessed[] = $cart->getId();
+
         return $cart;
     }
 }

@@ -1,8 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Methods;
 
@@ -22,7 +20,7 @@ class Creditcard extends Mollie
      *
      * @var string
      */
-    const CODE = 'mollie_methods_creditcard';
+    public const CODE = 'mollie_methods_creditcard';
 
     public function authorize(InfoInterface $payment, $amount)
     {

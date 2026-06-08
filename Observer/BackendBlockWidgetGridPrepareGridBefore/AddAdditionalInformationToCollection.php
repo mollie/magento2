@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -14,7 +15,7 @@ use Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection;
 
 class AddAdditionalInformationToCollection implements ObserverInterface
 {
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         $collection = $observer->getEvent()->getCollection();
 

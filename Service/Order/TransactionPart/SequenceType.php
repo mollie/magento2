@@ -4,78 +4,44 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
-use Magento\Customer\Model\Session;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Vault\Model\Ui\VaultConfigProvider;
-use Mollie\Payment\Config;
-use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\OrderContainsSubscriptionProduct;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class SequenceType implements TransactionPartInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var OrderContainsSubscriptionProduct
-     */
-    private $orderContainsSubscriptionProduct;
-
-    /**
-     * @var Session
-     */
-    private $customerSession;
-
     public function __construct(
-        Config $config,
-        OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
-        Session $customerSession
-    ) {
-        $this->config = $config;
-        $this->orderContainsSubscriptionProduct = $orderContainsSubscriptionProduct;
-        $this->customerSession = $customerSession;
-    }
+        private OrderContainsSubscriptionProduct $orderContainsSubscriptionProduct,
+    ) {}
 
-    public function process(OrderInterface $order, $apiMethod, array $transaction): array
+    public function process(OrderInterface $order, array $transaction): array
     {
-        if (!$this->shouldAddSequenceType($order)) {
+        if ($this->orderContainsSubscriptionProduct->check($order)) {
+            $transaction['sequenceType'] = 'first';
             return $transaction;
         }
 
-        if ($apiMethod == Payments::CHECKOUT_TYPE) {
-            $transaction['sequenceType'] = 'first';
+        $payment = $order->getPayment();
+        if (!$payment) {
+            return $transaction;
         }
 
-        if ($apiMethod == Orders::CHECKOUT_TYPE) {
-            $transaction['payment']['sequenceType'] = 'first';
+        $info = $payment->getAdditionalInformation();
+
+        if (($info['mollie_mandate_id'] ?? '') !== '') {
+            $transaction['sequenceType'] = 'oneoff';
+            return $transaction;
+        }
+
+        if (($info['mollie_save_card'] ?? null) === true) {
+            $transaction['sequenceType'] = 'first';
+            return $transaction;
         }
 
         return $transaction;
-    }
-
-    private function shouldAddSequenceType(OrderInterface $order): bool
-    {
-        if ($this->orderContainsSubscriptionProduct->check($order)) {
-            return true;
-        }
-
-        if (!$order->getPayment() || !$this->customerSession->isLoggedIn()) {
-            return false;
-        }
-
-        if ($this->config->isMagentoVaultEnabled($order->getStoreId()) &&
-            $order->getPayment()->getAdditionalInformation(VaultConfigProvider::IS_ACTIVE_CODE) &&
-            $order->getPayment()->getMethod() == 'mollie_methods_creditcard'
-        ) {
-            return true;
-        }
-
-        return false;
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -10,24 +11,15 @@ namespace Mollie\Payment\Service\Mollie;
 
 class GetMollieStatusResult
 {
-    /**
-     * @var string
-     */
-    private $status;
-    /**
-     * @var string|null
-     */
-    private $method;
+    private ?string $method;
 
     public function __construct(
-        string $status,
-        ?string $method = null
+        private string $status,
+        ?string $method = null,
     ) {
         if ($method !== null) {
             $method = str_replace('mollie_methods_', '', $method);
         }
-
-        $this->status = $status;
         $this->method = $method;
     }
 
@@ -41,10 +33,15 @@ class GetMollieStatusResult
         return $this->method;
     }
 
+    public function isAwaitingConfirmation(): bool
+    {
+        return $this->status === 'open' && $this->method !== 'banktransfer';
+    }
+
     public function shouldRedirectToSuccessPage(): bool
     {
         $status = $this->status;
-        if (in_array($status, ['created', 'open']) && $this->method == 'banktransfer') {
+        if ($status === 'open' && $this->method == 'banktransfer') {
             return true;
         }
 

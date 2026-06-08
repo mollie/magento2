@@ -1,23 +1,35 @@
 <p align="center">
-  <img src="https://github-production-user-asset-6210df.s3.amazonaws.com/24823946/391587636-d0f8dbe3-9736-4642-aeb3-d31cb7f5a433.jpg?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAVCODYLSA53PQK4ZA%2F20241202%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20241202T144300Z&X-Amz-Expires=300&X-Amz-Signature=01b3c3e15683b8f9080d375e152f3734a39932eed8d6b8c2890d3e2ca1c537e4&X-Amz-SignedHeaders=host" />
-  
+  <img src="mollie-logo.svg" />
 </p>
-<h1 align="center">Mollie for Magento 2.3.3 and higher</h1>
+
+<h1 align="center">Mollie for Magento 2.4.5 and higher</h1>
 
 > **Magento 1.x** users check out our [Mollie Magento 1 plugin](https://github.com/mollie/Magento).
 
+## Version 3.0
+
+We recently released version 3.0 of the Mollie Payment extension. Some of the highlights of this release are:
+
+- PHP 8.1 and Magento 2.4.5 or higher are required.
+- Removed Orders API integration
+- Queue-based transaction processing enabled by default.
+- Handle refunds from external sources
+- Optional invoices
+- Cancel order on manual checkout return
+
+For more information, see the upgrade guides in [English](docs/en/UPGRADING.md) and [Dutch](docs/nl/UPGRADING.md).
 
 ## Installation & Update the Mollie Payments plugin
 
-[1. Installation through Magento Marketplace](https://github.com/mollie/magento2/wiki/Installation-using-Marketplace)
+[1. Installation through Magento Marketplace](docs/en/INSTALLATION.md#installation-via-magento-marketplace)
 
-[2. Installation by Composer](https://github.com/mollie/magento2/wiki/Installation-using-Composer)
+[2. Installation by Composer](docs/en/INSTALLATION.md#installation-via-composer)
 
-[3. Update by Composer](https://github.com/mollie/magento2/wiki/Update-through-Composer)
+[3. Update by Composer](docs/en/INSTALLATION.md#update-an-existing-installation)
 
-[- Configuration](https://github.com/mollie/magento2/wiki/Configure-the-extension)
+[- Configuration](docs/en/CONFIGURATION.md)
 
-[- Troubleshooting](https://github.com/mollie/magento2/wiki/Troubleshooting)
+[- Troubleshooting](docs/en/TROUBLESHOOTING.md)
 
 ## About Mollie Payments
 With Mollie, you can accept payments and donations online and expand your customer base internationally with support for all major payment methods through a single integration. No need to spend weeks on paperwork or security compliance procedures. No more lost conversions because you don’t support a shopper’s favourite payment method or because they don’t feel safe. We made our products and API expansive, intuitive, and safe for merchants, customers and developers alike. 
@@ -66,7 +78,8 @@ To extend the functionality of the Mollie Magento 2 plugin, we have developed a 
 
 - [Subscriptions](https://github.com/mollie/magento2-subscriptions) - Create and manage subscriptions in your Magento 2 webshop.
 - [Multi shipping](https://github.com/mollie/magento2-multishipping) - Enable multi shipping in your Magento 2 webshop.
-- [Analytics](https://github.com/mollie/magento2-analytics) - Track your Mollie payments in Google Analytics.
+
+> The former [Analytics](https://github.com/mollie/magento2-analytics) addon is now part of the main module.
 
 ### Support for other alternative frontends
 
@@ -75,7 +88,7 @@ To extend the functionality of the Mollie Magento 2 plugin, we have developed a 
 - [Scandi PWA](https://github.com/mollie/magento2-scandipwa)
 
 ## Configuration, FAQ and Troubleshooting
-If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension in Magento 2.3.3 and higher, please see our [WIKI Page](https://github.com/mollie/magento2/wiki) or send an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
+If you experience problems with the extension installation, setup or whenever you need more information about how to setup the Mollie Payment extension, please see the [full documentation](docs/en/README.md) or send an e-mail to [info@mollie.com](mailto:info@mollie.com) with an exact description of the problem.
 
 ## Compatible modules
 
@@ -93,4 +106,4 @@ These modules are tested and known to be working with the Mollie Payment extensi
 
 ## License
 [BSD (Berkeley Software Distribution) License](http://www.opensource.org/licenses/bsd-license.php).
-Copyright (c) 2011-2020, Mollie B.V.
+Copyright (c) 2011-2025, Mollie B.V.

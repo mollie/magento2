@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 require([
     'jquery',
     'Magento_Ui/js/modal/modal',
@@ -218,8 +223,9 @@ require([
     /**
      * Ajax request event
      */
-    $(document).on('click', '[id^=mm-mollie-button]', function () {
-        var actionName = this.id.split('_')[1];
+    $(document).on('click', '[id^=mm-mollie-button], .mm-mollie-button', function () {
+        var actionName = this.dataset.mollieAction ?? this.id.split('_')[1];
+        console.log('actionName', actionName)
         var $modal = $('#mm-mollie-result_' + actionName + '-modal');
         var $result = $('#mm-mollie-result_' + actionName);
 

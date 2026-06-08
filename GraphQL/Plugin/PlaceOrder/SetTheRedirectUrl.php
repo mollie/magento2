@@ -1,8 +1,11 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\GraphQL\Plugin\PlaceOrder;
 
@@ -11,16 +14,9 @@ use Mollie\Payment\Service\Order\Transaction;
 
 class SetTheRedirectUrl
 {
-    /**
-     * @var Transaction
-     */
-    private $transaction;
-
     public function __construct(
-        Transaction $transaction
-    ) {
-        $this->transaction = $transaction;
-    }
+        private Transaction $transaction
+    ) {}
 
     public function beforeResolve(
         PlaceOrder $subject,
@@ -28,8 +24,8 @@ class SetTheRedirectUrl
         $context,
         $info,
         ?array $value = null,
-        ?array $args = null
-    ) {
+        ?array $args = null,
+    ): void {
         if (isset($args['input']['mollie_return_url'])) {
             $this->transaction->setRedirectUrl($args['input']['mollie_return_url']);
         }

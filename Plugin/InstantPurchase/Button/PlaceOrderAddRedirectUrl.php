@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Plugin\InstantPurchase\Button;
 
 use Magento\Framework\App\ResponseInterface;
@@ -15,37 +17,12 @@ use Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPur
 
 class PlaceOrderAddRedirectUrl
 {
-    /**
-     * @var ResponseInterface
-     */
-    private $response;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
-    /**
-     * @var ResultFactory
-     */
-    private $resultFactory;
-
-    /**
-     * @var StartTransactionForInstantPurchaseOrders
-     */
-    private $startTransaction;
-
     public function __construct(
-        ResponseInterface $response,
-        SerializerInterface $serializer,
-        ResultFactory $resultFactory,
-        StartTransactionForInstantPurchaseOrders $startTransaction
-    ) {
-        $this->response = $response;
-        $this->serializer = $serializer;
-        $this->resultFactory = $resultFactory;
-        $this->startTransaction = $startTransaction;
-    }
+        private ResponseInterface $response,
+        private SerializerInterface $serializer,
+        private ResultFactory $resultFactory,
+        private StartTransactionForInstantPurchaseOrders $startTransaction
+    ) {}
 
     public function afterExecute(PlaceOrder $subject, Json $result)
     {

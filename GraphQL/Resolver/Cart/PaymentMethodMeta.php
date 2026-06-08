@@ -1,8 +1,11 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\GraphQL\Resolver\Cart;
 
@@ -13,23 +16,16 @@ use Magento\Framework\View\Asset\Repository;
 
 class PaymentMethodMeta implements ResolverInterface
 {
-    /**
-     * @var Repository
-     */
-    private $assetRepository;
-
     public function __construct(
-        Repository $assertRepository
-    ) {
-        $this->assetRepository = $assertRepository;
-    }
+        private Repository $assetRepository
+    ) {}
 
     public function resolve(
         Field $field,
         $context,
         ResolveInfo $info,
         ?array $value = null,
-        ?array $args = null
+        ?array $args = null,
     ) {
         $method = $value['code'];
         if (strpos($method, 'mollie_method') !== 0) {

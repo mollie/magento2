@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Observer\CheckoutAllowGuest;
 
 use Magento\Framework\DataObject;
@@ -14,18 +16,11 @@ use Mollie\Payment\Service\Quote\CartContainsRecurringProduct;
 
 class ForceCustomerLoginWhenSubscriptionItemInCart implements ObserverInterface
 {
-    /**
-     * @var CartContainsRecurringProduct
-     */
-    private $cartContainsRecurringProduct;
-
     public function __construct(
-        CartContainsRecurringProduct $cartContainsRecurringProduct
-    ) {
-        $this->cartContainsRecurringProduct = $cartContainsRecurringProduct;
-    }
+        private CartContainsRecurringProduct $cartContainsRecurringProduct
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var CartInterface $cart */
         $cart = $observer->getData('quote');

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -13,15 +14,9 @@ use Mollie\Api\Resources\Payment;
 
 class CanRegisterCaptureNotification
 {
-    /**
-     * @var CanUseManualCapture
-     */
-    private $canUseManualCapture;
-
     public function __construct(
-        CanUseManualCapture $canUseManualCapture
+        private readonly CanUseManualCapture $canUseManualCapture,
     ) {
-        $this->canUseManualCapture = $canUseManualCapture;
     }
 
     public function execute(OrderInterface $order, Payment $molliePayment): bool
@@ -30,6 +25,6 @@ class CanRegisterCaptureNotification
             return true;
         }
 
-        return $molliePayment->isPaid() && $molliePayment->getAmountCaptured() !== 0.0;
+        return $molliePayment->getAmountCaptured() !== 0.0;
     }
 }

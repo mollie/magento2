@@ -1,14 +1,15 @@
-includes:
-	- phpstan-baseline.neon
+#includes:
+#	- phpstan-baseline.neon
 
 parameters:
-    level: 1
+    level: 2
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
 # Not applicable on level 1
 #        - '#Call to an undefined method [a-zA-Z0-9\\_]+::(get|set|uns|has|calc|unset)[A-Z]#'
-        - '#Variable \$block might not be defined.#'
-        - '#Undefined variable: \$block#'
+        - '#^Call to an undefined method .*Interface::.*\(\)\.$#'
+        - '#Method Magento\\Sales\\Api\\Data\\OrderPaymentInterface::setAdditionalInformation\(\) invoked with 2 parameters, 1 required.#'
+        - '#Method Magento\\Sales\\Api\\Data\\OrderPaymentInterface::getAdditionalInformation\(\) invoked with 1 parameter, 0 required.#'
     fileExtensions:
         - php
         - phtml

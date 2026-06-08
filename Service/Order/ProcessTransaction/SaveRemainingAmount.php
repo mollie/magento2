@@ -1,35 +1,27 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\ProcessTransaction;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Api\Resources\Order as MollieOrder;
 use Mollie\Api\Resources\Payment;
 
 class SaveRemainingAmount implements ProcessTransactionInterface
 {
-    public function process(OrderInterface $order, ?MollieOrder $mollieOrder = null, ?Payment $molliePayment = null)
+    public function process(OrderInterface $order, Payment $molliePayment): void
     {
-        if ($mollieOrder) {
-            $this->processOrder($order, $mollieOrder);
-        }
-    }
-
-    private function processOrder(OrderInterface $order, MollieOrder $mollieOrder)
-    {
-        $amount = 0;
-        foreach ($mollieOrder->_embedded->payments as $payment) {
-            if (!isset($payment->details->remainderAmount)) {
-                continue;
-            }
-
-            $amount += $payment->details->remainderAmount->value;
+        if (!isset($molliePayment->details->remainderAmount)) {
+            return;
         }
 
-        $order->getPayment()->setAdditionalInformation('remainder_amount', $amount);
+        $order->getPayment()->setAdditionalInformation(
+            'remainder_amount',
+            $molliePayment->details->remainderAmount->value,
+        );
     }
 }

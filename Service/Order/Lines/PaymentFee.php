@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\Lines;
 
@@ -12,35 +14,22 @@ use Mollie\Payment\Helper\General;
 class PaymentFee
 {
     /**
-     * @var General
-     */
-    private $mollieHelper;
-
-    /**
-     * @var OrderLinesProcessor
-     */
-    private $orderLinesProcessor;
-
-    /**
      * StoreCredit constructor.
      * @param General $mollieHelper
      * @param OrderLinesProcessor $orderLinesProcessor
      */
     public function __construct(
-        General $mollieHelper,
-        OrderLinesProcessor $orderLinesProcessor
-    ) {
-        $this->mollieHelper = $mollieHelper;
-        $this->orderLinesProcessor = $orderLinesProcessor;
-    }
+        private General $mollieHelper,
+        private OrderLinesProcessor $orderLinesProcessor
+    ) {}
 
     /**
      * @param OrderInterface $order
      * @return bool
      */
-    public function orderHasPaymentFee(OrderInterface $order)
+    public function orderHasPaymentFee(OrderInterface $order): bool
     {
-        return (float)$order->getData('base_mollie_payment_fee') && (float)$order->getData('mollie_payment_fee');
+        return (float) $order->getData('base_mollie_payment_fee') && (float) $order->getData('mollie_payment_fee');
     }
 
     /**

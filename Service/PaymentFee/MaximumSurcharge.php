@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\PaymentFee;
 
@@ -13,24 +15,12 @@ use Mollie\Payment\Service\Tax\TaxCalculate;
 
 class MaximumSurcharge
 {
-    /**
-     * @var PaymentFee
-     */
-    private $config;
-    /**
-     * @var TaxCalculate
-     */
-    private $taxCalculate;
-
     public function __construct(
-        PaymentFee $config,
-        TaxCalculate $taxCalculate
-    ) {
-        $this->config = $config;
-        $this->taxCalculate = $taxCalculate;
-    }
+        private PaymentFee $config,
+        private TaxCalculate $taxCalculate
+    ) {}
 
-    public function calculate(CartInterface $cart, Result $result)
+    public function calculate(CartInterface $cart, Result $result): void
     {
         $paymentFeeType = $this->config->getType($cart);
         if ($paymentFeeType == PaymentFeeType::FIXED_FEE) {

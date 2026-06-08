@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -14,22 +15,10 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class UpdateProfileId
 {
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-    /**
-     * @var WriterInterface
-     */
-    private $configWriter;
-
     public function __construct(
-        MollieApiClient $mollieApiClient,
-        WriterInterface $configWriter
-    ) {
-        $this->mollieApiClient = $mollieApiClient;
-        $this->configWriter = $configWriter;
-    }
+        private MollieApiClient $mollieApiClient,
+        private WriterInterface $configWriter
+    ) {}
 
     public function execute(string $apiKey, string $scope, int $scopeId): void
     {
@@ -41,7 +30,7 @@ class UpdateProfileId
             Config::GENERAL_PROFILEID,
             $profileId,
             $scope,
-            $scopeId
+            $scopeId,
         );
     }
 }

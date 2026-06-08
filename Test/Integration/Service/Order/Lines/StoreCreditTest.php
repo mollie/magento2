@@ -1,10 +1,15 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order\Lines;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\TestFramework\ObjectManager;
 use Mollie\Payment\Exceptions\NoStoreCreditFound;
 use Mollie\Payment\Service\Order\Lines\StoreCredit;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -12,7 +17,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class StoreCreditTest extends IntegrationTestCase
 {
-    public static function orderHasStoreCreditProvider()
+    public static function orderHasStoreCreditProvider(): array
     {
         return [
             ['amstorecredit_amount'],
@@ -24,7 +29,7 @@ class StoreCreditTest extends IntegrationTestCase
      * @dataProvider orderHasStoreCreditProvider
      */
     #[DataProvider('orderHasStoreCreditProvider')]
-    public function testOrderHasStoreCreditReturnsTrueWhenApplicable($column)
+    public function testOrderHasStoreCreditReturnsTrueWhenApplicable(string $column): void
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
@@ -35,7 +40,7 @@ class StoreCreditTest extends IntegrationTestCase
 
         $this->assertTrue(
             $instance->orderHasStoreCredit($order),
-            'The order has a store credit but the method can\'t find it'
+            'The order has a store credit but the method can\'t find it',
         );
     }
 
@@ -43,7 +48,7 @@ class StoreCreditTest extends IntegrationTestCase
      * @dataProvider orderHasStoreCreditProvider
      */
     #[DataProvider('orderHasStoreCreditProvider')]
-    public function testCreditmemoHasStoreCredit($column)
+    public function testCreditmemoHasStoreCredit(string $column): void
     {
         /** @var CreditmemoInterface $creditmemo */
         $creditmemo = $this->objectManager->create(CreditmemoInterface::class);
@@ -54,11 +59,11 @@ class StoreCreditTest extends IntegrationTestCase
 
         $this->assertTrue(
             $instance->creditmemoHasStoreCredit($creditmemo),
-            'The creditmemo has a store credit but the method can\'t find it'
+            'The creditmemo has a store credit but the method can\'t find it',
         );
     }
 
-    public function testOrderHasStoreCreditReturnsFalseWhenNotApplicable()
+    public function testOrderHasStoreCreditReturnsFalseWhenNotApplicable(): void
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
@@ -68,11 +73,11 @@ class StoreCreditTest extends IntegrationTestCase
 
         $this->assertFalse(
             $instance->orderHasStoreCredit($order),
-            'The order doesn\'t have a store credit but the method thinks it does.'
+            'The order doesn\'t have a store credit but the method thinks it does.',
         );
     }
 
-    public function testCreditmemoHasStoreCreditReturnsFalseWhenNotApplicable()
+    public function testCreditmemoHasStoreCreditReturnsFalseWhenNotApplicable(): void
     {
         /** @var CreditmemoInterface $creditmemo */
         $creditmemo = $this->objectManager->create(CreditmemoInterface::class);
@@ -82,11 +87,11 @@ class StoreCreditTest extends IntegrationTestCase
 
         $this->assertFalse(
             $instance->creditmemoHasStoreCredit($creditmemo),
-            'The creditmemo doesn\'t have a store credit but the method thinks it does.'
+            'The creditmemo doesn\'t have a store credit but the method thinks it does.',
         );
     }
 
-    public function testThrowsAnExceptionWhenTheStoreCreditCantBeFound()
+    public function testThrowsAnExceptionWhenTheStoreCreditCantBeFound(): void
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);
@@ -100,15 +105,16 @@ class StoreCreditTest extends IntegrationTestCase
         } catch (NoStoreCreditFound $exception) {
             $this->assertEquals(
                 'We were unable to find the store credit for order #999',
-                $exception->getMessage()
+                $exception->getMessage(),
             );
+
             return;
         }
 
         $this->fail('We expected a ' . NoStoreCreditFound::class . ' exception but got none');
     }
 
-    public static function createsTheOrderLineProvider()
+    public static function createsTheOrderLineProvider(): array
     {
         return [
             [['amstorecredit_amount', 'amstorecredit_base_amount']],
@@ -120,7 +126,7 @@ class StoreCreditTest extends IntegrationTestCase
      * @dataProvider createsTheOrderLineProvider
      */
     #[DataProvider('createsTheOrderLineProvider')]
-    public function testCreatesTheOrderLine($fields)
+    public function testCreatesTheOrderLine(array $fields): void
     {
         /** @var OrderInterface $order */
         $order = $this->objectManager->create(OrderInterface::class);

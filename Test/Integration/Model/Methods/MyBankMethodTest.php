@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\MyBank;
 
 class MyBankMethodTest extends AbstractTestMethod
 {
-    protected $instance = MyBank::class;
+    protected ?string $instance = MyBank::class;
 
-    protected $code = 'mybank';
+    protected ?string $code = 'mybank';
 }

@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,30 +13,17 @@ use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderPaymentRepositoryInterface;
-use Magento\Sales\Model\Order\PaymentAdapterInterface;
 use Mollie\Payment\Model\Methods\Paymentlink;
 use Mollie\Payment\Service\Magento\PaymentLinkUrl;
 
 class SetCheckoutUrlForPaymentLink implements ObserverInterface
 {
-    /**
-     * @var PaymentLinkUrl
-     */
-    private $paymentLinkUrl;
-    /**
-     * @var OrderPaymentRepositoryInterface
-     */
-    private $orderPaymentRepository;
-
     public function __construct(
-        PaymentLinkUrl $paymentLinkUrl,
-        OrderPaymentRepositoryInterface $orderPaymentRepository
-    ) {
-        $this->paymentLinkUrl = $paymentLinkUrl;
-        $this->orderPaymentRepository = $orderPaymentRepository;
-    }
+        private PaymentLinkUrl $paymentLinkUrl,
+        private OrderPaymentRepositoryInterface $orderPaymentRepository
+    ) {}
 
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var OrderInterface $order */
         $order = $observer->getEvent()->getData('order');
@@ -47,7 +35,7 @@ class SetCheckoutUrlForPaymentLink implements ObserverInterface
 
         $payment->setAdditionalInformation(
             'checkout_url',
-            $this->paymentLinkUrl->execute((int)$order->getEntityId())
+            $this->paymentLinkUrl->execute((int) $order->getEntityId()),
         );
 
         $this->orderPaymentRepository->save($payment);

@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\PaymentFee\Types;
 
@@ -15,37 +17,15 @@ use Mollie\Payment\Service\Tax\TaxCalculate;
 
 class FixedAmount implements TypeInterface
 {
-    /**
-     * @var ResultFactory
-     */
-    private $resultFactory;
-
-    /**
-     * @var PaymentFee
-     */
-    private $config;
-
-    /**
-     * @var TaxCalculate
-     */
-    private $taxCalculate;
-
     public function __construct(
-        ResultFactory $resultFactory,
-        PaymentFee $config,
-        TaxCalculate $taxCalculate
-    ) {
-        $this->resultFactory = $resultFactory;
-        $this->config = $config;
-        $this->taxCalculate = $taxCalculate;
-    }
+        private ResultFactory $resultFactory,
+        private PaymentFee $config,
+        private TaxCalculate $taxCalculate
+    ) {}
 
-    /**
-     * @inheritDoc
-     */
-    public function calculate(CartInterface $cart, Total $total)
+    public function calculate(CartInterface $cart, Total $total): Result
     {
-        $amount = $this->config->getFixedAmount($cart->getPayment()->getMethod(), $cart->getStoreId());
+        $amount = $this->config->getFixedAmount($cart->getPayment()->getMethod(), storeId($cart->getStoreId()));
         $tax = $this->taxCalculate->getTaxFromAmountIncludingTax($cart, $amount);
 
         /** @var Result $result */

@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order;
 
@@ -21,7 +27,7 @@ class PaymentReminderTest extends IntegrationTestCase
 
         /** @var PendingPaymentReminderInterface $pendingPaymentReminder */
         $pendingPaymentReminder = $this->objectManager->create(PendingPaymentReminderInterface::class);
-        $pendingPaymentReminder->setOrderId($order->getId());
+        $pendingPaymentReminder->setOrderId((int)$order->getId());
 
         $secondChanceMock = $this->createMock(SecondChanceEmail::class);
         $secondChanceMock->expects($this->never())->method('send');
@@ -50,7 +56,7 @@ class PaymentReminderTest extends IntegrationTestCase
 
         /** @var PendingPaymentReminderInterface $pendingPaymentReminder */
         $pendingPaymentReminder = $this->objectManager->create(PendingPaymentReminderInterface::class);
-        $pendingPaymentReminder->setOrderId($order->getId());
+        $pendingPaymentReminder->setOrderId((int)$order->getId());
 
         $secondChanceMock = $this->createMock(SecondChanceEmail::class);
         $secondChanceMock->expects($this->never())->method('send');

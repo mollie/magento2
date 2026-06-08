@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\PaymentFee;
 
@@ -21,7 +23,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class CalculateTest extends IntegrationTestCase
 {
-    public function testReturnsEmptyResultWhenNotAvailable()
+    public function testReturnsEmptyResultWhenNotAvailable(): void
     {
         /** @var Calculate $instance */
         $instance = $this->objectManager->create(Calculate::class);
@@ -36,7 +38,7 @@ class CalculateTest extends IntegrationTestCase
         $this->assertEquals(0, $result->getAmountIncludingTax());
     }
 
-    public static function calculatesTheFixedAmountProvider()
+    public static function calculatesTheFixedAmountProvider(): array
     {
         return [
             [PaymentFeeType::FIXED_FEE, 'fixedAmount', FixedAmount::class],
@@ -49,7 +51,7 @@ class CalculateTest extends IntegrationTestCase
      * @dataProvider calculatesTheFixedAmountProvider
      */
     #[DataProvider('calculatesTheFixedAmountProvider')]
-    public function testCalculatesTheFixedAmount($type, $key, $typeCalculatorClass)
+    public function testCalculatesTheFixedAmount(string $type, string $key, string $typeCalculatorClass): void
     {
         /** @var Result $result */
         $result = $this->objectManager->create(Result::class);
@@ -79,7 +81,7 @@ class CalculateTest extends IntegrationTestCase
         $this->assertEquals(10, $result->getAmountIncludingTax());
     }
 
-    public function testLimitsTheResult()
+    public function testLimitsTheResult(): void
     {
         /** @var Result $result */
         $result = $this->objectManager->create(Result::class);
@@ -96,12 +98,12 @@ class CalculateTest extends IntegrationTestCase
         $maximumSurchageMock = $this->createMock(MaximumSurcharge::class);
         $maximumSurchageMock->method('calculate')->with(
             $this->isInstanceOf(CartInterface::class),
-            $this->callback(function (Result $result) {
+            $this->callback(function (Result $result): bool {
                 $result->setAmount($result->getAmount() / 2);
                 $result->setTaxAmount($result->getTaxAmount() / 2);
 
                 return true;
-            })
+            }),
         );
 
         /** @var Calculate $instance */

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Plugin\InventorySales\Model\IsProductSalableForRequestedQtyCondition\IsSalableWithReservationsCondition;
 
 use Magento\Framework\ObjectManagerInterface;
@@ -11,21 +13,11 @@ use Magento\InventorySalesApi\Api\Data\ProductSalableResultInterface;
 
 class DisableCheckForAdminOrders
 {
-    /**
-     * @var bool
-     */
-    private $disabled = false;
-
-    /**
-     * @var ObjectManagerInterface
-     */
-    private $objectManager;
+    private bool $disabled = false;
 
     public function __construct(
-        ObjectManagerInterface $objectManager
-    ) {
-        $this->objectManager = $objectManager;
-    }
+        private ObjectManagerInterface $objectManager
+    ) {}
 
     /**
      * This method is only called from the `\Mollie\Payment\Service\Order\Reorder::recreate` method, to prevent

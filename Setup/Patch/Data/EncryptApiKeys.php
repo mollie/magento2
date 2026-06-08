@@ -4,10 +4,11 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Setup\Patch\Data;
 
 use Magento\Config\Model\ResourceModel\Config;
-use Magento\Config\Model\ResourceModel\Config\Data\Collection;
 use Magento\Config\Model\ResourceModel\Config\Data\CollectionFactory;
 use Magento\Framework\App\Config\Value;
 use Magento\Framework\Encryption\EncryptorInterface;
@@ -15,30 +16,11 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 
 class EncryptApiKeys implements DataPatchInterface
 {
-    /**
-     * @var Collection
-     */
-    private $configReaderFactory;
-
-    /**
-     * @var Config
-     */
-    private $configResource;
-
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
     public function __construct(
-        CollectionFactory $configReaderFactory,
-        Config $configResource,
-        EncryptorInterface $encryptor
-    ) {
-        $this->configReaderFactory = $configReaderFactory;
-        $this->configResource = $configResource;
-        $this->encryptor = $encryptor;
-    }
+        private CollectionFactory $configReaderFactory,
+        private Config $configResource,
+        private EncryptorInterface $encryptor
+    ) {}
 
     public function apply()
     {
@@ -61,7 +43,7 @@ class EncryptApiKeys implements DataPatchInterface
 
     private function updateRecord(Value $configItem): void
     {
-        $value = (string)$configItem->getData('value');
+        $value = (string) $configItem->getData('value');
 
         // Same check as in \Magento\Config\Model\Config\Backend\Encrypted::beforeSave
         if (!preg_match('/^\*+$/', $value) && !empty($value)) {
@@ -69,7 +51,7 @@ class EncryptApiKeys implements DataPatchInterface
                 $configItem->getData('path'),
                 $this->encryptor->encrypt($value),
                 $configItem->getData('scope'),
-                $configItem->getData('scope_id')
+                $configItem->getData('scope_id'),
             );
         }
     }

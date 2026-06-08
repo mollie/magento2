@@ -3,9 +3,9 @@
   ~ Copyright Magmodules.eu. All rights reserved.
   ~ See COPYING.txt for license details.
   -->
-
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Mollie\Payment\Api\Webapi\PaymentTokenRequestInterface" type="Mollie\Payment\Webapi\PaymentToken" />
+    <preference for="Mollie\Payment\Api\Webapi\SavedCardsInterface" type="Mollie\Payment\Webapi\SavedCards" />
     <preference for="Mollie\Payment\Api\Webapi\StartTransactionRequestInterface" type="Mollie\Payment\Webapi\StartTransaction" />
     <preference for="Mollie\Payment\Api\Webapi\GetCustomerOrderInterface" type="Mollie\Payment\Webapi\GetCustomerOrder" />
     <preference for="Mollie\Payment\Api\Webapi\GetPaymentLinkRedirectInterface" type="Mollie\Payment\Webapi\GetPaymentLinkRedirect" />
@@ -14,6 +14,9 @@
 
     <preference for="Mollie\Payment\Api\PaymentTokenRepositoryInterface" type="Mollie\Payment\Model\PaymentTokenRepository"/>
     <preference for="Mollie\Payment\Api\Data\PaymentTokenInterface" type="Mollie\Payment\Model\Data\PaymentToken"/>
+
+    <preference for="Mollie\Payment\Api\TrackingRepositoryInterface" type="Mollie\Payment\Model\TrackingRepository"/>
+    <preference for="Mollie\Payment\Api\Data\TrackingInterface" type="Mollie\Payment\Model\Tracking"/>
 
     <preference for="Mollie\Payment\Api\MollieCustomerRepositoryInterface" type="Mollie\Payment\Model\MollieCustomerRepository"/>
     <preference for="Mollie\Payment\Api\Data\MollieCustomerInterface" type="Mollie\Payment\Model\Data\MollieCustomer"/>
@@ -63,6 +66,29 @@
         </arguments>
     </virtualType>
 
+    <type name="Mollie\Payment\Logger\RemovePrivacyData">
+        <arguments>
+            <argument name="fieldsToRedact" xsi:type="array">
+                <item xsi:type="string" name="givenName">givenName</item>
+                <item xsi:type="string" name="familyName">familyName</item>
+                <item xsi:type="string" name="firstname">firstname</item>
+                <item xsi:type="string" name="lastname">lastname</item>
+                <item xsi:type="string" name="company">company</item>
+                <item xsi:type="string" name="organizationName">organizationName</item>
+                <item xsi:type="string" name="street">street</item>
+                <item xsi:type="string" name="streetAndNumber">streetAndNumber</item>
+                <item xsi:type="string" name="city">city</item>
+                <item xsi:type="string" name="postalCode">postalCode</item>
+                <item xsi:type="string" name="country">country</item>
+                <item xsi:type="string" name="telephone">telephone</item>
+                <item xsi:type="string" name="phone">phone</item>
+                <item xsi:type="string" name="email">email</item>
+                <item xsi:type="string" name="consumerName">consumerName</item>
+                <item xsi:type="string" name="consumerAccount">consumerAccount</item>
+            </argument>
+        </arguments>
+    </type>
+
     <!-- Set sensitive information -->
     <type name="Magento\Config\Model\Config\TypePool">
         <arguments>
@@ -83,12 +109,6 @@
         </arguments>
     </type>
 
-    <type name="Mollie\Payment\Model\Client\Orders">
-        <arguments>
-            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-
     <type name="Mollie\Payment\Model\Client\Payments">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
@@ -96,8 +116,8 @@
     </type>
 
     <type name="Magento\Sales\Api\OrderRepositoryInterface">
-        <plugin name="mollie_payment_fee_order" type="Mollie\Payment\Plugin\Sales\AddPaymentFeeToOrder" />
-        <plugin name="mollie_payment_add_subscription_data" type="Mollie\Payment\Plugin\Sales\AddRecurringData" />
+        <plugin name="mollie_payment_fee_order" type="Mollie\Payment\Plugin\Sales\AddPaymentFeeToOrder"/>
+        <plugin name="mollie_payment_add_subscription_data" type="Mollie\Payment\Plugin\Sales\AddRecurringData"/>
     </type>
 
     <type name="Magento\Sales\Api\OrderManagementInterface">
@@ -119,18 +139,22 @@
     <type name="Mollie\Payment\Service\Order\BuildTransaction">
         <arguments>
             <argument name="parts" xsi:type="array">
+                <item name="orderLines" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\OrderLines</item>
+                <item name="sequenceType" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\SequenceType</item>
+                <item name="storeCredentials" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\StoreCredentials</item>
+                <item name="mandateId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\MandateId</item>
                 <item name="cardToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CardToken</item>
                 <item name="customerId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CustomerId</item>
                 <item name="issuer" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\Issuer</item>
                 <item name="applePayPaymentToken" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\ApplePayPaymentToken</item>
-                <item name="sequenceTypeForVault" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\SequenceType</item>
-                <item name="UseSavedPaymentMethod" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\UseSavedPaymentMethod</item>
                 <item name="PhoneNumber" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\PhoneNumber</item>
                 <item name="DateOfBirth" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\DateOfBirth</item>
                 <item name="CaptureMode" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureMode</item>
+                <item name="CaptureDelay" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureDelay</item>
                 <item name="terminalId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\TerminalId</item>
                 <item name="LimitStreetLength" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitStreetLength</item>
                 <item name="LimitedMethods" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitedMethods</item>
+                <item name="AddTrackingCookiesToRedirectUrl" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\AddTrackingCookiesToRedirectUrl</item>
             </argument>
         </arguments>
     </type>
@@ -281,42 +305,9 @@
         <plugin name="mollie_add_redirect_url" type="Mollie\Payment\Plugin\InstantPurchase\Button\PlaceOrderAddRedirectUrl" />
     </type>
 
-    <type name="Mollie\Payment\Model\Client\Orders\ProcessTransaction">
-        <arguments>
-            <argument name="orderProcessors" xsi:type="object">Mollie\Payment\Model\Client\Orders\OrderProcessors</argument>
-        </arguments>
-    </type>
-
     <type name="Mollie\Payment\Model\Client\Payments\ProcessTransaction">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
-        </arguments>
-    </type>
-
-    <type name="Mollie\Payment\Model\Client\Orders\OrderProcessors">
-        <arguments>
-            <argument name="processors" xsi:type="array">
-                <item name="preprocess" xsi:type="array">
-                    <item name="add_additional_data" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\AddAdditionalInformation</item>
-                    <item name="save_card_label" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\SaveCardDetails</item>
-                    <item name="payment_link_save_payment_method" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\PaymentLinkPaymentMethod</item>
-                </item>
-                <item name="last_payment_status_is_failure" xsi:type="array">
-                    <item name="last_payment_status_is_failure" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\LastPaymentStatusIsFailure</item>
-                </item>
-                <item name="created" xsi:type="array">
-                    <item name="send_confirmation_email_for_banktransfer" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\SendConfirmationEmailForBanktransfer</item>
-                </item>
-                <item name="cancelled" xsi:type="array">
-                    <item name="cancelled" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\CancelledProcessor</item>
-                </item>
-                <item name="expired" xsi:type="array">
-                    <item name="expired" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\ExpiredProcessor</item>
-                </item>
-                <item name="is_successful" xsi:type="array">
-                    <item name="is_successful" xsi:type="object">Mollie\Payment\Model\Client\Orders\Processors\SuccessfulPayment</item>
-                </item>
-            </argument>
         </arguments>
     </type>
 
@@ -325,6 +316,7 @@
             <argument name="processors" xsi:type="array">
                 <item name="preprocess" xsi:type="array">
                     <item name="add_additional_data" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\AddAdditionalInformation</item>
+                    <item name="save_capture_before_date" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SaveCaptureBeforeDate</item>
                 </item>
                 <item name="failed" xsi:type="array">
                     <item name="failed" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\FailedStatusProcessor</item>
@@ -337,6 +329,11 @@
                 </item>
                 <item name="paid" xsi:type="array">
                     <item name="paid" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SuccessfulPayment</item>
+                </item>
+                <item name="refunded" xsi:type="array">
+                    <item name="external_refunds" xsi:type="object">
+                        Mollie\Payment\Model\Client\Payments\Processors\HandleExternalRefunds
+                    </item>
                 </item>
             </argument>
         </arguments>
@@ -394,6 +391,12 @@
     <type name="Magento\Sales\Model\CronJob\CleanExpiredOrders">
         <arguments>
             <argument name="collectionFactory" xsi:type="object">CleanExpiredOrdersCollectionFactory</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Controller\Express\CreateSession">
+        <arguments>
+            <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
         </arguments>
     </type>
 
@@ -899,18 +902,10 @@
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
             <argument name="valueHandlerPool" xsi:type="object">MollieCreditcardValueHandlerPool</argument>
-            <argument name="commandPool" xsi:type="object">MollieCreditcardCommandPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
             <argument name="validatorPool" xsi:type="object">MollieCreditcardValidatorPool</argument>
         </arguments>
     </type>
-
-    <virtualType name="MollieCreditcardCommandPool" type="MollieCommandPool">
-        <arguments>
-            <argument name="commands" xsi:type="array">
-                <item name="vault_authorize" xsi:type="string">MollieCreditcardVaultAuthorizeCommand</item>
-            </argument>
-        </arguments>
-    </virtualType>
 
     <virtualType name="MollieCreditcardValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
@@ -944,48 +939,6 @@
         <arguments>
             <argument name="config" xsi:type="object">MollieCreditcardConfig</argument>
         </arguments>
-    </virtualType>
-
-    <!-- Creditcard Vault -->
-    <type name="Mollie\Payment\Model\Methods\CreditcardVault">
-        <arguments>
-            <argument name="config" xsi:type="object">MollieCreditcardVaultConfig</argument>
-            <argument name="valueHandlerPool" xsi:type="object">MollieCreditcardVaultValueHandlerPool</argument>
-            <argument name="vaultProvider" xsi:type="object">Mollie\Payment\Model\Methods\Creditcard</argument>
-            <argument name="code" xsi:type="const">Mollie\Payment\Model\Methods\CreditcardVault::CODE</argument>
-            <argument name="validatorPool" xsi:type="object">MollieCreditcardVaultValidatorPool</argument>
-        </arguments>
-    </type>
-
-    <virtualType name="MollieCreditcardVaultValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
-        <arguments>
-            <argument name="handlers" xsi:type="array">
-                <item name="default" xsi:type="string">MollieCreditcardConfigValueHandler</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieCreditcardVaultConfig" type="Mollie\Payment\Model\Data\CreditcardVaultConfig">
-        <arguments>
-            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Creditcard::CODE</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieCreditcardVaultValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
-        <arguments>
-            <argument name="validators" xsi:type="array">
-                <item name="country" xsi:type="string">MollieCreditcardVaultCountryValidator</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieCreditcardVaultCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
-        <arguments>
-            <argument name="config" xsi:type="object">MollieCreditcardVaultConfig</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieCreditcardVaultAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
     </virtualType>
 
     <!-- Directdebit -->
@@ -1075,6 +1028,53 @@
     <virtualType name="MollieEpsCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
         <arguments>
             <argument name="config" xsi:type="object">MollieEpsConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Expresscomponents -->
+    <type name="Mollie\Payment\Model\Methods\Expresscomponents">
+        <arguments>
+            <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
+            <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieExpresscomponentsValueHandlerPool</argument>
+            <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
+            <argument name="validatorPool" xsi:type="object">MollieExpresscomponentsValidatorPool</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="MollieExpresscomponentsValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">MollieExpresscomponentsConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieExpresscomponentsConfigValueHandler"
+                 type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">MollieExpresscomponentsConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieExpresscomponentsConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Expresscomponents::CODE</argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieExpresscomponentsValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">MollieExpresscomponentsCountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="MollieExpresscomponentsCountryValidator"
+                 type="Magento\Payment\Gateway\Validator\CountryValidator">
+        <arguments>
+            <argument name="config" xsi:type="object">MollieExpresscomponentsConfig</argument>
         </arguments>
     </virtualType>
 
@@ -1348,138 +1348,87 @@
         </arguments>
     </virtualType>
 
-    <!-- Klarnapaylater -->
-    <type name="Mollie\Payment\Model\Methods\Klarnapaylater">
+    <!-- Legacy stubs added in v3.0. The Orders API was removed in v3, taking the original Klarna method
+         classes with it. Without these stubs, getMethodInstance() throws on any pre-v3 Klarna order.
+         Do not remove these entries. -->
+    <!-- Klarna Pay Later (legacy stub) -->
+    <type name="Mollie\Payment\Model\Methods\KlarnaPayLater">
         <arguments>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
-            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnapaylaterValueHandlerPool</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnaPayLaterValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
-            <argument name="validatorPool" xsi:type="object">MollieKlarnapaylaterValidatorPool</argument>
         </arguments>
     </type>
-
-    <virtualType name="MollieKlarnapaylaterValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+    <virtualType name="MollieKlarnaPayLaterValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
-                <item name="default" xsi:type="string">MollieKlarnapaylaterConfigValueHandler</item>
+                <item name="default" xsi:type="string">MollieKlarnaPayLaterConfigValueHandler</item>
             </argument>
         </arguments>
     </virtualType>
-
-    <virtualType name="MollieKlarnapaylaterConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+    <virtualType name="MollieKlarnaPayLaterConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
         <arguments>
-            <argument name="configInterface" xsi:type="object">MollieKlarnapaylaterConfig</argument>
+            <argument name="configInterface" xsi:type="object">MollieKlarnaPayLaterConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MollieKlarnaPayLaterConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\KlarnaPayLater::CODE</argument>
         </arguments>
     </virtualType>
 
-    <virtualType name="MollieKlarnapaylaterConfig" type="Magento\Payment\Gateway\Config\Config">
-        <arguments>
-            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Klarnapaylater::CODE</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieKlarnapaylaterValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
-        <arguments>
-            <argument name="validators" xsi:type="array">
-                <item name="country" xsi:type="string">MollieKlarnapaylaterCountryValidator</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieKlarnapaylaterCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
-        <arguments>
-            <argument name="config" xsi:type="object">MollieKlarnapaylaterConfig</argument>
-        </arguments>
-    </virtualType>
-
-    <!-- Klarnapaynow -->
-    <type name="Mollie\Payment\Model\Methods\Klarnapaynow">
+    <!-- Klarna Pay Now (legacy stub) -->
+    <type name="Mollie\Payment\Model\Methods\KlarnaPayNow">
         <arguments>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
-            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnapaynowValueHandlerPool</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnaPayNowValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
-            <argument name="validatorPool" xsi:type="object">MollieKlarnapaynowValidatorPool</argument>
         </arguments>
     </type>
-
-    <virtualType name="MollieKlarnapaynowValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+    <virtualType name="MollieKlarnaPayNowValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
-                <item name="default" xsi:type="string">MollieKlarnapaynowConfigValueHandler</item>
+                <item name="default" xsi:type="string">MollieKlarnaPayNowConfigValueHandler</item>
             </argument>
         </arguments>
     </virtualType>
-
-    <virtualType name="MollieKlarnapaynowConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+    <virtualType name="MollieKlarnaPayNowConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
         <arguments>
-            <argument name="configInterface" xsi:type="object">MollieKlarnapaynowConfig</argument>
+            <argument name="configInterface" xsi:type="object">MollieKlarnaPayNowConfig</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="MollieKlarnaPayNowConfig" type="Magento\Payment\Gateway\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\KlarnaPayNow::CODE</argument>
         </arguments>
     </virtualType>
 
-    <virtualType name="MollieKlarnapaynowConfig" type="Magento\Payment\Gateway\Config\Config">
-        <arguments>
-            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Klarnapaynow::CODE</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieKlarnapaynowValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
-        <arguments>
-            <argument name="validators" xsi:type="array">
-                <item name="country" xsi:type="string">MollieKlarnapaynowCountryValidator</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieKlarnapaynowCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
-        <arguments>
-            <argument name="config" xsi:type="object">MollieKlarnapaynowConfig</argument>
-        </arguments>
-    </virtualType>
-
-    <!-- Klarnasliceit -->
-    <type name="Mollie\Payment\Model\Methods\Klarnasliceit">
+    <!-- Klarna Slice It (legacy stub) -->
+    <type name="Mollie\Payment\Model\Methods\KlarnaSliceIt">
         <arguments>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
             <argument name="infoBlockType" xsi:type="string">Mollie\Payment\Block\Info\Base</argument>
-            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnasliceitValueHandlerPool</argument>
+            <argument name="valueHandlerPool" xsi:type="object">MollieKlarnaSliceItValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
-            <argument name="validatorPool" xsi:type="object">MollieKlarnasliceitValidatorPool</argument>
         </arguments>
     </type>
-
-    <virtualType name="MollieKlarnasliceitValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+    <virtualType name="MollieKlarnaSliceItValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
-                <item name="default" xsi:type="string">MollieKlarnasliceitConfigValueHandler</item>
+                <item name="default" xsi:type="string">MollieKlarnaSliceItConfigValueHandler</item>
             </argument>
         </arguments>
     </virtualType>
-
-    <virtualType name="MollieKlarnasliceitConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+    <virtualType name="MollieKlarnaSliceItConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
         <arguments>
-            <argument name="configInterface" xsi:type="object">MollieKlarnasliceitConfig</argument>
+            <argument name="configInterface" xsi:type="object">MollieKlarnaSliceItConfig</argument>
         </arguments>
     </virtualType>
-
-    <virtualType name="MollieKlarnasliceitConfig" type="Magento\Payment\Gateway\Config\Config">
+    <virtualType name="MollieKlarnaSliceItConfig" type="Magento\Payment\Gateway\Config\Config">
         <arguments>
-            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\Klarnasliceit::CODE</argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieKlarnasliceitValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
-        <arguments>
-            <argument name="validators" xsi:type="array">
-                <item name="country" xsi:type="string">MollieKlarnasliceitCountryValidator</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
-    <virtualType name="MollieKlarnasliceitCountryValidator" type="Magento\Payment\Gateway\Validator\CountryValidator">
-        <arguments>
-            <argument name="config" xsi:type="object">MollieKlarnasliceitConfig</argument>
+            <argument name="methodCode" xsi:type="const">Mollie\Payment\Model\Methods\KlarnaSliceIt::CODE</argument>
         </arguments>
     </virtualType>
 
@@ -2410,7 +2359,6 @@
             <argument name="commands" xsi:type="array">
                 <item name="order" xsi:type="string">MollieOrderCommand</item>
                 <item name="authorize" xsi:type="string">MollieInitializeCommand</item>
-                <item name="vault_authorize" xsi:type="string">MollieInitializeCommand</item>
             </argument>
         </arguments>
     </virtualType>

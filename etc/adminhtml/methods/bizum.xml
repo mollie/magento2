@@ -8,6 +8,8 @@
          xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
     <group id="mollie_methods_bizum" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1"
            showInStore="1">
+        <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\GroupFrontendModel</frontend_model>
+
         <label>Bizum</label>
         <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
                showInStore="1">
@@ -23,24 +25,22 @@
                 <field id="active">1</field>
             </depends>
         </field>
-        <field id="method" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1"
-               showInStore="1">
-            <label>Method</label>
-            <source_model>Mollie\Payment\Model\Adminhtml\Source\Method</source_model>
-            <config_path>payment/mollie_methods_bizum/method</config_path>
-            <depends>
-                <field id="active">1</field>
-            </depends>
-            <comment><![CDATA[Click
-            <a href="https://github.com/mollie/magento2/wiki/Differences-Payments-API-&-Orders-API" target="_blank">here</a>
-            to read more about the differences between the Payment and Orders API.]]></comment>
-        </field>
-        <field id="payment_description" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+        <field id="payment_description" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Description</label>
             <config_path>payment/mollie_methods_bizum/payment_description</config_path>
             <comment model="Mollie\Payment\Model\Adminhtml\Comment\AvailableDescriptionVariables"/>
             <depends>
                 <field id="method">payment</field>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="capture_mode" translate="label comment" type="select" sortOrder="40" showInDefault="1"
+               showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Capture method</label>
+            <config_path>payment/mollie_methods_bizum/capture_mode</config_path>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\CaptureMode</source_model>
+            <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Field\LockCaptureMode</frontend_model>
+            <depends>
                 <field id="active">1</field>
             </depends>
         </field>
@@ -53,7 +53,7 @@
                 <field id="active">1</field>
                 <field id="method">order</field>
             </depends>
-            <comment>How many days before orders for this method becomes expired? Leave empty to use default expiration (28 days)</comment>
+            <comment>How many days before orders for this method expire? Leave empty to use default expiration (28 days)</comment>
         </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="60" showInDefault="1"
                showInWebsite="1" showInStore="1">
@@ -125,7 +125,7 @@
                showInStore="1">
             <label>Payment Surcharge limit</label>
             <config_path>payment/mollie_methods_bizum/payment_surcharge_limit</config_path>
-            <comment><![CDATA[Enter the maximum amount of payment surchage to should be charged to the customer.]]></comment>
+            <comment><![CDATA[Enter the maximum amount of payment surcharge that should be charged to the customer.]]></comment>
             <backend_model>Mollie\Payment\Model\Adminhtml\Backend\VerifiyPaymentFee</backend_model>
             <frontend_class>validate-not-negative-number</frontend_class>
             <depends>

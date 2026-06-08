@@ -1,7 +1,7 @@
 {
   "name": "mollie/magento2",
   "description": "Mollie Payment Module for Magento 2",
-  "version": "2.51.0",
+  "version": "3.0.0",
   "keywords": [
     "mollie",
     "payment",
@@ -30,9 +30,6 @@
     "mybank",
     "kbc",
     "klarna",
-    "klarnapaylater",
-    "klarnapaynow",
-    "klarnasliceit",
     "pay by bank",
     "paypal",
     "paysafecard",
@@ -59,12 +56,13 @@
     "charges",
     "intersolve",
     "paylater",
+    "wero",
     "magento2",
     "magento 2"
   ],
   "require": {
-    "mollie/mollie-api-php": "^2.65",
-    "magento/framework": ">=102.0.3",
+    "mollie/mollie-api-php": "^3.3",
+    "magento/framework": ">=103.0.5",
     "magento/module-backend": ">=100.3.3",
     "magento/module-catalog": ">=100.3.3",
     "magento/module-checkout": ">=100.3.3",
@@ -78,9 +76,11 @@
     "magento/module-store": ">=100.3.3",
     "magento/module-tax": ">=100.3.3",
     "magento/module-ui": ">=100.3.3",
-    "magento/module-vault": ">=100.3.3",
-    "php": ">=7.3",
+    "php": ">=8.1",
     "ext-json": "*"
+  },
+  "replace": {
+    "mollie/magento2-analytics": "*"
   },
   "type": "magento2-module",
   "license": [
@@ -91,7 +91,7 @@
     "files": [
       "registration.php",
       "GraphQL/Replaces/AdditionalDataProviderInterface.php",
-      "Service/InstantPurchase/AvailabilityCheckerInterface.php"
+      "Service/storeid.php"
     ],
     "psr-4": {
       "Mollie\\Payment\\": ""
@@ -103,7 +103,6 @@
       "mollie/magento2-hyva-react-checkout": "Hyvä React Checkout integration for Mollie Payments",
       "mollie/magento2-multishipping": "Multishipping integration for Mollie Payments",
       "mollie/magento2-scandipwa": "ScandiPWA integration for Mollie Payments",
-      "mollie/magento2-analytics": "Analytics integration for Mollie Payments",
       "mollie/magento2-subscriptions": "Subscriptions integration for Mollie Payments"
   }
 }

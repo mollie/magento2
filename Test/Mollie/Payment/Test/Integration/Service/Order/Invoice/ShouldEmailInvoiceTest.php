@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -66,7 +70,7 @@ class ShouldEmailInvoiceTest extends IntegrationTestCase
         /** @var ShouldEmailInvoice $instance */
         $instance = $this->objectManager->create(ShouldEmailInvoice::class);
 
-        $result = $instance->execute(1, 'mollie_methods_klarnapaynow');
+        $result = $instance->execute(1, 'mollie_methods_klarna');
 
         $this->assertFalse($result);
     }

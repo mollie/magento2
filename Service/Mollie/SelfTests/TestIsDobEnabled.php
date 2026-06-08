@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -13,23 +14,10 @@ use Mollie\Payment\Helper\General;
 
 class TestIsDobEnabled extends AbstractSelfTest
 {
-    /**
-     * @var ScopeConfigInterface
-     */
-    private $scopeConfig;
-
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
     public function __construct(
-        ScopeConfigInterface $scopeConfig,
-        General $mollieHelper
-    ) {
-        $this->scopeConfig = $scopeConfig;
-        $this->mollieHelper = $mollieHelper;
-    }
+        private ScopeConfigInterface $scopeConfig,
+        private General $mollieHelper
+    ) {}
 
     public function execute(): void
     {
@@ -42,7 +30,7 @@ class TestIsDobEnabled extends AbstractSelfTest
                 'Date of Birth is not enabled in the customer address settings. This is required for IN3. ' .
                 'Please enable this in Stores > Configuration > Customers > Customer Configuration > ' .
                 'Name and Address Options > Show Date of Birth. Please be also aware that this needs to be available ' .
-                'in the checkout.'
+                'in the checkout.',
             ));
         }
     }

@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -19,7 +23,7 @@ class PointOfSaleAvailabilityTest extends IntegrationTestCase
         $cart = $this->objectManager->create(Quote::class);
         $cart->load('test01', 'reserved_order_id');
 
-        /** @var \Mollie\Payment\Service\Mollie\PointOfSaleAvailability $instance */
+        /** @var PointOfSaleAvailability $instance */
         $instance = $this->objectManager->get(PointOfSaleAvailability::class);
 
         $this->assertFalse($instance->isAvailable($cart));
@@ -35,7 +39,7 @@ class PointOfSaleAvailabilityTest extends IntegrationTestCase
         $cart = $this->objectManager->create(Quote::class);
         $cart->load('test01', 'reserved_order_id');
 
-        /** @var \Mollie\Payment\Service\Mollie\PointOfSaleAvailability $instance */
+        /** @var PointOfSaleAvailability $instance */
         $instance = $this->objectManager->get(PointOfSaleAvailability::class);
 
         $this->assertTrue($instance->isAvailable($cart));

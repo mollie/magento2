@@ -1,8 +1,11 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Api\Data;
 
@@ -10,8 +13,8 @@ use Magento\Framework\Api\ExtensibleDataInterface;
 
 interface SentPaymentReminderInterface extends ExtensibleDataInterface
 {
-    const ENTITY_ID = 'entity_id';
-    const ORDER_ID = 'order_id';
+    public const ENTITY_ID = 'entity_id';
+    public const ORDER_ID = 'order_id';
 
     /**
      * @param int $id

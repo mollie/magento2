@@ -65,17 +65,15 @@ class ParseAdditionalData
         return $this->additionalDataFactory->create(['details' => $details]);
     }
 
-    /**
-     * @param OrderPaymentInterface $payment
-     * @return array|mixed|null
-     */
     public function getDetails(OrderPaymentInterface $payment): ?Details
     {
         $details = $payment->getAdditionalInformation('details');
         if ($this->config->encryptPaymentDetails()) {
             try {
                 $details = $this->encryptor->decrypt($details);
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+                $this->config->addToLog('error', $e->getMessage());
+            }
         }
         if (is_string($details)) {
             $details = json_decode($details, true);

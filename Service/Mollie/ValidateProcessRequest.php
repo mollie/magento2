@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -17,28 +18,11 @@ use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 
 class ValidateProcessRequest
 {
-    /**
-     * @var RequestInterface
-     */
-    private $request;
-    /**
-     * @var SearchCriteriaBuilderFactory
-     */
-    private $searchCriteriaBuilderFactory;
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
     public function __construct(
-        RequestInterface $request,
-        SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
-        PaymentTokenRepositoryInterface $paymentTokenRepository
-    ) {
-        $this->request = $request;
-        $this->searchCriteriaBuilderFactory = $searchCriteriaBuilderFactory;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-    }
+        private RequestInterface $request,
+        private SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
+        private PaymentTokenRepositoryInterface $paymentTokenRepository
+    ) {}
 
     /**
      * @return array

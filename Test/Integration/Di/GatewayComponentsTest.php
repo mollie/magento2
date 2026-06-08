@@ -4,16 +4,24 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Di;
 
 use Magento\Framework\ObjectManager\ConfigInterface;
+use Magento\Payment\Block\Form;
 use Magento\TestFramework\ObjectManager\Config;
-use Mollie\Payment\Model\Methods\CreditcardVault;
+use Mollie\Payment\Block\Form\Paymentlink;
+use Mollie\Payment\Block\Form\Pointofsale;
+use Mollie\Payment\Model\Methods\KlarnaPayLater;
+use Mollie\Payment\Model\Methods\KlarnaPayNow;
+use Mollie\Payment\Model\Methods\KlarnaSliceIt;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use ReflectionObject;
 
 class GatewayComponentsTest extends IntegrationTestCase
 {
-    public function testHasAValidatorPool()
+    public function testHasAValidatorPool(): void
     {
         /** @var Config $config */
         $config = $this->objectManager->get(ConfigInterface::class);
@@ -25,13 +33,13 @@ class GatewayComponentsTest extends IntegrationTestCase
         }
     }
 
-    public function testHasTheValidatorPoolConfigured()
+    public function testHasTheValidatorPoolConfigured(): void
     {
         $arguments = $this->getObjectManagerArguments();
 
         foreach ($this->getMethods() as $method) {
             $class = $method['class'];
-            $name  = $method['name'];
+            $name = $method['name'];
             $classArguments = $arguments[$class];
 
             $this->assertArrayHasKey('validatorPool', $classArguments, $name . ' does not have a ValidatorPool');
@@ -39,7 +47,7 @@ class GatewayComponentsTest extends IntegrationTestCase
         }
     }
 
-    public function testHasACountryValidator()
+    public function testHasACountryValidator(): void
     {
         /** @var Config $config */
         $config = $this->objectManager->get(ConfigInterface::class);
@@ -51,7 +59,7 @@ class GatewayComponentsTest extends IntegrationTestCase
         }
     }
 
-    public function testCountryValidatorUsesCorrectConfiguration()
+    public function testCountryValidatorUsesCorrectConfiguration(): void
     {
         $arguments = $this->getObjectManagerArguments();
 
@@ -59,7 +67,7 @@ class GatewayComponentsTest extends IntegrationTestCase
         $config = $this->objectManager->get(ConfigInterface::class);
 
         foreach ($this->getMethods() as $method) {
-            $name  = $method['name'];
+            $name = $method['name'];
 
             $virtualTypes = $config->getVirtualTypes();
 
@@ -77,18 +85,14 @@ class GatewayComponentsTest extends IntegrationTestCase
         $arguments = $this->getObjectManagerArguments();
 
         $blocks = [
-            'default' => \Magento\Payment\Block\Form::class,
-            'Paymentlink' => \Mollie\Payment\Block\Form\Paymentlink::class,
-            'Pointofsale' => \Mollie\Payment\Block\Form\Pointofsale::class,
+            'default' => Form::class,
+            'Paymentlink' => Paymentlink::class,
+            'Pointofsale' => Pointofsale::class,
         ];
 
         foreach ($this->getMethods() as $method) {
-            if ($method['name'] == 'CreditcardVault') {
-                continue;
-            }
-
             $class = $method['class'];
-            $name  = $method['name'];
+            $name = $method['name'];
             $classArguments = $arguments[$class];
 
             $expected = $blocks[$name] ?? $blocks['default'];
@@ -96,15 +100,6 @@ class GatewayComponentsTest extends IntegrationTestCase
             $this->assertArrayHasKey('formBlockType', $classArguments, $name . ' does not have a formBlockType');
             $this->assertEquals($expected, $classArguments['formBlockType'], $name . ' have an incorrect formBlockType');
         }
-    }
-
-    public function testCreditcardVaultDoesNotHaveFormBlockType(): void
-    {
-        $arguments = $this->getObjectManagerArguments();
-
-        $classArguments = $arguments[CreditcardVault::class];
-
-        $this->assertArrayNotHasKey('formBlockType', $classArguments, 'CreditcardVault does have a formBlockType');
     }
 
     private function getObjectManagerArguments(): array
@@ -118,9 +113,8 @@ class GatewayComponentsTest extends IntegrationTestCase
         /** @var Config $config */
         $config = $this->objectManager->get(ConfigInterface::class);
 
-        $reflectionObject = new \ReflectionObject($config);
+        $reflectionObject = new ReflectionObject($config);
         $reflectionProperty = $reflectionObject->getProperty('_arguments');
-        $reflectionProperty->setAccessible(true);
 
         $arguments = $reflectionProperty->getValue($config);
 
@@ -131,11 +125,18 @@ class GatewayComponentsTest extends IntegrationTestCase
     {
         $keys = array_keys($this->getObjectManagerArguments());
 
-        $methods = array_filter($keys, function ($key) {
-            return strpos($key, 'Mollie\\Payment\\Model\\Methods') !== false;
+        $methods = array_filter($keys, function (int|string $key): bool {
+            if (strpos($key, 'Mollie\\Payment\\Model\\Methods') === false) {
+                return false;
+            }
+
+            // Legacy stubs added in v3.0 to keep pre-v3 Klarna orders viewable in admin.
+            // They are intentionally minimal (no ValidatorPool) since they are never used at checkout.
+            $legacyStubs = [KlarnaPayLater::class, KlarnaPayNow::class, KlarnaSliceIt::class];
+            return !in_array($key, $legacyStubs, true);
         });
 
-        return array_map(function ($key) {
+        return array_map(function (int|string $key): array {
             $parts = explode('\\', $key);
 
             return [

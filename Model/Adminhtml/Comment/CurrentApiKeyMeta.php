@@ -4,28 +4,23 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Adminhtml\Comment;
 
+use Magento\Config\Model\Config\CommentInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\View\Element\AbstractBlock;
-use Magento\Config\Model\Config\CommentInterface;
 use Magento\Framework\View\Element\Context;
 
 class CurrentApiKeyMeta extends AbstractBlock implements CommentInterface
 {
-    /**
-     * @var EncryptorInterface
-     */
-    private $encryptor;
-
     public function __construct(
         Context $context,
-        EncryptorInterface $encryptor,
-        array $data = []
+        private EncryptorInterface $encryptor,
+        array $data = [],
     ) {
         parent::__construct($context, $data);
-
-        $this->encryptor = $encryptor;
     }
 
     public function getCommentText($elementValue)

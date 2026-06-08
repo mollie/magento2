@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -8,19 +9,13 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\SelfTests;
 
+use Mollie\Payment\Config;
+
 class TestDefaultBankTransferStatus extends AbstractSelfTest
 {
-    /**
-     * @var \Mollie\Payment\Config
-     */
-    private $config;
-
     public function __construct(
-        \Mollie\Payment\Config $config
-    ) {
-        $this->config = $config;
-    }
-
+        private Config $config
+    ) {}
 
     public function execute(): void
     {

@@ -4,12 +4,12 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Helper;
 
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Locale\Resolver;
-use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Store\Api\StoreRepositoryInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -17,131 +17,12 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class GeneralTest extends IntegrationTestCase
 {
-    /**
-     * @magentoConfigFixture default_store payment/mollie_general/locale en_US
-     */
-    public function testGetLocaleCodeWithFixedLocale()
-    {
-        /** @var General $instance */
-        $instance = $this->objectManager->get(General::class);
-
-        $result = $instance->getLocaleCode(null, 'order');
-
-        $this->assertEquals('en_US', $result);
-    }
-
-    /**
-     * @magentoConfigFixture default_store payment/mollie_general/locale
-     */
-    public function testGetLocaleCodeWithAutomaticDetectionAndAValidLocale()
-    {
-        /** @var Resolver $localeResolver */
-        $localeResolver = $this->objectManager->get(Resolver::class);
-        $localeResolver->setLocale('en_US');
-
-        /** @var General $instance */
-        $instance = $this->objectManager->get(General::class);
-
-        $result = $instance->getLocaleCode(null, 'order');
-
-        $this->assertEquals('en_US', $result);
-    }
-
-    /**
-     * @magentoConfigFixture default_store payment/mollie_general/locale
-     */
-    public function testGetLocaleCodeWithAutomaticDetectionAndAInvalidLocale()
-    {
-        /** @var Resolver $localeResolver */
-        $localeResolver = $this->objectManager->get(Resolver::class);
-        $localeResolver->setLocale('en_GB');
-
-        /** @var General $instance */
-        $instance = $this->objectManager->get(General::class);
-
-        $result = $instance->getLocaleCode(null, 'order');
-
-        $this->assertEquals('en_US', $result);
-    }
-
-    /**
-     * @magentoConfigFixture default_store payment/mollie_general/locale store
-     */
-    public function testGetLocaleCodeBasedOnTheStoreLocaleWithAValidValue()
-    {
-        /** @var Resolver $localeResolver */
-        $localeResolver = $this->objectManager->get(Resolver::class);
-        $localeResolver->setLocale('en_GB');
-
-        /** @var General $instance */
-        $instance = $this->objectManager->get(General::class);
-
-        $result = $instance->getLocaleCode(null, 'order');
-
-        $this->assertEquals('en_US', $result);
-    }
-
-    /**
-     * @magentoConfigFixture default_store payment/mollie_general/locale
-     */
-    public function testGetLocaleCanReturnNull()
-    {
-        /** @var Resolver $localeResolver */
-        $localeResolver = $this->objectManager->get(Resolver::class);
-        $localeResolver->setLocale('en_GB');
-
-        /** @var General $instance */
-        $instance = $this->objectManager->get(General::class);
-
-        $result = $instance->getLocaleCode(null, 'payment');
-
-        $this->assertNull($result);
-    }
-
-    public function testIsPaidUsingMollieOrdersApiCatchesExceptions()
-    {
-        $order = $this->objectManager->create(OrderInterface::class);
-
-        $payment = $this->objectManager->create(OrderPaymentInterface::class);
-        $payment->setMethod('non-existing-method');
-        $order->setPayment($payment);
-
-        /** @var General $instance */
-        $instance = $this->objectManager->create(General::class);
-        $result = $instance->isPaidUsingMollieOrdersApi($order);
-
-        $this->assertFalse($result);
-    }
-
-    /**
-     * @magentoDataFixture Magento/Store/_files/second_store.php
-     * @magentoConfigFixture current_store payment/mollie_general/apikey_test keyA
-     * @magentoConfigFixture fixture_second_store_store payment/mollie_general/apikey_test keyB
-     */
-    public function testGetApiKeyGivesAUniqueKeyPerStore()
-    {
-        $storeA = $this->objectManager->get(StoreRepositoryInterface::class)->get('default')->getId();
-        $storeB = $this->objectManager->get(StoreRepositoryInterface::class)->get('fixture_second_store')->getId();
-
-        $encryptorMock = $this->createMock(EncryptorInterface::class);
-        $encryptorMock->method('decrypt')->willReturn('keyA', 'keyB');
-
-        /** @var General $instance */
-        $instance = $this->objectManager->create(General::class, [
-            'encryptor' => $encryptorMock,
-        ]);
-
-        $this->assertEquals('keyA', $instance->getApiKey($storeA));
-        $this->assertEquals('keyB', $instance->getApiKey($storeB));
-    }
-
-    public static function getMethodCodeDataProvider()
+    public static function getMethodCodeDataProvider(): array
     {
         return [
             'paymentlink' => ['mollie_methods_paymentlink', ''],
             'checkmo' => ['checkmo', ''],
             'free' => ['free', ''],
-
             'applepay' => ['mollie_methods_applepay', 'applepay'],
             'alma' => ['mollie_methods_alma', 'alma'],
             'bancomatpay' => ['mollie_methods_bancomatpay', 'bancomatpay'],
@@ -154,15 +35,13 @@ class GeneralTest extends IntegrationTestCase
             'creditcard' => ['mollie_methods_creditcard', 'creditcard'],
             'directdebit' => ['mollie_methods_directdebit', 'directdebit'],
             'eps' => ['mollie_methods_eps', 'eps'],
+            'expresscomponents' => ['mollie_methods_expresscomponents', 'expresscomponents'],
             'giftcard' => ['mollie_methods_giftcard', 'giftcard'],
             'googlepay' => ['mollie_methods_googlepay', 'creditcard'],
             'ideal' => ['mollie_methods_ideal', 'ideal'],
             'in3' => ['mollie_methods_in3', 'in3'],
             'kbc' => ['mollie_methods_kbc', 'kbc'],
             'klarna' => ['mollie_methods_klarna', 'klarna'],
-            'klarnapaylater' => ['mollie_methods_klarnapaylater', 'klarnapaylater'],
-            'klarnapaynow' => ['mollie_methods_klarnapaynow', 'klarnapaynow'],
-            'klarnasliceit' => ['mollie_methods_klarnasliceit', 'klarnasliceit'],
             'voucher' => ['mollie_methods_voucher', 'voucher'],
             'mbway' => ['mollie_methods_mbway', 'mbway'],
             'mobilepay' => ['mollie_methods_mobilepay', 'mobilepay'],
@@ -185,24 +64,105 @@ class GeneralTest extends IntegrationTestCase
     }
 
     /**
-     * @dataProvider getMethodCodeDataProvider
+     * @magentoDataFixture Magento/Store/_files/second_store.php
+     * @magentoConfigFixture current_store payment/mollie_general/apikey_test keyA
+     * @magentoConfigFixture fixture_second_store_store payment/mollie_general/apikey_test keyB
      */
-    #[DataProvider('getMethodCodeDataProvider')]
-    public function testGetMethodCode($input, $expected)
+    public function testGetApiKeyGivesAUniqueKeyPerStore(): void
     {
-        /** @var OrderInterface $order */
-        $order = $this->objectManager->create(OrderInterface::class);
+        $storeA = $this->objectManager->get(StoreRepositoryInterface::class)->get('default')->getId();
+        $storeB = $this->objectManager->get(StoreRepositoryInterface::class)->get('fixture_second_store')->getId();
 
-        /** @var OrderPaymentInterface $payment */
-        $payment = $this->objectManager->create(OrderPaymentInterface::class);
-        $order->setPayment($payment);
-
-        $payment->setMethod($input);
+        $encryptorMock = $this->createMock(EncryptorInterface::class);
+        $encryptorMock->method('decrypt')->willReturn('keyA', 'keyB');
 
         /** @var General $instance */
-        $instance = $this->objectManager->create(General::class);
-        $result = $instance->getMethodCode($order);
+        $instance = $this->objectManager->create(General::class, [
+            'encryptor' => $encryptorMock,
+        ]);
 
-        $this->assertEquals($expected, $result);
+        $this->assertEquals('keyA', $instance->getApiKey($storeA));
+        $this->assertEquals('keyB', $instance->getApiKey($storeB));
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/locale
+     */
+    public function testGetLocaleCanReturnNull(): void
+    {
+        /** @var Resolver $localeResolver */
+        $localeResolver = $this->objectManager->get(Resolver::class);
+        $localeResolver->setLocale('en_GB');
+
+        /** @var General $instance */
+        $instance = $this->objectManager->get(General::class);
+
+        $result = $instance->getLocaleCode(null);
+
+        $this->assertNull($result);
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/locale store
+     */
+    public function testGetLocaleCodeBasedOnTheStoreLocaleWithAValidValue(): void
+    {
+        /** @var Resolver $localeResolver */
+        $localeResolver = $this->objectManager->get(Resolver::class);
+        $localeResolver->setLocale('en_GB');
+
+        /** @var General $instance */
+        $instance = $this->objectManager->get(General::class);
+
+        $result = $instance->getLocaleCode(null);
+
+        $this->assertNull($result);
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/locale
+     */
+    public function testGetLocaleCodeWithAutomaticDetectionAndAInvalidLocale(): void
+    {
+        /** @var Resolver $localeResolver */
+        $localeResolver = $this->objectManager->get(Resolver::class);
+        $localeResolver->setLocale('en_GB');
+
+        /** @var General $instance */
+        $instance = $this->objectManager->get(General::class);
+
+        $result = $instance->getLocaleCode(null);
+
+        $this->assertNull($result);
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/locale
+     */
+    public function testGetLocaleCodeWithAutomaticDetectionAndAValidLocale(): void
+    {
+        /** @var Resolver $localeResolver */
+        $localeResolver = $this->objectManager->get(Resolver::class);
+        $localeResolver->setLocale('en_US');
+
+        /** @var General $instance */
+        $instance = $this->objectManager->get(General::class);
+
+        $result = $instance->getLocaleCode(null);
+
+        $this->assertNull($result);
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/locale en_US
+     */
+    public function testGetLocaleCodeWithFixedLocale(): void
+    {
+        /** @var General $instance */
+        $instance = $this->objectManager->get(General::class);
+
+        $result = $instance->getLocaleCode(null);
+
+        $this->assertEquals('en_US', $result);
     }
 }

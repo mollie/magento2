@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\Lines;
 
@@ -10,29 +16,16 @@ use Mollie\Payment\Helper\General;
 class StoreCredit
 {
     /**
-     * @var General
-     */
-    private $mollieHelper;
-
-    /**
-     * @var OrderLinesProcessor
-     */
-    private $orderLinesProcessor;
-
-    /**
      * StoreCredit constructor.
      * @param General $mollieHelper
      * @param OrderLinesProcessor $orderLinesProcessor
      */
     public function __construct(
-        General $mollieHelper,
-        OrderLinesProcessor $orderLinesProcessor
-    ) {
-        $this->mollieHelper = $mollieHelper;
-        $this->orderLinesProcessor = $orderLinesProcessor;
-    }
+        private General $mollieHelper,
+        private OrderLinesProcessor $orderLinesProcessor
+    ) {}
 
-    public function orderHasStoreCredit(OrderInterface $order)
+    public function orderHasStoreCredit(OrderInterface $order): bool
     {
         if ($order->getData('customer_balance_amount')) {
             return true;
@@ -45,7 +38,7 @@ class StoreCredit
         return false;
     }
 
-    public function creditmemoHasStoreCredit(CreditmemoInterface $creditmemo)
+    public function creditmemoHasStoreCredit(CreditmemoInterface $creditmemo): bool
     {
         if ($creditmemo->getData('customer_balance_amount')) {
             return true;
@@ -64,12 +57,12 @@ class StoreCredit
      * @return array
      * @throws NoStoreCreditFound
      */
-    public function getOrderLine(OrderInterface $order, $forceBaseCurrency)
+    public function getOrderLine(OrderInterface $order, $forceBaseCurrency): array
     {
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $unitPrice = $this->getUnitPrice($order, $forceBaseCurrency);
-        $vatRate = $this->getVatRate($order, $forceBaseCurrency);
-        $vatAmount = $this->getVatAmount($order, $forceBaseCurrency);
+        $vatRate = $this->getVatRate();
+        $vatAmount = $this->getVatAmount();
 
         $orderLine = [
             'type' => 'store_credit',
@@ -107,34 +100,26 @@ class StoreCredit
         throw new NoStoreCreditFound(
             __(
                 'We were unable to find the store credit for order #%1',
-                $order->getEntityId()
-            )
+                $order->getEntityId(),
+            ),
         );
     }
 
     /**
      * The current implementations, Magento Enterprise Store Credit and  Amasty Store Credit,
      * don't support tax on the amounts.
-     *
-     * @param OrderInterface $order
-     * @param bool $forceBaseCurrency
-     * @return string
      */
-    private function getVatRate(OrderInterface $order, $forceBaseCurrency)
+    private function getVatRate(): float
     {
-        return '0.00';
+        return 0.0;
     }
 
     /**
      * The current implementations, Magento Enterprise Store Credit and  Amasty Store Credit,
      * don't support tax on the amounts.
-     *
-     * @param OrderInterface $order
-     * @param bool $forceBaseCurrency
-     * @return string
      */
-    private function getVatAmount(OrderInterface $order, $forceBaseCurrency)
+    private function getVatAmount(): float
     {
-        return '0.00';
+        return 0.0;
     }
 }

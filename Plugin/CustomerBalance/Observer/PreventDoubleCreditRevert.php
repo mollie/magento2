@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -12,14 +16,16 @@ class PreventDoubleCreditRevert
     public function aroundExecute($subject, callable $proceed, Observer $observer)
     {
         $order = $observer->getData('order');
-        if (!$order ||
+        if (
+            !$order ||
             !$order instanceof OrderInterface ||
             !$order->getPayment()
         ) {
             return $proceed($observer);
         }
 
-        if ($observer->getEvent()->getName() == 'restore_quote' &&
+        if (
+            $observer->getEvent()->getName() == 'restore_quote' &&
             $this->isMollieOrder($order)
         ) {
             return $subject;

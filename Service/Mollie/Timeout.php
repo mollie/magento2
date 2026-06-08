@@ -1,24 +1,25 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Mollie;
+
+use Exception;
 
 class Timeout
 {
-    /**
-     * @var \Exception
-     */
-    private $lastException;
+    private ?Exception $lastException = null;
 
     /**
      * @param callable $callback
      * @return mixed
-     * @throws \Exception
+     * @throws Exception
      */
-    public function retry(Callable $callback)
+    public function retry(callable $callback)
     {
         $tries = 0;
         do {
@@ -37,7 +38,7 @@ class Timeout
     {
         try {
             return $callback();
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->lastException = $exception;
             $this->handle($exception);
 
@@ -45,7 +46,7 @@ class Timeout
         }
     }
 
-    private function handle(\Exception $exception)
+    private function handle(Exception $exception): void
     {
         if (stripos($exception->getMessage(), 'cURL error 28') !== false) {
             return;

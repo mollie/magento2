@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Block\Info;
 
@@ -13,7 +15,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class BaseTest extends IntegrationTestCase
 {
-    public function testReturnsTheDashboardUrl()
+    public function testReturnsTheDashboardUrl(): void
     {
         /** @var Info $info */
         $info = $this->objectManager->create(Info::class);
@@ -25,7 +27,7 @@ class BaseTest extends IntegrationTestCase
         $this->assertEquals('http://example.com/dashboard', $instance->getDashboardUrl());
     }
 
-    public function testReturnsTheMollieId()
+    public function testReturnsTheMollieId(): void
     {
         /** @var Info $info */
         $info = $this->objectManager->create(Info::class);
@@ -56,7 +58,7 @@ class BaseTest extends IntegrationTestCase
         $this->assertNull($instance->{$method}());
     }
 
-    public function testReturnsTheRemainderAmount()
+    public function testReturnsTheRemainderAmount(): void
     {
         /** @var Info $info */
         $info = $this->objectManager->create(Info::class);

@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Fakes\Plugin\Quote\Api;
 
@@ -22,8 +28,8 @@ class PaymentMethodManagementPluginFake extends PaymentMethodManagementPlugin
 
     public function dontReturnMollieMethods(): void
     {
-        $this->callback = function ($result) {
-            return array_filter($result, function ($method) {
+        $this->callback = function ($result): array {
+            return array_filter($result, function ($method): bool {
                 return !$method instanceof Mollie;
             });
         };

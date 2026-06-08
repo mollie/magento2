@@ -1,10 +1,12 @@
-/**
-  * Copyright © Magmodules.eu. All rights reserved.
-  * See COPYING.txt for license details.
-  */
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 @import '_icons.less';
 @import '_mm-buttons';
+@import '_method-card';
+@import '_other-modules';
 @import './variables/_mm-colors.less';
 
 .admin__menu .item-menu.parent.level-0 > a:before {
@@ -49,7 +51,7 @@ ul[role="menu"] [data-ui-id^="menu-magmodules"] strong:before {
 }
 
 .mm-mollie-heading-comment {
-    padding: 1rem 0rem 0rem 1rem;
+    padding: 1rem 0 0 1rem;
     font-size: 1.2rem;
     line-height: 2.5rem;
     border-left: 4px solid @color-white-fog;
@@ -59,7 +61,7 @@ ul[role="menu"] [data-ui-id^="menu-magmodules"] strong:before {
     color: @bordercolor;
     font-weight: 600;
     display: block;
-    padding: 3px 0px 3px 0px;
+    padding: 3px 0;
 }
 
 .mm-mollie-header {

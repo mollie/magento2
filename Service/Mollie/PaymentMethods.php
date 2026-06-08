@@ -4,17 +4,14 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Mollie;
 
 use Mollie\Payment\Config;
 
 class PaymentMethods
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public const METHODS = [
         'mollie_methods_applepay',
         'mollie_methods_alma',
@@ -28,15 +25,13 @@ class PaymentMethods
         'mollie_methods_creditcard',
         'mollie_methods_directdebit',
         'mollie_methods_eps',
+        'mollie_methods_expresscomponents',
         'mollie_methods_giftcard',
         'mollie_methods_googlepay',
         'mollie_methods_ideal',
         'mollie_methods_in3',
         'mollie_methods_kbc',
         'mollie_methods_klarna',
-        'mollie_methods_klarnapaylater',
-        'mollie_methods_klarnapaynow',
-        'mollie_methods_klarnasliceit',
         'mollie_methods_mbway',
         'mollie_methods_mobilepay',
         'mollie_methods_multibanco',
@@ -57,10 +52,8 @@ class PaymentMethods
     ];
 
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
     public function getCodes(): array
     {
@@ -69,7 +62,7 @@ class PaymentMethods
 
     public function getCodesWithTitle(): array
     {
-        return array_map(function ($method) {
+        return array_map(function ($method): array {
             return [
                 'value' => $method,
                 'label' => $this->config->getMethodTitle($method),

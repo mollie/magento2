@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
@@ -259,7 +265,7 @@ class PhoneNumber implements TransactionPartInterface
         'ZW' => '263', // Zimbabwe
     ];
 
-    public function process(OrderInterface $order, $apiMethod, array $transaction)
+    public function process(OrderInterface $order, array $transaction): array
     {
         $transaction['billingAddress'] = $this->formatForAddress(
             $order->getBillingAddress(),

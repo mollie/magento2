@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Eps;
 
 class EpsMethodTest extends AbstractTestMethod
 {
-    protected $instance = Eps::class;
+    protected ?string $instance = Eps::class;
 
-    protected $code = 'eps';
+    protected ?string $code = 'eps';
 }

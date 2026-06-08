@@ -1,11 +1,12 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Observer\SalesQuoteSaveBefore;
+declare(strict_types=1);
 
+namespace Mollie\Payment\Observer\SalesQuoteSaveBefore;
 
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -16,7 +17,7 @@ class SetPaymentFeeDataOnQuote implements ObserverInterface
     /**
      * @inheritDoc
      */
-    public function execute(Observer $observer)
+    public function execute(Observer $observer): void
     {
         /** @var CartInterface $quote */
         $quote = $observer->getData('quote');

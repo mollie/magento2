@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\PaymentToken;
 
 use Magento\Sales\Api\Data\OrderInterface;
@@ -11,23 +13,10 @@ use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 
 class PaymentTokenForOrder
 {
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
-    /**
-     * @var Generate
-     */
-    private $generate;
-
     public function __construct(
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        Generate $generate
-    ) {
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->generate = $generate;
-    }
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private Generate $generate
+    ) {}
 
     public function execute(OrderInterface $order): string
     {

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Webapi;
 
 use Magento\Quote\Model\Quote;
@@ -25,7 +27,7 @@ class PaymentTokenTestWebApi extends AbstractTestWebApi
     /**
      * @magentoDataFixture Magento/Sales/_files/quote.php
      */
-    public function testAddsANewPaymentToken()
+    public function testAddsANewPaymentToken(): void
     {
         $cart = $this->objectManager->create(Quote::class);
         $cart->load('test01', 'reserved_order_id');

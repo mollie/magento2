@@ -4,20 +4,19 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Fakes\Service\Mollie;
 
-use Magento\TestFramework\ObjectManager;
-use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class FakeMollieApiClient extends MollieApiClient
 {
-    /**
-     * @var \Mollie\Api\MollieApiClient
-     */
-    private $instance;
+    private bool $disableApiCall = true;
 
-    public function setInstance(\Mollie\Api\MollieApiClient $instance)
+    private ?\Mollie\Api\MollieApiClient $instance = null;
+
+    public function setInstance(\Mollie\Api\MollieApiClient $instance): void
     {
         $this->instance = $instance;
     }
@@ -38,19 +37,17 @@ class FakeMollieApiClient extends MollieApiClient
         return parent::loadByStore($storeId);
     }
 
-    public function returnFakePayment(?Payment $payment = null): ?Payment
+    public function loadByApiKey(string $apiKey): \Mollie\Api\MollieApiClient
     {
-        $this->loadInstance();
-
-        $endpoint = ObjectManager::getInstance()->create(FakeMolliePaymentApiEndpoint::class);
-
-        $this->instance->payments = $endpoint;
-
-        if ($payment) {
-            $endpoint->setFakePayment($payment);
-            return $payment;
+        if ($this->instance) {
+            return $this->instance;
         }
 
-        return null;
+        return parent::loadByApiKey($apiKey);
+    }
+
+    public function fake(array $expectedResponses = [], bool $retainRequests = false): void
+    {
+        $this->instance = \Mollie\Api\MollieApiClient::fake($expectedResponses, $retainRequests);
     }
 }

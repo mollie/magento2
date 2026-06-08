@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -12,7 +13,7 @@ use Mollie\Payment\Service\Mollie\ValidateProcessRequest;
 
 class FakeValidateProcessRequest extends ValidateProcessRequest
 {
-    private $response = null;
+    private ?array $response = null;
 
     public function setResponse(array $response): void
     {

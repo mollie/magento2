@@ -1,47 +1,34 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Block\Adminhtml\Sales\Creditmemo;
 
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Registry;
 use Magento\Framework\View\Element\Template;
+use Magento\Framework\View\Element\Template\Context;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Mollie\Payment\Service\Mollie\Order\ParseAdditionalData;
 
 class RemainderAmountWarning extends Template
 {
-    /**
-     * @var Registry
-     */
-    private $registry;
-
-    /**
-     * @var PriceCurrencyInterface
-     */
-    private $priceCurrency;
-    /**
-     * @var ParseAdditionalData
-     */
-    private $parseAdditionalData;
-
     public function __construct(
-        Template\Context $context,
-        Registry $registry,
-        PriceCurrencyInterface $priceCurrency,
-        ParseAdditionalData $parseAdditionalData,
-        array $data = []
+        Context $context,
+        private readonly Registry $registry,
+        private readonly PriceCurrencyInterface $priceCurrency,
+        private readonly ParseAdditionalData $parseAdditionalData,
+        array $data = [],
     ) {
         parent::__construct($context, $data);
-        $this->registry = $registry;
-        $this->priceCurrency = $priceCurrency;
-        $this->parseAdditionalData = $parseAdditionalData;
     }
 
-    public function toHtml()
+    public function toHtml(): string
     {
         /** @var CreditmemoInterface $creditmemo */
         $creditmemo = $this->registry->registry('current_creditmemo');
@@ -65,8 +52,8 @@ class RemainderAmountWarning extends Template
                 $remainderAmount->getValue(),
                 true,
                 PriceCurrencyInterface::DEFAULT_PRECISION,
-                $creditmemo->getStoreId()
-            )
+                $creditmemo->getStoreId(),
+            ),
         );
 
         return '<br><div class="message message-warning warning">' . $message . '</div>';

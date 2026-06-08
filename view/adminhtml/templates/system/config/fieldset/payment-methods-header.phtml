@@ -4,11 +4,12 @@
  * See COPYING.txt for license details.
  */
 
-/** @var $block \Mollie\Payment\Block\Adminhtml\Render\PaymentMethodsHeader */
-/** @var \Magento\Framework\Escaper $escaper */
+/** @var PaymentMethodsHeader $block */
+/** @var Escaper $escaper */
 
-// Magento 2.3 compatibility
-isset($escaper) || $escaper = $block; // @phpstan-ignore-line
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Adminhtml\Render\PaymentMethodsHeader;
+
 ?>
 <div class="mm-block-mollie">
     <a class="helpbutton" href="https://www.mollie.com/dashboard/settings/profiles" target="_blank"></a>

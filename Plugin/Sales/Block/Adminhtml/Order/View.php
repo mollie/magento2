@@ -1,33 +1,30 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order;
 
-use Magento\Framework\UrlInterface;
-use Magento\OfflinePayments\Model\Checkmo;
-use Magento\Payment\Helper\Data as PaymentHelper;
-use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Block\Adminhtml\Order\View as Subject;
-use Mollie\Payment\Config;
 use Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons\ButtonInterface;
 
 class View
 {
     /**
-     * @var ButtonInterface[]
+     * @param ButtonInterface[] $buttons
      */
-    private $buttons = [];
-
     public function __construct(
-        $buttons = []
+        /**
+         * @var ButtonInterface[]
+         */
+        private $buttons = [],
     ) {
-        $this->buttons = $buttons;
     }
 
-    public function beforeSetLayout(Subject $subject)
+    public function beforeSetLayout(Subject $subject): void
     {
         foreach ($this->buttons as $button) {
             $button->add($subject);

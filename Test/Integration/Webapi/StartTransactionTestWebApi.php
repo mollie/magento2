@@ -4,9 +4,11 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Webapi;
+declare(strict_types=1);
 
-use Mollie\Payment\Test\Integration\Webapi\AbstractTestWebApi;
+namespace Mollie\Payment\Test\Integration\Webapi;
+
+use Mollie\Payment\Webapi\StartTransaction;
 
 class StartTransactionTestWebApi extends AbstractTestWebApi
 {

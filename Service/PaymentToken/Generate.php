@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\PaymentToken;
 
@@ -16,43 +18,14 @@ use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 
 class Generate
 {
-    /**
-     * @var CartRepositoryInterface
-     */
-    private $cartRepository;
-
-    /**
-     * @var Random
-     */
-    private $mathRandom;
-
-    /**
-     * @var PaymentTokenRepositoryInterface
-     */
-    private $paymentTokenRepository;
-
-    /**
-     * @var PaymentTokenInterfaceFactory
-     */
-    private $paymentTokenFactory;
-
     public function __construct(
-        CartRepositoryInterface $cartRepository,
-        Random $mathRandom,
-        PaymentTokenRepositoryInterface $paymentTokenRepository,
-        PaymentTokenInterfaceFactory $paymentTokenFactory
-    ) {
-        $this->cartRepository = $cartRepository;
-        $this->mathRandom = $mathRandom;
-        $this->paymentTokenRepository = $paymentTokenRepository;
-        $this->paymentTokenFactory = $paymentTokenFactory;
-    }
+        private CartRepositoryInterface $cartRepository,
+        private Random $mathRandom,
+        private PaymentTokenRepositoryInterface $paymentTokenRepository,
+        private PaymentTokenInterfaceFactory $paymentTokenFactory
+    ) {}
 
-    /**
-     * @param CartInterface $cart
-     * @return string
-     */
-    public function forCart(CartInterface $cart)
+    public function forCart(CartInterface $cart): string
     {
         $token = $this->getUniquePaymentToken();
 
@@ -66,10 +39,6 @@ class Generate
         return $token;
     }
 
-    /**
-     * @param OrderInterface $order
-     * @return PaymentTokenInterface
-     */
     public function forOrder(OrderInterface $order): PaymentTokenInterface
     {
         $token = $this->getUniquePaymentToken();
@@ -85,10 +54,7 @@ class Generate
         return $model;
     }
 
-    /**
-     * @return string
-     */
-    private function getUniquePaymentToken()
+    private function getUniquePaymentToken(): string
     {
         $token = $this->mathRandom->getUniqueHash();
 

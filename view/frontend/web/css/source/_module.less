@@ -3,6 +3,71 @@
  * See COPYING.txt for license details.
  */
 
+& when (@media-common = true) {
+
+    // ---- Saved-card radio list ------------------------------------------ //
+
+    .mollie-saved-cards {
+        margin-bottom: @indent__s;
+
+        .mollie-saved-cards__heading {
+            font-size: 1.4rem;
+            font-weight: @font-weight__semibold;
+            margin-bottom: @indent__xs;
+            color: @color-gray34;
+        }
+
+        .field.choice {
+            margin-bottom: @indent__xs;
+
+            .label {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+            }
+        }
+
+        .mollie-card-logo {
+            vertical-align: middle;
+            border-radius: 3px;
+        }
+    }
+
+    // ---- "Save your card" checkbox row ------------------------------------ //
+
+    .mollie-save-card {
+        margin-top: @indent__s;
+        padding-top: @indent__s;
+        border-top: 1px solid @color-gray80;
+    }
+
+    // ---- Consent notice block --------------------------------------------- //
+
+    .mollie-save-card-consent {
+        margin-top: @indent__xs;
+        padding: @indent__s @indent__base;
+        background-color: @color-gray95;
+        border-left: 3px solid @color-gray60;
+        border-radius: 0 3px 3px 0;
+
+        .mollie-save-card-consent__text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: @color-gray34;
+            margin-bottom: @indent__s;
+        }
+
+        .field.choice {
+            margin-bottom: 0;
+
+            .label {
+                font-size: 1.2rem;
+                font-weight: @font-weight__semibold;
+            }
+        }
+    }
+}
+
 .apple-pay-button {
   display: inline-block;
   cursor: pointer;

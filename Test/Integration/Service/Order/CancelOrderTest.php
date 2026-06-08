@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Order;
 
 use Magento\Sales\Model\Order;
@@ -15,7 +17,7 @@ class CancelOrderTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testRegisterCancellationCancelsTheOrder()
+    public function testRegisterCancellationCancelsTheOrder(): void
     {
         $order = $this->loadOrderById('100000001');
 
@@ -29,7 +31,7 @@ class CancelOrderTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testRegisterCancellationSetsTheCorrectMessage()
+    public function testRegisterCancellationSetsTheCorrectMessage(): void
     {
         $order = $this->loadOrderById('100000001');
 

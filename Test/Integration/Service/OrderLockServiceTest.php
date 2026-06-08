@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service;
 
@@ -19,7 +25,7 @@ class OrderLockServiceTest extends IntegrationTestCase
         /** @var OrderLockService $instance */
         $instance = $this->objectManager->create(OrderLockService::class);
 
-        $instance->execute($order, function ($order) {
+        $instance->execute($order, function ($order): void {
             $this->assertEquals('test_value', $order->getMollieTransactionId());
         });
     }

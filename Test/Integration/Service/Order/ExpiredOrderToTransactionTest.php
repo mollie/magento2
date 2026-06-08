@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order;
 
@@ -23,16 +29,16 @@ class ExpiredOrderToTransactionTest extends IntegrationTestCase
 
         /** @var TransactionToOrderInterface $transactionToOrder1 */
         $transactionToOrder1 = $this->objectManager->create(TransactionToOrderInterface::class);
-        $transactionToOrder1->setOrderId($order->getEntityId());
+        $transactionToOrder1->setOrderId((int)$order->getEntityId());
         $transactionToOrder1->setTransactionId($transaction1);
-        $transactionToOrder1->setSkipped(true);
+        $transactionToOrder1->setSkipped(1);
         $this->objectManager->get(TransactionToOrderRepositoryInterface::class)->save($transactionToOrder1);
 
         /** @var TransactionToOrderInterface $transactionToOrder2 */
         $transactionToOrder2 = $this->objectManager->create(TransactionToOrderInterface::class);
-        $transactionToOrder2->setOrderId($order->getEntityId());
+        $transactionToOrder2->setOrderId((int)$order->getEntityId());
         $transactionToOrder2->setTransactionId($transaction2);
-        $transactionToOrder1->setSkipped(false);
+        $transactionToOrder1->setSkipped(0);
         $this->objectManager->get(TransactionToOrderRepositoryInterface::class)->save($transactionToOrder2);
 
         /** @var ExpiredOrderToTransaction $instance */

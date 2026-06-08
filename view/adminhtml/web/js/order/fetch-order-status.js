@@ -1,3 +1,8 @@
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 define([
     'jquery',
     'mage/translate',
@@ -5,6 +10,8 @@ define([
     return function (config, wrapper) {
         var button = $('.fetch-mollie-payment-status', wrapper);
         var row = $('.mollie-order-status-result', wrapper);
+
+        button.prop('disabled', false);
 
         button.click(function () {
             button.text($t('Fetching...'));
@@ -19,7 +26,7 @@ define([
                     location.reload();
                 },
                 error: function (result) {
-                    row.html('<th>' + $t('Error While Fetching') + '</th><td class="mollie-error">' + result.responseJSON.msg + '</td>');
+                    row.html('<th>' + $t('Error While Fetching') + '</th><td class="mollie-error">' + result.responseJSON.status + '</td>');
                     row.show();
                 },
                 complete: function () {

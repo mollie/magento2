@@ -1,5 +1,12 @@
 <?php
 
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
+
 namespace Mollie\Payment\GraphQL\Resolver\General;
 
 use Magento\Framework\GraphQl\Config\Element\Field;
@@ -9,16 +16,9 @@ use Mollie\Payment\Config;
 
 class MollieStoreConfig implements ResolverInterface
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config
-    ) {
-        $this->config = $config;
-    }
+        private Config $config
+    ) {}
 
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {

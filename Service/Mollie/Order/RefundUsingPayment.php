@@ -1,7 +1,14 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\Order;
 
+use Exception;
 use Magento\Framework\Exception\LocalizedException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\PaymentFactory;
@@ -14,20 +21,14 @@ class RefundUsingPayment
      */
     private $paymentFactory;
 
-    /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-
     public function __construct(
         PaymentFactory $paymentFactory,
-        MollieHelper $mollieHelper
+        private MollieHelper $mollieHelper,
     ) {
         $this->paymentFactory = $paymentFactory;
-        $this->mollieHelper = $mollieHelper;
     }
 
-    public function execute(MollieApiClient $mollieApi, $transactionId, $currencyCode, $amount)
+    public function execute(MollieApiClient $mollieApi, $transactionId, ?string $currencyCode, ?float $amount): void
     {
         $mollieOrder = $mollieApi->orders->get($transactionId, ['embed' => 'payments']);
         $payments = $mollieOrder->_embedded->payments;
@@ -41,14 +42,14 @@ class RefundUsingPayment
                     'currency' => $currencyCode,
                     'value' => $this->mollieHelper->formatCurrencyValue(
                         $amount,
-                        $currencyCode
+                        $currencyCode,
                     ),
-                ]
+                ],
             ]);
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             $this->mollieHelper->addTolog('error', $exception->getMessage());
             throw new LocalizedException(
-                __('Mollie API: %1', $exception->getMessage())
+                __('Mollie API: %1', $exception->getMessage()),
             );
         }
     }

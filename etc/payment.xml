@@ -3,7 +3,6 @@
   ~ Copyright Magmodules.eu. All rights reserved.
   ~ See COPYING.txt for license details.
   -->
-
 <payment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/payment.xsd">
     <methods>
         <method name="mollie_methods_applepay">
@@ -42,6 +41,9 @@
         <method name="mollie_methods_eps">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
+        <method name="mollie_methods_expresscomponents">
+            <allow_multiple_address>0</allow_multiple_address>
+        </method>
         <method name="mollie_methods_giftcard">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
@@ -58,15 +60,6 @@
             <allow_multiple_address>0</allow_multiple_address>
         </method>
         <method name="mollie_methods_klarna">
-            <allow_multiple_address>0</allow_multiple_address>
-        </method>
-        <method name="mollie_methods_klarnapaylater">
-            <allow_multiple_address>0</allow_multiple_address>
-        </method>
-        <method name="mollie_methods_klarnapaynow">
-            <allow_multiple_address>0</allow_multiple_address>
-        </method>
-        <method name="mollie_methods_klarnasliceit">
             <allow_multiple_address>0</allow_multiple_address>
         </method>
         <method name="mollie_methods_mbway">

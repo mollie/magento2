@@ -1,0 +1,55 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
+
+namespace Mollie\Payment\Controller\Express;
+
+use Magento\Checkout\Model\Session;
+use Magento\Framework\App\Action\HttpPostActionInterface;
+use Magento\Framework\App\RequestInterface;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\Data\CartInterface;
+
+class CreateSession implements HttpPostActionInterface
+{
+    public function __construct(
+        private readonly Session $checkoutSession,
+        private readonly JsonFactory $jsonFactory,
+        private readonly CartRepositoryInterface $cartRepository,
+        private readonly RequestInterface $request,
+        private readonly \Mollie\Payment\Service\Mollie\CreateSession $createSession,
+    ) {
+    }
+
+    public function execute()
+    {
+        $cart = $this->checkoutSession->getQuote();
+        $this->setEmailOnCart($cart);
+
+        $isExpressCheckout = $this->request->getParam('type') !== 'checkout';
+        $accessToken = $this->createSession->execute($cart, $isExpressCheckout);
+
+        $cart->collectTotals();
+        $this->cartRepository->save($cart);
+
+        return $this->jsonFactory->create()->setData([
+            'clientAccessToken' => $accessToken,
+        ]);
+    }
+
+    private function setEmailOnCart(CartInterface $cart): void
+    {
+        $email = $this->request->getParam('email');
+
+        if (!$email) {
+            return;
+        }
+
+        $cart->getPayment()->setAdditionalInformation('mollie_guest_email', $email);
+    }
+}

@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order;
 
@@ -11,7 +17,7 @@ class OrderCommentHistoryTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testAddingHistory()
+    public function testAddingHistory(): void
     {
         $message = '[TEST] a brand new status';
 

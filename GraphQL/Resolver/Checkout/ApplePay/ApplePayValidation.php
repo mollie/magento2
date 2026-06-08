@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\GraphQL\Resolver\Checkout\ApplePay;
 
@@ -9,16 +15,9 @@ use Mollie\Payment\Service\Mollie\ApplePay\Validation;
 
 class ApplePayValidation implements ResolverInterface
 {
-    /**
-     * @var Validation
-     */
-    private $validation;
-
     public function __construct(
-        Validation $validation
-    ) {
-        $this->validation = $validation;
-    }
+        private Validation $validation
+    ) {}
 
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {

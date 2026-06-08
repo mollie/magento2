@@ -4,97 +4,45 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Order\Lines;
 
+use Laminas\Uri\Http;
 use Magento\Catalog\Model\Product\Type as ProductType;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Store\Model\StoreManagerInterface;
-use Mollie\Payment\Helper\General as MollieHelper;
+use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Model\OrderLinesFactory;
 use Mollie\Payment\Model\ResourceModel\OrderLines\CollectionFactory;
 
 class Order
 {
-    /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
+    private ?string $currency;
 
-    /**
-     * @var StoreCredit
-     */
-    private $storeCredit;
+    private ?bool $forceBaseCurrency = null;
 
-    /**
-     * @var PaymentFee
-     */
-    private $paymentFee;
-
-    /**
-     * @var OrderLinesFactory
-     */
-    private $orderLinesFactory;
-
-    /**
-     * @var string|null
-     */
-    private $currency;
-
-    /**
-     * @var bool
-     */
-    private $forceBaseCurrency;
-
-    /**
-     * @var OrderInterface
-     */
-    private $order;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $orderLinesCollectionFactory;
-
-    /**
-     * @var OrderLinesProcessor
-     */
-    private $orderLinesProcessor;
-
-    /**
-     * @var OrderLinesGenerator
-     */
-    private $orderLinesGenerator;
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
+    private ?OrderInterface $order = null;
 
     public function __construct(
-        MollieHelper $mollieHelper,
-        StoreCredit $storeCredit,
-        PaymentFee $paymentFee,
-        CollectionFactory $orderLinesCollection,
-        OrderLinesFactory $orderLinesFactory,
-        OrderLinesProcessor $orderLinesProcessor,
-        OrderLinesGenerator $orderLinesGenerator,
-        StoreManagerInterface $storeManager
+        private General $mollieHelper,
+        private StoreCredit $storeCredit,
+        private PaymentFee $paymentFee,
+        private CollectionFactory $orderLinesCollection,
+        private OrderLinesFactory $orderLinesFactory,
+        private OrderLinesProcessor $orderLinesProcessor,
+        private OrderLinesGenerator $orderLinesGenerator,
+        private StoreManagerInterface $storeManager,
+        private Http $http,
     ) {
-        $this->mollieHelper = $mollieHelper;
-        $this->storeCredit = $storeCredit;
-        $this->paymentFee = $paymentFee;
-        $this->orderLinesCollectionFactory = $orderLinesCollection;
-        $this->orderLinesFactory = $orderLinesFactory;
-        $this->orderLinesProcessor = $orderLinesProcessor;
-        $this->orderLinesGenerator = $orderLinesGenerator;
-        $this->storeManager = $storeManager;
     }
 
-    public function get(OrderInterface $order)
+    public function get(OrderInterface $order): array
     {
         $this->order = $order;
-        $this->forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
+        $this->forceBaseCurrency = (bool) $this->mollieHelper->useBaseCurrency(storeId($order->getStoreId()));
         $this->currency = $this->forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
         $orderLines = [];
 
@@ -144,7 +92,7 @@ class Order
      * @param bool $zeroPriceLine Sometimes the line must be present but the amount must be zero. (mostly for bundles)
      * @return array
      */
-    private function getOrderLine(OrderItemInterface $item, $zeroPriceLine = false)
+    private function getOrderLine(OrderItemInterface $item, bool $zeroPriceLine = false): array
     {
         /**
          * The total amount of the line, including VAT and discounts
@@ -182,17 +130,14 @@ class Order
         $orderLine = [
             'item_id' => $item->getId(),
             'type' => $item->getIsVirtual() !== null && (int) $item->getIsVirtual() !== 1 ? 'physical' : 'digital',
-            'name' => preg_replace('/[^\p{L}\p{N} -]/u', '', $item->getName() ?? ''),
-            'quantity' => round($item->getQtyOrdered()),
+            'description' => preg_replace('/[^\p{L}\p{N} -]/u', '', $item->getName() ?? ''),
+            'quantity' => round((float)$item->getQtyOrdered()),
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $unitPrice),
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
-            'vatRate' => sprintf("%.2f", $item->getTaxPercent()),
+            'vatRate' => sprintf('%.2f', $item->getTaxPercent()),
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
             'sku' => substr($item->getSku() ?? '', 0, 64),
             'productUrl' => $this->getProductUrl($item),
-            'metadata' => [
-                'item_id' => $item->getId(),
-            ]
         ];
 
         if ($discountAmount) {
@@ -206,7 +151,7 @@ class Order
      * @param OrderInterface $order
      * @return array
      */
-    protected function getShippingOrderLine(OrderInterface $order)
+    protected function getShippingOrderLine(OrderInterface $order): array
     {
         /**
          * The total amount of the line, including VAT and discounts
@@ -231,13 +176,13 @@ class Order
         $orderLine = [
             'item_id' => '',
             'type' => 'shipping_fee',
-            'name' => $name,
+            'description' => $name,
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
-            'vatRate' => sprintf("%.2f", $vatRate),
+            'vatRate' => sprintf('%.2f', $vatRate),
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
-            'sku' => $order->getShippingMethod()
+            'sku' => $order->getShippingMethod(),
         ];
 
         return $this->orderLinesProcessor->process($orderLine, $this->order);
@@ -272,7 +217,7 @@ class Order
      *
      * @return float
      */
-    private function getDiscountAmountOrderItem(OrderItemInterface $item)
+    private function getDiscountAmountOrderItem(OrderItemInterface $item): float|int
     {
         if ($this->forceBaseCurrency) {
             return abs($item->getBaseDiscountAmount() + $item->getBaseDiscountTaxCompensationAmount());
@@ -286,7 +231,7 @@ class Order
      *
      * @return float
      */
-    private function getTotalAmountShipping(OrderInterface $order)
+    private function getTotalAmountShipping(OrderInterface $order): float|int|array
     {
         if ($this->forceBaseCurrency) {
             return $order->getBaseShippingAmount()
@@ -299,12 +244,7 @@ class Order
             + $order->getShippingDiscountTaxCompensationAmount();
     }
 
-    /**
-     * @param OrderInterface $order
-     *
-     * @return mixed
-     */
-    public function getShippingVatRate(OrderInterface $order)
+    public function getShippingVatRate(OrderInterface $order): int|float
     {
         $taxPercentage = 0;
         if ($order->getShippingAmount() > 0) {
@@ -318,9 +258,9 @@ class Order
      * @param OrderInterface $order
      * @param                $orderLines
      */
-    public function saveOrderLines($orderLines, OrderInterface $order)
+    public function saveOrderLines($orderLines, OrderInterface $order): void
     {
-        $existingItems = $this->orderLinesCollectionFactory->create()
+        $existingItems = $this->orderLinesCollection->create()
             ->addFieldToFilter('order_id', ['eq' => $order->getEntityId()]);
 
         // When the orderLines already exists, do not create again.
@@ -331,6 +271,7 @@ class Order
         foreach ($orderLines as $line) {
             /** @var OrderLines $orderLine */
             $orderLine = $this->orderLinesFactory->create();
+            // @phpstan-ignore-next-line TODO: Make a proper repository for this
             $orderLine->addData($line)->setOrderId($order->getId())->save();
         }
     }
@@ -350,10 +291,11 @@ class Order
         // characters we will return the base url with the direct url to the controller.
         // Magento bug: https://github.com/magento/magento2/issues/26672
         $url = $product->getProductUrl();
-        $path = parse_url($url, PHP_URL_PATH);
+        $path = $this->http->parse($url)->getPath();
         // Allow a-z, A-Z, "-", "/" and ".". If anything else is present return the catalog/product/view url.
         if (preg_match('#[^a-zA-Z-/.]#', $path)) {
             $baseUrl = rtrim($this->storeManager->getStore()->getBaseUrl(), '/');
+
             return $baseUrl . '/catalog/product/view/id/' . $item->getProductId();
         }
 
@@ -378,7 +320,7 @@ class Order
             return null;
         }
 
-        $difference = round(round($grandTotal, 2) - round($orderLinesTotal, 2), 2);
+        $difference = round(round((float)$grandTotal, 2) - round((float)$orderLinesTotal, 2), 2);
         if (abs($difference) < 0.01) {
             return null;
         }
@@ -386,11 +328,11 @@ class Order
         return [
             'item_id' => '',
             'type' => 'discount',
-            'name' => 'Adjustment',
+            'description' => 'Adjustment',
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $difference),
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $difference),
-            'vatRate' => sprintf("%.2f", 0),
+            'vatRate' => sprintf('%.2f', 0),
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, 0),
             'sku' => 'adjustment',
         ];

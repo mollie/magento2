@@ -1,12 +1,11 @@
 <?php
-/**
- * Copyright Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Data;
 
 use Magento\Framework\Api\AbstractExtensibleObject;
+use Mollie\Payment\Api\Data\MollieCustomerExtensionInterface;
 use Mollie\Payment\Api\Data\MollieCustomerInterface;
 
 class MollieCustomer extends AbstractExtensibleObject implements MollieCustomerInterface
@@ -23,7 +22,7 @@ class MollieCustomer extends AbstractExtensibleObject implements MollieCustomerI
     /**
      * Set entity_id
      * @param string $entityId
-     * @return \Mollie\Payment\Api\Data\MollieCustomerInterface
+     * @return MollieCustomerInterface
      */
     public function setEntityId($entityId)
     {
@@ -42,7 +41,7 @@ class MollieCustomer extends AbstractExtensibleObject implements MollieCustomerI
     /**
      * Set customer_id
      * @param int $customerId
-     * @return \Mollie\Payment\Api\Data\MollieCustomerInterface
+     * @return MollieCustomerInterface
      */
     public function setCustomerId($customerId)
     {
@@ -61,7 +60,7 @@ class MollieCustomer extends AbstractExtensibleObject implements MollieCustomerI
     /**
      * Set customer_id
      * @param int $mollieCustomerId
-     * @return \Mollie\Payment\Api\Data\MollieCustomerInterface
+     * @return MollieCustomerInterface
      */
     public function setMollieCustomerId($mollieCustomerId)
     {
@@ -83,7 +82,7 @@ class MollieCustomer extends AbstractExtensibleObject implements MollieCustomerI
      * @return $this
      */
     public function setExtensionAttributes(
-        \Mollie\Payment\Api\Data\MollieCustomerExtensionInterface $extensionAttributes
+        MollieCustomerExtensionInterface $extensionAttributes,
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

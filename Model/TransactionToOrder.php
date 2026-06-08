@@ -1,4 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model;
 
@@ -41,7 +47,7 @@ class TransactionToOrder extends AbstractExtensibleModel implements TransactionT
      */
     public function getOrderId(): ?int
     {
-        return (int)$this->getData(self::ORDER_ID);
+        return (int) $this->getData(self::ORDER_ID);
     }
 
     /**
@@ -79,7 +85,7 @@ class TransactionToOrder extends AbstractExtensibleModel implements TransactionT
      */
     public function getSkipped(): ?int
     {
-        return (int)$this->getData(self::SKIPPED);
+        return (int) $this->getData(self::SKIPPED);
     }
 
     /**
@@ -98,7 +104,7 @@ class TransactionToOrder extends AbstractExtensibleModel implements TransactionT
      */
     public function getRedirected(): ?int
     {
-        return (int)$this->getData(self::REDIRECTED);
+        return (int) $this->getData(self::REDIRECTED);
     }
 
     /**
@@ -126,7 +132,7 @@ class TransactionToOrder extends AbstractExtensibleModel implements TransactionT
      * @return $this
      */
     public function setExtensionAttributes(
-        TransactionToOrderExtensionInterface $extensionAttributes
+        TransactionToOrderExtensionInterface $extensionAttributes,
     ) {
         return $this->_setExtensionAttributes($extensionAttributes);
     }

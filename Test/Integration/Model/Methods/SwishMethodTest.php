@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Swish;
 
 class SwishMethodTest extends AbstractTestMethod
 {
-    protected $instance = Swish::class;
+    protected ?string $instance = Swish::class;
 
-    protected $code = 'swish';
+    protected ?string $code = 'swish';
 }

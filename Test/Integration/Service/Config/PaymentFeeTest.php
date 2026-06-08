@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Service\Config;
 
 use Magento\Checkout\Model\Session;
@@ -18,7 +20,7 @@ class PaymentFeeTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Checkout/_files/quote_with_payment_saved.php
      */
-    public static function isAvailableForMethodProvider()
+    public static function isAvailableForMethodProvider(): array
     {
         return [
             ['mollie_methods_applepay', true],
@@ -33,15 +35,13 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_creditcard', true],
             ['mollie_methods_directdebit', true],
             ['mollie_methods_eps', true],
+            ['mollie_methods_expresscomponents', true],
             ['mollie_methods_giftcard', true],
             ['mollie_methods_googlepay', true],
             ['mollie_methods_ideal', true],
             ['mollie_methods_in3', true],
             ['mollie_methods_kbc', true],
             ['mollie_methods_klarna', true],
-            ['mollie_methods_klarnapaylater', true],
-            ['mollie_methods_klarnapaynow', true],
-            ['mollie_methods_klarnasliceit', true],
             ['mollie_methods_mbway', true],
             ['mollie_methods_mobilepay', true],
             ['mollie_methods_multibanco', true],
@@ -67,7 +67,7 @@ class PaymentFeeTest extends IntegrationTestCase
      * @dataProvider isAvailableForMethodProvider
      */
     #[DataProvider('isAvailableForMethodProvider')]
-    public function testIsAvailableForMethod($method, $expected)
+    public function testIsAvailableForMethod(string $method, bool $expected): void
     {
         $configMock = $this->createMock(Config::class);
         $configMock->method('paymentSurchargeType')->willReturn(PaymentFeeType::PERCENTAGE);

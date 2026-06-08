@@ -1,31 +1,23 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model;
 
+use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Model\AbstractModel;
 use Magento\Framework\Model\Context;
 use Magento\Framework\Registry;
 use Mollie\Payment\Api\Data\MollieCustomerInterface;
 use Mollie\Payment\Api\Data\MollieCustomerInterfaceFactory;
-use Magento\Framework\Api\DataObjectHelper;
 use Mollie\Payment\Model\ResourceModel\MollieCustomer\Collection;
 
 class MollieCustomer extends AbstractModel
 {
-    /**
-     * @var MollieCustomerInterfaceFactory
-     */
-    protected $customerDataFactory;
-
-    /**
-     * @var DataObjectHelper
-     */
-    protected $dataObjectHelper;
-
     /**
      * @var string
      */
@@ -43,16 +35,13 @@ class MollieCustomer extends AbstractModel
     public function __construct(
         Context $context,
         Registry $registry,
-        MollieCustomerInterfaceFactory $customerDataFactory,
-        DataObjectHelper $dataObjectHelper,
+        protected MollieCustomerInterfaceFactory $customerDataFactory,
+        protected DataObjectHelper $dataObjectHelper,
         ResourceModel\MollieCustomer $resource,
         Collection $resourceCollection,
-        array $data = []
+        array $data = [],
     ) {
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
-
-        $this->customerDataFactory = $customerDataFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
     }
 
     /**
@@ -67,7 +56,7 @@ class MollieCustomer extends AbstractModel
         $this->dataObjectHelper->populateWithArray(
             $customerDataObject,
             $customerData,
-            MollieCustomerInterface::class
+            MollieCustomerInterface::class,
         );
 
         return $customerDataObject;

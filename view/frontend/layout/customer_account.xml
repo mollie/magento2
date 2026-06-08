@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="customer_account_navigation">
+            <block class="Magento\Customer\Block\Account\SortLink"
+                   name="customer-account-navigation-mollie-saved-cards-link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">Saved cards</argument>
+                    <argument name="path" xsi:type="string">mollie/savedcards/index</argument>
+                    <argument name="sortOrder" xsi:type="number">220</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

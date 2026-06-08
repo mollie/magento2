@@ -1,10 +1,15 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderAddressInterface;
 use Magento\Sales\Api\Data\OrderPaymentInterface;
-use Mollie\Payment\Model\Client\Orders;
 use Mollie\Payment\Service\Order\TransactionPart\PhoneNumber;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -23,7 +28,7 @@ class PhoneNumberTest extends IntegrationTestCase
     public function testConvertsPhoneNumbersToTheCorrectFormat(
         string $countryCode,
         string $phoneNumber,
-        string $expected
+        string $expected,
     ): void {
         $order = $this->loadOrder('100000001');
         $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
@@ -33,16 +38,23 @@ class PhoneNumberTest extends IntegrationTestCase
         $billingAddress->setCountryId($countryCode);
         $billingAddress->setTelephone($phoneNumber);
 
+        $shippingAddress = $order->getShippingAddress();
+        $shippingAddress->setCountryId($countryCode);
+        $shippingAddress->setTelephone($phoneNumber);
+
         /** @var PhoneNumber $instance */
         $instance = $this->objectManager->create(PhoneNumber::class);
 
         $transaction = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            ['billingAddress' => [], 'shippingAddress' => []]
+            [
+                'billingAddress' => [],
+                'shippingAddress' => [],
+            ],
         );
 
         $this->assertSame($expected, $transaction['billingAddress']['phone']);
+        $this->assertSame($expected, $transaction['shippingAddress']['phone']);
     }
 
     /**
@@ -59,16 +71,23 @@ class PhoneNumberTest extends IntegrationTestCase
         $billingAddress->setCountryId('NL');
         $billingAddress->setTelephone('');
 
+        $shippingAddress = $order->getShippingAddress();
+        $shippingAddress->setCountryId('NL');
+        $shippingAddress->setTelephone('');
+
         /** @var PhoneNumber $instance */
         $instance = $this->objectManager->create(PhoneNumber::class);
 
         $transaction = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            ['billingAddress' => [], 'shippingAddress' => []]
+            [
+                'billingAddress' => [],
+                'shippingAddress' => [],
+            ],
         );
 
         $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
+        $this->assertArrayNotHasKey('phone', $transaction['shippingAddress']);
     }
 
     /**
@@ -89,7 +108,6 @@ class PhoneNumberTest extends IntegrationTestCase
 
         $transaction = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
             [
                 'billingAddress' => [],
             // Virtual orders don't have a shipping address
@@ -114,16 +132,65 @@ class PhoneNumberTest extends IntegrationTestCase
         $billingAddress->setCountryId('NL');
         $billingAddress->setData(OrderAddressInterface::TELEPHONE, null);
 
+        $shippingAddress = $order->getShippingAddress();
+        $shippingAddress->setCountryId('NL');
+        $shippingAddress->setData(OrderAddressInterface::TELEPHONE, null);
+
         /** @var PhoneNumber $instance */
         $instance = $this->objectManager->create(PhoneNumber::class);
 
         $transaction = $instance->process(
             $order,
-            Orders::CHECKOUT_TYPE,
-            ['billingAddress' => [], 'shippingAddress' => []]
+            [
+                'billingAddress' => [],
+                'shippingAddress' => [],
+            ],
         );
 
         $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
+        $this->assertArrayNotHasKey('phone', $transaction['shippingAddress']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @return void
+     */
+    public function testDoesNotOverrideExistingAddressData(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+        $order->getPayment()->setMethod('mollie_methods_in3');
+
+        $billingAddress = $order->getBillingAddress();
+        $billingAddress->setCountryId('NL');
+        $billingAddress->setData(OrderAddressInterface::TELEPHONE, '0612345678');
+
+        $shippingAddress = $order->getShippingAddress();
+        $shippingAddress->setCountryId('NL');
+        $shippingAddress->setData(OrderAddressInterface::TELEPHONE, '0612345678');
+
+        /** @var PhoneNumber $instance */
+        $instance = $this->objectManager->create(PhoneNumber::class);
+
+        $transaction = $instance->process(
+            $order,
+            [
+                'billingAddress' => [
+                    'streetAndNumber' => 'Example Street 15',
+                ],
+                'shippingAddress' => [
+                    'streetAndNumber' => 'Example Street 15',
+                ],
+            ],
+        );
+
+        $this->assertArrayHasKey('streetAndNumber', $transaction['billingAddress']);
+        $this->assertSame('Example Street 15', $transaction['billingAddress']['streetAndNumber']);
+        $this->assertArrayHasKey('phone', $transaction['billingAddress']);
+
+        $this->assertArrayHasKey('streetAndNumber', $transaction['shippingAddress']);
+        $this->assertSame('Example Street 15', $transaction['shippingAddress']['streetAndNumber']);
+        $this->assertArrayHasKey('phone', $transaction['shippingAddress']);
     }
 
     public static function convertsPhoneNumbersToTheCorrectFormatDataProvider(): array

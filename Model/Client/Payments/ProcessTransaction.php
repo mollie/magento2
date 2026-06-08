@@ -4,64 +4,43 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model\Client\Payments;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Model\Order;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
-use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Mollie\Order\GetTransactionId;
 
 class ProcessTransaction
 {
-    /**
-     * @var ProcessTransactionResponseFactory
-     */
-    private $processTransactionResponseFactory;
-
-    /**
-     * @var PaymentProcessors
-     */
-    private $paymentProcessors;
-
-    /**
-     * @var MollieApiClient
-     */
-    private $mollieApiClient;
-
-    /**
-     * @var MollieHelper
-     */
-    private $mollieHelper;
-
     public function __construct(
-        ProcessTransactionResponseFactory $processTransactionResponseFactory,
-        PaymentProcessors $paymentProcessors,
-        MollieApiClient $mollieApiClient,
-        MollieHelper $mollieHelper
-    ) {
-        $this->processTransactionResponseFactory = $processTransactionResponseFactory;
-        $this->paymentProcessors = $paymentProcessors;
-        $this->mollieApiClient = $mollieApiClient;
-        $this->mollieHelper = $mollieHelper;
-    }
+        private ProcessTransactionResponseFactory $processTransactionResponseFactory,
+        private PaymentProcessors $paymentProcessors,
+        private MollieApiClient $mollieApiClient,
+        private MollieHelper $mollieHelper,
+        private GetTransactionId $getTransactionId
+    ) {}
 
     public function execute(
         OrderInterface $magentoOrder,
-        string $type = 'webhook'
+        string $type = 'webhook',
     ): ProcessTransactionResponse {
-        $mollieApi = $this->mollieApiClient->loadByStore((int)$magentoOrder->getStoreId());
-        $molliePayment = $mollieApi->payments->get($magentoOrder->getMollieTransactionId());
+        $mollieApi = $this->mollieApiClient->loadByStore((int) $magentoOrder->getStoreId());
+        $transactionId = $this->getTransactionId->forOrder($magentoOrder);
+        $molliePayment = $mollieApi->payments->get($transactionId);
         $this->mollieHelper->addTolog($type, $molliePayment);
         $status = $molliePayment->status;
 
-        $defaultResponse = $this->processTransactionResponseFactory->create([
+        $response = $this->processTransactionResponseFactory->create([
             'success' => true,
             'status' => $status,
             'order_id' => $magentoOrder->getEntityId(),
-            'type' => $type
+            'type' => $type,
         ]);
 
         $this->paymentProcessors->process(
@@ -69,28 +48,31 @@ class ProcessTransaction
             $magentoOrder,
             $molliePayment,
             $type,
-            $defaultResponse
+            $response,
         );
 
-        $refunded = isset($molliePayment->_links->refunds) ? true : false;
-        if (in_array($status, ['paid', 'authorized']) && !$refunded) {
-            return $this->paymentProcessors->process(
+        if (in_array($status, ['paid', 'authorized'])) {
+            $response = $this->paymentProcessors->process(
                 'paid',
                 $magentoOrder,
                 $molliePayment,
                 $type,
-                $defaultResponse
+                $response,
             );
         }
 
-        if ($refunded) {
+        if (isset($molliePayment->_links->refunds) ? true : false) {
             return $this->paymentProcessors->process(
                 'refunded',
                 $magentoOrder,
                 $molliePayment,
                 $type,
-                $defaultResponse
+                $response,
             );
+        }
+
+        if (in_array($status, ['paid', 'authorized'])) {
+            return $response;
         }
 
         if ($status == 'open') {
@@ -99,7 +81,7 @@ class ProcessTransaction
                 $magentoOrder,
                 $molliePayment,
                 $type,
-                $defaultResponse
+                $response,
             );
         }
 
@@ -109,7 +91,7 @@ class ProcessTransaction
                 $magentoOrder,
                 $molliePayment,
                 $type,
-                $defaultResponse
+                $response,
             );
         }
 
@@ -119,7 +101,7 @@ class ProcessTransaction
                 $magentoOrder,
                 $molliePayment,
                 $type,
-                $defaultResponse
+                $response,
             );
         }
 
@@ -129,10 +111,10 @@ class ProcessTransaction
                 $magentoOrder,
                 $molliePayment,
                 $type,
-                $defaultResponse
+                $response,
             );
         }
 
-        throw new \Exception('Unknown status');
+        throw new LocalizedException(__('Unknown status'));
     }
 }

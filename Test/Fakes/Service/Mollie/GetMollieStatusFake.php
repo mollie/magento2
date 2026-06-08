@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -13,10 +14,7 @@ use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
 
 class GetMollieStatusFake extends GetMollieStatus
 {
-    /**
-     * @var null|GetMollieStatusResult
-     */
-    private $response = null;
+    private ?GetMollieStatusResult $response = null;
 
     public function setResponse(GetMollieStatusResult $response): void
     {

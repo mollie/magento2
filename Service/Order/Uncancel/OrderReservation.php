@@ -1,16 +1,22 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\Uncancel;
 
 use Magento\Catalog\Model\Indexer\Product\Price\Processor;
 use Magento\Framework\ObjectManagerInterface;
+use Magento\InventorySales\Model\PlaceReservationsForSalesEvent;
 use Magento\InventorySales\Model\SalesEvent;
 use Magento\InventorySalesApi\Api\Data\ItemToSellInterface;
 use Magento\InventorySalesApi\Api\Data\SalesChannelInterface;
 use Magento\InventorySalesApi\Api\Data\SalesEventInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Store\Api\WebsiteRepositoryInterface;
-use Magento\InventorySales\Model\PlaceReservationsForSalesEvent;
 
 /**
  * Class OrderReservation
@@ -27,46 +33,27 @@ use Magento\InventorySales\Model\PlaceReservationsForSalesEvent;
  */
 class OrderReservation
 {
-    /**
-     * @var WebsiteRepositoryInterface
-     */
-    private $websiteRepository;
-
-    /**
-     * @var Processor
-     */
-    private $priceIndexer;
-
-    /**
-     * @var ObjectManager
-     */
-    private $objectManager;
-
     public function __construct(
-        WebsiteRepositoryInterface $websiteRepository,
-        Processor $priceIndexer,
-        ObjectManagerInterface $objectManager
-    ) {
-        $this->websiteRepository = $websiteRepository;
-        $this->priceIndexer = $priceIndexer;
-        $this->objectManager = $objectManager;
-    }
+        private WebsiteRepositoryInterface $websiteRepository,
+        private Processor $priceIndexer,
+        private ObjectManagerInterface $objectManager
+    ) {}
 
-    public function execute(OrderItemInterface $orderItem)
+    public function execute(OrderItemInterface $orderItem): void
     {
         $websiteId = $orderItem->getStore()->getWebsiteId();
         $websiteCode = $this->websiteRepository->getById($websiteId)->getCode();
         $salesChannel = $this->objectManager->create(SalesChannelInterface::class, [
             'data' => [
                 'type' => SalesChannelInterface::TYPE_WEBSITE,
-                'code' => $websiteCode
-            ]
+                'code' => $websiteCode,
+            ],
         ]);
 
         $salesEvent = $this->objectManager->create(SalesEvent::class, [
             'type' => 'order_uncanceled',
             'objectType' => SalesEventInterface::OBJECT_TYPE_ORDER,
-            'objectId' => (string)$orderItem->getOrderId(),
+            'objectId' => (string) $orderItem->getOrderId(),
         ]);
 
         $placeReservationsForSalesEvent = $this->objectManager->create(PlaceReservationsForSalesEvent::class);
@@ -75,7 +62,10 @@ class OrderReservation
         $this->priceIndexer->reindexRow($orderItem->getProductId());
     }
 
-    private function getItemsToUncancel(OrderItemInterface $orderItem)
+    /**
+     * @return mixed[]
+     */
+    private function getItemsToUncancel(OrderItemInterface $orderItem): array
     {
         $itemsToUncancel = [];
         $itemsToUncancel[] = $this->objectManager->create(ItemToSellInterface::class, [

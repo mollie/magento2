@@ -1,46 +1,25 @@
 <?php
-/**
- * Copyright Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\PaymentFee\Quote\Address\Total;
 
+use Magento\Framework\Phrase;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Quote\Api\Data\ShippingAssignmentInterface;
 use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address\Total;
 use Magento\Quote\Model\Quote\Address\Total\AbstractTotal;
-use Magento\Tax\Model\Sales\Total\Quote\CommonTaxCollector;
 use Mollie\Payment\Service\Config\PaymentFee as PaymentFeeConfig;
 use Mollie\Payment\Service\PaymentFee\Calculate;
 
 class PaymentFee extends AbstractTotal
 {
-    /**
-     * @var PaymentFeeConfig
-     */
-    private $paymentFeeConfig;
-
-    /**
-     * @var PriceCurrencyInterface
-     */
-    private $priceCurrency;
-
-    /**
-     * @var Calculate
-     */
-    private $calculate;
-
     public function __construct(
-        PaymentFeeConfig $paymentFeeConfig,
-        PriceCurrencyInterface $priceCurrency,
-        Calculate $calculate
-    ) {
-        $this->paymentFeeConfig = $paymentFeeConfig;
-        $this->priceCurrency = $priceCurrency;
-        $this->calculate = $calculate;
-    }
+        private PaymentFeeConfig $paymentFeeConfig,
+        private PriceCurrencyInterface $priceCurrency,
+        private Calculate $calculate
+    ) {}
 
     /**
      * @param Quote $quote
@@ -95,7 +74,7 @@ class PaymentFee extends AbstractTotal
     }
 
     /**
-     * @return \Magento\Framework\Phrase
+     * @return Phrase
      */
     public function getLabel()
     {

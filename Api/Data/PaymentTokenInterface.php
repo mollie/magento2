@@ -1,8 +1,11 @@
 <?php
-/**
+
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Api\Data;
 
@@ -10,10 +13,10 @@ use Magento\Framework\Api\ExtensibleDataInterface;
 
 interface PaymentTokenInterface extends ExtensibleDataInterface
 {
-    const ENTITY_ID = 'entity_id';
-    const CART_ID = 'cart_id';
-    const ORDER_ID = 'order_id';
-    const TOKEN = 'token';
+    public const ENTITY_ID = 'entity_id';
+    public const CART_ID = 'cart_id';
+    public const ORDER_ID = 'order_id';
+    public const TOKEN = 'token';
 
     /**
      * Get paymenttoken_id

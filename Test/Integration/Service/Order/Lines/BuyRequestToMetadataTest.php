@@ -4,8 +4,9 @@
  * See COPYING.txt for license details.
  */
 
-namespace Mollie\Payment\Test\Integration\Service\Order\Lines;
+declare(strict_types=1);
 
+namespace Mollie\Payment\Test\Integration\Service\Order\Lines;
 
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
@@ -14,7 +15,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class BuyRequestToMetadataTest extends IntegrationTestCase
 {
-    public function testDoesNothingWhenNoOrderItemIsPresent()
+    public function testDoesNothingWhenNoOrderItemIsPresent(): void
     {
         /** @var BuyRequestToMetadata $instance */
         $instance = $this->objectManager->create(BuyRequestToMetadata::class);
@@ -24,7 +25,7 @@ class BuyRequestToMetadataTest extends IntegrationTestCase
         $this->assertEquals(['empty' => true], $result);
     }
 
-    public function testDoesNothingWhenThereIsNoBuyRequestAvailable()
+    public function testDoesNothingWhenThereIsNoBuyRequestAvailable(): void
     {
         /** @var BuyRequestToMetadata $instance */
         $instance = $this->objectManager->create(BuyRequestToMetadata::class);
@@ -32,13 +33,13 @@ class BuyRequestToMetadataTest extends IntegrationTestCase
         $result = $instance->process(
             ['empty' => true],
             $this->objectManager->create(OrderInterface::class),
-            $this->objectManager->create(OrderItemInterface::class)
+            $this->objectManager->create(OrderItemInterface::class),
         );
 
         $this->assertEquals(['empty' => true], $result);
     }
 
-    public function testDoesNothingWhenThereIsMetadataAvailable()
+    public function testDoesNothingWhenThereIsMetadataAvailable(): void
     {
         /** @var BuyRequestToMetadata $instance */
         $instance = $this->objectManager->create(BuyRequestToMetadata::class);
@@ -50,13 +51,13 @@ class BuyRequestToMetadataTest extends IntegrationTestCase
         $result = $instance->process(
             ['empty' => true],
             $this->objectManager->create(OrderInterface::class),
-            $orderItem
+            $orderItem,
         );
 
         $this->assertEquals(['empty' => true], $result);
     }
 
-    public function testIncludesTheMetadataWhenItsPresent()
+    public function testIncludesTheMetadataWhenItsPresent(): void
     {
         /** @var BuyRequestToMetadata $instance */
         $instance = $this->objectManager->create(BuyRequestToMetadata::class);
@@ -73,7 +74,7 @@ class BuyRequestToMetadataTest extends IntegrationTestCase
         $result = $instance->process(
             ['empty' => false],
             $this->objectManager->create(OrderInterface::class),
-            $orderItem
+            $orderItem,
         );
 
         $this->assertEquals(['empty' => false, 'metadata' => ['mollie_subscriptions_product' => 1]], $result);

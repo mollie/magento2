@@ -4,24 +4,18 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Plugin\Quote\Api\Item;
 
-use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\Serialize\SerializerInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 
 class MakeRecurringProductsUniqueInCart
 {
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
     public function __construct(
-        SerializerInterface $serializer
-    ) {
-        $this->serializer = $serializer;
-    }
+        private SerializerInterface $serializer
+    ) {}
 
     /**
      * @param CartItemInterface $item

@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\Lines\Generator;
 
@@ -8,23 +14,10 @@ use Mollie\Payment\Helper\General;
 
 class GeisswebEuvat implements GeneratorInterface
 {
-    /**
-     * @var General
-     */
-    private $mollieHelper;
-
-    /**
-     * @var Manager
-     */
-    private $moduleManager;
-
     public function __construct(
-        General $mollieHelper,
-        Manager $moduleManager
-    ) {
-        $this->mollieHelper = $mollieHelper;
-        $this->moduleManager = $moduleManager;
-    }
+        private General $mollieHelper,
+        private Manager $moduleManager
+    ) {}
 
     /**
      * The Geissweb_Euvat module messes with the trigger_recollect in
@@ -42,7 +35,7 @@ class GeisswebEuvat implements GeneratorInterface
             return $orderLines;
         }
 
-        $forceBaseCurrency = (bool)$this->mollieHelper->useBaseCurrency($order->getStoreId());
+        $forceBaseCurrency = (bool) $this->mollieHelper->useBaseCurrency(storeId($order->getStoreId()));
         $orderTotal = $forceBaseCurrency ? $order->getBaseGrandTotal() : $order->getGrandTotal();
         $orderLinesTotal = $this->getOrderLinesTotal($orderLines);
 
@@ -54,12 +47,12 @@ class GeisswebEuvat implements GeneratorInterface
 
         $orderLines[] = [
             'type' => 'discount',
-            'name' => 'EU VAT',
+            'description' => 'EU VAT',
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($currency, $orderTotal - $orderLinesTotal),
             'totalAmount' => $this->mollieHelper->getAmountArray($currency, $orderTotal - $orderLinesTotal),
             'vatRate' => 0,
-            'vatAmount' => $this->mollieHelper->getAmountArray($currency, 0)
+            'vatAmount' => $this->mollieHelper->getAmountArray($currency, 0),
         ];
 
         return $orderLines;

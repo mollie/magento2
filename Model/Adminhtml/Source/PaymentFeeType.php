@@ -1,8 +1,10 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Adminhtml\Source;
 
@@ -10,15 +12,15 @@ use Magento\Framework\Data\OptionSourceInterface;
 
 class PaymentFeeType implements OptionSourceInterface
 {
-    const DISABLED = '';
-    const PERCENTAGE = 'percentage';
-    const FIXED_FEE = 'fixed_fee';
-    const FIXED_FEE_AND_PERCENTAGE = 'fixed_fee_and_percentage';
+    public const DISABLED = '';
+    public const PERCENTAGE = 'percentage';
+    public const FIXED_FEE = 'fixed_fee';
+    public const FIXED_FEE_AND_PERCENTAGE = 'fixed_fee_and_percentage';
 
     /**
      * @inheritDoc
      */
-    public function toOptionArray()
+    public function toOptionArray(): array
     {
         return [
             [

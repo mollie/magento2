@@ -1,0 +1,33 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var Template $block */
+
+use Magento\Framework\View\Element\Template;
+
+?>
+
+<div id="mollie-express" data-bind="scope: 'mollieExpress'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "#mollie-express": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "mollieExpress": {
+                        "component": "Mollie_Payment/js/view/payment/express-components",
+                        "config": {
+                            "template": "Mollie_Payment/payment/express-components",
+                            "placement": "cart"
+                        }
+                    }
+                }
+            }
+        }
+    }
+</script>

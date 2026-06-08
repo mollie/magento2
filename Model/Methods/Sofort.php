@@ -1,8 +1,6 @@
 <?php
-/**
- * Copyright © 2018 Magmodules.eu. All rights reserved.
- * See COPYING.txt for license details.
- */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Methods;
 
@@ -20,5 +18,5 @@ class Sofort extends Mollie
      *
      * @var string
      */
-    const CODE = 'mollie_methods_sofort';
+    public const CODE = 'mollie_methods_sofort';
 }

@@ -1,35 +1,22 @@
 <?php
-/**
+/*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Config;
 
 use Magento\Quote\Api\Data\CartInterface;
-use Magento\Tax\Model\Calculation;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Adminhtml\Source\PaymentFeeType;
 
 class PaymentFee
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var Calculation
-     */
-    private $taxCalculation;
-
     public function __construct(
-        Config $config,
-        Calculation $taxCalculation
-    ) {
-        $this->config = $config;
-        $this->taxCalculation = $taxCalculation;
-    }
+        private Config $config,
+    ) {}
 
     /**
      * @param CartInterface $quote
@@ -39,7 +26,7 @@ class PaymentFee
     {
         $method = $quote->getPayment()->getMethod();
 
-        if ($this->config->paymentSurchargeType($method, $quote->getStoreId()) == PaymentFeeType::DISABLED) {
+        if ($this->config->paymentSurchargeType($method, storeId($quote->getStoreId())) == PaymentFeeType::DISABLED) {
             return false;
         }
 
@@ -54,7 +41,7 @@ class PaymentFee
     {
         $method = $quote->getPayment()->getMethod();
 
-        return $this->config->paymentSurchargeType($method, $quote->getStoreId());
+        return $this->config->paymentSurchargeType($method, storeId($quote->getStoreId()));
     }
 
     /**
@@ -62,7 +49,7 @@ class PaymentFee
      * @param $storeId
      * @return float
      */
-    public function getFixedAmount($method, $storeId)
+    public function getFixedAmount($method, ?int $storeId)
     {
         return $this->config->paymentSurchargeFixedAmount($method, $storeId);
     }
@@ -72,9 +59,9 @@ class PaymentFee
      * @param $storeId
      * @return float
      */
-    public function getPercentage($method, $storeId)
+    public function getPercentage($method, ?int $storeId): float
     {
-        return (float)$this->config->paymentSurchargePercentage($method, $storeId);
+        return (float) $this->config->paymentSurchargePercentage($method, $storeId);
     }
 
     /**
@@ -85,7 +72,7 @@ class PaymentFee
     {
         $method = $cart->getPayment()->getMethod();
 
-        return $this->config->paymentSurchargeLimit($method, $cart->getStoreId());
+        return $this->config->paymentSurchargeLimit($method, storeId($cart->getStoreId()));
     }
 
     /**
@@ -96,14 +83,14 @@ class PaymentFee
     {
         $method = $cart->getPayment()->getMethod();
 
-        return $this->config->paymentSurchargeTaxClass($method, $cart->getStoreId());
+        return $this->config->paymentSurchargeTaxClass($method, storeId($cart->getStoreId()));
     }
 
     /**
      * @param null $storeId
      * @return bool
      */
-    public function includeShippingInSurcharge($storeId = null)
+    public function includeShippingInSurcharge(?int $storeId = null): bool
     {
         return $this->config->includeShippingInSurcharge($storeId);
     }
@@ -112,7 +99,7 @@ class PaymentFee
      * @param null $storeId
      * @return bool
      */
-    public function includeDiscountInSurcharge($storeId = null): bool
+    public function includeDiscountInSurcharge(?int $storeId = null): bool
     {
         return $this->config->includeDiscountInSurcharge($storeId);
     }

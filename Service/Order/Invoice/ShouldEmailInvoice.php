@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
 declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order\Invoice;
@@ -8,18 +13,12 @@ use Mollie\Payment\Config;
 
 class ShouldEmailInvoice
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
     public function __construct(
-        Config $config
+        private Config $config,
     ) {
-        $this->config = $config;
     }
 
-    public function execute(int $storeId, string $paymentMethod): bool
+    public function execute(?int $storeId, string $paymentMethod): bool
     {
         if (!$this->config->sendInvoiceEmail($storeId)) {
             return false;
@@ -32,16 +31,8 @@ class ShouldEmailInvoice
         return $this->config->sendInvoiceEmailForKlarna($storeId);
     }
 
-    private function isKlarna(string $paymentMethod)
+    private function isKlarna(string $paymentMethod): bool
     {
-        return in_array(
-            $paymentMethod,
-            [
-                'mollie_methods_klarna',
-                'mollie_methods_klarnapaylater',
-                'mollie_methods_klarnapaynow',
-                'mollie_methods_klarnasliceit',
-            ]
-        );
+        return $paymentMethod === 'mollie_methods_klarna';
     }
 }

@@ -12,7 +12,7 @@ isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 ?>
 <p><?= $escaper->escapeHtml(__('The following method(s) are disabled in the Mollie Dashboard. They won\'t be available in the checkout.')); ?></p>
 <ul>
-    <?php foreach($block->getData('methods') as $method): ?>
+    <?php foreach ($block->getData('methods') as $method): ?>
         <li><?= $escaper->escapeHtml($method); ?></li>
     <?php endforeach; ?>
 </ul>

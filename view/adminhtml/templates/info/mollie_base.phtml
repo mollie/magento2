@@ -6,16 +6,15 @@
 
 // @codingStandardsIgnoreFile
 /**
- * @var \Mollie\Payment\Block\Info\Base $block
- * @var \Magento\Framework\Escaper $escaper
+ * @var Base $block
+ * @var Escaper $escaper
  */
 
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Info\Base;
 use Mollie\Payment\Block\Info\Method\GiftcardInfo;
 use Mollie\Payment\Model\Methods\Giftcard;
 use Mollie\Payment\Model\Methods\Voucher;
-
-// Magento 2.3 compatibility
-isset($escaper) || $escaper = $block; // @phpstan-ignore-line
 
 $specificInfo = $block->getSpecificInformation();
 $status = $block->getPaymentStatus();
@@ -40,19 +39,13 @@ $status = $block->getPaymentStatus();
     <?= $escaper->escapeHtml(__(
         '%1 using Voucher, %2 direct.',
         $block->formatPrice($block->getAmountPaidByVoucher()),
-        $block->formatPrice($block->getRemainderAmount())
+        $block->formatPrice($block->getRemainderAmount()),
     ));
-    ?>
+        ?>
     <?php endif; ?>
 
     <table class="data-table admin__table-secondary">
         <tbody>
-            <?php if ($block->getCheckoutType()): ?>
-                <tr>
-                    <th><?= $escaper->escapeHtml(__('Checkout Type')); ?></th>
-                    <td class="mollie-checkout-type"><?= $escaper->escapeHtml(ucfirst($block->getCheckoutType())); ?></td>
-                </tr>
-            <?php endif; ?>
             <?php if ($block->getCheckoutUrl() && $status == 'created'): ?>
                 <tr class="mollie-checkout-url">
                     <th><?= $escaper->escapeHtml(__('Checkout Url')); ?></th>
@@ -71,6 +64,12 @@ $status = $block->getPaymentStatus();
                 <tr>
                     <th><?= $escaper->escapeHtml(__('Valid Until')); ?></th>
                     <td><?= $escaper->escapeHtml($block->getExpiresAt()); ?></td>
+                </tr>
+            <?php endif; ?>
+            <?php if ($block->getCaptureBefore()): ?>
+                <tr>
+                    <th><?= $escaper->escapeHtml(__('Capture Before')); ?></th>
+                    <td><?= $escaper->escapeHtml($block->getCaptureBefore()); ?></td>
                 </tr>
             <?php endif; ?>
             <?php if ($block->getPaymentStatus()): ?>

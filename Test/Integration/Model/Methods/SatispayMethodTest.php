@@ -4,13 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\Model\Methods;
 
 use Mollie\Payment\Model\Methods\Satispay;
 
 class SatispayMethodTest extends AbstractTestMethod
 {
-    protected $instance = Satispay::class;
+    protected ?string $instance = Satispay::class;
 
-    protected $code = 'satispay';
+    protected ?string $code = 'satispay';
 }

@@ -4,11 +4,15 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Model;
 
 use Magento\Framework\Api\ExtensionAttribute\JoinProcessorInterface;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaInterface;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Sql\Expression;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Api\Data\OrderSearchResultInterface;
 use Magento\Sales\Api\Data\OrderSearchResultInterfaceFactory;
@@ -16,34 +20,16 @@ use Mollie\Payment\Api\MagentoOrderRepositoryInterface;
 
 class MagentoOrderRepository implements MagentoOrderRepositoryInterface
 {
-    /**
-     * @var JoinProcessorInterface
-     */
-    private $extensionAttributesJoinProcessor;
-
-    /**
-     * @var CollectionProcessorInterface
-     */
-    private $collectionProcessor;
-
-    /**
-     * @var \Magento\Sales\Api\Data\OrderSearchResultInterfaceFactory
-     */
-    private $searchResultsFactory;
-
     public function __construct(
-        JoinProcessorInterface $extensionAttributesJoinProcessor,
-        CollectionProcessorInterface $collectionProcessor,
-        OrderSearchResultInterfaceFactory $searchResultsFactory
-    ) {
-        $this->extensionAttributesJoinProcessor = $extensionAttributesJoinProcessor;
-        $this->collectionProcessor = $collectionProcessor;
-        $this->searchResultsFactory = $searchResultsFactory;
-    }
+        private JoinProcessorInterface $extensionAttributesJoinProcessor,
+        private CollectionProcessorInterface $collectionProcessor,
+        private OrderSearchResultInterfaceFactory $searchResultsFactory,
+        private ResourceConnection $resource,
+    ) {}
 
     /**
-     * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-     * @return \Magento\Sales\Api\Data\OrderSearchResultInterface
+     * @param SearchCriteriaInterface $searchCriteria
+     * @return OrderSearchResultInterface
      */
     public function getRecurringOrders(SearchCriteriaInterface $searchCriteria)
     {
@@ -51,7 +37,8 @@ class MagentoOrderRepository implements MagentoOrderRepositoryInterface
         $searchResults = $this->searchResultsFactory->create();
         $searchResults->setSearchCriteria($searchCriteria);
 
-        $subquery = new \Zend_Db_Expr('(select distinct order_id from sales_order_item where product_options like \'%is_recurring%\')');
+        $table = $this->resource->getTableName('sales_order_item');
+        $subquery = new Expression("(select distinct order_id from {$table} where product_options like '%is_recurring%')");
         $searchResults->getSelect()->join(['t' => $subquery], 'main_table.entity_id = t.order_id');
 
         $this->extensionAttributesJoinProcessor->process($searchResults);

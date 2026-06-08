@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -9,15 +10,13 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Order\TransactionPart;
 
 use Magento\Sales\Api\Data\OrderInterface;
-use Mollie\Payment\Model\Client\Orders;
-use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class LimitStreetLength implements TransactionPartInterface
 {
-    private $streetTruncated = false;
+    private bool $streetTruncated = false;
 
-    public function process(OrderInterface $order, $apiMethod, array $transaction): array
+    public function process(OrderInterface $order, array $transaction): array
     {
         $transaction = $this->limitAddress('billingAddress', $transaction);
         $transaction = $this->limitAddress('shippingAddress', $transaction);
@@ -36,6 +35,7 @@ class LimitStreetLength implements TransactionPartInterface
         }
 
         $this->streetTruncated = true;
+
         return mb_substr($street, 0, 100);
     }
 

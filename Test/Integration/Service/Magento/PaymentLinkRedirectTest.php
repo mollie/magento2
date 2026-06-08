@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -9,9 +10,9 @@ declare(strict_types=1);
 namespace Mollie\Payment\Test\Integration\Service\Magento;
 
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\NotFoundException;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
-use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Magento\PaymentLinkRedirect;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -19,7 +20,7 @@ class PaymentLinkRedirectTest extends IntegrationTestCase
 {
     public function testThrowsExceptionWhenOrderDoesNotExists(): void
     {
-        $this->expectException(\Magento\Framework\Exception\NotFoundException::class);
+        $this->expectException(NotFoundException::class);
 
         $encryptor = $this->objectManager->get(EncryptorInterface::class);
         $orderId = base64_encode($encryptor->encrypt('random string'));

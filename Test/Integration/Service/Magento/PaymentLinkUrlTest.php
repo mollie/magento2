@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -24,7 +25,7 @@ class PaymentLinkUrlTest extends IntegrationTestCase
         /** @var PaymentLinkUrl $instance */
         $instance = $this->objectManager->create(PaymentLinkUrl::class);
 
-        $result = $instance->execute((int)$order->getEntityId());
+        $result = $instance->execute((int) $order->getEntityId());
 
         $this->assertStringContainsString('/mollie/checkout/paymentlink/order/', $result);
     }
@@ -42,7 +43,7 @@ class PaymentLinkUrlTest extends IntegrationTestCase
         /** @var PaymentLinkUrl $instance */
         $instance = $this->objectManager->create(PaymentLinkUrl::class);
 
-        $result = $instance->execute((int)$order->getEntityId());
+        $result = $instance->execute((int) $order->getEntityId());
 
         $this->assertStringContainsString('https://example.com', $result);
     }
@@ -60,7 +61,7 @@ class PaymentLinkUrlTest extends IntegrationTestCase
         /** @var PaymentLinkUrl $instance */
         $instance = $this->objectManager->create(PaymentLinkUrl::class);
 
-        $result = $instance->execute((int)$order->getEntityId());
+        $result = $instance->execute((int) $order->getEntityId());
 
         $this->assertStringContainsString('https://example.com/?order=', $result);
         $this->assertStringNotContainsString('{{order}}', $result);

@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Quote\Api\Data\CartInterface;
@@ -12,14 +14,14 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class MethodParameterPartTest extends IntegrationTestCase
 {
-    const DEFAULT_INPUT = [
+    public const DEFAULT_INPUT = [
         'amount[value]' => 10,
         'amount[currency]' => 'EUR',
         'resource' => 'orders',
-        'includeWallets' => 'applepay',
+        'includeWallets' => ['applepay'],
     ];
 
-    public function testChangesNothingWhenNoPartsAreConfigured()
+    public function testChangesNothingWhenNoPartsAreConfigured(): void
     {
         /** @var MethodParameters $instance */
         $instance = $this->objectManager->create(MethodParameters::class, ['parametersParts' => []]);
@@ -29,7 +31,7 @@ class MethodParameterPartTest extends IntegrationTestCase
         $this->assertEquals(static::DEFAULT_INPUT, $result);
     }
 
-    public function testTheParametersCanBeAdjusted()
+    public function testTheParametersCanBeAdjusted(): void
     {
         $part = new class() implements ParameterPartInterface {
             public function enhance(array $parameters, CartInterface $cart): array
@@ -48,7 +50,7 @@ class MethodParameterPartTest extends IntegrationTestCase
         $this->assertEquals(static::DEFAULT_INPUT + ['test' => true], $result);
     }
 
-    public function testSupportsMultipleParameterParts()
+    public function testSupportsMultipleParameterParts(): void
     {
         $part1 = new class() implements ParameterPartInterface {
             public function enhance(array $parameters, CartInterface $cart): array
@@ -69,7 +71,7 @@ class MethodParameterPartTest extends IntegrationTestCase
             'parametersParts' => [
                 'test1' => $part1,
                 'test2' => $part2,
-            ]
+            ],
         ]);
 
         $result = $instance->enhance(static::DEFAULT_INPUT, $this->objectManager->create(CartInterface::class));

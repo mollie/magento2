@@ -1,4 +1,8 @@
 <?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Framework\App\RouterList">
         <arguments>
@@ -24,17 +28,21 @@
         <plugin name="mollie_csrf_validation_disable" type="Mollie\Payment\Plugin\Framework\App\Request\CsrfValidatorSkip" />
     </type>
 
-    <type name="Magento\Vault\Model\Ui\TokensConfigProvider">
-        <arguments>
-            <argument name="tokenUiComponentProviders" xsi:type="array">
-                <item name="mollie_methods_creditcard" xsi:type="object">Mollie\Payment\Ui\TokenUiComponentProvider</item>
-            </argument>
-        </arguments>
-    </type>
-
     <type name="Mollie\Payment\Model\MollieTerminalConfigProvider">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Model\MollieConfigProvider">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Block\Account\SavedCards">
+        <arguments>
+            <argument name="customerSession" xsi:type="object">Magento\Customer\Model\Session\Proxy</argument>
         </arguments>
     </type>
 </config>

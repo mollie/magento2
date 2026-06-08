@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
@@ -11,7 +12,7 @@ namespace Mollie\Payment\Test\Integration\Controller\Checkout;
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Sales\Model\Order;
 use Magento\TestFramework\TestCase\AbstractController;
-use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\StartTransaction;
 
 class PaymentLinkTest extends AbstractController
 {
@@ -43,9 +44,9 @@ class PaymentLinkTest extends AbstractController
      */
     public function testRedirectsToMollieWhenTheInputIsValid(): void
     {
-        $mollieMock = $this->createMock(Mollie::class);
-        $mollieMock->method('startTransaction')->willReturn('https://www.example.com');
-        $this->_objectManager->addSharedInstance($mollieMock, Mollie::class);
+        $startTransactionMock = $this->createMock(StartTransaction::class);
+        $startTransactionMock->method('execute')->willReturn('https://www.example.com');
+        $this->_objectManager->addSharedInstance($startTransactionMock, StartTransaction::class);
 
         $order = $this->_objectManager->create(Order::class)->loadByIncrementId('100000001');
         $key = $this->_objectManager->get(EncryptorInterface::class)->encrypt($order->getId());

@@ -1,14 +1,18 @@
 <?php
+
 /*
  * Copyright Magmodules.eu. All rights reserved.
  * See COPYING.txt for license details.
  */
+
 declare(strict_types=1);
 
 namespace Mollie\Payment\Cron;
 
 use DateInterval;
+use DateTimeImmutable;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -18,59 +22,19 @@ use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie as MollieModel;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
+use Throwable;
 
 class ProcessPendingOrders
 {
-    /**
-     * @var Config
-     */
-    private $config;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var DateTime
-     */
-    private $dateTime;
-
-    /**
-     * @var MollieModel
-     */
-    private $mollieModel;
-    /**
-     * @var StoreManagerInterface
-     */
-    private $storeManager;
-    /**
-     * @var OrderCommentHistory
-     */
-    private $orderCommentHistory;
-
     public function __construct(
-        Config $config,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        OrderRepositoryInterface $orderRepository,
-        DateTime $dateTime,
-        StoreManagerInterface $storeManager,
-        MollieModel $mollieModel,
-        OrderCommentHistory $orderCommentHistory
-    ) {
-        $this->config = $config;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
-        $this->orderRepository = $orderRepository;
-        $this->dateTime = $dateTime;
-        $this->mollieModel = $mollieModel;
-        $this->storeManager = $storeManager;
-        $this->orderCommentHistory = $orderCommentHistory;
-    }
+        private Config $config,
+        private SearchCriteriaBuilder $searchCriteriaBuilder,
+        private OrderRepositoryInterface $orderRepository,
+        private DateTime $dateTime,
+        private StoreManagerInterface $storeManager,
+        private MollieModel $mollieModel,
+        private OrderCommentHistory $orderCommentHistory
+    ) {}
 
     public function execute(): void
     {
@@ -80,9 +44,9 @@ class ProcessPendingOrders
         }
     }
 
-    private function processOrdersForStore(StoreInterface $store)
+    private function processOrdersForStore(StoreInterface $store): void
     {
-        if (!$this->config->isPendingOrderCronEnabled((int)$store->getId())) {
+        if (!$this->config->isPendingOrderCronEnabled((int) $store->getId())) {
             return;
         }
 
@@ -90,12 +54,12 @@ class ProcessPendingOrders
         foreach ($pendingOrders as $order) {
             try {
                 $this->processOrder($order);
-            } catch (\Throwable $exception) {
+            } catch (Throwable $exception) {
                 $this->config->addToLog('error', [
                     'message' => 'Error processing pending order in cron',
                     'order_id' => $order->getEntityId(),
                     'error' => $exception->getMessage(),
-                    'trace' => $exception->getTraceAsString()
+                    'trace' => $exception->getTraceAsString(),
                 ]);
             }
         }
@@ -106,14 +70,14 @@ class ProcessPendingOrders
      */
     private function getPendingOrders(StoreInterface $store): array
     {
-        $fromDate = (new \DateTimeImmutable($this->dateTime->gmtDate()))
+        $fromDate = (new DateTimeImmutable($this->dateTime->gmtDate()))
             ->sub(new DateInterval('P10D'))
             ->format('Y-m-d H:i:s');
-        $toDate = (new \DateTimeImmutable($this->dateTime->gmtDate()))
+        $toDate = (new DateTimeImmutable($this->dateTime->gmtDate()))
             ->sub(new DateInterval('PT30M'))
             ->format('Y-m-d H:i:s');
 
-        $batchSize = $this->config->pendingOrderCronBatchSize((int)$store->getId());
+        $batchSize = $this->config->pendingOrderCronBatchSize((int) $store->getId());
 
         $this->searchCriteriaBuilder
             ->addFilter('state', Order::STATE_PENDING_PAYMENT)
@@ -145,7 +109,9 @@ class ProcessPendingOrders
         }
 
         if (is_array($result) && isset($result['error']) && $result['error']) {
-            throw new \Exception($result['msg'] ?? 'Unknown error during transaction processing');
+            throw new LocalizedException(
+                __($result['msg'] ?? 'Unknown error during transaction processing'),
+            );
         }
     }
 }

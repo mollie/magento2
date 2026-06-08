@@ -1,44 +1,46 @@
 <?php
 /*
  * Copyright Magmodules.eu. All rights reserved.
- *  See COPYING.txt for license details.
+ * See COPYING.txt for license details.
  */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Model;
 
+use Magento\Framework\Api\DataObjectHelper;
+use Magento\Framework\Model\AbstractModel;
+use Magento\Framework\Model\Context;
+use Magento\Framework\Registry;
 use Mollie\Payment\Api\Data\SentPaymentReminderInterface;
 use Mollie\Payment\Api\Data\SentPaymentReminderInterfaceFactory;
-use Magento\Framework\Api\DataObjectHelper;
+use Mollie\Payment\Model\ResourceModel\SentPaymentReminder\Collection;
 
-class SentPaymentReminder extends \Magento\Framework\Model\AbstractModel
+class SentPaymentReminder extends AbstractModel
 {
-
-    protected $sentpaymentreminderDataFactory;
-
-    protected $dataObjectHelper;
+    protected SentPaymentReminderInterfaceFactory $sentpaymentreminderDataFactory;
 
     protected $_eventPrefix = 'mollie_sent_payment_reminder';
 
     /**
-     * @param \Magento\Framework\Model\Context $context
-     * @param \Magento\Framework\Registry $registry
+     * @param Context $context
+     * @param Registry $registry
      * @param SentPaymentReminderInterfaceFactory $sentpaymentreminderDataFactory
      * @param DataObjectHelper $dataObjectHelper
-     * @param \Mollie\Payment\Model\ResourceModel\SentPaymentReminder $resource
-     * @param \Mollie\Payment\Model\ResourceModel\SentPaymentReminder\Collection $resourceCollection
+     * @param ResourceModel\SentPaymentReminder $resource
+     * @param Collection $resourceCollection
      * @param array $data
      */
     public function __construct(
-        \Magento\Framework\Model\Context $context,
-        \Magento\Framework\Registry $registry,
+        Context $context,
+        Registry $registry,
         SentPaymentReminderInterfaceFactory $sentpaymentreminderDataFactory,
-        DataObjectHelper $dataObjectHelper,
-        \Mollie\Payment\Model\ResourceModel\SentPaymentReminder $resource,
-        \Mollie\Payment\Model\ResourceModel\SentPaymentReminder\Collection $resourceCollection,
-        array $data = []
+        protected DataObjectHelper $dataObjectHelper,
+        ResourceModel\SentPaymentReminder $resource,
+        Collection $resourceCollection,
+        array $data = [],
     ) {
         $this->sentpaymentreminderDataFactory = $sentpaymentreminderDataFactory;
-        $this->dataObjectHelper = $dataObjectHelper;
         parent::__construct($context, $registry, $resource, $resourceCollection, $data);
     }
 
@@ -54,7 +56,7 @@ class SentPaymentReminder extends \Magento\Framework\Model\AbstractModel
         $this->dataObjectHelper->populateWithArray(
             $sentpaymentreminderDataObject,
             $sentpaymentreminderData,
-            SentPaymentReminderInterface::class
+            SentPaymentReminderInterface::class,
         );
 
         return $sentpaymentreminderDataObject;
