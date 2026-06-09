@@ -102,6 +102,16 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="saved_cards_manual_capture_notice" translate="label" sortOrder="85" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label/>
+            <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Field\SavedCardsManualCaptureNotice</frontend_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="enable_customers_api">1</field>
+                <field id="capture_mode">manual</field>
+            </depends>
+        </field>
         <field id="consent_text" translate="label" type="textarea" sortOrder="90" showInDefault="1" showInWebsite="1"
                showInStore="1" canRestore="1">
             <label>Consent text</label>
