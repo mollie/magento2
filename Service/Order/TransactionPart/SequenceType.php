@@ -37,11 +37,6 @@ class SequenceType implements TransactionPartInterface
             return $transaction;
         }
 
-        if (($info['mollie_save_card'] ?? null) === true) {
-            $transaction['sequenceType'] = 'first';
-            return $transaction;
-        }
-
         return $transaction;
     }
 }

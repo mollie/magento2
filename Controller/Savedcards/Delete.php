@@ -36,7 +36,7 @@ class Delete implements AccountInterface, HttpPostActionInterface
     {
         $redirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
 
-        if (!$this->config->creditcardEnableCustomersApi()) {
+        if (!$this->config->creditcardEnableCustomersApi() || !$this->config->isProductionMode()) {
             return $redirect->setPath('noroute');
         }
 

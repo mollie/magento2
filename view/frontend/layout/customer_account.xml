@@ -7,7 +7,7 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceBlock name="customer_account_navigation">
-            <block class="Magento\Customer\Block\Account\SortLink"
+            <block class="Mollie\Payment\Block\Account\SavedCardsLink"
                    name="customer-account-navigation-mollie-saved-cards-link">
                 <arguments>
                     <argument name="label" xsi:type="string" translate="true">Saved cards</argument>
