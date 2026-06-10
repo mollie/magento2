@@ -8,18 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set issue type
-… +75 lines
-
-name: Create Jira ticket from GitHub Issue
-on:
-  issues:
-    types: [opened]
-
-jobs:
-  create-jira-ticket:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set issue type
         id: type
         run: |
           LABELS='${{ toJson(github.event.issue.labels.*.name) }}'
