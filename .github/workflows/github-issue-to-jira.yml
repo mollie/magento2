@@ -56,7 +56,7 @@ jobs:
             -X POST \
             -H "Content-Type: application/json" \
             -d "$JSON" \
-            "https://mollie.atlassian.net/rest/api/3/issue")
+            "https://api.atlassian.com/ex/jira/c6d7ab52-daef-4ab7-9923-177bbb70dbc8/rest/api/3/issue")
 
           echo "API Response: $RESPONSE"
           JIRA_KEY=$(echo $RESPONSE | python3 -c 'import sys,json; print(json.load(sys.stdin).get("key",""))' 2>/dev/null || echo "")
