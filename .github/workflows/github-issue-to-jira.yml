@@ -8,6 +8,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Set issue type
+… +75 lines
+
+name: Create Jira ticket from GitHub Issue
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  create-jira-ticket:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set issue type
         id: type
         run: |
           LABELS='${{ toJson(github.event.issue.labels.*.name) }}'
@@ -47,8 +59,10 @@ jobs:
                   }]
                 },
                 issuetype: {name: $type},
-                labels: ["github-issue"]
-              }
+                assignee: {accountId: "5a15453b9b3ce10ed7593192"},
+                labels: ["github-issue", "magento2"]
+              },
+              transition: {id: "21"}
             }')
 
           RESPONSE=$(curl -s \
