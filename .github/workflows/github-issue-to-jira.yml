@@ -58,6 +58,7 @@ jobs:
             -d "$JSON" \
             "https://mollie.atlassian.net/rest/api/3/issue")
 
+          echo "API Response: $RESPONSE"
           JIRA_KEY=$(echo $RESPONSE | python3 -c 'import sys,json; print(json.load(sys.stdin).get("key",""))' 2>/dev/null || echo "")
           echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_OUTPUT
 
