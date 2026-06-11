@@ -1,0 +1,196 @@
+name: Bug report
+description: Report a problem with the Mollie Magento 2 plugin
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this issue. Please fill out the fields below so we can help you as quickly as possible.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A brief description of the problem
+      placeholder: e.g. "Payment status not updated after successful iDEAL payment"
+    validations:
+      required: true
+
+  - type: input
+    id: mollie-version
+    attributes:
+      label: Mollie plugin version
+      description: You can find this in Stores > Configuration > Mollie > General
+      placeholder: e.g. 2.34.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: magento-edition
+    attributes:
+      label: Magento edition
+      options:
+        - Open Source
+        - Commerce (Enterprise)
+        - B2B
+    validations:
+      required: true
+
+  - type: input
+    id: magento-version
+    attributes:
+      label: Magento version
+      placeholder: e.g. 2.4.8-p4
+    validations:
+      required: true
+
+  - type: dropdown
+    id: php-version
+    attributes:
+      label: PHP version
+      options:
+        - "8.5"
+        - "8.4"
+        - "8.3"
+        - "8.2"
+        - "8.1"
+        - "7.4"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: theme
+    attributes:
+      label: Frontend theme base
+      options:
+        - Luma / Blank (default Magento)
+        - Hyva
+        - Custom theme
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: hyva-theme-version
+    attributes:
+      label: Hyva Theme version
+      description: Only if you use Hyva. Leave empty otherwise.
+      placeholder: e.g. 1.4.5
+
+  - type: input
+    id: hyva-checkout-version
+    attributes:
+      label: Hyva Checkout version
+      description: Only if you use Hyva Checkout. Leave empty otherwise.
+      placeholder: e.g. 1.3.8
+
+  - type: checkboxes
+    id: payment-methods
+    attributes:
+      label: Payment method (if applicable)
+      description: Which payment method is affected?
+      options:
+        - label: Not applicable
+        - label: Apple Pay (direct)
+        - label: Alma
+        - label: Bancontact
+        - label: Bancomat Pay
+        - label: Bank transfer
+        - label: Belfius Pay Button
+        - label: Billie
+        - label: Bizum
+        - label: Blik
+        - label: Credit card (VISA, MasterCard, Maestro and American Express)
+        - label: EPS
+        - label: Gift cards (Webshop Giftcard, Podium Cadeaukaart, VVV Cadeaukaart, YourGift etc.)
+        - label: Google Pay
+        - label: iDEAL
+        - label: in3
+        - label: KBC/CBC Payment Button
+        - label: Klarna One
+        - label: Klarna Pay now
+        - label: Klarna Pay later
+        - label: Klarna Slice it
+        - label: Meal vouchers, eco vouchers, or other gift vouchers
+        - label: Pay by Bank
+        - label: PayPal
+        - label: Paysafecard
+        - label: Point Of Sale (POS)
+        - label: Payconiq
+        - label: Przelewy24
+        - label: Satispay
+        - label: SEPA Direct Debit
+        - label: SOFORT Banking
+        - label: Swish
+        - label: Trustly
+        - label: TWINT
+        - label: Vipps
+
+  - type: checkboxes
+    id: integrations
+    attributes:
+      label: Store integrations & background processes
+      description: Do any of the following apply to your store? These integrations can affect order handling.
+      options:
+        - label: ERP integration (e.g. Akeneo, Picqer, ChannelEngine, Katana, Exact)
+        - label: Automatic shipping / fulfillment service
+        - label: Order management system (OMS)
+        - label: Cron-based order processing (custom or 3rd-party)
+        - label: Multi-store / multi-website setup
+        - label: Webhook consumers that update order statuses
+        - label: Other 3rd-party modules that modify orders or invoices
+
+  - type: textarea
+    id: integrations-details
+    attributes:
+      label: Integration details
+      description: If you checked any of the above, please provide details (names, versions, what they do).
+      placeholder: e.g. "We use Picqer for fulfillment which automatically ships orders and updates tracking info"
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to reproduce
+      description: Provide step-by-step instructions to reproduce the issue
+      placeholder: |
+        1. Go to checkout
+        2. Select iDEAL
+        3. Complete the payment
+        4. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual behavior
+      description: What actually happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: error-logs
+    attributes:
+      label: Relevant log output
+      description: Paste any relevant logs from var/log/exception.log, var/log/system.log, or var/log/mollie.log
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots
+      description: If applicable, add screenshots to help explain the problem
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional context
+      description: Any other information (hosting provider, CDN, custom modules, etc.)
