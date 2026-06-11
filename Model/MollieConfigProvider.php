@@ -166,7 +166,7 @@ class MollieConfigProvider implements ConfigProviderInterface
 
     private function appendSavedCardsConfig(array &$config, int $storeId): void
     {
-        $enabled = $this->config->creditcardEnableCustomersApi($storeId);
+        $enabled = $this->config->creditcardEnableCustomersApi($storeId) && $this->config->isProductionMode($storeId);
         $config['payment']['mollie']['creditcard']['saved_cards_enabled'] = $enabled;
 
         if (!$enabled) {
