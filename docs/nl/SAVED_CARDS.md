@@ -7,6 +7,7 @@ Met opgeslagen kaarten kunnen ingelogde klanten een creditcard opslaan na een ge
 - De creditcardbetaalmethode is ingeschakeld - zie [Credit Card Payments](CREDIT_CARD.md)
 - Mollie Components is ingeschakeld (`Use Mollie Components` ingesteld op `Yes`) - opgeslagen kaarten is alleen beschikbaar met het ingebedde kaartformulier, niet met de gehoste redirectflow
 - Een Profile ID is opgeslagen onder **Stores → Configuration → Mollie → General** - Components vereist dit
+- **Modus** staat op **Live**: opgeslagen kaarten werkt niet in testmodus (zie [API Keys](API_KEYS.md))
 
 ## Opgeslagen kaarten inschakelen
 
@@ -15,6 +16,8 @@ Met opgeslagen kaarten kunnen ingelogde klanten een creditcard opslaan na een ge
 3. Klik op **Save Config** en leeg de cache - de optie voor kaartopslag verschijnt niet bij de checkout totdat de cache is geleegd
 
 Opgeslagen kaarten worden alleen aangeboden aan ingelogde klanten. Gastklanten zien het selectievakje voor kaartopslag nooit.
+
+Opgeslagen kaarten vereist daarnaast live-modus. Zolang **Modus** op **Test** staat, zijn het selectievakje voor kaartopslag en eerder opgeslagen kaarten verborgen bij de checkout, ook als de instelling is ingeschakeld, en is de pagina **Saved cards** in het klantenaccount niet bereikbaar.
 
 ## Klanttoestemming bij de checkout
 
@@ -53,9 +56,15 @@ Om deze te wijzigen:
 
 Pas de URL van het privacybeleid in de standaardtekst aan zodat deze verwijst naar je eigen privacypagina voordat je live gaat.
 
+## Opgeslagen kaarten met handmatige capture
+
+Mollie maakt het mandaat voor een opgeslagen kaart pas aan zodra de betaling is verrekend, en dat gebeurt bij de capture. Met **Capture method** ingesteld op **Manual capture** wordt een kaart die bij de checkout is opgeslagen daarom pas beschikbaar voor de klant nadat je die order hebt gefactureerd of verzonden, afhankelijk van de instelling **When to capture?**.
+
+Magento Admin toont een melding onder de instelling **Enable saved cards** wanneer handmatige capture en opgeslagen kaarten beide zijn ingeschakeld. Er is geen actie nodig: de kaart verschijnt automatisch bij de opgeslagen kaarten van de klant zodra de order is gecaptured. Zie [Credit Card Payments](CREDIT_CARD.md) voor de capture-configuratie.
+
 ## Opgeslagen kaarten beheren (Mijn account)
 
-Wanneer opgeslagen kaarten zijn ingeschakeld, verschijnt een link **Saved cards** in de navigatie van het klantenaccount onder **My Account**. Klanten bereiken de pagina via `/mollie/savedcards/index`.
+Wanneer opgeslagen kaarten zijn ingeschakeld en de extensie in live-modus draait, verschijnt een link **Saved cards** in de navigatie van het klantenaccount onder **My Account**. Klanten bereiken de pagina via `/mollie/savedcards/index`.
 
 De pagina toont alle geldige creditcardmandaten. Elke rij toont:
 
@@ -65,7 +74,7 @@ De pagina toont alle geldige creditcardmandaten. Elke rij toont:
 
 Om een kaart te verwijderen, klikt de klant op **Remove saved card** naast het item en bevestigt de vraag. De extensie trekt het mandaat direct in via de Mollie API. Eenmaal ingetrokken verschijnt de kaart niet meer bij de checkout en kan deze niet worden belast.
 
-De link **Saved cards** verschijnt alleen in de accountnavigatie wanneer opgeslagen kaarten zijn ingeschakeld. Als je de functie uitschakelt nadat klanten al kaarten hebben opgeslagen, worden de link en pagina ontoegankelijk, maar de onderliggende mandaten in Mollie blijven bestaan totdat ze worden ingetrokken.
+De link **Saved cards** verschijnt alleen in de accountnavigatie wanneer opgeslagen kaarten zijn ingeschakeld en **Modus** op **Live** staat. Als je de functie uitschakelt of naar testmodus wisselt nadat klanten al kaarten hebben opgeslagen, worden de link en pagina ontoegankelijk, maar de onderliggende mandaten in Mollie blijven bestaan totdat ze worden ingetrokken.
 
 ## Zichtbaarheid in Admin
 

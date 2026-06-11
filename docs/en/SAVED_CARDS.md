@@ -7,6 +7,7 @@ Saved cards lets logged-in customers store a credit card after a successful paym
 - The Credit Card payment method is enabled — see [Credit Card Payments](CREDIT_CARD.md)
 - Mollie Components is enabled (`Use Mollie Components` set to `Yes`) — saved cards is only available with the embedded card form, not the hosted redirect flow
 - A Profile ID is saved under **Stores → Configuration → Mollie → General** — Components requires it
+- **Modus** is set to **Live**: saved cards does not work in test mode (see [API Keys](API_KEYS.md))
 
 ## Enable Saved Cards
 
@@ -15,6 +16,8 @@ Saved cards lets logged-in customers store a credit card after a successful paym
 3. Click **Save Config** and flush the cache — the save-card option does not appear at checkout until the cache is cleared
 
 Saved cards is only offered to logged-in customers. Guest customers never see the save-card checkbox.
+
+Saved cards also requires live mode. While **Modus** is set to **Test**, the save-card checkbox and any previously saved cards are hidden at checkout even when the setting is enabled, and the **Saved cards** page in the customer account is not accessible.
 
 ## Customer Consent at Checkout
 
@@ -53,9 +56,15 @@ To change it:
 
 Update the privacy policy URL in the default text to point to your own policy page before going live.
 
+## Saved Cards with Manual Capture
+
+Mollie only creates the mandate for a saved card once the payment is settled, which happens at capture. With **Capture method** set to **Manual capture**, a card saved at checkout therefore only becomes available to the customer after you invoice or ship that order, depending on the **When to capture?** setting.
+
+Magento Admin shows a notice under the **Enable saved cards** setting when manual capture and saved cards are both enabled. No action is needed: the card appears in the customer's saved cards automatically once the order is captured. See [Credit Card Payments](CREDIT_CARD.md) for capture configuration.
+
 ## Managing Saved Cards (My Account)
 
-When saved cards is enabled, a **Saved cards** link appears in the customer account navigation under **My Account**. Customers reach the page at `/mollie/savedcards/index`.
+When saved cards is enabled and the extension runs in live mode, a **Saved cards** link appears in the customer account navigation under **My Account**. Customers reach the page at `/mollie/savedcards/index`.
 
 The page lists all valid credit card mandates on file. Each row shows:
 
@@ -65,7 +74,7 @@ The page lists all valid credit card mandates on file. Each row shows:
 
 To remove a card, the customer clicks **Remove saved card** next to the entry and confirms the prompt. The extension immediately revokes the mandate via the Mollie API. Once revoked, the card no longer appears at checkout and cannot be charged.
 
-The **Saved cards** link only appears in the account navigation when saved cards is enabled. If you disable the feature after customers have already saved cards, the link and page become inaccessible, but the underlying mandates in Mollie remain until revoked.
+The **Saved cards** link only appears in the account navigation when saved cards is enabled and **Modus** is set to **Live**. If you disable the feature or switch to test mode after customers have already saved cards, the link and page become inaccessible, but the underlying mandates in Mollie remain until revoked.
 
 ## Admin Visibility
 
