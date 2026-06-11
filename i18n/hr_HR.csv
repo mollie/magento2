@@ -462,7 +462,7 @@
 "Vipps","Vipps"
 "Voucher","Bon"
 "Warning","Upozorenje"
-"Warning: This order is (partially) paid using a voucher or giftcard. You can refund a maximum of %1.","Upozorenje: Ova narudžba je (djelomično) plaćena vaučerom ili poklon karticom. Možete izvršiti povrat do najviše %1."
+"Warning: This order is (partially) paid using a voucher or giftcard. The voucher/giftcard portion may not be refundable online. An amount of %1 can always be refunded. If a higher refund fails, please process the remaining part directly with the issuer.","Upozorenje: Ova narudžba je (djelomično) plaćena vaučerom ili poklon karticom. Dio plaćen vaučerom ili poklon karticom možda neće biti moguće refundirati online. Iznos od %1 uvijek se može refundirati. Ako veći povrat ne uspije, preostali dio obradite izravno s izdavateljem."
 "Warning: We detected that Cloudflare is being used. Please read <a href=""%1"" target=""_blank"">this wiki</a> to be sure that everything works as expected.","Upozorenje: Otkrili smo da se koristi Cloudflare. Molimo pročitajte <a href=""%1"" target=""_blank"">ovaj wiki</a> kako biste bili sigurni da sve radi prema očekivanjima."
 "Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Upozorenje: Preporučujemo da instalirate Mollie ekstenziju putem Composera. Trenutno je instalirana u mapi app/code. "
 "Warning: We recommend to use a unique payment status for pending Banktransfer payments","Upozorenje: Preporučujemo korištenje jedinstvenog statusa plaćanja za čekajuće bankovne transfere"

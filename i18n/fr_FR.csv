@@ -462,7 +462,7 @@
 "Vipps","Vipps"
 "Voucher","Bon d'achat"
 "Warning","Avertissement"
-"Warning: This order is (partially) paid using a voucher or giftcard. You can refund a maximum of %1.","Avertissement : Cette commande est (partiellement) payée à l'aide d'un bon d'achat ou d'une carte cadeau. Vous pouvez rembourser un maximum de %1."
+"Warning: This order is (partially) paid using a voucher or giftcard. The voucher/giftcard portion may not be refundable online. An amount of %1 can always be refunded. If a higher refund fails, please process the remaining part directly with the issuer.","Avertissement : Cette commande est (partiellement) payée à l'aide d'un bon d'achat ou d'une carte cadeau. La partie payée par bon d'achat ou carte cadeau peut ne pas être remboursable en ligne. Un montant de %1 peut toujours être remboursé. Si un remboursement supérieur échoue, veuillez traiter la partie restante directement auprès de l'émetteur."
 "Warning: We detected that Cloudflare is being used. Please read <a href=""%1"" target=""_blank"">this wiki</a> to be sure that everything works as expected.","Avertissement : Nous avons détecté que Cloudflare est utilisé. Veuillez lire <a href=""%1"" target=""_blank"">ce wiki</a> pour vous assurer que tout fonctionne comme prévu."
 "Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Avertissement: nous vous recommandons d'installer l'extension Mollie en utilisant Composer, il se trouve actuellement dans le dossier app/code."
 "Warning: We recommend to use a unique payment status for pending Banktransfer payments","Avertissement: nous vous recommandons d'utiliser un statut de paiement unique pour les paiements par virement bancaire en attente"

@@ -462,7 +462,7 @@
 "Vipps","Vipps"
 "Voucher","Kupons"
 "Warning","Brīdinājums"
-"Warning: This order is (partially) paid using a voucher or giftcard. You can refund a maximum of %1.","Brīdinājums: Šis pasūtījums ir (daļēji) apmaksāts, izmantojot kuponu vai dāvanu karti. Maksimālā atmaksas summa ir %1."
+"Warning: This order is (partially) paid using a voucher or giftcard. The voucher/giftcard portion may not be refundable online. An amount of %1 can always be refunded. If a higher refund fails, please process the remaining part directly with the issuer.","Brīdinājums: Šis pasūtījums ir (daļēji) apmaksāts, izmantojot kuponu vai dāvanu karti. Ar kuponu vai dāvanu karti apmaksāto daļu, iespējams, nevarēs atmaksāt tiešsaistē. Summu %1 vienmēr var atmaksāt. Ja lielāka atmaksa neizdodas, atlikušo daļu kārtojiet tieši ar izdevēju."
 "Warning: We detected that Cloudflare is being used. Please read <a href=""%1"" target=""_blank"">this wiki</a> to be sure that everything works as expected.","Brīdinājums: Tika konstatēts, ka tiek izmantots Cloudflare. Lūdzu, izlasiet <a href=""%1"" target=""_blank"">šo wiki</a>, lai pārliecinātos, ka viss darbojas kā paredzēts."
 "Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Brīdinājums: iesakām instalēt Mollie paplašinājumu, izmantojot Composer, pašlaik tas ir instalēts mapē app/code."
 "Warning: We recommend to use a unique payment status for pending Banktransfer payments","Brīdinājums: iesakām izmantot unikālu maksājuma statusu gaidošiem bankas pārskaitījuma maksājumiem"

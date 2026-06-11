@@ -462,7 +462,7 @@
 "Vipps","Vipps"
 "Voucher","Κουπόνι"
 "Warning","Προειδοποίηση"
-"Warning: This order is (partially) paid using a voucher or giftcard. You can refund a maximum of %1.","Προειδοποίηση: Αυτή η παραγγελία πληρώθηκε (εν μέρει) με κουπόνι ή δωροκάρτα. Μπορείτε να επιστρέψετε έως και %1."
+"Warning: This order is (partially) paid using a voucher or giftcard. The voucher/giftcard portion may not be refundable online. An amount of %1 can always be refunded. If a higher refund fails, please process the remaining part directly with the issuer.","Προειδοποίηση: Αυτή η παραγγελία πληρώθηκε (εν μέρει) με κουπόνι ή δωροκάρτα. Το μέρος που πληρώθηκε με κουπόνι ή δωροκάρτα ενδέχεται να μην μπορεί να επιστραφεί διαδικτυακά. Ποσό %1 μπορεί πάντα να επιστραφεί. Εάν μια μεγαλύτερη επιστροφή αποτύχει, διεκπεραιώστε το υπόλοιπο μέρος απευθείας με τον εκδότη."
 "Warning: We detected that Cloudflare is being used. Please read <a href=""%1"" target=""_blank"">this wiki</a> to be sure that everything works as expected.","Προειδοποίηση: Εντοπίσαμε ότι χρησιμοποιείται το Cloudflare. Διαβάστε <a href=""%1"" target=""_blank"">αυτό το wiki</a> για να βεβαιωθείτε ότι όλα λειτουργούν σωστά."
 "Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Προειδοποίηση: Συνιστάται να εγκαταστήσετε την επέκταση Mollie χρησιμοποιώντας το Composer. Αυτή τη στιγμή είναι εγκατεστημένη στον φάκελο app/code."
 "Warning: We recommend to use a unique payment status for pending Banktransfer payments","Προειδοποίηση: Συνιστούμε να χρησιμοποιείτε μια μοναδική κατάσταση πληρωμής για τις εκκρεμείς πληρωμές μέσω τραπεζικής μεταφοράς"

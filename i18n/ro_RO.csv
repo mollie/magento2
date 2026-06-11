@@ -462,7 +462,7 @@
 "Vipps","Vipps"
 "Voucher","Voucher"
 "Warning","Atenție"
-"Warning: This order is (partially) paid using a voucher or giftcard. You can refund a maximum of %1.","Avertisment: Această comandă este (parțial) plătită cu un voucher sau card cadou. Puteți rambursa maximum %1."
+"Warning: This order is (partially) paid using a voucher or giftcard. The voucher/giftcard portion may not be refundable online. An amount of %1 can always be refunded. If a higher refund fails, please process the remaining part directly with the issuer.","Avertisment: Această comandă este (parțial) plătită cu un voucher sau card cadou. Partea plătită cu voucher sau card cadou poate să nu fie rambursabilă online. O sumă de %1 poate fi întotdeauna rambursată. Dacă o rambursare mai mare eșuează, procesați partea rămasă direct cu emitentul."
 "Warning: We detected that Cloudflare is being used. Please read <a href=""%1"" target=""_blank"">this wiki</a> to be sure that everything works as expected.","Avertisment: Am detectat că se utilizează Cloudflare. Vă rugăm să citiți <a href=""%1"" target=""_blank"">acest wiki</a> pentru a vă asigura că totul funcționează conform așteptărilor."
 "Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Atenție: Recomandăm instalarea extensiei Mollie folosind Composer, în prezent este instalată în folderul app/code."
 "Warning: We recommend to use a unique payment status for pending Banktransfer payments","Atenție: Recomandăm să utilizați un status de plată unic pentru plățile în așteptare prin transfer bancar"
