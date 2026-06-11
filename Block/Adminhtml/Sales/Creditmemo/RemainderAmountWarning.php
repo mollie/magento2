@@ -47,7 +47,7 @@ class RemainderAmountWarning extends Template
         }
 
         $message = __(
-            'Warning: This order is (partially) paid using a voucher or giftcard. You can refund a maximum of %1.',
+            'Warning: This order is (partially) paid using a voucher or giftcard. The voucher/giftcard portion may not be refundable online. An amount of %1 can always be refunded. If a higher refund fails, please process the remaining part directly with the issuer.',
             $this->priceCurrency->format(
                 $remainderAmount->getValue(),
                 true,

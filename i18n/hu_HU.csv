@@ -462,7 +462,7 @@
 "Vipps","Vipps"
 "Voucher","Kupon"
 "Warning","Figyelmeztetés"
-"Warning: This order is (partially) paid using a voucher or giftcard. You can refund a maximum of %1.","Figyelmeztetés: Ez a rendelés (részben) utalvánnyal vagy ajándékkártyával lett kifizetve. Legfeljebb %1 visszatérítése lehetséges."
+"Warning: This order is (partially) paid using a voucher or giftcard. The voucher/giftcard portion may not be refundable online. An amount of %1 can always be refunded. If a higher refund fails, please process the remaining part directly with the issuer.","Figyelmeztetés: Ez a rendelés (részben) utalvánnyal vagy ajándékkártyával lett kifizetve. Az utalvánnyal vagy ajándékkártyával fizetett rész online esetleg nem téríthető vissza. %1 összeg mindig visszatéríthető. Ha egy magasabb összegű visszatérítés sikertelen, a fennmaradó részt közvetlenül a kibocsátóval rendezze."
 "Warning: We detected that Cloudflare is being used. Please read <a href=""%1"" target=""_blank"">this wiki</a> to be sure that everything works as expected.","Figyelmeztetés: Cloudflare használatát észleltük. Kérjük, olvassa el <a href=""%1"" target=""_blank"">ezt a wikicikket</a>, hogy megbizonyosodjon a megfelelő működésről."
 "Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Figyelmeztetés: Javasoljuk, hogy a Mollie kiterjesztést Composer segítségével telepítse, jelenleg az app/code mappában van telepítve."
 "Warning: We recommend to use a unique payment status for pending Banktransfer payments","Figyelmeztetés: Javasoljuk, hogy a függő banki átutalásokhoz egyedi fizetési állapotot használjon."

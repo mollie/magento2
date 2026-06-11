@@ -462,7 +462,7 @@
 "Vipps","Vipps"
 "Voucher","Afsláttarmiði"
 "Warning","Viðvörun"
-"Warning: This order is (partially) paid using a voucher or giftcard. You can refund a maximum of %1.","Viðvörun: Þessi pöntun er (að hluta) greidd með afsláttarmiða eða gjafakort. Þú getur endurgreitt að hámarki %1."
+"Warning: This order is (partially) paid using a voucher or giftcard. The voucher/giftcard portion may not be refundable online. An amount of %1 can always be refunded. If a higher refund fails, please process the remaining part directly with the issuer.","Viðvörun: Þessi pöntun er (að hluta) greidd með afsláttarmiða eða gjafakorti. Hugsanlega er ekki hægt að endurgreiða þann hluta sem greiddur var með afsláttarmiða eða gjafakorti á netinu. Alltaf er hægt að endurgreiða %1. Ef hærri endurgreiðsla mistekst skaltu afgreiða eftirstöðvarnar beint hjá útgefanda."
 "Warning: We detected that Cloudflare is being used. Please read <a href=""%1"" target=""_blank"">this wiki</a> to be sure that everything works as expected.","Viðvörun: Við greindum að Cloudflare er í notkun. Vinsamlegast lestu <a href=""%1"" target=""_blank"">þessa wiki</a> til að tryggja að allt virki sem skyldi."
 "Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Aðvörun: Við ráðleggjum að hala niður Mollie viðbótina með Composer, eins og stendur er hún sett upp í smáforrita/kóða möppunni."
 "Warning: We recommend to use a unique payment status for pending Banktransfer payments","Aðvörun: Við ráðleggjum að nota einstakan greiðslustöðu fyrir væntandi bankaflutningagreiðslur"
