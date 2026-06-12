@@ -97,9 +97,19 @@
             <label>Enable saved cards</label>
             <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
             <config_path>payment/mollie_methods_creditcard/enable_customers_api</config_path>
-            <comment><![CDATA[Allow logged-in customers to save their card for faster checkout. Uses the <a href="https://docs.mollie.com/docs/saving-a-card-for-returning-customers" target="_blank">Mollie Customers API</a>.]]></comment>
+            <comment><![CDATA[Allow logged-in customers to save their card for faster checkout. Uses the <a href="https://docs.mollie.com/docs/saving-a-card-for-returning-customers" target="_blank">Mollie Customers API</a>.<br><strong>Note:</strong> Saved cards only work in live mode. The option is hidden in the checkout while test mode is active.]]></comment>
             <depends>
                 <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="saved_cards_manual_capture_notice" translate="label" sortOrder="85" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label/>
+            <frontend_model>Mollie\Payment\Block\Adminhtml\System\Config\Form\Field\SavedCardsManualCaptureNotice</frontend_model>
+            <depends>
+                <field id="active">1</field>
+                <field id="enable_customers_api">1</field>
+                <field id="capture_mode">manual</field>
             </depends>
         </field>
         <field id="consent_text" translate="label" type="textarea" sortOrder="90" showInDefault="1" showInWebsite="1"

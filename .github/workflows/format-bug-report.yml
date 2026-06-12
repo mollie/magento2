@@ -1,0 +1,118 @@
+name: Format issue body
+
+on:
+  issues:
+    types: [opened]
+  workflow_dispatch:
+    inputs:
+      issue_number:
+        description: 'Issue number to reformat'
+        required: true
+        type: number
+
+permissions:
+  issues: write
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Reformat issue body
+        uses: actions/github-script@v8
+        with:
+          script: |
+            let issue;
+            if (context.eventName === 'workflow_dispatch') {
+              const { data } = await github.rest.issues.get({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: ${{ inputs.issue_number }},
+              });
+              issue = data;
+            } else {
+              issue = context.payload.issue;
+            }
+
+            const body = issue.body;
+            if (!body) return;
+
+            // Only format issues created from the bug report template
+            // by checking for sections unique to that template
+            const isBugReport = body.includes('### Mollie plugin version') &&
+                                body.includes('### Steps to reproduce');
+            if (!isBugReport) {
+              console.log('Skipping: issue was not created from the bug report template');
+              return;
+            }
+
+            // Parse sections from the GitHub issue form output
+            // Format: ### Label\n\nValue\n\n
+            const sections = {};
+            const sectionRegex = /### (.+?)\n\n([\s\S]*?)(?=\n### |\n*$)/g;
+            let match;
+            while ((match = sectionRegex.exec(body)) !== null) {
+              sections[match[1].trim()] = match[2].trim();
+            }
+
+            // Version/environment fields to put in a table
+            const tableFields = [
+              'Mollie plugin version',
+              'Magento edition',
+              'Magento version',
+              'PHP version',
+              'Frontend theme base',
+              'Hyva Theme version',
+              'Hyva Checkout version',
+            ];
+
+            // Build the version table, skip empty fields
+            let table = '| **Type** | **Version** |\n';
+            table += '|---|---|\n';
+            for (const field of tableFields) {
+              const value = sections[field];
+              if (value && value !== '_No response_') {
+                table += `| **${field}** | ${value} |\n`;
+              }
+            }
+
+            // Fields that should be collapsible
+            const collapsibleFields = [
+              'Payment method (if applicable)'
+            ];
+
+            // Fields to render as regular sections (in order)
+            const regularFields = [
+              'Summary',
+              'Payment method (if applicable)',
+              'Store integrations & background processes',
+              'Integration details',
+              'Steps to reproduce',
+              'Expected behavior',
+              'Actual behavior',
+              'Relevant log output',
+              'Screenshots',
+              'Additional context',
+            ];
+
+            let newBody = table + '\n';
+
+            for (const field of regularFields) {
+              const value = sections[field];
+              if (value && value !== '_No response_') {
+                if (collapsibleFields.includes(field)) {
+                  newBody += `<details>\n<summary><strong>${field}</strong></summary>\n\n${value}\n\n</details>\n\n`;
+                } else {
+                  newBody += `### ${field}\n\n${value}\n\n`;
+                }
+              }
+            }
+
+            // Only update if the body actually changed
+            if (newBody.trim() !== body.trim()) {
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: newBody.trim(),
+              });
+            }

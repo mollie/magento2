@@ -462,7 +462,7 @@
 "Vipps","Vipps"
 "Voucher","Kuponas"
 "Warning","Įspėjimas"
-"Warning: This order is (partially) paid using a voucher or giftcard. You can refund a maximum of %1.","Įspėjimas: šis užsakymas (iš dalies) apmokėtas kuponą arba dovanų kortele. Galite grąžinti ne daugiau kaip %1."
+"Warning: This order is (partially) paid using a voucher or giftcard. The voucher/giftcard portion may not be refundable online. An amount of %1 can always be refunded. If a higher refund fails, please process the remaining part directly with the issuer.","Įspėjimas: šis užsakymas (iš dalies) apmokėtas kuponu arba dovanų kortele. Kuponu arba dovanų kortele apmokėtos dalies gali nepavykti grąžinti internetu. %1 sumą visada galima grąžinti. Jei didesnis grąžinimas nepavyksta, likusią dalį tvarkykite tiesiogiai su išdavėju."
 "Warning: We detected that Cloudflare is being used. Please read <a href=""%1"" target=""_blank"">this wiki</a> to be sure that everything works as expected.","Įspėjimas: aptikome, kad naudojamas Cloudflare. Perskaitykite <a href=""%1"" target=""_blank"">šį wiki</a>, kad įsitikintumėte, jog viskas veikia kaip tikimasi."
 "Warning: We recommend to install the Mollie extension using Composer, currently it's installed in the app/code folder.","Įspėjimas: Rekomenduojame įdiegti Mollie plėtinį naudojant Composer, šiuo metu jis įdiegtas app/code aplanke."
 "Warning: We recommend to use a unique payment status for pending Banktransfer payments","Įspėjimas: rekomenduojame naudoti unikalią mokėjimo būseną laukiančioms banko pavedimo operacijoms"

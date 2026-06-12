@@ -22,28 +22,11 @@
                                             <item name="children" xsi:type="array">
                                                 <item name="payment" xsi:type="array">
                                                     <item name="children" xsi:type="array">
-                                                        <!-- Express Components -->
-                                                        <item name="beforeMethods" xsi:type="array">
-                                                            <item name="component" xsi:type="string">uiComponent</item>
-                                                            <item name="displayArea" xsi:type="string">beforeMethods
-                                                            </item>
-                                                            <item name="children" xsi:type="array">
-                                                                <item name="mollie_express_components" xsi:type="array">
-                                                                    <item name="component" xsi:type="string">
-                                                                        Mollie_Payment/js/view/payment/express-components
-                                                                    </item>
-                                                                    <item name="config" xsi:type="array">
-                                                                        <item name="template" xsi:type="string">
-                                                                            Mollie_Payment/payment/express-components
-                                                                        </item>
-                                                                        <item name="placement" xsi:type="string">
-                                                                            checkout
-                                                                        </item>
-                                                                    </item>
-                                                                </item>
-                                                            </item>
-                                                        </item>
-
+                                                        <!--
+                                                            Express Components are added via the mollie_express_components layout handle,
+                                                            applied by Mollie\Payment\Observer\LayoutLoadBefore\AddExpressComponentsLayoutHandle
+                                                            only when express components are available.
+                                                        -->
                                                         <item name="renders" xsi:type="array">
                                                             <item name="children" xsi:type="array">
                                                                 <item name="mollie_payment" xsi:type="array">

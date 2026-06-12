@@ -10,6 +10,7 @@ namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Mollie\Api\Types\MandateQuery;
 
 class GetCustomerMandates
 {
@@ -34,7 +35,10 @@ class GetCustomerMandates
         $api = $this->mollieApiClient->loadByStore($storeId);
         $mandates = [];
 
-        foreach ($api->mandates->iteratorForId($mollieCustomerId) as $mandate) {
+        foreach ($api->mandates->iteratorForId(
+            $mollieCustomerId,
+            scopes: [MandateQuery::SCOPE_CUSTOMER_PRESENT]
+        ) as $mandate) {
             if ($mandate->method !== 'creditcard' || !$mandate->isValid()) {
                 continue;
             }

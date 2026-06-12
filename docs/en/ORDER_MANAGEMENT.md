@@ -54,6 +54,8 @@ For Klarna and Billie, the default is **On shipment**, which matches the buy-now
 
 **Important:** An authorisation that is not captured before the expiration window closes is released automatically. Once released, the order cannot be captured and must be cancelled.
 
+Cancelling an order that has not been fully captured releases the remaining authorisation at Mollie automatically, so the reserved amount is returned to the customer without waiting for the expiration window. If the release request fails, the order is still cancelled in Magento and a warning is shown in Magento Admin; Mollie then releases the uncaptured amount itself when the authorisation expires.
+
 ### Automatic Capture Delay
 
 For methods using **Autocapture**, you can insert a delay between authorisation and capture. This gives you a window to review or cancel orders before the customer is charged.
@@ -75,7 +77,7 @@ The Mollie refund ID is stored against the credit memo for reference.
 
 If a refund is initiated directly in the Mollie Dashboard — for example, by a support agent — the extension detects it on the next webhook call and creates the corresponding credit memo in Magento automatically, without triggering a second API call.
 
-**Note on gift card orders:** If the customer paid part of the order with a gift card, only the portion paid through Mollie can be refunded via this mechanism. The extension limits the refund amount to the Mollie-paid portion automatically.
+**Note on gift card and voucher orders:** If the customer paid part of the order with a voucher or gift card, that portion may not be refundable online. The amount paid through the remaining payment method can always be refunded; the credit memo page shows this amount in a warning. If a refund above that amount fails, settle the remaining part directly with the voucher or gift card issuer.
 
 ## Failed Payment Handling
 

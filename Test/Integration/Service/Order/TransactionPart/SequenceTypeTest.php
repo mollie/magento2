@@ -52,7 +52,7 @@ class SequenceTypeTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
-    public function testSetsSequenceTypeToFirstWhenSavingCard(): void
+    public function testDoesNotSetSequenceTypeWhenSavingCard(): void
     {
         $order = $this->loadOrderById('100000001');
         $order->getPayment()->setAdditionalInformation('mollie_save_card', true);
@@ -66,7 +66,7 @@ class SequenceTypeTest extends IntegrationTestCase
         ]);
         $result = $instance->process($order, []);
 
-        $this->assertEquals(['sequenceType' => 'first'], $result);
+        $this->assertEquals([], $result);
     }
 
     /**

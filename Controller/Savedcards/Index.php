@@ -23,7 +23,7 @@ class Index implements AccountInterface, HttpGetActionInterface
 
     public function execute(): ResultInterface
     {
-        if (!$this->config->creditcardEnableCustomersApi()) {
+        if (!$this->config->creditcardEnableCustomersApi() || !$this->config->isProductionMode()) {
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('noroute');
         }
 

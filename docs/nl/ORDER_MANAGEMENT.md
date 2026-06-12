@@ -54,6 +54,8 @@ Voor Klarna en Billie is de standaard **On shipment**, wat overeenkomt met de ko
 
 **Belangrijk:** Een autorisatie die niet wordt gecaptured voordat het vervaltijdvenster sluit, wordt automatisch vrijgegeven. Eenmaal vrijgegeven kan de order niet meer worden gecaptured en moet deze worden geannuleerd.
 
+Het annuleren van een order die nog niet volledig is gecaptured, geeft de resterende autorisatie bij Mollie automatisch vrij, zodat het gereserveerde bedrag terugkeert naar de klant zonder het vervaltijdvenster af te wachten. Als het vrijgaveverzoek mislukt, wordt de order alsnog geannuleerd in Magento en verschijnt een waarschuwing in Magento Admin; Mollie geeft het niet-gecapturede bedrag dan zelf vrij wanneer de autorisatie verloopt.
+
 ### Vertraging bij automatische capture
 
 Voor methoden die **Autocapture** gebruiken, kun je een vertraging invoegen tussen autorisatie en capture. Dit geeft je een venster om orders te controleren of te annuleren voordat de klant wordt belast.
@@ -75,7 +77,7 @@ Het Mollie-terugbetalings-ID wordt opgeslagen bij de creditnota als referentie.
 
 Als een terugbetaling rechtstreeks in het Mollie Dashboard wordt gestart - bijvoorbeeld door een supportmedewerker - detecteert de extensie dit bij de volgende webhook-aanroep en maakt automatisch de bijbehorende creditnota aan in Magento, zonder een tweede API-aanroep te starten.
 
-**Opmerking over cadeaukaartorders:** Als de klant een deel van de order heeft betaald met een cadeaukaart, kan alleen het gedeelte dat via Mollie is betaald via dit mechanisme worden terugbetaald. De extensie beperkt het terugbetalingsbedrag automatisch tot het via Mollie betaalde gedeelte.
+**Opmerking over cadeaukaart- en voucherorders:** Als de klant een deel van de order heeft betaald met een voucher of cadeaukaart, is dat gedeelte mogelijk niet online terug te betalen. Het bedrag dat via de resterende betaalmethode is betaald, kan altijd worden terugbetaald; de creditnotapagina toont dit bedrag in een waarschuwing. Als een terugbetaling boven dat bedrag mislukt, handel het resterende deel dan rechtstreeks af met de uitgever van de voucher of cadeaukaart.
 
 ## Afhandeling van mislukte betalingen
 
