@@ -322,7 +322,7 @@ class PhoneNumber implements TransactionPartInterface
         $formattedNumber = '+' . $countryCode . $formattedNumber;
 
         if (strlen($formattedNumber) <= 3 || !preg_match('/^\+[1-9]\d{1,14}$/', $formattedNumber)) {
-            throw new InvalidArgumentException(__('Phone number "%s" is not valid', $formattedNumber));
+            throw new InvalidArgumentException((string) __('Phone number "%s" is not valid', $formattedNumber));
         }
 
         return $formattedNumber;

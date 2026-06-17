@@ -155,6 +155,39 @@ class PhoneNumberTest extends IntegrationTestCase
      * @magentoDataFixture Magento/Sales/_files/order.php
      * @return void
      */
+    public function testDoesNotThrowWhenThePhoneNumberIsInvalid(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+        $order->getPayment()->setMethod('mollie_methods_in3');
+
+        $billingAddress = $order->getBillingAddress();
+        $billingAddress->setCountryId('NL');
+        $billingAddress->setTelephone('000');
+
+        $shippingAddress = $order->getShippingAddress();
+        $shippingAddress->setCountryId('NL');
+        $shippingAddress->setTelephone('000');
+
+        /** @var PhoneNumber $instance */
+        $instance = $this->objectManager->create(PhoneNumber::class);
+
+        $transaction = $instance->process(
+            $order,
+            [
+                'billingAddress' => [],
+                'shippingAddress' => [],
+            ],
+        );
+
+        $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
+        $this->assertArrayNotHasKey('phone', $transaction['shippingAddress']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @return void
+     */
     public function testDoesNotOverrideExistingAddressData(): void
     {
         $order = $this->loadOrder('100000001');
