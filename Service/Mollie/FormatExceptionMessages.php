@@ -36,7 +36,7 @@ class FormatExceptionMessages
 
         foreach ($this->allowedErrorMessages as $message) {
             if (stripos($exception->getMessage(), $message) !== false) {
-                return __($message);
+                return __($message)->render();
             }
         }
 
