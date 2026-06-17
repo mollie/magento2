@@ -69,20 +69,22 @@ export default class OrdersPage {
       await page.reload({waitUntil: 'load'});
     }
 
-    async assertOrderStatusIs(page, status: string, maxRetries = 90) {
+    async assertOrderStatusIs(page, status: string, maxWaitSeconds = 120) {
       const orderStatusLocator = page.locator('#order_status');
+      const deadline = Date.now() + (maxWaitSeconds * 1000);
 
-      for (let i = 0; i < maxRetries; i++) {
+      while (Date.now() < deadline) {
         const text = await orderStatusLocator.textContent();
         if (text && text.includes(status)) {
           await expect(orderStatusLocator).toContainText(status, { timeout: 100 });
           return;
         }
+
+        await page.waitForTimeout(1000);
         await page.reload({waitUntil: 'load'});
-        await page.waitForLoadState('domcontentloaded');
       }
 
-      throw new Error(`Order status "${status}" was not found after ${maxRetries} retries.`);
+      throw new Error(`Order status "${status}" was not reached within ${maxWaitSeconds} seconds.`);
     }
 
     async checkIfLoggedIn(page, urlToNavigateAfterLogin) {
