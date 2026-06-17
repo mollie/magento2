@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: Reformat issue body
         uses: actions/github-script@v8
+        env:
+          INPUT_ISSUE_NUMBER: ${{ inputs.issue_number }}
         with:
           script: |
             let issue;
@@ -26,7 +28,7 @@ jobs:
               const { data } = await github.rest.issues.get({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: ${{ inputs.issue_number }},
+                issue_number: Number(process.env.INPUT_ISSUE_NUMBER),
               });
               issue = data;
             } else {
