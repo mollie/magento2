@@ -41,6 +41,14 @@ define(
                 return this;
             },
 
+            isAmastyCheckout: function () {
+                return $('#checkout').hasClass('am-checkout');
+            },
+
+            renderAsButton: function () {
+                return this.isIosc || this.isAmastyCheckout();
+            },
+
             getMethodImage: function () {
                 return checkoutConfig.image[this.item.method];
             },
