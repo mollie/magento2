@@ -24,6 +24,7 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Logger\MollieLogger;
+use Mollie\Payment\Service\Mollie\AsyncPaymentMethods;
 use Mollie\Payment\Service\Mollie\PaymentMethods;
 use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\Uncancel;
@@ -89,6 +90,7 @@ class General extends AbstractHelper
         private Config $config,
         private Uncancel $uncancel,
         private CancelOrder $cancelOrder,
+        private AsyncPaymentMethods $asyncPaymentMethods,
     ) {
         $this->urlBuilder = $context->getUrlBuilder();
         parent::__construct($context);
@@ -487,8 +489,9 @@ class General extends AbstractHelper
     {
         $status = null;
         $storeId = storeId($order->getStoreId());
-        if ($order->getPayment()->getMethod() == 'mollie_methods_banktransfer') {
-            $status = $this->config->statusPendingBanktransfer($storeId);
+        $method = $order->getPayment()->getMethod();
+        if ($this->asyncPaymentMethods->contains($method)) {
+            $status = $this->config->statusPendingForMethod($method, $storeId);
         }
 
         if (!$status) {

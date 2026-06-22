@@ -26,11 +26,11 @@ class GetMollieStatusResultTest extends IntegrationTestCase
     }
 
     /**
-     * @dataProvider returnsTheCorrectStatusForBanktransferProvider
+     * @dataProvider returnsTheCorrectStatusForAsyncMethodProvider
      * @return void
      */
-    #[DataProvider('returnsTheCorrectStatusForBanktransferProvider')]
-    public function testReturnsTheCorrectStatusForBanktransfer(string $status, string $method): void
+    #[DataProvider('returnsTheCorrectStatusForAsyncMethodProvider')]
+    public function testReturnsTheCorrectStatusForAsyncMethod(string $status, string $method): void
     {
         $instance = $this->objectManager->create(GetMollieStatusResult::class, [
             'status' => $status,
@@ -40,11 +40,13 @@ class GetMollieStatusResultTest extends IntegrationTestCase
         $this->assertTrue($instance->shouldRedirectToSuccessPage());
     }
 
-    public static function returnsTheCorrectStatusForBanktransferProvider(): array
+    public static function returnsTheCorrectStatusForAsyncMethodProvider(): array
     {
         return [
             'open, banktransfer' => ['open', 'banktransfer'],
             'open, mollie_methods_banktransfer' => ['open', 'mollie_methods_banktransfer'],
+            'open, paybybank' => ['open', 'paybybank'],
+            'open, mollie_methods_paybybank' => ['open', 'mollie_methods_paybybank'],
         ];
     }
 
@@ -95,6 +97,8 @@ class GetMollieStatusResultTest extends IntegrationTestCase
             'open, mollie_methods_paypal' => ['open', 'mollie_methods_paypal', true],
             'open, banktransfer — not awaiting, goes to success directly' => ['open', 'banktransfer', false],
             'open, mollie_methods_banktransfer' => ['open', 'mollie_methods_banktransfer', false],
+            'open, paybybank — async, goes to success directly' => ['open', 'paybybank', false],
+            'open, mollie_methods_paybybank' => ['open', 'mollie_methods_paybybank', false],
             'paid, ideal — confirmed, not awaiting' => ['paid', 'ideal', false],
             'canceled, paypal' => ['canceled', 'paypal', false],
         ];

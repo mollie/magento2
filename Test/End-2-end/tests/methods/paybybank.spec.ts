@@ -20,6 +20,8 @@ const cartPage = new CartPage();
 
 const testCases = [
   { status: 'paid', orderStatus: 'Processing', title: '[C4241027] Validate the submission of an order with Pay by Bank as payment method and payment mark as "Paid"' },
+  { status: 'open', orderStatus: 'Pending Payment', title: '[C4241028] Validate the submission of an order with Pay by Bank as payment method and payment mark as "Open"' },
+  { status: 'pending', orderStatus: 'Pending Payment', title: '[C4241032] Validate the submission of an order with Pay by Bank as payment method and payment mark as "Pending"' },
   { status: 'failed', orderStatus: 'Canceled', title: '[C4241029] Validate the submission of an order with Pay by Bank as payment method and payment mark as "Failed"' },
   { status: 'expired', orderStatus: 'Canceled', title: '[C4241030] Validate the submission of an order with Pay by Bank as payment method and payment mark as "Expired"' },
   { status: 'canceled', orderStatus: 'Canceled', title: '[C4241031] Validate the submission of an order with Pay by Bank as payment method and payment mark as "Cancelled"' },
@@ -36,7 +38,7 @@ for (const testCase of testCases) {
 
     await mollieHostedPaymentPage.selectStatus(page, testCase.status);
 
-    if (testCase.status === 'paid') {
+    if (['paid', 'open', 'pending'].includes(testCase.status)) {
       await checkoutSuccessPage.assertThatOrderSuccessPageIsShown(page);
     }
 

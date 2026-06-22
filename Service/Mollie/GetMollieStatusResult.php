@@ -14,6 +14,7 @@ class GetMollieStatusResult
     private ?string $method;
 
     public function __construct(
+        private readonly AsyncPaymentMethods $asyncPaymentMethods,
         private string $status,
         ?string $method = null,
     ) {
@@ -35,13 +36,13 @@ class GetMollieStatusResult
 
     public function isAwaitingConfirmation(): bool
     {
-        return $this->status === 'open' && $this->method !== 'banktransfer';
+        return $this->status === 'open' && !$this->asyncPaymentMethods->contains($this->method);
     }
 
     public function shouldRedirectToSuccessPage(): bool
     {
         $status = $this->status;
-        if ($status === 'open' && $this->method == 'banktransfer') {
+        if ($status === 'open' && $this->asyncPaymentMethods->contains($this->method)) {
             return true;
         }
 
