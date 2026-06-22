@@ -24,6 +24,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Service\Mollie\Order\CanRegisterCaptureNotification;
 use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
 use Mollie\Payment\Service\Order\OrderAmount;
+use Mollie\Payment\Service\Order\OrderStatePromotion;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\TransactionProcessor;
@@ -43,6 +44,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         private readonly SendOrderEmails $sendOrderEmails,
         private readonly CanRegisterCaptureNotification $canRegisterCaptureNotification,
         private readonly CanUseManualCapture $canUseManualCapture,
+        private readonly OrderStatePromotion $orderStatePromotion,
     ) {
     }
 
@@ -189,10 +191,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
 
         /** @var null|int $statusUpdated */
         $statusUpdated = $payment->getAdditionalInformation('mollie_status_updated');
-        if ($statusUpdated !== null &&
-            $statusUpdated === 1 &&
-            $order->getState() !== Order::STATE_PAYMENT_REVIEW
-        ) {
+        if ($statusUpdated === 1 && !$this->orderStatePromotion->canBePromotedToProcessing($order->getState())) {
             return;
         }
 

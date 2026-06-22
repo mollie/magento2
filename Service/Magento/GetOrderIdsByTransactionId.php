@@ -1,10 +1,17 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Magento;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\ResourceModel\Order as OrderResource;
 use Mollie\Payment\Api\Data\TransactionToOrderInterface;
 use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Config;
@@ -20,6 +27,7 @@ class GetOrderIdsByTransactionId
         private readonly TransactionToOrderRepositoryInterface $transactionToOrderRepository,
         private readonly MollieApiClient $mollieApiClient,
         private readonly LinkTransactionToOrder $linkTransactionToOrder,
+        private readonly OrderResource $orderResource,
     ) {
     }
 
@@ -84,7 +92,7 @@ class GetOrderIdsByTransactionId
         }
 
         $this->linkTransactionToOrder->execute($transactionId, $order);
-        $this->orderRepository->save($order);
+        $this->orderResource->saveAttribute($order, 'mollie_transaction_id');
 
         return [$orderId];
     }
