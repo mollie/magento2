@@ -19,6 +19,7 @@ class IsPaymentLinkExpiredTest extends IntegrationTestCase
 {
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
      * @return void
      */
     public function testIsValidTheDayBeforeTheDefaultExpire(): void
@@ -27,7 +28,7 @@ class IsPaymentLinkExpiredTest extends IntegrationTestCase
         $order->getPayment()->setMethod(Paymentlink::CODE);
 
         $date = new DateTimeImmutable();
-        $date = $date->add(new DateInterval('P28D'))->setTime(0, 0, 0);
+        $date = $date->add(new DateInterval('P27D'))->setTime(0, 0, 0);
         $order->setCreatedAt($date->format('Y-m-d H:i:s'));
 
         $instance = $this->objectManager->create(IsPaymentLinkExpired::class);
@@ -36,6 +37,7 @@ class IsPaymentLinkExpiredTest extends IntegrationTestCase
     }
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
      * @return void
      */
     public function testIsInvalidTheDayAfterTheDefaultExpire(): void
@@ -44,7 +46,7 @@ class IsPaymentLinkExpiredTest extends IntegrationTestCase
         $order->getPayment()->setMethod(Paymentlink::CODE);
 
         $date = new DateTimeImmutable();
-        $date = $date->add(new DateInterval('P29D'))->setTime(23, 59, 59);
+        $date = $date->add(new DateInterval('P28D'))->setTime(23, 59, 59);
         $order->setCreatedAt($date->format('Y-m-d H:i:s'));
 
         $instance = $this->objectManager->create(IsPaymentLinkExpired::class);
@@ -54,6 +56,7 @@ class IsPaymentLinkExpiredTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 10
      * @return void
      */
@@ -75,6 +78,7 @@ class IsPaymentLinkExpiredTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
      * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 10
      * @return void
      */
@@ -96,6 +100,7 @@ class IsPaymentLinkExpiredTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
      * @magentoConfigFixture default_store payment/mollie_methods_paymentlink/days_before_expire 10
      */
     public function testUsesPaymentlinkForExpiryWhenNoLimitedMethodsAreSet(): void
