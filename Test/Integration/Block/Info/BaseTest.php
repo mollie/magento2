@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Block\Info;
 
+use Magento\Framework\Registry;
+use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment\Info;
 use Mollie\Payment\Block\Info\Base;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -15,6 +17,43 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class BaseTest extends IntegrationTestCase
 {
+    protected function tearDown(): void
+    {
+        $this->objectManager->get(Registry::class)->unregister('current_order');
+
+        parent::tearDown();
+    }
+
+    public function testHasStartedTransactionIsTrueWhenOrderHasTransactionId(): void
+    {
+        $order = $this->objectManager->create(Order::class);
+        $order->setMollieTransactionId('tr_qGVySXRnNBeEXv3TMbmSJ');
+        $this->objectManager->get(Registry::class)->register('current_order', $order);
+
+        /** @var Base $instance */
+        $instance = $this->objectManager->create(Base::class);
+
+        $this->assertTrue($instance->hasStartedTransaction());
+    }
+
+    public function testHasStartedTransactionIsFalseWhenOrderHasNoTransactionId(): void
+    {
+        $order = $this->objectManager->create(Order::class);
+        $this->objectManager->get(Registry::class)->register('current_order', $order);
+
+        /** @var Base $instance */
+        $instance = $this->objectManager->create(Base::class);
+
+        $this->assertFalse($instance->hasStartedTransaction());
+    }
+
+    public function testHasStartedTransactionIsFalseWhenNoOrderIsAvailable(): void
+    {
+        /** @var Base $instance */
+        $instance = $this->objectManager->create(Base::class);
+
+        $this->assertFalse($instance->hasStartedTransaction());
+    }
     public function testReturnsTheDashboardUrl(): void
     {
         /** @var Info $info */
