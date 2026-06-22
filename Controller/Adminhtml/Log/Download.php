@@ -12,10 +12,8 @@ namespace Mollie\Payment\Controller\Adminhtml\Log;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\App\Response\Http\FileFactory;
-use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\Controller\ResultFactory;
-use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Mollie\Payment\Logger\MollieLogger;
@@ -35,7 +33,7 @@ class Download implements HttpGetActionInterface
     ) {
     }
 
-    public function execute(): ResultInterface|ResponseInterface
+    public function execute()
     {
         if (!$this->authorization->isAllowed(self::ADMIN_RESOURCE)) {
             $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);

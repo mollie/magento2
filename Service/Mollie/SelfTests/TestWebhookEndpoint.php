@@ -9,9 +9,9 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Mollie\SelfTests;
 
 use Exception;
+use Laminas\Http\Client;
 use Laminas\Http\Request;
 use Laminas\Http\Response;
-use Magento\Framework\HTTP\LaminasClient;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Config;
@@ -24,7 +24,7 @@ class TestWebhookEndpoint extends AbstractSelfTest
     public function __construct(
         private Config $config,
         private StoreManagerInterface $storeManager,
-        private LaminasClient $client,
+        private Client $client,
         private UrlInterface $urlBuilder,
     ) {}
 

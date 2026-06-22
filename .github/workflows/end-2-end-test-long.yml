@@ -52,7 +52,7 @@ jobs:
             MAGENTO_VERSION: 2.4.9
             NO_API_KEY_TEST: false
           - PHP_VERSION: php81-fpm
-            MAGENTO_VERSION: 2.4.6-p13
+            MAGENTO_VERSION: 2.4.5-p14
             NO_API_KEY_TEST: true
     runs-on: ubuntu-latest
     env:
