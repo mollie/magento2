@@ -11,17 +11,19 @@ namespace Mollie\Payment\Model\Client\Payments\Processors;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Api\Resources\Payment;
-use Mollie\Payment\Config;
+use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\PaymentProcessorInterface;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
+use Mollie\Payment\Service\Mollie\AsyncPaymentMethods;
 use Mollie\Payment\Service\Order\SendOrderEmails;
 use Mollie\Payment\Service\Order\TransactionProcessor;
 
-class SendEmailForBanktransfer implements PaymentProcessorInterface
+class SendEmailForAsyncPayment implements PaymentProcessorInterface
 {
     public function __construct(
-        private Config $config,
+        private General $mollieHelper,
+        private AsyncPaymentMethods $asyncPaymentMethods,
         private ProcessTransactionResponseFactory $processTransactionResponseFactory,
         private TransactionProcessor $transactionProcessor,
         private SendOrderEmails $sendOrderEmails
@@ -33,13 +35,11 @@ class SendEmailForBanktransfer implements PaymentProcessorInterface
         string $type,
         ProcessTransactionResponse $response,
     ): ?ProcessTransactionResponse {
-        if ($molliePayment->method != 'banktransfer' || $magentoOrder->getEmailSent()) {
+        if (!$this->asyncPaymentMethods->contains($molliePayment->method) || $magentoOrder->getEmailSent()) {
             return $response;
         }
 
-        if (!$statusPending = $this->config->statusPendingBanktransfer($magentoOrder->getStoreId())) {
-            $statusPending = $magentoOrder->getStatus();
-        }
+        $statusPending = $this->mollieHelper->getPendingPaymentStatus($magentoOrder) ?: $magentoOrder->getStatus();
 
         $magentoOrder->setStatus($statusPending);
         $magentoOrder->setState(Order::STATE_PENDING_PAYMENT);
@@ -49,7 +49,7 @@ class SendEmailForBanktransfer implements PaymentProcessorInterface
 
         return $this->processTransactionResponseFactory->create([
             'success' => true,
-            'status' => 'open',
+            'status' => $molliePayment->status,
             'order_id' => $magentoOrder->getId(),
             'type' => $type,
         ]);

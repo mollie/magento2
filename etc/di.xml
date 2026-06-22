@@ -325,7 +325,10 @@
                     <item name="failed" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\ExpiredStatusProcessor</item>
                 </item>
                 <item name="open" xsi:type="array">
-                    <item name="open" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SendEmailForBanktransfer</item>
+                    <item name="open" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SendEmailForAsyncPayment</item>
+                </item>
+                <item name="pending" xsi:type="array">
+                    <item name="pending" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SendEmailForAsyncPayment</item>
                 </item>
                 <item name="paid" xsi:type="array">
                     <item name="paid" xsi:type="object">Mollie\Payment\Model\Client\Payments\Processors\SuccessfulPayment</item>
@@ -335,6 +338,15 @@
                         Mollie\Payment\Model\Client\Payments\Processors\HandleExternalRefunds
                     </item>
                 </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Mollie\Payment\Service\Mollie\AsyncPaymentMethods">
+        <arguments>
+            <argument name="methods" xsi:type="array">
+                <item name="banktransfer" xsi:type="string">banktransfer</item>
+                <item name="paybybank" xsi:type="string">paybybank</item>
             </argument>
         </arguments>
     </type>

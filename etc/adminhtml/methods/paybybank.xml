@@ -43,6 +43,16 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="order_status_pending" translate="label comment" type="select" sortOrder="45"
+               showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Status Pending</label>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\Pending</source_model>
+            <config_path>payment/mollie_methods_paybybank/order_status_pending</config_path>
+            <comment><![CDATA[Pay by Bank is processed asynchronously: the order stays pending until Mollie confirms the payment through the webhook.<br>We recommend using another 'pending' status as the default Magento pending status can automatically cancel the order before the payment is confirmed.<br>By default the status "Pending Payment" is not visible for customers, therefore we advise you to create a new status for this, which should also be visible to the customer, informing them their payment is still being confirmed.]]></comment>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
         <field id="allowspecific" translate="label" type="allowspecific" sortOrder="50" showInDefault="1"
                showInWebsite="1" showInStore="1">
             <label>Payment from Applicable Countries</label>
