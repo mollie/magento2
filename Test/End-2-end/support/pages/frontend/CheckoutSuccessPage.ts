@@ -12,4 +12,8 @@ export default class CheckoutSuccessPage {
         const thankYouMessage = page.locator('text=Thank you for your purchase!');
         await this.expect(thankYouMessage).toBeVisible();
     }
+
+    async assertIncrementIdIsShown(page, incrementId) {
+        await this.expect(page.getByText(incrementId)).toBeVisible();
+    }
 }
