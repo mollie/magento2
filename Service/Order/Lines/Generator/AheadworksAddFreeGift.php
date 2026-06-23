@@ -25,7 +25,7 @@ class AheadworksAddFreeGift implements GeneratorInterface
 
         $discount = 0;
         foreach ($order->getItems() as $item) {
-            $discount += abs($item->getAwAfptcAmount());
+            $discount += abs((float) $item->getAwAfptcAmount());
         }
 
         if (!$discount) {
