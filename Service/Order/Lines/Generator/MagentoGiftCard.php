@@ -26,7 +26,7 @@ class MagentoGiftCard implements GeneratorInterface
 
         $forceBaseCurrency = (bool) $this->mollieHelper->useBaseCurrency(storeId($order->getStoreId()));
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
-        $amount = $order->getData(($forceBaseCurrency ? 'base_' : '') . 'gift_cards_amount');
+        $amount = (float) $order->getData(($forceBaseCurrency ? 'base_' : '') . 'gift_cards_amount');
 
         if (abs($amount) < 0.01) {
             return $orderLines;
