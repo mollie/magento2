@@ -8,9 +8,9 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Mollie\Compatibility;
 
+use Laminas\Http\Client;
 use Laminas\Http\Headers;
 use Laminas\Http\Response;
-use Magento\Framework\HTTP\LaminasClient;
 use Magento\Framework\UrlInterface;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -48,7 +48,7 @@ class TestWebhookEndpointTest extends TestCase
         }
         $response->setHeaders($headers);
 
-        $client = $this->createMock(LaminasClient::class);
+        $client = $this->createMock(Client::class);
         $client->method('send')->willReturn($response);
 
         $urlBuilder = $this->createMock(UrlInterface::class);

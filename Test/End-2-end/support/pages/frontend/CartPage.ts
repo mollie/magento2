@@ -7,6 +7,6 @@ import {expect} from "@playwright/test";
 
 export default class CartPage {
     async assertCartPageIsShown(page) {
-      await expect(page).toHaveURL('/checkout/cart/');
+      await expect(page).toHaveURL(/\/checkout\/cart\/?$/);
     }
 }

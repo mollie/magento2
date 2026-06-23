@@ -7,7 +7,7 @@ jobs:
           matrix:
             include:
               - PHP_VERSION: php81-fpm
-                MAGENTO_VERSION: 2.4.6-p4
+                MAGENTO_VERSION: 2.4.5-p14
               - PHP_VERSION: php84-fpm
                 MAGENTO_VERSION: 2.4.9
               - PHP_VERSION: php85-fpm

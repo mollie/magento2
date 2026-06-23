@@ -19,9 +19,8 @@ use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
-use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultFactory;
+use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Data\Form\FormKey\Validator;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
@@ -73,7 +72,7 @@ class BuyNowValidation extends Action implements HttpPostActionInterface
         return null;
     }
 
-    public function execute(): ResponseInterface|Json
+    public function execute(): ResultInterface
     {
         if (!$this->formKeyValidator->validate($this->getRequest())) {
             $this->messageManager->addErrorMessage(

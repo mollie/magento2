@@ -9,7 +9,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v3.0.1</version>
+                <version>v3.0.2</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -570,6 +570,7 @@
                 <model>Mollie\Payment\Model\Methods\Paybybank</model>
                 <title>Pay by Bank</title>
                 <payment_description>{ordernumber}</payment_description>
+                <order_status_pending>pending_payment</order_status_pending>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>

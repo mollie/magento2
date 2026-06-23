@@ -32,16 +32,18 @@
         <div class="actions-toolbar">
             <div class="primary">
                 <!-- ko if: isPlaceOrderActionAllowed() && !totalsLoading() -->
-                    <!-- ko ifnot: isIosc -->
+                    <!-- ko ifnot: renderAsButton() -->
                     <div class="apple-pay-button-with-text apple-pay-button-white-with-text" data-bind="click: placeApplePayOrder">
                         <span class="text">Buy with</span>
                         <span class="logo"></span>
                     </div>
                     <!--/ko-->
 
-                    <!-- ko if: isIosc -->
-                    <!-- The One Step Checkout requires some extra classes, but these mess up the regulare checkout,
-                        that's why we render this button different if we detect the One Step Checkout -->
+                    <!-- ko if: renderAsButton() -->
+                    <!-- The One Step Checkout and Amasty checkout require some extra classes, but these mess up the
+                        regular checkout, that's why we render this button different when we detect either of them.
+                        The action/primary/checkout classes let these checkouts move the button into their own
+                        summary block so the place order button is not rendered twice. -->
                     <button class="apple-pay-button action primary checkout apple-pay-button-with-text apple-pay-button-white-with-text" data-bind="click: placeApplePayOrder">
                         <span class="text">Buy with</span>
                         <span class="logo"></span>

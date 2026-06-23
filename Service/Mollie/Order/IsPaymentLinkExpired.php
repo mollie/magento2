@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\Order;
 
-use DateTime;
+use Magento\Framework\Intl\DateTimeFactory;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Service\Mollie\Order\Transaction\Expires;
@@ -20,7 +20,8 @@ class IsPaymentLinkExpired
     public function __construct(
         private MethodCode $methodCode,
         private Expires $expires,
-        private TimezoneInterface $timezone
+        private TimezoneInterface $timezone,
+        private DateTimeFactory $dateTimeFactory
     ) {}
 
     public function execute(OrderInterface $order): bool
@@ -33,8 +34,9 @@ class IsPaymentLinkExpired
         }
 
         $expiresAt = $this->expires->atDateForMethod($methodCode, $storeId);
+        $orderDate = $this->timezone->scopeDate($storeId, $this->dateTimeFactory->create($order->getCreatedAt()))->format('Y-m-d');
 
-        return $expiresAt < $order->getCreatedAt();
+        return $expiresAt < $orderDate;
     }
 
     /**
@@ -42,9 +44,8 @@ class IsPaymentLinkExpired
      */
     private function checkWithDefaultDate(OrderInterface $order): bool
     {
-        $storeId = storeId($order->getStoreId());
-        $now = $this->timezone->scopeDate($storeId);
-        $orderDate = $this->timezone->scopeDate($storeId, new DateTime($order->getCreatedAt()));
+        $now = $this->dateTimeFactory->create();
+        $orderDate = $this->dateTimeFactory->create($order->getCreatedAt());
         $diff = $now->diff($orderDate);
 
         return $diff->days >= 28;

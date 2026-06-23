@@ -32,8 +32,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - PHP_VERSION: php83-fpm
-            MAGENTO_VERSION: 2.4.7-p3
+          - PHP_VERSION: php81-fpm
+            MAGENTO_VERSION: 2.4.5-p14
             NO_API_KEY_TEST: false
             SHARD_INDEX: 1
             SHARD_TOTAL: 3

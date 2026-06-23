@@ -19,7 +19,7 @@ class MageWorxRewardPoints implements GeneratorInterface
 
     public function process(OrderInterface $order, array $orderLines): array
     {
-        $amount = $order->getMwRwrdpointsAmnt();
+        $amount = (float) $order->getMwRwrdpointsAmnt();
         if (!$amount) {
             return $orderLines;
         }

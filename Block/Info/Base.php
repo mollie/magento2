@@ -114,6 +114,16 @@ class Base extends Info
         return null;
     }
 
+    public function hasStartedTransaction(): bool
+    {
+        $order = $this->getOrder();
+        if (!$order) {
+            return false;
+        }
+
+        return (string) $order->getMollieTransactionId() !== '';
+    }
+
     public function getMollieId(): ?string
     {
         try {

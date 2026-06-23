@@ -69,11 +69,11 @@ $status = $block->getPaymentStatus();
             <tr>
                 <th><?= $escaper->escapeHtml(__('Update Payment Status')); ?></th>
                 <td>
-                    <?php if (!$block->getMollieId()): ?>
+                    <?php if (!$block->hasStartedTransaction()): ?>
                         <?= $escaper->escapeHtml(__('Payment not started')); ?>
                     <?php endif; ?>
 
-                    <?php if ($block->getMollieId()): ?>
+                    <?php if ($block->hasStartedTransaction()): ?>
                         <button type="button" class="fetch-mollie-payment-status"><?= $escaper->escapeHtmlAttr(__('Fetch Status')); ?></button>
                         <a href="#" class="mollie-tooltip">(i)
                             <span>

@@ -29,8 +29,8 @@ class BuildPaymentRequest
     public function execute(array $request): CreatePaymentRequest
     {
         $request['amount'] = $this->convertToMoney($request['amount']);
-        $request['billingAddress'] = $this->convertToAddress($request['billingAddress']);
-        $request['shippingAddress'] = $this->convertToAddress($request['shippingAddress']);
+        $request['billingAddress'] = $this->convertToAddress($request['billingAddress'] ?? []);
+        $request['shippingAddress'] = $this->convertToAddress($request['shippingAddress'] ?? []);
 
         if (array_key_exists('lines', $request)) {
             $request['lines'] = $this->dataCollectionFactory->create(['items' => $request['lines']]);
