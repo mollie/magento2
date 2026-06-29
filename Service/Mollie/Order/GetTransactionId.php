@@ -19,10 +19,9 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 class GetTransactionId
 {
     public function __construct(
-        private TransactionToOrderManagementInterface $transactionToOrderManagement,
-        private MollieApiClient $mollieApiClient,
-        private General $mollieHelper,
-        private Config $config
+        private readonly TransactionToOrderManagementInterface $transactionToOrderManagement,
+        private readonly MollieApiClient $mollieApiClient,
+        private readonly Config $config,
     ) {}
 
     /**
