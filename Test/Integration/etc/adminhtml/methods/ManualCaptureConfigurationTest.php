@@ -36,4 +36,28 @@ class ManualCaptureConfigurationTest extends AbstractXmlConfiguration
             );
         }
     }
+
+    public function testGooglePaySupportsManualCaptureConfiguration(): void
+    {
+        $configXml = $this->getGeneralXmlConfigFile();
+        $googlePayConfig = $configXml->default->payment->mollie_methods_googlepay;
+
+        $this->assertSame(
+            '1',
+            (string) $googlePayConfig->can_change_capture_method,
+            'Google Pay should allow changing the capture method'
+        );
+
+        $googlePayXml = $this->getMethodXmlFiles()['googlepay'];
+
+        $this->assertTrue(
+            $this->hasField($googlePayXml, 'capture_mode'),
+            'Google Pay does not have the capture_mode field'
+        );
+
+        $this->assertTrue(
+            $this->hasField($googlePayXml, 'when_to_capture'),
+            'Google Pay does not have the when_to_capture field'
+        );
+    }
 }
