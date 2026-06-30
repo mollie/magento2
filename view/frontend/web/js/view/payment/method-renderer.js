@@ -61,7 +61,8 @@ define(
             {type: 'mollie_methods_swish', component: defaultComponent},
             {type: 'mollie_methods_twint', component: defaultComponent},
             {type: 'mollie_methods_vipps', component: defaultComponent},
-            {type: 'mollie_methods_voucher', component: defaultComponent}
+            {type: 'mollie_methods_voucher', component: defaultComponent},
+            {type: 'mollie_methods_wero', component: defaultComponent}
         ];
 
         function canUseApplePay()

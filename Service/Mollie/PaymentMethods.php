@@ -49,6 +49,7 @@ class PaymentMethods
         'mollie_methods_twint',
         'mollie_methods_vipps',
         'mollie_methods_voucher',
+        'mollie_methods_wero',
     ];
 
     public function __construct(
