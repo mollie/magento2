@@ -17,6 +17,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Order\GetTransactionId;
+use Mollie\Payment\Service\Mollie\Order\ResolvePaymentId;
 
 class ProcessTransactionFake extends ProcessTransaction
 {
@@ -32,6 +33,7 @@ class ProcessTransactionFake extends ProcessTransaction
         MollieApiClient $mollieApiClient,
         MollieHelper $mollieHelper,
         GetTransactionId $getTransactionId,
+        ResolvePaymentId $resolvePaymentId,
     ) {
         parent::__construct(
             $processTransactionResponseFactory,
@@ -39,6 +41,7 @@ class ProcessTransactionFake extends ProcessTransaction
             $mollieApiClient,
             $mollieHelper,
             $getTransactionId,
+            $resolvePaymentId,
         );
 
         $this->processTransactionResponseFactory = $processTransactionResponseFactory;
