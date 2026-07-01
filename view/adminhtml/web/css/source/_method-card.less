@@ -21,6 +21,21 @@
     box-sizing: border-box;
 }
 
+.mollie-method-card-head {
+    display: flex;
+    align-items: center;
+}
+
+.mollie-method-card-icon {
+    width: auto;
+    height: 24px;
+    max-width: 40px;
+    margin-right: 10px;
+    object-fit: contain;
+    flex-shrink: 0;
+    vertical-align: middle;
+}
+
 /* Dialog styling */
 .mollie-method-card-dialog[open] {
     width: 850px;
@@ -98,6 +113,11 @@
     transition: transform .2s ease, box-shadow .2s ease;
     border-bottom: 0;
     color: var(--text);
+}
+
+/* Disabled methods get a gray background so the state is visible without relying on color */
+.mollie-configuration-method-inactive > .entry-edit-head {
+    background: var(--bg-card-disabled);
 }
 
 /* Hover */
