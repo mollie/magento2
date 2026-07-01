@@ -56,11 +56,17 @@ class PaymentMethods
         private Config $config
     ) {}
 
+    /**
+     * @return list<string>
+     */
     public function getCodes(): array
     {
         return static::METHODS;
     }
 
+    /**
+     * @return list<array{value: string, label: string}>
+     */
     public function getCodesWithTitle(): array
     {
         return array_map(function ($method): array {

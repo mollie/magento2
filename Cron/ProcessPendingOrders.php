@@ -108,9 +108,9 @@ class ProcessPendingOrders
             );
         }
 
-        if (is_array($result) && isset($result['error']) && $result['error']) {
+        if (!$result->isSuccess()) {
             throw new LocalizedException(
-                __($result['msg'] ?? 'Unknown error during transaction processing'),
+                __('Transaction processing failed with status %1', $result->getStatus()),
             );
         }
     }

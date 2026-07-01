@@ -26,6 +26,11 @@ class MolliePaymentMethods implements ResolverInterface
         private Config $config
     ) {}
 
+    /**
+     * @param array<string, mixed>|null $value
+     * @param array<string, mixed>|null $args
+     * @return array<string, mixed>
+     */
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         $amount = 10;
@@ -66,6 +71,9 @@ class MolliePaymentMethods implements ResolverInterface
         ];
     }
 
+    /**
+     * @return array<int|string, Method>
+     */
     private function getMethods(float $amount, ?string $currency, int $storeId): array
     {
         $mollieApiClient = $this->mollieApiClient->loadByStore($storeId);

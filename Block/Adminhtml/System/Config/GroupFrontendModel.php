@@ -19,6 +19,9 @@ use Mollie\Payment\Config;
 
 class GroupFrontendModel extends Fieldset
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct(
         Context $context,
         Session $authSession,
