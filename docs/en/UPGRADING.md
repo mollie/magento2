@@ -119,6 +119,14 @@ const clientId = raw?.split('.').slice(2).join('.') ?? null;
 
 These changes affect how the extension behaves after the upgrade, even when the package update itself succeeds.
 
+### Orders Placed Before the Upgrade
+
+Orders placed on 2.x store a legacy Orders API transaction id (`ord_...`). Version 3 resolves these to the underlying payment automatically, so a 2.x order that is still pending updates correctly once the customer pays. No action is required for status processing.
+
+Capturing a 2.x order on shipment also works: because these orders live on the Orders API, version 3 captures them by shipping the order, which always settles the full authorised amount. Partial captures are not available for 2.x orders.
+
+Authorisation release (cancellation) and refunds are still not handled for these legacy orders. Cancel or refund any 2.x order that needs it from the Mollie Dashboard.
+
 ### External Refunds Now Sync Back to Magento
 
 Refunds created directly in the Mollie Dashboard are now detected and converted into Magento credit memos automatically.
@@ -144,6 +152,7 @@ After the upgrade:
 5. Check whether automatic invoice creation should remain enabled
 6. Verify any headless, PWA, or custom webhook configuration
 7. Place a real checkout test and confirm webhook processing, invoicing, and order status updates
+8. Cancel or refund any 2.x orders that need it from the Mollie Dashboard
 
 ## Next Steps
 

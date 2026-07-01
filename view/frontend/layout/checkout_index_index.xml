@@ -244,6 +244,12 @@
                                                                                   xsi:type="boolean">true
                                                                             </item>
                                                                         </item>
+                                                                        <item name="mollie_methods_wero"
+                                                                              xsi:type="array">
+                                                                            <item name="isBillingAddressRequired"
+                                                                                  xsi:type="boolean">true
+                                                                            </item>
+                                                                        </item>
                                                                     </item>
                                                                 </item>
                                                             </item>

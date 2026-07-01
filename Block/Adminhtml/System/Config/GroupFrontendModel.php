@@ -19,6 +19,9 @@ use Mollie\Payment\Config;
 
 class GroupFrontendModel extends Fieldset
 {
+    /**
+     * @param array<string, mixed> $data
+     */
     public function __construct(
         Context $context,
         Session $authSession,
@@ -75,7 +78,20 @@ class GroupFrontendModel extends Fieldset
         return '<a id="' . $element->getHtmlId() . '-head"
             data-method="' . $element->getHtmlId() . '"
             class="mollie-method-card-head"
-            >' . $element->getLegend() . '</a>';
+            >' . $this->getMethodImageHtml($element) . $element->getLegend() . '</a>';
+    }
+
+    private function getMethodImageHtml(AbstractElement $element): string
+    {
+        $originalData = $element->getData('original_data');
+        if (!is_array($originalData) || !isset($originalData['id'])) {
+            return '';
+        }
+
+        $method = str_replace('mollie_methods_', '', $originalData['id']);
+        $imageUrl = $this->getViewFileUrl('Mollie_Payment::images/' . $method . '.svg');
+
+        return '<img src="' . $imageUrl . '" alt="" class="mollie-method-card-icon" />';
     }
 
     private function getMethodClass(string $id): string

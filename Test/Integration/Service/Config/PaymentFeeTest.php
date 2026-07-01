@@ -59,6 +59,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_twint', true],
             ['mollie_methods_vipps', true],
             ['mollie_methods_voucher', true],
+            ['mollie_methods_wero', true],
             ['not_relevant_payment_method', false],
         ];
     }

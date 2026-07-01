@@ -49,4 +49,5 @@
     <include path="Mollie_Payment::methods/twint.xml"/>
     <include path="Mollie_Payment::methods/vipps.xml"/>
     <include path="Mollie_Payment::methods/voucher.xml"/>
+    <include path="Mollie_Payment::methods/wero.xml"/>
 </include>

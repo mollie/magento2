@@ -80,7 +80,7 @@ class ProcessPendingOrders
         $batchSize = $this->config->pendingOrderCronBatchSize((int) $store->getId());
 
         $this->searchCriteriaBuilder
-            ->addFilter('state', Order::STATE_PENDING_PAYMENT)
+            ->addFilter('state', [Order::STATE_PENDING_PAYMENT, Order::STATE_PAYMENT_REVIEW], 'in')
             ->addFilter('created_at', $fromDate, 'gt')
             ->addFilter('created_at', $toDate, 'lt')
             ->addFilter('mollie_transaction_id', null, 'notnull')
@@ -108,9 +108,9 @@ class ProcessPendingOrders
             );
         }
 
-        if (is_array($result) && isset($result['error']) && $result['error']) {
+        if (!$result->isSuccess()) {
             throw new LocalizedException(
-                __($result['msg'] ?? 'Unknown error during transaction processing'),
+                __('Transaction processing failed with status %1', $result->getStatus()),
             );
         }
     }

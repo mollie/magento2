@@ -11,7 +11,7 @@ export default class InvoicePage {
     await this.expect(page.locator('#system_messages')).toHaveCount(0);
 
     // Last element on the page so javascript has time to load
-    await this.expect(page.locator('.magento-version')).toBeVisible();
+    await this.expect(page.locator('.magento-version').first()).toBeVisible();
     await page.waitForTimeout(500);
 
     await this.expect(page.locator('[data-ui-id="order-items-submit-button"]')).toBeEnabled().then(button => button.click());
@@ -23,7 +23,7 @@ export default class InvoicePage {
 
   async creditMemo(page) {
     // Last element on the page so javascript has time to load
-    await this.expect(page.locator('.magento-version')).toBeVisible();
+    await this.expect(page.locator('.magento-version').first()).toBeVisible();
     await page.waitForTimeout(500);
 
     const button = await page.locator('.credit-memo');

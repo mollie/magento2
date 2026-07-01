@@ -26,7 +26,8 @@ class MollieApiClient
         private Config $config,
         private MollieApiClientFallbackWrapperFactory $mollieApiClientWrapperFactory,
         private FetchFallbackApiKeys $fetchFallbackApiKeys,
-        private Manager $moduleManager
+        private Manager $moduleManager,
+        private CreateHttpAdapter $createHttpAdapter
     ) {}
 
     public function loadByStore(?int $storeId = null): \Mollie\Api\MollieApiClient
@@ -45,7 +46,9 @@ class MollieApiClient
         }
 
         /** @var MollieApiClientFallbackWrapper $mollieApiClient */
-        $mollieApiClient = $this->mollieApiClientWrapperFactory->create();
+        $mollieApiClient = $this->mollieApiClientWrapperFactory->create([
+            'client' => $this->createHttpAdapter->execute(),
+        ]);
         $mollieApiClient->setFallbackApiKeysInstance($this->fetchFallbackApiKeys);
 
         $mollieApiClient->setApiKey($apiKey);
