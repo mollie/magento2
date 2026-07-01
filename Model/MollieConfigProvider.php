@@ -76,12 +76,17 @@ class MollieConfigProvider implements ConfigProviderInterface
         try {
             $amount = $this->mollieHelper->getOrderAmountByQuote($cart);
             $parameters = [
-                'amount[value]' => $amount['value'],
-                'amount[currency]' => $amount['currency'],
                 'resource' => 'orders',
                 'includeWallets' => ['applepay'],
                 'billingCountry' => $cart->getBillingAddress()->getCountry(),
             ];
+
+            if ($amount['currency'] !== null) {
+                $parameters['amount'] = [
+                    'value' => $amount['value'],
+                    'currency' => $amount['currency'],
+                ];
+            }
 
             $this->methodData = [];
             $apiMethods = $mollieApi->methods->allEnabled($this->methodParameters->enhance($parameters, $cart));
