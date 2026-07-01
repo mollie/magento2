@@ -15,8 +15,10 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 class MethodParameterPartTest extends IntegrationTestCase
 {
     public const DEFAULT_INPUT = [
-        'amount[value]' => 10,
-        'amount[currency]' => 'EUR',
+        'amount' => [
+            'value' => 10,
+            'currency' => 'EUR',
+        ],
         'resource' => 'orders',
         'includeWallets' => ['applepay'],
     ];

@@ -8,7 +8,11 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Model;
 
+use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\Quote;
 use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Data\Money;
+use Mollie\Api\Http\PendingRequest;
 use Mollie\Api\Http\Requests\GetEnabledMethodsRequest;
 use Mollie\Api\MollieApiClient;
 use Mollie\Payment\Config;
@@ -152,6 +156,39 @@ class MollieConfigProviderTest extends IntegrationTestCase
         $this->assertArrayHasKey('locale', $result['payment']['mollie']);
 
         $this->assertSame('nl_NL', $result['payment']['mollie']['locale']);
+    }
+
+    public function testForwardsTheQuoteAmountAndCurrencyToTheMethodsApi(): void
+    {
+        $client = MollieApiClient::fake([
+            GetEnabledMethodsRequest::class => MockResponse::ok('method-list'),
+        ]);
+
+        /** @var FakeMollieApiClient $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
+        $fakeMollieApiClient->setInstance($client);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
+
+        /** @var Quote $cart */
+        $cart = $this->objectManager->create(CartInterface::class);
+        $cart->setStoreId(1);
+        $cart->setBaseCurrencyCode('PLN');
+        $cart->setBaseGrandTotal(34.00);
+        $cart->setQuoteCurrencyCode('PLN');
+        $cart->setGrandTotal(34.00);
+        $cart->getBillingAddress()->setCountryId('PL');
+
+        /** @var MollieConfigProvider $instance */
+        $instance = $this->objectManager->create(MollieConfigProvider::class);
+        $instance->getActiveMethods($cart);
+
+        $client->assertSent(function (PendingRequest $request): bool {
+            $amount = $request->getRequest()->query()->all()['amount'] ?? null;
+
+            return $amount instanceof Money
+                && $amount->currency === 'PLN'
+                && $amount->value === '34.00';
+        });
     }
 
     public function testWhenNoActiveMethodsAvailableTheResultIsAnEmptyArray(): void
