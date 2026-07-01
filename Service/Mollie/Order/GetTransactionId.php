@@ -19,10 +19,9 @@ use Mollie\Payment\Service\Mollie\MollieApiClient;
 class GetTransactionId
 {
     public function __construct(
-        private TransactionToOrderManagementInterface $transactionToOrderManagement,
-        private MollieApiClient $mollieApiClient,
-        private General $mollieHelper,
-        private Config $config
+        private readonly TransactionToOrderManagementInterface $transactionToOrderManagement,
+        private readonly MollieApiClient $mollieApiClient,
+        private readonly Config $config,
     ) {}
 
     /**
@@ -66,6 +65,10 @@ class GetTransactionId
         return $order->getMollieTransactionId();
     }
 
+    /**
+     * @param string[] $transactions
+     * @return array<string, string>
+     */
     public function getTransactionStatuses(OrderInterface $order, array $transactions): array
     {
         $results = [];
@@ -81,6 +84,6 @@ class GetTransactionId
     {
         $transaction = $mollieApiClient->payments->get($transactionId);
 
-        return $transaction->status ?? 'unknown';
+        return $transaction->status;
     }
 }
