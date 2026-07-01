@@ -18,6 +18,15 @@ export default class CheckoutPaymentPage {
     await page.waitForSelector('[data-role="loader"]:not(:visible)', { state: 'attached' });
   }
 
+  async selectPaymentMethodByCode(page, code) {
+    const radio = page.locator(`#${code}`);
+    await radio.waitFor({ state: 'visible' });
+    await radio.check();
+
+    // Wait for all elements with the '.loader' class to be detached or invisible
+    await page.waitForSelector('[data-role="loader"]:not(:visible)', { state: 'attached' });
+  }
+
   async selectIssuer(page, issuer) {
     await page.locator(`text=${issuer}`).first().check();
   }

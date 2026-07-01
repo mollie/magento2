@@ -60,6 +60,7 @@ class GeneralTest extends IntegrationTestCase
             'trustly' => ['mollie_methods_trustly', 'trustly'],
             'twint' => ['mollie_methods_twint', 'twint'],
             'vipps' => ['mollie_methods_vipps', 'vipps'],
+            'wero' => ['mollie_methods_wero', 'wero'],
         ];
     }
 
