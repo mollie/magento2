@@ -64,20 +64,25 @@ jobs:
           JIRA_KEY=$(echo $RESPONSE | python3 -c 'import sys,json; print(json.load(sys.stdin).get("key",""))' 2>/dev/null || echo "")
           echo "JIRA_KEY=$JIRA_KEY" >> $GITHUB_OUTPUT
 
-      - name: Comment Jira link on GitHub issue
+      - name: Append Jira link to GitHub issue
         if: steps.create.outputs.JIRA_KEY != ''
         uses: actions/github-script@v7
+        env:
+          JIRA_KEY: ${{ steps.create.outputs.JIRA_KEY }}
         with:
           script: |
-            github.rest.issues.createComment({
+            const { JIRA_KEY } = process.env;
+            const originalBody = context.payload.issue.body || '';
+            const jiraNote = `\n\n---\n\n🎫 Jira ticket created: [${JIRA_KEY}](https://mollie.atlassian.net/browse/${JIRA_KEY})`;
+            await github.rest.issues.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: '🎫 Jira ticket created: [${{ steps.create.outputs.JIRA_KEY }}](https://mollie.atlassian.net/browse/${{ steps.create.outputs.JIRA_KEY }})'
-            })
-            github.rest.issues.addLabels({
+              body: originalBody + jiraNote
+            });
+            await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
               labels: ['jira-created']
-            })
+            });
