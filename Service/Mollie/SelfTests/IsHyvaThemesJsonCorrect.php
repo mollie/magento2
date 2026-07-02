@@ -19,11 +19,11 @@ class IsHyvaThemesJsonCorrect extends AbstractSelfTest
     private const MODULE_METADATA = [
         'Mollie_HyvaCompatibility' => [
             'name' => 'Mollie Hyvä Compatibility',
-            'url' => 'https://github.com/mollie/magento2-hyva-compatibility',
+            'package' => 'mollie/magento2-hyva-compatibility',
         ],
         'Mollie_HyvaCheckout' => [
             'name' => 'Mollie Hyvä Checkout',
-            'url' => 'https://github.com/mollie/magento2-hyva-checkout',
+            'package' => 'mollie/magento2-hyva-checkout',
         ],
     ];
 
@@ -51,7 +51,7 @@ class IsHyvaThemesJsonCorrect extends AbstractSelfTest
         $contents = $this->file->read($fullPath);
 
         if ($contents === false) {
-            $this->addMessage('error', __('The Hyva Themes configuration file is missing. Please run the command `bin/magento hyva:modules:config:generate` to generate the file.'));
+            $this->addMessage('error', __('The Hyva Themes configuration file is missing. Please run the command `bin/magento hyva:config:generate` to generate the file.'));
 
             return;
         }
@@ -61,7 +61,7 @@ class IsHyvaThemesJsonCorrect extends AbstractSelfTest
             $this->validateThatModuleIsPresent($json, 'Mollie_HyvaCompatibility');
             $this->validateThatModuleIsPresent($json, 'Mollie_HyvaCheckout');
         } catch (Exception $exception) {
-            $this->addMessage('error', __('The Hyva Themes configuration file is not a valid JSON file. Please run the command `bin/magento hyva:modules:config:generate` to generate the file.'));
+            $this->addMessage('error', __('The Hyva Themes configuration file is not a valid JSON file. Please run the command `bin/magento hyva:config:generate` to generate the file.'));
         }
     }
 
@@ -71,17 +71,18 @@ class IsHyvaThemesJsonCorrect extends AbstractSelfTest
             return;
         }
 
+        $metadata = self::MODULE_METADATA[$module];
+
         foreach ($json['extensions'] as $extension) {
-            if (strpos($extension['src'], $module) !== false) {
+            if (strpos($extension['src'], $metadata['package']) !== false) {
                 return;
             }
         }
 
-        $metadata = self::MODULE_METADATA[$module];
-        $link = sprintf('<a href="%s" target="_blank">%s</a>', $metadata['url'], $metadata['name']);
+        $link = sprintf('<a href="https://github.com/%s" target="_blank">%s</a>', $metadata['package'], $metadata['name']);
 
         $this->addMessage('error', __(
-            'The %1 module is not present in the Hyva Themes configuration file. Please run the command `bin/magento hyva:modules:config:generate` to generate the file.',
+            'The %1 module is not present in the Hyva Themes configuration file. Please run the command `bin/magento hyva:config:generate` to generate the file.',
             $link,
         ));
     }
