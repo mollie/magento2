@@ -16,17 +16,20 @@ use Mollie\Api\MollieApiClient;
  * Orders placed on the module's V2 stored an Orders API id (ord_...) in mollie_transaction_id. Those payments are
  * linked to an order and cannot be captured through the Payments API: paymentCaptures->createForId(ord_...) returns
  * a 404 followed by a 422 ("use the Shipments API instead"). The Orders API captures an authorised order by shipping
- * it, so this ships every line to capture the full authorised amount, matching the pre-V3 behaviour. Legacy orders
- * therefore only support a full capture; partial captures are not available for them.
+ * it. Passing no payload ships every line to capture the full authorised amount, matching the pre-V3 behaviour;
+ * passing a lines payload ships only those order lines, which is how a partial capture is performed for a legacy order.
  *
  * @deprecated This is a transitional fallback for V2 orders only. Remove once no ord_ orders remain in flight.
  */
 class CaptureLegacyOrder
 {
-    public function execute(MollieApiClient $mollieApi, string $transactionId): string
+    /**
+     * @param array<string, mixed> $payload
+     */
+    public function execute(MollieApiClient $mollieApi, string $transactionId, array $payload = []): string
     {
         $shipment = $mollieApi->send(
-            new DynamicPostRequest('orders/' . $transactionId . '/shipments'),
+            new DynamicPostRequest('orders/' . $transactionId . '/shipments', $payload),
         )->toArray();
 
         $shipmentId = $shipment['id'] ?? null;
