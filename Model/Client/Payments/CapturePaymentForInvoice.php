@@ -14,6 +14,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Api\MollieApiClient as MollieApi;
 use Mollie\Payment\Helper\General;
+use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Order\CaptureLegacyOrder;
 use Mollie\Payment\Service\Mollie\Order\LegacyOrderTransactionId;
@@ -27,6 +28,7 @@ class CapturePaymentForInvoice
         private OrderRepositoryInterface $orderRepository,
         private CaptureLegacyOrder $captureLegacyOrder,
         private LegacyOrderTransactionId $legacyOrderTransactionId,
+        private OrderLines $orderLines,
     ) {
     }
 
@@ -53,7 +55,7 @@ class CapturePaymentForInvoice
             );
         }
 
-        $captureId = $this->capture($mollieApi, $mollieTransactionId, $data);
+        $captureId = $this->capture($mollieApi, $invoice, $mollieTransactionId, $data);
         $payment->setTransactionId($mollieTransactionId);
 
         $order->addCommentToStatusHistory(
@@ -71,10 +73,16 @@ class CapturePaymentForInvoice
     /**
      * @param array<string, mixed> $data
      */
-    private function capture(MollieApi $mollieApi, string $transactionId, array $data): string
-    {
+    private function capture(
+        MollieApi $mollieApi,
+        InvoiceInterface $invoice,
+        string $transactionId,
+        array $data,
+    ): string {
         if ($this->legacyOrderTransactionId->matches($transactionId)) {
-            return $this->captureLegacyOrder->execute($mollieApi, $transactionId);
+            $payload = isset($data['amount']) ? $this->orderLines->getInvoiceOrderLines($invoice) : [];
+
+            return $this->captureLegacyOrder->execute($mollieApi, $transactionId, $payload);
         }
 
         return $mollieApi->paymentCaptures->createForId($transactionId, $data)->id;
