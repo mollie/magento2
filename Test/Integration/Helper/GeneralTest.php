@@ -30,6 +30,7 @@ class GeneralTest extends IntegrationTestCase
             'banktransfer' => ['mollie_methods_banktransfer', 'banktransfer'],
             'belfius' => ['mollie_methods_belfius', 'belfius'],
             'billie' => ['mollie_methods_billie', 'billie'],
+            'billink' => ['mollie_methods_billink', 'billink'],
             'bizum' => ['mollie_methods_bizum', 'bizum'],
             'blik' => ['mollie_methods_blik', 'blik'],
             'creditcard' => ['mollie_methods_creditcard', 'creditcard'],

@@ -19,6 +19,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Billie;
+use Mollie\Payment\Model\Methods\Billink;
 use Mollie\Payment\Model\Methods\In3;
 use Mollie\Payment\Model\Methods\Klarna;
 use Mollie\Payment\Model\Methods\Riverty;
@@ -228,6 +229,7 @@ class Base extends Info
             $code = $this->getInfo()->getMethod();
             $methods = [
                 Billie::CODE,
+                Billink::CODE,
                 In3::CODE,
                 Klarna::CODE,
                 Riverty::CODE,
