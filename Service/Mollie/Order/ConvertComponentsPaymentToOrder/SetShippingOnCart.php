@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Mollie\Order\ConvertComponentsPaymentToOrder;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;

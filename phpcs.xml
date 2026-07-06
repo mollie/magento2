@@ -10,4 +10,14 @@
     <rule ref="Magento2">
         <exclude name="Magento2.Annotation.MethodAnnotationStructure.NoCommentBlock"/>
     </rule>
+
+    <rule ref="Generic.PHP.RequireStrictTypes">
+        <severity>9</severity>
+        <exclude-pattern>*.phtml</exclude-pattern>
+    </rule>
+
+    <rule ref="./Test/Phpcs/Mollie/Sniffs/Legal/CopyrightNoticeSniff.php">
+        <severity>9</severity>
+        <exclude-pattern>*.phtml</exclude-pattern>
+    </rule>
 </ruleset>
