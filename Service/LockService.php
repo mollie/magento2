@@ -13,7 +13,10 @@ use Mollie\Payment\Config;
 
 class LockService
 {
-    private bool $alreadyLocked = false;
+    /**
+     * @var array<string, bool>
+     */
+    private array $activeLocks = [];
 
     public function __construct(
         private Config $config,
@@ -30,15 +33,20 @@ class LockService
      */
     public function lock(string $name, int $timeout = -1, ?string $reason = null): bool
     {
-        // Make sure we only lock once per request.
-        if ($this->alreadyLocked) {
+        // Make sure we only lock a given name once per request.
+        if (isset($this->activeLocks[$name])) {
             return true;
         }
 
         $message = 'Locking: ' . $name . ($reason ? ' - Reason: ' . $reason : '');
         $this->config->addToLog('info', $message);
 
-        return $this->alreadyLocked = $this->lockManager->lock($name, $timeout);
+        $result = $this->lockManager->lock($name, $timeout);
+        if ($result) {
+            $this->activeLocks[$name] = true;
+        }
+
+        return $result;
     }
 
     /**
@@ -52,7 +60,9 @@ class LockService
         $this->config->addToLog('info', 'Unlocking: ' . $name);
 
         $result = $this->lockManager->unlock($name);
-        $this->alreadyLocked = !$result;
+        if ($result) {
+            unset($this->activeLocks[$name]);
+        }
 
         return $result;
     }
