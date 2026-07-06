@@ -119,6 +119,14 @@ const clientId = raw?.split('.').slice(2).join('.') ?? null;
 
 Deze wijzigingen beïnvloeden het gedrag van de extensie na de upgrade, ook wanneer de pakket-update zelf zonder fouten is verlopen.
 
+### Orders Geplaatst Vóór De Upgrade
+
+Orders die op 2.x zijn geplaatst, bevatten een oud Orders API-transactie-id (`ord_...`). Versie 3 herleidt deze automatisch naar de onderliggende betaling, zodat een 2.x-order die nog openstaat correct wordt bijgewerkt zodra de klant betaalt. Voor statusverwerking is geen actie nodig.
+
+Het captureren van een 2.x-order bij verzending werkt ook: omdat deze orders op de Orders API staan, captured versie 3 ze door de order te verzenden, waarbij altijd het volledige geautoriseerde bedrag wordt afgerekend. Gedeeltelijke captures zijn voor 2.x-orders niet beschikbaar.
+
+Het vrijgeven van autorisaties (annulering) en refunds worden voor deze oude orders nog steeds niet afgehandeld. Annuleer of crediteer een 2.x-order die dat nodig heeft via het Mollie Dashboard.
+
 ### Externe Refunds Synchroniseren Nu Terug Naar Magento
 
 Refunds die direct in het Mollie Dashboard worden aangemaakt, worden nu automatisch gedetecteerd en omgezet naar Magento-creditmemo's.
@@ -144,6 +152,7 @@ Controleer na de upgrade:
 5. controleer of automatische factuurcreatie ingeschakeld moet blijven
 6. controleer eventuele headless-, PWA- of aangepaste webhookconfiguratie
 7. plaats een echte checkouttest en controleer webhookverwerking, facturatie en orderstatus-updates
+8. annuleer of crediteer 2.x-orders die dat nodig hebben via het Mollie Dashboard
 
 ## Volgende Stappen
 

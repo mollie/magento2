@@ -12,8 +12,12 @@ use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
+use Mollie\Api\MollieApiClient as MollieApi;
 use Mollie\Payment\Helper\General;
+use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Mollie\Order\CaptureLegacyOrder;
+use Mollie\Payment\Service\Mollie\Order\LegacyOrderTransactionId;
 
 class CapturePaymentForInvoice
 {
@@ -22,6 +26,9 @@ class CapturePaymentForInvoice
         private General $mollieHelper,
         private PriceCurrencyInterface $price,
         private OrderRepositoryInterface $orderRepository,
+        private CaptureLegacyOrder $captureLegacyOrder,
+        private LegacyOrderTransactionId $legacyOrderTransactionId,
+        private OrderLines $orderLines,
     ) {
     }
 
@@ -48,18 +55,36 @@ class CapturePaymentForInvoice
             );
         }
 
-        $capture = $mollieApi->paymentCaptures->createForId($mollieTransactionId, $data);
+        $captureId = $this->capture($mollieApi, $invoice, $mollieTransactionId, $data);
         $payment->setTransactionId($mollieTransactionId);
 
         $order->addCommentToStatusHistory(
             __(
                 'Trying to capture %1. Capture ID: %2',
                 $this->price->format($captureAmount),
-                $capture->id,
+                $captureId,
             ),
             $status,
         );
 
         $this->orderRepository->save($order);
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function capture(
+        MollieApi $mollieApi,
+        InvoiceInterface $invoice,
+        string $transactionId,
+        array $data,
+    ): string {
+        if ($this->legacyOrderTransactionId->matches($transactionId)) {
+            $payload = isset($data['amount']) ? $this->orderLines->getInvoiceOrderLines($invoice) : [];
+
+            return $this->captureLegacyOrder->execute($mollieApi, $transactionId, $payload);
+        }
+
+        return $mollieApi->paymentCaptures->createForId($transactionId, $data)->id;
     }
 }

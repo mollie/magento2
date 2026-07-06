@@ -26,6 +26,11 @@ class MolliePaymentMethods implements ResolverInterface
         private Config $config
     ) {}
 
+    /**
+     * @param array<string, mixed>|null $value
+     * @param array<string, mixed>|null $args
+     * @return array<string, mixed>
+     */
     public function resolve(Field $field, $context, ResolveInfo $info, ?array $value = null, ?array $args = null)
     {
         $amount = 10;
@@ -40,7 +45,7 @@ class MolliePaymentMethods implements ResolverInterface
         }
 
         $storeId = storeId($context->getExtensionAttributes()->getStore()->getId());
-        $apiMethods = $this->getMethods($amount, $currency, $storeId) ?? [];
+        $apiMethods = $this->getMethods($amount, $currency, $storeId);
 
         $methods = [];
         /** @var Method $method */
@@ -66,7 +71,10 @@ class MolliePaymentMethods implements ResolverInterface
         ];
     }
 
-    private function getMethods(float $amount, ?string $currency, int $storeId): ?array
+    /**
+     * @return array<int|string, Method>
+     */
+    private function getMethods(float $amount, ?string $currency, int $storeId): array
     {
         $mollieApiClient = $this->mollieApiClient->loadByStore($storeId);
 
@@ -80,10 +88,12 @@ class MolliePaymentMethods implements ResolverInterface
         }
 
         $parameters = [
-            'amount[value]' => number_format($amount, 2, '.', ''),
-            'amount[currency]' => $currency,
+            'amount' => [
+                'value' => number_format($amount, 2, '.', ''),
+                'currency' => $currency,
+            ],
             'resource' => 'orders',
-            'includeWallets' => 'applepay',
+            'includeWallets' => ['applepay'],
         ];
 
         return (array) $mollieApiClient->methods->allActive(

@@ -11,13 +11,15 @@ namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Mollie\Payment\Service\Mollie\Order\ResolvePaymentId;
 
 class GetMollieStatus
 {
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
         private MollieApiClient $mollieApiClient,
-        private GetMollieStatusResultFactory $getMollieStatusResultFactory
+        private GetMollieStatusResultFactory $getMollieStatusResultFactory,
+        private ResolvePaymentId $resolvePaymentId
     ) {}
 
     public function execute(int $orderId, ?string $transactionId = null): GetMollieStatusResult
@@ -32,7 +34,8 @@ class GetMollieStatus
         }
 
         $mollieApi = $this->mollieApiClient->loadByStore(storeId($order->getStoreId()));
-        $molliePayment = $mollieApi->payments->get($transactionId);
+        $paymentId = $this->resolvePaymentId->execute($mollieApi, $transactionId);
+        $molliePayment = $mollieApi->payments->get($paymentId);
 
         return $this->getMollieStatusResultFactory->create([
             'status' => $molliePayment->status,

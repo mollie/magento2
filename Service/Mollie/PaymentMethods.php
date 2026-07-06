@@ -20,6 +20,7 @@ class PaymentMethods
         'mollie_methods_banktransfer',
         'mollie_methods_belfius',
         'mollie_methods_billie',
+        'mollie_methods_billink',
         'mollie_methods_bizum',
         'mollie_methods_blik',
         'mollie_methods_creditcard',
@@ -49,17 +50,24 @@ class PaymentMethods
         'mollie_methods_twint',
         'mollie_methods_vipps',
         'mollie_methods_voucher',
+        'mollie_methods_wero',
     ];
 
     public function __construct(
         private Config $config
     ) {}
 
+    /**
+     * @return list<string>
+     */
     public function getCodes(): array
     {
         return static::METHODS;
     }
 
+    /**
+     * @return list<array{value: string, label: string}>
+     */
     public function getCodesWithTitle(): array
     {
         return array_map(function ($method): array {

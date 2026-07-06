@@ -76,6 +76,12 @@
                                                                                   xsi:type="boolean">true
                                                                             </item>
                                                                         </item>
+                                                                        <item name="mollie_methods_billink"
+                                                                              xsi:type="array">
+                                                                            <item name="isBillingAddressRequired"
+                                                                                  xsi:type="boolean">true
+                                                                            </item>
+                                                                        </item>
                                                                         <item name="mollie_methods_blik"
                                                                               xsi:type="array">
                                                                             <item name="isBillingAddressRequired"
@@ -239,6 +245,12 @@
                                                                             </item>
                                                                         </item>
                                                                         <item name="mollie_methods_voucher"
+                                                                              xsi:type="array">
+                                                                            <item name="isBillingAddressRequired"
+                                                                                  xsi:type="boolean">true
+                                                                            </item>
+                                                                        </item>
+                                                                        <item name="mollie_methods_wero"
                                                                               xsi:type="array">
                                                                             <item name="isBillingAddressRequired"
                                                                                   xsi:type="boolean">true

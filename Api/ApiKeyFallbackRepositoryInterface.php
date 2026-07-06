@@ -34,13 +34,13 @@ interface ApiKeyFallbackRepositoryInterface
 
     /**
      * @param ApiKeyFallbackInterface $entity
-     * @return ApiKeyFallbackInterface
+     * @return bool
      */
-    public function delete(ApiKeyFallbackInterface $entity);
+    public function delete(ApiKeyFallbackInterface $entity): bool;
 
     /**
      * @param int $id
-     * @return ApiKeyFallbackInterface
+     * @return bool
      */
-    public function deleteById(int $id);
+    public function deleteById(int $id): bool;
 }

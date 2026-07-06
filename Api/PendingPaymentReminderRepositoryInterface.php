@@ -41,19 +41,19 @@ interface PendingPaymentReminderRepositoryInterface
 
     /**
      * @param PendingPaymentReminderInterface $entity
-     * @return PendingPaymentReminderInterface
+     * @return bool
      */
-    public function delete(PendingPaymentReminderInterface $entity);
+    public function delete(PendingPaymentReminderInterface $entity): bool;
 
     /**
      * @param int $id
-     * @return PendingPaymentReminderInterface
+     * @return bool
      */
-    public function deleteById(int $id);
+    public function deleteById(int $id): bool;
 
     /**
      * @param int $id
-     * @return PendingPaymentReminderInterface
+     * @return bool
      */
-    public function deleteByOrderId(int $id);
+    public function deleteByOrderId(int $id): bool;
 }

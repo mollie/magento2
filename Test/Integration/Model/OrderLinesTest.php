@@ -11,6 +11,9 @@ namespace Mollie\Payment\Test\Integration\Model;
 use Exception;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use Magento\Sales\Api\Data\InvoiceInterface;
+use Magento\Sales\Api\Data\InvoiceItemInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -87,6 +90,149 @@ class OrderLinesTest extends IntegrationTestCase
         $line = $result['lines'][0];
         $this->assertEquals(45 - 9 + 7.56, $line['amount']['value']);
         $this->assertEquals(1, $line['quantity']);
+    }
+
+    public function testGetInvoiceOrderLines(): void
+    {
+        $orderLine = $this->objectManager->get(OrderLinesFactory::class)->create();
+        $orderLine->setItemId(999);
+        $orderLine->setLineId('odl_abc123');
+        $orderLine->save();
+
+        /** @var InvoiceItemInterface $invoiceItem */
+        $invoiceItem = $this->objectManager->create(InvoiceItemInterface::class);
+        $invoiceItem->setOrderItemId(999);
+        $invoiceItem->setQty(2);
+
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setBaseCurrencyCode('EUR');
+
+        /** @var InvoiceInterface $invoice */
+        $invoice = $this->objectManager->create(InvoiceInterface::class);
+        $invoice->setOrder($order);
+        $invoice->setBaseShippingAmount(0);
+        $invoice->setItems([$invoiceItem]);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+        $result = $instance->getInvoiceOrderLines($invoice);
+
+        $this->assertCount(1, $result['lines']);
+
+        $line = $result['lines'][0];
+        $this->assertEquals('odl_abc123', $line['id']);
+        $this->assertEquals(2, $line['quantity']);
+        $this->assertArrayNotHasKey('amount', $line);
+    }
+
+    public function testGetInvoiceOrderLinesSkipsItemsWithoutAMollieLine(): void
+    {
+        /** @var InvoiceItemInterface $invoiceItem */
+        $invoiceItem = $this->objectManager->create(InvoiceItemInterface::class);
+        $invoiceItem->setOrderItemId(123456);
+        $invoiceItem->setQty(1);
+
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+
+        /** @var InvoiceInterface $invoice */
+        $invoice = $this->objectManager->create(InvoiceInterface::class);
+        $invoice->setOrder($order);
+        $invoice->setBaseShippingAmount(0);
+        $invoice->setItems([$invoiceItem]);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+        $result = $instance->getInvoiceOrderLines($invoice);
+
+        $this->assertCount(0, $result['lines']);
+    }
+
+    public function testInvoiceUsesTheDiscount(): void
+    {
+        $orderLine = $this->objectManager->get(OrderLinesFactory::class)->create();
+        $orderLine->setItemId(999);
+        $orderLine->setLineId('odl_abc123');
+        $orderLine->save();
+
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = $this->objectManager->create(OrderItemInterface::class);
+        $orderItem->setId(999);
+        $orderItem->setBaseRowTotal(45); // 45 - 21% tax
+        $orderItem->setBaseTaxAmount(7.56);
+        $orderItem->setBaseDiscountAmount(9);
+        $orderItem->setBaseDiscountTaxCompensationAmount(0);
+        $orderItem->setQtyOrdered(1);
+
+        /** @var InvoiceItemInterface $invoiceItem */
+        $invoiceItem = $this->objectManager->create(InvoiceItemInterface::class);
+        $invoiceItem->setQty(1);
+        $invoiceItem->setOrderItem($orderItem);
+
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setBaseCurrencyCode('EUR');
+        $order->setDiscountAmount(-9);
+
+        /** @var InvoiceInterface $invoice */
+        $invoice = $this->objectManager->create(InvoiceInterface::class);
+        $invoice->setOrder($order);
+        $invoice->setBaseShippingAmount(0);
+        $invoice->setItems([$invoiceItem]);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+        $result = $instance->getInvoiceOrderLines($invoice);
+
+        $this->assertCount(1, $result['lines']);
+
+        $line = $result['lines'][0];
+        $this->assertEquals('EUR', $line['amount']['currency']);
+        $this->assertEquals(45 - 9 + 7.56, $line['amount']['value']);
+        $this->assertEquals(1, $line['quantity']);
+    }
+
+    public function testGetInvoiceOrderLinesHandlesDatabaseStringsAndSkipsZeroQtyItems(): void
+    {
+        $invoicedLine = $this->objectManager->get(OrderLinesFactory::class)->create();
+        $invoicedLine->setItemId(999);
+        $invoicedLine->setLineId('odl_invoiced');
+        $invoicedLine->save();
+
+        $skippedLine = $this->objectManager->get(OrderLinesFactory::class)->create();
+        $skippedLine->setItemId(1000);
+        $skippedLine->setLineId('odl_skipped');
+        $skippedLine->save();
+
+        /** @var InvoiceItemInterface $invoicedItem */
+        $invoicedItem = $this->objectManager->create(InvoiceItemInterface::class);
+        $invoicedItem->setOrderItemId(999);
+        $invoicedItem->setQty('1.0000');
+
+        /** @var InvoiceItemInterface $notInvoicedItem */
+        $notInvoicedItem = $this->objectManager->create(InvoiceItemInterface::class);
+        $notInvoicedItem->setOrderItemId(1000);
+        $notInvoicedItem->setQty('0.0000');
+
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setBaseCurrencyCode('EUR');
+        $order->setDiscountAmount('0.0000');
+
+        /** @var InvoiceInterface $invoice */
+        $invoice = $this->objectManager->create(InvoiceInterface::class);
+        $invoice->setOrder($order);
+        $invoice->setBaseShippingAmount(0);
+        $invoice->setItems([$invoicedItem, $notInvoicedItem]);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+        $result = $instance->getInvoiceOrderLines($invoice);
+
+        $this->assertCount(1, $result['lines']);
+        $this->assertEquals('odl_invoiced', $result['lines'][0]['id']);
+        $this->assertEquals(1, $result['lines'][0]['quantity']);
     }
 
     /**
@@ -217,5 +363,42 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertEquals(0.01, $productLine['discountAmount']['value']);
         $this->assertEquals(12.94, $productLine['totalAmount']['value']);
         $this->assertEquals(12.95, $productLine['unitPrice']['value']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoDataFixture Magento/Catalog/_files/product_simple.php
+     *
+     * @throws Exception
+     */
+    public function testHandlesBundleProductWithStringRowTotalInclTax(): void
+    {
+        // Bundle order items store their row total as a decimal string ("24.0000"); under
+        // declare(strict_types=1) that string used to break the ?float return of
+        // getTotalAmountOrderItem() before it is called for the line, throwing a TypeError.
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = $this->objectManager->create(OrderItemInterface::class);
+        $orderItem->setProductId(1);
+        $orderItem->setProductType('bundle');
+        $orderItem->setQtyOrdered(1);
+        $orderItem->setTaxPercent(0);
+        $orderItem->setDiscountAmount(0);
+        $orderItem->setDiscountTaxCompensationAmount(0);
+        $orderItem->setBaseDiscountAmount(0);
+        $orderItem->setBaseDiscountTaxCompensationAmount(0);
+        $orderItem->setRowTotalInclTax('24.0000');
+        $orderItem->setBaseRowTotalInclTax('24.0000');
+
+        $order = $this->loadOrderById('100000001');
+        $order->setBaseCurrencyCode('EUR');
+        $order->setItems([$orderItem]);
+
+        /** @var OrderOrderLines $instance */
+        $instance = $this->objectManager->get(OrderOrderLines::class);
+
+        $result = $instance->get($order);
+
+        $this->assertNotEmpty($result);
+        $this->assertArrayHasKey('totalAmount', $result[0]);
     }
 }

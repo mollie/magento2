@@ -96,7 +96,7 @@ class Reorder extends Mollie
      * @throws LocalizedException
      * @throws ApiException
      */
-    public function initialize($paymentAction, $stateObject): void
+    public function initialize($paymentAction, $stateObject): static
     {
         /** @var Payment $payment */
         $payment = $this->getInfoInstance();
@@ -105,6 +105,8 @@ class Reorder extends Mollie
         $order = $payment->getOrder();
         $order->setCanSendNewEmailFlag(false);
         $this->orderRepository->save($order);
+
+        return $this;
     }
 
     public function isAvailable(?CartInterface $quote = null): bool

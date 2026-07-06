@@ -30,6 +30,7 @@ use Mollie\Payment\Block\Adminhtml\System\Config\Form\Field\CaptureExpirationWin
         match($block->getPaymentMethod()) {
             'klarna' => __('28 days'),
             'billie' => __('28 days'),
+            'billink' => __('28 days'),
             'riverty' => __('30 days'),
             'vipps' => __('180 days'),
             'mobilepay' => __('14 days'),

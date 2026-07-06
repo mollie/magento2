@@ -11,6 +11,8 @@ namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\General;
 use Exception;
 use Magento\PageCache\Model\Cache\Type;
 use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\Data\Money;
+use Mollie\Api\Http\PendingRequest;
 use Mollie\Api\Http\Requests\GetEnabledMethodsRequest;
 use Mollie\Api\Http\Requests\GetPaginatedTerminalsRequest;
 use Mollie\Api\MollieApiClient;
@@ -80,6 +82,40 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         $this->assertCount(2, $result);
         $this->assertEquals('CREDITCARD', $result[0]['name']);
         $this->assertEquals('iDEAL', $result[1]['name']);
+    }
+
+    public function testForwardsTheAmountAndCurrencyToTheMethodsApi(): void
+    {
+        $this->cleanCache();
+        $this->loadFakeEncryptor()->addReturnValue('', 'test_dummyapikeythatisvalidandislongenough');
+
+        $client = MollieApiClient::fake([
+            GetEnabledMethodsRequest::class => MockResponse::ok('method-list'),
+            GetPaginatedTerminalsRequest::class => MockResponse::ok('terminal-list'),
+        ]);
+
+        /** @var FakeMollieApiClient $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
+        $fakeMollieApiClient->setInstance($client);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
+
+        $this->graphQlQuery('
+            query {
+                molliePaymentMethods(input: {amount: 34.00, currency: "PLN"}) {
+                    methods {
+                        code
+                    }
+                }
+            }
+        ');
+
+        $client->assertSent(function (PendingRequest $request): bool {
+            $amount = $request->getRequest()->query()->all()['amount'] ?? null;
+
+            return $amount instanceof Money
+                && $amount->currency === 'PLN'
+                && $amount->value === '34.00';
+        });
     }
 
     private function callEndpoint(): array

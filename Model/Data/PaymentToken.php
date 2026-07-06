@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -90,9 +94,12 @@ class PaymentToken extends AbstractExtensibleObject implements PaymentTokenInter
      * Retrieve existing extension attributes object or create a new one.
      * @return PaymentTokenExtensionInterface|null
      */
-    public function getExtensionAttributes()
+    public function getExtensionAttributes(): ?PaymentTokenExtensionInterface
     {
-        return $this->_getExtensionAttributes();
+        /** @var PaymentTokenExtensionInterface|null $extensionAttributes */
+        $extensionAttributes = $this->_getExtensionAttributes();
+
+        return $extensionAttributes;
     }
 
     /**

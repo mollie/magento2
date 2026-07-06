@@ -196,7 +196,9 @@ class Order
     private function getTotalAmountOrderItem(OrderItemInterface $item): ?float
     {
         if ($item->getProductType() == ProductType::TYPE_BUNDLE) {
-            return $this->forceBaseCurrency ? $item->getBaseRowTotalInclTax() : $item->getRowTotalInclTax();
+            $rowTotalInclTax = $this->forceBaseCurrency ? $item->getBaseRowTotalInclTax() : $item->getRowTotalInclTax();
+
+            return $rowTotalInclTax === null ? null : (float)$rowTotalInclTax;
         }
 
         if ($this->forceBaseCurrency) {

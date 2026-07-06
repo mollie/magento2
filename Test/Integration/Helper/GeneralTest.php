@@ -30,6 +30,7 @@ class GeneralTest extends IntegrationTestCase
             'banktransfer' => ['mollie_methods_banktransfer', 'banktransfer'],
             'belfius' => ['mollie_methods_belfius', 'belfius'],
             'billie' => ['mollie_methods_billie', 'billie'],
+            'billink' => ['mollie_methods_billink', 'billink'],
             'bizum' => ['mollie_methods_bizum', 'bizum'],
             'blik' => ['mollie_methods_blik', 'blik'],
             'creditcard' => ['mollie_methods_creditcard', 'creditcard'],
@@ -60,6 +61,7 @@ class GeneralTest extends IntegrationTestCase
             'trustly' => ['mollie_methods_trustly', 'trustly'],
             'twint' => ['mollie_methods_twint', 'twint'],
             'vipps' => ['mollie_methods_vipps', 'vipps'],
+            'wero' => ['mollie_methods_wero', 'wero'],
         ];
     }
 

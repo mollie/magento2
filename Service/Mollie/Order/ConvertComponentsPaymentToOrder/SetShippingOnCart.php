@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Service\Mollie\Order\ConvertComponentsPaymentToOrder;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -24,7 +26,8 @@ class SetShippingOnCart
     public function execute(CartInterface $cart, Payment $payment): void
     {
         $hasShipping = false;
-        foreach ($payment->lines as $line) {
+        foreach ($payment->lines ?? [] as $line) {
+            /** @var stdClass $line */
             if ($line->type == 'physical') {
                 $this->addProductToCart($line, $cart);
             }
@@ -35,13 +38,14 @@ class SetShippingOnCart
             }
         }
 
-        // When no shipping method is selected in idealexpress, set the shipping to zero.
-        if (!$hasShipping && $payment->method == 'ideal') {
+        // The captured amount never included shipping when there is no shipping line,
+        // so the order must not charge for it either.
+        if (!$hasShipping) {
             $this->setShippingToZero($cart);
         }
     }
 
-    private function addProductToCart(stdClass $line, $cart): void
+    private function addProductToCart(stdClass $line, CartInterface $cart): void
     {
         if (!preg_match('/^\[([^\]]+)\]/', $line->description, $matches)) {
             throw new LocalizedException(__('Unable to extract SKU from description: %1', $line->description));

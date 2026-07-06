@@ -1,4 +1,8 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
 
 declare(strict_types=1);
 
@@ -74,10 +78,10 @@ class PaymentFee extends AbstractTotal
     }
 
     /**
-     * @return Phrase
+     * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
-        return __('Payment Fee');
+        return (string) __('Payment Fee');
     }
 }

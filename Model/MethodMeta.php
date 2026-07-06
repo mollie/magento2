@@ -9,10 +9,16 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Model;
 
+use Mollie\Payment\Api\Data\IssuerInterface;
 use Mollie\Payment\Api\Data\MethodMetaInterface;
+use Mollie\Payment\Api\Data\TerminalInterface;
 
 class MethodMeta implements MethodMetaInterface
 {
+    /**
+     * @param IssuerInterface[] $issuers
+     * @param TerminalInterface[] $terminals
+     */
     public function __construct(
         private string $code,
         private array $issuers,
@@ -28,7 +34,7 @@ class MethodMeta implements MethodMetaInterface
     }
 
     /**
-     * @return string[]
+     * @return IssuerInterface[]
      */
     public function getIssuers(): array
     {
@@ -36,7 +42,7 @@ class MethodMeta implements MethodMetaInterface
     }
 
     /**
-     * @return string[]
+     * @return TerminalInterface[]
      */
     public function getTerminals(): array
     {

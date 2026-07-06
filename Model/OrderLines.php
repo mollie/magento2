@@ -16,6 +16,8 @@ use Magento\Framework\Model\ResourceModel\AbstractResource;
 use Magento\Framework\Registry;
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\CreditmemoItemInterface;
+use Magento\Sales\Api\Data\InvoiceInterface;
+use Magento\Sales\Api\Data\InvoiceItemInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Model\Order;
@@ -197,6 +199,57 @@ class OrderLines extends AbstractModel
         return ['lines' => $orderLines];
     }
 
+    /**
+     * @param InvoiceInterface $invoice
+     * @return array
+     */
+    public function getInvoiceOrderLines(InvoiceInterface $invoice): array
+    {
+        $orderLines = [];
+
+        /** @var OrderInterface $order */
+        $order = $invoice->getOrder();
+        $orderHasDiscount = abs((float)($order->getDiscountAmount() ?? 0)) > 0;
+
+        /** @var InvoiceItemInterface $item */
+        foreach ($invoice->getItems() as $item) {
+            if ((float)$item->getQty() <= 0) {
+                continue;
+            }
+
+            $lineId = $this->getOrderLineByItemId($item->getOrderItemId())->getLineId();
+            if (!$lineId) {
+                continue;
+            }
+
+            $line = ['id' => $lineId, 'quantity' => (int)round((float)$item->getQty())];
+
+            if ($orderHasDiscount) {
+                $orderItem = $item->getOrderItem();
+                $rowTotal = $orderItem->getBaseRowTotal()
+                    - $orderItem->getBaseDiscountAmount()
+                    + $orderItem->getBaseTaxAmount()
+                    + $orderItem->getBaseDiscountTaxCompensationAmount();
+
+                $line['amount'] = $this->mollieHelper->getAmountArray(
+                    $order->getBaseCurrencyCode(),
+                    (($rowTotal) / $orderItem->getQtyOrdered()) * $item->getQty(),
+                );
+            }
+
+            $orderLines[] = $line;
+        }
+
+        if ($invoice->getBaseShippingAmount() > 0) {
+            $shippingFeeItemLine = $this->getShippingFeeItemLineOrder($order->getId());
+            if ($shippingFeeItemLine->getLineId()) {
+                $orderLines[] = ['id' => $shippingFeeItemLine->getLineId(), 'quantity' => 1];
+            }
+        }
+
+        return ['lines' => $orderLines];
+    }
+
     private function addNonProductItems(OrderInterface $order, array &$orderLines): void
     {
         $collection = $this->orderLinesCollection->create()
@@ -217,12 +270,15 @@ class OrderLines extends AbstractModel
      *
      * @return OrderLines
      */
-    public function getOrderLineByItemId($itemId)
+    public function getOrderLineByItemId($itemId): OrderLines
     {
-        return $this->orderLinesCollection->create()
+        /** @var OrderLines $orderLine */
+        $orderLine = $this->orderLinesCollection->create()
             ->addFieldToFilter('item_id', ['eq' => $itemId])
             ->addFieldToFilter('line_id', ['notnull' => true])
             ->getLastItem();
+
+        return $orderLine;
     }
 
     /**
@@ -283,8 +339,9 @@ class OrderLines extends AbstractModel
      *
      * @return OrderLines
      */
-    public function getShippingFeeItemLineOrder($orderId)
+    public function getShippingFeeItemLineOrder($orderId): OrderLines
     {
+        /** @var OrderLines $shippingLine */
         $shippingLine = $this->orderLinesCollection->create()
             ->addFieldToFilter('order_id', ['eq' => $orderId])
             ->addFieldToFilter('type', ['eq' => 'shipping_fee'])
@@ -298,8 +355,9 @@ class OrderLines extends AbstractModel
      *
      * @return OrderLines
      */
-    public function getStoreCreditItemLineOrder($orderId)
+    public function getStoreCreditItemLineOrder($orderId): OrderLines
     {
+        /** @var OrderLines $storeCreditLine */
         $storeCreditLine = $this->orderLinesCollection->create()
             ->addFieldToFilter('order_id', ['eq' => $orderId])
             ->addFieldToFilter('type', ['eq' => 'store_credit'])
@@ -313,12 +371,15 @@ class OrderLines extends AbstractModel
      *
      * @return OrderLines
      */
-    public function getPaymentFeeCreditItemLineOrder($orderId)
+    public function getPaymentFeeCreditItemLineOrder($orderId): OrderLines
     {
-        return $this->orderLinesCollection->create()
+        /** @var OrderLines $paymentFeeLine */
+        $paymentFeeLine = $this->orderLinesCollection->create()
             ->addFieldToFilter('order_id', ['eq' => $orderId])
             ->addFieldToFilter('type', ['eq' => 'surcharge'])
             ->getLastItem();
+
+        return $paymentFeeLine;
     }
 
     /**

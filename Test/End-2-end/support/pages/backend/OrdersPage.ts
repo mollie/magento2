@@ -50,7 +50,13 @@ export default class OrdersPage {
       await expect(page.getByRole('button', { name: 'Fetch Status' })).toBeVisible();
 
       try {
-        await page.locator('.fetch-mollie-payment-status').click({timeout: 5000});
+        await Promise.all([
+          page.waitForResponse(
+            (response) => response.url().includes('mollie/action/fetchOrderStatus') && response.request().method() === 'POST',
+            {timeout: 15000}
+          ),
+          page.locator('.fetch-mollie-payment-status').click({timeout: 5000}),
+        ]);
       } catch (error) {
         if (attempt > 2) {
           throw error;
@@ -61,9 +67,6 @@ export default class OrdersPage {
         await this.callFetchStatus(page, attempt + 1);
         return;
       }
-
-      await expect(page.locator('.fetch-mollie-payment-status')).toContainText('Fetching...');
-      await expect(page.locator('.fetch-mollie-payment-status')).toContainText('Fetch Status', {timeout: 15000});
 
       await page.waitForLoadState('networkidle');
       await page.reload({waitUntil: 'load'});

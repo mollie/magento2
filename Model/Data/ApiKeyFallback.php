@@ -94,9 +94,12 @@ class ApiKeyFallback extends AbstractExtensibleObject implements ApiKeyFallbackI
      * Retrieve existing extension attributes object or create a new one.
      * @return ApiKeyFallbackExtensionInterface|null
      */
-    public function getExtensionAttributes()
+    public function getExtensionAttributes(): ?ApiKeyFallbackExtensionInterface
     {
-        return $this->_getExtensionAttributes();
+        /** @var ApiKeyFallbackExtensionInterface|null $extensionAttributes */
+        $extensionAttributes = $this->_getExtensionAttributes();
+
+        return $extensionAttributes;
     }
 
     /**

@@ -189,7 +189,7 @@ class Reorder
      */
     public function getPaymentMethod(OrderInterface $originalOrder): ?string
     {
-        $value = $this->config->secondChanceUsePaymentMethod($originalOrder->getStoreId());
+        $value = $this->config->secondChanceUsePaymentMethod(storeId($originalOrder->getStoreId()));
 
         if ($value == SecondChancePaymentMethod::USE_PREVIOUS_METHOD) {
             return $originalOrder->getPayment()->getMethod();

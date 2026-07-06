@@ -20,16 +20,18 @@ class WarnIfQueueNotConfiguredCorrectly implements DataPatchInterface
         private Inbox $inbox,
     ) {}
 
-    public function apply(): void
+    public function apply(): static
     {
         if ($this->areQueuesConfiguredCorrectly->execute()) {
-            return;
+            return $this;
         }
 
         $this->inbox->addCritical(
             (string)__('Mollie Payment: queue consumer not configured'),
             (string)__('Queue processing is enabled but "mollie.transaction.processor" is missing from your cron_consumers_runner/consumers whitelist in env.php. Webhooks will be enqueued but never processed, leaving orders stuck in pending_payment. Add "mollie.transaction.processor" to the whitelist, or disable queue processing under Stores > Configuration > Mollie > General.'),
         );
+
+        return $this;
     }
 
     public static function getDependencies(): array

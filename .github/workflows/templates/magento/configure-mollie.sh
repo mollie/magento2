@@ -23,6 +23,7 @@ bin/magento config:set payment/mollie_methods_bancontact/active 1
 bin/magento config:set payment/mollie_methods_banktransfer/active 1
 bin/magento config:set payment/mollie_methods_belfius/active 1
 bin/magento config:set payment/mollie_methods_billie/active 1
+bin/magento config:set payment/mollie_methods_billink/active 1
 bin/magento config:set payment/mollie_methods_bizum/active 1
 bin/magento config:set payment/mollie_methods_blik/active 1
 bin/magento config:set payment/mollie_methods_creditcard/active 1
@@ -52,6 +53,7 @@ bin/magento config:set payment/mollie_methods_swish/active 1
 bin/magento config:set payment/mollie_methods_twint/active 1
 bin/magento config:set payment/mollie_methods_vipps/active 1
 bin/magento config:set payment/mollie_methods_voucher/active 1
+bin/magento config:set payment/mollie_methods_wero/active 1
 
 # Disable queues as we don't have those in the test environment
 bin/magento config:set payment/mollie_general/process_transactions_in_the_queue 0

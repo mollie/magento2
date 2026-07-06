@@ -30,6 +30,7 @@ class FetchOrderStatus extends Action implements HttpPostActionInterface
 
     public function execute(): Json
     {
+        /** @var Json $result */
         $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         try {

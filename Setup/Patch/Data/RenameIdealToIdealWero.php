@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Setup\Patch\Data;
 
@@ -25,7 +31,7 @@ class RenameIdealToIdealWero implements DataPatchInterface
         $this->configWriter = $configWriter;
     }
 
-    public function apply(): void
+    public function apply(): static
     {
         $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
             'eq' => 'payment/mollie_methods_ideal/title'
@@ -38,6 +44,8 @@ class RenameIdealToIdealWero implements DataPatchInterface
                 $configItem->getData('value')
             );
         }
+
+        return $this;
     }
 
     private function updateMethodTitle(string $scope, int $scopeId, ?string $currentValue = null)

@@ -13,9 +13,9 @@ use Magento\Framework\View\Element\AbstractBlock;
 
 class AvailableDescriptionVariables extends AbstractBlock implements CommentInterface
 {
-    public function getCommentText($elementValue)
+    public function getCommentText($elementValue): string
     {
-        return __(
+        return (string) __(
             'The description to be used for this transaction. These variables are available:<br><br>' .
             '<strong>{ordernumber}</strong>: The order number for this transaction.<br>' .
             '<strong>{storename}</strong>: The name of the store.<br>' .

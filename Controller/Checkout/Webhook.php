@@ -106,6 +106,7 @@ class Webhook extends Action implements HttpGetActionInterface, HttpPostActionIn
 
     private function getErrorResponse(int $code, ?string $message = null): Json
     {
+        /** @var Json $result */
         $result = $this->resultFactory->create(ResultFactory::TYPE_JSON);
         $result->setData(['error' => true]);
 

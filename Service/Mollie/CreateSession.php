@@ -1,4 +1,10 @@
 <?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie;
 
@@ -44,12 +50,14 @@ class CreateSession
         // So they need shipping, coupons, etc.
         $total = (float)($isExpressCheckout ? $this->totals->getSubtotalInclTax() : $this->totals->getGrandTotal());
 
+        $storeName = $this->scopeConfig->getValue('general/store_information/name');
+
         /** @var Session $session */
         $session = $mollie->send(new CreateSessionRequest(
             $this->transaction->getExpressRedirectUrl($cart, $paymentToken),
             $this->urlBuilder->getUrl('checkout/cart'),
             new Money($cart->getQuoteCurrencyCode(), number_format($total, 2, '.', '')),
-            $this->scopeConfig->getValue('general/store_information/name') ?? __('Unnamed webshop')->render(),
+            is_string($storeName) ? $storeName : __('Unnamed webshop')->render(),
             $this->getLines($isExpressCheckout),
             ['webhookUrl' => $this->transaction->getExpressWebhookUrl($cart)],
             ['quoteId' => $cart->getEntityId(), 'store_id' => storeId($cart->getStoreId())],
@@ -60,12 +68,16 @@ class CreateSession
         return $session->clientAccessToken; // @phpstan-ignore property.notFound
     }
 
+    /**
+     * @return array<int, array<string, mixed>>
+     */
     private function getLines(bool $isExpressCheckout): array
     {
         $lines = [];
         $currency = $this->cart->getQuoteCurrencyCode();
-        foreach ($this->cart->getItems() as $item) {
+        foreach ($this->cart->getItems() ?? [] as $item) {
             $lines[] = [
+                'type' => $item->getIsVirtual() ? 'digital' : 'physical',
                 'description' => '[' . $item->getSku() . '] ' . $item->getName(),
                 'quantity' => (int)$item->getQty(),
                 'unitPrice' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax()),
@@ -96,6 +108,7 @@ class CreateSession
             }
 
             $lines[] = [
+                'type' => $this->getSegmentType($segment->getCode(), $value),
                 'description' => $segment->getTitle(),
                 'quantity' => 1,
                 'unitPrice' => $this->mollieHelper->getAmountArray($currency, $value),
@@ -104,6 +117,15 @@ class CreateSession
         }
 
         return $lines;
+    }
+
+    private function getSegmentType(string $code, float $value): string
+    {
+        if ($code === 'shipping') {
+            return 'shipping_fee';
+        }
+
+        return $value < 0 ? 'discount' : 'surcharge';
     }
 
     private function getWeightInGrams(CartItemInterface $item): string

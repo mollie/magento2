@@ -36,7 +36,9 @@ use Mollie\Payment\Service\Mollie\SavedCardConsentText;
  */
 class MollieConfigProvider implements ConfigProviderInterface
 {
+    /** @var array<string, MethodInterface|null> */
     private array $methods = [];
+    /** @var array<string, array<string, mixed>>|null */
     private ?array $methodData = null;
 
     public function __construct(
@@ -62,6 +64,9 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
     }
 
+    /**
+     * @return array<string, array<string, mixed>>
+     */
     public function getActiveMethods(?CartInterface $cart = null): array
     {
         if ($this->methodData !== null) {
@@ -76,12 +81,17 @@ class MollieConfigProvider implements ConfigProviderInterface
         try {
             $amount = $this->mollieHelper->getOrderAmountByQuote($cart);
             $parameters = [
-                'amount[value]' => $amount['value'],
-                'amount[currency]' => $amount['currency'],
                 'resource' => 'orders',
                 'includeWallets' => ['applepay'],
                 'billingCountry' => $cart->getBillingAddress()->getCountry(),
             ];
+
+            if ($amount['currency'] !== null) {
+                $parameters['amount'] = [
+                    'value' => $amount['value'],
+                    'currency' => $amount['currency'],
+                ];
+            }
 
             $this->methodData = [];
             $apiMethods = $mollieApi->methods->allEnabled($this->methodParameters->enhance($parameters, $cart));
@@ -102,7 +112,7 @@ class MollieConfigProvider implements ConfigProviderInterface
     /**
      * Config Data for checkout
      *
-     * @return array
+     * @return array<string, mixed>
      */
     public function getConfig(): array
     {
@@ -153,7 +163,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         return $config;
     }
 
-    public function getMethodInstance($code): ?MethodInterface
+    public function getMethodInstance(string $code): ?MethodInterface
     {
         try {
             return $this->paymentHelper->getMethodInstance($code);
@@ -164,6 +174,9 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
     }
 
+    /**
+     * @param array<string, mixed> $config
+     */
     private function appendSavedCardsConfig(array &$config, int $storeId): void
     {
         $enabled = $this->config->creditcardEnableCustomersApi($storeId) && $this->config->isProductionMode($storeId);
@@ -186,6 +199,10 @@ class MollieConfigProvider implements ConfigProviderInterface
         }
     }
 
+    /**
+     * @param array<string, mixed> $config
+     * @return array<string, mixed>
+     */
     private function getIssuers(string $code, array $config): array
     {
         $issuerListType = $this->config->getIssuerListType(

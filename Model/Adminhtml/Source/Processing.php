@@ -19,9 +19,9 @@ use Magento\Sales\Model\Order;
 class Processing extends Status
 {
     /**
-     * @var string
+     * @var array<string>
      */
-    protected $_stateStatuses = Order::STATE_PROCESSING;
+    protected $_stateStatuses = [Order::STATE_PROCESSING];
 
     /**
      * @return array

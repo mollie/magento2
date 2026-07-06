@@ -34,6 +34,7 @@ define(
             {type: 'mollie_methods_banktransfer', component: defaultComponent},
             {type: 'mollie_methods_belfius', component: defaultComponent},
             {type: 'mollie_methods_billie', component: billieComponent},
+            {type: 'mollie_methods_billink', component: defaultComponent},
             {type: 'mollie_methods_bizum', component: defaultComponent},
             {type: 'mollie_methods_blik', component: defaultComponent},
             {type: 'mollie_methods_creditcard', component: creditcardComponent},
@@ -61,7 +62,8 @@ define(
             {type: 'mollie_methods_swish', component: defaultComponent},
             {type: 'mollie_methods_twint', component: defaultComponent},
             {type: 'mollie_methods_vipps', component: defaultComponent},
-            {type: 'mollie_methods_voucher', component: defaultComponent}
+            {type: 'mollie_methods_voucher', component: defaultComponent},
+            {type: 'mollie_methods_wero', component: defaultComponent}
         ];
 
         function canUseApplePay()

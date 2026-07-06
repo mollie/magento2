@@ -15,6 +15,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Order\GetTransactionId;
+use Mollie\Payment\Service\Mollie\Order\ResolvePaymentId;
 
 class ProcessTransaction
 {
@@ -23,7 +24,8 @@ class ProcessTransaction
         private PaymentProcessors $paymentProcessors,
         private MollieApiClient $mollieApiClient,
         private MollieHelper $mollieHelper,
-        private GetTransactionId $getTransactionId
+        private GetTransactionId $getTransactionId,
+        private ResolvePaymentId $resolvePaymentId
     ) {}
 
     public function execute(
@@ -32,7 +34,8 @@ class ProcessTransaction
     ): ProcessTransactionResponse {
         $mollieApi = $this->mollieApiClient->loadByStore((int) $magentoOrder->getStoreId());
         $transactionId = $this->getTransactionId->forOrder($magentoOrder);
-        $molliePayment = $mollieApi->payments->get($transactionId);
+        $paymentId = $this->resolvePaymentId->execute($mollieApi, $transactionId);
+        $molliePayment = $mollieApi->payments->get($paymentId);
         $this->mollieHelper->addTolog($type, $molliePayment);
         $status = $molliePayment->status;
 

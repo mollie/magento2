@@ -49,9 +49,9 @@ class PaymentFee
      * @param $storeId
      * @return float
      */
-    public function getFixedAmount($method, ?int $storeId)
+    public function getFixedAmount($method, ?int $storeId): float
     {
-        return $this->config->paymentSurchargeFixedAmount($method, $storeId);
+        return (float) $this->config->paymentSurchargeFixedAmount($method, $storeId);
     }
 
     /**

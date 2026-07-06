@@ -30,6 +30,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_banktransfer', true],
             ['mollie_methods_belfius', true],
             ['mollie_methods_billie', true],
+            ['mollie_methods_billink', true],
             ['mollie_methods_bizum', true],
             ['mollie_methods_blik', true],
             ['mollie_methods_creditcard', true],
@@ -59,6 +60,7 @@ class PaymentFeeTest extends IntegrationTestCase
             ['mollie_methods_twint', true],
             ['mollie_methods_vipps', true],
             ['mollie_methods_voucher', true],
+            ['mollie_methods_wero', true],
             ['not_relevant_payment_method', false],
         ];
     }
