@@ -25,6 +25,7 @@ Buy-now-pay-later methods such as Klarna and Billie authorise the payment when t
 | Mobile Pay | On invoice | Yes |
 | Vipps | On invoice | Yes |
 | Riverty | On shipment (fixed) | No |
+| Billink | On shipment (fixed) | No |
 
 For Klarna and Billie the default is **On shipment**, which matches the buy-now-pay-later flow. Riverty always uses manual capture on shipment and does not expose the setting in Admin.
 

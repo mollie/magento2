@@ -25,6 +25,7 @@ Buy-now-pay-later-methoden zoals Klarna en Billie autoriseren de betaling wannee
 | Mobile Pay | On invoice | Yes |
 | Vipps | On invoice | Yes |
 | Riverty | On shipment (fixed) | No |
+| Billink | On shipment (fixed) | No |
 
 Voor Klarna en Billie is de standaard **On shipment**, wat aansluit bij de buy-now-pay-later-stroom. Riverty gebruikt altijd manual capture op verzending en toont de instelling niet in Admin.
 

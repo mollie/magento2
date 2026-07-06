@@ -17,6 +17,7 @@ class OrderLines implements TransactionPartInterface
 {
     private array $methodsRequiringOrderLines = [
         'billie',
+        'billink',
         'in3',
         'klarna',
         'riverty',

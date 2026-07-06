@@ -20,6 +20,7 @@ De extensie bevat de volgende betaalmethoden standaard:
 | Bank Transfer | `mollie_methods_banktransfer` |
 | Belfius | `mollie_methods_belfius` |
 | Billie | `mollie_methods_billie` |
+| Billink | `mollie_methods_billink` |
 | Bizum | `mollie_methods_bizum` |
 | Blik | `mollie_methods_blik` |
 | Credit Card | `mollie_methods_creditcard` |
