@@ -4,6 +4,8 @@
  * See COPYING.txt for license details.
  */
 
+declare(strict_types=1);
+
 namespace Mollie\Payment\Test\Integration\etc\adminhtml\methods;
 
 class CaptureDelayConfigurationTest extends AbstractXmlConfiguration
