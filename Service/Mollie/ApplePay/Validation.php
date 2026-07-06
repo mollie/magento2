@@ -34,9 +34,9 @@ class Validation
             $domain = $this->http->parse($this->url->getBaseUrl())->getHost();
         }
 
-        return $api->wallets->requestApplePayPaymentSession(
-            $domain,
-            $validationUrl,
+        return json_encode(
+            $api->wallets->requestApplePayPaymentSession($domain, $validationUrl)->toArray(),
+            JSON_THROW_ON_ERROR
         );
     }
 

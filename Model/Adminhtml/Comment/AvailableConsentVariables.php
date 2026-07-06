@@ -13,9 +13,9 @@ use Magento\Framework\View\Element\AbstractBlock;
 
 class AvailableConsentVariables extends AbstractBlock implements CommentInterface
 {
-    public function getCommentText($elementValue)
+    public function getCommentText($elementValue): string
     {
-        return __(
+        return (string) __(
             'These placeholders are available:<br><br>' .
             '<strong>{{tradingname}}</strong>: Replaced with the store name.<br>' .
             '<strong>{{supportcontact}}</strong>: Replaced with the general contact email address.<br><br>' .

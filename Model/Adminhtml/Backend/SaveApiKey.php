@@ -53,7 +53,7 @@ class SaveApiKey extends Encrypted
         );
     }
 
-    public function beforeSave()
+    public function beforeSave(): static
     {
         // Save the unencrypted value so we can test it.
         $value = (string) $this->getValue();

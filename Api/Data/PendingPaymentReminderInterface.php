@@ -25,9 +25,9 @@ interface PendingPaymentReminderInterface extends ExtensibleDataInterface
     public function setEntityId(int $id);
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getEntityId();
+    public function getEntityId(): ?int;
 
     /**
      * @param int|null $customerId

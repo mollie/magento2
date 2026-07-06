@@ -41,13 +41,13 @@ interface SentPaymentReminderRepositoryInterface
 
     /**
      * @param SentPaymentReminderInterface $entity
-     * @return SentPaymentReminderInterface
+     * @return bool
      */
-    public function delete(SentPaymentReminderInterface $entity);
+    public function delete(SentPaymentReminderInterface $entity): bool;
 
     /**
      * @param int $id
-     * @return SentPaymentReminderInterface
+     * @return bool
      */
-    public function deleteById(int $id);
+    public function deleteById(int $id): bool;
 }

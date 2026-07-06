@@ -12,11 +12,13 @@ class SentPaymentReminder extends AbstractExtensibleObject implements SentPaymen
 {
     /**
      * Get id
-     * @return string|null
+     * @return int|null
      */
-    public function getEntityId()
+    public function getEntityId(): ?int
     {
-        return $this->_get(self::ENTITY_ID);
+        $entityId = $this->_get(self::ENTITY_ID);
+
+        return $entityId === null ? null : (int) $entityId;
     }
 
     /**
@@ -50,9 +52,12 @@ class SentPaymentReminder extends AbstractExtensibleObject implements SentPaymen
      * Retrieve existing extension attributes object or create a new one.
      * @return SentPaymentReminderExtensionInterface|null
      */
-    public function getExtensionAttributes()
+    public function getExtensionAttributes(): ?SentPaymentReminderExtensionInterface
     {
-        return $this->_getExtensionAttributes();
+        /** @var SentPaymentReminderExtensionInterface|null $extensionAttributes */
+        $extensionAttributes = $this->_getExtensionAttributes();
+
+        return $extensionAttributes;
     }
 
     /**

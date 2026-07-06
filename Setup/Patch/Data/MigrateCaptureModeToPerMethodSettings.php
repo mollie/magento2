@@ -40,14 +40,14 @@ class MigrateCaptureModeToPerMethodSettings implements DataPatchInterface
         private WriterInterface $configWriter,
     ) {}
 
-    public function apply(): void
+    public function apply(): static
     {
         $oldRows = $this->collectionFactory->create()
             ->addFieldToFilter('path', self::OLD_PATH)
             ->getItems();
 
         if (empty($oldRows)) {
-            return;
+            return $this;
         }
 
         $existingPaths = $this->loadExistingPerMethodPaths();
@@ -60,6 +60,8 @@ class MigrateCaptureModeToPerMethodSettings implements DataPatchInterface
                 $existingPaths,
             );
         }
+
+        return $this;
     }
 
     private function migrateScope(string $scope, int $scopeId, string $captureMode, array $existingPaths): void

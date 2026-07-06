@@ -19,13 +19,13 @@ class AvailableTerminals
     ) {}
 
     /**
-     * @return array{
+     * @return list<array{
      *      id: string,
      *      brand: string,
      *      model: string,
      *      serialNumber: string|null,
      *      description: string
-     *  }
+     *  }>
      */
     public function execute(?int $storeId = null): array
     {

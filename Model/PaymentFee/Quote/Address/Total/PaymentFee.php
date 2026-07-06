@@ -74,10 +74,10 @@ class PaymentFee extends AbstractTotal
     }
 
     /**
-     * @return Phrase
+     * @return string
      */
-    public function getLabel()
+    public function getLabel(): string
     {
-        return __('Payment Fee');
+        return (string) __('Payment Fee');
     }
 }

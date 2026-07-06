@@ -81,6 +81,7 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         $this->cartRepository->save($cart);
         $cart->getPayment()->addData(['method' => 'mollie_methods_applepay']);
 
+        /** @var Json $response */
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         try {

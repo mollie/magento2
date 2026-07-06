@@ -34,16 +34,16 @@ interface MollieCustomerRepositoryInterface
     /**
      * Retrieve Mollie Customer connection by Mollie Customer ID
      * @param string $customerId
-     * @return \Mollie\Payment\Api\Data\MollieCustomerInterface
+     * @return \Mollie\Payment\Api\Data\MollieCustomerInterface|null
      */
-    public function getByMollieCustomerId(string $customerId);
+    public function getByMollieCustomerId(string $customerId): ?\Mollie\Payment\Api\Data\MollieCustomerInterface;
 
     /**
      * Retrieve Mollie Customer by Magento customer
      * @param \Magento\Customer\Api\Data\CustomerInterface $customer
-     * @return \Mollie\Payment\Api\Data\MollieCustomerInterface
+     * @return \Mollie\Payment\Api\Data\MollieCustomerInterface|null
      */
-    public function getByCustomer(CustomerInterface $customer);
+    public function getByCustomer(CustomerInterface $customer): ?\Mollie\Payment\Api\Data\MollieCustomerInterface;
 
     /**
      * Retrieve Customer matching the specified criteria.

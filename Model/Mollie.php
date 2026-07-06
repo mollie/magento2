@@ -220,10 +220,10 @@ class Mollie extends Adapter
      * @param string $paymentAction
      * @param object $stateObject
      *
-     * @return void
+     * @return $this
      * @throws LocalizedException
      */
-    public function initialize($paymentAction, $stateObject): void
+    public function initialize($paymentAction, $stateObject): static
     {
         /** @var Payment $payment */
         $payment = $this->getInfoInstance();
@@ -236,6 +236,8 @@ class Mollie extends Adapter
         $stateObject->setState(Order::STATE_NEW);
         $stateObject->setStatus($status);
         $stateObject->setIsNotified(false);
+
+        return $this;
     }
 
     /**

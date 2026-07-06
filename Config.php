@@ -426,7 +426,7 @@ class Config
 
     public function showPaypalReferenceInTransactionsGrid(?int $storeId = null): bool
     {
-        return (string) $this->isSetFlag(
+        return $this->isSetFlag(
             static::PAYMENT_PAYPAL_SHOW_REFERENCE_IN_TRANSACTIONS_GRID,
             $storeId,
         );

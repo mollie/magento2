@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Magento;
 
 use Magento\Framework\App\ActionFactory;
+use Magento\Framework\App\ActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Route\ConfigInterface;
 use Magento\Framework\App\Router\ActionList;
@@ -23,7 +24,7 @@ class ApplePayDomainAssociationRouter implements RouterInterface
         private ConfigInterface $routeConfig
     ) {}
 
-    public function match(RequestInterface $request)
+    public function match(RequestInterface $request): ?ActionInterface
     {
         $identifier = trim($request->getPathInfo(), '/');
         if ($identifier !== '.well-known/apple-developer-merchantid-domain-association') {

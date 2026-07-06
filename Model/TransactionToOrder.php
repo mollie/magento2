@@ -123,7 +123,10 @@ class TransactionToOrder extends AbstractExtensibleModel implements TransactionT
      */
     public function getExtensionAttributes(): ?TransactionToOrderExtensionInterface
     {
-        return $this->_getExtensionAttributes();
+        /** @var TransactionToOrderExtensionInterface|null $extensionAttributes */
+        $extensionAttributes = $this->_getExtensionAttributes();
+
+        return $extensionAttributes;
     }
 
     /**

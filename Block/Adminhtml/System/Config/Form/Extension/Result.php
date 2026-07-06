@@ -41,9 +41,9 @@ class Result extends Field
     /**
      * @param AbstractElement $element
      *
-     * @return bool
+     * @return string
      */
-    public function render(AbstractElement $element)
+    public function render(AbstractElement $element): string
     {
         $element->unsScope()->unsCanUseWebsiteValue()->unsCanUseDefaultValue();
 
@@ -53,9 +53,9 @@ class Result extends Field
     /**
      * @param AbstractElement $element
      *
-     * @return bool
+     * @return string
      */
-    protected function _getElementHtml(AbstractElement $element)
+    protected function _getElementHtml(AbstractElement $element): string
     {
         return $this->_toHtml();
     }

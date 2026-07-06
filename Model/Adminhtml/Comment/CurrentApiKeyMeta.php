@@ -23,7 +23,7 @@ class CurrentApiKeyMeta extends AbstractBlock implements CommentInterface
         parent::__construct($context, $data);
     }
 
-    public function getCommentText($elementValue)
+    public function getCommentText($elementValue): string
     {
         if (empty($elementValue)) {
             return '';
@@ -32,6 +32,6 @@ class CurrentApiKeyMeta extends AbstractBlock implements CommentInterface
         $start = substr($elementValue, 0, 5);
         $end = substr($elementValue, -4);
 
-        return __('The current value starts with <strong>%1</strong> and ends on <strong>%2</strong>', $start, $end);
+        return (string) __('The current value starts with <strong>%1</strong> and ends on <strong>%2</strong>', $start, $end);
     }
 }

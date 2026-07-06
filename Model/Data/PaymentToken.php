@@ -90,9 +90,12 @@ class PaymentToken extends AbstractExtensibleObject implements PaymentTokenInter
      * Retrieve existing extension attributes object or create a new one.
      * @return PaymentTokenExtensionInterface|null
      */
-    public function getExtensionAttributes()
+    public function getExtensionAttributes(): ?PaymentTokenExtensionInterface
     {
-        return $this->_getExtensionAttributes();
+        /** @var PaymentTokenExtensionInterface|null $extensionAttributes */
+        $extensionAttributes = $this->_getExtensionAttributes();
+
+        return $extensionAttributes;
     }
 
     /**

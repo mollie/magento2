@@ -19,7 +19,7 @@ class ChangeSecondChanceEmailTemplatePath implements DataPatchInterface
         private WriterInterface $configWriter
     ) {}
 
-    public function apply()
+    public function apply(): static
     {
         $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
             'eq' => 'payment/mollie_general/second_chance_email_template',
@@ -27,7 +27,7 @@ class ChangeSecondChanceEmailTemplatePath implements DataPatchInterface
 
         foreach ($collection as $item) {
             if (stripos($item->getData('value'), 'mollie_general_second_chance_email_template') === false) {
-                return;
+                return $this;
             }
 
             $this->configWriter->save(

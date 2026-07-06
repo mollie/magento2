@@ -25,7 +25,7 @@ class RenameIdealToIdealWero implements DataPatchInterface
         $this->configWriter = $configWriter;
     }
 
-    public function apply(): void
+    public function apply(): static
     {
         $collection = $this->configReaderFactory->create()->addFieldToFilter('path', [
             'eq' => 'payment/mollie_methods_ideal/title'
@@ -38,6 +38,8 @@ class RenameIdealToIdealWero implements DataPatchInterface
                 $configItem->getData('value')
             );
         }
+
+        return $this;
     }
 
     private function updateMethodTitle(string $scope, int $scopeId, ?string $currentValue = null)

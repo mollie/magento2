@@ -71,9 +71,12 @@ class MollieCustomer extends AbstractExtensibleObject implements MollieCustomerI
      * Retrieve existing extension attributes object or create a new one.
      * @return \Mollie\Payment\Api\Data\MollieCustomerExtensionInterface|null
      */
-    public function getExtensionAttributes()
+    public function getExtensionAttributes(): ?MollieCustomerExtensionInterface
     {
-        return $this->_getExtensionAttributes();
+        /** @var MollieCustomerExtensionInterface|null $extensionAttributes */
+        $extensionAttributes = $this->_getExtensionAttributes();
+
+        return $extensionAttributes;
     }
 
     /**
