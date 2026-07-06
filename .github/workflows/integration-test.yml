@@ -29,9 +29,5 @@ jobs:
       - name: Activate the extension
         run: docker exec magento-project-community-edition ./retry "php bin/magento module:enable Mollie_Payment && php bin/magento setup:upgrade"
 
-      - name: Set developer mode for 2.3.7 and 2.4.0
-        if: ${{ matrix.MAGENTO_VERSION == '2.3.7-p4' || matrix.MAGENTO_VERSION == '2.4.0' }}
-        run: docker exec magento-project-community-edition ./retry "php bin/magento deploy:mode:set developer"
-
       - name: Run tests
         run: docker exec magento-project-community-edition bash -c "cd /data/dev/tests/integration/ && /data/vendor/bin/phpunit -c /data/dev/tests/integration/phpunit.xml"
