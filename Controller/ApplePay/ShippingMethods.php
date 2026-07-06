@@ -64,6 +64,7 @@ class ShippingMethods extends Action implements HttpPostActionInterface
         $cart->collectTotals();
 
         $methods = $this->shippingMethodManagement->getList($cart->getId());
+        /** @var Json $response */
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         $transportObject = new DataObject(

@@ -2,7 +2,7 @@
 #	- phpstan-baseline.neon
 
 parameters:
-    level: 2
+    level: 3
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
 # Not applicable on level 1

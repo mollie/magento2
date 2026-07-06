@@ -37,6 +37,7 @@ class ApplePayValidation extends Action implements HttpPostActionInterface
 
     public function execute(): Json
     {
+        /** @var Json $response */
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         try {

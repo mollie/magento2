@@ -91,7 +91,7 @@ class MollieCustomerRepository implements MollieCustomerRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getByMollieCustomerId(string $customerId)
+    public function getByMollieCustomerId(string $customerId): ?MollieCustomerInterface
     {
         $mollieCustomer = $this->mollieCustomerFactory->create();
         $this->resource->load($mollieCustomer, $customerId, 'mollie_customer_id');
@@ -106,7 +106,7 @@ class MollieCustomerRepository implements MollieCustomerRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function getByCustomer(CustomerInterface $customer)
+    public function getByCustomer(CustomerInterface $customer): ?MollieCustomerInterface
     {
         $mollieCustomer = $this->mollieCustomerFactory->create();
         $this->resource->load($mollieCustomer, $customer->getId(), 'customer_id');

@@ -270,12 +270,15 @@ class OrderLines extends AbstractModel
      *
      * @return OrderLines
      */
-    public function getOrderLineByItemId($itemId)
+    public function getOrderLineByItemId($itemId): OrderLines
     {
-        return $this->orderLinesCollection->create()
+        /** @var OrderLines $orderLine */
+        $orderLine = $this->orderLinesCollection->create()
             ->addFieldToFilter('item_id', ['eq' => $itemId])
             ->addFieldToFilter('line_id', ['notnull' => true])
             ->getLastItem();
+
+        return $orderLine;
     }
 
     /**
@@ -336,8 +339,9 @@ class OrderLines extends AbstractModel
      *
      * @return OrderLines
      */
-    public function getShippingFeeItemLineOrder($orderId)
+    public function getShippingFeeItemLineOrder($orderId): OrderLines
     {
+        /** @var OrderLines $shippingLine */
         $shippingLine = $this->orderLinesCollection->create()
             ->addFieldToFilter('order_id', ['eq' => $orderId])
             ->addFieldToFilter('type', ['eq' => 'shipping_fee'])
@@ -351,8 +355,9 @@ class OrderLines extends AbstractModel
      *
      * @return OrderLines
      */
-    public function getStoreCreditItemLineOrder($orderId)
+    public function getStoreCreditItemLineOrder($orderId): OrderLines
     {
+        /** @var OrderLines $storeCreditLine */
         $storeCreditLine = $this->orderLinesCollection->create()
             ->addFieldToFilter('order_id', ['eq' => $orderId])
             ->addFieldToFilter('type', ['eq' => 'store_credit'])
@@ -366,12 +371,15 @@ class OrderLines extends AbstractModel
      *
      * @return OrderLines
      */
-    public function getPaymentFeeCreditItemLineOrder($orderId)
+    public function getPaymentFeeCreditItemLineOrder($orderId): OrderLines
     {
-        return $this->orderLinesCollection->create()
+        /** @var OrderLines $paymentFeeLine */
+        $paymentFeeLine = $this->orderLinesCollection->create()
             ->addFieldToFilter('order_id', ['eq' => $orderId])
             ->addFieldToFilter('type', ['eq' => 'surcharge'])
             ->getLastItem();
+
+        return $paymentFeeLine;
     }
 
     /**

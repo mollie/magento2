@@ -52,6 +52,7 @@ class TrackingRepository implements TrackingRepositoryInterface
         $collection->setOrder(TrackingInterface::ENTITY_ID, 'DESC');
         $collection->setPageSize(1);
 
+        /** @var \Mollie\Payment\Model\Tracking $item */
         $item = $collection->getFirstItem();
 
         return $item->getEntityId() ? $item : null;

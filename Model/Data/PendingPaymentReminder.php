@@ -16,11 +16,13 @@ class PendingPaymentReminder extends AbstractExtensibleObject implements Pending
 {
     /**
      * Get id
-     * @return string|null
+     * @return int|null
      */
-    public function getEntityId()
+    public function getEntityId(): ?int
     {
-        return $this->_get(self::ENTITY_ID);
+        $entityId = $this->_get(self::ENTITY_ID);
+
+        return $entityId === null ? null : (int) $entityId;
     }
 
     /**
@@ -35,11 +37,13 @@ class PendingPaymentReminder extends AbstractExtensibleObject implements Pending
 
     /**
      * Get customer_id
-     * @return string|null
+     * @return int|null
      */
-    public function getCustomerId()
+    public function getCustomerId(): ?int
     {
-        return $this->_get(self::CUSTOMER_ID);
+        $customerId = $this->_get(self::CUSTOMER_ID);
+
+        return $customerId === null ? null : (int) $customerId;
     }
 
     /**
@@ -92,9 +96,12 @@ class PendingPaymentReminder extends AbstractExtensibleObject implements Pending
      * Retrieve existing extension attributes object or create a new one.
      * @return PendingPaymentReminderExtensionInterface|null
      */
-    public function getExtensionAttributes()
+    public function getExtensionAttributes(): ?PendingPaymentReminderExtensionInterface
     {
-        return $this->_getExtensionAttributes();
+        /** @var PendingPaymentReminderExtensionInterface|null $extensionAttributes */
+        $extensionAttributes = $this->_getExtensionAttributes();
+
+        return $extensionAttributes;
     }
 
     /**

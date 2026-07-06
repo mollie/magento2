@@ -34,7 +34,7 @@ class Paymentlink extends Mollie
      *
      * @throws LocalizedException
      */
-    public function initialize($paymentAction, $stateObject): void
+    public function initialize($paymentAction, $stateObject): static
     {
         /** @var Payment $payment */
         $payment = $this->getInfoInstance();
@@ -48,6 +48,8 @@ class Paymentlink extends Mollie
         if ($status = $this->config->statusNewPaymentLink(storeId($order->getStoreId()))) {
             $stateObject->setStatus($status);
         }
+
+        return $this;
     }
 
     /**

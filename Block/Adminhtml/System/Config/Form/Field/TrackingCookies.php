@@ -25,6 +25,6 @@ class TrackingCookies extends AbstractFieldArray
         ]);
 
         $this->_addAfter = false;
-        $this->_addButtonLabel = __('Add cookie');
+        $this->_addButtonLabel = (string) __('Add cookie');
     }
 }
