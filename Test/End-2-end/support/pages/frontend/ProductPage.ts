@@ -14,6 +14,10 @@ export default class ProductPage {
         await page.goto(`/catalog/product/view/id/${productId}`);
     }
 
+    async getProductName(page: Page): Promise<string> {
+        return (await page.locator('.page-title .base').first().innerText()).trim();
+    }
+
     async addSimpleProductToCart(page: Page, quantity = 1) {
         await page.locator('#qty').clear();
         await page.locator('#qty').fill(quantity.toString());
