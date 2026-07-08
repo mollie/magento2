@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\Order\ConvertComponentsPaymentToOrder;
 
-use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote\Address\Rate;
@@ -19,19 +18,16 @@ use stdClass;
 class SetShippingOnCart
 {
     public function __construct(
-        private readonly ProductRepositoryInterface $productRepository,
         private readonly RateFactory $rateFactory,
     ) {}
 
-    public function execute(CartInterface $cart, Payment $payment): void
+    public function execute(CartInterface $baseCart, CartInterface $cart, Payment $payment): void
     {
+        $this->copyProductsFromBaseCart($baseCart, $cart);
+
         $hasShipping = false;
         foreach ($payment->lines ?? [] as $line) {
             /** @var stdClass $line */
-            if ($line->type == 'physical') {
-                $this->addProductToCart($line, $cart);
-            }
-
             if ($line->type == 'shipping_fee') {
                 $hasShipping = true;
                 $this->addShippingToQuote($cart, $line);
@@ -45,20 +41,14 @@ class SetShippingOnCart
         }
     }
 
-    private function addProductToCart(stdClass $line, CartInterface $cart): void
+    private function copyProductsFromBaseCart(CartInterface $baseCart, CartInterface $cart): void
     {
-        if (!preg_match('/^\[([^\]]+)\]/', $line->description, $matches)) {
-            throw new LocalizedException(__('Unable to extract SKU from description: %1', $line->description));
+        foreach ($baseCart->getAllVisibleItems() as $item) {
+            $result = $cart->addProduct($item->getProduct(), $item->getBuyRequest());
+            if (is_string($result)) {
+                throw new LocalizedException(__($result));
+            }
         }
-
-        $sku = $matches[1];
-        $product = $this->productRepository->get($sku);
-
-        $product->setPrice($line->unitPrice->value);
-        $cart->addProduct(
-            $product,
-            intval($line->quantity)
-        );
     }
 
     private function addShippingToQuote(CartInterface $cart, stdClass $line): void
