@@ -15,6 +15,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderManagementInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Mollie\Order\OrderReachedSuccessPage;
 
 class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
 {
@@ -22,6 +23,7 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
         private readonly OrderManagementInterface $orderManagement,
         private readonly Session $checkoutSession,
         private readonly Config $config,
+        private readonly OrderReachedSuccessPage $orderReachedSuccessPage,
     ) {
     }
 
@@ -36,6 +38,10 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
 
         $mollieSucces = $payment->getAdditionalInformation('mollie_success');
         if ($mollieSucces === null || $mollieSucces === true) {
+            return;
+        }
+
+        if ($this->orderReachedSuccessPage->execute($order)) {
             return;
         }
 
