@@ -10,15 +10,18 @@ namespace Mollie\Payment\Gateway\Validator;
 
 use Magento\Payment\Gateway\Validator\AbstractValidator;
 use Magento\Payment\Gateway\Validator\ResultInterface;
-use Magento\Payment\Model\InfoInterface;
-use Magento\Quote\Model\Quote\Payment as QuotePayment;
 use Magento\Sales\Model\Order\Payment as OrderPayment;
 
 class BillingOrganizationValidator extends AbstractValidator
 {
     public function validate(array $validationSubject): ResultInterface
     {
-        if ($this->hasBillingOrganization($validationSubject['payment'] ?? null)) {
+        $payment = $validationSubject['payment'] ?? null;
+        if (!$payment instanceof OrderPayment) {
+            return $this->createResult(true);
+        }
+
+        if ($this->hasBillingOrganization($payment)) {
             return $this->createResult(true);
         }
 
@@ -28,19 +31,8 @@ class BillingOrganizationValidator extends AbstractValidator
         );
     }
 
-    private function hasBillingOrganization(?InfoInterface $payment): bool
+    private function hasBillingOrganization(OrderPayment $payment): bool
     {
-        return $this->getCompany($payment) !== '';
-    }
-
-    private function getCompany(?InfoInterface $payment): string
-    {
-        $billingAddress = match (true) {
-            $payment instanceof OrderPayment => $payment->getOrder()?->getBillingAddress(),
-            $payment instanceof QuotePayment => $payment->getQuote()?->getBillingAddress(),
-            default => null,
-        };
-
-        return (string)($billingAddress?->getCompany() ?? '');
+        return (string)($payment->getOrder()?->getBillingAddress()?->getCompany() ?? '') !== '';
     }
 }
