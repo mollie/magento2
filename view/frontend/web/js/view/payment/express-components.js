@@ -61,23 +61,18 @@ define([
 
         initializeExpressComponent: function (result) {
             const checkout = Mollie.Checkout(result.clientAccessToken)
-            let configuration = {};
+            let configuration = {
+                buttons: {
+                    paypal: {
+                        visibility: 'hidden',
+                    }
+                }
+            };
 
             if (this.placement === 'cart') {
-                configuration = {
-                    paymentMethods: {
-                        idealcheckout: 'always',
-                        applepay: 'never',
-                        googlepay: 'never',
-                    }
-                };
-            }
-
-            if (this.placement === 'checkout') {
-                configuration = {
-                    paymentMethods: {
-                        idealcheckout: 'never',
-                    }
+                configuration.paymentMethods = {
+                    applepay: 'never',
+                    googlepay: 'never',
                 };
             }
 
