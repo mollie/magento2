@@ -808,6 +808,7 @@
         <arguments>
             <argument name="validators" xsi:type="array">
                 <item name="country" xsi:type="string">MollieBillieCountryValidator</item>
+                <item name="global" xsi:type="string">Mollie\Payment\Gateway\Validator\BillingOrganizationValidator</item>
             </argument>
         </arguments>
     </virtualType>
