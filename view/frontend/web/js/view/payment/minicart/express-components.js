@@ -78,9 +78,13 @@ define([
             const checkout = Mollie.Checkout(result.clientAccessToken)
             let configuration = {
                 paymentMethods: {
-                    idealcheckout: 'always',
                     applepay: 'never',
                     googlepay: 'never',
+                },
+                buttons: {
+                    paypal: {
+                        visibility: 'hidden',
+                    }
                 }
             };
 
