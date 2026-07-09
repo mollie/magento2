@@ -42,7 +42,7 @@ class SendSecondChanceEmail extends Action implements HttpPostActionInterface
 
         try {
             $reminder = $this->sentPaymentReminderFactory->create();
-            $reminder->setOrderId($order->getEntityId());
+            $reminder->setOrderId((int)$order->getEntityId());
             $this->sentPaymentReminderRepository->save($reminder);
         } catch (CouldNotSaveException) {
             // It might already exist
