@@ -47,7 +47,7 @@ class ConvertComponentsPaymentToOrder
         $cart->setCustomer($this->getCustomer($baseCart, $payment));
 
         $this->setAddressesOnCart->execute($baseCart, $cart, $payment);
-        $this->setShippingOnCart->execute($cart, $payment);
+        $this->setShippingOnCart->execute($baseCart, $cart, $payment);
         $this->cartRepository->save($cart);
 
         $cart->getPayment()->setMethod('mollie_methods_expresscomponents');

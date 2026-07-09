@@ -15,6 +15,7 @@ use Mollie\Payment\Service\Magento\PaymentLinkRedirect;
 use Mollie\Payment\Service\Magento\PaymentLinkRedirectResult;
 use Mollie\Payment\Service\Magento\PaymentLinkRedirectResultFactory;
 use Mollie\Payment\Service\Mollie\Order\IsPaymentLinkExpired;
+use Mollie\Payment\Service\Mollie\ProcessTransaction;
 use Mollie\Payment\Service\Mollie\StartTransaction;
 
 class PaymentLinkRedirectFake extends PaymentLinkRedirect
@@ -34,6 +35,7 @@ class PaymentLinkRedirectFake extends PaymentLinkRedirect
         StartTransaction $startTransaction,
         PaymentLinkRedirectResultFactory $paymentLinkRedirectResultFactory,
         IsPaymentLinkExpired $isPaymentLinkExpired,
+        ProcessTransaction $processTransaction,
     ) {
         parent::__construct(
             $encryptor,
@@ -41,6 +43,7 @@ class PaymentLinkRedirectFake extends PaymentLinkRedirect
             $startTransaction,
             $paymentLinkRedirectResultFactory,
             $isPaymentLinkExpired,
+            $processTransaction,
         );
 
         $this->paymentLinkRedirectResultFactory = $paymentLinkRedirectResultFactory;
