@@ -40,7 +40,7 @@ class RenameIdealToIdealWero implements DataPatchInterface
         foreach ($collection as $configItem) {
             $this->updateMethodTitle(
                 $configItem->getData('scope'),
-                $configItem->getData('scope_id'),
+                (int) $configItem->getData('scope_id'),
                 $configItem->getData('value')
             );
         }
