@@ -287,6 +287,8 @@ When reporting a bug or requesting support, collect the following information fi
 
 File issues at [github.com/mollie/magento2/issues](https://github.com/mollie/magento2/issues). Attach the debug bundle and self-test output rather than pasting raw log content, as the bundle includes the context needed to diagnose most problems.
 
+If a fix for your issue is already available in an open pull request, you can apply it before the next release: see [Install a Pull Request](INSTALLATION.md#install-a-pull-request).
+
 ## Next Steps
 
 - [Installation](INSTALLATION.md) — Installation steps and system requirements

@@ -119,6 +119,112 @@ php bin/magento cache:flush
 
 Bekijk [Upgraden](UPGRADING.md) en de [changelog](https://github.com/mollie/magento2/releases) voordat je bijwerkt. Hoofdversies kunnen breaking changes bevatten die configuratieaanpassingen vereisen.
 
+## Een pull request installeren
+
+Als een oplossing voor je probleem al in een open pull request staat maar nog niet is uitgebracht, kun je die pull request als patch op je winkel toepassen. Dit is de snelste manier om te bevestigen dat de oplossing werkt voor jouw installatie.
+
+**Belangrijk:** Een patch is tijdelijk. Verwijder de patch zodra de oplossing in een release zit, want het bijwerken van de extensie mislukt zodra de gepatchte code niet meer overeenkomt.
+
+### 1. Installeer de patches-plugin
+
+```bash
+composer require cweagans/composer-patches
+```
+
+Composer vraagt of je de plugin vertrouwt om code uit te voeren. Antwoord met `y` en druk op Enter, anders wordt er nooit een patch toegepast.
+
+### 2. Download het patchbestand
+
+Elke pull request heeft een patchweergave: neem de URL van de pull request op [github.com/mollie/magento2/pulls](https://github.com/mollie/magento2/pulls) en voeg `.patch` toe. Sla het resultaat op in een map `patches` in je Magento-root.
+
+```bash
+mkdir -p patches
+curl -L -o patches/1234.patch https://github.com/mollie/magento2/pull/1234.patch
+```
+
+Bewaar het bestand lokaal in plaats van de externe URL in `composer.json` te zetten. Een externe patch wordt bij elke deployment opnieuw gedownload, waardoor de inhoud kan wijzigen nadat je die hebt gecontroleerd.
+
+### 3. Verwijs naar de patch in composer.json
+
+Voeg de patch toe aan de sectie `extra` van `composer.json`:
+
+```json
+{
+    "extra": {
+        "patches": {
+            "mollie/magento2": {
+                "Oplossing voor issue #1234": "patches/1234.patch"
+            }
+        }
+    }
+}
+```
+
+De sleutel is een vrije omschrijving die Composer toont bij het toepassen van de patch. Gebruik die om vast te leggen wat de patch oplost.
+
+### 4. Pas de patch toe
+
+```bash
+composer update mollie/magento2
+```
+
+Composer installeert het pakket opnieuw en meldt elke toegepaste patch. Sluit af met de gebruikelijke stappen na installatie:
+
+```bash
+php bin/magento setup:upgrade
+php bin/magento setup:di:compile
+php bin/magento cache:flush
+```
+
+### De patch verwijderen
+
+Verwijder het item uit de sectie `patches` in `composer.json` en voer opnieuw `composer update mollie/magento2` uit. Het pakket wordt teruggezet naar de uitgebrachte versie.
+
+## Composer meldt een hogere versie op Packagist
+
+Composer kan de installatie weigeren met een melding als:
+
+```
+Higher matching version 2.40.0 of mollie/magento2 was found in public repository
+packagist.org than 2.39.0 in private https://repo.magento.com
+```
+
+De extensie wordt zowel op Packagist als op de Adobe Commerce Marketplace gepubliceerd. Releases op de Marketplace doorlopen een beoordelingsproces dat tijd kost, waardoor een nieuwe versie eerst op Packagist beschikbaar is. Composer kiest niet stilzwijgend voor de publieke versie, omdat dat ruimte geeft aan een dependency confusion-aanval, waarbij iemand een pakket onder een privé-vendornaam op een publieke repository publiceert.
+
+Beide pakketten zijn dezelfde extensie. Kies een van de onderstaande oplossingen.
+
+### Sluit Mollie uit van repo.magento.com (aanbevolen)
+
+Laat Composer Mollie-pakketten nooit via de Marketplace-repository oplossen. Voeg `exclude` toe aan het item `repo.magento.com` in de sectie `repositories` van `composer.json`:
+
+```json
+{
+    "repositories": {
+        "repo.magento.com": {
+            "type": "composer",
+            "url": "https://repo.magento.com/",
+            "exclude": ["mollie/*"]
+        }
+    }
+}
+```
+
+Voer daarna opnieuw `composer require mollie/magento2` uit. Dit is een permanente oplossing: latere updates verlopen via Packagist zonder dat de melding terugkeert.
+
+### Installeer de versie van de Marketplace
+
+Vraag exact de versie op die de melding noemt voor `repo.magento.com`:
+
+```bash
+composer require mollie/magento2:2.39.0
+```
+
+Je blijft dan op een oudere release en krijgt bij de volgende update dezelfde melding. Gebruik dit alleen als je deploymentproces vereist dat elk pakket van `repo.magento.com` komt.
+
+### Verwijder repo.magento.com tijdelijk
+
+Haal het item `repo.magento.com` uit de sectie `repositories`, voer `composer require mollie/magento2` uit en zet het item daarna terug. De opgeloste versie wordt vastgelegd in `composer.lock`, dus de installatie slaagt, maar de melding komt terug zodra je de extensie de volgende keer bijwerkt.
+
 ## Aanvullende modules
 
 De volgende pakketten breiden de standaardfunctionaliteit van de extensie uit. Elk pakket wordt afzonderlijk via Composer geïnstalleerd met dezelfde stappen als hierboven.

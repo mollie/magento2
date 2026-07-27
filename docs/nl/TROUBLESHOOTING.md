@@ -287,6 +287,8 @@ Verzamel de volgende informatie voordat je een bug meldt of ondersteuning aanvra
 
 Meld problemen via [github.com/mollie/magento2/issues](https://github.com/mollie/magento2/issues). Voeg het debug-pakket en de zelftestuitvoer toe in plaats van onbewerkte loginhoud te plakken, want het pakket bevat de context die nodig is om de meeste problemen te diagnosticeren.
 
+Als een oplossing voor je probleem al in een open pull request staat, kun je die toepassen voordat de volgende release verschijnt: zie [Een pull request installeren](INSTALLATION.md#een-pull-request-installeren).
+
 ## Volgende stappen
 
 - [Installatie](INSTALLATION.md) - Installatiestappen en systeemvereisten
