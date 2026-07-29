@@ -74,6 +74,7 @@ class Config
     public const PAYMENT_METHOD_WHEN_TO_CAPTURE = 'payment/mollie_methods_%s/when_to_capture';
     public const PAYMENT_METHOD_CAPTURE_DELAY = 'payment/mollie_methods_%s/capture_delay';
     public const PAYMENT_METHOD_CAPTURE_DELAY_UNIT = 'payment/mollie_methods_%s/capture_delay_unit';
+    public const PAYMENT_METHOD_SUPPORTS_PARTIAL_CAPTURE = 'payment/mollie_methods_%s/supports_partial_capture';
     public const PAYMENT_METHOD_PAYMENT_SURCHARGE_FIXED_AMOUNT = 'payment/mollie_methods_%s/payment_surcharge_fixed_amount';
     public const PAYMENT_METHOD_PAYMENT_SURCHARGE_LIMIT = 'payment/mollie_methods_%s/payment_surcharge_limit';
     public const PAYMENT_METHOD_PAYMENT_SURCHARGE_PERCENTAGE = 'payment/mollie_methods_%s/payment_surcharge_percentage';
@@ -111,7 +112,7 @@ class Config
 
     /**
      * @param string $type
-     * @param string|array $data
+     * @param string|array<mixed> $data
      * @return void
      */
     public function addToLog(string $type, $data): void
@@ -189,7 +190,7 @@ class Config
 
     public function getTestApiKey(?int $storeId = null): string
     {
-        $apiKey = trim((string) $this->getPath(static::GENERAL_APIKEY_TEST, $storeId) ?? '');
+        $apiKey = trim((string) $this->getPath(static::GENERAL_APIKEY_TEST, $storeId));
         if (empty($apiKey)) {
             $this->addToLog('error', 'Mollie API key not set (test modus)');
         }
@@ -203,7 +204,7 @@ class Config
 
     public function getLiveApiKey(?int $storeId = null): string
     {
-        $apiKey = trim((string) $this->getPath(static::GENERAL_APIKEY_LIVE, $storeId) ?? '');
+        $apiKey = trim((string) $this->getPath(static::GENERAL_APIKEY_LIVE, $storeId));
         if (empty($apiKey)) {
             $this->addToLog('error', 'Mollie API key not set (live modus)');
         }
@@ -240,6 +241,14 @@ class Config
         return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_CAPTURE_DELAY_UNIT, $method), $storeId);
     }
 
+    public function supportsPartialCapture(string $method, ?int $storeId = null): bool
+    {
+        return $this->isSetFlag(
+            $this->addMethodToPath(static::PAYMENT_METHOD_SUPPORTS_PARTIAL_CAPTURE, $method),
+            $storeId,
+        );
+    }
+
     public function isMethodsApiEnabled(?int $storeId = null): bool
     {
         return $this->isSetFlag(static::ADVANCED_ENABLE_METHODS_API, $storeId);
@@ -270,7 +279,7 @@ class Config
         return $this->isSetFlag(static::GENERAL_ENABLE_SECOND_CHANCE_EMAIL, $storeId);
     }
 
-    public function automaticallySendSecondChanceEmails(?int $storeId = null)
+    public function automaticallySendSecondChanceEmails(?int $storeId = null): bool
     {
         if (!$this->isSecondChanceEmailEnabled($storeId)) {
             return false;
@@ -652,11 +661,7 @@ class Config
         return (int) ($this->getPath(static::GENERAL_PENDING_ORDER_CRON_BATCH_SIZE, $storeId) ?? 25);
     }
 
-    /**
-     * @param $method
-     * @return string
-     */
-    private function addMethodToPath($path, $method): string
+    private function addMethodToPath(string $path, ?string $method): string
     {
         return sprintf(
             $path,

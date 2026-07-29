@@ -18,6 +18,7 @@ use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Order\CaptureLegacyOrder;
 use Mollie\Payment\Service\Mollie\Order\LegacyOrderTransactionId;
+use Mollie\Payment\Service\Mollie\Order\ValidatePartialCapture;
 
 class CapturePaymentForInvoice
 {
@@ -29,11 +30,14 @@ class CapturePaymentForInvoice
         private CaptureLegacyOrder $captureLegacyOrder,
         private LegacyOrderTransactionId $legacyOrderTransactionId,
         private OrderLines $orderLines,
+        private ValidatePartialCapture $validatePartialCapture,
     ) {
     }
 
     public function execute(InvoiceInterface $invoice): void
     {
+        $this->validatePartialCapture->execute($invoice);
+
         $order = $invoice->getOrder();
         $payment = $order->getPayment();
 
