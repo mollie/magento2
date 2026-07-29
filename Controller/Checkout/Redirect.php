@@ -27,6 +27,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\FormatExceptionMessages;
 use Mollie\Payment\Service\Mollie\Order\RedirectUrl;
+use Mollie\Payment\Service\Order\OrderAwaitingPaymentFromSession;
 use Mollie\Payment\Service\OrderLockService;
 
 class Redirect extends Action implements HttpGetActionInterface
@@ -42,6 +43,7 @@ class Redirect extends Action implements HttpGetActionInterface
         private readonly RedirectUrl $redirectUrl,
         private readonly FormatExceptionMessages $formatExceptionMessages,
         private readonly OrderLockService $orderLockService,
+        private readonly OrderAwaitingPaymentFromSession $orderAwaitingPaymentFromSession,
     ) {
         parent::__construct($context);
     }
@@ -69,7 +71,7 @@ class Redirect extends Action implements HttpGetActionInterface
             if (!$methodInstance instanceof Mollie) {
                 $msg = __('Payment Method not found');
                 $this->messageManager->addErrorMessage($msg);
-                $this->config->addTolog('error', $msg);
+                $this->config->addTolog('error', (string) $msg);
                 $this->checkoutSession->restoreQuote();
 
                 return $this->_redirect('checkout/cart');
@@ -103,7 +105,7 @@ class Redirect extends Action implements HttpGetActionInterface
                 }
 
                 $order->setState(Order::STATE_PENDING_PAYMENT);
-                $this->orderManagement->cancel($order->getEntityId());
+                $this->orderManagement->cancel((int) $order->getEntityId());
                 $order->addCommentToStatusHistory($order->getEntityId(), $historyMessage);
 
                 $this->config->addToLog('info', sprintf('Canceled order %s', $order->getIncrementId()));
@@ -117,16 +119,18 @@ class Redirect extends Action implements HttpGetActionInterface
     private function getOrder(): OrderInterface
     {
         $token = $this->getRequest()->getParam('paymentToken');
-        if (!$token) {
-            throw new LocalizedException(__('The required payment token is not available'));
+        if (!is_string($token) || $token === '') {
+            return $this->orderAwaitingPaymentFromSession->execute();
         }
 
         $model = $this->paymentTokenRepository->getByToken($token);
         if (!$model) {
-            throw new LocalizedException(__('The payment token %1 does not exists', $token));
+            $this->config->addToLog('error', (string) __('The payment token %1 does not exists', $token));
+
+            return $this->orderAwaitingPaymentFromSession->execute();
         }
 
-        return $this->orderRepository->get($model->getOrderId());
+        return $this->orderRepository->get((int) $model->getOrderId());
     }
 
     private function getMethodInstance(string $method): MethodInterface
