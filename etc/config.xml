@@ -52,6 +52,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -76,6 +77,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -96,6 +98,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -114,6 +117,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -132,6 +136,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -152,6 +157,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -170,6 +176,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -188,6 +195,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -208,6 +216,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>0</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -228,6 +237,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -246,6 +256,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -264,6 +275,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -290,6 +302,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -308,6 +321,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -327,6 +341,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -346,6 +361,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>0</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -365,6 +381,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -388,6 +405,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -406,6 +424,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -425,6 +444,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -443,6 +463,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -462,6 +483,7 @@
                 <can_order>0</can_order>
                 <can_refund>0</can_refund>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
             </mollie_methods_klarnapaylater>
             <mollie_methods_klarnapaynow>
                 <active>0</active>
@@ -473,6 +495,7 @@
                 <can_order>0</can_order>
                 <can_refund>0</can_refund>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
             </mollie_methods_klarnapaynow>
             <mollie_methods_klarnasliceit>
                 <active>0</active>
@@ -484,6 +507,7 @@
                 <can_order>0</can_order>
                 <can_refund>0</can_refund>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
             </mollie_methods_klarnasliceit>
             <mollie_methods_mbway>
                 <active>1</active>
@@ -498,6 +522,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -517,6 +542,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -537,6 +563,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -555,6 +582,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -575,6 +603,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>1</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -594,6 +623,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -612,6 +642,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -631,6 +662,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -649,6 +681,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>1</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -667,6 +700,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -685,6 +719,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -703,6 +738,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>0</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -722,6 +758,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -740,6 +777,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -758,6 +796,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -776,6 +815,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -794,6 +834,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -813,6 +854,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -833,6 +875,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>1</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -852,6 +895,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>
@@ -871,6 +915,7 @@
                 <can_refund>1</can_refund>
                 <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
+                <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
                 <can_authorize_vault>0</can_authorize_vault>

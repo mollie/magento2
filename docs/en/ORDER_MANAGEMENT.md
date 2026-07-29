@@ -56,6 +56,14 @@ For Klarna and Billie, the default is **On shipment**, which matches the buy-now
 
 Cancelling an order that has not been fully captured releases the remaining authorisation at Mollie automatically, so the reserved amount is returned to the customer without waiting for the expiration window. If the release request fails, the order is still cancelled in Magento and a warning is shown in Magento Admin; Mollie then releases the uncaptured amount itself when the authorisation expires.
 
+### Methods Without Partial Captures
+
+**Riverty** and **Billink** can only capture the complete order amount at once. Whichever action triggers the capture — creating the invoice or creating the shipment, depending on **When to capture?** — is refused with an error in Magento Admin if it does not cover the complete order, and nothing is created. A notice is shown on that page as a reminder.
+
+To ship or invoice such an order, include every item in a single invoice or shipment. If you cannot deliver the complete order, cancel it instead so the authorisation is released, and place a new order for the items you can deliver.
+
+Note that Riverty and Billink ship without a default for **When to capture?**. Until you set it, no capture is triggered at all and the authorisation expires on its own, so set it before taking these methods live.
+
 ### Automatic Capture Delay
 
 For methods using **Autocapture**, you can insert a delay between authorisation and capture. This gives you a window to review or cancel orders before the customer is charged.

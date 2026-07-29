@@ -1,4 +1,5 @@
 """%1"" does not implement %1","""%1"" does not implement %1"
+"%1 does not support partial captures. Create a single invoice or shipment for the complete order, or cancel the order to release the authorization.","%1 does not support partial captures. Create a single invoice or shipment for the complete order, or cancel the order to release the authorization."
 "%1 hours","%1 hours"
 "%1 using Voucher, %2 direct.","%1 using Voucher, %2 direct."
 "-- Please Select --","-- Please Select --"
@@ -11,6 +12,7 @@
 <strong>Store Locale</strong>: Use the locale active in the current store or fall back to English if this can't be determined."
 "<strong>Description:</strong> Order #%order_id from %store_name","<strong>Description:</strong> Order #%order_id from %store_name"
 "<strong>Optional:</strong> Comma-separated list of email addresses. Leave empty to disable.","<strong>Optional:</strong> Comma-separated list of email addresses. Leave empty to disable."
+"Please note: %1 does not support partial captures. Only the complete order can be captured, so a partial invoice or shipment will be refused.","Please note: %1 does not support partial captures. Only the complete order can be captured, so a partial invoice or shipment will be refused."
 "[TEST] An error occured","[TEST] An error occured"
 "A Timeout while connecting to %1 occurred, this could be the result of an outage. Please try again or select another payment method.","A Timeout while connecting to %1 occurred, this could be the result of an outage. Please try again or select another payment method."
 "Actions","Actions"

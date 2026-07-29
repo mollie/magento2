@@ -39,6 +39,35 @@ class ManualCaptureConfigurationTest extends AbstractXmlConfiguration
         }
     }
 
+    public function testEveryMethodDeclaresWhetherItSupportsPartialCaptures(): void
+    {
+        $configXml = $this->getGeneralXmlConfigFile();
+
+        foreach ($configXml->default->payment->children() as $groupName => $config) {
+            if (!str_starts_with($groupName, 'mollie_methods_')) {
+                continue;
+            }
+
+            $this->assertTrue(
+                isset($config->supports_partial_capture),
+                sprintf('Method group "%s" does not declare supports_partial_capture', $groupName)
+            );
+        }
+    }
+
+    public function testRivertyAndBillinkDoNotSupportPartialCaptures(): void
+    {
+        $configXml = $this->getGeneralXmlConfigFile();
+
+        foreach (['riverty', 'billink'] as $method) {
+            $this->assertSame(
+                '0',
+                (string) $configXml->default->payment->{'mollie_methods_' . $method}->supports_partial_capture,
+                sprintf('Method "%s" should not allow partial captures', $method)
+            );
+        }
+    }
+
     public function testGooglePaySupportsManualCaptureConfiguration(): void
     {
         $configXml = $this->getGeneralXmlConfigFile();

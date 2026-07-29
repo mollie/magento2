@@ -1,0 +1,17 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Mollie\Payment\Block\Adminhtml\Sales\Order\PartialCaptureNotSupportedNotice;
+
+/** @var PartialCaptureNotSupportedNotice $block */
+/** @var Escaper $escaper */
+?>
+<div class="mollie-partial-capture-not-supported message message-notice notice">
+    <?= $escaper->escapeHtml($block->getMessage()); ?>
+</div>

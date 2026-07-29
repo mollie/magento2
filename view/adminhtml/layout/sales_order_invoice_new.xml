@@ -4,25 +4,16 @@
   ~ See COPYING.txt for license details.
   -->
 
-<!--
-/**
- * Copyright © Magento, Inc. All rights reserved.
- * See COPYING.txt for license details.
- */
--->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="submit_before">
-            <block template="Mollie_Payment::order/shipment/create/payment_hold_warning.phtml"
-                   name="mollie.payment.hold.warning"
-            />
             <block class="Mollie\Payment\Block\Adminhtml\Sales\Order\PartialCaptureNotSupportedNotice"
                    template="Mollie_Payment::order/partial_capture_not_supported.phtml"
                    name="mollie.partial.capture.not.supported"
             >
                 <arguments>
-                    <argument name="registry_key" xsi:type="string">current_shipment</argument>
-                    <argument name="capture_moment" xsi:type="string">shipment</argument>
+                    <argument name="registry_key" xsi:type="string">current_invoice</argument>
+                    <argument name="capture_moment" xsi:type="string">invoice</argument>
                 </arguments>
             </block>
         </referenceContainer>

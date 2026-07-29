@@ -12,6 +12,7 @@ use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Api\InvoiceRepositoryInterface;
 use Magento\Sales\Model\Service\InvoiceService;
+use Mollie\Payment\Service\Mollie\Order\ValidatePartialCapture;
 
 class CaptureInvoiceForShipment
 {
@@ -19,6 +20,7 @@ class CaptureInvoiceForShipment
         private readonly InvoiceRepositoryInterface $invoiceRepository,
         private readonly InvoiceService $invoiceService,
         private readonly CapturePaymentForInvoice $capturePaymentForInvoice,
+        private readonly ValidatePartialCapture $validatePartialCapture,
     ) {}
 
     public function execute(ShipmentInterface $shipment): ?InvoiceInterface
@@ -30,6 +32,7 @@ class CaptureInvoiceForShipment
         }
 
         $invoice = $this->invoiceService->prepareInvoice($order, $this->getShipmentQtys($shipment));
+        $this->validatePartialCapture->execute($invoice);
         $invoice->register();
 
         $this->invoiceRepository->save($invoice);
@@ -39,6 +42,9 @@ class CaptureInvoiceForShipment
         return $invoice;
     }
 
+    /**
+     * @return array<int, float>
+     */
     private function getShipmentQtys(ShipmentInterface $shipment): array
     {
         $qtys = [];
