@@ -29,6 +29,7 @@ use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\PaymentToken\Generate;
+use Mollie\Payment\Service\Quote\SetCityFromApplePayAddress;
 use Mollie\Payment\Service\Quote\SetRegionFromApplePayAddress;
 
 class PlaceOrder extends Action implements HttpPostActionInterface
@@ -44,6 +45,7 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly Config $config,
         private readonly ScopeConfigInterface $scopeConfig,
+        private readonly SetCityFromApplePayAddress $setCityFromApplePayAddress,
     ) {
         parent::__construct($context);
     }
@@ -155,10 +157,10 @@ class PlaceOrder extends Action implements HttpPostActionInterface
             // Sometimes the familyName may be empty, fall back to -- in that case.
             AddressInterface::KEY_LASTNAME => $input['familyName'] ?: '--',
             AddressInterface::KEY_FIRSTNAME => $input['givenName'],
-            AddressInterface::KEY_CITY => $input['locality'],
             AddressInterface::KEY_POSTCODE => $input['postalCode'],
         ]);
 
+        $this->setCityFromApplePayAddress->execute($address, $input);
         $this->setRegionFromApplePayAddress->execute($address, $input);
 
         if (isset($input['phoneNumber'])) {
