@@ -156,7 +156,7 @@ class MollieCustomerRepository implements MollieCustomerRepositoryInterface
     ): bool {
         try {
             $customerModel = $this->mollieCustomerFactory->create();
-            $this->resource->load($customerModel, $customer->getCustomerId());
+            $this->resource->load($customerModel, $customer->getEntityId());
             $this->resource->delete($customerModel);
         } catch (Exception $exception) {
             throw new CouldNotDeleteException(__(
