@@ -34,4 +34,15 @@ class AsyncPaymentMethods
     {
         return array_values($this->methods);
     }
+
+    /**
+     * @return string[]
+     */
+    public function allCodes(): array
+    {
+        return array_map(
+            static fn (string $method): string => 'mollie_methods_' . $method,
+            $this->all(),
+        );
+    }
 }

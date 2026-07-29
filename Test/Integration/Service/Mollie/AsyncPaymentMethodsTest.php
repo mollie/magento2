@@ -39,4 +39,15 @@ class AsyncPaymentMethodsTest extends IntegrationTestCase
             'null' => [null, false],
         ];
     }
+
+    public function testAllCodesReturnsThePaymentMethodCodes(): void
+    {
+        /** @var AsyncPaymentMethods $instance */
+        $instance = $this->objectManager->get(AsyncPaymentMethods::class);
+
+        $this->assertEquals(
+            ['mollie_methods_banktransfer', 'mollie_methods_paybybank'],
+            $instance->allCodes(),
+        );
+    }
 }
