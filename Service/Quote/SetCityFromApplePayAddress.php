@@ -26,6 +26,9 @@ class SetCityFromApplePayAddress
     ) {
     }
 
+    /**
+     * @param array<string, mixed> $input
+     */
     public function execute(AddressInterface $address, array $input): void
     {
         $address->setCity($this->getSupportedCity($input['locality'] ?? ''));
@@ -83,6 +86,9 @@ class SetCityFromApplePayAddress
         return $this->hasCityMessage($validator->getMessages());
     }
 
+    /**
+     * @param array<string, mixed> $messages
+     */
     private function hasCityMessage(array $messages): bool
     {
         if (array_key_exists(AddressInterface::KEY_CITY, $messages)) {

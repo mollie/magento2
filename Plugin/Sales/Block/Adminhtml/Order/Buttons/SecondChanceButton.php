@@ -51,7 +51,7 @@ class SecondChanceButton implements ButtonInterface
         );
     }
 
-    private function getUrl(string $orderId)
+    private function getUrl(string $orderId): string
     {
         return $this->url->getUrl('mollie/action/sendSecondChanceEmail/id/' . $orderId);
     }
