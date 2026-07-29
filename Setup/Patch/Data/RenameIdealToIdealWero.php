@@ -39,8 +39,8 @@ class RenameIdealToIdealWero implements DataPatchInterface
 
         foreach ($collection as $configItem) {
             $this->updateMethodTitle(
-                $configItem->getData('scope'),
-                $configItem->getData('scope_id'),
+                (string)$configItem->getData('scope'),
+                storeId($configItem->getData('scope_id')) ?? 0,
                 $configItem->getData('value')
             );
         }
@@ -48,8 +48,12 @@ class RenameIdealToIdealWero implements DataPatchInterface
         return $this;
     }
 
-    private function updateMethodTitle(string $scope, int $scopeId, ?string $currentValue = null)
+    private function updateMethodTitle(string $scope, int $scopeId, ?string $currentValue = null): void
     {
+        if ($currentValue === null) {
+            return;
+        }
+
         // Some merchant might have iDEAL + €1 or something similar, don't update those
         if (strtolower($currentValue) !== 'ideal') {
             return;
