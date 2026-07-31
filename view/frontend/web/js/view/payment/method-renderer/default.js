@@ -5,6 +5,7 @@ define(
         'ko',
         'mage/url',
         'mage/storage',
+        'mage/translate',
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/checkout-data',
@@ -19,6 +20,7 @@ define(
         ko,
         url,
         storage,
+        $t,
         Component,
         quote,
         checkoutData,
@@ -75,10 +77,26 @@ define(
                 placeOrder: function (data, event) {
                     this.isPlaceOrderActionAllowed(false);
                     var parent = this._super.bind(this);
-                    this.beforePlaceOrder().always(function () {
+                    this.beforePlaceOrder().done(function (response) {
                         this.isPlaceOrderActionAllowed(true);
+
+                        if (!this.paymentToken()) {
+                            this.onPaymentTokenFailed(response);
+                            return;
+                        }
+
                         parent(data, event);
+                    }.bind(this)).fail(function (response) {
+                        this.isPlaceOrderActionAllowed(true);
+                        this.onPaymentTokenFailed(response);
                     }.bind(this));
+                },
+                onPaymentTokenFailed: function (response) {
+                    console.error('Mollie: unable to retrieve the payment token, the order has not been placed.', response);
+
+                    this.messageContainer.addErrorMessage({
+                        message: $t('We were unable to start your payment. Please try again.')
+                    });
                 },
                 beforePlaceOrder: function () {
                     var serviceUrl;
@@ -104,7 +122,19 @@ define(
                 },
                 afterPlaceOrder: function () {
                     this._super();
-                    window.location = url.build('mollie/checkout/redirect/paymentToken/' + this.paymentToken());
+
+                    window.location = this.getRedirectUrl();
+                },
+                /**
+                 * Without a token the redirect controller falls back to the last order of the checkout session,
+                 * so an order is never left behind unpaid when the payment token could not be retrieved.
+                 */
+                getRedirectUrl: function () {
+                    if (!this.paymentToken()) {
+                        return url.build('mollie/checkout/redirect');
+                    }
+
+                    return url.build('mollie/checkout/redirect/paymentToken/' + this.paymentToken());
                 },
                 renderMessages: function () {
                     // Copied from Magento_Theme/js/view/messages

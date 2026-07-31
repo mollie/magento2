@@ -19,7 +19,7 @@ use Mollie\Payment\Api\Data\PendingPaymentReminderInterfaceFactory;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
-use Mollie\Payment\Model\Methods\Banktransfer;
+use Mollie\Payment\Service\Mollie\AsyncPaymentMethods;
 
 class SavePendingOrder implements ObserverInterface
 {
@@ -28,7 +28,8 @@ class SavePendingOrder implements ObserverInterface
         private Config $config,
         private PendingPaymentReminderInterfaceFactory $reminderFactory,
         private PendingPaymentReminderRepositoryInterface $repository,
-        private EncryptorInterface $encryptor
+        private EncryptorInterface $encryptor,
+        private AsyncPaymentMethods $asyncPaymentMethods,
     ) {}
 
     public function execute(Observer $observer): void
@@ -38,7 +39,7 @@ class SavePendingOrder implements ObserverInterface
 
         if (
             !$this->config->automaticallySendSecondChanceEmails(storeId($order->getStoreId())) ||
-            $order->getPayment()->getMethod() == Banktransfer::CODE
+            $this->asyncPaymentMethods->contains($order->getPayment()?->getMethod())
         ) {
             return;
         }

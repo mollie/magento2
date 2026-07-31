@@ -1,4 +1,5 @@
 """%1"" does not implement %1","""%1"" implementeert %1 niet"
+"%1 does not support partial captures. Create a single invoice or shipment for the complete order, or cancel the order to release the authorization.","%1 ondersteunt geen gedeeltelijke captures. Maak één factuur of verzending aan voor de volledige order, of annuleer de order om de autorisatie vrij te geven."
 "%1 hours","%1 uur"
 "%1 using Voucher, %2 direct.","%1 met Voucher, %2 direct."
 "-- Please Select --","-- Selecteer --"
@@ -11,6 +12,7 @@
 <strong>Winkellocatie</strong>: Gebruik de taal die actief is in de huidige winkel, of val terug op Engels als dit niet bepaald kan worden."
 "<strong>Description:</strong> Order #%order_id from %store_name","<strong>Beschrijving:</strong> Bestelling #%order_id bij %store_name"
 "<strong>Optional:</strong> Comma-separated list of email addresses. Leave empty to disable.","<strong>Optioneel:</strong> Door komma's gescheiden lijst van e-mailadressen. Laat leeg om uit te schakelen."
+"Please note: %1 does not support partial captures. Only the complete order can be captured, so a partial invoice or shipment will be refused.","Let op: %1 ondersteunt geen gedeeltelijke captures. Alleen de volledige order kan worden gecaptured, dus een gedeeltelijke factuur of verzending wordt geweigerd."
 "[TEST] An error occured","[TEST] Er is een fout opgetreden."
 "A Timeout while connecting to %1 occurred, this could be the result of an outage. Please try again or select another payment method.","Er is een time-out opgetreden tijdens de verbinding met %1, dit kan het gevolg zijn van een storing. Probeer het opnieuw of kies een andere betaalmethode."
 "Actions","Acties"

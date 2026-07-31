@@ -16,6 +16,15 @@
             <block template="Mollie_Payment::order/shipment/create/payment_hold_warning.phtml"
                    name="mollie.payment.hold.warning"
             />
+            <block class="Mollie\Payment\Block\Adminhtml\Sales\Order\PartialCaptureNotSupportedNotice"
+                   template="Mollie_Payment::order/partial_capture_not_supported.phtml"
+                   name="mollie.partial.capture.not.supported"
+            >
+                <arguments>
+                    <argument name="registry_key" xsi:type="string">current_shipment</argument>
+                    <argument name="capture_moment" xsi:type="string">shipment</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>

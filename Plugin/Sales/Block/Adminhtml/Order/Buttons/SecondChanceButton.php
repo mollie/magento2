@@ -44,12 +44,14 @@ class SecondChanceButton implements ButtonInterface
             'mollie_payment_second_chance_email',
             [
                 'label' => __('Send Payment Reminder'),
-                'onclick' => 'setLocation("' . $this->getUrl((string)$view->getOrderId()) . '")',
+                'onclick' => 'confirmSetLocation(\''
+                    . __('Are you sure you want to send a payment reminder e-mail to the customer?')
+                    . '\', \'' . $this->getUrl((string)$view->getOrderId()) . '\', {data: {}})',
             ],
         );
     }
 
-    private function getUrl(string $orderId)
+    private function getUrl(string $orderId): string
     {
         return $this->url->getUrl('mollie/action/sendSecondChanceEmail/id/' . $orderId);
     }

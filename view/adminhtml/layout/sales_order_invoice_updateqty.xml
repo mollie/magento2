@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="order_items">
+            <container name="submit_before" label="Submit Before">
+                <block class="Mollie\Payment\Block\Adminhtml\Sales\Order\PartialCaptureNotSupportedNotice"
+                       template="Mollie_Payment::order/partial_capture_not_supported.phtml"
+                       name="mollie.partial.capture.not.supported"
+                >
+                    <arguments>
+                        <argument name="registry_key" xsi:type="string">current_invoice</argument>
+                        <argument name="capture_moment" xsi:type="string">invoice</argument>
+                    </arguments>
+                </block>
+            </container>
+        </referenceBlock>
+    </body>
+</page>

@@ -138,9 +138,9 @@ define(
             afterPlaceOrder: function () {
                 this.session.completePayment(ApplePaySession.STATUS_SUCCESS);
 
-                var paymentToken = this.paymentToken();
+                var redirectUrl = this.getRedirectUrl();
                 setTimeout( function () {
-                    window.location = url.build('mollie/checkout/redirect/paymentToken/' + paymentToken);
+                    window.location = redirectUrl;
                 }, 1000);
             }
         });

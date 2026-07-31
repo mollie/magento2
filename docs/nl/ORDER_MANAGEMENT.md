@@ -56,6 +56,14 @@ Voor Klarna en Billie is de standaard **On shipment**, wat overeenkomt met de ko
 
 Het annuleren van een order die nog niet volledig is gecaptured, geeft de resterende autorisatie bij Mollie automatisch vrij, zodat het gereserveerde bedrag terugkeert naar de klant zonder het vervaltijdvenster af te wachten. Als het vrijgaveverzoek mislukt, wordt de order alsnog geannuleerd in Magento en verschijnt een waarschuwing in Magento Admin; Mollie geeft het niet-gecapturede bedrag dan zelf vrij wanneer de autorisatie verloopt.
 
+### Methodes zonder gedeeltelijke captures
+
+**Riverty** en **Billink** kunnen alleen het volledige orderbedrag in één keer capturen. De actie die de capture start — het aanmaken van de factuur of van de verzending, afhankelijk van **When to capture?** — wordt geweigerd met een foutmelding in Magento Admin als deze niet de volledige order dekt, en er wordt niets aangemaakt. Op die pagina verschijnt ter herinnering een melding.
+
+Neem alle artikelen op in één factuur of verzending om zo'n order te factureren of te verzenden. Kun je de order niet volledig leveren, annuleer deze dan zodat de autorisatie wordt vrijgegeven, en plaats een nieuwe order voor de artikelen die je wel kunt leveren.
+
+Let op: Riverty en Billink hebben geen standaardwaarde voor **When to capture?**. Zolang je deze niet instelt wordt er helemaal geen capture gestart en verloopt de autorisatie vanzelf, dus stel dit in voordat je deze methodes live zet.
+
 ### Vertraging bij automatische capture
 
 Voor methoden die **Autocapture** gebruiken, kun je een vertraging invoegen tussen autorisatie en capture. Dit geeft je een venster om orders te controleren of te annuleren voordat de klant wordt belast.

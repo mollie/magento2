@@ -23,12 +23,15 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\GuestCartRepositoryInterface;
+use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\QuoteManagement;
-use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Payment;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\PaymentToken\Generate;
+use Mollie\Payment\Service\Quote\SetCityFromApplePayAddress;
 use Mollie\Payment\Service\Quote\SetRegionFromApplePayAddress;
 
 class PlaceOrder extends Action implements HttpPostActionInterface
@@ -44,12 +47,14 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly Config $config,
         private readonly ScopeConfigInterface $scopeConfig,
+        private readonly SetCityFromApplePayAddress $setCityFromApplePayAddress,
     ) {
         parent::__construct($context);
     }
 
     public function execute(): Json
     {
+        /** @var Quote $cart */
         $cart = $this->getCart();
 
         $shippingAddress = $cart->getShippingAddress();
@@ -74,7 +79,7 @@ class PlaceOrder extends Action implements HttpPostActionInterface
             );
         }
 
-        $cart->setPaymentMethod('mollie_methods_applepay');
+        $cart->setData('payment_method', 'mollie_methods_applepay');
         $cart->setCustomerIsGuest(true);
 
         $cart->collectTotals();
@@ -85,7 +90,7 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         $response = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 
         try {
-            /** @var OrderInterface $order */
+            /** @var Order $order */
             $order = $this->quoteManagement->submit($cart);
         } catch (Exception $exception) {
             $this->config->addToLog('error', [
@@ -99,7 +104,9 @@ class PlaceOrder extends Action implements HttpPostActionInterface
             return $response->setData(['error' => true, 'message' => $exception->getMessage()]);
         }
 
-        $order->getPayment()->setAdditionalInformation(
+        /** @var Payment $payment */
+        $payment = $order->getPayment();
+        $payment->setAdditionalInformation(
             'applepay_payment_token',
             $this->getRequest()->getParam('applePayPaymentToken'),
         );
@@ -135,7 +142,10 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         return $this->checkoutSession->getQuote();
     }
 
-    private function getAddressLines($addressLines): string
+    /**
+     * @param string[] $addressLines
+     */
+    private function getAddressLines(array $addressLines): string
     {
         $maxLinesCount = $this->scopeConfig->getValue('customer/address/street_lines');
         $linesCount = count($addressLines);
@@ -147,6 +157,9 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         return implode(PHP_EOL, $addressLines);
     }
 
+    /**
+     * @param array<string, mixed> $input
+     */
     private function updateAddress(AddressInterface $address, array $input): void
     {
         $address->addData([
@@ -155,10 +168,10 @@ class PlaceOrder extends Action implements HttpPostActionInterface
             // Sometimes the familyName may be empty, fall back to -- in that case.
             AddressInterface::KEY_LASTNAME => $input['familyName'] ?: '--',
             AddressInterface::KEY_FIRSTNAME => $input['givenName'],
-            AddressInterface::KEY_CITY => $input['locality'],
             AddressInterface::KEY_POSTCODE => $input['postalCode'],
         ]);
 
+        $this->setCityFromApplePayAddress->execute($address, $input);
         $this->setRegionFromApplePayAddress->execute($address, $input);
 
         if (isset($input['phoneNumber'])) {
