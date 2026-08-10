@@ -56,6 +56,7 @@ class ProcessTransaction implements ResolverInterface
             'cart' => $cart,
             'redirect_to_cart' => !$redirectToSuccessPage,
             'redirect_to_success_page' => $redirectToSuccessPage,
+            'awaiting_confirmation' => $result->isAwaitingConfirmation(),
         ];
     }
 

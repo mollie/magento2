@@ -217,6 +217,7 @@ mutation processTransaction($paymentToken: String!) {
     paymentStatus
     redirect_to_success_page
     redirect_to_cart
+    awaiting_confirmation
     cart {
       id
     }
@@ -233,11 +234,40 @@ mutation processTransaction($paymentToken: String!) {
 | `paymentStatus` | `PaymentStatusEnum` | The Mollie payment status at the time of the call |
 | `redirect_to_success_page` | `Boolean` | `true` when the payment succeeded and the customer should see the order confirmation |
 | `redirect_to_cart` | `Boolean` | `true` when the payment failed, was cancelled, or expired |
+| `awaiting_confirmation` | `Boolean` | `true` when the payment has not reached a final state yet and may still be confirmed |
 | `cart` | `Cart` | The restored cart, present only when `redirect_to_cart` is `true` |
 
-**`PaymentStatusEnum` values:** `CREATED`, `OPEN`, `PENDING`, `AUTHORIZED`, `PAID`, `SHIPPING`, `COMPLETED`, `CANCELED`, `EXPIRED`, `REFUNDED`, `FAILED`, `ERROR`
-
 When `redirect_to_cart` is `true`, the extension reactivates the cart automatically and returns it in the `cart` field so the customer can amend their order without starting over.
+
+**Handling `awaiting_confirmation`.** A customer can return from Mollie while the payment is still `open`, for example by pressing the browser back button on the payment page. The payment may still be confirmed moments later by the webhook. The Luma checkout handles this with a short waiting page that polls the status before deciding where to send the customer, and `awaiting_confirmation` lets you do the same in a headless storefront.
+
+`redirect_to_cart` is `true` in this situation and the cart is already reactivated, so it is safe to fall back to the cart. If you want to match Luma, show a "confirming your payment" screen while `awaiting_confirmation` is `true`, poll `mollieCustomerOrder` for a few seconds, and only send the customer back to the cart once the payment is still not confirmed.
+
+---
+
+### Payment Statuses
+
+`paymentStatus` is the raw [Mollie Payments API payment status](https://docs.mollie.com/docs/handling-payment-status), with one addition: `CHARGEBACK`, which the extension reports when an already paid payment has been charged back.
+
+**Do not route on `paymentStatus`.** Use `redirect_to_success_page` and `redirect_to_cart` for that, because those booleans already account for the payment method. Use `paymentStatus` only to decide the wording of the message you show.
+
+| `paymentStatus` | `redirect_to_success_page` | What to show the customer |
+|---|---|---|
+| `PAID` | `true` | The order confirmation |
+| `AUTHORIZED` | `true` | The order confirmation. The amount is reserved and is captured later |
+| `PENDING` | `true` | The order confirmation, optionally worded as "your payment is being processed" |
+| `OPEN`, on Bank transfer or Pay by Bank | `true` | The order confirmation with payment instructions. The customer still has to transfer the money |
+| `OPEN`, on any other method | `false` | The customer returned without completing the payment. The cart is reactivated |
+| `CANCELED` | `false` | "Payment canceled, please try again" |
+| `EXPIRED` | `false` | "Transaction failed, please try again" |
+| `FAILED` | `false` | "Transaction failed, please try again" |
+| `CHARGEBACK` | `false` | Rarely seen on return. Treat it as a failed payment |
+
+`OPEN` on Bank transfer and Pay by Bank counts as a success because the order is placed and the money arrives later. On every other method it means the customer walked away from the payment page. That distinction is why routing on the booleans is safer than routing on the status.
+
+The Mollie payment status is not the same thing as the Magento order status. The extension sets the Magento order status to the one configured under **Stores → Configuration → Mollie → Order Management → Statuses → Status Pending** (`pending_payment` by default) the moment the customer is redirected to Mollie, before any payment exists. That status never surfaces through `paymentStatus`.
+
+The `PaymentStatusEnum` also contains `CREATED`, `SHIPPING`, `COMPLETED`, `REFUNDED` and `ERROR`. These are leftovers from the Orders API, which was [removed in v3.0.0](UPGRADING.md#orders-api-removal). They are marked as deprecated in the schema and are never returned.
 
 ---
 
@@ -285,6 +315,10 @@ query getOrderByHash($hash: String!) {
 ```
 
 The `hash` parameter comes from the `order_id` query parameter appended to the return URL by the extension. The resolver decrypts the hash internally and returns a standard `CustomerOrder` object.
+
+**The `status` field here is not the Mollie payment status.** The GraphQL query returns the Magento order status, which the webhook updates once the payment is confirmed. The REST equivalent, `GET /rest/V1/mollie/get-order/by-hash/:hash`, behaves differently: it queries the Mollie API on every call and maps the payment status onto `pending`, `processing`, `canceled` or `complete`.
+
+That difference matters when you poll while `awaiting_confirmation` is `true`. The GraphQL query only reflects the payment once the webhook has been processed, so a delayed or blocked webhook keeps it on the pending status. The REST endpoint reads the payment straight from Mollie and does not depend on the webhook. Use the REST endpoint if you need the payment state as Mollie knows it, and the GraphQL query if you need the order as Magento knows it.
 
 ---
 
@@ -628,6 +662,8 @@ POST /rest/V1/mollie/get-order/by-payment-token/:token
 ```
 
 Both return a Magento order object. Check the order's status to determine whether to show a success page or route the customer back to the cart.
+
+The `status` these endpoints return is derived from the Mollie payment, not read from the order: they query the Mollie API on every call and map the payment status onto `pending`, `processing`, `canceled` or `complete`. That makes them suitable for polling while a payment is still being confirmed, because they do not depend on the webhook having arrived. The GraphQL `mollieCustomerOrder` query returns the Magento order status instead, which only changes once the webhook has been processed.
 
 ---
 

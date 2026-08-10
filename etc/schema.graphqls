@@ -111,6 +111,7 @@ type MollieProcessTransactionOutput {
     cart: Cart @doc(description: "The cart is only available when the payment status is failed, canceled or expired.")
     redirect_to_cart: Boolean @doc(description: "Indicates if the customer should be redirected to the cart.")
     redirect_to_success_page: Boolean @doc(description: "Indicates if the customer should be redirected to the success page.")
+    awaiting_confirmation: Boolean @doc(description: "Indicates the payment has not reached a final state yet. Poll the status before sending the customer to the cart, the payment may still be confirmed by the webhook.")
 }
 
 type MolliePaymentFee {
@@ -155,16 +156,17 @@ input PlaceOrderInput {
 }
 
 enum PaymentStatusEnum {
-    CREATED
-    PAID
-    AUTHORIZED
-    CANCELED
-    SHIPPING
-    COMPLETED
-    EXPIRED
-    PENDING
-    REFUNDED
-    ERROR
-    FAILED
-    OPEN
+    OPEN @doc(description: "The payment has been created but not completed yet.")
+    PENDING @doc(description: "The payment has started but is not final yet.")
+    AUTHORIZED @doc(description: "The payment is reserved and will be captured later.")
+    PAID @doc(description: "The payment has been completed.")
+    CANCELED @doc(description: "The customer canceled the payment.")
+    EXPIRED @doc(description: "The customer did not complete the payment in time.")
+    FAILED @doc(description: "The payment could not be completed.")
+    CHARGEBACK @doc(description: "The payment was completed earlier but has been charged back.")
+    CREATED @deprecated(reason: "Orders API status. The Orders API was removed in v3.0.0, this value is never returned.")
+    SHIPPING @deprecated(reason: "Orders API status. The Orders API was removed in v3.0.0, this value is never returned.")
+    COMPLETED @deprecated(reason: "Orders API status. The Orders API was removed in v3.0.0, this value is never returned.")
+    REFUNDED @deprecated(reason: "Orders API status. The Orders API was removed in v3.0.0, this value is never returned.")
+    ERROR @deprecated(reason: "Never a Mollie payment status, this value is never returned.")
 }
