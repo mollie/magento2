@@ -23,6 +23,7 @@ use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
 use Mollie\Payment\Service\Mollie\Order\CanRegisterCaptureNotification;
 use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
+use Mollie\Payment\Service\Mollie\Order\IsPaymentAlreadyProcessed;
 use Mollie\Payment\Service\Order\OrderAmount;
 use Mollie\Payment\Service\Order\OrderStatePromotion;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
@@ -45,6 +46,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         private readonly CanRegisterCaptureNotification $canRegisterCaptureNotification,
         private readonly CanUseManualCapture $canUseManualCapture,
         private readonly OrderStatePromotion $orderStatePromotion,
+        private readonly IsPaymentAlreadyProcessed $isPaymentAlreadyProcessed,
     ) {
     }
 
@@ -86,7 +88,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
 
         /** @var PaymentInterface|Order\Payment $payment */
         $payment = $magentoOrder->getPayment();
-        if ($payment->getIsTransactionClosed() || $type != 'webhook') {
+        if ($this->isPaymentAlreadyProcessed->execute($magentoOrder) || $type != 'webhook') {
             return $this->processTransactionResponseFactory->create([
                 'success' => true,
                 'status' => 'paid',
@@ -130,6 +132,10 @@ class SuccessfulPayment implements PaymentProcessorInterface
         // Don't close the transaction if the payment method is using manual capture.
         $usesManualCapture = $this->canUseManualCapture->execute($magentoOrder);
         $payment->setIsTransactionClosed(!$usesManualCapture);
+
+        if (!$usesManualCapture) {
+            $payment->setAdditionalInformation(IsPaymentAlreadyProcessed::PAYMENT_PROCESSED, true);
+        }
 
         if ($this->canRegisterCaptureNotification->execute($magentoOrder, $molliePayment) &&
             $type != Payments::TRANSACTION_TYPE_SUBSCRIPTION &&
@@ -190,12 +196,12 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $payment = $order->getPayment();
 
         /** @var null|int $statusUpdated */
-        $statusUpdated = $payment->getAdditionalInformation('mollie_status_updated');
+        $statusUpdated = $payment->getAdditionalInformation(IsPaymentAlreadyProcessed::STATUS_UPDATED);
         if ($statusUpdated === 1 && !$this->orderStatePromotion->canBePromotedToProcessing($order->getState())) {
             return;
         }
 
-        $payment->setAdditionalInformation('mollie_status_updated', 1);
+        $payment->setAdditionalInformation(IsPaymentAlreadyProcessed::STATUS_UPDATED, 1);
         $order->setState(Order::STATE_PROCESSING);
 
         if ($order->getIsVirtual()) {
