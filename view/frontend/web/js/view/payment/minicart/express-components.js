@@ -88,7 +88,7 @@ define([
                 }
             };
 
-            const expressComponent = checkout.create('express-checkout', configuration);
+            const expressComponent = checkout.create('express-component', configuration);
             expressComponent.mount(document.getElementById(this.elementId))
         }
     })
