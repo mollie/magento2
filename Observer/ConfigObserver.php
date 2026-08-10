@@ -13,6 +13,7 @@ use Magento\Framework\Event\Observer as EventObserver;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Framework\Message\ManagerInterface;
 use Mollie\Api\Resources\Method;
+use Mollie\Api\Types\MethodQuery;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Directdebit;
@@ -77,7 +78,7 @@ class ConfigObserver implements ObserverInterface
 
         try {
             $apiMethods = $this->mollieApiClient->loadByStore($storeId)->methods->allEnabled([
-                'includeWallets' => ['applepay'],
+                'includeWallets' => MethodQuery::WALLETS,
             ]);
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());

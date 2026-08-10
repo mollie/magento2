@@ -13,6 +13,7 @@ use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Quote\Api\Data\CartInterfaceFactory;
 use Mollie\Api\Resources\Method;
+use Mollie\Api\Types\MethodQuery;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\Mollie\MethodParameters;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
@@ -79,7 +80,9 @@ class MolliePaymentMethods implements ResolverInterface
         $mollieApiClient = $this->mollieApiClient->loadByStore($storeId);
 
         if ($currency === null) {
-            $available = $mollieApiClient->methods->allEnabled();
+            $available = $mollieApiClient->methods->allEnabled([
+                'includeWallets' => MethodQuery::WALLETS,
+            ]);
             $available = array_filter((array) $available, function (Method $method): bool {
                 return $method->status == 'activated';
             });
@@ -93,7 +96,7 @@ class MolliePaymentMethods implements ResolverInterface
                 'currency' => $currency,
             ],
             'resource' => 'orders',
-            'includeWallets' => ['applepay'],
+            'includeWallets' => MethodQuery::WALLETS,
         ];
 
         return (array) $mollieApiClient->methods->allActive(

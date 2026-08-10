@@ -28,7 +28,7 @@ class ApplePayMethodTest extends AbstractTestMethod
         $client = MollieApiClient::fake([
             GetEnabledMethodsRequest::class => function (PendingRequest $request): MockResponse {
                 $this->assertTrue($request->getRequest()->query()->has('includeWallets'));
-                $this->assertEquals('applepay', $request->getRequest()->query()->get('includeWallets'));
+                $this->assertEquals('applepay,googlepay', $request->getRequest()->query()->get('includeWallets'));
 
                 return MockResponse::ok('method-list');
             },
