@@ -33,6 +33,6 @@ class BillingOrganizationValidator extends AbstractValidator
 
     private function hasBillingOrganization(OrderPayment $payment): bool
     {
-        return (string)($payment->getOrder()?->getBillingAddress()?->getCompany() ?? '') !== '';
+        return (string)($payment->getOrder()->getBillingAddress()?->getCompany() ?? '') !== '';
     }
 }

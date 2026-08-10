@@ -73,7 +73,7 @@ class Process extends Action implements HttpGetActionInterface
             return $this->_redirect($this->redirectOnError->getUrl());
         }
 
-        if ($result !== null && $result->shouldRedirectToSuccessPage()) {
+        if ($result->shouldRedirectToSuccessPage()) {
             try {
                 $this->successPageRedirect->execute($order, $orderIds);
 
@@ -86,7 +86,7 @@ class Process extends Action implements HttpGetActionInterface
             }
         }
 
-        if ($result !== null && $result->isAwaitingConfirmation()) {
+        if ($result->isAwaitingConfirmation()) {
             // phpcs:ignore Magento2.Functions.DiscouragedFunction.Discouraged
             $token = base64_encode($this->encryptor->encrypt((string) $order->getId()));
 

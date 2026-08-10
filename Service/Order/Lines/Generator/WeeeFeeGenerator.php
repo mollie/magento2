@@ -69,8 +69,8 @@ class WeeeFeeGenerator implements GeneratorInterface
 
     private function getWeeeItems(OrderInterface $order): array
     {
-        return array_filter($order->getItems(), function (OrderItemInterface $item) {
-            return $item->getWeeeTaxAppliedAmount();
+        return array_filter($order->getItems(), function (OrderItemInterface $item): bool {
+            return (bool) $item->getWeeeTaxAppliedAmount();
         });
     }
 

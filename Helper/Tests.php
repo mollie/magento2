@@ -47,7 +47,7 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieApiClient->loadByApiKey($testKey);
-                    $methods = $mollieApi->methods->allEnabled() ?? [];
+                    $methods = $mollieApi->methods->allEnabled();
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
@@ -85,7 +85,7 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieApiClient->loadByApiKey($liveKey);
-                    $methods = $mollieApi->methods->allEnabled() ?? [];
+                    $methods = $mollieApi->methods->allEnabled();
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);

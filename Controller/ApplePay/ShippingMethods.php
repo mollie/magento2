@@ -47,7 +47,6 @@ class ShippingMethods extends Action implements HttpPostActionInterface
          * @var Address $address
          */
         $address = $cart->getShippingAddress();
-        $address->setData(null);
         $address->setCountryId(strtoupper($this->getRequest()->getParam('countryCode')));
         $address->setPostcode($this->getRequest()->getParam('postalCode'));
 

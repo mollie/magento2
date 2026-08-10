@@ -8,8 +8,6 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Logger;
 
-use Exception;
-
 class RemovePrivacyData
 {
     public function __construct(
@@ -22,14 +20,10 @@ class RemovePrivacyData
             return $this->removeFromArray($data);
         }
 
-        if (is_object($data)) {
-            return $this->removeFromObject($data);
-        }
-
-        throw new Exception('Invalid data type');
+        return $this->removeFromObject($data);
     }
 
-    private function removeFromArray(array $data): array|object
+    private function removeFromArray(array $data): array
     {
         foreach ($this->fieldsToRedact as $field) {
             if (array_key_exists($field, $data) && is_string($data[$field])) {
@@ -50,7 +44,7 @@ class RemovePrivacyData
         return $data;
     }
 
-    private function removeFromObject(object $data): array|object
+    private function removeFromObject(object $data): object
     {
         $data = clone $data;
 

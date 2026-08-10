@@ -36,6 +36,7 @@ class RestoreQuoteOfUnsuccessfulPayment implements ObserverInterface
             return;
         }
 
+        /** @var bool|null $mollieSucces */
         $mollieSucces = $payment->getAdditionalInformation('mollie_success');
         if ($mollieSucces === null || $mollieSucces === true) {
             return;

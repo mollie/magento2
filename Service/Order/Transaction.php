@@ -119,7 +119,7 @@ class Transaction
         ]);
     }
 
-    private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, ?int $storeId = null): string|array
+    private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, ?int $storeId = null): string
     {
         $replacements = [
             '{{order_id}}' => $order->getId(),

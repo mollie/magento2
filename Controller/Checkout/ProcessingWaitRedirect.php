@@ -50,9 +50,12 @@ class ProcessingWaitRedirect implements HttpGetActionInterface
 
         $processResult = $this->mollieModel->processTransactionForOrder($order, 'success');
 
+        /** @var string|null $method */
+        $method = $order->getPayment()->getAdditionalInformation('method');
+
         $result = $this->getMollieStatusResultFactory->create([
             'status' => $processResult->getStatus(),
-            'method' => $order->getPayment()->getAdditionalInformation('method') ?? $order->getPayment()->getMethod(),
+            'method' => $method ?? $order->getPayment()->getMethod(),
         ]);
 
         if ($result->shouldRedirectToSuccessPage()) {

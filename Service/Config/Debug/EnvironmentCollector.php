@@ -65,9 +65,7 @@ class EnvironmentCollector implements CollectorInterface
             'Magento edition: ' . $this->describeEdition($edition),
             'PHP version: ' . PHP_VERSION,
             'PHP SAPI: ' . PHP_SAPI,
-            'Mollie extension version: ' . ($mollieVersion !== null && $mollieVersion !== ''
-                ? (string)$mollieVersion
-                : 'unknown'),
+            'Mollie extension version: ' . ($mollieVersion !== '' ? $mollieVersion : 'unknown'),
             'OS: ' . php_uname('s') . ' ' . php_uname('r'),
             'Deploy mode: ' . $this->appState->getMode(),
             'Web server: ' . $this->detectWebServer(),

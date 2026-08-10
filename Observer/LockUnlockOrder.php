@@ -44,7 +44,7 @@ class LockUnlockOrder implements ObserverInterface
 
     private function getOrder(string $name, Observer $observer): OrderInterface
     {
-        /** @var ShipmentInterface $shipment */
+        /** @var ShipmentInterface|null $shipment */
         $shipment = $observer->getEvent()->getData('shipment');
 
         if ($shipment) {

@@ -69,8 +69,9 @@ class ParseAdditionalData
 
     public function getDetails(OrderPaymentInterface $payment): ?Details
     {
+        /** @var mixed $details */
         $details = $payment->getAdditionalInformation('details');
-        if ($this->config->encryptPaymentDetails()) {
+        if ($this->config->encryptPaymentDetails() && is_string($details)) {
             try {
                 $details = $this->encryptor->decrypt($details);
             } catch (Exception $e) {

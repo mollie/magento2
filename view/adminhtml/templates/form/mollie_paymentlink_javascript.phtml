@@ -67,10 +67,4 @@ $scriptString = '
     });
 ';
 
-// @phpstan-ignore-next-line
-if (isset($secureRenderer)) {
-    ?><?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); // @phpcs:ignore?><?php
-    return;
-}
-?>
-<script><?= /* @noEscape */ $scriptString; ?></script>
+?><?= /* @noEscape */ $secureRenderer->renderTag('script', [], $scriptString, false); // @phpcs:ignore?>

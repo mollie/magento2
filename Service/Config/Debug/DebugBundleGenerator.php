@@ -91,9 +91,7 @@ class DebugBundleGenerator
         $lines = [
             'Mollie debug bundle',
             'Generated at: ' . date('c'),
-            'Mollie extension version: ' . ($mollieVersion !== null && $mollieVersion !== ''
-                ? (string)$mollieVersion
-                : 'unknown'),
+            'Mollie extension version: ' . ($mollieVersion !== '' ? $mollieVersion : 'unknown'),
             '',
             'Contents:',
             '- manifest.txt: this file',

@@ -11,7 +11,6 @@ namespace Mollie\Payment\Plugin\Tax\Helper;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\InvoiceInterface;
-use Magento\Sales\Model\Order\Tax\Item;
 use Magento\Tax\Api\Data\OrderTaxDetailsItemInterface;
 use Magento\Tax\Api\OrderTaxManagementInterface;
 
@@ -33,7 +32,7 @@ class DataPlugin
         $order = $source->getOrder();
         $orderTaxDetails = $this->orderTaxManagement->getOrderTaxDetails($order->getId());
 
-        $items = array_filter($orderTaxDetails->getItems(), function (Item $item): bool {
+        $items = array_filter($orderTaxDetails->getItems(), function (OrderTaxDetailsItemInterface $item): bool {
             return $item->getType() == 'mollie_payment_fee_tax';
         });
 
