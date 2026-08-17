@@ -55,7 +55,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_general>
             <mollie_methods_applepay>
@@ -80,7 +79,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <capture_delay/>
                 <capture_delay_unit>hours</capture_delay_unit>
@@ -101,7 +99,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_alma>
             <mollie_methods_bancontact>
@@ -120,7 +117,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_bancontact>
             <mollie_methods_bancomatpay>
@@ -139,7 +135,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_bancomatpay>
             <mollie_methods_banktransfer>
@@ -160,7 +155,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_banktransfer>
             <mollie_methods_belfius>
@@ -179,7 +173,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_belfius>
             <mollie_methods_billie>
@@ -198,7 +191,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <can_change_capture_method>1</can_change_capture_method>
                 <when_to_capture>shipment</when_to_capture>
@@ -219,7 +211,6 @@
                 <supports_partial_capture>0</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <capture_mode>manual</capture_mode>
             </mollie_methods_billink>
@@ -240,7 +231,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_bizum>
             <mollie_methods_blik>
@@ -259,7 +249,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_blik>
             <mollie_methods_creditcard>
@@ -278,11 +267,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
-                <instant_purchase>
-                    <supported>1</supported>
-                    <available>Mollie\Payment\Service\InstantPurchase\AvailabilityCheck</available>
-                </instant_purchase>
                 <can_change_capture_method>1</can_change_capture_method>
                 <when_to_capture>invoice</when_to_capture>
                 <capture_delay/>
@@ -305,7 +289,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_directdebit>
             <mollie_methods_eps>
@@ -324,7 +307,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_eps>
             <mollie_methods_expresscomponents>
@@ -344,7 +326,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_expresscomponents>
             <mollie_methods_giftcard>
@@ -364,7 +345,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_giftcard>
             <mollie_methods_googlepay>
@@ -384,7 +364,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <can_change_capture_method>1</can_change_capture_method>
                 <when_to_capture>invoice</when_to_capture>
@@ -408,7 +387,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_ideal>
             <mollie_methods_in3>
@@ -427,7 +405,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_in3>
             <mollie_methods_kbc>
@@ -447,7 +424,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_kbc>
             <mollie_methods_klarna>
@@ -466,7 +442,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <can_change_capture_method>1</can_change_capture_method>
                 <when_to_capture>shipment</when_to_capture>
@@ -525,7 +500,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_mbway>
             <mollie_methods_mobilepay>
@@ -545,7 +519,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <can_change_capture_method>1</can_change_capture_method>
                 <when_to_capture>invoice</when_to_capture>
@@ -566,7 +539,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_multibanco>
             <mollie_methods_mybank>
@@ -585,7 +557,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_mybank>
             <mollie_methods_paymentlink>
@@ -606,7 +577,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_paymentlink>
             <mollie_methods_paybybank>
@@ -626,7 +596,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_paybybank>
             <mollie_methods_paypal>
@@ -645,7 +614,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <show_reference_in_transactions_grid>1</show_reference_in_transactions_grid>
             </mollie_methods_paypal>
@@ -665,7 +633,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_paysafecard>
             <mollie_methods_pointofsale>
@@ -684,7 +651,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_pointofsale>
             <mollie_methods_payconiq>
@@ -703,7 +669,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_payconiq>
             <mollie_methods_przelewy24>
@@ -722,7 +687,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_przelewy24>
             <mollie_methods_riverty>
@@ -741,7 +705,6 @@
                 <supports_partial_capture>0</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>1</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <capture_mode>manual</capture_mode>
             </mollie_methods_riverty>
@@ -761,7 +724,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_satispay>
             <mollie_methods_sofort>
@@ -780,7 +742,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_sofort>
             <mollie_methods_swish>
@@ -799,7 +760,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_swish>
             <mollie_methods_trustly>
@@ -818,7 +778,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_trustly>
             <mollie_methods_twint>
@@ -837,7 +796,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_twint>
             <mollie_methods_vipps>
@@ -857,7 +815,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <can_change_capture_method>1</can_change_capture_method>
                 <when_to_capture>invoice</when_to_capture>
@@ -878,7 +835,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_reorder>
             <mollie_methods_voucher>
@@ -898,7 +854,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
             </mollie_methods_voucher>
             <mollie_methods_wero>
@@ -918,7 +873,6 @@
                 <supports_partial_capture>1</supports_partial_capture>
                 <can_cancel>1</can_cancel>
                 <can_authorize>0</can_authorize>
-                <can_authorize_vault>0</can_authorize_vault>
                 <can_edit>1</can_edit>
                 <can_change_capture_method>1</can_change_capture_method>
                 <when_to_capture>invoice</when_to_capture>
