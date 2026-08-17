@@ -10,6 +10,7 @@ namespace Mollie\Payment\Test\Integration\GraphQL\Resolver\General;
 
 use Exception;
 use Magento\PageCache\Model\Cache\Type;
+use Mollie\Api\Fake\MockMollieClient;
 use Mollie\Api\Fake\MockResponse;
 use Mollie\Api\Http\Data\Money;
 use Mollie\Api\Http\PendingRequest;
@@ -87,17 +88,7 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
     public function testForwardsTheAmountAndCurrencyToTheMethodsApi(): void
     {
         $this->cleanCache();
-        $this->loadFakeEncryptor()->addReturnValue('', 'test_dummyapikeythatisvalidandislongenough');
-
-        $client = MollieApiClient::fake([
-            GetEnabledMethodsRequest::class => MockResponse::ok('method-list'),
-            GetPaginatedTerminalsRequest::class => MockResponse::ok('terminal-list'),
-        ]);
-
-        /** @var FakeMollieApiClient $fakeMollieApiClient */
-        $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
-        $fakeMollieApiClient->setInstance($client);
-        $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
+        $client = $this->fakeMollieApiClient();
 
         $this->graphQlQuery('
             query {
@@ -118,7 +109,47 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         });
     }
 
-    private function callEndpoint(): array
+    public function testRequestsTheWalletMethodsWhenNoCurrencyIsGiven(): void
+    {
+        $this->cleanCache();
+        $client = $this->fakeMollieApiClient();
+
+        $this->graphQlQuery('
+            query {
+                molliePaymentMethods {
+                    methods {
+                        code
+                    }
+                }
+            }
+        ');
+
+        $client->assertSent(function (PendingRequest $request): bool {
+            return $request->getRequest()->query()->get('includeWallets') === 'applepay,googlepay';
+        });
+    }
+
+    public function testRequestsTheWalletMethodsWhenACurrencyIsGiven(): void
+    {
+        $this->cleanCache();
+        $client = $this->fakeMollieApiClient();
+
+        $this->graphQlQuery('
+            query {
+                molliePaymentMethods(input: {amount: 34.00, currency: "EUR"}) {
+                    methods {
+                        code
+                    }
+                }
+            }
+        ');
+
+        $client->assertSent(function (PendingRequest $request): bool {
+            return $request->getRequest()->query()->get('includeWallets') === 'applepay,googlepay';
+        });
+    }
+
+    private function fakeMollieApiClient(): MockMollieClient
     {
         $this->loadFakeEncryptor()->addReturnValue('', 'test_dummyapikeythatisvalidandislongenough');
 
@@ -131,6 +162,13 @@ class MolliePaymentMethodsTest extends GraphQLTestCase
         $fakeMollieApiClient = $this->objectManager->get(FakeMollieApiClient::class);
         $fakeMollieApiClient->setInstance($client);
         $this->objectManager->addSharedInstance($fakeMollieApiClient, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
+
+        return $client;
+    }
+
+    private function callEndpoint(): array
+    {
+        $this->fakeMollieApiClient();
 
         return $this->graphQlQuery('
             query {

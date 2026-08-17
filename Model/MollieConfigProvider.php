@@ -19,6 +19,7 @@ use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Mollie\Api\Types\MethodQuery;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
@@ -82,7 +83,7 @@ class MollieConfigProvider implements ConfigProviderInterface
             $amount = $this->mollieHelper->getOrderAmountByQuote($cart);
             $parameters = [
                 'resource' => 'orders',
-                'includeWallets' => ['applepay'],
+                'includeWallets' => MethodQuery::WALLETS,
                 'billingCountry' => $cart->getBillingAddress()->getCountry(),
             ];
 
