@@ -10,6 +10,7 @@ namespace Mollie\Payment\Model\Client\Payments;
 
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
@@ -54,7 +55,9 @@ class ProcessTransaction
             $response,
         );
 
-        if (in_array($status, ['paid', 'authorized'])) {
+        $isPaid = in_array($status, [PaymentStatus::PAID, PaymentStatus::AUTHORIZED], true);
+
+        if ($isPaid) {
             $response = $this->paymentProcessors->process(
                 'paid',
                 $magentoOrder,
@@ -64,7 +67,7 @@ class ProcessTransaction
             );
         }
 
-        if (isset($molliePayment->_links->refunds) ? true : false) {
+        if ($molliePayment->hasRefunds()) {
             return $this->paymentProcessors->process(
                 'refunded',
                 $magentoOrder,
@@ -74,7 +77,7 @@ class ProcessTransaction
             );
         }
 
-        if (in_array($status, ['paid', 'authorized'])) {
+        if ($isPaid) {
             return $response;
         }
 
