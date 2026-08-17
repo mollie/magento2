@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Model\ResourceModel;
 
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Model\ResourceModel\Db\AbstractDb;
 
 class TransactionToOrder extends AbstractDb
@@ -19,5 +20,23 @@ class TransactionToOrder extends AbstractDb
     protected function _construct()
     {
         $this->_init(self::MAIN_TABLE, self::ID_FIELD_NAME);
+    }
+
+    /**
+     * Checkout links the transaction from inside an open database transaction, so a concurrent webhook cannot see
+     * that row yet and an existence check would not prevent a duplicate. The unique key has to arbitrate instead.
+     */
+    public function link(string $transactionId, int $orderId): void
+    {
+        /** @var AdapterInterface $connection */
+        $connection = $this->getConnection();
+
+        $connection->insertOnDuplicate(
+            $this->getMainTable(),
+            [
+                'transaction_id' => $transactionId,
+                'order_id' => $orderId,
+            ],
+        );
     }
 }
