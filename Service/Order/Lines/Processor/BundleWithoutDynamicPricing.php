@@ -58,12 +58,12 @@ class BundleWithoutDynamicPricing implements ProcessorInterface
         return $orderLine;
     }
 
-    private function getDiscountAmountWithTax(OrderItemInterface $item, bool $forceBaseCurrency): float|int
+    private function getDiscountAmountWithTax(OrderItemInterface $item, bool $forceBaseCurrency): float
     {
         if ($forceBaseCurrency) {
-            return abs($item->getBaseDiscountAmount());
+            return abs((float) $item->getBaseDiscountAmount());
         }
 
-        return abs($item->getDiscountAmount());
+        return abs((float) $item->getDiscountAmount());
     }
 }

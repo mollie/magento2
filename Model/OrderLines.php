@@ -164,7 +164,7 @@ class OrderLines extends AbstractModel
 
         /** @var OrderInterface $order */
         $order = $shipment->getOrder();
-        $orderHasDiscount = abs($order->getDiscountAmount() ?? 0) > 0;
+        $orderHasDiscount = abs((float)($order->getDiscountAmount() ?? 0)) > 0;
 
         /** @var Item $item */
         foreach ($shipment->getItemsCollection() as $item) {
