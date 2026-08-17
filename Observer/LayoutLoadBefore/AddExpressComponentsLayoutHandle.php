@@ -28,7 +28,7 @@ class AddExpressComponentsLayoutHandle implements ObserverInterface
             return;
         }
 
-        /** @var LayoutInterface $layout */
+        /** @var LayoutInterface|null $layout */
         $layout = $observer->getEvent()->getData('layout');
         if ($layout === null) {
             return;

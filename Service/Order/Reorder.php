@@ -112,7 +112,7 @@ class Reorder
         $this->orderCreate->setPaymentMethod($method);
         $cart = $this->orderCreate->getQuote();
         $cart->setCustomerId($originalOrder->getCustomerId());
-        $cart->setCustomerIsGuest($originalOrder->getCustomerIsGuest());
+        $cart->setCustomerIsGuest((bool) $originalOrder->getCustomerIsGuest());
 
         $this->disableCheckForAdminOrders->disable();
         $this->productHelper->setSkipSaleableCheck(true);

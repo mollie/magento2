@@ -85,12 +85,7 @@ class EnvCollector implements CollectorInterface
             return $value;
         }
 
-        $leaf = end($path);
-        if (!is_string($leaf)) {
-            return $value;
-        }
-
-        $lowerLeaf = strtolower($leaf);
+        $lowerLeaf = strtolower(end($path));
         foreach (self::SENSITIVE_NEEDLES as $needle) {
             if (str_contains($lowerLeaf, $needle)) {
                 return self::REDACTED;

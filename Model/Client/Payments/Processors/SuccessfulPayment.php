@@ -16,7 +16,6 @@ use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Payment\Transaction;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Config;
-use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\PaymentProcessorInterface;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
@@ -39,7 +38,6 @@ class SuccessfulPayment implements PaymentProcessorInterface
         private readonly Uncancel $uncancel,
         private readonly TransactionProcessor $transactionProcessor,
         private readonly OrderCommentHistory $orderCommentHistory,
-        private readonly General $mollieHelper,
         private readonly OrderRepositoryInterface $orderRepository,
         private readonly SendOrderEmails $sendOrderEmails,
         private readonly CanRegisterCaptureNotification $canRegisterCaptureNotification,

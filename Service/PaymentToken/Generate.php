@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\PaymentToken;
 
 use Magento\Framework\Math\Random;
-use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Api\Data\PaymentTokenInterface;
@@ -19,7 +18,6 @@ use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 class Generate
 {
     public function __construct(
-        private CartRepositoryInterface $cartRepository,
         private Random $mathRandom,
         private PaymentTokenRepositoryInterface $paymentTokenRepository,
         private PaymentTokenInterfaceFactory $paymentTokenFactory

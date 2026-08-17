@@ -136,6 +136,7 @@ class Order
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
             'vatRate' => sprintf('%.2f', $item->getTaxPercent()),
             'vatAmount' => $this->mollieHelper->getAmountArray($this->currency, $vatAmount),
+            // @phpstan-ignore nullCoalesce.expr (sales_order_item.sku is nullable="true", the @return string lies)
             'sku' => substr($item->getSku() ?? '', 0, 64),
             'productUrl' => $this->getProductUrl($item),
         ];
@@ -214,12 +215,7 @@ class Order
             + $item->getDiscountTaxCompensationAmount();
     }
 
-    /**
-     * @param OrderItemInterface $item
-     *
-     * @return float
-     */
-    private function getDiscountAmountOrderItem(OrderItemInterface $item): float|int
+    private function getDiscountAmountOrderItem(OrderItemInterface $item): float
     {
         if ($this->forceBaseCurrency) {
             return abs($item->getBaseDiscountAmount() + $item->getBaseDiscountTaxCompensationAmount());
@@ -228,12 +224,7 @@ class Order
         return abs($item->getDiscountAmount() + $item->getDiscountTaxCompensationAmount());
     }
 
-    /**
-     * @param OrderInterface $order
-     *
-     * @return float
-     */
-    private function getTotalAmountShipping(OrderInterface $order): float|int|array
+    private function getTotalAmountShipping(OrderInterface $order): float
     {
         if ($this->forceBaseCurrency) {
             return $order->getBaseShippingAmount()
@@ -246,9 +237,9 @@ class Order
             + $order->getShippingDiscountTaxCompensationAmount();
     }
 
-    public function getShippingVatRate(OrderInterface $order): int|float
+    public function getShippingVatRate(OrderInterface $order): float
     {
-        $taxPercentage = 0;
+        $taxPercentage = 0.0;
         if ($order->getShippingAmount() > 0) {
             $taxPercentage = ($order->getShippingTaxAmount() / $order->getShippingAmount()) * 100;
         }

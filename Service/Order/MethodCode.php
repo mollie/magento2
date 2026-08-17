@@ -50,6 +50,7 @@ class MethodCode
 
     private function paymentLinkMethod(OrderInterface $order): string
     {
+        /** @var array<string, mixed> $additionalInformation */
         $additionalInformation = $order->getPayment()->getAdditionalInformation();
         if (!$additionalInformation || !array_key_exists('limited_methods', $additionalInformation)) {
             return '';

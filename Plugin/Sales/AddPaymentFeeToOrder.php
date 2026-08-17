@@ -56,7 +56,7 @@ class AddPaymentFeeToOrder
 
     /**
      * @param OrderInterface $entity
-     * @return OrderExtension|OrderExtensionInterface|null
+     * @return OrderExtension|OrderExtensionInterface
      */
     private function getExtensionAttributes(OrderInterface $entity)
     {

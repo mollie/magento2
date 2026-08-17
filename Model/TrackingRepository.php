@@ -48,7 +48,7 @@ class TrackingRepository implements TrackingRepositoryInterface
     public function getByCartId(int $cartId): ?TrackingInterface
     {
         $collection = $this->collectionFactory->create();
-        $collection->addFieldToFilter(TrackingInterface::CART_ID, $cartId);
+        $collection->addFieldToFilter(TrackingInterface::CART_ID, ['eq' => $cartId]);
         $collection->setOrder(TrackingInterface::ENTITY_ID, 'DESC');
         $collection->setPageSize(1);
 

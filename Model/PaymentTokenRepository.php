@@ -23,7 +23,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Reflection\DataObjectProcessor;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Api\Data\PaymentTokenInterface;
 use Mollie\Payment\Api\Data\PaymentTokenInterfaceFactory;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
@@ -33,8 +32,19 @@ use Mollie\Payment\Model\ResourceModel\PaymentToken\CollectionFactory as Payment
 
 class PaymentTokenRepository implements PaymentTokenRepositoryInterface
 {
-    public function __construct(protected ResourcePaymentToken $resource, protected PaymentTokenFactory $paymentTokenFactory, protected PaymentTokenInterfaceFactory $dataPaymentTokenFactory, protected PaymentTokenCollectionFactory $paymentTokenCollectionFactory, protected SearchResultsInterfaceFactory $searchResultsFactory, protected DataObjectHelper $dataObjectHelper, protected DataObjectProcessor $dataObjectProcessor, private StoreManagerInterface $storeManager, private CollectionProcessorInterface $collectionProcessor, protected JoinProcessorInterface $extensionAttributesJoinProcessor, protected ExtensibleDataObjectConverter $extensibleDataObjectConverter, private SearchCriteriaBuilderFactory $criteriaBuilderFactory)
-    {
+    public function __construct(
+        protected ResourcePaymentToken $resource,
+        protected PaymentTokenFactory $paymentTokenFactory,
+        protected PaymentTokenInterfaceFactory $dataPaymentTokenFactory,
+        protected PaymentTokenCollectionFactory $paymentTokenCollectionFactory,
+        protected SearchResultsInterfaceFactory $searchResultsFactory,
+        protected DataObjectHelper $dataObjectHelper,
+        protected DataObjectProcessor $dataObjectProcessor,
+        private CollectionProcessorInterface $collectionProcessor,
+        protected JoinProcessorInterface $extensionAttributesJoinProcessor,
+        protected ExtensibleDataObjectConverter $extensibleDataObjectConverter,
+        private SearchCriteriaBuilderFactory $criteriaBuilderFactory,
+    ) {
     }
 
     /**

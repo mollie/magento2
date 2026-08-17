@@ -122,7 +122,7 @@ class BuyNowValidation extends Action implements HttpPostActionInterface
                 __('We can\'t add this item to your shopping cart right now.'),
             );
 
-            $this->config->addToLog('error', $e);
+            $this->config->addToLog('error', $e->getMessage());
 
             $response->setHttpResponseCode(403);
 

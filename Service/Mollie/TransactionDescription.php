@@ -38,9 +38,9 @@ class TransactionDescription
         );
 
         $replacements = [
-            '{ordernumber}' => $order->getIncrementId(),
-            '{storename}' => $storeName,
-            '{customerid}' => $order->getCustomerId(),
+            '{ordernumber}' => (string) $order->getIncrementId(),
+            '{storename}' => (string) $storeName,
+            '{customerid}' => (string) $order->getCustomerId(),
         ];
 
         return str_replace(

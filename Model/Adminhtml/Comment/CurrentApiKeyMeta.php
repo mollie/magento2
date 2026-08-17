@@ -9,7 +9,6 @@ declare(strict_types=1);
 namespace Mollie\Payment\Model\Adminhtml\Comment;
 
 use Magento\Config\Model\Config\CommentInterface;
-use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Element\Context;
 
@@ -17,7 +16,6 @@ class CurrentApiKeyMeta extends AbstractBlock implements CommentInterface
 {
     public function __construct(
         Context $context,
-        private EncryptorInterface $encryptor,
         array $data = [],
     ) {
         parent::__construct($context, $data);
