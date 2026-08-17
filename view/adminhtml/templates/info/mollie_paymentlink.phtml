@@ -93,8 +93,8 @@ $status = $block->getPaymentStatus();
     {
         ".mollie-method": {
             "Mollie_Payment/js/order/fetch-order-status": {
-                "endpoint": "<?= $escaper->escapeHtmlAttr($block->getUrl('mollie/action/fetchOrderStatus')); ?>",
-                "order_id": "<?= $escaper->escapeHtmlAttr($block->getOrderId()); ?>"
+                "endpoint": "<?= $escaper->escapeJs($block->getUrl('mollie/action/fetchOrderStatus')); ?>",
+                "order_id": "<?= $escaper->escapeJs($block->getOrderId()); ?>"
             }
         },
         ".mollie-copy-url": {

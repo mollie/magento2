@@ -46,27 +46,32 @@ export default class OrdersPage {
       await page.getByText('Submit Comment').isVisible();
     }
 
-    async callFetchStatus(page, attempt = 0) {
-      await expect(page.getByRole('button', { name: 'Fetch Status' })).toBeVisible();
+    async clickFetchStatus(page) {
+      const fetchStatusButton = page.locator('.fetch-mollie-payment-status');
+      await expect(fetchStatusButton).toBeVisible();
 
-      try {
-        await Promise.all([
-          page.waitForResponse(
-            (response) => response.url().includes('mollie/action/fetchOrderStatus') && response.request().method() === 'POST',
-            {timeout: 15000}
-          ),
-          page.locator('.fetch-mollie-payment-status').click({timeout: 5000}),
-        ]);
-      } catch (error) {
-        if (attempt > 2) {
-          throw error;
+      let fetchOrderStatusResponse;
+
+      // The click handler is bound when the fetch-order-status RequireJS module loads, so an
+      // early click does nothing. Retry until the fetchOrderStatus request actually fires.
+      await expect(async () => {
+        const responsePromise = page.waitForResponse(
+          (response) => response.url().includes('mollie/action/fetchOrderStatus') && response.request().method() === 'POST',
+          {timeout: 5000}
+        );
+
+        if (await fetchStatusButton.isEnabled()) {
+          await fetchStatusButton.click();
         }
 
-        await page.reload();
-        await page.waitForLoadState('load');
-        await this.callFetchStatus(page, attempt + 1);
-        return;
-      }
+        fetchOrderStatusResponse = await responsePromise;
+      }).toPass({timeout: 60000});
+
+      return fetchOrderStatusResponse;
+    }
+
+    async callFetchStatus(page) {
+      await this.clickFetchStatus(page);
 
       await page.waitForLoadState('networkidle');
       await page.reload({waitUntil: 'load'});
