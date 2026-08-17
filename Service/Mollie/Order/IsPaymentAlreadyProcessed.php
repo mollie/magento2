@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Mollie\Order;
 
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Model\Order\Payment;
 
 class IsPaymentAlreadyProcessed
 {
@@ -25,6 +26,7 @@ class IsPaymentAlreadyProcessed
             return false;
         }
 
+        /** @var Payment $payment */
         $payment = $order->getPayment();
 
         if ($payment->getIsTransactionClosed()) {
@@ -40,7 +42,10 @@ class IsPaymentAlreadyProcessed
 
     private function wasProcessedBeforeThisFlagExisted(OrderInterface $order): bool
     {
-        return $order->getPayment()->getAdditionalInformation(self::STATUS_UPDATED) === 1
+        /** @var Payment $payment */
+        $payment = $order->getPayment();
+
+        return $payment->getAdditionalInformation(self::STATUS_UPDATED) === 1
             && $order->getInvoiceCollection()->count() > 0;
     }
 }
