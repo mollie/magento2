@@ -217,6 +217,7 @@ mutation processTransaction($paymentToken: String!) {
     paymentStatus
     redirect_to_success_page
     redirect_to_cart
+    awaiting_confirmation
     cart {
       id
     }
@@ -233,11 +234,40 @@ mutation processTransaction($paymentToken: String!) {
 | `paymentStatus` | `PaymentStatusEnum` | De Mollie-betaalstatus op het moment van de aanroep |
 | `redirect_to_success_page` | `Boolean` | `true` wanneer de betaling is geslaagd en de klant de orderbevestiging moet zien |
 | `redirect_to_cart` | `Boolean` | `true` wanneer de betaling is mislukt, geannuleerd of verlopen |
+| `awaiting_confirmation` | `Boolean` | `true` wanneer de betaling nog geen definitieve status heeft en alsnog bevestigd kan worden |
 | `cart` | `Cart` | De herstelde winkelwagen, alleen aanwezig wanneer `redirect_to_cart` `true` is |
 
-**`PaymentStatusEnum`-waarden:** `CREATED`, `OPEN`, `PENDING`, `AUTHORIZED`, `PAID`, `SHIPPING`, `COMPLETED`, `CANCELED`, `EXPIRED`, `REFUNDED`, `FAILED`, `ERROR`
-
 Wanneer `redirect_to_cart` `true` is, reaktiveert de extensie de winkelwagen automatisch en retourneert deze in het veld `cart` zodat de klant de bestelling kan aanpassen zonder opnieuw te beginnen.
+
+**Omgaan met `awaiting_confirmation`.** Een klant kan terugkeren van Mollie terwijl de betaling nog `open` is, bijvoorbeeld door op de betaalpagina op de terugknop van de browser te drukken. De betaling kan even later alsnog door de webhook bevestigd worden. De Luma-checkout vangt dit op met een korte wachtpagina die de status pollt voordat hij bepaalt waar de klant heen gaat, en met `awaiting_confirmation` doe je hetzelfde in een headless storefront.
+
+`redirect_to_cart` is in deze situatie `true` en de winkelwagen is al opnieuw geactiveerd, dus terugvallen op de winkelwagen is veilig. Wil je Luma volgen, toon dan een "we bevestigen je betaling"-scherm zolang `awaiting_confirmation` `true` is, poll `mollieCustomerOrder` een paar seconden, en stuur de klant pas terug naar de winkelwagen als de betaling dan nog steeds niet bevestigd is.
+
+---
+
+### Betaalstatussen
+
+`paymentStatus` is de onbewerkte [betaalstatus van de Mollie Payments API](https://docs.mollie.com/docs/handling-payment-status), met één toevoeging: `CHARGEBACK`, die de extensie meldt wanneer een reeds betaalde betaling is teruggeboekt.
+
+**Stuur je routering niet op `paymentStatus`.** Gebruik daarvoor `redirect_to_success_page` en `redirect_to_cart`, want die booleans houden al rekening met de betaalmethode. Gebruik `paymentStatus` alleen om te bepalen welke tekst je toont.
+
+| `paymentStatus` | `redirect_to_success_page` | Wat je de klant toont |
+|---|---|---|
+| `PAID` | `true` | De orderbevestiging |
+| `AUTHORIZED` | `true` | De orderbevestiging. Het bedrag is gereserveerd en wordt later geïncasseerd |
+| `PENDING` | `true` | De orderbevestiging, eventueel met de tekst "je betaling wordt verwerkt" |
+| `OPEN`, bij Bankoverschrijving of Pay by Bank | `true` | De orderbevestiging met betaalinstructies. De klant moet het bedrag nog overmaken |
+| `OPEN`, bij elke andere methode | `false` | De klant is teruggekeerd zonder de betaling af te ronden. De winkelwagen wordt opnieuw geactiveerd |
+| `CANCELED` | `false` | "Betaling geannuleerd, probeer het opnieuw" |
+| `EXPIRED` | `false` | "Transactie mislukt, probeer het opnieuw" |
+| `FAILED` | `false` | "Transactie mislukt, probeer het opnieuw" |
+| `CHARGEBACK` | `false` | Kom je zelden tegen bij terugkeer. Behandel dit als een mislukte betaling |
+
+`OPEN` telt bij Bankoverschrijving en Pay by Bank als een succes, omdat de order is geplaatst en het geld later binnenkomt. Bij elke andere methode betekent het dat de klant de betaalpagina heeft verlaten. Dat verschil is precies waarom routeren op de booleans veiliger is dan routeren op de status.
+
+De Mollie-betaalstatus is niet hetzelfde als de Magento-orderstatus. De extensie zet de Magento-orderstatus op de status die is ingesteld onder **Stores → Configuration → Mollie → Order Management → Statuses → Status Pending** (standaard `pending_payment`) op het moment dat de klant naar Mollie wordt doorgestuurd, dus voordat er een betaling bestaat. Die status komt nooit terug via `paymentStatus`.
+
+De `PaymentStatusEnum` bevat daarnaast `CREATED`, `SHIPPING`, `COMPLETED`, `REFUNDED` en `ERROR`. Dat zijn restanten van de Orders API, die [in v3.0.0 is verwijderd](UPGRADING.md#verwijdering-van-de-orders-api). Ze zijn in het schema als deprecated gemarkeerd en worden nooit geretourneerd.
 
 ---
 
@@ -285,6 +315,10 @@ query getOrderByHash($hash: String!) {
 ```
 
 De parameter `hash` komt van de queryparameter `order_id` die door de extensie aan de retour-URL wordt toegevoegd. De resolver ontsleutelt de hash intern en retourneert een standaard `CustomerOrder`-object.
+
+**Het veld `status` is hier niet de Mollie-betaalstatus.** De GraphQL-query retourneert de Magento-orderstatus, die de webhook bijwerkt zodra de betaling is bevestigd. Het REST-equivalent, `GET /rest/V1/mollie/get-order/by-hash/:hash`, werkt anders: dat bevraagt bij elke aanroep de Mollie API en vertaalt de betaalstatus naar `pending`, `processing`, `canceled` of `complete`.
+
+Dat verschil is belangrijk wanneer je pollt terwijl `awaiting_confirmation` `true` is. De GraphQL-query weerspiegelt de betaling pas nadat de webhook is verwerkt, dus bij een vertraagde of geblokkeerde webhook blijft die op de pending-status staan. Het REST-endpoint leest de betaling rechtstreeks bij Mollie en is niet afhankelijk van de webhook. Gebruik het REST-endpoint als je de betaalstatus nodig hebt zoals Mollie die kent, en de GraphQL-query als je de bestelling nodig hebt zoals Magento die kent.
 
 ---
 
@@ -628,6 +662,8 @@ POST /rest/V1/mollie/get-order/by-payment-token/:token
 ```
 
 Beide retourneren een Magento-bestelobj. Controleer de status van de bestelling om te bepalen of je een bevestigingspagina moet tonen of de klant terug naar de winkelwagen moet sturen.
+
+De `status` die deze endpoints retourneren is afgeleid van de Mollie-betaling en wordt niet van de bestelling gelezen: ze bevragen bij elke aanroep de Mollie API en vertalen de betaalstatus naar `pending`, `processing`, `canceled` of `complete`. Daarmee zijn ze geschikt om te pollen zolang een betaling nog bevestigd moet worden, want ze zijn niet afhankelijk van een binnengekomen webhook. De GraphQL-query `mollieCustomerOrder` retourneert daarentegen de Magento-orderstatus, die pas verandert nadat de webhook is verwerkt.
 
 ---
 
