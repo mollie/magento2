@@ -295,16 +295,6 @@
         </arguments>
     </type>
 
-    <type name="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPurchaseOrders">
-        <arguments>
-            <argument name="mollie" xsi:type="object">Mollie\Payment\Model\Mollie\Proxy</argument>
-        </arguments>
-    </type>
-
-    <type name="Magento\InstantPurchase\Controller\Button\PlaceOrder">
-        <plugin name="mollie_add_redirect_url" type="Mollie\Payment\Plugin\InstantPurchase\Button\PlaceOrderAddRedirectUrl" />
-    </type>
-
     <type name="Mollie\Payment\Model\Client\Payments\ProcessTransaction">
         <arguments>
             <argument name="checkoutSession" xsi:type="object">Magento\Checkout\Model\Session\Proxy</argument>
