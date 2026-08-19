@@ -13,6 +13,7 @@ use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Model\Client\Payments\CaptureInvoiceForShipment;
+use Mollie\Payment\Service\LockService;
 use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
 use Mollie\Payment\Service\Mollie\Order\WhenToCapture;
 
@@ -21,7 +22,8 @@ class CaptureShipment implements ObserverInterface
     public function __construct(
         private readonly CanUseManualCapture $canUseManualCapture,
         private readonly WhenToCapture $whenToCapture,
-        private readonly CaptureInvoiceForShipment $captureInvoiceForShipment
+        private readonly CaptureInvoiceForShipment $captureInvoiceForShipment,
+        private readonly LockService $lockService
     ) {}
 
     public function execute(Observer $observer)
@@ -41,6 +43,11 @@ class CaptureShipment implements ObserverInterface
             return;
         }
 
-        $this->captureInvoiceForShipment->execute($shipment);
+        // Lock the order, so the webhook does not process this order while we capture it.
+        $this->lockService->executeWhileLocked(
+            'mollie.order.' . $order->getEntityId(),
+            fn () => $this->captureInvoiceForShipment->execute($shipment),
+            'shipment',
+        );
     }
 }

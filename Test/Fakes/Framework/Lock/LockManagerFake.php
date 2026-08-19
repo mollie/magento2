@@ -22,6 +22,11 @@ class LockManagerFake implements LockManagerInterface
      */
     private array $lockCallsByName = [];
 
+    /**
+     * @var array<string, int>
+     */
+    private array $unlockCallsByName = [];
+
     public function lock(string $name, int $timeout = -1): bool
     {
         $this->locks[$name] = true;
@@ -33,6 +38,7 @@ class LockManagerFake implements LockManagerInterface
     public function unlock(string $name): bool
     {
         unset($this->locks[$name]);
+        $this->unlockCallsByName[$name] = ($this->unlockCallsByName[$name] ?? 0) + 1;
 
         return true;
     }
@@ -45,5 +51,10 @@ class LockManagerFake implements LockManagerInterface
     public function lockCallCount(string $name): int
     {
         return $this->lockCallsByName[$name] ?? 0;
+    }
+
+    public function unlockCallCount(string $name): int
+    {
+        return $this->unlockCallsByName[$name] ?? 0;
     }
 }
