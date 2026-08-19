@@ -8,13 +8,14 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service;
 
+use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Lock\LockManagerInterface;
 use Mollie\Payment\Config;
 
 class LockService
 {
     /**
-     * @var array<string, bool>
+     * @var array<string, int>
      */
     private array $activeLocks = [];
 
@@ -22,6 +23,30 @@ class LockService
         private Config $config,
         private LockManagerInterface $lockManager
     ) {}
+
+    /**
+     * Runs the callback while the lock is held, and releases the lock afterwards.
+     *
+     * @param string $name lock name
+     * @param callable $callback
+     * @param ?string $reason Reason for locking, will be logged only
+     * @return mixed
+     * @throws LocalizedException
+     */
+    public function executeWhileLocked(string $name, callable $callback, ?string $reason = null)
+    {
+        if ($this->checkIfIsLockedWithWait($name)) {
+            throw new LocalizedException(__('Unable to get lock for %1', $name));
+        }
+
+        $this->lock($name, -1, $reason);
+
+        try {
+            return $callback();
+        } finally {
+            $this->unlock($name);
+        }
+    }
 
     /**
      * Sets a lock
@@ -33,8 +58,10 @@ class LockService
      */
     public function lock(string $name, int $timeout = -1, ?string $reason = null): bool
     {
-        // Make sure we only lock a given name once per request.
+        // The lock is re-entrant: only the outermost call acquires the underlying lock.
         if (isset($this->activeLocks[$name])) {
+            $this->activeLocks[$name]++;
+
             return true;
         }
 
@@ -43,7 +70,7 @@ class LockService
 
         $result = $this->lockManager->lock($name, $timeout);
         if ($result) {
-            $this->activeLocks[$name] = true;
+            $this->activeLocks[$name] = 1;
         }
 
         return $result;
@@ -57,6 +84,13 @@ class LockService
      */
     public function unlock(string $name): bool
     {
+        // Only release the underlying lock once the outermost caller is done with it.
+        if (isset($this->activeLocks[$name]) && $this->activeLocks[$name] > 1) {
+            $this->activeLocks[$name]--;
+
+            return true;
+        }
+
         $this->config->addToLog('info', 'Unlocking: ' . $name);
 
         $result = $this->lockManager->unlock($name);
@@ -79,6 +113,21 @@ class LockService
     }
 
     /**
+     * Tests if the lock is held by another process, ignoring the locks this request owns itself.
+     *
+     * @param string $name lock name
+     * @return bool
+     */
+    public function isLockedByAnotherProcess(string $name): bool
+    {
+        if (isset($this->activeLocks[$name])) {
+            return false;
+        }
+
+        return $this->isLocked($name);
+    }
+
+    /**
      * Try to get a lock, and if not, try $attempts times to get it.
      *
      * @param string $name
@@ -89,7 +138,7 @@ class LockService
     {
         $count = 0;
         $waitTime = 0;
-        while ($this->isLocked($name)) {
+        while ($this->isLockedByAnotherProcess($name)) {
             $waitTime += 500000;
             $this->config->addToLog(
                 'info',

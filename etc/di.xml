@@ -280,12 +280,6 @@
         </arguments>
     </type>
 
-    <type name="Mollie\Payment\Service\LockService">
-        <arguments>
-            <argument name="resourceConnection" xsi:type="object">Magento\Framework\App\ResourceConnection\Proxy</argument>
-        </arguments>
-    </type>
-
     <type name="Mollie\Payment\Model\Mollie">
         <arguments>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
