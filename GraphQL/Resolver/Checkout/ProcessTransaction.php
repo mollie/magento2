@@ -16,6 +16,7 @@ use Magento\Framework\GraphQl\Exception\GraphQlNoSuchEntityException;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Service\Mollie\ProcessTransaction as ProcessTransactionAction;
@@ -48,7 +49,7 @@ class ProcessTransaction implements ResolverInterface
 
         $cart = null;
         if ($tokenModel->getCartId()) {
-            $cart = $this->getCart(!$redirectToSuccessPage, $tokenModel->getCartId());
+            $cart = $this->getCart(!$redirectToSuccessPage, (int)$tokenModel->getCartId());
         }
 
         return [
@@ -56,17 +57,18 @@ class ProcessTransaction implements ResolverInterface
             'cart' => $cart,
             'redirect_to_cart' => !$redirectToSuccessPage,
             'redirect_to_success_page' => $redirectToSuccessPage,
+            'awaiting_confirmation' => $result->isAwaitingConfirmation(),
         ];
     }
 
-    private function getCart(bool $restoreCart, string $cartId): ?array
+    private function getCart(bool $restoreCart, int $cartId): ?array
     {
         try {
             $cart = $this->cartRepository->get($cartId);
 
             if ($restoreCart) {
-                $cart->setIsActive(1);
-                $cart->setReservedOrderId(null);
+                $cart->setIsActive(true);
+                $cart->setData(CartInterface::KEY_RESERVED_ORDER_ID, null);
                 $this->cartRepository->save($cart);
             }
 

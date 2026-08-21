@@ -36,6 +36,7 @@ class StoreCredentials implements TransactionPartInterface
             return $transaction;
         }
 
+        /** @var array<string, mixed> $info */
         $info = $payment->getAdditionalInformation();
         if (($info['mollie_save_card'] ?? null) !== true || ($info['mollie_mandate_id'] ?? '') !== '') {
             return $transaction;

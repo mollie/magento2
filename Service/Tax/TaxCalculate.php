@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Tax;
 
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Model\Quote\Address;
 use Magento\Tax\Model\Calculation;
 use Mollie\Payment\Service\Config\PaymentFee;
 
@@ -22,6 +23,7 @@ class TaxCalculate
     public function getTaxFromAmountIncludingTax(CartInterface $cart, $amount)
     {
         $shippingAddress = $cart->getShippingAddress();
+        /** @var Address|null $billingAddress */
         $billingAddress = $cart->getBillingAddress();
         $customerTaxClassId = $cart->getCustomerTaxClassId();
         $storeId = storeId($cart->getStoreId());

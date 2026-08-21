@@ -143,7 +143,7 @@ class LogCollector implements CollectorInterface
                 $position -= $read;
                 $this->driver->fileSeek($handle, $position);
                 $data = $this->driver->fileRead($handle, $read);
-                if ($data === '' || $data === false) {
+                if ($data === '') {
                     break;
                 }
                 $buffer = $data . $buffer;

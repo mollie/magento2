@@ -392,7 +392,7 @@ class Mollie extends Adapter
             $payment = $mollieApi->payments->get($transactionId);
 
             // @see https://github.com/mollie/mollie-api-php/issues/840
-            $oldHandler = set_error_handler(function() {});
+            $oldHandler = set_error_handler(static fn (int $errno, string $errstr): bool => true);
             try {
                 $refund = $payment->refund([
                     'description' => __('Refund for order %1', $order->getIncrementId()),

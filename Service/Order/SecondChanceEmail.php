@@ -10,7 +10,6 @@ namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\ManagerInterface;
-use Magento\Framework\Mail\Template\SenderResolverInterface;
 use Magento\Framework\Mail\Template\TransportBuilder;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -27,7 +26,6 @@ class SecondChanceEmail
 
     public function __construct(
         private Config $config,
-        private SenderResolverInterface $senderResolver,
         private TransportBuilder $transportBuilder,
         private IdentityInterface $identityContainer,
         private StoreManagerInterface $storeManager,
@@ -111,17 +109,6 @@ class SecondChanceEmail
 
     private function setFrom(TransportBuilder $builder, int $storeId): void
     {
-        $emailIdentity = $this->identityContainer->getEmailIdentity();
-
-        // Only exists in newer versions
-        // @see https://github.com/mollie/magento2/issues/367#issuecomment-805840292
-        if (method_exists($builder, 'setFromByScope')) {
-            $builder->setFromByScope($emailIdentity, $storeId);
-
-            return;
-        }
-
-        $from = $this->senderResolver->resolve($emailIdentity, $storeId);
-        $builder->setFrom($from);
+        $builder->setFromByScope($this->identityContainer->getEmailIdentity(), $storeId);
     }
 }

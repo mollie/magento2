@@ -86,3 +86,39 @@ test('Shows the Fetch Status button for a payment link order once the customer h
   await expect(page.locator('.fetch-mollie-payment-status')).toBeEnabled();
   await expect(page.getByText('Payment not started')).toHaveCount(0);
 });
+
+test('Retrieves the latest status from Mollie when clicking the Fetch Status button on a payment link order', async ({page, browser}) => {
+  test.setTimeout(180000);
+
+  await createOrderPage.startNewOrder(page);
+  await createOrderPage.selectCustomerByEmail(page, 'roni_cost@example.com');
+  await createOrderPage.selectStoreView(page, 'Default Store View');
+
+  await createOrderPage.addProductBySku(page, '24-MB05');
+
+  await createOrderPage.selectFirstShippingMethod(page);
+  await createOrderPage.selectPaymentMethod(page, 'mollie_methods_paymentlink');
+
+  await createOrderPage.submitOrder(page);
+
+  const paymentLinkUrl = await createOrderPage.getPaymentLinkUrl(page);
+
+  const visitorContext = await browser.newContext();
+  const visitorPage = await visitorContext.newPage();
+
+  try {
+    await visitorPage.goto(paymentLinkUrl);
+
+    await mollieHostedPaymentPage.assertIsVisible(visitorPage);
+  } finally {
+    await visitorContext.close();
+  }
+
+  await page.reload({waitUntil: 'load'});
+
+  const response = await ordersPage.clickFetchStatus(page);
+
+  expect(response.status()).toBe(200);
+
+  await expect(page.getByText('The latest status from Mollie has been retrieved')).toBeVisible();
+});

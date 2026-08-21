@@ -280,12 +280,6 @@
         </arguments>
     </type>
 
-    <type name="Mollie\Payment\Service\LockService">
-        <arguments>
-            <argument name="resourceConnection" xsi:type="object">Magento\Framework\App\ResourceConnection\Proxy</argument>
-        </arguments>
-    </type>
-
     <type name="Mollie\Payment\Model\Mollie">
         <arguments>
             <argument name="formBlockType" xsi:type="string">Magento\Payment\Block\Form</argument>
@@ -293,16 +287,6 @@
             <argument name="valueHandlerPool" xsi:type="object">MollieValueHandlerPool</argument>
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
         </arguments>
-    </type>
-
-    <type name="Mollie\Payment\Observer\CheckoutSubmitAllAfter\StartTransactionForInstantPurchaseOrders">
-        <arguments>
-            <argument name="mollie" xsi:type="object">Mollie\Payment\Model\Mollie\Proxy</argument>
-        </arguments>
-    </type>
-
-    <type name="Magento\InstantPurchase\Controller\Button\PlaceOrder">
-        <plugin name="mollie_add_redirect_url" type="Mollie\Payment\Plugin\InstantPurchase\Button\PlaceOrderAddRedirectUrl" />
     </type>
 
     <type name="Mollie\Payment\Model\Client\Payments\ProcessTransaction">

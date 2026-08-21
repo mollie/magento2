@@ -14,10 +14,7 @@ trait ApiKeyFallbackTrait
 
     private $instanceInitiated = false;
 
-    /**
-     * @var FetchFallbackApiKeys
-     */
-    private $fallbackApiKeysInstance;
+    private ?FetchFallbackApiKeys $fallbackApiKeysInstance = null;
 
     /**
      * This instance is a proxy, so don't call it until really needed.

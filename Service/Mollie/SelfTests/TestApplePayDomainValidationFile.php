@@ -40,13 +40,6 @@ class TestApplePayDomainValidationFile extends AbstractSelfTest
             return;
         }
 
-        if ($contents === false) {
-            $message = __('Error: The Apple Pay domain validation file could not be accessed.');
-            $this->addMessage('error', $message);
-
-            return;
-        }
-
         if (!$contents) {
             $message = __('Error: The Apple Pay domain validation file is empty.');
             $this->addMessage('error', $message);

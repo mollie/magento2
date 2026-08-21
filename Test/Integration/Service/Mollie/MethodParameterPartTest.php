@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Mollie;
 
 use Magento\Quote\Api\Data\CartInterface;
+use Mollie\Api\Types\MethodQuery;
 use Mollie\Payment\Service\Mollie\Parameters\ParameterPartInterface;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
@@ -20,7 +21,7 @@ class MethodParameterPartTest extends IntegrationTestCase
             'currency' => 'EUR',
         ],
         'resource' => 'orders',
-        'includeWallets' => ['applepay'],
+        'includeWallets' => MethodQuery::WALLETS,
     ];
 
     public function testChangesNothingWhenNoPartsAreConfigured(): void

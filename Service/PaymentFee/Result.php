@@ -68,10 +68,7 @@ class Result
         $this->taxAmount = $taxAmount;
     }
 
-    /**
-     * @return float
-     */
-    public function getAmountIncludingTax(): float|int|array
+    public function getAmountIncludingTax(): float
     {
         return $this->amount + $this->taxAmount;
     }

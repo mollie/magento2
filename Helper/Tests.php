@@ -12,6 +12,7 @@ use Exception;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Types\MethodQuery;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 /**
@@ -47,7 +48,9 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieApiClient->loadByApiKey($testKey);
-                    $methods = $mollieApi->methods->allEnabled() ?? [];
+                    $methods = $mollieApi->methods->allEnabled([
+                        'includeWallets' => MethodQuery::WALLETS,
+                    ]);
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);
@@ -85,7 +88,9 @@ class Tests extends AbstractHelper
                 try {
                     $availableMethods = [];
                     $mollieApi = $this->mollieApiClient->loadByApiKey($liveKey);
-                    $methods = $mollieApi->methods->allEnabled() ?? [];
+                    $methods = $mollieApi->methods->allEnabled([
+                        'includeWallets' => MethodQuery::WALLETS,
+                    ]);
 
                     foreach ($methods as $apiMethod) {
                         $availableMethods[] = ucfirst($apiMethod->id);

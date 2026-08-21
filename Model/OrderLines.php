@@ -164,7 +164,7 @@ class OrderLines extends AbstractModel
 
         /** @var OrderInterface $order */
         $order = $shipment->getOrder();
-        $orderHasDiscount = abs($order->getDiscountAmount() ?? 0) > 0;
+        $orderHasDiscount = abs((float)($order->getDiscountAmount() ?? 0)) > 0;
 
         /** @var Item $item */
         foreach ($shipment->getItemsCollection() as $item) {
@@ -455,26 +455,5 @@ class OrderLines extends AbstractModel
         }
 
         return true;
-    }
-
-    /**
-     * @param OrderInterface $order
-     * @param int $forceBaseCurrency
-     * @return array
-     */
-    private function getOrderDiscount(OrderInterface $order, $forceBaseCurrency): array
-    {
-        $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
-        $amount = $forceBaseCurrency ? $order->getBaseDiscountAmount() : $order->getDiscountAmount();
-
-        return [
-            'name' => 'Discount',
-            'type' => 'discount',
-            'unitPrice' => $this->mollieHelper->getAmountArray($currency, $amount),
-            'totalAmount' => $this->mollieHelper->getAmountArray($currency, $amount),
-            'vatRate' => 0,
-            'vatAmount' => $this->mollieHelper->getAmountArray($currency, 0),
-            'quantity' => 1,
-        ];
     }
 }

@@ -121,8 +121,8 @@ class General extends AbstractHelper
     /**
      * Get admin value by path and storeId
      *
-     * @param     $path
-     * @param int $storeId
+     * @param string $path
+     * @param int|string|null $storeId
      *
      * @return mixed
      */
@@ -219,7 +219,7 @@ class General extends AbstractHelper
     }
 
     /**
-     * @param null $storeId
+     * @param int|null $storeId
      *
      * @return mixed
      */

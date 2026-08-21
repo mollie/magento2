@@ -16,6 +16,7 @@ use Magento\Sales\Api\Data\InvoiceItemInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Api\Data\ShipmentInterface;
+use Magento\Sales\Api\Data\ShipmentItemInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Model\OrderLinesFactory;
@@ -268,6 +269,48 @@ class OrderLinesTest extends IntegrationTestCase
         $this->assertCount(1, $result['lines']);
         $this->assertEquals('ord_abc123', $result['lines'][0]['id']);
         $this->assertEquals(2, $result['lines'][0]['quantity']);
+    }
+
+    public function testGetShipmentOrderLinesHandlesDatabaseStrings(): void
+    {
+        $shippedLine = $this->objectManager->get(OrderLinesFactory::class)->create();
+        $shippedLine->setItemId(999);
+        $shippedLine->setLineId('odl_shipped');
+        $shippedLine->save();
+
+        /** @var OrderItemInterface $orderItem */
+        $orderItem = $this->objectManager->create(OrderItemInterface::class);
+        $orderItem->setItemId(999);
+        $orderItem->setBaseRowTotal('45.0000'); // 45 - 21% tax
+        $orderItem->setBaseTaxAmount('7.5600');
+        $orderItem->setBaseDiscountAmount('9.0000');
+        $orderItem->setBaseDiscountTaxCompensationAmount('0.0000');
+        $orderItem->setQtyOrdered('1.0000');
+
+        /** @var ShipmentItemInterface $shipmentItem */
+        $shipmentItem = $this->objectManager->create(ShipmentItemInterface::class);
+        $shipmentItem->setQty('1.0000');
+        $shipmentItem->setOrderItem($orderItem);
+
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setEntityId(999999);
+        $order->setBaseCurrencyCode('EUR');
+        $order->setDiscountAmount('-9.0000');
+
+        /** @var ShipmentInterface $shipment */
+        $shipment = $this->objectManager->create(ShipmentInterface::class);
+        $shipment->setOrder($order);
+        $shipment->setItems([$shipmentItem]);
+
+        /** @var OrderLines $instance */
+        $instance = $this->objectManager->get(OrderLines::class);
+        $result = $instance->getShipmentOrderLines($shipment);
+
+        $this->assertCount(1, $result['lines']);
+        $this->assertEquals('odl_shipped', $result['lines'][0]['id']);
+        $this->assertEquals('EUR', $result['lines'][0]['amount']['currency']);
+        $this->assertEquals(45 - 9 + 7.56, $result['lines'][0]['amount']['value']);
     }
 
     /**

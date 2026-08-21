@@ -46,6 +46,55 @@ test('[C1835263] Validate that an order can be placed through GraphQL', async ({
   await ordersPage.assertOrderStatusIs(page, 'Processing');
 });
 
+test('Validate that awaiting_confirmation is reported through GraphQL until the payment is confirmed', async ({ page, browser }) => {
+  test.skip(!process.env.mollie_available_methods.includes('ideal'), 'Skipping test as iDEAL is not available');
+
+  await page.goto('opt/mollie-pwa-graphql.html');
+
+  await page.click('[data-key="start-checkout-process"]');
+
+  await page.click('[data-key="mollie_methods_ideal"]');
+
+  await page.click('[data-key="place-order-action"]');
+
+  const redirectUrl = await page.locator('[data-key="redirect-url"]').getAttribute('href');
+
+  // Open Mollie in a separate context so the storefront tab stays alive and keeps the
+  // payment token it holds in memory, the same way the demo opens the redirect url in a
+  // new tab. Navigating this tab away would lose the token and the scenario with it.
+  const mollieContext = await browser.newContext({ ignoreHTTPSErrors: true });
+  const molliePage = await mollieContext.newPage();
+  await molliePage.goto(redirectUrl);
+  await mollieHostedPaymentPage.selectFirstIssuer(molliePage);
+
+  const molliePaymentUrl = molliePage.url();
+
+  // The customer leaves the payment page without paying, so the payment stays open.
+  await mollieHostedPaymentPage.selectStatus(molliePage, 'open');
+  await molliePage.waitForURL(url => !url.href.includes('mollie.com/checkout'));
+
+  await page.click('[data-key="process-transaction-action"]');
+
+  await expect(page.locator('[data-key="payment-status"]')).toHaveText('OPEN');
+  await expect(page.locator('[data-key="awaiting-confirmation"]')).toHaveText('true');
+  await expect(page.locator('[data-key="redirect-to-success-page"]')).toHaveText('false');
+  await expect(page.locator('[data-key="redirect-to-cart"]')).toHaveText('true');
+
+  // The payment is confirmed afterwards, which is what awaiting_confirmation tells the
+  // storefront to wait for instead of dropping the customer back on the cart.
+  await molliePage.goto(molliePaymentUrl);
+  await mollieHostedPaymentPage.selectStatus(molliePage, 'paid');
+  await molliePage.waitForURL(url => !url.href.includes('mollie.com/checkout'));
+  await mollieContext.close();
+
+  await page.click('[data-key="process-transaction-action"]');
+
+  await expect(page.locator('[data-key="payment-status"]')).toHaveText('PAID');
+  await expect(page.locator('[data-key="awaiting-confirmation"]')).toHaveText('false');
+  await expect(page.locator('[data-key="redirect-to-success-page"]')).toHaveText('true');
+  await expect(page.locator('[data-key="redirect-to-cart"]')).toHaveText('false');
+});
+
 test('[C1835263] Validate that a point of sale order can be placed through GraphQL', async ({ page }) => {
   await page.goto('opt/mollie-pwa-graphql.html');
 

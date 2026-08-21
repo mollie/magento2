@@ -10,8 +10,6 @@ namespace Mollie\Payment\Plugin\Sales\Block\Adminhtml\Order\Buttons;
 
 use Magento\Framework\AuthorizationInterface;
 use Magento\Framework\UrlInterface;
-use Magento\Payment\Helper\Data as PaymentHelper;
-use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Block\Adminhtml\Order\View;
 use Magento\Sales\Helper\Reorder;
 use Magento\Sales\Model\Order\Reorder\UnavailableProductsProvider;
@@ -22,8 +20,6 @@ class MarkAsPaidButton implements ButtonInterface
     public function __construct(
         private Config $config,
         private UrlInterface $url,
-        private OrderRepositoryInterface $orderRepository,
-        private PaymentHelper $paymentHelper,
         private Reorder $reorderHelper,
         private UnavailableProductsProvider $unavailableProductsProvider,
         private AuthorizationInterface $authorization,

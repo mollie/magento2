@@ -84,7 +84,7 @@ class ComposerCollector implements CollectorInterface
             if (($stat['size'] ?? 0) > self::MAX_FILE_SIZE) {
                 return ['composer/' . $name => sprintf(
                     'File too large (%d MB), skipped.',
-                    (int) round(($stat['size'] ?? 0) / 1024 / 1024)
+                    (int) round($stat['size'] / 1024 / 1024)
                 )];
             }
             return ['composer/' . $name => $this->driver->fileGetContents($absolute)];

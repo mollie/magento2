@@ -8,10 +8,10 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Plugin\Sales\Cart;
 
-use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartExtensionInterfaceFactory;
 use Magento\Quote\Api\Data\CartInterface;
+use Magento\Quote\Api\Data\CartSearchResultsInterface;
 
 class AddPaymentFeeToCart
 {
@@ -31,7 +31,10 @@ class AddPaymentFeeToCart
         return $result;
     }
 
-    public function afterGetList(CartRepositoryInterface $subject, SearchResultsInterface $result): SearchResultsInterface
+    public function afterGetList(
+        CartRepositoryInterface $subject,
+        CartSearchResultsInterface $result,
+    ): CartSearchResultsInterface
     {
         $items = $result->getItems();
         foreach ($items as $id => $item) {

@@ -52,7 +52,7 @@ class ResetCart implements ResolverInterface
     {
         $cartCustomerId = (int) $cart->getCustomerId();
         /* Guest cart, allow operations */
-        if (0 === $cartCustomerId && (null === $customerId || 0 === $customerId)) {
+        if (0 === $cartCustomerId && 0 === $customerId) {
             return;
         }
 
