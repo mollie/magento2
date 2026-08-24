@@ -9,6 +9,7 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Order\Lines;
 
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Api\Types\OrderLineType;
 use Mollie\Payment\Helper\General;
 
 class PaymentFee
@@ -49,8 +50,8 @@ class PaymentFee
         }
 
         $orderLine = [
-            'type' => 'surcharge',
-            'name' => __('Payment Fee'),
+            'type' => OrderLineType::SURCHARGE,
+            'description' => __('Payment Fee'),
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($currency, $amount + $taxAmount),
             'totalAmount' => $this->mollieHelper->getAmountArray($currency, $amount + $taxAmount),

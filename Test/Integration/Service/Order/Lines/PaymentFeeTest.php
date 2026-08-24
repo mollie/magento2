@@ -41,6 +41,10 @@ class PaymentFeeTest extends IntegrationTestCase
         $instance = $this->objectManager->create(PaymentFee::class);
 
         $line = $instance->getOrderLine($order, true);
+
+        $this->assertEquals('surcharge', $line['type']);
+        $this->assertEquals(__('Payment Fee'), $line['description']);
+        $this->assertArrayNotHasKey('name', $line);
     }
 
     public function testGetOrderLineAcceptsStringValuesFromTheDatabase(): void

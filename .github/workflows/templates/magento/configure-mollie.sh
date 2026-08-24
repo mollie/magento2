@@ -58,6 +58,12 @@ bin/magento config:set payment/mollie_methods_wero/active 1
 # Disable queues as we don't have those in the test environment
 bin/magento config:set payment/mollie_general/process_transactions_in_the_queue 0
 
+# Enable a payment fee for Klarna so every Klarna test covers the surcharge order line (mollie/magento2#1061).
+# Tax class 2 = Taxable Goods; the fee only gets tax when a tax rule matches the shipping address.
+bin/magento config:set payment/mollie_methods_klarna/payment_surcharge_type fixed_fee
+bin/magento config:set payment/mollie_methods_klarna/payment_surcharge_fixed_amount 1.95
+bin/magento config:set payment/mollie_methods_klarna/payment_surcharge_tax_class 2
+
 # Enable Express Components. Not part of the list above because it is not controlled by the Methods API and
 # is hidden in the admin until it is active, so it can only be enabled here.
 bin/magento config:set payment/mollie_methods_expresscomponents/active 1
