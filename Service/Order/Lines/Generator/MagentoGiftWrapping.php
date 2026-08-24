@@ -43,10 +43,10 @@ class MagentoGiftWrapping implements GeneratorInterface
             'type' => OrderLineType::SURCHARGE,
             'description' => __('Magento Gift Wrapping'),
             'quantity' => 1,
-            'unitPrice' => $this->mollieHelper->getAmountArray($currency, $amount),
-            'totalAmount' => $this->mollieHelper->getAmountArray($currency, $amount),
+            'unitPrice' => $this->mollieHelper->getAmountArray($currency, (float)$amount),
+            'totalAmount' => $this->mollieHelper->getAmountArray($currency, (float)$amount),
             'vatRate' => '0.00',
-            'vatAmount' => $this->mollieHelper->getAmountArray($currency, '0.00'),
+            'vatAmount' => $this->mollieHelper->getAmountArray($currency, 0.0),
         ];
 
         return $orderLines;
