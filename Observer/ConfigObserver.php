@@ -41,10 +41,7 @@ class ConfigObserver implements ObserverInterface
      */
     public function execute(EventObserver $observer): void
     {
-        $storeId = $observer->getStore();
-        if ($storeId === null || $storeId === '') {
-            $storeId = 0;
-        }
+        $storeId = storeId($observer->getStore());
 
         $enabled = $this->mollieHelper->isAvailable($storeId);
         $modus = $this->mollieHelper->getModus($storeId);
