@@ -19,6 +19,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Fake\MockResponse;
 use Mollie\Api\Http\Requests\CreatePaymentRefundRequest;
 use Mollie\Api\Http\Requests\CreatePaymentRequest;
+use Mollie\Api\Http\Requests\DynamicGetRequest;
 use Mollie\Api\Http\Requests\GetPaymentRequest;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
@@ -261,6 +262,124 @@ class MollieTest extends IntegrationTestCase
         $infoPayment->setCreditmemo($creditmemo);
 
         $instance->refund($infoPayment, 12.34);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_general/currency 0
+     * @magentoConfigFixture default_store payment/mollie_general/type test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
+     *
+     * @return void
+     * @throws LocalizedException
+     */
+    public function testRefundsALegacyOrdersApiOrderViaItsPaymentId(): void
+    {
+        if (getenv('CI')) {
+            $this->markTestSkipped('Fails on CI');
+        }
+
+        $order = $this->loadOrder('100000001');
+        $order->setMollieTransactionId('ord_legacy123');
+
+        $client = MollieApiClient::fake([
+            DynamicGetRequest::class => MockResponse::ok($this->legacyOrderWithPaymentsResponse()),
+            GetPaymentRequest::class => MockResponse::ok('payment'),
+            CreatePaymentRefundRequest::class => MockResponse::ok('refund'),
+        ]);
+
+        $mollieApiMock = $this->objectManager->create(FakeMollieApiClient::class);
+        $mollieApiMock->setInstance($client);
+
+        $this->objectManager->addSharedInstance($mollieApiMock, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
+
+        /** @var Mollie $instance */
+        $instance = $this->objectManager->create(Mollie::class);
+
+        /** @var \Magento\Sales\Model\Order\Payment $infoPayment */
+        $infoPayment = $this->objectManager->get(\Magento\Sales\Model\Order\Payment::class);
+        $infoPayment->setOrder($order);
+        $infoPayment->setAdditionalInformation('checkout_type', 'order');
+
+        $creditmemo = $this->objectManager->create(CreditmemoInterface::class);
+        $creditmemo->setBaseGrandTotal(12.34);
+        $creditmemo->setGrandTotal(56.78);
+        $infoPayment->setCreditmemo($creditmemo);
+
+        $instance->refund($infoPayment, 12.34);
+
+        $this->assertNotEmpty($order->getPayment()->getLastTransId());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_general/currency 0
+     * @magentoConfigFixture default_store payment/mollie_general/type test
+     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
+     *
+     * @return void
+     * @throws LocalizedException
+     */
+    public function testRefundsALegacyOrdersApiOrderPartially(): void
+    {
+        if (getenv('CI')) {
+            $this->markTestSkipped('Fails on CI');
+        }
+
+        $order = $this->loadOrder('100000001');
+        $order->setMollieTransactionId('ord_legacy123');
+
+        $client = MollieApiClient::fake([
+            DynamicGetRequest::class => MockResponse::ok($this->legacyOrderWithPaymentsResponse()),
+            GetPaymentRequest::class => MockResponse::ok('payment'),
+            CreatePaymentRefundRequest::class => MockResponse::ok('refund'),
+        ]);
+
+        $mollieApiMock = $this->objectManager->create(FakeMollieApiClient::class);
+        $mollieApiMock->setInstance($client);
+
+        $this->objectManager->addSharedInstance($mollieApiMock, \Mollie\Payment\Service\Mollie\MollieApiClient::class);
+
+        /** @var Mollie $instance */
+        $instance = $this->objectManager->create(Mollie::class);
+
+        /** @var \Magento\Sales\Model\Order\Payment $infoPayment */
+        $infoPayment = $this->objectManager->get(\Magento\Sales\Model\Order\Payment::class);
+        $infoPayment->setOrder($order);
+        $infoPayment->setAdditionalInformation('checkout_type', 'order');
+
+        $creditmemo = $this->objectManager->create(CreditmemoInterface::class);
+        $creditmemo->setBaseGrandTotal(25.00);
+        $creditmemo->setGrandTotal(25.00);
+        $infoPayment->setCreditmemo($creditmemo);
+
+        $instance->refund($infoPayment, 25.00);
+
+        $client->assertSent(function ($pendingRequest): bool {
+            if (!$pendingRequest->getRequest() instanceof CreatePaymentRefundRequest) {
+                return false;
+            }
+
+            $amount = $pendingRequest->payload()->get('amount');
+            $value = is_array($amount) ? $amount['value'] : $amount->value;
+
+            $this->assertEquals('25.00', $value);
+
+            return true;
+        });
+    }
+
+    private function legacyOrderWithPaymentsResponse(): string
+    {
+        return '{
+            "resource": "order",
+            "id": "ord_legacy123",
+            "_embedded": {
+                "payments": [
+                    {"resource": "payment", "id": "tr_paid456", "status": "paid"}
+                ]
+            }
+        }';
     }
 
     /**

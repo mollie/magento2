@@ -34,6 +34,7 @@ use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\Payments;
 use Mollie\Payment\Model\Client\Payments\ProcessTransaction;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
+use Mollie\Payment\Service\Mollie\Order\ResolvePaymentId;
 use Mollie\Payment\Service\OrderLockService;
 use Psr\Log\LoggerInterface;
 
@@ -60,6 +61,7 @@ class Mollie extends Adapter
         private ProcessTransaction $paymentsProcessTransaction,
         private OrderLockService $orderLockService,
         private \Mollie\Payment\Service\Mollie\MollieApiClient $mollieApiClient,
+        private ResolvePaymentId $resolvePaymentId,
         $formBlockType,
         $infoBlockType,
         ?CommandPoolInterface $commandPool = null,
@@ -361,12 +363,6 @@ class Mollie extends Adapter
         $order = $payment->getOrder();
         $storeId = storeId($order->getStoreId());
 
-        if ($this->mollieHelper->getCheckoutType($order) == 'order') {
-            throw new LocalizedException(
-                __('This order was placed using the Mollie Orders API, which is no longer supported in v3. Please process this refund via the Mollie Dashboard.')
-            );
-        }
-
         $transactionId = $order->getMollieTransactionId();
         if (empty($transactionId)) {
             throw new LocalizedException(__('Transaction ID not found'));
@@ -389,6 +385,7 @@ class Mollie extends Adapter
             }
 
             $mollieApi = $this->loadMollieApi($apiKey);
+            $transactionId = $this->resolvePaymentId->execute($mollieApi, $transactionId);
             $payment = $mollieApi->payments->get($transactionId);
 
             // @see https://github.com/mollie/mollie-api-php/issues/840

@@ -29,6 +29,7 @@ use Mollie\Payment\Model\Client\Payments as PaymentsApi;
 use Mollie\Payment\Model\Client\Payments\ProcessTransaction as PaymentsProcessTransaction;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Mollie\Order\ResolvePaymentId;
 use Mollie\Payment\Service\OrderLockService;
 use Psr\Log\LoggerInterface;
 
@@ -59,6 +60,7 @@ class Reorder extends Mollie
         PaymentsProcessTransaction $paymentsProcessTransaction,
         OrderLockService $orderLockService,
         MollieApiClient $mollieApiClient,
+        ResolvePaymentId $resolvePaymentId,
         private RequestInterface $request,
         $formBlockType,
         $infoBlockType,
@@ -80,6 +82,7 @@ class Reorder extends Mollie
             $paymentsProcessTransaction,
             $orderLockService,
             $mollieApiClient,
+            $resolvePaymentId,
             $formBlockType,
             $infoBlockType,
             $commandPool,
