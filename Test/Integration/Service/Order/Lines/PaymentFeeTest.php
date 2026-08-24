@@ -41,5 +41,29 @@ class PaymentFeeTest extends IntegrationTestCase
         $instance = $this->objectManager->create(PaymentFee::class);
 
         $line = $instance->getOrderLine($order, true);
+
+        $this->assertEquals('surcharge', $line['type']);
+        $this->assertEquals(__('Payment Fee'), $line['description']);
+        $this->assertArrayNotHasKey('name', $line);
+    }
+
+    public function testGetOrderLineAcceptsStringValuesFromTheDatabase(): void
+    {
+        /** @var OrderInterface $order */
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setBaseCurrencyCode('EUR');
+
+        $order->setData('base_mollie_payment_fee', '1.6500');
+        $order->setData('base_mollie_payment_fee_tax', '0.3500');
+
+        /** @var PaymentFee $instance */
+        $instance = $this->objectManager->create(PaymentFee::class);
+
+        $line = $instance->getOrderLine($order, true);
+
+        $this->assertEquals('2.00', $line['unitPrice']['value']);
+        $this->assertEquals('2.00', $line['totalAmount']['value']);
+        $this->assertEquals('0.35', $line['vatAmount']['value']);
+        $this->assertEquals(21.21, $line['vatRate']);
     }
 }

@@ -10,6 +10,7 @@ namespace Mollie\Payment\Service\Order\Lines;
 
 use Magento\Sales\Api\Data\CreditmemoInterface;
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Api\Types\OrderLineType;
 use Mollie\Payment\Exceptions\NoStoreCreditFound;
 use Mollie\Payment\Helper\General;
 
@@ -65,8 +66,8 @@ class StoreCredit
         $vatAmount = $this->getVatAmount();
 
         $orderLine = [
-            'type' => 'store_credit',
-            'name' => __('Store Credit'),
+            'type' => OrderLineType::STORE_CREDIT,
+            'description' => __('Store Credit'),
             'quantity' => 1,
             'unitPrice' => $this->mollieHelper->getAmountArray($currency, -$unitPrice),
             'totalAmount' => $this->mollieHelper->getAmountArray($currency, -$unitPrice),

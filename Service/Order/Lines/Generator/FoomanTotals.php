@@ -44,8 +44,8 @@ class FoomanTotals implements GeneratorInterface
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
 
         foreach ($totals as $total) {
-            $amount = $forceBaseCurrency ? $total->getBaseAmount() : $total->getAmount();
-            $taxAmount = $forceBaseCurrency ? $total->getBaseTaxAmount() : $total->getTaxAmount();
+            $amount = (float)($forceBaseCurrency ? $total->getBaseAmount() : $total->getAmount());
+            $taxAmount = (float)($forceBaseCurrency ? $total->getBaseTaxAmount() : $total->getTaxAmount());
 
             $vatRate = 0;
             if ($taxAmount && $amount != 0) {
