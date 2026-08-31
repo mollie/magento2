@@ -16,6 +16,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\AuthorizationException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Helper\Data;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -52,7 +53,19 @@ class Process extends Action implements HttpGetActionInterface
      */
     public function execute(): ResponseInterface
     {
-        $orderIds = $this->validateProcessRequest->execute();
+        try {
+            $orderIds = $this->validateProcessRequest->execute();
+        } catch (AuthorizationException $exception) {
+            $this->mollieHelper->addTolog('error', sprintf(
+                'Rejected the return for order %s: %s',
+                (string) $this->getRequest()->getParam('order_id'),
+                $exception->getMessage(),
+            ));
+            $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));
+
+            return $this->_redirect($this->redirectOnError->getUrl());
+        }
+
         if (!$orderIds) {
             $this->mollieHelper->addTolog('error', __('Invalid return, missing order id.'));
             $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));

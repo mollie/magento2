@@ -128,6 +128,19 @@ class ProcessTest extends AbstractController
         $this->assertRedirect($this->stringContains('mollie/checkout/processingwait'));
     }
 
+    public function testRedirectsToCartWhenThePaymentTokenIsInvalid(): void
+    {
+        $validateProcessRequest = $this->_objectManager->create(FakeValidateProcessRequest::class);
+        $validateProcessRequest->givenTheTokenIsInvalid();
+
+        $this->_objectManager->addSharedInstance($validateProcessRequest, ValidateProcessRequest::class);
+
+        $this->dispatch('mollie/checkout/process?order_id=123&payment_token=abc');
+
+        $this->assertRedirect($this->stringContains('checkout/cart'));
+        $this->assertSessionMessages($this->equalTo(['Invalid return from Mollie.']), MessageInterface::TYPE_NOTICE);
+    }
+
     /**
      * @param $orderId
      * @return OrderInterface
