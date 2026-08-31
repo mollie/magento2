@@ -10,7 +10,6 @@ namespace Mollie\Payment\Observer\SalesModelServiceQuoteSubmitSuccess;
 
 use Exception;
 use Magento\Framework\Api\ExtensibleDataObjectConverter;
-use Magento\Framework\Api\SearchResultsInterface;
 use Magento\Framework\DB\TransactionFactory;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -47,8 +46,8 @@ class AttachPaymentTokenToOrder implements ObserverInterface
             return;
         }
 
-        $tokens = $this->paymentTokenRepository->getByCart($quote);
-        if (!$tokens->getTotalCount()) {
+        $tokens = $this->getTokensWithoutOrder($quote);
+        if ($tokens === []) {
             return;
         }
 
@@ -56,16 +55,34 @@ class AttachPaymentTokenToOrder implements ObserverInterface
     }
 
     /**
-     * @param SearchResultsInterface $tokens
+     * A quote is reused when the customer retries after an unsuccessful payment, so it can have
+     * tokens of previously placed orders attached to it. Those belong to the order they were
+     * created for: taking them over would leave that order without a way to validate its return.
+     *
+     * @param CartInterface $quote
+     * @return PaymentTokenInterface[]
+     */
+    private function getTokensWithoutOrder(CartInterface $quote): array
+    {
+        /** @var PaymentTokenInterface[] $tokens */
+        $tokens = $this->paymentTokenRepository->getByCart($quote)->getItems();
+
+        return array_filter(
+            $tokens,
+            static fn (PaymentTokenInterface $paymentToken): bool => $paymentToken->getOrderId() === null,
+        );
+    }
+
+    /**
+     * @param PaymentTokenInterface[] $tokens
      * @param OrderInterface $order
      * @throws Exception
      */
-    private function updateModels(SearchResultsInterface $tokens, OrderInterface $order): void
+    private function updateModels(array $tokens, OrderInterface $order): void
     {
         $transaction = $this->transactionFactory->create();
 
-        /** @var PaymentTokenInterface $paymentToken */
-        foreach ($tokens->getItems() as $paymentToken) {
+        foreach ($tokens as $paymentToken) {
             $paymentToken->setOrderId($order->getEntityId());
 
             $paymentTokenData = $this->extensibleDataObjectConverter->toNestedArray(
