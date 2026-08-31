@@ -8,7 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\Savedcards;
 
-use Magento\Customer\Controller\AccountInterface;
+use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\Controller\ResultFactory;
@@ -20,7 +20,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Service\Mollie\RevokeMandate;
 
-class Delete implements AccountInterface, HttpPostActionInterface
+class Delete implements HttpPostActionInterface
 {
     public function __construct(
         private RequestInterface $request,
@@ -30,11 +30,16 @@ class Delete implements AccountInterface, HttpPostActionInterface
         private RevokeMandate $revokeMandate,
         private Config $config,
         private MollieLogger $logger,
+        private Session $customerSession,
     ) {}
 
     public function execute(): ResultInterface
     {
         $redirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+
+        if (!$this->customerSession->authenticate()) {
+            return $redirect->setPath('customer/account/login');
+        }
 
         if (!$this->config->creditcardEnableCustomersApi() || !$this->config->isProductionMode()) {
             return $redirect->setPath('noroute');
