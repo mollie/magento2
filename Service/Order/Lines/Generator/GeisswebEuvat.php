@@ -44,13 +44,14 @@ class GeisswebEuvat implements GeneratorInterface
         }
 
         $currency = $forceBaseCurrency ? $order->getBaseCurrencyCode() : $order->getOrderCurrencyCode();
+        $residual = $orderTotal - $orderLinesTotal;
 
         $orderLines[] = [
-            'type' => 'discount',
+            'type' => $residual < 0 ? 'discount' : 'surcharge',
             'description' => 'EU VAT',
             'quantity' => 1,
-            'unitPrice' => $this->mollieHelper->getAmountArray($currency, $orderTotal - $orderLinesTotal),
-            'totalAmount' => $this->mollieHelper->getAmountArray($currency, $orderTotal - $orderLinesTotal),
+            'unitPrice' => $this->mollieHelper->getAmountArray($currency, $residual),
+            'totalAmount' => $this->mollieHelper->getAmountArray($currency, $residual),
             'vatRate' => 0,
             'vatAmount' => $this->mollieHelper->getAmountArray($currency, 0),
         ];
