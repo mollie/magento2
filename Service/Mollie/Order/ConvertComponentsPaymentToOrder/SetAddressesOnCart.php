@@ -42,10 +42,13 @@ class SetAddressesOnCart
         $cartAddress = $this->addressFactory->create();
         $cartAddress->setFirstname($address->givenName);
         $cartAddress->setLastname($address->familyName);
-        $cartAddress->setStreet([
-            $address->streetAndNumber,
-            $address->streetAdditional ?? null,
-        ]);
+        $cartAddress->setStreet(array_filter(
+            [
+                $address->streetAndNumber,
+                $address->streetAdditional ?? null,
+            ],
+            static fn ($line): bool => $line !== null,
+        ));
         $cartAddress->setPostcode($address->postalCode);
         $cartAddress->setTelephone($address->phone);
         $cartAddress->setCity($address->city);
