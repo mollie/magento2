@@ -110,7 +110,6 @@ class Webhook implements HttpPostActionInterface, HttpGetActionInterface, CsrfAw
     public function placeOrRetrieveOrder(CartInterface $cart, Payment $payment): OrderInterface
     {
         $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
-        $searchCriteriaBuilder->addFilter('quote_id', $cart->getEntityId());
         $searchCriteriaBuilder->addFilter('mollie_transaction_id', $payment->id);
 
         $items = $this->orderRepository->getList($searchCriteriaBuilder->create())->getItems();

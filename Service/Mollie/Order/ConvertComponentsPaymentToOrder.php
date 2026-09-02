@@ -14,6 +14,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\CartInterfaceFactory;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Api\Data\PaymentTokenInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
@@ -28,6 +29,7 @@ class ConvertComponentsPaymentToOrder
         private readonly CartRepositoryInterface $cartRepository,
         private readonly CartInterfaceFactory $cartFactory,
         private readonly CartManagementInterface $cartManagement,
+        private readonly OrderRepositoryInterface $orderRepository,
         private readonly Config $config,
         private readonly Payments $molliePayments,
         private readonly GetCustomerFromPayment $getCustomerFromPayment,
@@ -53,9 +55,8 @@ class ConvertComponentsPaymentToOrder
         $cart->getPayment()->setMethod('mollie_methods_expresscomponents');
         $this->cartRepository->save($cart);
 
-        $order = $this->cartManagement->submit($cart);
-        $order->setMollieTransactionId($payment->id);
-        $this->updatePaymentToken($baseCart, $order->getEntityId());
+        $order = $this->placeOrder($cart, $payment);
+        $this->updatePaymentToken($baseCart, (int)$order->getEntityId());
 
         $this->molliePayments->processResponse($order, $payment);
 
@@ -66,6 +67,14 @@ class ConvertComponentsPaymentToOrder
         ]);
 
         return $order;
+    }
+
+    private function placeOrder(CartInterface $cart, Payment $payment): OrderInterface
+    {
+        $order = $this->cartManagement->submit($cart);
+        $order->setMollieTransactionId($payment->id);
+
+        return $this->orderRepository->save($order);
     }
 
     public function updatePaymentToken(CartInterface $baseCart, int $entityId): void
