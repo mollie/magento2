@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\Express;
 
-use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\Action\HttpPostActionInterface;
 use Magento\Framework\App\CsrfAwareActionInterface;
@@ -21,12 +20,12 @@ use Magento\Framework\Exception\NotFoundException;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\OrderInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
 use Mollie\Payment\Service\LockService;
 use Mollie\Payment\Service\Mollie\Order\ConvertComponentsPaymentToOrder;
+use Mollie\Payment\Service\Mollie\Order\GetOrderByTransactionId;
 use Mollie\Payment\Service\Mollie\Wrapper\GetExpressPayment;
 use Throwable;
 
@@ -37,14 +36,13 @@ class Webhook implements HttpPostActionInterface, HttpGetActionInterface, CsrfAw
     public function __construct(
         readonly private RequestInterface $request,
         readonly private Raw $response,
-        readonly private SearchCriteriaBuilderFactory $searchCriteriaBuilderFactory,
         readonly private CartRepositoryInterface $cartRepository,
-        readonly private OrderRepositoryInterface $orderRepository,
         readonly private Config $config,
         readonly private GetExpressPayment $getExpressPayment,
         readonly private Mollie $mollieModel,
         readonly private LockService $lockService,
         readonly private ConvertComponentsPaymentToOrder $convertComponentPaymentToOrder,
+        readonly private GetOrderByTransactionId $getOrderByTransactionId,
     ) {}
 
     public function createCsrfValidationException(RequestInterface $request): ?InvalidRequestException
@@ -109,12 +107,9 @@ class Webhook implements HttpPostActionInterface, HttpGetActionInterface, CsrfAw
 
     public function placeOrRetrieveOrder(CartInterface $cart, Payment $payment): OrderInterface
     {
-        $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
-        $searchCriteriaBuilder->addFilter('mollie_transaction_id', $payment->id);
-
-        $items = $this->orderRepository->getList($searchCriteriaBuilder->create())->getItems();
-        if ($items !== []) {
-            return array_shift($items);
+        $order = $this->getOrderByTransactionId->execute($payment->id);
+        if ($order !== null) {
+            return $order;
         }
 
         $this->created = true;
