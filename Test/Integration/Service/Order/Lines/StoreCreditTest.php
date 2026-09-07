@@ -140,7 +140,8 @@ class StoreCreditTest extends IntegrationTestCase
         $result = $instance->getOrderLine($order, true);
 
         $this->assertEquals('store_credit', $result['type']);
-        $this->assertEquals(__('Store Credit'), $result['name']);
+        $this->assertEquals(__('Store Credit'), $result['description']);
+        $this->assertArrayNotHasKey('name', $result);
         $this->assertEquals(1, $result['quantity']);
         $this->assertEquals(['currency' => 'EUR', 'value' => '-20.00'], $result['unitPrice']);
         $this->assertEquals(['currency' => 'EUR', 'value' => '-20.00'], $result['totalAmount']);
