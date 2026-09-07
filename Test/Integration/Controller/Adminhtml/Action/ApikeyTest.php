@@ -81,6 +81,24 @@ class ApikeyTest extends BackendControllerTestCase
         $this->assertTrue($result['success']);
     }
 
+    /**
+     * @magentoConfigFixture base_website payment/mollie_general/apikey_test test_websiteapikey123456789101112
+     * @return void
+     */
+    public function testFallsBackOnTheWebsiteScopeWhenAWebsiteParamIsGiven(): void
+    {
+        $this->mockMollieMethodsEndpointForConfigurationKeys('test_websiteapikey123456789101112', '');
+
+        $this->getRequest()->setMethod('POST');
+        $this->getRequest()->setParam('website', 'base');
+        $this->dispatch('backend/mollie/action/apikey');
+
+        $result = json_decode($this->getResponse()->getContent(), true);
+
+        $this->assertStringContainsString('Test API-key: Success!', $result['msg']);
+        $this->assertTrue($result['success']);
+    }
+
     protected function mockMollieMethodsEndpointForRequestKeys(string $testApiKey, string $liveApiKey): void
     {
         $mollieModelMock = $this->createMock(\Mollie\Payment\Service\Mollie\MollieApiClient::class);
