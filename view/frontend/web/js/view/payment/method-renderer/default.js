@@ -1,36 +1,42 @@
 define(
     [
         'jquery',
-        'underscore',
         'ko',
         'mage/url',
         'mage/storage',
         'mage/translate',
+        'uiLayout',
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/checkout-data',
         'Magento_Customer/js/model/customer',
         'Magento_Checkout/js/model/url-builder',
         'Mollie_Payment/js/model/checkout-config',
+        'Mollie_Payment/js/model/messages',
         'jquery/jquery-storageapi'
     ],
     function (
         $,
-        _,
         ko,
         url,
         storage,
         $t,
+        layout,
         Component,
         quote,
         checkoutData,
         customer,
         urlBuilder,
-        checkoutConfigData
+        checkoutConfigData,
+        Messages
     ) {
         'use strict';
 
         var checkoutConfig = window.checkoutConfig.payment;
+        var messageContainerMethods = {
+            success: 'addSuccessMessage',
+            notice: 'addNoticeMessage'
+        };
 
         return Component.extend(
             {
@@ -52,6 +58,30 @@ define(
                     if (this.getCode() === this.isChecked()) {
                         this.renderMessages();
                     }
+
+                    return this;
+                },
+                /**
+                 * Replaces the message container and its renderer with the Mollie variants, which can render a
+                 * notice instead of collapsing it into an error.
+                 */
+                initChildren: function () {
+                    this.messageContainer = new Messages();
+                    this.createMessagesComponent();
+
+                    return this;
+                },
+                createMessagesComponent: function () {
+                    layout([{
+                        parent: this.name,
+                        name: this.name + '.messages',
+                        displayArea: 'messages',
+                        component: 'Magento_Ui/js/view/messages',
+                        config: {
+                            messageContainer: this.messageContainer,
+                            template: 'Mollie_Payment/messages'
+                        }
+                    }]);
 
                     return this;
                 },
@@ -137,28 +167,62 @@ define(
                     return url.build('mollie/checkout/redirect/paymentToken/' + this.paymentToken());
                 },
                 renderMessages: function () {
-                    // Copied from Magento_Theme/js/view/messages
-                    var messages = _.unique($.cookieStorage.get('mage-messages'), 'text');
-
-                    $.each(messages, function (index, row) {
-                        if (row.type === 'success') {
-                            this.messageContainer.addSuccessMessage({message: row.text});
-                        } else {
-                            this.messageContainer.addErrorMessage({message: row.text});
-                        }
-                    }.bind(this));
-
-                    // Copied from Magento_Theme/js/view/messages
-                    $.mage.cookies.set('mage-messages', '', {
-                        samesite: 'strict',
-                        domain: ''
-                    });
+                    var messages = this.takeMollieMessages();
 
                     if (!messages.length) {
                         return;
                     }
 
-                    // Make sure the messages are visible
+                    this.removeFromPageMessages(messages);
+
+                    $.each(messages, function (index, row) {
+                        var method = messageContainerMethods[row.type] || 'addErrorMessage';
+
+                        this.messageContainer[method]({message: row.text});
+                    }.bind(this));
+
+                    this.scrollToMessages();
+                },
+                /**
+                 * The messages Mollie added right before redirecting back to the checkout. They are consumed once,
+                 * so selecting a second payment method does not render them again.
+                 */
+                takeMollieMessages: function () {
+                    var messages = (checkoutConfig.mollie && checkoutConfig.mollie.messages) || [];
+
+                    if (checkoutConfig.mollie) {
+                        checkoutConfig.mollie.messages = [];
+                    }
+
+                    return messages;
+                },
+                /**
+                 * The `mage-messages` cookie is shared with the rest of the shop and the checkout page has no
+                 * renderer to empty it, so only the messages rendered here are removed. Anything else stays behind
+                 * for the page it belongs to.
+                 */
+                removeFromPageMessages: function (messages) {
+                    var pageMessages = $.cookieStorage.get('mage-messages');
+
+                    if (!Array.isArray(pageMessages)) {
+                        return;
+                    }
+
+                    var rendered = messages.map(function (row) {
+                        return row.text;
+                    });
+
+                    var remaining = pageMessages.filter(function (row) {
+                        return rendered.indexOf(row.text) === -1;
+                    });
+
+                    // Copied from Magento_Theme/js/view/messages
+                    $.mage.cookies.set('mage-messages', remaining.length ? JSON.stringify(remaining) : '', {
+                        samesite: 'strict',
+                        domain: ''
+                    });
+                },
+                scrollToMessages: function () {
                     var attempts = 0;
                     var interval = setInterval(function () {
                         attempts++;
