@@ -456,7 +456,8 @@
                 <allowspecific>0</allowspecific>
                 <can_use_checkout>0</can_use_checkout>
                 <can_order>0</can_order>
-                <can_refund>0</can_refund>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
                 <supports_partial_capture>1</supports_partial_capture>
             </mollie_methods_klarnapaylater>
@@ -468,7 +469,8 @@
                 <allowspecific>0</allowspecific>
                 <can_use_checkout>0</can_use_checkout>
                 <can_order>0</can_order>
-                <can_refund>0</can_refund>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
                 <supports_partial_capture>1</supports_partial_capture>
             </mollie_methods_klarnapaynow>
@@ -480,7 +482,8 @@
                 <allowspecific>0</allowspecific>
                 <can_use_checkout>0</can_use_checkout>
                 <can_order>0</can_order>
-                <can_refund>0</can_refund>
+                <can_refund>1</can_refund>
+                <can_refund_partial_per_invoice>1</can_refund_partial_per_invoice>
                 <can_use_internal>0</can_use_internal>
                 <supports_partial_capture>1</supports_partial_capture>
             </mollie_methods_klarnasliceit>
