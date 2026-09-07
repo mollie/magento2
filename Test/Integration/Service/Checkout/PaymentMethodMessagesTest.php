@@ -16,7 +16,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 
 class PaymentMethodMessagesTest extends IntegrationTestCase
 {
-    private PaymentMethodMessages $instance;
+    private ?PaymentMethodMessages $instance = null;
 
     protected function setUp(): void
     {
