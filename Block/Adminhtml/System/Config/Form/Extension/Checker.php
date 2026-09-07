@@ -37,7 +37,7 @@ class Checker extends Field
      */
     public function getAjaxUrl(): string
     {
-        return $this->getUrl('mollie/action/apikey');
+        return $this->getUrl('mollie/action/apikey', ['_current' => true]);
     }
 
     public function getApiKeyButtonHtml(): string

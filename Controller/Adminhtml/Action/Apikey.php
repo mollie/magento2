@@ -64,9 +64,27 @@ class Apikey extends Action implements HttpPostActionInterface
     private function getKey(string $type): string
     {
         if (!$this->request->getParam($type . '_key') || $this->request->getParam($type . '_key') == '******') {
-            return $this->scopeConfig->getValue('payment/mollie_general/apikey_' . $type, ScopeInterface::SCOPE_STORE);
+            return (string) $this->scopeConfig->getValue(
+                'payment/mollie_general/apikey_' . $type,
+                $this->getScope(),
+                $this->getScopeCode(),
+            );
         }
 
         return $this->request->getParam($type . '_key');
+    }
+
+    private function getScope(): string
+    {
+        if ($this->request->getParam('website')) {
+            return ScopeInterface::SCOPE_WEBSITE;
+        }
+
+        return ScopeInterface::SCOPE_STORE;
+    }
+
+    private function getScopeCode(): ?string
+    {
+        return $this->request->getParam('store') ?: $this->request->getParam('website') ?: null;
     }
 }
