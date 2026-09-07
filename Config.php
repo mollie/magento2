@@ -188,9 +188,9 @@ class Config
         return $apiKey;
     }
 
-    public function getTestApiKey(?int $storeId = null): string
+    public function getTestApiKey(?int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): string
     {
-        $apiKey = trim((string) $this->getPath(static::GENERAL_APIKEY_TEST, $storeId));
+        $apiKey = trim((string) $this->getPath(static::GENERAL_APIKEY_TEST, $storeId, $scope));
         if (empty($apiKey)) {
             $this->addToLog('error', 'Mollie API key not set (test modus)');
         }
@@ -202,9 +202,9 @@ class Config
         return $apiKey;
     }
 
-    public function getLiveApiKey(?int $storeId = null): string
+    public function getLiveApiKey(?int $storeId = null, string $scope = ScopeInterface::SCOPE_STORE): string
     {
-        $apiKey = trim((string) $this->getPath(static::GENERAL_APIKEY_LIVE, $storeId));
+        $apiKey = trim((string) $this->getPath(static::GENERAL_APIKEY_LIVE, $storeId, $scope));
         if (empty($apiKey)) {
             $this->addToLog('error', 'Mollie API key not set (live modus)');
         }
