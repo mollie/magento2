@@ -15,7 +15,6 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\Resources\Payment;
-use stdClass;
 
 class GetCustomerFromPayment
 {
@@ -29,8 +28,9 @@ class GetCustomerFromPayment
     {
         $billingAddress = $payment->billingAddress;
 
+        $email = $this->getEmail($oldCart, $payment);
+
         try {
-            $email = $this->getEmail($oldCart, $billingAddress);
             return $this->customerRepository->get($email);
         } catch (NoSuchEntityException) {
         }
@@ -50,8 +50,10 @@ class GetCustomerFromPayment
         return $this->customerRepository->save($customer);
     }
 
-    private function getEmail(CartInterface $oldCart, ?stdClass $billingAddress): string
+    private function getEmail(CartInterface $oldCart, Payment $payment): string
     {
+        $billingAddress = $payment->billingAddress;
+
         if ($oldCart->getCustomerEmail()) {
             return $oldCart->getCustomerEmail();
         }
@@ -62,10 +64,16 @@ class GetCustomerFromPayment
 
         $email = $oldCart->getPayment()->getAdditionalInformation('mollie_guest_email');
 
-        if (!$email) {
-            throw new NoSuchEntityException(__('No email address found for this payment.'));
+        if ($email) {
+            return $email;
         }
 
-        return $email;
+        $consumerAccount = $payment->details->consumerAccount ?? null;
+
+        if (is_string($consumerAccount) && filter_var($consumerAccount, FILTER_VALIDATE_EMAIL)) {
+            return $consumerAccount;
+        }
+
+        throw new NoSuchEntityException(__('No email address found for this payment.'));
     }
 }
