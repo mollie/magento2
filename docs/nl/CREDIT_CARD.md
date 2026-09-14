@@ -65,6 +65,8 @@ Wanneer opgeslagen kaarten zijn ingeschakeld, kunnen ingelogde klanten hun kaart
 
 Bij de checkout verschijnt een selectievakje met de toestemmingstekst wanneer de klant betaalt met een creditcard. De kaart wordt alleen opgeslagen als de klant het vakje aanvinkt.
 
+Opgeslagen kaarten wordt momenteel niet ondersteund in combinatie met handmatige capture. Houd **Capture method** op **Autocapture** wanneer opgeslagen kaarten is ingeschakeld. Zie [Opgeslagen kaarten](SAVED_CARDS.md#opgeslagen-kaarten-met-handmatige-capture) voor details.
+
 ### De toestemmingstekst aanpassen
 
 De tekst naast het selectievakje voor kaartopslag is aanpasbaar. Het ondersteunt twee tijdelijke aanduidingen die tijdens gebruik worden vervangen:

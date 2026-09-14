@@ -8,6 +8,7 @@ Met opgeslagen kaarten kunnen ingelogde klanten een creditcard opslaan na een ge
 - Mollie Components is ingeschakeld (`Use Mollie Components` ingesteld op `Yes`) - opgeslagen kaarten is alleen beschikbaar met het ingebedde kaartformulier, niet met de gehoste redirectflow
 - Een Profile ID is opgeslagen onder **Stores → Configuration → Mollie → General** - Components vereist dit
 - **Modus** staat op **Live**: opgeslagen kaarten werkt niet in testmodus (zie [API Keys](API_KEYS.md))
+- **Capture method** staat op **Autocapture**: opgeslagen kaarten wordt momenteel niet ondersteund met handmatige capture (zie [Opgeslagen kaarten met handmatige capture](#opgeslagen-kaarten-met-handmatige-capture))
 
 ## Opgeslagen kaarten inschakelen
 
@@ -58,9 +59,9 @@ Pas de URL van het privacybeleid in de standaardtekst aan zodat deze verwijst na
 
 ## Opgeslagen kaarten met handmatige capture
 
-Mollie maakt het mandaat voor een opgeslagen kaart pas aan zodra de betaling is verrekend, en dat gebeurt bij de capture. Met **Capture method** ingesteld op **Manual capture** wordt een kaart die bij de checkout is opgeslagen daarom pas beschikbaar voor de klant nadat je die order hebt gefactureerd of verzonden, afhankelijk van de instelling **When to capture?**.
+Opgeslagen kaarten wordt momenteel niet ondersteund in combinatie met handmatige capture. Zet **Capture method** op **Autocapture** onder **Stores → Configuration → Mollie → Payment Methods → Credit Card** om opgeslagen kaarten aan te bieden. Zie [Credit Card Payments](CREDIT_CARD.md) voor de capture-configuratie.
 
-Magento Admin toont een melding onder de instelling **Enable saved cards** wanneer handmatige capture en opgeslagen kaarten beide zijn ingeschakeld. Er is geen actie nodig: de kaart verschijnt automatisch bij de opgeslagen kaarten van de klant zodra de order is gecaptured. Zie [Credit Card Payments](CREDIT_CARD.md) voor de capture-configuratie.
+Magento Admin toont een waarschuwing onder de instelling **Enable saved cards** wanneer handmatige capture en opgeslagen kaarten beide zijn ingeschakeld. De extensie blokkeert de combinatie niet, dus de waarschuwing is de enige aanwijzing dat de twee instellingen met elkaar in strijd zijn.
 
 ## Opgeslagen kaarten beheren (Mijn account)
 
