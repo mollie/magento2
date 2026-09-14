@@ -8,6 +8,7 @@ Saved cards lets logged-in customers store a credit card after a successful paym
 - Mollie Components is enabled (`Use Mollie Components` set to `Yes`) — saved cards is only available with the embedded card form, not the hosted redirect flow
 - A Profile ID is saved under **Stores → Configuration → Mollie → General** — Components requires it
 - **Modus** is set to **Live**: saved cards does not work in test mode (see [API Keys](API_KEYS.md))
+- **Capture method** is set to **Autocapture**: saved cards is not currently supported with manual capture (see [Saved Cards with Manual Capture](#saved-cards-with-manual-capture))
 
 ## Enable Saved Cards
 
@@ -58,9 +59,9 @@ Update the privacy policy URL in the default text to point to your own policy pa
 
 ## Saved Cards with Manual Capture
 
-Mollie only creates the mandate for a saved card once the payment is settled, which happens at capture. With **Capture method** set to **Manual capture**, a card saved at checkout therefore only becomes available to the customer after you invoice or ship that order, depending on the **When to capture?** setting.
+Saved cards is not currently supported in combination with manual capture. To offer saved cards, set **Capture method** to **Autocapture** under **Stores → Configuration → Mollie → Payment Methods → Credit Card**. See [Credit Card Payments](CREDIT_CARD.md) for capture configuration.
 
-Magento Admin shows a notice under the **Enable saved cards** setting when manual capture and saved cards are both enabled. No action is needed: the card appears in the customer's saved cards automatically once the order is captured. See [Credit Card Payments](CREDIT_CARD.md) for capture configuration.
+Magento Admin shows a warning under the **Enable saved cards** setting when manual capture and saved cards are both enabled. The extension does not block the combination, so the warning is the only indication that the two settings conflict.
 
 ## Managing Saved Cards (My Account)
 

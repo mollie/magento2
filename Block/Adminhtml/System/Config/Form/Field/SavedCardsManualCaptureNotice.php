@@ -16,9 +16,8 @@ class SavedCardsManualCaptureNotice extends Field
     protected function _getElementHtml(AbstractElement $element): string
     {
         $message = (string) __(
-            'Saved cards rely on a mandate that Mollie only creates once the payment is settled, which ' .
-            'happens at capture (on invoice or shipment). A card saved on a manual capture order will ' .
-            'therefore only become available to the customer after the previous order has been captured.'
+            'Saved cards are not currently supported in combination with manual capture. ' .
+            'Set Capture method to Autocapture to offer saved cards to your customers.'
         );
 
         return sprintf(
