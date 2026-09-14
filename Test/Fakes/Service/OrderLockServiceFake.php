@@ -13,7 +13,7 @@ use Mollie\Payment\Service\OrderLockService;
 
 class OrderLockServiceFake extends OrderLockService
 {
-    public function execute(OrderInterface $order, callable $callback)
+    public function execute(OrderInterface $order, callable $callback): mixed
     {
         return $callback($order);
     }

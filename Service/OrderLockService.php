@@ -8,13 +8,14 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service;
 
-use Exception;
 use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\OrderRepositoryInterfaceFactory;
 use Mollie\Payment\Config;
+use Throwable;
 
 class OrderLockService
 {
@@ -25,8 +26,14 @@ class OrderLockService
         private Config $config
     ) {}
 
-    public function execute(OrderInterface $originalOrder, callable $callback)
+    /**
+     * @template T
+     * @param callable(OrderInterface): T $callback
+     * @return T The result of the callback
+     */
+    public function execute(OrderInterface $originalOrder, callable $callback): mixed
     {
+        $orderId = (int)$originalOrder->getEntityId();
         $key = $this->getKeyName($originalOrder);
         if ($this->lockService->checkIfIsLockedWithWait($key)) {
             throw new LocalizedException(__('Unable to get lock for %1', $key));
@@ -40,27 +47,32 @@ class OrderLockService
         $connection = $this->resourceConnection->getConnection('sales');
         $connection->beginTransaction();
 
-        // Save this value, so we can restore it after the order has been saved.
-        $mollieTransactionId = $originalOrder->getMollieTransactionId();
-
-        // The order repository uses caching to make sure it only loads the order once, but in this case we want
-        // the latest version of the order, so we need to make sure we get a new instance of the repository.
-        /** @var OrderRepositoryInterface $orderRepository */
-        $orderRepository = $this->orderRepositoryFactory->create();
-        $order = $orderRepository->get($originalOrder->getEntityId());
-
-        // Restore the transaction ID as it might not be set on the saved order yet.
-        // This is required further down the process.
-        $order->setMollieTransactionId($mollieTransactionId);
-
         try {
+            // This must be the first statement in the transaction. Another process (for example a credit memo
+            // being refunded) can be mid-transaction on this order. Without the row lock, the read below returns
+            // the snapshot from before their commit and the save() writes that outdated state back over their result.
+            $this->lockOrderRow($connection, $orderId);
+
+            // Save this value, so we can restore it after the order has been saved.
+            $mollieTransactionId = $originalOrder->getMollieTransactionId();
+
+            // The order repository uses caching to make sure it only loads the order once, but in this case we want
+            // the latest version of the order, so we need to make sure we get a new instance of the repository.
+            /** @var OrderRepositoryInterface $orderRepository */
+            $orderRepository = $this->orderRepositoryFactory->create();
+            $order = $orderRepository->get($orderId);
+
+            // Restore the transaction ID as it might not be set on the saved order yet.
+            // This is required further down the process.
+            $order->setMollieTransactionId($mollieTransactionId);
+
             $result = $callback($order);
             $orderRepository->save($order);
             $connection->commit();
 
             // Update the original order with the new data.
             $originalOrder->setData($order->getData());
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             $connection->rollBack();
             throw $e;
         } finally {
@@ -76,6 +88,16 @@ class OrderLockService
         $key = $this->getKeyName($order);
 
         return $this->lockService->isLocked($key);
+    }
+
+    private function lockOrderRow(AdapterInterface $connection, int $orderId): void
+    {
+        $connection->query(
+            $connection->select()
+                ->from($this->resourceConnection->getTableName('sales_order'), 'entity_id')
+                ->where('entity_id = ?', $orderId)
+                ->forUpdate(true)
+        );
     }
 
     private function getKeyName(OrderInterface $order): string
