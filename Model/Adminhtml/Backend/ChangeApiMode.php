@@ -52,9 +52,11 @@ class ChangeApiMode extends Value
 
     public function afterSave()
     {
-        $apiKey = $this->getApiKey($this->getValue());
-        if ($apiKey) {
-            $this->updateProfileId->execute($apiKey, $this->getScope(), (int) $this->getScopeId());
+        if ($this->isValueChanged()) {
+            $apiKey = $this->getApiKey($this->getValue());
+            if ($apiKey) {
+                $this->updateProfileId->execute($apiKey, $this->getScope(), (int) $this->getScopeId());
+            }
         }
 
         return parent::afterSave();
@@ -63,9 +65,9 @@ class ChangeApiMode extends Value
     private function getApiKey(string $mode): string
     {
         if ($mode === 'live') {
-            return $this->mollieConfig->getLiveApiKey((int) $this->getScopeId());
+            return $this->mollieConfig->getLiveApiKey((int) $this->getScopeId(), $this->getScope());
         }
 
-        return $this->mollieConfig->getTestApiKey((int) $this->getScopeId());
+        return $this->mollieConfig->getTestApiKey((int) $this->getScopeId(), $this->getScope());
     }
 }

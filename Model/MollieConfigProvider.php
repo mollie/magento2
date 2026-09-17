@@ -22,6 +22,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\Types\MethodQuery;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
+use Mollie\Payment\Service\Checkout\PaymentMethodMessages;
 use Mollie\Payment\Service\Mollie\ApplePay\SupportedNetworks;
 use Mollie\Payment\Service\Mollie\GetCustomerMandates;
 use Mollie\Payment\Service\Mollie\GetIssuers;
@@ -41,6 +42,8 @@ class MollieConfigProvider implements ConfigProviderInterface
     private array $methods = [];
     /** @var array<string, array<string, mixed>>|null */
     private ?array $methodData = null;
+    /** @var array<int, array{type: string, text: string}>|null */
+    private ?array $messages = null;
 
     public function __construct(
         private Http $request,
@@ -58,11 +61,23 @@ class MollieConfigProvider implements ConfigProviderInterface
         private GetCustomerMandates $getCustomerMandates,
         private SavedCardConsentText $savedCardConsentText,
         private CustomerSession $customerSession,
+        private PaymentMethodMessages $paymentMethodMessages,
     )
     {
         foreach (PaymentMethods::METHODS as $code) {
             $this->methods[$code] = $this->getMethodInstance($code);
         }
+    }
+
+    /**
+     * The messages are removed from the session when they are read, so they are kept around in case the checkout
+     * config is built more than once during the same request.
+     *
+     * @return array<int, array{type: string, text: string}>
+     */
+    private function getMessages(): array
+    {
+        return $this->messages ??= $this->paymentMethodMessages->getAndClear();
     }
 
     /**
@@ -134,6 +149,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['mollie']['creditcard']['use_components'] = $this->config->creditcardUseComponents($storeId);
         $config['payment']['mollie']['applepay']['integration_type'] = $this->config->applePayIntegrationType($storeId);
         $config['payment']['mollie']['applepay']['supported_networks'] = $this->supportedNetworks->execute((int)$storeId);
+        $config['payment']['mollie']['messages'] = $this->getMessages();
         $config['payment']['mollie']['store']['name'] = $storeName;
         $config['payment']['mollie']['store']['currency'] = $this->config->getStoreCurrency($storeId);
         $config['payment']['mollie']['expresscomponents']['enabled'] = $this->getMethodInstance('mollie_methods_expresscomponents')->isAvailable();

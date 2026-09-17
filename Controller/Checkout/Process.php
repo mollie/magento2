@@ -16,11 +16,13 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Framework\Exception\AuthorizationException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Payment\Helper\Data;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Checkout\PaymentMethodMessages;
 use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
 use Mollie\Payment\Service\Mollie\Order\AddResultMessage;
 use Mollie\Payment\Service\Mollie\Order\SuccessPageRedirect;
@@ -43,6 +45,7 @@ class Process extends Action implements HttpGetActionInterface
         private SuccessPageRedirect $successPageRedirect,
         private AddResultMessage $addResultMessage,
         private EncryptorInterface $encryptor,
+        private PaymentMethodMessages $paymentMethodMessages,
     ) {
         parent::__construct($context);
     }
@@ -52,10 +55,22 @@ class Process extends Action implements HttpGetActionInterface
      */
     public function execute(): ResponseInterface
     {
-        $orderIds = $this->validateProcessRequest->execute();
+        try {
+            $orderIds = $this->validateProcessRequest->execute();
+        } catch (AuthorizationException $exception) {
+            $this->mollieHelper->addTolog('error', sprintf(
+                'Rejected the return for order %s: %s',
+                (string) $this->getRequest()->getParam('order_id'),
+                $exception->getMessage(),
+            ));
+            $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));
+
+            return $this->_redirect($this->redirectOnError->getUrl());
+        }
+
         if (!$orderIds) {
             $this->mollieHelper->addTolog('error', __('Invalid return, missing order id.'));
-            $this->messageManager->addNoticeMessage(__('Invalid return from Mollie.'));
+            $this->paymentMethodMessages->addNotice(__('Invalid return from Mollie.'));
 
             return $this->_redirect($this->redirectOnError->getUrl());
         }
@@ -68,7 +83,7 @@ class Process extends Action implements HttpGetActionInterface
             }
         } catch (Exception $e) {
             $this->mollieHelper->addTolog('error', $e->getMessage());
-            $this->messageManager->addExceptionMessage($e, __('There was an error checking the transaction status.'));
+            $this->paymentMethodMessages->addException($e, __('There was an error checking the transaction status.'));
 
             return $this->_redirect($this->redirectOnError->getUrl());
         }
@@ -80,7 +95,7 @@ class Process extends Action implements HttpGetActionInterface
                 return $this->getResponse();
             } catch (Exception $e) {
                 $this->mollieHelper->addTolog('error', $e->getMessage());
-                $this->messageManager->addErrorMessage(__('Transaction failed. Please verify your billing information and payment method, and try again.'));
+                $this->paymentMethodMessages->addError(__('Transaction failed. Please verify your billing information and payment method, and try again.'));
 
                 return $this->_redirect($this->redirectOnError->getUrl());
             }

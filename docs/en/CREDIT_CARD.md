@@ -65,6 +65,8 @@ When saved cards are enabled, logged-in customers can save their card after a su
 
 A checkbox labelled with the consent text appears at checkout when the customer pays by credit card. The card is saved only if the customer ticks the box.
 
+Saved cards is not currently supported in combination with manual capture. Keep **Capture method** set to **Autocapture** when saved cards is enabled. See [Saved Cards](SAVED_CARDS.md#saved-cards-with-manual-capture) for details.
+
 ### Customise the Consent Text
 
 The text shown alongside the save-card checkbox is configurable. It supports two placeholders that are replaced at runtime:

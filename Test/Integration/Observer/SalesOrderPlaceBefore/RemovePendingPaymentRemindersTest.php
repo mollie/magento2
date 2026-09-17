@@ -8,7 +8,9 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Observer\SalesOrderPlaceBefore;
 
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Event\Observer;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Api\Data\PendingPaymentReminderInterfaceFactory;
 use Mollie\Payment\Api\PendingPaymentReminderRepositoryInterface;
@@ -65,5 +67,88 @@ class RemovePendingPaymentRemindersTest extends IntegrationTestCase
         $this->objectManager->create(RemovePendingPaymentReminders::class)->execute($observer);
 
         $this->assertSame($saved->getEntityId(), $repository->get($saved->getEntityId())->getEntityId());
+    }
+
+    /**
+     * A reminder queued during a guest attempt is stored with customer_id NULL and a hashed email, so
+     * deleteByCustomerId can never match it. The shopper used to receive the second chance email for
+     * the guest attempt they had just completed while logged in.
+     *
+     * @magentoConfigFixture default_store payment/mollie_general/enable_second_chance_email 1
+     * @magentoConfigFixture default_store payment/mollie_general/automatically_send_second_chance_emails 1
+     */
+    public function testDeletesTheGuestReminderWhenTheSameShopperOrdersWhileLoggedIn(): void
+    {
+        $repository = $this->objectManager->get(PendingPaymentReminderRepositoryInterface::class);
+        $encryptor = $this->objectManager->get(EncryptorInterface::class);
+
+        $reminder = $this->objectManager->get(PendingPaymentReminderInterfaceFactory::class)->create();
+        $reminder->setOrderId(99999);
+        $reminder->setHash($encryptor->hash('test@example.com'));
+        $saved = $repository->save($reminder);
+
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setCustomerId(1);
+        $order->setCustomerEmail('test@example.com');
+
+        $observer = $this->objectManager->create(Observer::class);
+        $observer->setData('order', $order);
+
+        $this->objectManager->create(RemovePendingPaymentReminders::class)->execute($observer);
+
+        $this->expectException(NoSuchEntityException::class);
+        $repository->get($saved->getEntityId());
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/enable_second_chance_email 1
+     * @magentoConfigFixture default_store payment/mollie_general/automatically_send_second_chance_emails 1
+     */
+    public function testStillDeletesTheReminderBelongingToTheOrdersOwnCustomer(): void
+    {
+        $repository = $this->objectManager->get(PendingPaymentReminderRepositoryInterface::class);
+
+        $reminder = $this->objectManager->get(PendingPaymentReminderInterfaceFactory::class)->create();
+        $reminder->setOrderId(99999);
+        $reminder->setCustomerId(1);
+        $saved = $repository->save($reminder);
+
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setCustomerId(1);
+        $order->setCustomerEmail('test@example.com');
+
+        $observer = $this->objectManager->create(Observer::class);
+        $observer->setData('order', $order);
+
+        $this->objectManager->create(RemovePendingPaymentReminders::class)->execute($observer);
+
+        $this->expectException(NoSuchEntityException::class);
+        $repository->get($saved->getEntityId());
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_general/enable_second_chance_email 1
+     * @magentoConfigFixture default_store payment/mollie_general/automatically_send_second_chance_emails 1
+     */
+    public function testDeletesTheGuestReminderForAGuestOrder(): void
+    {
+        $repository = $this->objectManager->get(PendingPaymentReminderRepositoryInterface::class);
+        $encryptor = $this->objectManager->get(EncryptorInterface::class);
+
+        $reminder = $this->objectManager->get(PendingPaymentReminderInterfaceFactory::class)->create();
+        $reminder->setOrderId(99999);
+        $reminder->setHash($encryptor->hash('test@example.com'));
+        $saved = $repository->save($reminder);
+
+        $order = $this->objectManager->create(OrderInterface::class);
+        $order->setCustomerEmail('test@example.com');
+
+        $observer = $this->objectManager->create(Observer::class);
+        $observer->setData('order', $order);
+
+        $this->objectManager->create(RemovePendingPaymentReminders::class)->execute($observer);
+
+        $this->expectException(NoSuchEntityException::class);
+        $repository->get($saved->getEntityId());
     }
 }

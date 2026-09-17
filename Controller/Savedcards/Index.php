@@ -8,21 +8,26 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Controller\Savedcards;
 
-use Magento\Customer\Controller\AccountInterface;
+use Magento\Customer\Model\Session;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Mollie\Payment\Config;
 
-class Index implements AccountInterface, HttpGetActionInterface
+class Index implements HttpGetActionInterface
 {
     public function __construct(
         private ResultFactory $resultFactory,
         private Config $config,
+        private Session $customerSession,
     ) {}
 
     public function execute(): ResultInterface
     {
+        if (!$this->customerSession->authenticate()) {
+            return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('customer/account/login');
+        }
+
         if (!$this->config->creditcardEnableCustomersApi() || !$this->config->isProductionMode()) {
             return $this->resultFactory->create(ResultFactory::TYPE_REDIRECT)->setPath('noroute');
         }

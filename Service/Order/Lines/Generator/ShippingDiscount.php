@@ -39,7 +39,7 @@ class ShippingDiscount implements GeneratorInterface
             'unitPrice' => $this->mollieHelper->getAmountArray($currency, -$amount),
             'totalAmount' => $this->mollieHelper->getAmountArray($currency, -$amount),
             'vatRate' => '0.00',
-            'vatAmount' => $this->mollieHelper->getAmountArray($currency, '0.00'),
+            'vatAmount' => $this->mollieHelper->getAmountArray($currency, 0.0),
         ];
 
         return $orderLines;

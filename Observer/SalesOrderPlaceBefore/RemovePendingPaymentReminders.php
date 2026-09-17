@@ -39,8 +39,12 @@ class RemovePendingPaymentReminders implements ObserverInterface
 
         if ($customerId = $order->getCustomerId()) {
             $this->deletePaymentReminder->deleteByCustomerId((int)$customerId);
-            return;
         }
-        $this->deletePaymentReminder->deleteByEmail((string)$order->getCustomerEmail());
+
+        // Also delete by email, even when the order has a customer id. A reminder queued during an
+        // earlier guest attempt is stored with customer_id NULL and a hashed email, so deleteByCustomerId
+        // can never match it. Without this the shopper receives the second chance email for the guest
+        // attempt they have just completed while logged in.
+        $this->deletePaymentReminder->deleteByEmail((string)$email);
     }
 }
