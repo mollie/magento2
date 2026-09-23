@@ -16,6 +16,7 @@ use Magento\Framework\Stdlib\DateTime;
 use Magento\Framework\View\Element\Template\Context;
 use Magento\Payment\Block\Info;
 use Magento\Sales\Api\Data\OrderInterface;
+use Magento\Sales\Model\Order\Payment as OrderPayment;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General as MollieHelper;
 use Mollie\Payment\Model\Methods\Billie;
@@ -24,6 +25,7 @@ use Mollie\Payment\Model\Methods\In3;
 use Mollie\Payment\Model\Methods\Klarna;
 use Mollie\Payment\Model\Methods\Riverty;
 use Mollie\Payment\Service\Magento\PaymentLinkUrl;
+use Mollie\Payment\Service\Order\SwitchedPaymentMethod;
 
 class Base extends Info
 {
@@ -43,6 +45,7 @@ class Base extends Info
         private Registry $registry,
         private PriceCurrencyInterface $price,
         private PaymentLinkUrl $paymentLinkUrl,
+        private SwitchedPaymentMethod $switchedPaymentMethod,
     ) {
         parent::__construct($context);
         $this->timezone = $context->getLocaleDate();
@@ -198,6 +201,25 @@ class Base extends Info
         return $this->paymentLinkUrl->execute((int) $this->getInfo()->getParentId());
     }
 
+    public function getSwitchedMethodTitle(): ?string
+    {
+        $method = $this->getSwitchedMethod();
+        if ($method === null) {
+            return null;
+        }
+
+        $title = $this->config->getMethodTitle($method, $this->getPaymentStoreId());
+
+        return $title !== '' ? $title : ucfirst($method);
+    }
+
+    public function getSwitchedMethodImage(): ?string
+    {
+        $method = $this->getSwitchedMethod();
+
+        return $method === null ? null : $method . '.svg';
+    }
+
     public function getPaymentStatus(): ?string
     {
         try {
@@ -243,6 +265,24 @@ class Base extends Info
         }
 
         return false;
+    }
+
+    private function getSwitchedMethod(): ?string
+    {
+        $info = $this->getInfo();
+        $mollieMethod = $info->getAdditionalInformation('method');
+
+        return $this->switchedPaymentMethod->execute(
+            (string) $info->getMethod(),
+            is_string($mollieMethod) ? $mollieMethod : null,
+        );
+    }
+
+    private function getPaymentStoreId(): ?int
+    {
+        $info = $this->getInfo();
+
+        return $info instanceof OrderPayment ? storeId($info->getOrder()->getStoreId()) : null;
     }
 
     private function getOrder(): ?OrderInterface

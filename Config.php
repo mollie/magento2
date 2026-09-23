@@ -536,7 +536,7 @@ class Config
 
     public function getMethodTitle(string $method, ?int $storeId = null): string
     {
-        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_TITLE, $method), $storeId);
+        return (string) $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_TITLE, $method), $storeId);
     }
 
     public function cancelFailedOrders(?int $storeId = null): bool
