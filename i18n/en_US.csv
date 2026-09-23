@@ -248,6 +248,8 @@
 "MyBank","MyBank"
 "Name on card","Name on card"
 "New order email sent","New order email sent"
+"New order email scheduled for sending","New order email scheduled for sending"
+"Unable to send the new order email, please check the logs for details","Unable to send the new order email, please check the logs for details"
 "No","No"
 "No email address found for this payment.","No email address found for this payment."
 "No info_buyRequest option found","No info_buyRequest option found"
