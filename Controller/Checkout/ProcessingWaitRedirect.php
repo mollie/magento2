@@ -40,7 +40,7 @@ class ProcessingWaitRedirect implements HttpGetActionInterface
     public function execute(): ResponseInterface
     {
         $token = $this->request->getParam('token');
-        if (!$token) {
+        if (!is_string($token) || $token === '') {
             throw new AuthorizationException(__('Invalid token'));
         }
 
@@ -51,11 +51,12 @@ class ProcessingWaitRedirect implements HttpGetActionInterface
         $processResult = $this->mollieModel->processTransactionForOrder($order, 'success');
 
         /** @var string|null $method */
-        $method = $order->getPayment()->getAdditionalInformation('method');
+        $method = $order->getPayment()?->getAdditionalInformation('method');
 
         $result = $this->getMollieStatusResultFactory->create([
             'status' => $processResult->getStatus(),
-            'method' => $method ?? $order->getPayment()->getMethod(),
+            'method' => $method ?? $order->getPayment()?->getMethod(),
+            'paymentFailure' => $processResult->getPaymentFailure(),
         ]);
 
         if ($result->shouldRedirectToSuccessPage()) {

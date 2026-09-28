@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Model\Client;
 
+use Mollie\Payment\Service\Mollie\PaymentFailure;
+
 class ProcessTransactionResponse
 {
     public function __construct(
@@ -15,6 +17,7 @@ class ProcessTransactionResponse
         private readonly string $status,
         private readonly string $order_id,
         private readonly string $type,
+        private readonly ?PaymentFailure $payment_failure = null,
     ) {
     }
 
@@ -50,6 +53,14 @@ class ProcessTransactionResponse
         return $this->type;
     }
 
+    public function getPaymentFailure(): ?PaymentFailure
+    {
+        return $this->payment_failure;
+    }
+
+    /**
+     * @return array<string, bool|string>
+     */
     public function toArray(): array
     {
         return [

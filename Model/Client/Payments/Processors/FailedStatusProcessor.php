@@ -14,6 +14,7 @@ use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\Client\PaymentProcessorInterface;
 use Mollie\Payment\Model\Client\ProcessTransactionResponse;
 use Mollie\Payment\Model\Client\ProcessTransactionResponseFactory;
+use Mollie\Payment\Service\Mollie\PaymentFailure;
 use Mollie\Payment\Service\Order\CancelOrder;
 use Mollie\Payment\Service\Order\TransactionProcessor;
 
@@ -47,6 +48,8 @@ class FailedStatusProcessor implements PaymentProcessorInterface
 
         $this->mollieHelper->addTolog('success', $message);
 
-        return $this->processTransactionResponseFactory->create($message);
+        return $this->processTransactionResponseFactory->create(
+            $message + ['payment_failure' => PaymentFailure::fromPaymentDetails($molliePayment->details)],
+        );
     }
 }

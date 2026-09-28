@@ -17,6 +17,7 @@ class GetMollieStatusResult
         private readonly AsyncPaymentMethods $asyncPaymentMethods,
         private string $status,
         ?string $method = null,
+        private readonly ?PaymentFailure $paymentFailure = null,
     ) {
         if ($method !== null) {
             $method = str_replace('mollie_methods_', '', $method);
@@ -32,6 +33,11 @@ class GetMollieStatusResult
     public function getMethod(): ?string
     {
         return $this->method;
+    }
+
+    public function getPaymentFailure(): ?PaymentFailure
+    {
+        return $this->paymentFailure;
     }
 
     public function isAwaitingConfirmation(): bool
