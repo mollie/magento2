@@ -80,7 +80,7 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         }
 
         $cart->setData('payment_method', 'mollie_methods_applepay');
-        $cart->setCustomerIsGuest(true);
+        $cart->setCustomerIsGuest($this->isGuestCart($cart));
 
         $cart->collectTotals();
         $this->cartRepository->save($cart);
@@ -142,6 +142,17 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         return $this->checkoutSession->getQuote();
     }
 
+    private function isGuestCart(CartInterface $cart): bool
+    {
+        return (int) $cart->getCustomerId() === 0;
+    }
+
+    private function detachFromAddressBook(AddressInterface $address): void
+    {
+        $address->setCustomerAddressId(null);
+        $address->setSaveInAddressBook(0);
+    }
+
     /**
      * @param string[] $addressLines
      */
@@ -162,6 +173,8 @@ class PlaceOrder extends Action implements HttpPostActionInterface
      */
     private function updateAddress(AddressInterface $address, array $input): void
     {
+        $this->detachFromAddressBook($address);
+
         $address->addData([
             AddressInterface::KEY_STREET => $this->getAddressLines($input['addressLines']),
             AddressInterface::KEY_COUNTRY_ID => strtoupper($input['countryCode']),
