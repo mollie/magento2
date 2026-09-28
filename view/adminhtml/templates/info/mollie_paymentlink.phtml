@@ -45,6 +45,18 @@ $status = $block->getPaymentStatus();
                     <td><?= $escaper->escapeHtml($block->getExpiresAt()); ?></td>
                 </tr>
             <?php endif; ?>
+            <?php if ($switchedMethodTitle = $block->getSwitchedMethodTitle()): ?>
+                <tr class="mollie-switched-method">
+                    <th><?= $escaper->escapeHtml(__('Paid with')); ?></th>
+                    <td>
+                        <img src="<?= $escaper->escapeUrl($block->getViewFileUrl('Mollie_Payment::images/' . $block->getSwitchedMethodImage())) ?>" alt=""/>
+                        <?= $escaper->escapeHtml($switchedMethodTitle); ?>
+                        <a href="#" class="mollie-tooltip">(i)
+                            <span><?= $escaper->escapeHtml(__('The customer chose %1 on the Mollie payment page of this payment link.', $switchedMethodTitle)); ?></span>
+                        </a>
+                    </td>
+                </tr>
+            <?php endif; ?>
             <?php if ($block->getPaymentStatus()): ?>
                 <tr>
                     <th><?= $escaper->escapeHtml(__('Payment Status')); ?></th>

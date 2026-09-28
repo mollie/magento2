@@ -97,6 +97,40 @@ class BaseTest extends IntegrationTestCase
         $this->assertNull($instance->{$method}());
     }
 
+    /**
+     * @magentoConfigFixture current_store payment/mollie_methods_paypal/title PayPal by Mollie
+     */
+    public function testShowsTheConfiguredTitleAndImageOfTheMethodTheCustomerSwitchedTo(): void
+    {
+        $instance = $this->createBlockForPayment('mollie_methods_banktransfer', 'paypal');
+
+        $title = $instance->getSwitchedMethodTitle();
+        $image = $instance->getSwitchedMethodImage();
+
+        $this->assertSame('PayPal by Mollie', $title);
+        $this->assertSame('paypal.svg', $image);
+    }
+
+    public function testFallsBackToTheMollieMethodCodeWhenTheMethodHasNoTitle(): void
+    {
+        $instance = $this->createBlockForPayment('mollie_methods_banktransfer', 'newmethod');
+
+        $title = $instance->getSwitchedMethodTitle();
+
+        $this->assertSame('Newmethod', $title);
+    }
+
+    public function testShowsNoSwitchedMethodWhenTheCustomerPaidWithTheSelectedMethod(): void
+    {
+        $instance = $this->createBlockForPayment('mollie_methods_banktransfer', 'banktransfer');
+
+        $title = $instance->getSwitchedMethodTitle();
+        $image = $instance->getSwitchedMethodImage();
+
+        $this->assertNull($title);
+        $this->assertNull($image);
+    }
+
     public function testReturnsTheRemainderAmount(): void
     {
         /** @var Info $info */
@@ -107,5 +141,19 @@ class BaseTest extends IntegrationTestCase
         $instance = $this->objectManager->create(Base::class);
         $instance->setData('info', $info);
         $this->assertEquals('100', $instance->getRemainderAmount());
+    }
+
+    private function createBlockForPayment(string $magentoMethod, string $mollieMethod): Base
+    {
+        /** @var Info $info */
+        $info = $this->objectManager->create(Info::class);
+        $info->setMethod($magentoMethod);
+        $info->setAdditionalInformation('method', $mollieMethod);
+
+        /** @var Base $instance */
+        $instance = $this->objectManager->create(Base::class);
+        $instance->setData('info', $info);
+
+        return $instance;
     }
 }
