@@ -43,11 +43,12 @@ class ProcessTransaction
         $result = $this->mollieModel->processTransactionForOrder($order, $type);
 
         /** @var string|null $method */
-        $method = $order->getPayment()->getAdditionalInformation('method');
+        $method = $order->getPayment()?->getAdditionalInformation('method');
 
         return $this->getMollieStatusResultFactory->create([
             'status' => $result->getStatus(),
-            'method' => $method ?? $order->getPayment()->getMethod(),
+            'method' => $method ?? $order->getPayment()?->getMethod(),
+            'paymentFailure' => $result->getPaymentFailure(),
         ]);
     }
 

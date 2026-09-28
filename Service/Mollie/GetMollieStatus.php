@@ -40,6 +40,7 @@ class GetMollieStatus
         return $this->getMollieStatusResultFactory->create([
             'status' => $molliePayment->status,
             'method' => $molliePayment->method,
+            'paymentFailure' => PaymentFailure::fromPaymentDetails($molliePayment->details),
         ]);
     }
 }

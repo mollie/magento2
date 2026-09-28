@@ -16,6 +16,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpGetActionInterface;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Phrase;
 use Magento\Payment\Helper\Data;
 use Magento\Payment\Model\MethodInterface;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -25,9 +26,11 @@ use Magento\Sales\Model\Order;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Mollie;
+use Mollie\Payment\Service\Checkout\PaymentMethodMessages;
 use Mollie\Payment\Service\Mollie\FormatExceptionMessages;
 use Mollie\Payment\Service\Mollie\Order\RedirectUrl;
 use Mollie\Payment\Service\Order\OrderAwaitingPaymentFromSession;
+use Mollie\Payment\Service\Order\RedirectOnError;
 use Mollie\Payment\Service\OrderLockService;
 
 class Redirect extends Action implements HttpGetActionInterface
@@ -44,6 +47,8 @@ class Redirect extends Action implements HttpGetActionInterface
         private readonly FormatExceptionMessages $formatExceptionMessages,
         private readonly OrderLockService $orderLockService,
         private readonly OrderAwaitingPaymentFromSession $orderAwaitingPaymentFromSession,
+        private readonly RedirectOnError $redirectOnError,
+        private readonly PaymentMethodMessages $paymentMethodMessages,
     ) {
         parent::__construct($context);
     }
@@ -70,11 +75,11 @@ class Redirect extends Action implements HttpGetActionInterface
             $methodInstance = $this->getMethodInstance($method);
             if (!$methodInstance instanceof Mollie) {
                 $msg = __('Payment Method not found');
-                $this->messageManager->addErrorMessage($msg);
+                $this->paymentMethodMessages->addError($msg);
                 $this->config->addTolog('error', (string) $msg);
                 $this->checkoutSession->restoreQuote();
 
-                return $this->_redirect('checkout/cart');
+                return $this->getResponse()->setRedirect($this->redirectOnError->getUrl());
             }
 
             return $this->getResponse()->setRedirect(
@@ -82,12 +87,12 @@ class Redirect extends Action implements HttpGetActionInterface
             );
         } catch (Exception $exception) {
             $errorMessage = $this->formatExceptionMessages->execute($exception, $methodInstance ?? null);
-            $this->messageManager->addErrorMessage($errorMessage);
+            $this->paymentMethodMessages->addError(new Phrase($errorMessage));
             $this->config->addTolog('error', $exception->getMessage());
             $this->checkoutSession->restoreQuote();
             $this->cancelUnprocessedOrder($order, $exception->getMessage());
 
-            return $this->_redirect('checkout/cart');
+            return $this->getResponse()->setRedirect($this->redirectOnError->getUrl());
         }
     }
 
