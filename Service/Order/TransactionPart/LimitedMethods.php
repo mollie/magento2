@@ -22,8 +22,27 @@ class LimitedMethods implements TransactionPartInterface
             return $transaction;
         }
 
-        $transaction['method'] = $additionalData['limited_methods'];
+        $transaction['method'] = $this->mapMethods($additionalData['limited_methods']);
 
         return $transaction;
+    }
+
+    /**
+     * The Mollie API only accepts Google Pay through the creditcard method.
+     *
+     * @param string|string[] $methods
+     * @return string|string[]
+     */
+    private function mapMethods($methods)
+    {
+        if (!is_array($methods)) {
+            return $methods === 'googlepay' ? 'creditcard' : $methods;
+        }
+
+        $methods = array_map(function ($method) {
+            return $method === 'googlepay' ? 'creditcard' : $method;
+        }, $methods);
+
+        return array_values(array_unique($methods));
     }
 }
