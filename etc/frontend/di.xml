@@ -20,6 +20,7 @@
             <argument name="configProviders" xsi:type="array">
                 <item name="mollie_payment_config_provider" xsi:type="object">Mollie\Payment\Model\MollieConfigProvider</item>
                 <item name="mollie_payment_terminal_config_provider" xsi:type="object">Mollie\Payment\Model\MollieTerminalConfigProvider</item>
+                <item name="mollie_payment_instructions_config_provider" xsi:type="object">Mollie\Payment\Model\PaymentInstructionsConfigProvider</item>
             </argument>
         </arguments>
     </type>

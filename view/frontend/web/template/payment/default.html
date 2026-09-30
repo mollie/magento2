@@ -17,6 +17,12 @@
         <!-- ko template: getTemplate() --><!-- /ko -->
         <!--/ko-->
 
+        <!-- ko with: getInstructions() -->
+        <div class="mollie-payment-instructions" data-bind="css: cssClass">
+            <div data-bind="html: html"></div>
+        </div>
+        <!--/ko-->
+
         <div class="payment-method-billing-address">
             <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
             <!-- ko template: getTemplate() --><!-- /ko -->
