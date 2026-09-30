@@ -78,7 +78,7 @@ test.describe('Stock reservations for uncanceled payment link orders', () => {
         await mollieHostedPaymentPage.selectPaymentMethod(customerPage, 'iDEAL | Wero');
         await mollieHostedPaymentPage.selectFirstIssuer(customerPage);
         await mollieHostedPaymentPage.selectStatus(customerPage, 'paid');
-        await customerPage.waitForURL((url) => !url.hostname.endsWith('mollie.com'));
+        await customerPage.waitForURL((url) => url.origin === new URL(paymentLinkUrl).origin);
       } finally {
         await customerContext.close();
       }

@@ -12,6 +12,7 @@ use Magento\CatalogInventory\Model\StockRegistryStorage;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\DB\Select;
 use Magento\Framework\Exception\CouldNotSaveException;
+use Magento\Framework\Module\Manager;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\InventoryReservationsApi\Model\GetReservationsQuantityInterface;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -28,6 +29,7 @@ class UncancelTest extends IntegrationTestCase
 {
     private const DEFAULT_STOCK_ID = 1;
     private const ORDERED_QUANTITY = 2.0;
+    private const INVENTORY_SALES_API_MODULE = 'Magento_InventorySalesApi';
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
@@ -52,6 +54,8 @@ class UncancelTest extends IntegrationTestCase
      */
     public function testItReservesTheCanceledQuantityOfASimpleProductAgain(): void
     {
+        $this->skipWithoutInventoryReservations();
+
         $order = $this->cancelOrder($this->loadOrder('100000001'));
 
         $this->objectManager->create(Uncancel::class)->execute($order);
@@ -64,6 +68,8 @@ class UncancelTest extends IntegrationTestCase
      */
     public function testItReservesTheCanceledQuantityOfAConfigurableProductOnlyOnce(): void
     {
+        $this->skipWithoutInventoryReservations();
+
         $order = $this->cancelOrder($this->withConfigurableChildSku($this->loadOrder('100000001')));
 
         $this->objectManager->create(Uncancel::class)->execute($order);
@@ -76,6 +82,8 @@ class UncancelTest extends IntegrationTestCase
      */
     public function testItReservesTheCanceledQuantityOfTheBundleSelectionsAgain(): void
     {
+        $this->skipWithoutInventoryReservations();
+
         $order = $this->cancelOrder($this->withBundleSelectionAttributes($this->loadOrder('100000001')));
 
         $this->objectManager->create(Uncancel::class)->execute($order);
@@ -89,6 +97,8 @@ class UncancelTest extends IntegrationTestCase
      */
     public function testItAddsTheOrderIncrementIdToTheUncancelReservation(): void
     {
+        $this->skipWithoutInventoryReservations();
+
         $order = $this->cancelOrder($this->loadOrder('100000001'));
 
         $this->objectManager->create(Uncancel::class)->execute($order);
@@ -101,6 +111,8 @@ class UncancelTest extends IntegrationTestCase
      */
     public function testItRestoresTheStockOnlyOnceWhenAnOutdatedCopyOfTheOrderIsUncanceledAgain(): void
     {
+        $this->skipWithoutInventoryReservations();
+
         $order = $this->cancelOrder($this->loadOrder('100000001'));
         $outdatedCopy = $this->loadOrder('100000001');
 
@@ -115,6 +127,8 @@ class UncancelTest extends IntegrationTestCase
      */
     public function testItLeavesAnOrderThatIsNotCanceledInTheDatabaseUntouched(): void
     {
+        $this->skipWithoutInventoryReservations();
+
         $order = $this->loadOrder('100000001');
         $order->cancel();
 
@@ -135,7 +149,20 @@ class UncancelTest extends IntegrationTestCase
         $this->createUncancelWithoutInventoryReservations()->execute($order);
 
         $this->assertSame($initialQuantity - self::ORDERED_QUANTITY, $this->getLegacyStockQuantity('simple'));
-        $this->assertSame(self::ORDERED_QUANTITY, $this->getReservedQuantity('simple'));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testItPlacesNoReservationWhenInventoryReservationsAreDisabled(): void
+    {
+        $this->skipWithoutInventoryReservations();
+
+        $order = $this->cancelOrder($this->loadOrder('100000001'));
+
+        $this->createUncancelWithoutInventoryReservations()->execute($order);
+
+        $this->assertSame(0, $this->countUncancelReservations('simple'));
     }
 
     /**
@@ -143,6 +170,8 @@ class UncancelTest extends IntegrationTestCase
      */
     public function testItLeavesTheLegacyStockAloneWhenInventoryReservationsAreEnabled(): void
     {
+        $this->skipWithoutInventoryReservations();
+
         $order = $this->cancelOrder($this->loadOrder('100000001'));
         $initialQuantity = $this->getLegacyStockQuantity('simple');
 
@@ -191,7 +220,7 @@ class UncancelTest extends IntegrationTestCase
     {
         $this->objectManager->get(StockRegistryStorage::class)->clean();
         $moduleManager = $this->objectManager->create(ModuleManagerFake::class);
-        $moduleManager->givenModuleIsDisabled('Magento_InventorySalesApi');
+        $moduleManager->givenModuleIsDisabled(self::INVENTORY_SALES_API_MODULE);
 
         return $this->objectManager->create(Uncancel::class, array_filter([
             'moduleManager' => $moduleManager,
@@ -256,8 +285,24 @@ class UncancelTest extends IntegrationTestCase
             ->where('metadata LIKE ?', '%"event_type":"' . OrderReservation::EVENT_ORDER_UNCANCELED . '"%');
     }
 
+    private function skipWithoutInventoryReservations(): void
+    {
+        if (!$this->isInventoryReservationsInstalled()) {
+            $this->markTestSkipped('Module ' . self::INVENTORY_SALES_API_MODULE . ' is not enabled');
+        }
+    }
+
+    private function isInventoryReservationsInstalled(): bool
+    {
+        return $this->objectManager->get(Manager::class)->isEnabled(self::INVENTORY_SALES_API_MODULE);
+    }
+
     private function getLastReservationId(): int
     {
+        if (!$this->isInventoryReservationsInstalled()) {
+            return 0;
+        }
+
         $connection = $this->objectManager->get(ResourceConnection::class)->getConnection();
 
         return (int)$connection->fetchOne(
@@ -267,6 +312,10 @@ class UncancelTest extends IntegrationTestCase
 
     private function removeReservationsAfter(int $reservationId): void
     {
+        if (!$this->isInventoryReservationsInstalled()) {
+            return;
+        }
+
         $connection = $this->objectManager->get(ResourceConnection::class)->getConnection();
         $connection->delete($connection->getTableName('inventory_reservation'), ['reservation_id > ?' => $reservationId]);
     }
