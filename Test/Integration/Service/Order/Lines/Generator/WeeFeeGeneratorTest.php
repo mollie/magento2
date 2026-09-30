@@ -91,6 +91,27 @@ class WeeFeeGeneratorTest extends IntegrationTestCase
         $this->assertEquals(8.0, $result[0]['totalAmount']['value']);
     }
 
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testCountsWeeeOfTheParentWhenTheChildHasNoWeee(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setBaseCurrencyCode('EUR');
+        $parent = $this->createWeeeItem('2.85');
+        /** @var Item $child */
+        $child = $this->objectManager->create(Item::class);
+        $child->setParentItem($parent);
+        $order->setItems([$parent, $child]);
+
+        /** @var WeeeFeeGenerator $instance */
+        $instance = $this->objectManager->create(WeeeFeeGenerator::class);
+        $result = $instance->process($order, []);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals(2.85, $result[0]['totalAmount']['value']);
+    }
+
     private function createWeeeItem(string $amount): Item
     {
         /** @var Item $item */

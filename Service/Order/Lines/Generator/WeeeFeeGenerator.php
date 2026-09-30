@@ -69,14 +69,20 @@ class WeeeFeeGenerator implements GeneratorInterface
 
     private function getWeeeItems(OrderInterface $order): array
     {
-        return array_filter($order->getItems(), function (OrderItemInterface $item): bool {
-            return !$this->hasChildren($item) && (bool) $item->getWeeeTaxAppliedAmount();
+        $items = array_filter($order->getItems(), function (OrderItemInterface $item): bool {
+            return (bool) $item->getWeeeTaxAppliedAmount();
+        });
+
+        return array_filter($items, function (OrderItemInterface $item) use ($items): bool {
+            return !$this->isParentOfAny($item, $items);
         });
     }
 
-    private function hasChildren(OrderItemInterface $item): bool
+    private function isParentOfAny(OrderItemInterface $parent, array $items): bool
     {
-        return $item->getChildrenItems() !== [];
+        return array_filter($items, function (OrderItemInterface $item) use ($parent): bool {
+            return $item->getParentItem() === $parent;
+        }) !== [];
     }
 
     private function getTitle(array $items): string
