@@ -64,6 +64,16 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="days_before_expire" translate="label comment" type="text" sortOrder="65" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Days to expire</label>
+            <frontend_class>validate-digits-range digits-range-1-365</frontend_class>
+            <config_path>payment/mollie_methods_paymentlink/days_before_expire</config_path>
+            <comment>How many days the payment link stays valid after the order is created. Unpaid orders are canceled within a week after this period; older orders are left untouched. A change also applies to orders that are still open. Leave empty to use the default of 28 days.</comment>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
         <field id="order_status_new" translate="label comment" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Status After Creation</label>
             <source_model>Mollie\Payment\Model\Adminhtml\Source\PendingPaymentStatus</source_model>
