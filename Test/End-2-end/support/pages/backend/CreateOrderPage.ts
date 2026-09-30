@@ -66,6 +66,12 @@ export default class CreateOrderPage {
     await this.waitForLoadingMask(page);
   }
 
+  async limitPaymentLinkMethods(page: Page, methods: string[]) {
+    const limitedMethods = page.locator('#mollie_methods_paymentlink_methods');
+    await limitedMethods.waitFor({state: 'visible'});
+    await limitedMethods.selectOption(methods);
+  }
+
   async submitOrder(page: Page) {
     await this.waitForLoadingMask(page);
 

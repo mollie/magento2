@@ -11,12 +11,15 @@ namespace Mollie\Payment\Test\Fakes\Service\Mollie;
 
 use Mollie\Payment\Service\Mollie\GetMollieStatusResult;
 use Mollie\Payment\Service\Mollie\ProcessTransaction;
+use Throwable;
 
 class ProcessTransactionFake extends ProcessTransaction
 {
     private int $timesCalled = 0;
 
     private ?GetMollieStatusResult $response = null;
+
+    private ?Throwable $exception = null;
 
     public function getTimesCalled(): int
     {
@@ -28,9 +31,18 @@ class ProcessTransactionFake extends ProcessTransaction
         $this->response = $response;
     }
 
+    public function setException(Throwable $exception): void
+    {
+        $this->exception = $exception;
+    }
+
     public function execute(int $orderId, string $transactionId, string $type = 'webhook'): GetMollieStatusResult
     {
         $this->timesCalled++;
+
+        if ($this->exception) {
+            throw $this->exception;
+        }
 
         if ($this->response) {
             return $this->response;

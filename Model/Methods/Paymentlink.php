@@ -27,6 +27,7 @@ class Paymentlink extends Mollie
      * @var string
      */
     public const CODE = 'mollie_methods_paymentlink';
+    public const OPEN_ORDER_STATES = [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT];
 
     /**
      * @param string $paymentAction

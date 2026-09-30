@@ -65,6 +65,8 @@ class Config
     public const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     public const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     public const PAYMENT_CREDITCARD_CONSENT_TEXT = 'payment/mollie_methods_creditcard/consent_text';
+    public const PAYMENT_PAYMENTLINK_DAYS_BEFORE_EXPIRE = 'payment/mollie_methods_paymentlink/days_before_expire';
+    public const PAYMENT_PAYMENTLINK_DEFAULT_DAYS_BEFORE_EXPIRE = 28;
     public const PAYMENT_METHOD_API_METHOD = 'payment/mollie_methods_%s/method';
     public const PAYMENT_METHOD_STATUS_PENDING = 'payment/mollie_methods_%s/order_status_pending';
     public const PAYMENT_METHOD_ISSUER_LIST_TYPE = 'payment/mollie_methods_%s/issuer_list_type';
@@ -659,6 +661,13 @@ class Config
     public function pendingOrderCronBatchSize(?int $storeId = null): int
     {
         return (int) ($this->getPath(static::GENERAL_PENDING_ORDER_CRON_BATCH_SIZE, $storeId) ?? 25);
+    }
+
+    public function paymentLinkDaysBeforeExpire(?int $storeId = null): int
+    {
+        $days = (int) $this->getPath(static::PAYMENT_PAYMENTLINK_DAYS_BEFORE_EXPIRE, $storeId);
+
+        return $days > 0 ? $days : static::PAYMENT_PAYMENTLINK_DEFAULT_DAYS_BEFORE_EXPIRE;
     }
 
     private function addMethodToPath(string $path, ?string $method): string

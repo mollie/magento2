@@ -50,6 +50,64 @@ test('Places an admin order with Mollie Payment Link and processes it after payi
   await ordersPage.assertOrderStatusIs(page, 'Processing', 240);
 });
 
+// https://github.com/mollie/magento2/issues/1086
+// A link scanner opens the payment link, which starts a Mollie payment that expires after about
+// 15 minutes. The expired webhook canceled the order while the payment link itself was still valid.
+// The link is limited to one method, so selecting "expired" expires the whole payment instead of
+// only the attempt with that method.
+test('[1086] Keeps a payment link order open when the Mollie payment expires while the link is still valid', async ({page, browser}) => {
+  test.skip(!process.env.mollie_available_methods.includes('bancontact'), 'Skipping test as Bancontact is not available');
+  test.setTimeout(480000);
+
+  await createOrderPage.startNewOrder(page);
+  await createOrderPage.selectCustomerByEmail(page, 'roni_cost@example.com');
+  await createOrderPage.selectStoreView(page, 'Default Store View');
+
+  await createOrderPage.addProductBySku(page, '24-MB05');
+
+  await createOrderPage.selectFirstShippingMethod(page);
+  await createOrderPage.selectPaymentMethod(page, 'mollie_methods_paymentlink');
+  await createOrderPage.limitPaymentLinkMethods(page, ['bancontact']);
+
+  await createOrderPage.submitOrder(page);
+
+  const paymentLinkUrl = await createOrderPage.getPaymentLinkUrl(page);
+
+  const expiringContext = await browser.newContext();
+  const expiringPage = await expiringContext.newPage();
+
+  try {
+    await expiringPage.goto(paymentLinkUrl);
+
+    await mollieHostedPaymentPage.selectStatus(expiringPage, 'expired');
+
+    await expiringPage.waitForURL(/https:\/\/www\.mollie\.com\/checkout\/test-mode\/completed/);
+  } finally {
+    await expiringContext.close();
+  }
+
+  const stillValidComment = 'The order stays open because the payment link is valid until';
+  await ordersPage.waitForHistoryCommentOrStatus(page, stillValidComment, 'Canceled', 240);
+
+  await expect(page.locator('#order_status')).not.toContainText('Canceled');
+  await expect(page.locator('#order_history_block').getByText(stillValidComment)).toHaveCount(1);
+
+  const payingContext = await browser.newContext();
+  const payingPage = await payingContext.newPage();
+
+  try {
+    await payingPage.goto(paymentLinkUrl);
+
+    await mollieHostedPaymentPage.selectStatus(payingPage, 'paid');
+
+    await checkoutSuccessPage.assertThatOrderSuccessPageIsShown(payingPage);
+  } finally {
+    await payingContext.close();
+  }
+
+  await ordersPage.assertOrderStatusIs(page, 'Processing', 240);
+});
+
 test('Shows the Fetch Status button for a payment link order once the customer has opened the link', async ({page, browser}) => {
   test.setTimeout(360000);
 

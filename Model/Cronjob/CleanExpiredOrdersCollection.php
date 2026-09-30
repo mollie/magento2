@@ -21,6 +21,9 @@ use Psr\Log\LoggerInterface;
 
 class CleanExpiredOrdersCollection extends Collection
 {
+    /**
+     * @param string[] $excludedMethodCodes
+     */
     public function __construct(
         EntityFactory $entityFactory,
         LoggerInterface $logger,
@@ -29,6 +32,7 @@ class CleanExpiredOrdersCollection extends Collection
         Snapshot $entitySnapshot,
         Helper $coreResourceHelper,
         private readonly AsyncPaymentMethods $asyncPaymentMethods,
+        private readonly array $excludedMethodCodes = [],
         ?AdapterInterface $connection = null,
         ?AbstractDb $resource = null,
     ) {
@@ -46,12 +50,13 @@ class CleanExpiredOrdersCollection extends Collection
 
     /**
      * Do not auto cancel pending asynchronous orders. They may take a few days before they receive an update.
+     * Payment link orders are canceled by the Mollie module when the link expires.
      *
      * @return string[]
      */
     public function getAllIds($limit = null, $offset = null): array
     {
-        $codes = $this->asyncPaymentMethods->allCodes();
+        $codes = [...$this->asyncPaymentMethods->allCodes(), ...$this->excludedMethodCodes];
         if ($codes === []) {
             return parent::getAllIds($limit, $offset);
         }
