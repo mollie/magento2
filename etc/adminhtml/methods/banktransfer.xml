@@ -33,6 +33,26 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="instructions_style" translate="label comment" type="select" sortOrder="35" showInDefault="1"
+               showInWebsite="1" showInStore="1" canRestore="1">
+            <label>Instructions style</label>
+            <source_model>Mollie\Payment\Model\Adminhtml\Source\PaymentInstructionsStyle</source_model>
+            <config_path>payment/mollie_methods_banktransfer/instructions_style</config_path>
+            <comment><![CDATA[Uses the message styling of your theme. Choose "Plain text" if your checkout needs no highlighting.]]></comment>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
+        <field id="instructions" translate="label comment" type="textarea" sortOrder="36" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Instructions</label>
+            <config_path>payment/mollie_methods_banktransfer/instructions</config_path>
+            <comment><![CDATA[Shown in the checkout when the customer selects this payment method. For example: "Please pay before we ship your order."]]></comment>
+            <depends>
+                <field id="active">1</field>
+                <field id="instructions_style" negative="1">none</field>
+            </depends>
+        </field>
         <field id="capture_mode" translate="label comment" type="select" sortOrder="40" showInDefault="1"
                showInWebsite="1" showInStore="1" canRestore="1">
             <label>Capture method</label>

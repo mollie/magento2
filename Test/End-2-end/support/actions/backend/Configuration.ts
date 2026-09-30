@@ -11,6 +11,24 @@ export default class Configuration {
   }
 
   async setValue(page, section, group, field, value) {
+    const input = await this.openField(page, section, group, field);
+
+    if (await input.inputValue() !== value) {
+      await input.selectOption(value);
+      await this.save(page);
+    }
+  }
+
+  async setTextValue(page, section, group, field, value) {
+    const input = await this.openField(page, section, group, field);
+
+    if (await input.inputValue() !== value) {
+      await input.fill(value);
+      await this.save(page);
+    }
+  }
+
+  private async openField(page, section, group, field) {
     // Click on the config menu and navigate to the link
     const configLink = await page.locator('[data-ui-id="menu-magento-config-system-config"] > a');
     const href = await configLink.getAttribute('href');
@@ -38,24 +56,26 @@ export default class Configuration {
       await groupElement.click();
     }
 
-    const option = await groupElement.locator('.form-list tr').filter({ hasText: field });
+    const option = await groupElement.locator('.form-list tr').filter({ has: page.getByText(field, { exact: true }) });
 
     const useSystemValue = option.locator('input[type="checkbox"]').first();
     if (await useSystemValue.count() > 0 && await useSystemValue.isChecked()) {
         await useSystemValue.click();
     }
 
-    const selectElement = option.getByLabel(field);
-    const currentValue = await selectElement.inputValue();
+    return option.getByLabel(field, { exact: true });
+  }
 
-    if (currentValue !== value) {
-        await selectElement.selectOption(value);
-
-        await page.click('#save');
-
-        // Ensure the settings save and reload correctly
-        await page.locator('.mollie-tab').waitFor({ state: 'visible' });
-        await this.expect(await page.getByText('You saved the configuration.')).toBeVisible();
+  private async save(page) {
+    const paymentMethodDialogSaveButton = page.locator('dialog[open] .mollie-payment-save-config');
+    if (await paymentMethodDialogSaveButton.count() > 0) {
+      await paymentMethodDialogSaveButton.click();
+    } else {
+      await page.click('#save');
     }
+
+    // Ensure the settings save and reload correctly
+    await page.locator('.mollie-tab').waitFor({ state: 'visible' });
+    await this.expect(await page.getByText('You saved the configuration.')).toBeVisible();
   }
 }
