@@ -3,7 +3,7 @@
  * See COPYING.txt for license details.
  */
 
-import {Page, expect} from '@playwright/test';
+import {Locator, Page, expect} from '@playwright/test';
 import BackendLogin from 'Pages/backend/BackendLogin';
 
 const backendLogin = new BackendLogin();
@@ -43,6 +43,55 @@ export default class CreateOrderPage {
     const row = grid.locator('tr').filter({hasText: sku}).first();
     await row.locator('input[type="checkbox"]').check();
     await row.locator('input.qty').fill(quantity.toString());
+
+    await page.getByRole('button', {name: 'Add Selected Product(s) to Order'}).click();
+    await this.waitForLoadingMask(page);
+  }
+
+  async addConfigurableProductBySku(page: Page, sku: string, options: Record<string, string>, quantity = 1) {
+    const dialog = await this.openCompositeProductConfiguration(page, sku);
+
+    for (const [attributeLabel, optionLabel] of Object.entries(options)) {
+      await dialog.locator('.field')
+        .filter({has: page.locator('label', {hasText: attributeLabel})})
+        .locator('select')
+        .selectOption({label: optionLabel});
+    }
+
+    await this.confirmCompositeProductConfiguration(page, dialog, quantity);
+  }
+
+  async addBundleProductWithDefaultSelectionsBySku(page: Page, sku: string, quantity = 1) {
+    const dialog = await this.openCompositeProductConfiguration(page, sku);
+
+    await this.confirmCompositeProductConfiguration(page, dialog, quantity);
+  }
+
+  private async openCompositeProductConfiguration(page: Page, sku: string) {
+    await page.locator('#add_products').click();
+
+    const grid = page.locator('#sales_order_create_search_grid');
+    await grid.waitFor({state: 'visible'});
+
+    const skuFilter = grid.locator('input[name="sku"]');
+    await skuFilter.fill(sku);
+    await skuFilter.press('Enter');
+    await this.waitForLoadingMask(page);
+
+    const row = grid.locator('tr').filter({has: page.locator('td', {hasText: new RegExp(`^\\s*${sku}\\s*$`)})}).first();
+    await row.locator('input[type="checkbox"]').check();
+
+    const dialog = page.getByRole('dialog').filter({has: page.getByRole('heading', {name: 'Configure Product'})});
+    await dialog.waitFor({state: 'visible'});
+
+    return dialog;
+  }
+
+  private async confirmCompositeProductConfiguration(page: Page, dialog: Locator, quantity: number) {
+    await dialog.locator('#product_composite_configure_input_qty').fill(quantity.toString());
+
+    await dialog.getByRole('button', {name: 'OK'}).click();
+    await dialog.waitFor({state: 'hidden'});
 
     await page.getByRole('button', {name: 'Add Selected Product(s) to Order'}).click();
     await this.waitForLoadingMask(page);

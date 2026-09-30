@@ -106,6 +106,14 @@ export default class OrdersPage {
       }
     }
 
+    async cancelOrder(page) {
+      await page.locator('#order-view-cancel-button').click();
+      await page.locator('.modal-popup._show .action-accept').click();
+
+      await expect(page.getByText('You canceled the order.')).toBeVisible();
+      await expect(page.locator('#order_status')).toContainText('Canceled');
+    }
+
     async openTab(page, tabName: string) {
         await page.locator('[data-ui-id="sales-order-tabs-tab-sales-order-view-tabs"] li')
             .filter({ hasText: tabName })
