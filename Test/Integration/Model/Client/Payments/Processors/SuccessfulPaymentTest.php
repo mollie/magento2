@@ -26,6 +26,7 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     {
         $order = $this->loadOrder('100000001');
         $order->setBaseCurrencyCode('EUR');
+        $order->setOrderCurrencyCode('EUR');
         $order->setMollieTransactionId('abc123');
 
         $items = $order->getItems();
@@ -40,12 +41,13 @@ class SuccessfulPaymentTest extends IntegrationTestCase
 
         $this->objectManager->get(OrderRepositoryInterface::class)->save($order);
         $order->cancel();
+        $this->objectManager->get(OrderRepositoryInterface::class)->save($order);
 
         $this->assertEquals(Order::STATE_CANCELED, $order->getState());
 
         /** @var MolliePaymentBuilder $paymentBuilder */
         $paymentBuilder = $this->objectManager->create(MolliePaymentBuilder::class);
-        $paymentBuilder->setAmount((float)$order->getBaseGrandTotal(), (float)$order->getBaseCurrencyCode());
+        $paymentBuilder->setAmount((float)$order->getBaseGrandTotal(), $order->getBaseCurrencyCode());
 
         /** @var SuccessfulPayment $instance */
         $instance = $this->objectManager->create(SuccessfulPayment::class);
