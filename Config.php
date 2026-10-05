@@ -70,6 +70,8 @@ class Config
     public const PAYMENT_METHOD_ISSUER_LIST_TYPE = 'payment/mollie_methods_%s/issuer_list_type';
     public const PAYMENT_METHOD_PAYMENT_ACTIVE = 'payment/mollie_methods_%s/active';
     public const PAYMENT_METHOD_PAYMENT_DESCRIPTION = 'payment/mollie_methods_%s/payment_description';
+    public const PAYMENT_METHOD_INSTRUCTIONS = 'payment/mollie_methods_%s/instructions';
+    public const PAYMENT_METHOD_INSTRUCTIONS_STYLE = 'payment/mollie_methods_%s/instructions_style';
     public const PAYMENT_METHOD_CAPTURE_MODE = 'payment/mollie_methods_%s/capture_mode';
     public const PAYMENT_METHOD_WHEN_TO_CAPTURE = 'payment/mollie_methods_%s/when_to_capture';
     public const PAYMENT_METHOD_CAPTURE_DELAY = 'payment/mollie_methods_%s/capture_delay';
@@ -472,6 +474,16 @@ class Config
     public function paymentMethodDescription(string $method, ?int $storeId = null): mixed
     {
         return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_DESCRIPTION, $method), $storeId);
+    }
+
+    public function paymentMethodInstructions(string $method, ?int $storeId = null): string
+    {
+        return (string) $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_INSTRUCTIONS, $method), $storeId);
+    }
+
+    public function paymentMethodInstructionsStyle(string $method, ?int $storeId = null): string
+    {
+        return (string) $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_INSTRUCTIONS_STYLE, $method), $storeId);
     }
 
     /**

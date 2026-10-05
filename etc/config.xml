@@ -147,6 +147,7 @@
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
+                <instructions_style>none</instructions_style>
                 <can_use_checkout>1</can_use_checkout>
                 <can_order>1</can_order>
                 <can_refund>1</can_refund>
@@ -534,6 +535,7 @@
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
                 <instructions/>
+                <instructions_style>none</instructions_style>
                 <can_use_checkout>1</can_use_checkout>
                 <can_order>1</can_order>
                 <can_refund>1</can_refund>
