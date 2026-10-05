@@ -248,6 +248,8 @@
 "MyBank","MyBank"
 "Name on card","Naam op kaart"
 "New order email sent","E-mail voor nieuwe bestelling verzonden"
+"New order email scheduled for sending","E-mail voor nieuwe bestelling ingepland voor verzending"
+"Unable to send the new order email, please check the logs for details","Kan de e-mail voor de nieuwe bestelling niet verzenden, bekijk de logs voor details"
 "No","Nee"
 "No email address found for this payment.","Geen e-mailadres gevonden voor deze betaling."
 "No info_buyRequest option found","Geen info_buyRequest optie gevonden"
