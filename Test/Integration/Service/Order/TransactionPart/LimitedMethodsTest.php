@@ -61,4 +61,36 @@ class LimitedMethodsTest extends IntegrationTestCase
 
         $this->assertEquals('creditcard', $result['method']);
     }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testReplacesGooglePayWithCreditcard(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->getPayment()->setAdditionalInformation('limited_methods', ['creditcard', 'googlepay', 'paypal']);
+
+        /** @var LimitedMethods $instance */
+        $instance = $this->objectManager->create(LimitedMethods::class);
+
+        $result = $instance->process($order, ['method' => 'creditcard']);
+
+        $this->assertEquals(['creditcard', 'paypal'], $result['method']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testReplacesGooglePayWhenItIsTheOnlyLimitedMethod(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->getPayment()->setAdditionalInformation('limited_methods', ['googlepay']);
+
+        /** @var LimitedMethods $instance */
+        $instance = $this->objectManager->create(LimitedMethods::class);
+
+        $result = $instance->process($order, ['method' => 'creditcard']);
+
+        $this->assertEquals(['creditcard'], $result['method']);
+    }
 }
