@@ -249,6 +249,8 @@
 "MyBank","MyBank"
 "Name on card","Name auf der Karte"
 "New order email sent","E-Mail über neue Bestellung gesendet"
+"New order email scheduled for sending","E-Mail zur neuen Bestellung ist zum Versand eingeplant"
+"Unable to send the new order email, please check the logs for details","Die E-Mail zur neuen Bestellung konnte nicht gesendet werden, Details finden Sie in den Logs"
 "No","Nein"
 "No email address found for this payment.","Für diese Zahlung wurde keine E-Mail-Adresse gefunden."
 "No info_buyRequest option found","Keine info_buyRequest-Option gefunden"
