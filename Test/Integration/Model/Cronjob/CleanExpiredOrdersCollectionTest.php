@@ -38,6 +38,16 @@ class CleanExpiredOrdersCollectionTest extends IntegrationTestCase
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
      */
+    public function testExcludesPaymentLinkOrders(): void
+    {
+        $orderId = $this->createOrderWithMethod('mollie_methods_paymentlink');
+
+        $this->assertNotContains($orderId, $this->getAllIds());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
     public function testIncludesOrdersPaidWithASynchronousMethod(): void
     {
         $orderId = $this->createOrderWithMethod('mollie_methods_ideal');
