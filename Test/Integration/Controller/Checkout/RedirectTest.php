@@ -10,7 +10,9 @@ declare(strict_types=1);
 namespace Mollie\Payment\Test\Integration\Controller\Checkout;
 
 use Magento\Checkout\Model\Session;
+use Exception;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Message\MessageInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Quote\Model\Quote;
@@ -19,6 +21,7 @@ use Magento\TestFramework\TestCase\AbstractController;
 use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Service\Mollie\Order\RedirectUrl;
 use Mollie\Payment\Service\PaymentToken\Generate;
+use Mollie\Payment\Test\Fakes\Service\Mollie\Order\RedirectUrlFake;
 
 class RedirectTest extends AbstractController
 {
@@ -94,6 +97,28 @@ class RedirectTest extends AbstractController
         $this->dispatch('mollie/checkout/redirect');
 
         $this->assertRedirect($this->stringContains('checkout/cart'));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture current_store payment/mollie_general/redirect_when_transaction_fails_to redirect_to_checkout_payment
+     */
+    public function testRedirectsToTheConfiguredPageWithoutExposingTheErrorWhenStartingThePaymentFails(): void
+    {
+        $order = $this->createMollieOrderAwaitingPayment();
+        $this->addOrderToSession($order);
+
+        $redirectUrl = $this->_objectManager->create(RedirectUrlFake::class);
+        $redirectUrl->givenStartingThePaymentFails(new Exception('Request body: {"email":"customer@example.com"}'));
+        $this->_objectManager->addSharedInstance($redirectUrl, RedirectUrl::class);
+
+        $this->dispatch('mollie/checkout/redirect');
+
+        $this->assertRedirect($this->stringContains('checkout/#payment'));
+        $this->assertSessionMessages(
+            $this->equalTo(['Your payment was not completed. Please try again or select another payment method.']),
+            MessageInterface::TYPE_ERROR,
+        );
     }
 
     private function createMollieOrderAwaitingPayment(): OrderInterface
