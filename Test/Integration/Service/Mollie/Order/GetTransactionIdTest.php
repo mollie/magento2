@@ -141,6 +141,10 @@ class GetTransactionIdTest extends IntegrationTestCase
                 'transactions' => [['tr_abc123', 'pending'], ['tr_def465', 'pending'], ['tr_ghi678', 'paid']],
                 'paid' => 'tr_ghi678',
             ],
+            [
+                'transactions' => [['tr_abc123', 'open'], ['tr_def465', 'authorized']],
+                'paid' => 'tr_def465',
+            ],
         ];
     }
 
