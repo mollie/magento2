@@ -74,7 +74,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
             ]);
         }
 
-        $orderAmount = $this->orderAmount->getByTransactionId($magentoOrder->getMollieTransactionId());
+        $orderAmount = $this->orderAmount->forOrder($magentoOrder);
         if ($currency != $orderAmount['currency']) {
             return $this->processTransactionResponseFactory->create([
                 'success' => false,

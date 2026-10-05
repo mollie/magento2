@@ -10,7 +10,7 @@ namespace Mollie\Payment\Service\Order;
 
 use Magento\Framework\Api\SearchCriteriaBuilderFactory;
 use Magento\Framework\Exception\LocalizedException;
-use Magento\Sales\Api\Data\OrderSearchResultInterface;
+use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
@@ -29,10 +29,40 @@ class OrderAmount
      */
     public function getByTransactionId(string $transactionId): array
     {
+        $orders = $this->getOrders($transactionId);
+        if ($orders === []) {
+            throw new LocalizedException(__('No orders found for transaction %1', $transactionId));
+        }
+
+        return $this->getForOrders($orders);
+    }
+
+    /**
+     * An order can have multiple Mollie transactions (for example when the customer is redirected twice), while
+     * only one of them is stored on the order. The transaction currently being processed may therefore not be
+     * found on any order. In that case the amount of the order itself is used.
+     *
+     * @throws LocalizedException
+     */
+    public function forOrder(OrderInterface $order): array
+    {
+        $orders = $this->getOrders((string) $order->getMollieTransactionId());
+        if ($orders === []) {
+            $orders = [$order];
+        }
+
+        return $this->getForOrders($orders);
+    }
+
+    /**
+     * @param OrderInterface[] $orders
+     * @throws LocalizedException
+     */
+    private function getForOrders(array $orders): array
+    {
         $amount = 0.00;
         $currencies = [];
-        $orders = $this->getOrders($transactionId);
-        foreach ($orders->getItems() as $order) {
+        foreach ($orders as $order) {
             if ($this->config->useBaseCurrency(storeId($order->getStoreId()))) {
                 $currencies[] = $order->getBaseCurrencyCode();
                 $amount += $order->getBaseGrandTotal();
@@ -47,12 +77,19 @@ class OrderAmount
         return $this->mollieHelper->getAmountArray(reset($currencies), $amount);
     }
 
-    private function getOrders(string $transactionId): OrderSearchResultInterface
+    /**
+     * @return OrderInterface[]
+     */
+    private function getOrders(string $transactionId): array
     {
+        if ($transactionId === '') {
+            return [];
+        }
+
         $searchCriteriaBuilder = $this->searchCriteriaBuilderFactory->create();
         $searchCriteriaBuilder->addFilter('mollie_transaction_id', $transactionId);
 
-        return $this->orderRepository->getList($searchCriteriaBuilder->create());
+        return $this->orderRepository->getList($searchCriteriaBuilder->create())->getItems();
     }
 
     /**
