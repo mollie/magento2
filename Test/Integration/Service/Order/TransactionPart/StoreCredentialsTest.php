@@ -102,7 +102,22 @@ class StoreCredentialsTest extends IntegrationTestCase
         $instance = $this->createInstance(true, true);
         $result = $instance->process($order, []);
 
-        $this->assertEquals(['storeCredentials' => true], $result);
+        $this->assertEquals(['additional' => ['storeCredentials' => true]], $result);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testKeepsExistingAdditionalParameters(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->getPayment()->setMethod('mollie_methods_creditcard');
+        $order->getPayment()->setAdditionalInformation('mollie_save_card', true);
+
+        $instance = $this->createInstance(true, true);
+        $result = $instance->process($order, ['additional' => ['cardToken' => 'tkn_abc123']]);
+
+        $this->assertEquals(['additional' => ['cardToken' => 'tkn_abc123', 'storeCredentials' => true]], $result);
     }
 
     private function createInstance(bool $loggedIn, bool $toggleEnabled): StoreCredentials

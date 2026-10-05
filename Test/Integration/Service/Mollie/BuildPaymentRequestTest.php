@@ -42,4 +42,22 @@ class BuildPaymentRequestTest extends IntegrationTestCase
 
         $this->assertInstanceOf(CreatePaymentRequest::class, $result);
     }
+
+    public function testSendsStoreCredentialsAlongsideCardToken(): void
+    {
+        /** @var BuildPaymentRequest $instance */
+        $instance = $this->objectManager->create(BuildPaymentRequest::class);
+
+        $result = $instance->execute([
+            'description' => 'Order 0000025',
+            'amount' => ['currency' => 'EUR', 'value' => '10.00'],
+            'billingAddress' => ['email' => 'test@example.com'],
+            'customerId' => 'cst_abc123',
+            'additional' => ['cardToken' => 'tkn_abc123', 'storeCredentials' => true],
+        ]);
+
+        $body = json_decode((string)$result->payload(), true);
+        $this->assertSame('tkn_abc123', $body['cardToken']);
+        $this->assertTrue($body['storeCredentials']);
+    }
 }
