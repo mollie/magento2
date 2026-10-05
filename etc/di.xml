@@ -2493,4 +2493,29 @@
             <argument name="commandPool" xsi:type="object">MollieCommandPool</argument>
         </arguments>
     </virtualType>
+
+    <virtualType name="Mollie\Payment\Model\Data\ReEncryptorList\ApiKeyFallbackReEncryptor\Handler" type="Magento\EncryptionKey\Model\Data\ReEncryptorList\ReEncryptor\SimpleHandler">
+        <arguments>
+            <argument name="tableName" xsi:type="string">mollie_apikey_fallback</argument>
+            <argument name="identifierField" xsi:type="string">entity_id</argument>
+            <argument name="fieldsToReEncrypt" xsi:type="array">
+                <item name="apikey" xsi:type="string">apikey</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="Mollie\Payment\Model\Data\ReEncryptorList\ApiKeyFallbackReEncryptor" type="Magento\EncryptionKey\Model\Data\ReEncryptorList\ReEncryptor">
+        <arguments>
+            <argument name="description" xsi:type="string">Re-encrypts 'apikey' column in the 'mollie_apikey_fallback' DB table.</argument>
+            <argument name="handler" xsi:type="object">Mollie\Payment\Model\Data\ReEncryptorList\ApiKeyFallbackReEncryptor\Handler</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\EncryptionKey\Model\Data\ReEncryptorList">
+        <arguments>
+            <argument name="reEncryptors" xsi:type="array">
+                <item name="mollie_apikey_fallback" xsi:type="object">Mollie\Payment\Model\Data\ReEncryptorList\ApiKeyFallbackReEncryptor</item>
+            </argument>
+        </arguments>
+    </type>
 </config>
