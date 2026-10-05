@@ -88,6 +88,7 @@ class PaymentInstructionsTest extends IntegrationTestCase
 
     /**
      * @magentoAppIsolation enabled
+     * @dataProvider styleProvider
      */
     #[DataProvider('styleProvider')]
     public function testReturnsTheCssClassForTheConfiguredStyle(string $style, string $expectedCssClass): void
