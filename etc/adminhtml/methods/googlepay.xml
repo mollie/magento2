@@ -25,6 +25,14 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="payment_description" translate="label" type="text" sortOrder="25" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Description</label>
+            <config_path>payment/mollie_methods_googlepay/payment_description</config_path>
+            <comment model="Mollie\Payment\Model\Adminhtml\Comment\AvailableDescriptionVariables"/>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
         <field id="capture_mode" translate="label comment" type="select" sortOrder="30" showInDefault="1"
                showInWebsite="1" showInStore="1" canRestore="1">
             <label>Capture method</label>
