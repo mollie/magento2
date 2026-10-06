@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Mollie\Payment\Service\Mollie\Order;
 
 use Magento\Sales\Api\Data\OrderInterface;
+use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Api\Data\TransactionToOrderInterface;
 use Mollie\Payment\Api\TransactionToOrderManagementInterface;
 use Mollie\Payment\Config;
@@ -26,9 +27,9 @@ class GetTransactionId
 
     /**
      * Sometimes an order gets multiple transactions. If that's the case, this code will return the first
-     * transaction that has the status 'paid'. This is to prevent issues where one transaction is 'paid',
-     * but the other 'pending' transaction transitions to 'canceled'. This code prevents the order to get
-     * canceled in that case.
+     * transaction that has the status 'paid' or 'authorized'. This is to prevent issues where one transaction
+     * is 'paid', but the other 'pending' transaction transitions to 'canceled'. This code prevents the order
+     * to get canceled in that case.
      *
      *
      * @param OrderInterface $order
@@ -55,7 +56,7 @@ class GetTransactionId
 
         $statuses = $this->getTransactionStatuses($order, $transactions);
         foreach ($statuses as $transactionId => $status) {
-            if ($status === 'paid') {
+            if (in_array($status, [PaymentStatus::PAID, PaymentStatus::AUTHORIZED], true)) {
                 $order->setMollieTransactionId($transactionId);
 
                 return $transactionId;

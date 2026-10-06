@@ -9,7 +9,10 @@ declare(strict_types=1);
 namespace Mollie\Payment\Test\Integration\Controller\ApplePay;
 
 use Magento\Checkout\Model\Session;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Model\Address;
+use Magento\Customer\Model\ResourceModel\Address\Collection as AddressCollection;
+use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Request\Http as HttpRequest;
 use Magento\Framework\Validator\Factory as ValidatorFactory;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -21,6 +24,11 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class PlaceOrderTest extends AbstractController
 {
+    private const CUSTOMER_ID = 1;
+    private const SAVED_ADDRESS_ID = 1;
+    private const SAVED_ADDRESS_CITY = 'CityM';
+    private const APPLE_PAY_CITY = 'St Albans';
+
     /**
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoConfigFixture current_store carriers/flatrate/active 1
@@ -103,6 +111,100 @@ class PlaceOrderTest extends AbstractController
         $this->assertSame($supportedCity, $this->getPlacedOrder()->getBillingAddress()->getCity());
     }
 
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture Magento/Customer/_files/customer_address.php
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoConfigFixture current_store carriers/flatrate/active 1
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/apikey_test test_dummydummydummydummydummydummy
+     * @magentoConfigFixture current_store payment/mollie_general/enable_second_chance_email 0
+     * @magentoConfigFixture current_store payment/mollie_methods_applepay/active 1
+     */
+    public function testPlacesTheOrderForALoggedInCustomerWhoseQuoteUsesASavedAddress(): void
+    {
+        $this->prepareCustomerQuoteWithSavedAddress();
+
+        $this->dispatchPlaceOrder(self::APPLE_PAY_CITY);
+
+        $response = json_decode($this->getResponse()->getBody(), true);
+        $this->assertSame(
+            200,
+            $this->getResponse()->getHttpResponseCode(),
+            'Placing the Apple Pay order for a logged-in customer failed: ' . ($response['message'] ?? ''),
+        );
+        $this->assertFalse($response['error']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture Magento/Customer/_files/customer_address.php
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoConfigFixture current_store carriers/flatrate/active 1
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/apikey_test test_dummydummydummydummydummydummy
+     * @magentoConfigFixture current_store payment/mollie_general/enable_second_chance_email 0
+     * @magentoConfigFixture current_store payment/mollie_methods_applepay/active 1
+     */
+    public function testLinksTheOrderToTheLoggedInCustomerInsteadOfAGuest(): void
+    {
+        $this->prepareCustomerQuoteWithSavedAddress();
+
+        $this->dispatchPlaceOrder(self::APPLE_PAY_CITY);
+
+        $order = $this->getPlacedOrder();
+        $this->assertSame(self::CUSTOMER_ID, (int) $order->getCustomerId());
+        $this->assertFalse((bool) $order->getCustomerIsGuest());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture Magento/Customer/_files/customer_address.php
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoConfigFixture current_store carriers/flatrate/active 1
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/apikey_test test_dummydummydummydummydummydummy
+     * @magentoConfigFixture current_store payment/mollie_general/enable_second_chance_email 0
+     * @magentoConfigFixture current_store payment/mollie_methods_applepay/active 1
+     */
+    public function testUsesTheApplePayAddressInsteadOfTheSavedAddressForALoggedInCustomer(): void
+    {
+        $this->prepareCustomerQuoteWithSavedAddress();
+
+        $this->dispatchPlaceOrder(self::APPLE_PAY_CITY);
+
+        $order = $this->getPlacedOrder();
+        $this->assertSame(self::APPLE_PAY_CITY, $order->getBillingAddress()->getCity());
+        $this->assertSame(self::APPLE_PAY_CITY, $order->getShippingAddress()->getCity());
+        $this->assertNull($order->getBillingAddress()->getCustomerAddressId());
+        $this->assertNull($order->getShippingAddress()->getCustomerAddressId());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Customer/_files/customer.php
+     * @magentoDataFixture Magento/Customer/_files/customer_address.php
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoConfigFixture current_store carriers/flatrate/active 1
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/apikey_test test_dummydummydummydummydummydummy
+     * @magentoConfigFixture current_store payment/mollie_general/enable_second_chance_email 0
+     * @magentoConfigFixture current_store payment/mollie_methods_applepay/active 1
+     */
+    public function testLeavesTheAddressBookOfTheLoggedInCustomerUntouched(): void
+    {
+        $this->prepareCustomerQuoteWithSavedAddress();
+
+        $this->dispatchPlaceOrder(self::APPLE_PAY_CITY);
+
+        $savedAddresses = $this->getSavedAddressesOfCustomer();
+        $this->assertCount(1, $savedAddresses);
+        $this->assertSame(self::SAVED_ADDRESS_CITY, $savedAddresses->getFirstItem()->getCity());
+    }
+
     public static function localityProvider(): array
     {
         return array_map(
@@ -133,6 +235,34 @@ class PlaceOrderTest extends AbstractController
 
         $this->_objectManager->get(CartRepositoryInterface::class)->save($quote);
         $this->_objectManager->get(Session::class)->setQuoteId($quote->getId());
+    }
+
+    private function prepareCustomerQuoteWithSavedAddress(): void
+    {
+        /** @var Quote $quote */
+        $quote = $this->_objectManager->create(Quote::class);
+        $quote->load('test01', 'reserved_order_id');
+        $quote->setIsMultiShipping(false);
+        $quote->setIsActive(true);
+        $quote->setCustomer($this->_objectManager->get(CustomerRepositoryInterface::class)->getById(self::CUSTOMER_ID));
+        $quote->setCustomerIsGuest(false);
+        $quote->getBillingAddress()->setCustomerAddressId(self::SAVED_ADDRESS_ID);
+        $quote->getShippingAddress()->setCustomerAddressId(self::SAVED_ADDRESS_ID);
+        $quote->getShippingAddress()->setCollectShippingRates(true);
+
+        $this->_objectManager->get(CartRepositoryInterface::class)->save($quote);
+        $this->_objectManager->get(CustomerSession::class)->loginById(self::CUSTOMER_ID);
+        $this->_objectManager->get(Session::class)->setQuoteId($quote->getId());
+    }
+
+    private function getSavedAddressesOfCustomer(): AddressCollection
+    {
+        /** @var AddressCollection $collection */
+        $collection = $this->_objectManager->create(AddressCollection::class);
+        $collection->addAttributeToSelect('city');
+        $collection->addAttributeToFilter('parent_id', self::CUSTOMER_ID);
+
+        return $collection;
     }
 
     private function dispatchPlaceOrder(string $locality): void

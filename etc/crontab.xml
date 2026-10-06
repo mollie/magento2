@@ -14,5 +14,8 @@
         <job instance="Mollie\Payment\Cron\ProcessPendingOrders" method="execute" name="mollie_process_pending_orders">
             <schedule>*/30 * * * *</schedule>
         </job>
+        <job instance="Mollie\Payment\Cron\CancelExpiredPaymentLinkOrders" method="execute" name="mollie_cancel_expired_payment_link_orders">
+            <schedule>15 * * * *</schedule>
+        </job>
     </group>
 </config>

@@ -65,11 +65,15 @@ class Config
     public const PAYMENT_CREDITCARD_USE_COMPONENTS = 'payment/mollie_methods_creditcard/use_components';
     public const PAYMENT_CREDITCARD_ENABLE_CUSTOMERS_API = 'payment/mollie_methods_creditcard/enable_customers_api';
     public const PAYMENT_CREDITCARD_CONSENT_TEXT = 'payment/mollie_methods_creditcard/consent_text';
+    public const PAYMENT_PAYMENTLINK_DAYS_BEFORE_EXPIRE = 'payment/mollie_methods_paymentlink/days_before_expire';
+    public const PAYMENT_PAYMENTLINK_DEFAULT_DAYS_BEFORE_EXPIRE = 28;
     public const PAYMENT_METHOD_API_METHOD = 'payment/mollie_methods_%s/method';
     public const PAYMENT_METHOD_STATUS_PENDING = 'payment/mollie_methods_%s/order_status_pending';
     public const PAYMENT_METHOD_ISSUER_LIST_TYPE = 'payment/mollie_methods_%s/issuer_list_type';
     public const PAYMENT_METHOD_PAYMENT_ACTIVE = 'payment/mollie_methods_%s/active';
     public const PAYMENT_METHOD_PAYMENT_DESCRIPTION = 'payment/mollie_methods_%s/payment_description';
+    public const PAYMENT_METHOD_INSTRUCTIONS = 'payment/mollie_methods_%s/instructions';
+    public const PAYMENT_METHOD_INSTRUCTIONS_STYLE = 'payment/mollie_methods_%s/instructions_style';
     public const PAYMENT_METHOD_CAPTURE_MODE = 'payment/mollie_methods_%s/capture_mode';
     public const PAYMENT_METHOD_WHEN_TO_CAPTURE = 'payment/mollie_methods_%s/when_to_capture';
     public const PAYMENT_METHOD_CAPTURE_DELAY = 'payment/mollie_methods_%s/capture_delay';
@@ -474,6 +478,16 @@ class Config
         return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_DESCRIPTION, $method), $storeId);
     }
 
+    public function paymentMethodInstructions(string $method, ?int $storeId = null): string
+    {
+        return (string) $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_INSTRUCTIONS, $method), $storeId);
+    }
+
+    public function paymentMethodInstructionsStyle(string $method, ?int $storeId = null): string
+    {
+        return (string) $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_INSTRUCTIONS_STYLE, $method), $storeId);
+    }
+
     /**
      * @param string $method
      * @param int|null $storeId
@@ -536,7 +550,7 @@ class Config
 
     public function getMethodTitle(string $method, ?int $storeId = null): string
     {
-        return $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_TITLE, $method), $storeId);
+        return (string) $this->getPath($this->addMethodToPath(static::PAYMENT_METHOD_PAYMENT_TITLE, $method), $storeId);
     }
 
     public function cancelFailedOrders(?int $storeId = null): bool
@@ -659,6 +673,13 @@ class Config
     public function pendingOrderCronBatchSize(?int $storeId = null): int
     {
         return (int) ($this->getPath(static::GENERAL_PENDING_ORDER_CRON_BATCH_SIZE, $storeId) ?? 25);
+    }
+
+    public function paymentLinkDaysBeforeExpire(?int $storeId = null): int
+    {
+        $days = (int) $this->getPath(static::PAYMENT_PAYMENTLINK_DAYS_BEFORE_EXPIRE, $storeId);
+
+        return $days > 0 ? $days : static::PAYMENT_PAYMENTLINK_DEFAULT_DAYS_BEFORE_EXPIRE;
     }
 
     private function addMethodToPath(string $path, ?string $method): string

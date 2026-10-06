@@ -42,7 +42,7 @@ class StoreCredentials implements TransactionPartInterface
             return $transaction;
         }
 
-        $transaction['storeCredentials'] = true;
+        $transaction['additional'] = ($transaction['additional'] ?? []) + ['storeCredentials' => true];
 
         return $transaction;
     }

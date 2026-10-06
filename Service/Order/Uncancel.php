@@ -8,6 +8,8 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Order;
 
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\DB\Adapter\AdapterInterface;
 use Magento\Framework\Event\ManagerInterface;
 use Magento\Framework\Module\Manager;
 use Magento\Sales\Api\Data\OrderInterface;
@@ -15,32 +17,61 @@ use Magento\Sales\Api\Data\OrderItemInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Mollie\Payment\Config;
+use Mollie\Payment\Service\Order\Uncancel\LegacyStockDeduction;
 use Mollie\Payment\Service\Order\Uncancel\OrderReservation;
+use Throwable;
 
 class Uncancel
 {
-    /**
-     * @var bool
-     */
-    private $isInventorySalesApiEnabled;
+    private const INVENTORY_SALES_API_MODULE = 'Magento_InventorySalesApi';
+    private const SALES_CONNECTION = 'sales';
 
     public function __construct(
         private Config $config,
         private OrderRepositoryInterface $orderRepository,
         private OrderReservation $uncancelOrderItemReservation,
         private ManagerInterface $eventManager,
-        private Manager $moduleManager
+        private Manager $moduleManager,
+        private LegacyStockDeduction $legacyStockDeduction,
+        private ResourceConnection $resourceConnection,
     ) {}
 
     public function execute(OrderInterface $order): void
     {
-        $this->isInventorySalesApiEnabled = $this->moduleManager->isEnabled('Magento_InventorySalesApi');
+        $connection = $this->resourceConnection->getConnection(self::SALES_CONNECTION);
+        $connection->beginTransaction();
+
+        try {
+            $this->uncancelWhenCanceledInDatabase($connection, $order);
+            $connection->commit();
+        } catch (Throwable $exception) {
+            $connection->rollBack();
+            throw $exception;
+        }
+    }
+
+    private function uncancelWhenCanceledInDatabase(AdapterInterface $connection, OrderInterface $order): void
+    {
+        if (!$this->isCanceledInDatabase($connection, (int)$order->getEntityId())) {
+            return;
+        }
 
         $this->updateOrder($order);
         $this->updateOrderItems($order);
+        $this->restoreStock($order);
 
         $this->orderRepository->save($order);
         $this->eventManager->dispatch('sales_order_uncancel', ['order' => $order]);
+    }
+
+    private function isCanceledInDatabase(AdapterInterface $connection, int $orderId): bool
+    {
+        return $connection->fetchOne(
+            $connection->select()
+                ->from($this->resourceConnection->getTableName('sales_order'), 'state')
+                ->where('entity_id = ?', $orderId)
+                ->forUpdate(true),
+        ) === Order::STATE_CANCELED;
     }
 
     private function updateOrder(OrderInterface $order): void
@@ -72,11 +103,31 @@ class Uncancel
     {
         /** @var OrderItemInterface $item */
         foreach ($order->getAllItems() as $item) {
-            if ($this->isInventorySalesApiEnabled) {
-                $this->uncancelOrderItemReservation->execute($item);
-            }
-
             $this->uncancelItem($item);
+        }
+    }
+
+    private function restoreStock(OrderInterface $order): void
+    {
+        if ($this->moduleManager->isEnabled(self::INVENTORY_SALES_API_MODULE)) {
+            $this->placeReservations($order);
+            return;
+        }
+
+        $this->deductLegacyStock($order);
+    }
+
+    private function placeReservations(OrderInterface $order): void
+    {
+        foreach ($order->getAllItems() as $item) {
+            $this->uncancelOrderItemReservation->execute($item);
+        }
+    }
+
+    private function deductLegacyStock(OrderInterface $order): void
+    {
+        foreach ($order->getAllItems() as $item) {
+            $this->legacyStockDeduction->execute($item);
         }
     }
 

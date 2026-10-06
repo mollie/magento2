@@ -11,6 +11,8 @@ namespace Mollie\Payment\Test\Integration\Service\Mollie\Order;
 
 use DateInterval;
 use DateTimeImmutable;
+use DateTimeZone;
+use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Model\Methods\Paymentlink;
 use Mollie\Payment\Service\Mollie\Order\IsPaymentLinkExpired;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -19,108 +21,118 @@ class IsPaymentLinkExpiredTest extends IntegrationTestCase
 {
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
-     * @return void
      */
-    public function testIsValidTheDayBeforeTheDefaultExpire(): void
+    public function testIsValidOnTheDayBeforeTheDefaultExpiry(): void
     {
-        $order = $this->loadOrder('100000001');
-        $order->getPayment()->setMethod(Paymentlink::CODE);
+        $order = $this->createPaymentLinkOrderCreatedAgo('P27D');
 
-        $date = new DateTimeImmutable();
-        $date = $date->add(new DateInterval('P27D'))->setTime(0, 0, 0);
-        $order->setCreatedAt($date->format('Y-m-d H:i:s'));
+        $result = $this->objectManager->create(IsPaymentLinkExpired::class)->execute($order);
 
-        $instance = $this->objectManager->create(IsPaymentLinkExpired::class);
-
-        $this->assertFalse($instance->execute($order));
-    }
-    /**
-     * @magentoDataFixture Magento/Sales/_files/order.php
-     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
-     * @return void
-     */
-    public function testIsInvalidTheDayAfterTheDefaultExpire(): void
-    {
-        $order = $this->loadOrder('100000001');
-        $order->getPayment()->setMethod(Paymentlink::CODE);
-
-        $date = new DateTimeImmutable();
-        $date = $date->add(new DateInterval('P28D'))->setTime(23, 59, 59);
-        $order->setCreatedAt($date->format('Y-m-d H:i:s'));
-
-        $instance = $this->objectManager->create(IsPaymentLinkExpired::class);
-
-        $this->assertTrue($instance->execute($order));
+        $this->assertFalse($result);
     }
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
-     * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 10
-     * @return void
      */
-    public function testIsValidWhenAvailableForMethodIsSetTheDayBefore(): void
+    public function testIsExpiredAfterTheDefaultExpiry(): void
     {
-        $order = $this->loadOrder('100000001');
-        $order->getPayment()->setMethod(Paymentlink::CODE);
+        $order = $this->createPaymentLinkOrderCreatedAgo('P28DT1H');
 
-        $date = new DateTimeImmutable();
-        $date = $date->add(new DateInterval('P9D'))->setTime(0, 0, 0);
-        $order->setCreatedAt($date->format('Y-m-d H:i:s'));
+        $result = $this->objectManager->create(IsPaymentLinkExpired::class)->execute($order);
 
-        $order->getPayment()->setAdditionalInformation(['limited_methods' => ['ideal']]);
-
-        $instance = $this->objectManager->create(IsPaymentLinkExpired::class);
-
-        $this->assertFalse($instance->execute($order));
+        $this->assertTrue($result);
     }
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
-     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
-     * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 10
-     * @return void
-     */
-    public function testIsValidWhenAvailableForMethodIsSetTheDayAfter(): void
-    {
-        $order = $this->loadOrder('100000001');
-        $order->getPayment()->setMethod(Paymentlink::CODE);
-
-        $date = new DateTimeImmutable();
-        $date = $date->add(new DateInterval('P11D'))->setTime(23, 59, 59);
-        $order->setCreatedAt($date->format('Y-m-d H:i:s'));
-
-        $order->getPayment()->setAdditionalInformation(['limited_methods' => ['ideal']]);
-
-        $instance = $this->objectManager->create(IsPaymentLinkExpired::class);
-
-        $this->assertTrue($instance->execute($order));
-    }
-
-    /**
-     * @magentoDataFixture Magento/Sales/_files/order.php
-     * @magentoConfigFixture default_store general/locale/timezone Europe/Amsterdam
      * @magentoConfigFixture default_store payment/mollie_methods_paymentlink/days_before_expire 10
      */
-    public function testUsesPaymentlinkForExpiryWhenNoLimitedMethodsAreSet(): void
+    public function testIsValidWithinTheConfiguredDays(): void
+    {
+        $order = $this->createPaymentLinkOrderCreatedAgo('P9D');
+
+        $result = $this->objectManager->create(IsPaymentLinkExpired::class)->execute($order);
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_methods_paymentlink/days_before_expire 10
+     */
+    public function testIsExpiredAfterTheConfiguredDays(): void
+    {
+        $order = $this->createPaymentLinkOrderCreatedAgo('P10DT1H');
+
+        $result = $this->objectManager->create(IsPaymentLinkExpired::class)->execute($order);
+
+        $this->assertTrue($result);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_methods_paymentlink/days_before_expire 0
+     */
+    public function testUsesTheDefaultExpiryWhenTheConfiguredDaysAreInvalid(): void
+    {
+        $order = $this->createPaymentLinkOrderCreatedAgo('P27D');
+
+        $result = $this->objectManager->create(IsPaymentLinkExpired::class)->execute($order);
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_methods_ideal/days_before_expire 1
+     */
+    public function testIgnoresTheExpirySettingOfALimitedMethod(): void
+    {
+        $order = $this->createPaymentLinkOrderCreatedAgo('P5D');
+        $order->getPayment()->setAdditionalInformation(['limited_methods' => ['ideal']]);
+
+        $result = $this->objectManager->create(IsPaymentLinkExpired::class)->execute($order);
+
+        $this->assertFalse($result);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @magentoConfigFixture default_store payment/mollie_methods_paymentlink/days_before_expire 10
+     */
+    public function testReturnsTheCreationDatePlusTheConfiguredDaysAsExpiryDate(): void
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setCreatedAt('2026-01-01 12:00:00');
+
+        $result = $this->objectManager->create(IsPaymentLinkExpired::class)->getExpiresAt($order);
+
+        $this->assertSame('2026-01-11 12:00:00', $result->format('Y-m-d H:i:s'));
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_methods_paymentlink/days_before_expire 10
+     */
+    public function testReturnsTheConfiguredDaysAgoAsLatestExpiredCreationDate(): void
+    {
+        $expected = (new DateTimeImmutable('now', new DateTimeZone('UTC')))->sub(new DateInterval('P10D'));
+
+        $result = $this->objectManager->create(IsPaymentLinkExpired::class)->getLatestExpiredCreationDate(1);
+
+        $this->assertEqualsWithDelta($expected->getTimestamp(), $result->getTimestamp(), 5);
+        $this->assertSame('UTC', $result->getTimezone()->getName());
+    }
+
+    private function createPaymentLinkOrderCreatedAgo(string $interval): OrderInterface
     {
         $order = $this->loadOrder('100000001');
         $order->getPayment()->setMethod(Paymentlink::CODE);
-        $order->getPayment()->setAdditionalInformation(['limited_methods' => null]);
+        $order->setCreatedAt(
+            (new DateTimeImmutable('now', new DateTimeZone('UTC')))
+                ->sub(new DateInterval($interval))
+                ->format('Y-m-d H:i:s'),
+        );
 
-        $instance = $this->objectManager->create(IsPaymentLinkExpired::class);
-
-        $date = new DateTimeImmutable();
-        $date = $date->add(new DateInterval('P9D'))->setTime(23, 59, 59);
-        $order->setCreatedAt($date->format('Y-m-d H:i:s'));
-
-        $this->assertFalse($instance->execute($order));
-
-        $date = new DateTimeImmutable();
-        $date = $date->add(new DateInterval('P11D'))->setTime(23, 59, 59);
-        $order->setCreatedAt($date->format('Y-m-d H:i:s'));
-
-        $this->assertTrue($instance->execute($order));
+        return $order;
     }
 }

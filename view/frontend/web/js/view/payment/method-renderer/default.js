@@ -102,7 +102,9 @@ define(
                     return checkoutConfig.image[this.item.method];
                 },
                 getInstructions: function () {
-                    return checkoutConfig.instructions[this.item.method];
+                    var instructions = (checkoutConfig.mollie || {}).instructions || {};
+
+                    return instructions[this.item.method] || null;
                 },
                 placeOrder: function (data, event) {
                     this.isPlaceOrderActionAllowed(false);

@@ -95,6 +95,26 @@ export default class OrdersPage {
       throw new Error(`Order status "${status}" was not reached within ${maxWaitSeconds} seconds.`);
     }
 
+    async waitForHistoryCommentOrStatus(page, comment: string, status: string, maxWaitSeconds = 120) {
+      const deadline = Date.now() + (maxWaitSeconds * 1000);
+
+      while (Date.now() < deadline) {
+        if (await page.locator('#order_history_block').getByText(comment).count() > 0) {
+          return;
+        }
+
+        const statusText = await page.locator('#order_status').textContent();
+        if (statusText && statusText.includes(status)) {
+          return;
+        }
+
+        await page.waitForTimeout(1000);
+        await page.reload({waitUntil: 'load'});
+      }
+
+      throw new Error(`Neither the comment "${comment}" nor the status "${status}" appeared within ${maxWaitSeconds} seconds.`);
+    }
+
     async checkIfLoggedIn(page, urlToNavigateAfterLogin) {
       const issueElement = Array.from(await page.getByText('Report an issue').all()).length;
       const passwordElement = Array.from(await page.getByText('Forgot your password?').all()).length;
@@ -104,6 +124,14 @@ export default class OrdersPage {
 
         await page.goto(urlToNavigateAfterLogin);
       }
+    }
+
+    async cancelOrder(page) {
+      await page.locator('#order-view-cancel-button').click();
+      await page.locator('.modal-popup._show .action-accept').click();
+
+      await expect(page.getByText('You canceled the order.')).toBeVisible();
+      await expect(page.locator('#order_status')).toContainText('Canceled');
     }
 
     async openTab(page, tabName: string) {
