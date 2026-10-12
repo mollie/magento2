@@ -11,6 +11,7 @@ namespace Mollie\Payment\Service\Mollie;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Quote\Api\CartTotalRepositoryInterface;
+use Magento\Quote\Api\Data\AddressInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\TotalsInterface;
@@ -23,6 +24,11 @@ use Mollie\Payment\Service\PaymentToken\PaymentTokenForQuote;
 
 class CreateSession
 {
+    private const GUEST_EMAIL_KEY = 'mollie_guest_email';
+    private const CUSTOMER_DETAIL_EMAIL = 'email';
+    private const CUSTOMER_DETAIL_BILLING_ADDRESS = 'billing-address';
+    private const CUSTOMER_DETAIL_SHIPPING_ADDRESS = 'shipping-address';
+
     private CartInterface $cart;
     private TotalsInterface $totals;
 
@@ -61,11 +67,48 @@ class CreateSession
             $this->getLines($isExpressCheckout),
             ['webhookUrl' => $this->transaction->getExpressWebhookUrl($cart)],
             ['quoteId' => $cart->getEntityId(), 'store_id' => storeId($cart->getStoreId())],
+            $this->getRequiredCustomerDetails(),
         ));
 
         $cart->getPayment()->setAdditionalInformation('mollie_session_id', $session->id);
 
         return $session->clientAccessToken; // @phpstan-ignore property.notFound
+    }
+
+    /**
+     * The express webhook creates the order from the cart, so it needs an email and addresses. A guest cart on the
+     * cart page has neither, so let the Express Component collect what is missing. Mollie returns the data in
+     * billingAddress and shippingAddress.
+     *
+     * @return string[]
+     */
+    private function getRequiredCustomerDetails(): array
+    {
+        return array_values(array_filter([
+            $this->hasCustomerEmail() ? null : self::CUSTOMER_DETAIL_EMAIL,
+            $this->isComplete($this->cart->getBillingAddress()) ? null : self::CUSTOMER_DETAIL_BILLING_ADDRESS,
+            $this->needsShippingAddress() ? self::CUSTOMER_DETAIL_SHIPPING_ADDRESS : null,
+        ]));
+    }
+
+    private function hasCustomerEmail(): bool
+    {
+        return (string)$this->cart->getCustomerEmail() !== ''
+            || (string)$this->cart->getPayment()->getAdditionalInformation(self::GUEST_EMAIL_KEY) !== '';
+    }
+
+    private function needsShippingAddress(): bool
+    {
+        return !$this->cart->getIsVirtual() && !$this->isComplete($this->cart->getShippingAddress());
+    }
+
+    private function isComplete(?AddressInterface $address): bool
+    {
+        return $address !== null
+            && (string)$address->getFirstname() !== ''
+            && array_filter((array)$address->getStreet()) !== []
+            && (string)$address->getPostcode() !== ''
+            && (string)$address->getCountryId() !== '';
     }
 
     /**
