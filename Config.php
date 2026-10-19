@@ -34,6 +34,7 @@ class Config
     public const GENERAL_PROCESS_TRANSACTION_IN_THE_QUEUE = 'payment/mollie_general/process_transactions_in_the_queue';
     public const GENERAL_ENCRYPT_PAYMENT_DETAILS = 'payment/mollie_general/encrypt_payment_details';
     public const GENERAL_CREATE_INVOICE = 'payment/mollie_general/create_invoice';
+    public const GENERAL_CREATE_CREDITMEMO_FOR_EXTERNAL_REFUNDS = 'payment/mollie_general/create_creditmemo_for_external_refunds';
     public const GENERAL_CANCEL_ORDER_ON_CHECKOUT_RETURN = 'payment/mollie_general/cancel_order_on_checkout_return';
     public const GENERAL_INCLUDE_SHIPPING_IN_SURCHARGE = 'payment/mollie_general/include_shipping_in_surcharge';
     public const GENERAL_INCLUDE_DISCOUNT_IN_SURCHARGE = 'payment/mollie_general/include_discount_in_surcharge';
@@ -642,6 +643,11 @@ class Config
     public function createInvoice(?int $storeId = null): bool
     {
         return $this->isSetFlag(static::GENERAL_CREATE_INVOICE, $storeId);
+    }
+
+    public function createCreditmemoForExternalRefunds(?int $storeId = null): bool
+    {
+        return $this->isSetFlag(static::GENERAL_CREATE_CREDITMEMO_FOR_EXTERNAL_REFUNDS, $storeId);
     }
 
     public function cancelOrderOnCheckoutReturn(?int $storeId = null): bool

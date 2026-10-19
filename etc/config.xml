@@ -41,6 +41,7 @@
                 <pending_order_cron_batch_size>25</pending_order_cron_batch_size>
                 <encrypt_payment_details>0</encrypt_payment_details>
                 <create_invoice>1</create_invoice>
+                <create_creditmemo_for_external_refunds>1</create_creditmemo_for_external_refunds>
                 <debug>1</debug>
                 <anonymize_debug_requests>1</anonymize_debug_requests>
                 <tracking_cookies>{"_1":{"cookie_name":"_ga","alias":"clientId"}}</tracking_cookies>

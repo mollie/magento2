@@ -100,6 +100,7 @@
 "Could not save the tracking record: %1","Não foi possível guardar o registo de rastreamento: %1"
 "Could not save the transactionToOrder: %1","Não foi possível guardar o transactionToOrder: %1"
 "Create a Mollie Payment link and add this to the order email.","Criar um link de pagamento Mollie e adicioná-lo ao e-mail da encomenda."
+"Create credit memo for refunds made outside Magento","Criar nota de crédito para reembolsos efetuados fora do Magento"
 "Create invoice on successful payment","Criar fatura após pagamento bem-sucedido"
 "Created Mollie Checkout Url","URL Mollie Checkout criado"
 "Credit Card","Cartão de Crédito"
@@ -342,6 +343,7 @@
 "Redirect to checkout (payment)","Redirecionar para a finalização da compra (pagamento)"
 "Redirect to checkout (shipping)","Redirecionar para a finalização da compra (envio)"
 "Redirect user when redirect fails","Redirecionar o utilizador quando o redirecionamento falhar"
+"Refund %1 of %2 was made outside Magento, possibly through the Mollie Dashboard. No credit memo was created.","O reembolso %1 de %2 foi efetuado fora do Magento, possivelmente através do painel Mollie. Não foi criada nenhuma nota de crédito."
 "Refund for order %1","Reembolso da encomenda %1"
 "Reload","Carregar novamente"
 "Remove saved card","Remover cartão guardado"
@@ -494,6 +496,7 @@
 "We recommend using another 'pending' status as the default Magento pending status can automatically cancel the order before the payment expiry time is reached.<br>By default the status ""Pending Payment"" is not visible for customers, therefore we advise you to create a new status for this, which should also be visible to the customer, informing them they still have to complete their payment.","Recomendamos que use outro estado 'pendente', uma vez que o estado pendente padrão do Magento pode cancelar automaticamente a encomenda antes do prazo de expiração do pagamento.<br>Por
 definição, o estado ""Pagamento Pendente"" não é visível para os clientes. Recomendamos, portanto, que crie um novo estado para esse efeito, que também deve ser visível para o cliente, informando-o que ainda deve concluir o seu pagamento."
 "We were unable to find the store credit for order #%1","Não foi possível encontrar o crédito da loja para o pedido #%1"
+"When a refund is made outside Magento, for example in the Mollie Dashboard, a credit memo is created automatically. Disable this option to only add a comment to the order instead. When you enable this option again, credit memos are created for those refunds on the next update of the payment.","Quando um reembolso é efetuado fora do Magento, por exemplo no painel Mollie, é criada automaticamente uma nota de crédito. Desative esta opção para adicionar apenas um comentário à encomenda. Se voltar a ativar esta opção, serão criadas notas de crédito para esses reembolsos na próxima atualização do pagamento."
 "When to capture?","Quando capturar?"
 "When you save the API key or change the mode, this value is automatically updated.","Quando guardar a chave API ou alterar o modo, este valor é atualizado automaticamente."
 "White","Branco"
