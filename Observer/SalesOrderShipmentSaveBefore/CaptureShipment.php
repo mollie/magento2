@@ -38,8 +38,7 @@ class CaptureShipment implements ObserverInterface
             return;
         }
 
-        $method = $order->getPayment()->getMethod();
-        if (!$this->whenToCapture->onShipment($method, storeId($order->getStoreId()))) {
+        if (!$this->whenToCapture->onShipment($order)) {
             return;
         }
 

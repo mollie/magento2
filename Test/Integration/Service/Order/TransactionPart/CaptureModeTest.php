@@ -8,7 +8,11 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order\TransactionPart;
 
+use Mollie\Payment\Model\Adminhtml\Source\CaptureMode as CaptureModeSource;
+use Mollie\Payment\Model\Adminhtml\Source\CaptureMoment;
 use Mollie\Payment\Model\Methods\ApplePay;
+use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
+use Mollie\Payment\Service\Mollie\Order\WhenToCapture;
 use Mollie\Payment\Model\Methods\Creditcard;
 use Mollie\Payment\Model\Methods\Ideal;
 use Mollie\Payment\Service\Order\TransactionPart\CaptureMode;
@@ -70,5 +74,45 @@ class CaptureModeTest extends IntegrationTestCase
         $transaction = $instance->process($order, []);
 
         $this->assertArrayHasKey('captureMode', $transaction);
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_methods_creditcard/capture_mode automatic
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testItStoresAutomaticCaptureOnThePayment(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->getPayment()->setMethod(Creditcard::CODE);
+
+        $this->objectManager->create(CaptureMode::class)->process($order, []);
+
+        $this->assertSame(
+            CaptureModeSource::AUTOMATIC,
+            $order->getPayment()->getAdditionalInformation(CanUseManualCapture::CAPTURE_MODE),
+        );
+    }
+
+    /**
+     * @magentoConfigFixture default_store payment/mollie_methods_creditcard/capture_mode manual
+     * @magentoConfigFixture default_store payment/mollie_methods_creditcard/when_to_capture shipment
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testItStoresManualCaptureAndTheCaptureMomentOnThePayment(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->getPayment()->setMethod(Creditcard::CODE);
+
+        $this->objectManager->create(CaptureMode::class)->process($order, []);
+
+        $payment = $order->getPayment();
+        $this->assertSame(
+            CaptureModeSource::MANUAL,
+            $payment->getAdditionalInformation(CanUseManualCapture::CAPTURE_MODE),
+        );
+        $this->assertSame(
+            CaptureMoment::ON_SHIPMENT,
+            $payment->getAdditionalInformation(WhenToCapture::CAPTURE_MOMENT),
+        );
     }
 }
