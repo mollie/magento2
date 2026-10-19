@@ -21,6 +21,9 @@ use Mollie\Payment\Model\Adminhtml\Source\WebhookUrlOptions;
 
 class Transaction
 {
+    private const CHECKOUT_WEBHOOK_PATH = 'mollie/checkout/webhook';
+    private const EXPRESS_WEBHOOK_PATH = 'mollie/express/webhook';
+
     /**
      * @var UrlInterface
      */
@@ -56,9 +59,29 @@ class Transaction
             return '';
         }
 
+        $query = 'quoteId=' . $cart->getEntityId();
+        $customUrl = $this->getCustomExpressWebhookUrl(storeId($storeId));
+        if ($customUrl !== null) {
+            return $customUrl . (strpos($customUrl, '?') === false ? '?' : '&') . $query;
+        }
+
         return $this->urlBuilder->getUrl('mollie/express/webhook/', [
-            '_query' => 'quoteId=' . $cart->getEntityId(),
+            '_query' => $query,
         ]);
+    }
+
+    private function getCustomExpressWebhookUrl(?int $storeId): ?string
+    {
+        if ($this->config->useWebhooks($storeId) != WebhookUrlOptions::CUSTOM_URL) {
+            return null;
+        }
+
+        $customUrl = $this->config->customWebhookUrl($storeId);
+        if (stripos($customUrl, self::CHECKOUT_WEBHOOK_PATH) === false) {
+            return null;
+        }
+
+        return str_ireplace(self::CHECKOUT_WEBHOOK_PATH, self::EXPRESS_WEBHOOK_PATH, $customUrl);
     }
 
     public function getRedirectUrl(OrderInterface $order, string $paymentToken): string
