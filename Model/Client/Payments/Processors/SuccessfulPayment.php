@@ -14,6 +14,7 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Invoice;
 use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Sales\Model\Order\Payment\Transaction\ManagerInterface as TransactionManagerInterface;
 use Mollie\Api\Resources\Payment;
 use Mollie\Payment\Config;
 use Mollie\Payment\Model\Client\PaymentProcessorInterface;
@@ -45,6 +46,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         private readonly CanUseManualCapture $canUseManualCapture,
         private readonly OrderStatePromotion $orderStatePromotion,
         private readonly IsPaymentAlreadyProcessed $isPaymentAlreadyProcessed,
+        private readonly TransactionManagerInterface $transactionManager,
     ) {
     }
 
@@ -142,7 +144,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
             $this->registerCaptureNotification($molliePayment, $magentoOrder);
         }
 
-        if ($usesManualCapture) {
+        if ($usesManualCapture && $this->canRegisterAuthorization($magentoOrder, $molliePayment)) {
             $payment->addTransaction(Transaction::TYPE_AUTH);
         }
 
@@ -150,6 +152,24 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $this->transactionProcessor->process($magentoOrder, $molliePayment);
 
         $this->orderRepository->save($magentoOrder);
+    }
+
+    /**
+     * Magento finds an existing transaction by its transaction ID and changes its type. Adding the authorization
+     * again would turn the capture of a paid payment into an open authorization, or reopen an authorization that is
+     * already closed. So the authorization is only registered once, while the payment is actually authorized.
+     */
+    private function canRegisterAuthorization(OrderInterface $magentoOrder, Payment $molliePayment): bool
+    {
+        if (!$molliePayment->isAuthorized()) {
+            return false;
+        }
+
+        return !$this->transactionManager->isTransactionExists(
+            $magentoOrder->getMollieTransactionId(),
+            $magentoOrder->getPayment()->getId(),
+            $magentoOrder->getEntityId(),
+        );
     }
 
     private function registerCaptureNotification(Payment $molliePayment, OrderInterface $magentoOrder): void
