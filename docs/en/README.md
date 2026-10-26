@@ -39,4 +39,5 @@ Use this index to find setup, upgrade, configuration, and troubleshooting guides
 ## Help
 
 - [Troubleshooting](TROUBLESHOOTING.md)
+- [Sharing Debug Information](SHARING_DEBUG_INFORMATION.md)
 - [Best Practices](BEST_PRACTICES.md)
