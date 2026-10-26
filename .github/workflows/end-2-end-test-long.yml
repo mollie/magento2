@@ -118,7 +118,15 @@ jobs:
         run: |
           cd Test/End-2-end
           npm install
-          npx playwright install --with-deps
+          # The apt mirrors sometimes stall, so give each attempt 5 minutes and retry.
+          for attempt in 1 2 3; do
+            if timeout --kill-after=30s 5m npx playwright install --with-deps; then
+              exit 0
+            fi
+            echo "::warning::Playwright install attempt $attempt failed or timed out"
+            sudo dpkg --configure -a || true
+          done
+          exit 1
 
       - name: Run Playwright tests
         id: run_tests
