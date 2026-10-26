@@ -116,6 +116,7 @@ jobs:
               exit 0
             fi
             echo "::warning::Playwright install attempt $attempt failed or timed out"
+            sudo pkill -9 -x 'apt-get|dpkg' || true
             sudo dpkg --configure -a || true
           done
           exit 1
