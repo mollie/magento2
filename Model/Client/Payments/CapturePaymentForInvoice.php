@@ -17,6 +17,7 @@ use Mollie\Payment\Helper\General;
 use Mollie\Payment\Model\OrderLines;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Order\CaptureLegacyOrder;
+use Mollie\Payment\Service\Mollie\Order\IsSharedTransaction;
 use Mollie\Payment\Service\Mollie\Order\LegacyOrderTransactionId;
 use Mollie\Payment\Service\Mollie\Order\ValidatePartialCapture;
 
@@ -31,6 +32,7 @@ class CapturePaymentForInvoice
         private LegacyOrderTransactionId $legacyOrderTransactionId,
         private OrderLines $orderLines,
         private ValidatePartialCapture $validatePartialCapture,
+        private IsSharedTransaction $isSharedTransaction,
     ) {
     }
 
@@ -52,11 +54,8 @@ class CapturePaymentForInvoice
         $data = [
             'description' => __('Capture for order %1', $order->getIncrementId()),
         ];
-        if ($captureAmount != $order->getBaseGrandTotal()) {
-            $data['amount'] = $this->mollieHelper->getAmountArray(
-                $order->getOrderCurrencyCode(),
-                $captureAmount,
-            );
+        if (!$this->coversTheCompletePayment($invoice)) {
+            $data['amount'] = $this->getAmount($invoice);
         }
 
         $captureId = $this->capture($mollieApi, $invoice, $mollieTransactionId, $data);
@@ -72,6 +71,31 @@ class CapturePaymentForInvoice
         );
 
         $this->orderRepository->save($order);
+    }
+
+    private function coversTheCompletePayment(InvoiceInterface $invoice): bool
+    {
+        $order = $invoice->getOrder();
+        if ($invoice->getBaseGrandTotal() != $order->getBaseGrandTotal()) {
+            return false;
+        }
+
+        return !$this->isSharedTransaction->execute($order);
+    }
+
+    /**
+     * Uses the same currency as the payment was created in, see \Mollie\Payment\Helper\General::getOrderAmountByOrder
+     *
+     * @return array{currency: string, value: string}
+     */
+    private function getAmount(InvoiceInterface $invoice): array
+    {
+        $order = $invoice->getOrder();
+        if ($this->mollieHelper->useBaseCurrency(storeId($order->getStoreId()))) {
+            return $this->mollieHelper->getAmountArray($order->getBaseCurrencyCode(), (float) $invoice->getBaseGrandTotal());
+        }
+
+        return $this->mollieHelper->getAmountArray($order->getOrderCurrencyCode(), (float) $invoice->getGrandTotal());
     }
 
     /**

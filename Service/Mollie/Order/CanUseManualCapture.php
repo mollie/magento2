@@ -15,6 +15,8 @@ use Mollie\Payment\Model\Adminhtml\Source\CaptureMode;
 
 class CanUseManualCapture
 {
+    public const CAPTURE_MODE = 'mollie_capture_mode';
+
     public function __construct(
         private readonly Config $config,
     ) {
@@ -22,11 +24,19 @@ class CanUseManualCapture
 
     public function execute(OrderInterface $order): bool
     {
-        $method = $order->getPayment()->getMethod();
-        if ($this->config->captureMode($method, storeId($order->getStoreId())) != CaptureMode::MANUAL) {
-            return false;
-        }
+        return $this->getCaptureMode($order) === CaptureMode::MANUAL;
+    }
 
-        return true;
+    /**
+     * The capture mode is stored on the payment when the Mollie payment is created, and updated by the webhook with
+     * the capture mode that Mollie reports. The configuration only applies to orders that have neither, as a change
+     * in the configuration must not affect payments that already exist.
+     */
+    private function getCaptureMode(OrderInterface $order): ?string
+    {
+        $payment = $order->getPayment();
+
+        return $payment->getAdditionalInformation()[self::CAPTURE_MODE]
+            ?? $this->config->captureMode($payment->getMethod(), storeId($order->getStoreId()));
     }
 }

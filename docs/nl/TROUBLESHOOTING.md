@@ -62,7 +62,7 @@ Het debug-pakket bundelt het logbestand samen met geredigeerde configuratie- en 
 1. Ga naar **Stores → Configuration → Mollie → Developer Settings → Advanced**
 2. Klik op **Download debug information**
 
-De download is een `.tar.gz`-archief. Gevoelige waarden (API-sleutels, versleutelingssleutel, wachtwoorden) worden automatisch geredigeerd.
+De download is een `.tar.gz`-archief. Gevoelige waarden (API-sleutels, versleutelingssleutel, wachtwoorden) worden automatisch geredigeerd. Zie [Debuginformatie delen](SHARING_DEBUG_INFORMATION.md) voor stappen met schermafbeeldingen en hoe je het bestand privé deelt.
 
 ## Veelvoorkomende problemen
 
@@ -281,11 +281,11 @@ Verzamel de volgende informatie voordat je een bug meldt of ondersteuning aanvra
 - **Magento-versie en -editie**: zichtbaar in de voettekst van Magento Admin, of via `php bin/magento --version`
 - **PHP-versie**: `php -v`
 - **Zelftestresultaten**: voer de zelftest uit en kopieer of maak een screenshot van de volledige uitvoer
-- **Debug-pakket**: klik op **Download debug information** (zie hierboven) voor een geanonimiseerd archief van logboeken en configuratie
+- **Debug-pakket**: volg [Debuginformatie delen](SHARING_DEBUG_INFORMATION.md) om een geanonimiseerd archief van logboeken en configuratie te downloaden
 - **Stappen om te reproduceren**: de exacte reeks acties die het probleem veroorzaakt, inclusief welke betaalmethode werd gebruikt en of dit in test- of live-modus was
 - **Order-ID of transactie-ID** (indien van toepassing): het Magento-orderincrementele ID en/of het Mollie-transactie-ID van het Mollie Dashboard
 
-Meld problemen via [github.com/mollie/magento2/issues](https://github.com/mollie/magento2/issues). Voeg het debug-pakket en de zelftestuitvoer toe in plaats van onbewerkte loginhoud te plakken, want het pakket bevat de context die nodig is om de meeste problemen te diagnosticeren.
+Meld problemen via [github.com/mollie/magento2/issues](https://github.com/mollie/magento2/issues). Voeg de zelftestuitvoer toe aan het issue. Het debug-pakket kan klantgegevens bevatten, dus deel het privé zoals beschreven in [Debuginformatie delen](SHARING_DEBUG_INFORMATION.md) en voeg het niet toe aan het issue.
 
 Als een oplossing voor je probleem al in een open pull request staat, kun je die toepassen voordat de volgende release verschijnt: zie [Een pull request installeren](INSTALLATION.md#een-pull-request-installeren).
 

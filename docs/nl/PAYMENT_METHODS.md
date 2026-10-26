@@ -209,14 +209,7 @@ SEPA Direct Debit is standaard uitgeschakeld en vereist expliciete activering in
 
 ### Express Components
 
-Express Components is verborgen in Magento Admin totdat het eenmalig via de CLI is geactiveerd:
-
-```bash
-php bin/magento config:set payment/mollie_methods_expresscomponents/active 1
-php bin/magento cache:flush
-```
-
-Daarna configureer je het onder **Stores → Configuration → Mollie → Payment Methods → Express Components**. Zie [Express Components](EXPRESS_COMPONENTS.md) voor plaatsing, capture-gedrag en beperkingen voor live gebruik.
+Express Components heeft geen testmodus en werkt alleen met een live API-sleutel. Schakel het in en configureer het onder **Stores → Configuration → Mollie → Payment Methods → Express Components**. Zie [Express Components](EXPRESS_COMPONENTS.md) voor plaatsing, capture-gedrag en beperkingen voor live gebruik.
 
 ## Volgende stappen
 

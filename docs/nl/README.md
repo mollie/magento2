@@ -39,4 +39,5 @@ Gebruik deze index om handleidingen te vinden voor installatie, upgrades, config
 ## Hulp
 
 - [Probleemoplossing](TROUBLESHOOTING.md)
+- [Debuginformatie delen](SHARING_DEBUG_INFORMATION.md)
 - [Best Practices](BEST_PRACTICES.md)

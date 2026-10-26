@@ -16,6 +16,7 @@ use Mollie\Api\Exceptions\ApiException;
 use Mollie\Payment\Logger\MollieLogger;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
+use Mollie\Payment\Service\Mollie\Order\IsAuthorizationNeededByOtherOrders;
 
 class ReleaseAuthorization implements ObserverInterface
 {
@@ -23,7 +24,8 @@ class ReleaseAuthorization implements ObserverInterface
         private MollieApiClient $mollieApiClient,
         private CanUseManualCapture $canUseManualCapture,
         private MollieLogger $logger,
-        private ManagerInterface $messageManager
+        private ManagerInterface $messageManager,
+        private IsAuthorizationNeededByOtherOrders $isAuthorizationNeededByOtherOrders,
     ) {}
 
     public function execute(Observer $observer)
@@ -41,6 +43,18 @@ class ReleaseAuthorization implements ObserverInterface
 
         $mollieTransactionId = $order->getMollieTransactionId();
         if ($mollieTransactionId === null) {
+            return;
+        }
+
+        if ($this->isAuthorizationNeededByOtherOrders->execute($order)) {
+            $order->addCommentToStatusHistory(
+                __(
+                    'The Mollie payment authorization (%1) was not released, as other orders paid with the same ' .
+                    'payment still have to be captured.',
+                    $mollieTransactionId,
+                ),
+            );
+
             return;
         }
 

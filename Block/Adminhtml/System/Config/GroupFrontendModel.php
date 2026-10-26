@@ -96,12 +96,7 @@ class GroupFrontendModel extends Fieldset
 
     private function getMethodClass(string $id): string
     {
-        $isMethodActive = $this->config->isMethodActive($id);
-        if (!$isMethodActive && $id == 'mollie_methods_expresscomponents') {
-            return 'hidden';
-        }
-
-        if ($isMethodActive) {
+        if ($this->config->isMethodActive($id)) {
             return 'mollie-configuration-method-active';
         }
 
