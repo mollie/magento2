@@ -112,7 +112,7 @@ jobs:
           npm install
           # The apt mirrors sometimes stall, so give each attempt 5 minutes and retry.
           for attempt in 1 2 3; do
-            if timeout --kill-after=30s 5m npx playwright install --with-deps; then
+            if timeout --kill-after=30s 5m npx playwright install --with-deps chromium; then
               exit 0
             fi
             echo "::warning::Playwright install attempt $attempt failed or timed out"
