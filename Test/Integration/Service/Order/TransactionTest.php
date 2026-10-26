@@ -12,6 +12,7 @@ use Exception;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Encryption\Encryptor;
 use Magento\Framework\Encryption\EncryptorInterface;
+use Magento\Quote\Api\Data\CartInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
@@ -218,6 +219,66 @@ class TransactionTest extends IntegrationTestCase
         $this->assertEquals(99999, $id);
     }
 
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/use_webhooks enabled
+     */
+    public function testReturnsTheDefaultExpressWebhookUrl(): void
+    {
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+
+        $result = $instance->getExpressWebhookUrl($this->createCart());
+
+        $this->assertStringContainsString('mollie/express/webhook/?quoteId=123', $result);
+    }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/use_webhooks custom_url
+     * @magentoConfigFixture current_store payment/mollie_general/custom_webhook_url https://example.trycloudflare.com/mollie/checkout/webhook
+     */
+    public function testReturnsTheExpressWebhookUrlOnTheCustomWebhookDomain(): void
+    {
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+
+        $result = $instance->getExpressWebhookUrl($this->createCart());
+
+        $this->assertEquals('https://example.trycloudflare.com/mollie/express/webhook?quoteId=123', $result);
+    }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/use_webhooks custom_url
+     * @magentoConfigFixture current_store payment/mollie_general/custom_webhook_url https://example.com/mollie/checkout/webhook/?___store=nl
+     */
+    public function testKeepsTheQueryOfTheCustomWebhookUrlForTheExpressWebhook(): void
+    {
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+
+        $result = $instance->getExpressWebhookUrl($this->createCart());
+
+        $this->assertEquals('https://example.com/mollie/express/webhook/?___store=nl&quoteId=123', $result);
+    }
+
+    /**
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/use_webhooks custom_url
+     * @magentoConfigFixture current_store payment/mollie_general/custom_webhook_url custom_url_for_test
+     */
+    public function testUsesTheStoreUrlForTheExpressWebhookWhenTheCustomUrlHasNoCheckoutWebhookPath(): void
+    {
+        /** @var Transaction $instance */
+        $instance = $this->objectManager->create(Transaction::class);
+
+        $result = $instance->getExpressWebhookUrl($this->createCart());
+
+        $this->assertStringContainsString('mollie/express/webhook/?quoteId=123', $result);
+        $this->assertStringNotContainsString('custom_url_for_test', $result);
+    }
+
     public function testAllowsToManuallySetAnUrl(): void
     {
         $order = $this->objectManager->create(OrderInterface::class);
@@ -230,5 +291,15 @@ class TransactionTest extends IntegrationTestCase
         $result = $instance->getRedirectUrl($order, 'PAYMENT_TOKEN_TEST');
 
         $this->assertStringContainsString('http://this-is-a-test.com/', $result);
+    }
+
+    private function createCart(): CartInterface
+    {
+        /** @var CartInterface $cart */
+        $cart = $this->objectManager->create(CartInterface::class);
+        $cart->setId(123);
+        $cart->setStoreId(1);
+
+        return $cart;
     }
 }
