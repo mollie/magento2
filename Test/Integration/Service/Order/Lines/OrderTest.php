@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Order\Lines;
 
+use Mollie\Payment\Service\Order\Lines\CatchAllLine;
 use Mollie\Payment\Service\Order\Lines\Order as Subject;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -28,10 +29,10 @@ class OrderTest extends IntegrationTestCase
         /** @var Subject $instance */
         $instance = $this->objectManager->get(Subject::class);
 
-        $result = $instance->get($order);
+        $result = $this->withoutBalancingLines($instance->get($order));
 
         // We expect 3 rows: the first product comes from the order creation, the second is our custom product.
-        // The 3rd row is the shipping fee.
+        // The 3rd row is the shipping fee. The fixture grand total does not match, so we ignore the catch-all line.
         $this->assertCount(3, $result);
 
         $row = $result[1]; // Custom created item
@@ -56,10 +57,10 @@ class OrderTest extends IntegrationTestCase
         /** @var Subject $instance */
         $instance = $this->objectManager->get(Subject::class);
 
-        $result = $instance->get($order);
+        $result = $this->withoutBalancingLines($instance->get($order));
 
         // We expect 3 rows: the first product comes from the order creation, the second is our custom product.
-        // The 3rd row is the shipping fee.
+        // The 3rd row is the shipping fee. The fixture grand total does not match, so we ignore the catch-all line.
         $this->assertCount(3, $result);
 
         $row = $result[2]; // Shipping fee
@@ -175,13 +176,18 @@ class OrderTest extends IntegrationTestCase
     }
 
     /**
+     * @dataProvider catchAllDataProvider
      * @magentoDataFixture Magento/Sales/_files/order_with_bundle.php
      */
-    public function testDoesNotAddTheAdjustmentsWhenTheTotalIsMoreThanFiveCents(): void
-    {
+    #[DataProvider('catchAllDataProvider')]
+    public function testAddsACatchAllLineWhenTheTotalIsOffByMoreThanFiveCents(
+        float $difference,
+        string $expectedType,
+    ): void {
         $order = $this->loadOrderById('100000001');
+        $order->setOrderCurrencyCode('EUR');
         $order->setBaseCurrencyCode('EUR');
-        $order->setBaseGrandTotal($order->getBaseGrandTotal() + 0.06);
+        $order->setBaseGrandTotal($order->getBaseGrandTotal() + $difference);
 
         foreach ($order->getItems() as $item) {
             $item->setBaseRowTotal(50);
@@ -193,7 +199,35 @@ class OrderTest extends IntegrationTestCase
         $result = $instance->get($order);
         $lastLine = end($result);
 
-        $this->assertNotEquals('discount', $lastLine['type']);
+        $this->assertEquals($expectedType, $lastLine['type']);
+        $this->assertEquals(CatchAllLine::SKU, $lastLine['sku']);
+        $this->assertEquals($difference, $lastLine['totalAmount']['value']);
+        $this->assertEquals(round($order->getBaseGrandTotal(), 2), $this->sumOfLines($result));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order_with_bundle.php
+     */
+    public function testDoesNotAddAnExtraLineWhenTheTotalMatches(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->setOrderCurrencyCode('EUR');
+        $order->setBaseCurrencyCode('EUR');
+
+        foreach ($order->getItems() as $item) {
+            $item->setBaseRowTotal(50);
+        }
+
+        /** @var Subject $instance */
+        $instance = $this->objectManager->get(Subject::class);
+
+        $order->setBaseGrandTotal($this->sumOfLines($this->withoutBalancingLines($instance->get($order))));
+
+        $result = $this->objectManager->create(Subject::class)->get($order);
+
+        $skus = array_column($result, 'sku');
+        $this->assertNotContains(CatchAllLine::SKU, $skus);
+        $this->assertNotContains('adjustment', $skus);
     }
 
     public function testSupportsProductsWithVowelMutations(): void
@@ -234,6 +268,31 @@ class OrderTest extends IntegrationTestCase
             [0.03],
             [0.04],
             [0.05],
+        ];
+    }
+
+    private function sumOfLines(array $orderLines): float
+    {
+        return round(array_sum(array_column(array_column($orderLines, 'totalAmount'), 'value')), 2);
+    }
+
+    private function withoutBalancingLines(array $orderLines): array
+    {
+        return array_values(
+            array_filter(
+                $orderLines,
+                fn (array $line): bool => !in_array($line['sku'], [CatchAllLine::SKU, 'adjustment'], true),
+            ),
+        );
+    }
+
+    public static function catchAllDataProvider(): array
+    {
+        return [
+            'just above the rounding margin' => [0.06, 'surcharge'],
+            'unsupported surcharge' => [5.00, 'surcharge'],
+            'just below the rounding margin' => [-0.06, 'discount'],
+            'unsupported discount' => [-5.00, 'discount'],
         ];
     }
 }
