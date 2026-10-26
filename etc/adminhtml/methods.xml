@@ -19,12 +19,6 @@
     <include path="Mollie_Payment::methods/creditcard.xml"/>
     <include path="Mollie_Payment::methods/directdebit.xml"/>
     <include path="Mollie_Payment::methods/eps.xml"/>
-    <!--
-    Express components are only available by enabling them through the CLI:
-
-    payment/mollie_methods_expresscomponents/title Express Components
-    php bin/magento config:set payment/mollie_methods_expresscomponents/active 1
-    -->
     <include path="Mollie_Payment::methods/expresscomponents.xml"/>
     <include path="Mollie_Payment::methods/giftcard.xml"/>
     <include path="Mollie_Payment::methods/googlepay.xml"/>
