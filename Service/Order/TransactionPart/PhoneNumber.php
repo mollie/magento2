@@ -15,6 +15,11 @@ use Mollie\Payment\Service\Order\TransactionPartInterface;
 
 class PhoneNumber implements TransactionPartInterface
 {
+    private const INTERNATIONAL_PREFIX_PATTERN = '/^\s*(\+|00)/';
+    private const VALID_E164_PATTERN = '/^\+[1-9]\d{5,14}$/';
+    private const COUNTRIES_WITH_SIGNIFICANT_LEADING_ZERO = ['IT', 'SM', 'VA'];
+    private const NON_STANDARD_TRUNK_PREFIXES = ['HU' => '06'];
+
     public const COUNTRY_CODE_MAPPING = [
         'AC' => '247', // Ascension Island
         'AD' => '376', // Andorra
@@ -304,25 +309,64 @@ class PhoneNumber implements TransactionPartInterface
 
     private function formatInE164(string $countryCodeIso2, string $phoneNumber): string
     {
+        $countryCode = $this->getCallingCode($countryCodeIso2);
+        $withoutOwnPrefix = $this->stripOwnCountryPrefix($countryCode, $phoneNumber);
+
+        $formattedNumber = $this->hasInternationalPrefix($withoutOwnPrefix)
+            ? '+' . $this->digitsOnly(preg_replace(self::INTERNATIONAL_PREFIX_PATTERN, '', $withoutOwnPrefix))
+            : '+' . $countryCode . $this->toNationalSignificantNumber($countryCodeIso2, $this->digitsOnly($withoutOwnPrefix));
+
+        return $this->assertValid($formattedNumber);
+    }
+
+    private function toNationalSignificantNumber(string $countryCodeIso2, string $digits): string
+    {
+        if (in_array($countryCodeIso2, self::COUNTRIES_WITH_SIGNIFICANT_LEADING_ZERO, true)) {
+            return $digits;
+        }
+
+        return ltrim($this->stripNonStandardTrunkPrefix($countryCodeIso2, $digits), '0');
+    }
+
+    private function stripNonStandardTrunkPrefix(string $countryCodeIso2, string $digits): string
+    {
+        $trunkPrefix = self::NON_STANDARD_TRUNK_PREFIXES[$countryCodeIso2] ?? null;
+
+        if ($trunkPrefix === null || !str_starts_with($digits, $trunkPrefix)) {
+            return $digits;
+        }
+
+        return substr($digits, strlen($trunkPrefix));
+    }
+
+    private function getCallingCode(string $countryCodeIso2): string
+    {
         if (!array_key_exists($countryCodeIso2, self::COUNTRY_CODE_MAPPING)) {
             throw new InvalidArgumentException(sprintf('Country code "%s" is not supported', $countryCodeIso2));
         }
 
-        $countryCode = self::COUNTRY_CODE_MAPPING[$countryCodeIso2];
+        return self::COUNTRY_CODE_MAPPING[$countryCodeIso2];
+    }
 
-        $phoneNumber = preg_replace('/^\+' . $countryCode . '/', '', $phoneNumber);
-        $phoneNumber = preg_replace('/^00' . $countryCode . '/', '', $phoneNumber);
+    private function stripOwnCountryPrefix(string $countryCode, string $phoneNumber): string
+    {
+        return preg_replace('/^\s*(\+|00)' . $countryCode . '/', '', $phoneNumber);
+    }
 
-        $formattedNumber = preg_replace('/\D/', '', $phoneNumber);
+    private function hasInternationalPrefix(string $phoneNumber): bool
+    {
+        return preg_match(self::INTERNATIONAL_PREFIX_PATTERN, $phoneNumber) === 1;
+    }
 
-        // Remove the leading zeros from the number
-        $formattedNumber = ltrim($formattedNumber, '0');
+    private function digitsOnly(string $phoneNumber): string
+    {
+        return preg_replace('/\D/', '', $phoneNumber);
+    }
 
-        // Add the '+' sign and the country code to the beginning of the formatted number
-        $formattedNumber = '+' . $countryCode . $formattedNumber;
-
-        if (strlen($formattedNumber) <= 3 || !preg_match('/^\+[1-9]\d{1,14}$/', $formattedNumber)) {
-            throw new InvalidArgumentException((string) __('Phone number "%s" is not valid', $formattedNumber));
+    private function assertValid(string $formattedNumber): string
+    {
+        if (preg_match(self::VALID_E164_PATTERN, $formattedNumber) !== 1) {
+            throw new InvalidArgumentException((string) __('Phone number "%1" is not valid', $formattedNumber));
         }
 
         return $formattedNumber;

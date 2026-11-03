@@ -8,22 +8,19 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie;
 
-use Magento\Payment\Helper\Data;
+use Mollie\Payment\Config;
 use Mollie\Payment\Model\Methods\Expresscomponents;
 
 class ExpressComponentsAvailability
 {
     public function __construct(
-        private readonly Data $paymentHelper
+        private readonly Config $config
     ) {
     }
 
     public function isAvailable(): bool
     {
-        try {
-            return $this->paymentHelper->getMethodInstance(Expresscomponents::CODE)->isAvailable();
-        } catch (\Throwable $exception) {
-            return false;
-        }
+        return $this->config->isModuleEnabled() &&
+            $this->config->isMethodActive(Expresscomponents::CODE);
     }
 }

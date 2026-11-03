@@ -31,6 +31,7 @@ class CreateSessionRequest extends ResourceHydratableRequest implements HasPaylo
         readonly private array $lines,
         readonly private array $payment = [],
         readonly private array $metadata = [],
+        readonly private array $requiredCustomerDetails = [],
     ) {}
 
     public function resolveResourcePath(): string
@@ -54,6 +55,10 @@ class CreateSessionRequest extends ResourceHydratableRequest implements HasPaylo
 
         if ($this->metadata !== []) {
             $output['metadata'] = $this->metadata;
+        }
+
+        if ($this->requiredCustomerDetails !== []) {
+            $output['requiredCustomerDetails'] = $this->requiredCustomerDetails;
         }
 
         return $output;

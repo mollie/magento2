@@ -62,7 +62,7 @@ The debug bundle packages the log file together with redacted configuration and 
 1. Go to **Stores → Configuration → Mollie → Developer Settings → Advanced**
 2. Click **Download debug information**
 
-The download is a `.tar.gz` archive. Sensitive values (API keys, encryption key, passwords) are redacted automatically.
+The download is a `.tar.gz` archive. Sensitive values (API keys, encryption key, passwords) are redacted automatically. See [Sharing Debug Information](SHARING_DEBUG_INFORMATION.md) for step-by-step screenshots and how to share the file privately.
 
 ## Common Problems
 
@@ -281,11 +281,11 @@ When reporting a bug or requesting support, collect the following information fi
 - **Magento version and edition**: visible in the Magento Admin footer, or via `php bin/magento --version`
 - **PHP version**: `php -v`
 - **Self-test results**: run the self-test and copy or screenshot the full output
-- **Debug bundle**: click **Download debug information** (see above) for a redacted archive of logs and configuration
+- **Debug bundle**: follow [Sharing Debug Information](SHARING_DEBUG_INFORMATION.md) to download a redacted archive of logs and configuration
 - **Steps to reproduce**: the exact sequence of actions that triggers the problem, including what payment method was used and whether it was in test or live mode
 - **Order ID or transaction ID** (if applicable): the Magento order increment ID and/or the Mollie transaction ID from the Mollie Dashboard
 
-File issues at [github.com/mollie/magento2/issues](https://github.com/mollie/magento2/issues). Attach the debug bundle and self-test output rather than pasting raw log content, as the bundle includes the context needed to diagnose most problems.
+File issues at [github.com/mollie/magento2/issues](https://github.com/mollie/magento2/issues). Add the self-test output to the issue. The debug bundle can contain customer data, so share it privately as described in [Sharing Debug Information](SHARING_DEBUG_INFORMATION.md) rather than attaching it to the issue.
 
 If a fix for your issue is already available in an open pull request, you can apply it before the next release: see [Install a Pull Request](INSTALLATION.md#install-a-pull-request).
 

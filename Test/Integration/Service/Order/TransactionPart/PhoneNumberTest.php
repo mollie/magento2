@@ -186,6 +186,35 @@ class PhoneNumberTest extends IntegrationTestCase
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
+     * @dataProvider doesNotSendInvalidPhoneNumbersDataProvider
+     */
+    #[DataProvider('doesNotSendInvalidPhoneNumbersDataProvider')]
+    public function testDoesNotSendInvalidPhoneNumbers(string $countryCode, string $phoneNumber): void
+    {
+        $order = $this->loadOrder('100000001');
+        $order->setPayment($this->objectManager->create(OrderPaymentInterface::class));
+        $order->getPayment()->setMethod('mollie_methods_ideal');
+
+        $order->getBillingAddress()->setCountryId($countryCode)->setTelephone($phoneNumber);
+        $order->getShippingAddress()->setCountryId($countryCode)->setTelephone($phoneNumber);
+
+        /** @var PhoneNumber $instance */
+        $instance = $this->objectManager->create(PhoneNumber::class);
+
+        $transaction = $instance->process(
+            $order,
+            [
+                'billingAddress' => [],
+                'shippingAddress' => [],
+            ],
+        );
+
+        $this->assertArrayNotHasKey('phone', $transaction['billingAddress']);
+        $this->assertArrayNotHasKey('phone', $transaction['shippingAddress']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
      * @return void
      */
     public function testDoesNotOverrideExistingAddressData(): void
@@ -263,6 +292,57 @@ class PhoneNumberTest extends IntegrationTestCase
             ['DE', '030 1234 5678', '+493012345678'],
             ['DE', '040 1234 5678', '+494012345678'],
             ['DE', '089 9876 5432', '+498998765432'],
+
+            // Foreign numbers keep their own country code
+            ['BE', '+31612345678', '+31612345678'],
+            ['BE', '0031612345678', '+31612345678'],
+            ['BE', '+31 6 1234 5678', '+31612345678'],
+            ['DE', '+44 20 7123 4567', '+442071234567'],
+            ['NL', '+32 470 12 34 56', '+32470123456'],
+
+            // Trunk prefix written after the country code
+            ['NL', '+31 (0)6 1234 5678', '+31612345678'],
+
+            // Other common European formats
+            ['BE', '0470 12 34 56', '+32470123456'],
+            ['FR', '06 12 34 56 78', '+33612345678'],
+            ['ES', '612 34 56 78', '+34612345678'],
+            ['AT', '0664 123456', '+43664123456'],
+            ['CH', '078 123 45 67', '+41781234567'],
+            ['PL', '512 345 678', '+48512345678'],
+            ['SE', '070-123 45 67', '+46701234567'],
+            ['IE', '085 012 3456', '+353850123456'],
+            ['GB', '07400 123456', '+447400123456'],
+
+            // Short landlines
+            ['AT', '01 113', '+431113'],
+            ['DE', '030 136', '+4930136'],
+            ['LU', '24 79', '+3522479'],
+
+            // The leading zero is part of the number in Italy, San Marino and Vatican City
+            ['IT', '02 1234 5678', '+390212345678'],
+            ['IT', '+39 02 1234 5678', '+390212345678'],
+            ['IT', '312 345 6789', '+393123456789'],
+            ['SM', '0549 886377', '+3780549886377'],
+            ['VA', '06 6981 2345', '+390669812345'],
+            ['NL', '+39 02 1234 5678', '+390212345678'],
+
+            // Hungary uses 06 as trunk prefix
+            ['HU', '06 20 123 4567', '+36201234567'],
+            ['HU', '06 1 234 5678', '+3612345678'],
+            ['HU', '+36 20 123 4567', '+36201234567'],
+        ];
+    }
+
+    public static function doesNotSendInvalidPhoneNumbersDataProvider(): array
+    {
+        return [
+            'too short with own country code' => ['NL', '+319'],
+            'only a country code digit' => ['NL', '+3'],
+            'too short national number' => ['NL', '0612'],
+            'too short foreign number' => ['BE', '+3161'],
+            'too long foreign number' => ['BE', '+31 6123456789012345'],
+            'no digits' => ['NL', 'unknown'],
         ];
     }
 }

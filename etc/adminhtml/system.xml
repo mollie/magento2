@@ -312,6 +312,14 @@
                     <config_path>payment/mollie_general/create_invoice</config_path>
                     <comment><![CDATA[Disable this option if you create your invoices externally.]]></comment>
                 </field>
+
+                <field id="create_creditmemo_for_external_refunds" translate="label comment" type="select" sortOrder="30"
+                       showInDefault="1" showInWebsite="0" showInStore="1" canRestore="1">
+                    <label>Create credit memo for refunds made outside Magento</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/mollie_general/create_creditmemo_for_external_refunds</config_path>
+                    <comment><![CDATA[When a refund is made outside Magento, for example in the Mollie Dashboard, a credit memo is created automatically. Disable this option to only add a comment to the order instead. When you enable this option again, credit memos are created for those refunds on the next update of the payment.]]></comment>
+                </field>
             </group>
         </section>
 

@@ -79,6 +79,56 @@ class ConvertComponentsPaymentToOrderTest extends IntegrationTestCase
         $this->assertEquals(['Keizersgracht 126', 'Unit 4'], $order->getShippingAddress()->getStreet());
     }
 
+    /**
+     * With requiredCustomerDetails "email" Mollie returns a billingAddress that only holds the email.
+     *
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_address_and_shipping_method_saved.php
+     */
+    public function testPlacesTheOrderWhenMollieOnlyCollectedTheEmail(): void
+    {
+        $payment = $this->buildPayment('tr_expressemailonly');
+        $payment->billingAddress = new \stdClass();
+        $payment->billingAddress->email = 'guest@example.com';
+        $payment->shippingAddress = null;
+
+        $order = $this->convert($this->loadQuote(), $payment);
+
+        $this->assertSame('guest@example.com', $order->getCustomerEmail());
+        $this->assertNotEmpty($order->getShippingAddress()->getStreet(), 'The address must come from the cart');
+    }
+
+    /**
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_address_and_shipping_method_saved.php
+     */
+    public function testUsesThePhoneOfTheCartWhenMollieSendsNone(): void
+    {
+        $baseCart = $this->loadQuote();
+        $payment = $this->buildPayment('tr_expresscartphone');
+        unset($payment->billingAddress->phone, $payment->shippingAddress->phone);
+
+        $order = $this->convert($baseCart, $payment);
+
+        $this->assertSame($baseCart->getShippingAddress()->getTelephone(), $order->getShippingAddress()->getTelephone());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_address_and_shipping_method_saved.php
+     * @magentoConfigFixture current_store customer/address/telephone_show req
+     */
+    public function testUsesAPlaceholderPhoneWhenNeitherMollieNorTheCartHasOne(): void
+    {
+        $baseCart = $this->loadQuote();
+        $baseCart->getShippingAddress()->setTelephone(null);
+        $baseCart->getBillingAddress()->setTelephone(null);
+        $payment = $this->buildPayment('tr_expressnophone');
+        unset($payment->billingAddress->phone, $payment->shippingAddress->phone);
+
+        $order = $this->convert($baseCart, $payment);
+
+        $this->assertSame('-', $order->getShippingAddress()->getTelephone());
+        $this->assertSame('-', $order->getBillingAddress()->getTelephone());
+    }
+
     private function convert(CartInterface $baseCart, Payment $payment): OrderInterface
     {
         $this->objectManager->get(PaymentTokenForQuote::class)->execute($baseCart);

@@ -16,6 +16,7 @@ class CanRegisterCaptureNotification
 {
     public function __construct(
         private readonly CanUseManualCapture $canUseManualCapture,
+        private readonly IsSharedTransaction $isSharedTransaction,
     ) {
     }
 
@@ -23,6 +24,12 @@ class CanRegisterCaptureNotification
     {
         if (!$this->canUseManualCapture->execute($order)) {
             return true;
+        }
+
+        // A shared transaction is captured per order, and each capture creates the invoice of its own order. The
+        // captured amount of the payment does not say which order it belongs to, so it never invoices this one.
+        if ($this->isSharedTransaction->execute($order)) {
+            return false;
         }
 
         return $molliePayment->getAmountCaptured() !== 0.0;

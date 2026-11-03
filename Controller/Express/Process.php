@@ -76,6 +76,7 @@ class Process implements HttpGetActionInterface
     private function renderResultPage(string $token): Page
     {
         $resultPage = $this->resultPageFactory->create();
+        $resultPage->getConfig()->getTitle()->set(__('Confirming your payment'));
 
         /** @var Template $block */
         $block = $resultPage->getLayout()->getBlock('mollie.express.wait');

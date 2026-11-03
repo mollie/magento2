@@ -34,8 +34,7 @@ class CaptureInvoice implements ObserverInterface
             return;
         }
 
-        $method = $order->getPayment()->getMethod();
-        if (!$this->whenToCapture->onInvoice($method, storeId($order->getStoreId()))) {
+        if (!$this->whenToCapture->onInvoice($order)) {
             return;
         }
 

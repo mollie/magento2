@@ -36,6 +36,7 @@ class Order
         private OrderLinesGenerator $orderLinesGenerator,
         private StoreManagerInterface $storeManager,
         private Http $http,
+        private CatchAllLine $catchAllLine,
     ) {
     }
 
@@ -74,7 +75,8 @@ class Order
 
         $orderLines = $this->orderLinesGenerator->execute($order, $orderLines);
 
-        // The adjustment line should be the last one. This corrects any rounding issues.
+        // The adjustment line should be the last one. This corrects rounding issues and totals added by
+        // third-party modules that have no generator.
         if ($adjustment = $this->getAdjustment($order, $orderLines)) {
             $orderLines[] = $adjustment;
         }
@@ -307,15 +309,15 @@ class Order
             $grandTotal = $order->getBaseGrandTotal();
         }
 
-        $max = $orderLinesTotal + 0.05;
-        $min = $orderLinesTotal - 0.05;
-        if ($grandTotal < $min || $grandTotal > $max) {
-            return null;
-        }
-
         $difference = round(round((float)$grandTotal, 2) - round((float)$orderLinesTotal, 2), 2);
         if (abs($difference) < 0.01) {
             return null;
+        }
+
+        $max = $orderLinesTotal + 0.05;
+        $min = $orderLinesTotal - 0.05;
+        if ($grandTotal < $min || $grandTotal > $max) {
+            return $this->catchAllLine->create($order, $this->currency, $difference);
         }
 
         return [

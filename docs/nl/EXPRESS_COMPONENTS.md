@@ -10,16 +10,9 @@ Express Components voegt door Mollie gehoste express checkout-widgets toe aan de
 
 **Belangrijk:** Express Components ondersteunt geen testmodus. De Magento-configuratie inschakelen alleen is niet voldoende als de functie niet is ingeschakeld voor je live API-sleutel aan Mollie's kant.
 
-## Eerste activering
+## Inschakelen
 
-De configuratiekaart van Express Components is verborgen in Magento Admin totdat de methode eenmalig is geactiveerd. Schakel deze eerst in via de CLI:
-
-```bash
-php bin/magento config:set payment/mollie_methods_expresscomponents/active 1
-php bin/magento cache:flush
-```
-
-Ga daarna naar **Stores → Configuration → Mollie → Payment Methods** en configureer **Express Components** zoals elke andere Mollie-betaalmethode.
+Ga naar **Stores → Configuration → Mollie → Payment Methods** en schakel **Express Components** in zoals elke andere Mollie-betaalmethode. Leeg daarna de cache.
 
 ## Configuratie
 
@@ -70,7 +63,6 @@ Als je manual capture gebruikt, valideer dan de volledige workflow in een live o
 ## Beperkingen
 
 - De functie is alleen live en moet door Mollie Support worden ingeschakeld voor de actieve API-sleutel
-- De Admin-configuratiekaart blijft verborgen totdat de methode eenmalig via CLI is geactiveerd
 - De module biedt geen toeslag-instellingen voor Express Components. Zie [Payment Fee](PAYMENT_FEE.md)
 
 ## Volgende stappen

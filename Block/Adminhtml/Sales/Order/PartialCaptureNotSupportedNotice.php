@@ -18,6 +18,7 @@ use Mollie\Payment\Config;
 use Mollie\Payment\Model\Adminhtml\Source\CaptureMoment;
 use Mollie\Payment\Service\Mollie\Order\CanUseManualCapture;
 use Mollie\Payment\Service\Mollie\Order\SupportsPartialCapture;
+use Mollie\Payment\Service\Mollie\Order\WhenToCapture;
 
 class PartialCaptureNotSupportedNotice extends Template
 {
@@ -30,6 +31,7 @@ class PartialCaptureNotSupportedNotice extends Template
         private readonly Config $config,
         private readonly CanUseManualCapture $canUseManualCapture,
         private readonly SupportsPartialCapture $supportsPartialCapture,
+        private readonly WhenToCapture $whenToCapture,
         array $data = [],
     ) {
         parent::__construct($context, $data);
@@ -73,10 +75,7 @@ class PartialCaptureNotSupportedNotice extends Template
             return false;
         }
 
-        return $this->config->whenToCapture(
-            $order->getPayment()->getMethod(),
-            storeId($order->getStoreId()),
-        ) === $captureMoment;
+        return $this->whenToCapture->forOrder($order) === $captureMoment;
     }
 
     private function getMethodTitle(OrderInterface $order): string

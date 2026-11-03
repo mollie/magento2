@@ -125,6 +125,92 @@ class CreateSessionTest extends IntegrationTestCase
         });
     }
 
+    /**
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_address_and_shipping_method_saved.php
+     */
+    public function testAsksMollieToCollectTheEmailWhenTheCartHasNone(): void
+    {
+        $client = $this->fakeSessionRequest();
+        $cart = $this->loadQuote();
+        $cart->setCustomerEmail(null);
+
+        /** @var CreateSession $instance */
+        $instance = $this->objectManager->create(CreateSession::class);
+        $instance->execute($cart, true);
+
+        $client->assertSent(function (PendingRequest $request): bool {
+            $this->assertSame(['email'], $this->extractField($request, 'requiredCustomerDetails'));
+
+            return true;
+        });
+    }
+
+    /**
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_address_and_shipping_method_saved.php
+     */
+    public function testDoesNotAskForTheEmailWhenTheCartHasOne(): void
+    {
+        $client = $this->fakeSessionRequest();
+        $cart = $this->loadQuote();
+        $cart->setCustomerEmail('customer@example.com');
+
+        /** @var CreateSession $instance */
+        $instance = $this->objectManager->create(CreateSession::class);
+        $instance->execute($cart, true);
+
+        $client->assertSent(function (PendingRequest $request): bool {
+            $this->assertNull($this->extractField($request, 'requiredCustomerDetails'));
+
+            return true;
+        });
+    }
+
+    /**
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_address_and_shipping_method_saved.php
+     */
+    public function testDoesNotAskForTheEmailWhenTheGuestAlreadyEnteredIt(): void
+    {
+        $client = $this->fakeSessionRequest();
+        $cart = $this->loadQuote();
+        $cart->setCustomerEmail(null);
+        $cart->getPayment()->setAdditionalInformation('mollie_guest_email', 'guest@example.com');
+
+        /** @var CreateSession $instance */
+        $instance = $this->objectManager->create(CreateSession::class);
+        $instance->execute($cart, false);
+
+        $client->assertSent(function (PendingRequest $request): bool {
+            $this->assertNull($this->extractField($request, 'requiredCustomerDetails'));
+
+            return true;
+        });
+    }
+
+    /**
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_address_and_shipping_method_saved.php
+     */
+    public function testAsksMollieToCollectTheAddressesWhenTheCartHasNone(): void
+    {
+        $client = $this->fakeSessionRequest();
+        $cart = $this->loadQuote();
+        $cart->setCustomerEmail('customer@example.com');
+        $cart->getBillingAddress()->setStreet([]);
+        $cart->getShippingAddress()->setStreet([]);
+
+        /** @var CreateSession $instance */
+        $instance = $this->objectManager->create(CreateSession::class);
+        $instance->execute($cart, true);
+
+        $client->assertSent(function (PendingRequest $request): bool {
+            $this->assertSame(
+                ['billing-address', 'shipping-address'],
+                $this->extractField($request, 'requiredCustomerDetails'),
+            );
+
+            return true;
+        });
+    }
+
     private function fakeSessionRequest(): MollieApiClient
     {
         $client = MollieApiClient::fake([
@@ -149,6 +235,18 @@ class CreateSessionTest extends IntegrationTestCase
         $body = json_decode((string)$request->createPsrRequest()->getBody(), true);
 
         return $body['lines'] ?? [];
+    }
+
+    private function extractField(PendingRequest $request, string $field): mixed
+    {
+        $payload = $request->payload();
+        if ($payload !== null) {
+            return $payload->all()[$field] ?? null;
+        }
+
+        $body = json_decode((string)$request->createPsrRequest()->getBody(), true);
+
+        return $body[$field] ?? null;
     }
 
     private function extractAmount(PendingRequest $request): array

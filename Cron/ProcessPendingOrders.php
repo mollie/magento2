@@ -19,8 +19,12 @@ use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Store\Api\Data\StoreInterface;
 use Magento\Store\Model\StoreManagerInterface;
+use Mollie\Api\Types\PaymentStatus;
 use Mollie\Payment\Config;
+use Mollie\Payment\Model\Client\ProcessTransactionResponse;
+use Mollie\Payment\Model\Methods\Paymentlink;
 use Mollie\Payment\Model\Mollie as MollieModel;
+use Mollie\Payment\Service\Mollie\Order\IsPaymentLinkExpired;
 use Mollie\Payment\Service\Order\OrderCommentHistory;
 use Throwable;
 
@@ -33,7 +37,8 @@ class ProcessPendingOrders
         private DateTime $dateTime,
         private StoreManagerInterface $storeManager,
         private MollieModel $mollieModel,
-        private OrderCommentHistory $orderCommentHistory
+        private OrderCommentHistory $orderCommentHistory,
+        private IsPaymentLinkExpired $isPaymentLinkExpired,
     ) {}
 
     public function execute(): void
@@ -108,10 +113,25 @@ class ProcessPendingOrders
             );
         }
 
-        if (!$result->isSuccess()) {
-            throw new LocalizedException(
-                __('Transaction processing failed with status %1', $result->getStatus()),
-            );
+        if ($result->isSuccess() || $this->isExpiredPaymentWithValidPaymentLink($order, $result)) {
+            return;
         }
+
+        throw new LocalizedException(
+            __('Transaction processing failed with status %1', $result->getStatus()),
+        );
+    }
+
+    private function isExpiredPaymentWithValidPaymentLink(
+        OrderInterface $order,
+        ProcessTransactionResponse $result,
+    ): bool {
+        return $result->getStatus() === PaymentStatus::EXPIRED && $this->hasValidPaymentLink($order);
+    }
+
+    private function hasValidPaymentLink(OrderInterface $order): bool
+    {
+        return $order->getPayment()?->getMethod() === Paymentlink::CODE &&
+            !$this->isPaymentLinkExpired->execute($order);
     }
 }
