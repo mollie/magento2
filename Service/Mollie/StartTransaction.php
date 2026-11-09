@@ -24,7 +24,6 @@ class StartTransaction
     public function __construct(
         private ManagerInterface $eventManager,
         private OrderLockService $orderLockService,
-        private Timeout $timeout,
         private PaymentsApi $paymentsApi,
         private MollieApiClient $mollieApiClient,
         private MollieCustomerNoLongerExists $mollieCustomerNoLongerExists,
@@ -57,7 +56,7 @@ class StartTransaction
     {
         $mollieApi = $this->mollieApiClient->loadByStore(storeId($order->getStoreId()));
 
-        return $this->timeout->retry(fn (): ?string => $this->paymentsApi->startTransaction($order, $mollieApi));
+        return $this->paymentsApi->startTransaction($order, $mollieApi);
     }
 
     private function retryWithNewMollieCustomer(OrderInterface $order, ApiException $exception): ?string

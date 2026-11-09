@@ -15,6 +15,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Address;
 use Magento\Sales\Model\OrderRepository;
 use Mollie\Api\Exceptions\ApiException;
+use Mollie\Api\Exceptions\MollieException;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment as MolliePayment;
 use Mollie\Api\Types\PaymentStatus;
@@ -103,7 +104,7 @@ class Payments
 
         $this->mollieHelper->addTolog('request', $paymentData);
 
-        $payment = $mollieApi->send($this->buildPaymentRequest->execute($paymentData));
+        $payment = $this->createPayment($order, $mollieApi, $paymentData);
 
         $this->processResponse($order, $payment);
 
@@ -113,6 +114,31 @@ class Payments
         }
 
         return $payment->getCheckoutUrl();
+    }
+
+    private function createPayment(OrderInterface $order, MollieApiClient $mollieApi, array $paymentData): MolliePayment
+    {
+        try {
+            return $mollieApi->send($this->buildPaymentRequest->execute($paymentData));
+        } catch (MollieException $exception) {
+            $this->logFailedPaymentCreation($order, $paymentData, $exception);
+
+            throw $exception;
+        }
+    }
+
+    private function logFailedPaymentCreation(
+        OrderInterface $order,
+        array $paymentData,
+        MollieException $exception,
+    ): void {
+        $this->mollieHelper->addTolog('error', [
+            'message' => 'Payment creation failed',
+            'order' => $order->getIncrementId(),
+            'store_id' => $order->getStoreId(),
+            'amount' => $paymentData['amount'],
+            'exception' => $exception->getMessage(),
+        ]);
     }
 
     public function getAddressLine(OrderAddressInterface $address): array
