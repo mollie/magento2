@@ -16,6 +16,7 @@ use Mollie\Payment\Api\Data\TransactionToOrderInterface;
 use Mollie\Payment\Api\TransactionToOrderRepositoryInterface;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 use Mollie\Payment\Service\Mollie\Order\GetTransactionId;
+use Mollie\Payment\Service\Order\ExpiredOrderToTransaction;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -120,6 +121,119 @@ class GetTransactionIdTest extends IntegrationTestCase
             'tr_aaa111',
             $order->getMollieTransactionId(),
         );
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     * @dataProvider usesAnOpenTransactionInsteadOfAnUnsuccessfulOneDataProvider
+     */
+    #[DataProvider('usesAnOpenTransactionInsteadOfAnUnsuccessfulOneDataProvider')]
+    public function testUsesAnOpenTransactionInsteadOfAnUnsuccessfulOne(string $unsuccessfulStatus, string $openStatus): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->setMollieTransactionId('tr_duplicate456');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_original123');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_duplicate456');
+        $this->fakeTransactionStatuses([
+            'tr_original123' => $openStatus,
+            'tr_duplicate456' => $unsuccessfulStatus,
+        ]);
+
+        $result = $this->objectManager->create(GetTransactionId::class)->forOrder($order);
+
+        $this->assertEquals('tr_original123', $result);
+        $this->assertEquals('tr_original123', $order->getMollieTransactionId());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testSkipsTheUnsuccessfulTransactionWhenItUsesAnOpenOne(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->setMollieTransactionId('tr_duplicate456');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_original123');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_duplicate456');
+        $this->fakeTransactionStatuses([
+            'tr_original123' => 'open',
+            'tr_duplicate456' => 'canceled',
+        ]);
+
+        $this->objectManager->create(GetTransactionId::class)->forOrder($order);
+
+        $expiredOrderToTransaction = $this->objectManager->get(ExpiredOrderToTransaction::class);
+        $this->assertSame(1, (int) $expiredOrderToTransaction->getByTransactionId('tr_duplicate456')->getSkipped());
+        $this->assertSame(0, (int) $expiredOrderToTransaction->getByTransactionId('tr_original123')->getSkipped());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testUsesTheUnsuccessfulTransactionWhenNoOtherTransactionIsOpen(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->setMollieTransactionId('tr_duplicate456');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_original123');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_duplicate456');
+        $this->fakeTransactionStatuses([
+            'tr_original123' => 'expired',
+            'tr_duplicate456' => 'failed',
+        ]);
+
+        $result = $this->objectManager->create(GetTransactionId::class)->forOrder($order);
+
+        $this->assertEquals('tr_duplicate456', $result);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testKeepsAnExpiredTransactionSoTheExpiredProcessorCanSkipIt(): void
+    {
+        $order = $this->loadOrderById('100000001');
+        $order->setMollieTransactionId('tr_duplicate456');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_original123');
+        $this->addMollieTransactionToOrder((int) $order->getId(), 'tr_duplicate456');
+        $this->fakeTransactionStatuses([
+            'tr_original123' => 'open',
+            'tr_duplicate456' => 'expired',
+        ]);
+
+        $result = $this->objectManager->create(GetTransactionId::class)->forOrder($order);
+
+        $this->assertEquals('tr_duplicate456', $result);
+    }
+
+    public static function usesAnOpenTransactionInsteadOfAnUnsuccessfulOneDataProvider(): array
+    {
+        return [
+            'canceled duplicate, open original' => ['canceled', 'open'],
+            'failed duplicate, open original' => ['failed', 'open'],
+            'canceled duplicate, pending original' => ['canceled', 'pending'],
+        ];
+    }
+
+    /**
+     * @param array<string, string> $statuses
+     */
+    private function fakeTransactionStatuses(array $statuses): void
+    {
+        $responses = array_map(
+            fn (string $id, string $status): MockResponse => MockResponse::ok(
+                '{"id":"' . $id . '","status":"' . $status . '"}'
+            ),
+            array_keys($statuses),
+            array_values($statuses),
+        );
+
+        $client = \Mollie\Api\MollieApiClient::fake([
+            GetPaymentRequest::class => new SequenceMockResponse(...$responses),
+        ]);
+
+        /** @var FakeMollieApiClient $fakeMollieApiClient */
+        $fakeMollieApiClient = $this->objectManager->create(FakeMollieApiClient::class);
+        $fakeMollieApiClient->setInstance($client);
+        $this->objectManager->addSharedInstance($fakeMollieApiClient, MollieApiClient::class);
     }
 
     public static function usesTheFirstPaidTransactionDataProvider(): array

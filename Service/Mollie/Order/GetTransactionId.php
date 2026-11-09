@@ -16,13 +16,18 @@ use Mollie\Payment\Api\TransactionToOrderManagementInterface;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
+use Mollie\Payment\Service\Order\ExpiredOrderToTransaction;
 
 class GetTransactionId
 {
+    private const UNSUCCESSFUL_STATUSES = [PaymentStatus::CANCELED, PaymentStatus::FAILED];
+    private const OPEN_STATUSES = [PaymentStatus::OPEN, PaymentStatus::PENDING];
+
     public function __construct(
         private readonly TransactionToOrderManagementInterface $transactionToOrderManagement,
         private readonly MollieApiClient $mollieApiClient,
         private readonly Config $config,
+        private readonly ExpiredOrderToTransaction $expiredOrderToTransaction,
     ) {}
 
     /**
@@ -63,7 +68,37 @@ class GetTransactionId
             }
         }
 
+        $openTransactionId = $this->getOpenTransactionInsteadOfUnsuccessfulOne($order, $statuses);
+        if ($openTransactionId !== null) {
+            $this->expiredOrderToTransaction->markTransactionAsSkipped((string) $order->getMollieTransactionId());
+            $order->setMollieTransactionId($openTransactionId);
+
+            return $openTransactionId;
+        }
+
         return $order->getMollieTransactionId();
+    }
+
+    /**
+     * A canceled or failed duplicate payment must not cancel the order while another payment for it can still be
+     * paid. The unsuccessful payment is skipped, so ExpiredStatusProcessor cancels the order when the open one
+     * expires. Expired payments are left out: ExpiredStatusProcessor skips them one by one until the last one expires.
+     *
+     * @param array<string, string> $statuses
+     */
+    private function getOpenTransactionInsteadOfUnsuccessfulOne(OrderInterface $order, array $statuses): ?string
+    {
+        $currentStatus = $statuses[(string) $order->getMollieTransactionId()] ?? null;
+        if (!in_array($currentStatus, self::UNSUCCESSFUL_STATUSES, true)) {
+            return null;
+        }
+
+        $openTransactionIds = array_keys(array_filter(
+            $statuses,
+            fn (string $status): bool => in_array($status, self::OPEN_STATUSES, true),
+        ));
+
+        return $openTransactionIds[0] ?? null;
     }
 
     /**
