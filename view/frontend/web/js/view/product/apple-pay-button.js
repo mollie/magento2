@@ -22,6 +22,7 @@ define([
         session: null,
         totals: [],
         postalCode: null,
+        initialTotal: null,
 
         // Variables that are set from the template: view/frontend/templates/product/view/applepay.phtml
         formSelector: null,
@@ -83,6 +84,8 @@ define([
                 ]
             }
 
+            this.initialTotal = request.total;
+
             if (!this.session) {
                 this.session = new ApplePaySession(10, request);
             }
@@ -121,11 +124,17 @@ define([
                     type: 'POST',
                     url: url.build('mollie/applePay/shippingMethods'),
                     data: {
+                        supportsInvalidShippingContact: 1,
                         cartId: this.cartId,
                         countryCode: event.shippingContact.countryCode,
                         postalCode: event.shippingContact.postalCode
                     },
                     success: function (result) {
+                        if (result.invalid_shipping_contact) {
+                            this.rejectShippingContact(result.message);
+                            return;
+                        }
+
                         this.shippingMethods = result.shipping_methods;
                         this.selectedShippingMethod = result.shipping_methods[0];
                         this.quoteTotals = result.totals;
@@ -150,12 +159,18 @@ define([
                     type: 'POST',
                     url: url.build('mollie/applePay/shippingMethods'),
                     data: {
+                        supportsInvalidShippingContact: 1,
                         cartId: this.cartId,
                         shippingMethod: this.selectedShippingMethod,
                         countryCode: this.countryCode,
                         postalCode: this.postalCode
                     },
                     success: function (result) {
+                        if (result.invalid_shipping_contact) {
+                            this.handleAjaxError({responseJSON: {message: result.message}});
+                            return;
+                        }
+
                         this.quoteTotals = result.totals;
 
                         this.session.completeShippingMethodSelection(
@@ -237,6 +252,15 @@ define([
             return total;
         },
 
+        rejectShippingContact: function (message) {
+            this.session.completeShippingContactSelection({
+                newTotal: this.initialTotal,
+                newLineItems: [],
+                newShippingMethods: [],
+                errors: [new ApplePayError('shippingContactInvalid', 'postalAddress', message)]
+            });
+        },
+
         handleAjaxError: function (response) {
             $('body').loader('hide');
             this.session.abort();
@@ -246,7 +270,8 @@ define([
                 messages = customerMessages.messages || [];
 
             messages.push({
-                text: response.responseJSON.message,
+                text: (response.responseJSON && response.responseJSON.message) ||
+                    __('Something went wrong, please try again later.'),
                 type: 'error'
             });
 

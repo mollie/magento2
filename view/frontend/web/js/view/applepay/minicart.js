@@ -63,6 +63,8 @@ define([
                 ]
             }
 
+            this.initialTotal = request.total;
+
             if (!this.session) {
                 this.session = new ApplePaySession(3, request);
             }
@@ -81,10 +83,16 @@ define([
                     type: 'POST',
                     url: url.build('mollie/applePay/shippingMethods'),
                     data: {
+                        supportsInvalidShippingContact: 1,
                         countryCode: event.shippingContact.countryCode,
                         postalCode: event.shippingContact.postalCode
                     },
                     success: function (result) {
+                        if (result.invalid_shipping_contact) {
+                            this.rejectShippingContact(result.message);
+                            return;
+                        }
+
                         this.shippingMethods = result.shipping_methods;
                         this.selectedShippingMethod = result.shipping_methods[0];
                         this.quoteTotals = result.totals;
@@ -109,11 +117,17 @@ define([
                     type: 'POST',
                     url: url.build('mollie/applePay/shippingMethods'),
                     data: {
+                        supportsInvalidShippingContact: 1,
                         shippingMethod: this.selectedShippingMethod,
                         countryCode: this.countryCode,
                         postalCode: this.postalCode
                     },
                     success: function (result) {
+                        if (result.invalid_shipping_contact) {
+                            this.handleAjaxError({responseJSON: {message: result.message}});
+                            return;
+                        }
+
                         this.quoteTotals = result.totals;
 
                         this.session.completeShippingMethodSelection(
