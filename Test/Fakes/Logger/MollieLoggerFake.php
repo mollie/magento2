@@ -14,6 +14,8 @@ class MollieLoggerFake extends MollieLogger
 {
     private array $infoLogs = [];
 
+    private array $errorLogs = [];
+
     public function addInfoLog(string $type, $data): void
     {
         $this->infoLogs[] = ['type' => $type, 'data' => $data];
@@ -22,5 +24,15 @@ class MollieLoggerFake extends MollieLogger
     public function getInfoLogs(): array
     {
         return $this->infoLogs;
+    }
+
+    public function addErrorLog(string $type, $data): void
+    {
+        $this->errorLogs[] = ['type' => $type, 'data' => $data];
+    }
+
+    public function getErrorLogs(): array
+    {
+        return $this->errorLogs;
     }
 }
