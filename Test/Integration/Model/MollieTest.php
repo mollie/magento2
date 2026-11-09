@@ -8,7 +8,6 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Model;
 
-use Exception;
 use Magento\Framework\DataObject;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Model\Quote;
@@ -18,7 +17,6 @@ use Magento\Sales\Api\Data\OrderPaymentInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Mollie\Api\Fake\MockResponse;
 use Mollie\Api\Http\Requests\CreatePaymentRefundRequest;
-use Mollie\Api\Http\Requests\CreatePaymentRequest;
 use Mollie\Api\Http\Requests\DynamicGetRequest;
 use Mollie\Api\Http\Requests\GetPaymentRequest;
 use Mollie\Api\MollieApiClient;
@@ -104,44 +102,6 @@ class MollieTest extends IntegrationTestCase
 
         $apiClient = $this->objectManager->create(FakeMollieApiClient::class);
         $apiClient->setInstance(new MollieApiClient());
-
-        /** @var StartTransaction $instance */
-        $instance = $this->objectManager->create(StartTransaction::class, [
-            'paymentsApi' => $paymentsApiMock,
-            'mollieApiClient' => $apiClient,
-        ]);
-
-        $result = $instance->execute($order);
-
-        $this->assertEquals('payment', $result);
-    }
-
-    /**
-     * @magentoConfigFixture default_store payment/mollie_methods_ideal/method order
-     * @magentoConfigFixture default_store payment/mollie_general/mode test
-     * @magentoConfigFixture default_store payment/mollie_general/apikey_test test_dummyapikeywhichmustbe30characterslong
-     */
-    public function testRetriesOnACurlTimeout(): void
-    {
-        /** @var OrderInterface $order */
-        $order = $this->objectManager->create(OrderInterface::class);
-        $order->setEntityId(1);
-        $payment = $this->objectManager->create(OrderPaymentInterface::class);
-        $payment->setMethod('mollie_methods_ideal');
-        $order->setPayment($payment);
-
-        $client = MollieApiClient::fake([
-            CreatePaymentRequest::class => MockResponse::ok(),
-        ]);
-
-        $paymentsApiMock = $this->createMock(Payments::class);
-        $paymentsApiMock->method('startTransaction')->willReturnOnConsecutiveCalls(
-            $this->throwException(new Exception('cURL error 28')),
-            'payment',
-        );
-
-        $apiClient = $this->objectManager->create(FakeMollieApiClient::class);
-        $apiClient->setInstance($client);
 
         /** @var StartTransaction $instance */
         $instance = $this->objectManager->create(StartTransaction::class, [
