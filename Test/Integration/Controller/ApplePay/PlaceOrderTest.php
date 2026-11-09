@@ -205,6 +205,39 @@ class PlaceOrderTest extends AbstractController
         $this->assertSame(self::SAVED_ADDRESS_CITY, $savedAddresses->getFirstItem()->getCity());
     }
 
+    /**
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoConfigFixture current_store carriers/flatrate/active 1
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/apikey_test test_dummydummydummydummydummydummy
+     * @magentoConfigFixture current_store payment/mollie_general/enable_second_chance_email 0
+     * @magentoConfigFixture current_store payment/mollie_methods_applepay/active 1
+     * @dataProvider unusableShippingMethodProvider
+     */
+    #[DataProvider('unusableShippingMethodProvider')]
+    public function testReturnsAJsonErrorWhenTheShippingMethodIsUnusable(array|string $shippingMethod): void
+    {
+        $this->prepareGuestQuote();
+
+        $this->dispatchPlaceOrder(self::APPLE_PAY_CITY, $shippingMethod);
+
+        $response = json_decode($this->getResponse()->getBody(), true);
+        $this->assertSame(400, $this->getResponse()->getHttpResponseCode());
+        $this->assertTrue($response['error']);
+        $this->assertStringContainsString('shipping method', $response['message']);
+    }
+
+    public static function unusableShippingMethodProvider(): array
+    {
+        return [
+            'the string "undefined" sent by the Hyvä Apple Pay buttons' => ['undefined'],
+            'any other plain string' => ['flatrate__SPLIT__flatrate'],
+            'an array without an identifier' => [['label' => 'Flat Rate']],
+            'an empty identifier' => [['identifier' => '']],
+        ];
+    }
+
     public static function localityProvider(): array
     {
         return array_map(
@@ -265,8 +298,10 @@ class PlaceOrderTest extends AbstractController
         return $collection;
     }
 
-    private function dispatchPlaceOrder(string $locality): void
-    {
+    private function dispatchPlaceOrder(
+        string $locality,
+        array|string $shippingMethod = ['identifier' => 'flatrate__SPLIT__flatrate'],
+    ): void {
         $contact = [
             'addressLines' => ['Sample Street 1'],
             'countryCode' => 'GB',
@@ -282,7 +317,7 @@ class PlaceOrderTest extends AbstractController
         $this->getRequest()->setPostValue([
             'shippingAddress' => $contact,
             'billingAddress' => $contact,
-            'shippingMethod' => ['identifier' => 'flatrate__SPLIT__flatrate'],
+            'shippingMethod' => $shippingMethod,
             'applePayPaymentToken' => '{"paymentData":"sample"}',
         ]);
 
