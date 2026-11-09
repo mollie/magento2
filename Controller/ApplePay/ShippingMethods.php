@@ -24,6 +24,7 @@ use Magento\Quote\Api\ShippingMethodManagementInterface;
 use Magento\Quote\Model\Quote\Address;
 use Magento\Quote\Model\Quote\Address\Total as AddressTotal;
 use Mollie\Payment\Service\Magento\ChangeShippingMethodForQuote;
+use Mollie\Payment\Service\Quote\GetApplePayShippingMethodIdentifier;
 
 class ShippingMethods extends Action implements HttpPostActionInterface
 {
@@ -34,6 +35,7 @@ class ShippingMethods extends Action implements HttpPostActionInterface
         private CheckoutSession $checkoutSession,
         private GuestCartRepositoryInterface $guestCartRepository,
         private ChangeShippingMethodForQuote $changeShippingMethodForQuote,
+        private GetApplePayShippingMethodIdentifier $getApplePayShippingMethodIdentifier,
     )
     {
         parent::__construct($context);
@@ -50,11 +52,9 @@ class ShippingMethods extends Action implements HttpPostActionInterface
         $address->setCountryId(strtoupper($this->getRequest()->getParam('countryCode')));
         $address->setPostcode($this->getRequest()->getParam('postalCode'));
 
-        if ($this->getRequest()->getParam('shippingMethod')) {
-            $this->changeShippingMethodForQuote->execute(
-                $address,
-                $this->getRequest()->getParam('shippingMethod')['identifier'],
-            );
+        $shippingMethodIdentifier = $this->getApplePayShippingMethodIdentifier->execute($this->getRequest());
+        if ($shippingMethodIdentifier !== null) {
+            $this->changeShippingMethodForQuote->execute($address, $shippingMethodIdentifier);
         }
 
         $cart->setPaymentMethod('mollie_methods_applepay');
