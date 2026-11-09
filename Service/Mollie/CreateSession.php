@@ -19,6 +19,7 @@ use Mollie\Api\Http\Data\Money;
 use Mollie\Api\Resources\Session;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\Api\CreateSessionRequest;
+use Mollie\Payment\Service\Mollie\Session\LineVat;
 use Mollie\Payment\Service\Order\Transaction;
 use Mollie\Payment\Service\PaymentToken\PaymentTokenForQuote;
 
@@ -28,6 +29,7 @@ class CreateSession
     private const CUSTOMER_DETAIL_EMAIL = 'email';
     private const CUSTOMER_DETAIL_BILLING_ADDRESS = 'billing-address';
     private const CUSTOMER_DETAIL_SHIPPING_ADDRESS = 'shipping-address';
+    private const SEGMENT_SHIPPING = 'shipping';
 
     private CartInterface $cart;
     private TotalsInterface $totals;
@@ -40,6 +42,7 @@ class CreateSession
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly General $mollieHelper,
         private readonly CartTotalRepositoryInterface $cartTotalRepository,
+        private readonly LineVat $lineVat,
     ) {
     }
 
@@ -119,16 +122,18 @@ class CreateSession
         $lines = [];
         $currency = $this->cart->getQuoteCurrencyCode();
         foreach ($this->cart->getItems() ?? [] as $item) {
+            $totalAmount = (float)$item->getPriceInclTax() * (int)$item->getQty();
             $lines[] = [
                 'type' => $item->getIsVirtual() ? 'digital' : 'physical',
                 'description' => '[' . $item->getSku() . '] ' . $item->getName(),
                 'quantity' => (int)$item->getQty(),
                 'unitPrice' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax()),
-                'totalAmount' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax() * (int)$item->getQty()),
+                'totalAmount' => $this->mollieHelper->getAmountArray($currency, $totalAmount),
                 'totalWeight' => [
                     'value' => $this->getWeightInGrams($item),
                     'unit' => 'g',
                 ],
+                ...$this->lineVat->forLine($currency, $totalAmount, (float)$item->getTaxPercent()),
             ];
         }
 
@@ -142,7 +147,7 @@ class CreateSession
                 continue;
             }
 
-            $value = $segment->getCode() === 'shipping'
+            $value = $segment->getCode() === self::SEGMENT_SHIPPING
                 ? (float)$this->cart->getShippingAddress()->getShippingInclTax()
                 : (float)$segment->getValue();
 
@@ -156,15 +161,32 @@ class CreateSession
                 'quantity' => 1,
                 'unitPrice' => $this->mollieHelper->getAmountArray($currency, $value),
                 'totalAmount' => $this->mollieHelper->getAmountArray($currency, $value),
+                ...$this->getSegmentVat($segment->getCode(), $currency, $value),
             ];
         }
 
         return $lines;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    private function getSegmentVat(string $code, ?string $currency, float $value): array
+    {
+        if ($code !== self::SEGMENT_SHIPPING) {
+            return [];
+        }
+
+        return $this->lineVat->forLine(
+            $currency,
+            $value,
+            $this->lineVat->getShippingVatRate($this->cart->getShippingAddress()),
+        );
+    }
+
     private function getSegmentType(string $code, float $value): string
     {
-        if ($code === 'shipping') {
+        if ($code === self::SEGMENT_SHIPPING) {
             return 'shipping_fee';
         }
 
