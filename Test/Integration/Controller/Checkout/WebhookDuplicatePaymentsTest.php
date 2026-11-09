@@ -41,14 +41,23 @@ class WebhookDuplicatePaymentsTest extends ControllerTestCase
     private const WEBHOOK_PATH = 'mollie/checkout/webhook';
 
     /**
-     * @var array<string, string>
+     * Nullable because older Magento test frameworks set every test case property to null after each test.
+     *
+     * @var array<string, string>|null
      */
-    private array $paymentStatuses = [
-        self::PAID_TRANSACTION_ID => PaymentStatus::PAID,
-        self::FAILED_TRANSACTION_ID => PaymentStatus::FAILED,
-        self::OPEN_TRANSACTION_ID => PaymentStatus::OPEN,
-        self::CANCELED_DUPLICATE_TRANSACTION_ID => PaymentStatus::CANCELED,
-    ];
+    private ?array $paymentStatuses = null;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->paymentStatuses = [
+            self::PAID_TRANSACTION_ID => PaymentStatus::PAID,
+            self::FAILED_TRANSACTION_ID => PaymentStatus::FAILED,
+            self::OPEN_TRANSACTION_ID => PaymentStatus::OPEN,
+            self::CANCELED_DUPLICATE_TRANSACTION_ID => PaymentStatus::CANCELED,
+        ];
+    }
 
     /**
      * @magentoDataFixture Magento/Sales/_files/order.php
