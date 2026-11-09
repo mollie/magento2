@@ -39,6 +39,12 @@ class CancelOrder
             return false;
         }
 
+        if (!$order->canCancel()) {
+            $this->config->addToLog('info', $order->getIncrementId() . ' cannot be canceled, skipping cancellation');
+
+            return false;
+        }
+
         $comment = __('The order was canceled');
         if ($reason !== null) {
             $comment = __('The order was canceled, reason: payment %1', $reason);
