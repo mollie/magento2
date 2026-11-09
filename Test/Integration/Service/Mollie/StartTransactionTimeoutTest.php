@@ -38,14 +38,15 @@ class StartTransactionTimeoutTest extends IntegrationTestCase
     private const FIXTURE_QUOTE = 'test01';
     private const FIXTURE_ORDER = '100000001';
 
-    private array $history = [];
+    private ?array $history = null;
 
-    private MollieLoggerFake $logger;
+    private ?MollieLoggerFake $logger = null;
 
     protected function setUp(): void
     {
         parent::setUp();
 
+        $this->history = [];
         $this->loadFakeOrderLockService();
         $this->logger = $this->objectManager->create(MollieLoggerFake::class);
         $this->objectManager->addSharedInstance($this->logger, MollieLogger::class);
