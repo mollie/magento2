@@ -17,10 +17,17 @@ use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Api\Data\TotalsInterface;
 use Mollie\Api\Http\Data\Money;
 use Mollie\Api\Resources\Session;
+use Mollie\Payment\Exceptions\CustomerDetailsRequired;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Mollie\Api\CreateSessionRequest;
+use Mollie\Payment\Service\Mollie\Express\ExpressComponentsBeta;
+use Mollie\Payment\Service\Mollie\Express\ExpressSession;
+use Mollie\Payment\Service\Mollie\Express\ProductBuyRequest;
+use Mollie\Payment\Service\Mollie\Express\ProductPaymentMetadata;
+use Mollie\Payment\Service\Mollie\Express\SessionAddresses;
 use Mollie\Payment\Service\Mollie\Session\LineVat;
 use Mollie\Payment\Service\Order\Transaction;
+use Mollie\Payment\Service\PaymentToken\Generate;
 use Mollie\Payment\Service\PaymentToken\PaymentTokenForQuote;
 
 class CreateSession
@@ -32,50 +39,171 @@ class CreateSession
     private const SEGMENT_SHIPPING = 'shipping';
 
     private CartInterface $cart;
-    private TotalsInterface $totals;
+    private bool $isExpressCheckout;
+    private string $shippingCallbackUrl;
+
+    /** @var array<string, string> */
+    private array $billingAddressToSend;
+
+    /** @var array<string, string> */
+    private array $shippingAddressToSend;
 
     public function __construct(
         private readonly MollieApiClient $mollieApiClient,
         private readonly PaymentTokenForQuote $paymentTokenForQuote,
+        private readonly Generate $generatePaymentToken,
         private readonly Transaction $transaction,
         private readonly UrlInterface $urlBuilder,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly General $mollieHelper,
         private readonly CartTotalRepositoryInterface $cartTotalRepository,
+        private readonly ExpressComponentsBeta $beta,
+        private readonly SessionAddresses $sessionAddresses,
         private readonly LineVat $lineVat,
     ) {
     }
 
     public function execute(CartInterface $cart, bool $isExpressCheckout = true): string
     {
-        $this->cart = $cart;
-        $this->totals = $this->cartTotalRepository->get($cart->getId());
-
-        $mollie = $this->mollieApiClient->loadByStore($cart->getStoreId());
+        $this->prepare($cart, $isExpressCheckout, $this->transaction->getExpressShippingOptionsUrl($cart));
         $paymentToken = $this->paymentTokenForQuote->execute($cart);
 
-        // iDeal express allows you to pick the shipping method, so we only need the subtotal.
-        // Apple/Google Pay is only shown in the checkout, after the shipping method selection.
-        // So they need shipping, coupons, etc.
-        $total = (float)($isExpressCheckout ? $this->totals->getSubtotalInclTax() : $this->totals->getGrandTotal());
+        $session = $this->send(
+            $paymentToken,
+            $this->transaction->getExpressWebhookUrl($cart),
+            ['quoteId' => $cart->getEntityId(), 'store_id' => storeId($cart->getStoreId())],
+        );
 
+        return $session->clientAccessToken; // @phpstan-ignore property.notFound
+    }
+
+    /**
+     * The product page quote is never saved. Its token gets a row once the webhook placed the order, and the
+     * metadata holds what is needed to build the quote again.
+     */
+    public function executeForProduct(CartInterface $cart, ProductBuyRequest $buyRequest): ExpressSession
+    {
+        $storeId = (int)$cart->getStoreId();
+        $this->prepare($cart, true, $this->transaction->getExpressProductShippingOptionsUrl($storeId));
+        $paymentToken = $this->generatePaymentToken->unusedToken();
+        $customerId = $cart->getCustomer()->getId();
+
+        $metadata = new ProductPaymentMetadata(
+            $buyRequest,
+            $paymentToken,
+            $storeId,
+            $customerId === null ? null : (int)$customerId,
+        );
+
+        $session = $this->send(
+            $paymentToken,
+            $this->transaction->getExpressProductWebhookUrl($storeId),
+            $metadata->toArray(),
+        );
+
+        return new ExpressSession(
+            (string)$session->id,
+            (string)$session->clientAccessToken, // @phpstan-ignore property.notFound
+            $paymentToken,
+        );
+    }
+
+    private function prepare(CartInterface $cart, bool $isExpressCheckout, string $shippingCallbackUrl): void
+    {
+        $this->cart = $cart;
+        $this->isExpressCheckout = $isExpressCheckout;
+        $this->shippingCallbackUrl = $this->canOfferShippingOptions() ? $shippingCallbackUrl : '';
+        $this->billingAddressToSend = $this->sessionAddresses->billing($cart);
+        $this->shippingAddressToSend = $this->canSendShippingAddress() ? $this->sessionAddresses->shipping($cart) : [];
+    }
+
+    /*
+     * Mollie only accepts the shipping callback together with a shipping address it collects itself, so the callback
+     * and a merchant supplied shipping address exclude each other.
+     */
+    private function canSendShippingAddress(): bool
+    {
+        return $this->shippingCallbackUrl === '' && !$this->cart->getIsVirtual();
+    }
+
+    private function canOfferShippingOptions(): bool
+    {
+        return $this->isExpressCheckout
+            && !$this->cart->getIsVirtual()
+            && $this->beta->isEnabled(storeId($this->cart->getStoreId()));
+    }
+
+    /**
+     * @param array<string, mixed> $metadata
+     */
+    private function send(string $paymentToken, string $webhookUrl, array $metadata): Session
+    {
+        $requiredCustomerDetails = $this->getRequiredCustomerDetails();
+        $this->guardCustomerDetailsAreSupported($requiredCustomerDetails);
+
+        $lines = $this->getLines($this->isExpressCheckout);
         $storeName = $this->scopeConfig->getValue('general/store_information/name');
 
         /** @var Session $session */
-        $session = $mollie->send(new CreateSessionRequest(
-            $this->transaction->getExpressRedirectUrl($cart, $paymentToken),
+        $session = $this->mollieApiClient->loadByStore($this->cart->getStoreId())->send(new CreateSessionRequest(
+            $this->transaction->getExpressRedirectUrl($this->cart, $paymentToken),
             $this->urlBuilder->getUrl('checkout/cart'),
-            new Money($cart->getQuoteCurrencyCode(), number_format($total, 2, '.', '')),
+            new Money($this->cart->getQuoteCurrencyCode(), number_format($this->getTotal($lines), 2, '.', '')),
             is_string($storeName) ? $storeName : __('Unnamed webshop')->render(),
-            $this->getLines($isExpressCheckout),
-            ['webhookUrl' => $this->transaction->getExpressWebhookUrl($cart)],
-            ['quoteId' => $cart->getEntityId(), 'store_id' => storeId($cart->getStoreId())],
-            $this->getRequiredCustomerDetails(),
+            $lines,
+            ['webhookUrl' => $webhookUrl],
+            $metadata,
+            $requiredCustomerDetails,
+            $this->getShipping(),
+            $this->billingAddressToSend,
+            $this->shippingAddressToSend,
         ));
 
-        $cart->getPayment()->setAdditionalInformation('mollie_session_id', $session->id);
+        $this->cart->getPayment()->setAdditionalInformation('mollie_session_id', $session->id);
 
-        return $session->clientAccessToken; // @phpstan-ignore property.notFound
+        return $session;
+    }
+
+    /**
+     * Mollie answers requiredCustomerDetails with an error for accounts outside its beta. Sending it anyway would
+     * log an error for every guest that opens the minicart.
+     *
+     * @param string[] $requiredCustomerDetails
+     * @throws CustomerDetailsRequired
+     */
+    private function guardCustomerDetailsAreSupported(array $requiredCustomerDetails): void
+    {
+        if ($requiredCustomerDetails === [] || $this->beta->isEnabled(storeId($this->cart->getStoreId()))) {
+            return;
+        }
+
+        throw new CustomerDetailsRequired(
+            __('The express payment needs customer details that Mollie can only collect in the beta.')
+        );
+    }
+
+    /**
+     * On the express path Mollie adds the shipping costs, so the amount is what the lines add up to. Apple Pay and
+     * Google Pay are only shown in the checkout, after the shipping method selection, so they need the grand total.
+     *
+     * @param array<int, array<string, mixed>> $lines
+     */
+    private function getTotal(array $lines): float
+    {
+        if (!$this->isExpressCheckout) {
+            return (float)$this->getTotals()->getGrandTotal();
+        }
+
+        return array_reduce(
+            $lines,
+            static fn (float $total, array $line): float => $total + (float)$line['totalAmount']['value'],
+            0.0,
+        );
+    }
+
+    private function getTotals(): TotalsInterface
+    {
+        return $this->cartTotalRepository->get($this->cart->getId());
     }
 
     /**
@@ -89,9 +217,26 @@ class CreateSession
     {
         return array_values(array_filter([
             $this->hasCustomerEmail() ? null : self::CUSTOMER_DETAIL_EMAIL,
-            $this->isComplete($this->cart->getBillingAddress()) ? null : self::CUSTOMER_DETAIL_BILLING_ADDRESS,
+            $this->hasBillingAddress() ? null : self::CUSTOMER_DETAIL_BILLING_ADDRESS,
             $this->needsShippingAddress() ? self::CUSTOMER_DETAIL_SHIPPING_ADDRESS : null,
         ]));
+    }
+
+    private function hasBillingAddress(): bool
+    {
+        return $this->billingAddressToSend !== [] || $this->isComplete($this->cart->getBillingAddress());
+    }
+
+    /**
+     * On the express path no shipping method is selected yet. Mollie calls this URL with the address the customer
+     * picked in the Express Component and shows the returned options. Mollie only accepts this together with a
+     * required shipping address and without a shipping_fee line.
+     *
+     * @return array<string, string>
+     */
+    private function getShipping(): array
+    {
+        return $this->shippingCallbackUrl === '' ? [] : ['callbackUrl' => $this->shippingCallbackUrl];
     }
 
     private function hasCustomerEmail(): bool
@@ -102,7 +247,15 @@ class CreateSession
 
     private function needsShippingAddress(): bool
     {
-        return !$this->cart->getIsVirtual() && !$this->isComplete($this->cart->getShippingAddress());
+        if ($this->shippingCallbackUrl !== '') {
+            return true;
+        }
+
+        if ($this->cart->getIsVirtual()) {
+            return false;
+        }
+
+        return $this->shippingAddressToSend === [] && !$this->isComplete($this->cart->getShippingAddress());
     }
 
     private function isComplete(?AddressInterface $address): bool
@@ -142,7 +295,7 @@ class CreateSession
         }
 
         $exclude = ['subtotal', 'tax', 'grand_total', 'subtotal_incl_tax'];
-        foreach ($this->totals->getTotalSegments() as $segment) {
+        foreach ($this->getTotals()->getTotalSegments() as $segment) {
             if (in_array($segment->getCode(), $exclude)) {
                 continue;
             }

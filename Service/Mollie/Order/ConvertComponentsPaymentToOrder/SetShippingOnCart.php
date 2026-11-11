@@ -57,6 +57,40 @@ class SetShippingOnCart
 
     private function addShippingToQuote(CartInterface $baseCart, CartInterface $cart, stdClass $line): void
     {
+        if ($this->useSelectedShippingMethod($cart, $line)) {
+            return;
+        }
+
+        $this->addExpressShippingRate($cart, $line);
+    }
+
+    /**
+     * The reference is the shipping method the customer picked from the options the shipping options callback
+     * returned. Keep the price Mollie charged, as the rate may have changed since.
+     */
+    private function useSelectedShippingMethod(CartInterface $cart, stdClass $line): bool
+    {
+        $reference = $line->reference ?? null;
+        if (!is_string($reference) || $reference === '') {
+            return false;
+        }
+
+        $address = $cart->getShippingAddress();
+        $address->setCollectShippingRates(true)->collectShippingRates();
+
+        $rate = $address->getShippingRateByCode($reference);
+        if ($rate === false) {
+            return false;
+        }
+
+        $rate->setPrice($line->totalAmount->value);
+        $address->setShippingMethod($reference);
+
+        return true;
+    }
+
+    private function addExpressShippingRate(CartInterface $cart, stdClass $line): void
+    {
         $shippingMethod = 'flatrate_flatrate';
 
         $address = $cart->getShippingAddress();

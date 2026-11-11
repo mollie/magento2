@@ -23,6 +23,8 @@ class Transaction
 {
     private const CHECKOUT_WEBHOOK_PATH = 'mollie/checkout/webhook';
     private const EXPRESS_WEBHOOK_PATH = 'mollie/express/webhook';
+    private const EXPRESS_SHIPPING_OPTIONS_PATH = 'mollie/express/shippingOptions';
+    private const EXPRESS_PRODUCT_QUERY = 'placement=product';
 
     /**
      * @var UrlInterface
@@ -47,30 +49,71 @@ class Transaction
         $this->urlBuilder->setScope($storeId);
         return $this->urlBuilder->getUrl(
             'mollie/express/process/',
-            ['_query' => 'paymentToken=' . $paymentToken . '&utm_nooverride=1']
+            ['_query' => 'paymentToken=' . $paymentToken . '&storeId=' . (int)$storeId . '&utm_nooverride=1']
         );
     }
 
     public function getExpressWebhookUrl(CartInterface $cart): string
     {
-        $storeId = $cart->getStoreId();
+        return $this->getExpressCallbackUrl(
+            storeId($cart->getStoreId()),
+            self::EXPRESS_WEBHOOK_PATH,
+            'quoteId=' . $cart->getEntityId(),
+        );
+    }
+
+    public function getExpressShippingOptionsUrl(CartInterface $cart): string
+    {
+        return $this->getExpressCallbackUrl(
+            storeId($cart->getStoreId()),
+            self::EXPRESS_SHIPPING_OPTIONS_PATH,
+            'quoteId=' . $cart->getEntityId(),
+        );
+    }
+
+    public function getExpressProductWebhookUrl(int $storeId): string
+    {
+        return $this->getExpressCallbackUrl($storeId, self::EXPRESS_WEBHOOK_PATH, $this->getExpressProductQuery($storeId));
+    }
+
+    public function getExpressProductShippingOptionsUrl(int $storeId): string
+    {
+        return $this->getExpressCallbackUrl(
+            $storeId,
+            self::EXPRESS_SHIPPING_OPTIONS_PATH,
+            $this->getExpressProductQuery($storeId),
+        );
+    }
+
+    /**
+     * Store views that share a domain without store codes in their URLs all resolve to the same store, so the
+     * callback carries the store id to load the right Mollie API key.
+     */
+    private function getExpressProductQuery(int $storeId): string
+    {
+        return self::EXPRESS_PRODUCT_QUERY . '&storeId=' . $storeId;
+    }
+
+    private function getExpressCallbackUrl(?int $storeId, string $path, string $query): string
+    {
         if (!$this->config->isProductionMode($storeId) &&
             $this->config->useWebhooks($storeId) == WebhookUrlOptions::DISABLED) {
             return '';
         }
 
-        $query = 'quoteId=' . $cart->getEntityId();
-        $customUrl = $this->getCustomExpressWebhookUrl(storeId($storeId));
+        $customUrl = $this->getCustomExpressCallbackUrl($storeId, $path);
         if ($customUrl !== null) {
             return $customUrl . (strpos($customUrl, '?') === false ? '?' : '&') . $query;
         }
 
-        return $this->urlBuilder->getUrl('mollie/express/webhook/', [
+        $this->urlBuilder->setScope($storeId);
+
+        return $this->urlBuilder->getUrl($path . '/', [
             '_query' => $query,
         ]);
     }
 
-    private function getCustomExpressWebhookUrl(?int $storeId): ?string
+    private function getCustomExpressCallbackUrl(?int $storeId, string $path): ?string
     {
         if ($this->config->useWebhooks($storeId) != WebhookUrlOptions::CUSTOM_URL) {
             return null;
@@ -81,7 +124,7 @@ class Transaction
             return null;
         }
 
-        return str_ireplace(self::CHECKOUT_WEBHOOK_PATH, self::EXPRESS_WEBHOOK_PATH, $customUrl);
+        return str_ireplace(self::CHECKOUT_WEBHOOK_PATH, $path, $customUrl);
     }
 
     public function getRedirectUrl(OrderInterface $order, string $paymentToken): string
@@ -109,6 +152,9 @@ class Transaction
         $this->redirectUrl = $url;
     }
 
+    /**
+     * @param mixed[] $orders
+     */
     public function getWebhookUrl(array $orders): string
     {
         foreach ($orders as $order) {
@@ -118,6 +164,10 @@ class Transaction
         }
 
         $firstOrder = reset($orders);
+        if ($firstOrder === false) {
+            throw new InvalidArgumentException('Invalid order');
+        }
+
         $storeId = storeId($firstOrder->getStoreId());
         if (
             !$this->config->isProductionMode($storeId) &&
@@ -145,13 +195,13 @@ class Transaction
     private function addParametersToCustomUrl(OrderInterface $order, string $paymentToken, ?int $storeId = null): string
     {
         $replacements = [
-            '{{order_id}}' => $order->getId(),
-            '{{increment_id}}' => $order->getIncrementId(),
+            '{{order_id}}' => (string)$order->getId(),
+            '{{increment_id}}' => (string)$order->getIncrementId(),
             '{{payment_token}}' => $paymentToken,
             '{{order_hash}}' => base64_encode($this->encryptor->encrypt((string)$order->getId())),
-            '{{base_url}}' => $this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
-            '{{unsecure_base_url}}' => $this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
-            '{{secure_base_url}}' => $this->scopeConfig->getValue('web/secure/base_url', StoreScope::SCOPE_STORE, $storeId),
+            '{{base_url}}' => (string)$this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
+            '{{unsecure_base_url}}' => (string)$this->scopeConfig->getValue('web/unsecure/base_url', StoreScope::SCOPE_STORE, $storeId),
+            '{{secure_base_url}}' => (string)$this->scopeConfig->getValue('web/secure/base_url', StoreScope::SCOPE_STORE, $storeId),
         ];
 
         $customUrl = $this->config->customRedirectUrl($storeId);

@@ -20,6 +20,7 @@ define([
             sessionCreated: ko.observable(false),
             cartTotal: ko.observable(0),
             minicartIsOpen: ko.observable(false),
+            isBetaEnabled: false,
         },
 
         initialize: function () {
@@ -58,7 +59,7 @@ define([
         },
 
         createSession() {
-            if (this.sessionCreated() || !this.cartTotal() || !this.minicartIsOpen()) {
+            if (this.sessionCreated() || !this.cartTotal() || !this.minicartIsOpen() || !this.canPayAsCustomer()) {
                 return;
             }
 
@@ -72,6 +73,14 @@ define([
                     this.initializeExpressComponent(result);
                 }.bind(this),
             });
+        },
+
+        /*
+         * The minicart has no email of a guest. Only Mollie accounts in the beta can collect it, so without the beta
+         * the session would always be refused.
+         */
+        canPayAsCustomer: function () {
+            return this.isBetaEnabled || Boolean(customerData.get('customer')().firstname);
         },
 
         initializeExpressComponent: function (result) {

@@ -60,11 +60,14 @@ class ExpressPaymentBuilder
         return $line;
     }
 
-    public function shippingLine(string $value): stdClass
+    public function shippingLine(string $value, ?string $reference = null): stdClass
     {
         $line = new stdClass();
         $line->type = 'shipping_fee';
         $line->description = 'Standard delivery';
+        if ($reference !== null) {
+            $line->reference = $reference;
+        }
         $line->quantity = 1;
         $line->unitPrice = new stdClass();
         $line->unitPrice->value = $value;

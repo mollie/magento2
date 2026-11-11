@@ -129,6 +129,26 @@ class ConvertComponentsPaymentToOrderTest extends IntegrationTestCase
         $this->assertSame('-', $order->getBillingAddress()->getTelephone());
     }
 
+    /**
+     * The shipping option the customer picked in the Express Component comes back as the reference on the shipping
+     * line, and the order must carry that method instead of a generic flat rate.
+     *
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_address_and_shipping_method_saved.php
+     * @magentoConfigFixture current_store carriers/freeshipping/active 1
+     */
+    public function testUsesTheShippingMethodTheCustomerSelectedInTheExpressComponent(): void
+    {
+        $builder = $this->objectManager->get(ExpressPaymentBuilder::class);
+        $payment = $builder->build('tr_expressshippingoption');
+        $payment->lines = [$builder->productLine(), $builder->shippingLine('3.99', 'freeshipping_freeshipping')];
+
+        $order = $this->convert($this->loadQuote(), $payment);
+
+        $this->assertSame('freeshipping_freeshipping', $order->getShippingMethod());
+        $this->assertEquals(3.99, (float)$order->getShippingInclTax(), 'The customer paid the amount Mollie sent');
+        $this->assertStringContainsString('Free Shipping', (string)$order->getShippingDescription());
+    }
+
     private function convert(CartInterface $baseCart, Payment $payment): OrderInterface
     {
         $this->objectManager->get(PaymentTokenForQuote::class)->execute($baseCart);

@@ -5,8 +5,12 @@
  */
 
 /** @var Template $block */
+/** @var ExpressComponents $viewModel */
 
 use Magento\Framework\View\Element\Template;
+use Mollie\Payment\ViewModel\ExpressComponents;
+
+$viewModel = $block->getData('view_model');
 
 ?>
 
@@ -23,7 +27,8 @@ use Magento\Framework\View\Element\Template;
                         "component": "Mollie_Payment/js/view/payment/express-components",
                         "config": {
                             "template": "Mollie_Payment/payment/express-components",
-                            "placement": "cart"
+                            "placement": "cart",
+                            "isBetaEnabled": <?= $viewModel->isBetaEnabled() ? 'true' : 'false' ?>
                         }
                     }
                 }
