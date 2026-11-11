@@ -73,4 +73,14 @@ class ExpressPaymentBuilder
 
         return $line;
     }
+
+    public function shippingLineWithVat(string $value, string $vatRate, string $vatAmount): stdClass
+    {
+        $line = $this->shippingLine($value);
+        $line->vatRate = $vatRate;
+        $line->vatAmount = new stdClass();
+        $line->vatAmount->value = $vatAmount;
+
+        return $line;
+    }
 }

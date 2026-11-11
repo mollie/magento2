@@ -12,13 +12,17 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Model\Quote\Address\Rate;
 use Magento\Quote\Model\Quote\Address\RateFactory;
+use Magento\Tax\Model\Config as TaxConfig;
 use Mollie\Api\Resources\Payment;
 use stdClass;
 
 class SetShippingOnCart
 {
+    private const AMOUNT_PRECISION = 0.005;
+
     public function __construct(
         private readonly RateFactory $rateFactory,
+        private readonly TaxConfig $taxConfig,
     ) {}
 
     public function execute(CartInterface $baseCart, CartInterface $cart, Payment $payment): void
@@ -30,7 +34,7 @@ class SetShippingOnCart
             /** @var stdClass $line */
             if ($line->type == 'shipping_fee') {
                 $hasShipping = true;
-                $this->addShippingToQuote($cart, $line);
+                $this->addShippingToQuote($baseCart, $cart, $line);
             }
         }
 
@@ -51,17 +55,16 @@ class SetShippingOnCart
         }
     }
 
-    private function addShippingToQuote(CartInterface $cart, stdClass $line): void
+    private function addShippingToQuote(CartInterface $baseCart, CartInterface $cart, stdClass $line): void
     {
         $shippingMethod = 'flatrate_flatrate';
 
-        $amount = $line->totalAmount->value;
         $address = $cart->getShippingAddress();
 
         /** @var Rate $shippingRate */
         $shippingRate = $this->rateFactory->create();
         $shippingRate->setCode($shippingMethod);
-        $shippingRate->setPrice($amount);
+        $shippingRate->setPrice($this->getShippingPrice($baseCart, $cart, $line));
         $shippingRate->setCarrierTitle('Express');
         $shippingRate->setMethodTitle($line->description ?? '');
 
@@ -71,6 +74,27 @@ class SetShippingOnCart
 
         $address->getShippingRatesCollection()->removeAllItems();
         $address->addShippingRate($shippingRate);
+    }
+
+    private function getShippingPrice(CartInterface $baseCart, CartInterface $cart, stdClass $line): float
+    {
+        $paidShipping = (float)$line->totalAmount->value;
+        if ($this->taxConfig->shippingPriceIncludesTax($cart->getStoreId())) {
+            return $paidShipping;
+        }
+
+        if (!$this->isShippingOfBaseCart($baseCart, $paidShipping)) {
+            return $paidShipping;
+        }
+
+        return (float)$baseCart->getShippingAddress()->getShippingAmount();
+    }
+
+    private function isShippingOfBaseCart(CartInterface $baseCart, float $paidShipping): bool
+    {
+        $baseCartShipping = (float)$baseCart->getShippingAddress()->getShippingInclTax();
+
+        return abs($baseCartShipping - $paidShipping) < self::AMOUNT_PRECISION;
     }
 
     private function setShippingToZero(CartInterface $cart): void
