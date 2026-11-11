@@ -29,6 +29,7 @@ class ShippingMethodsTest extends ControllerTestCase
 {
     private const SIMPLE_QUOTE = 'test01';
     private const VIRTUAL_QUOTE = 'test_order_with_virtual_product_without_address';
+    private const FLATRATE_IDENTIFIER = 'flatrate__SPLIT__flatrate';
 
     /**
      * @magentoDataFixture Magento/Sales/_files/quote.php
@@ -308,6 +309,67 @@ class ShippingMethodsTest extends ControllerTestCase
         $this->assertSame([$pickupMethod], $response['shipping_methods']);
     }
 
+    /**
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/apikey_test test_dummydummydummydummydummydummy
+     * @magentoConfigFixture current_store payment/mollie_methods_applepay/active 1
+     * @magentoConfigFixture current_store carriers/flatrate/active 1
+     */
+    public function testSelectsTheShippingMethodTheCustomerPicked(): void
+    {
+        $this->useQuote(self::SIMPLE_QUOTE);
+
+        $this->dispatchWithPostValues([
+            'countryCode' => 'NL',
+            'postalCode' => '1012AB',
+            'shippingMethod' => ['identifier' => self::FLATRATE_IDENTIFIER],
+        ]);
+
+        $this->assertSame(200, $this->getResponse()->getHttpResponseCode());
+        $this->assertSame('flatrate_flatrate', $this->getActiveQuote()->getShippingAddress()->getShippingMethod());
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_general/type test
+     * @magentoConfigFixture current_store payment/mollie_general/apikey_test test_dummydummydummydummydummydummy
+     * @magentoConfigFixture current_store payment/mollie_methods_applepay/active 1
+     * @magentoConfigFixture current_store carriers/flatrate/active 1
+     * @dataProvider unusableShippingMethodProvider
+     */
+    #[DataProvider('unusableShippingMethodProvider')]
+    public function testReturnsTheAvailableShippingMethodsWhenTheShippingMethodIsUnusable(
+        array|string $shippingMethod,
+    ): void {
+        $this->useQuote(self::SIMPLE_QUOTE);
+
+        $this->dispatchWithPostValues([
+            'countryCode' => 'NL',
+            'postalCode' => '1012AB',
+            'shippingMethod' => $shippingMethod,
+        ]);
+
+        $response = json_decode($this->getResponse()->getBody(), true);
+        $this->assertSame(200, $this->getResponse()->getHttpResponseCode());
+        $this->assertContains(
+            self::FLATRATE_IDENTIFIER,
+            array_column($response['shipping_methods'], 'identifier'),
+        );
+    }
+
+    public static function unusableShippingMethodProvider(): array
+    {
+        return [
+            'the string "undefined" sent by the Hyvä Apple Pay buttons' => ['undefined'],
+            'any other plain string' => [self::FLATRATE_IDENTIFIER],
+            'an array without an identifier' => [['label' => 'Flat Rate']],
+            'an empty identifier' => [['identifier' => '']],
+        ];
+    }
+
     public static function missingCountryProvider(): array
     {
         return [
@@ -336,6 +398,15 @@ class ShippingMethodsTest extends ControllerTestCase
 
         $this->_objectManager->get(CartRepositoryInterface::class)->save($quote);
         $this->_objectManager->get(Session::class)->setQuoteId($quote->getId());
+    }
+
+    private function getActiveQuote(): Quote
+    {
+        /** @var Quote $quote */
+        $quote = $this->_objectManager->create(Quote::class);
+        $quote->load(self::SIMPLE_QUOTE, 'reserved_order_id');
+
+        return $quote;
     }
 
     private function dispatchShippingMethods(string $countryCode, string $postalCode): array
