@@ -61,7 +61,7 @@ class SetShippingOnCart
             return;
         }
 
-        $this->addExpressShippingRate($cart, $line);
+        $this->addExpressShippingRate($baseCart, $cart, $line);
     }
 
     /**
@@ -89,7 +89,7 @@ class SetShippingOnCart
         return true;
     }
 
-    private function addExpressShippingRate(CartInterface $cart, stdClass $line): void
+    private function addExpressShippingRate(CartInterface $baseCart, CartInterface $cart, stdClass $line): void
     {
         $shippingMethod = 'flatrate_flatrate';
 
