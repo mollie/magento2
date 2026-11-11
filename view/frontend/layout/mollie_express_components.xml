@@ -8,7 +8,11 @@
     <body>
         <referenceContainer name="checkout.cart.methods">
             <block template="Mollie_Payment::checkout/cart/express-components.phtml"
-                   name="mollie.express.components"/>
+                   name="mollie.express.components">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">Mollie\Payment\ViewModel\ExpressComponents</argument>
+                </arguments>
+            </block>
         </referenceContainer>
         <referenceBlock name="checkout.root">
             <arguments>
@@ -69,6 +73,7 @@
                                         </item>
                                         <item name="config" xsi:type="array">
                                             <item name="displayArea" xsi:type="string">promotion</item>
+                                            <item name="isBetaEnabled" xsi:type="boolean">false</item>
                                         </item>
                                     </item>
                                 </item>

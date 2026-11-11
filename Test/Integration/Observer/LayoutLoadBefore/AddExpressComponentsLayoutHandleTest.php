@@ -19,6 +19,7 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 class AddExpressComponentsLayoutHandleTest extends IntegrationTestCase
 {
     private const HANDLE = 'mollie_express_components';
+    private const BETA_HANDLE = 'mollie_express_components_beta';
 
     /**
      * @magentoAppArea frontend
@@ -74,6 +75,54 @@ class AddExpressComponentsLayoutHandleTest extends IntegrationTestCase
         $this->executeObserver($this->objectManager->create(LayoutInterface::class));
 
         $this->assertFalse($session->isQuoteRequested());
+    }
+
+    /**
+     * The shipping step and the product page need the shipping options beta of Mollie.
+     *
+     * @magentoAppArea frontend
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/beta_shipping_options 1
+     */
+    public function testAddsTheBetaLayoutHandleWhenTheBetaIsEnabled(): void
+    {
+        $layout = $this->objectManager->create(LayoutInterface::class);
+
+        $this->executeObserver($layout);
+
+        $this->assertContains(self::BETA_HANDLE, $layout->getUpdate()->getHandles());
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/beta_shipping_options 0
+     */
+    public function testDoesNotAddTheBetaLayoutHandleWhenTheBetaIsDisabled(): void
+    {
+        $layout = $this->objectManager->create(LayoutInterface::class);
+
+        $this->executeObserver($layout);
+
+        $this->assertContains(self::HANDLE, $layout->getUpdate()->getHandles());
+        $this->assertNotContains(self::BETA_HANDLE, $layout->getUpdate()->getHandles());
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 0
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/beta_shipping_options 1
+     */
+    public function testDoesNotAddTheBetaLayoutHandleWhenExpressComponentsAreDisabled(): void
+    {
+        $layout = $this->objectManager->create(LayoutInterface::class);
+
+        $this->executeObserver($layout);
+
+        $this->assertNotContains(self::BETA_HANDLE, $layout->getUpdate()->getHandles());
     }
 
     private function loadCheckoutSessionFake(): SessionFake

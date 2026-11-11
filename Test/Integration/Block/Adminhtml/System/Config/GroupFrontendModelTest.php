@@ -20,18 +20,16 @@ class GroupFrontendModelTest extends IntegrationTestCase
     private const EXPRESS_COMPONENTS_ID = 'mollie_methods_expresscomponents';
 
     /**
+     * Express Components is in beta: merchants are activated through the CLI, so the card stays hidden until then.
+     *
      * @magentoAppArea adminhtml
      * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 0
      */
-    public function testShowsTheExpressComponentsCardWhenTheMethodIsInactive(): void
+    public function testHidesTheExpressComponentsCardUntilItIsActivatedThroughTheCli(): void
     {
         $html = $this->render(self::EXPRESS_COMPONENTS_ID);
 
-        $this->assertStringNotContainsString('mollie-method-card hidden', $html);
-        $this->assertStringContainsString(
-            'class="section-config mollie-method-card mollie-configuration-method-inactive"',
-            $html
-        );
+        $this->assertStringContainsString('class="section-config mollie-method-card hidden"', $html);
     }
 
     /**

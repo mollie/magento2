@@ -4,5 +4,5 @@
   -->
 
 <!-- ko if: isEnabled -->
-<div id="express-component" data-bind="afterRender: createSession"></div>
+<div data-bind="attr: {id: elementId}, afterRender: createSession"></div>
 <!-- /ko -->

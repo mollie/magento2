@@ -48,13 +48,11 @@ class GroupFrontendModel extends Fieldset
                 </dialog>
             ';
 
-        $output = preg_replace(
+        return (string)preg_replace(
             '/(<fieldset[^>]*>.*?<\/fieldset>)/s',
             $newHtml,
             $output,
         );
-
-        return $output;
     }
 
     protected function _getFrontendClass($element): string
@@ -96,7 +94,12 @@ class GroupFrontendModel extends Fieldset
 
     private function getMethodClass(string $id): string
     {
-        if ($this->config->isMethodActive($id)) {
+        $isMethodActive = $this->config->isMethodActive($id);
+        if (!$isMethodActive && $id == 'mollie_methods_expresscomponents') {
+            return 'hidden';
+        }
+
+        if ($isMethodActive) {
             return 'mollie-configuration-method-active';
         }
 

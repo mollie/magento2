@@ -9,6 +9,7 @@ define([
     'mage/url',
     'Magento_Checkout/js/model/quote',
     'Magento_Checkout/js/model/resource-url-manager',
+    'Magento_Checkout/js/model/step-navigator',
     'https://js.mollie.com/v2/mollie.js',
 ], function (
     $,
@@ -16,17 +17,22 @@ define([
     url,
     quote,
     resourceUrlManager,
+    stepNavigator,
 ) {
     'use strict';
 
     const enabled = window.checkoutConfig.payment.mollie?.expresscomponents?.enabled ?? true;
     const PLACEMENT_CHECKOUT = 'checkout';
+    const PLACEMENT_SHIPPING = 'shipping';
+    const SHIPPING_STEP = 'shipping';
 
     return Component.extend({
         defaults: {
             isEnabled: enabled,
             placement: null,
             elementId: 'express-component',
+            // The cart page has no Mollie checkout config, so its template passes this setting.
+            isBetaEnabled: window.checkoutConfig.payment.mollie?.expresscomponents?.beta ?? false,
         },
 
         initialize: function () {
@@ -74,11 +80,31 @@ define([
                 return false;
             }
 
-            if (this.isGuest() && !quote.guestEmail) {
+            if (this.isShippingStepCompleted()) {
+                return false;
+            }
+
+            if (this.isGuest() && !quote.guestEmail && this.needsGuestEmail()) {
                 return false;
             }
 
             return !this.isWaitingForShippingMethod();
+        },
+
+        /*
+         * With the beta Mollie collects the email outside the payment step. Without it Mollie rejects a session
+         * that asks for the email, so wait until the guest entered it.
+         */
+        needsGuestEmail: function () {
+            return this.isCheckoutPlacement() || !this.isBetaEnabled;
+        },
+
+        /*
+         * Every session overwrites the session id on the cart. Once the customer moved on to the payment step only
+         * that step may create sessions, or the redirect checks the wrong session.
+         */
+        isShippingStepCompleted: function () {
+            return this.placement === PLACEMENT_SHIPPING && stepNavigator.isProcessed(SHIPPING_STEP);
         },
 
         /*
@@ -109,7 +135,7 @@ define([
         },
 
         getRequestData: function () {
-            return this.isGuest() ? {email: quote.guestEmail} : {};
+            return this.isGuest() && quote.guestEmail ? {email: quote.guestEmail} : {};
         },
 
         isGuest: function () {

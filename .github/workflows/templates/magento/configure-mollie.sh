@@ -67,6 +67,7 @@ bin/magento config:set payment/mollie_methods_klarna/payment_surcharge_tax_class
 # Enable Express Components. Not part of the list above because it is not controlled by the Methods API and
 # is hidden in the admin until it is active, so it can only be enabled here.
 bin/magento config:set payment/mollie_methods_expresscomponents/active 1
+bin/magento config:set payment/mollie_methods_expresscomponents/beta_shipping_options 1
 
 # Enable Components
 bin/magento config:set payment/mollie_methods_creditcard/use_components 1

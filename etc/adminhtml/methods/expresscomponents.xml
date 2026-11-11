@@ -104,5 +104,16 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="beta_shipping_options" translate="label comment" type="select" sortOrder="110" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Shipping options and product page (beta)</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/mollie_methods_expresscomponents/beta_shipping_options</config_path>
+            <comment>
+                <![CDATA[Lets Mollie collect the address and offer your shipping methods on the cart page, in the minicart, on the shipping step and on the product page. <strong>Only enable this when Mollie activated the customer details and shipping options beta for your account.</strong> Otherwise the Express Components outside the payment step stop working.]]></comment>
+            <depends>
+                <field id="active">1</field>
+            </depends>
+        </field>
     </group>
 </include>

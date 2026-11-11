@@ -20,6 +20,7 @@ use Magento\Payment\Model\MethodInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Api\Types\MethodQuery;
+use Mollie\Payment\Service\Mollie\Express\ExpressComponentsBeta;
 use Mollie\Payment\Config;
 use Mollie\Payment\Helper\General;
 use Mollie\Payment\Service\Checkout\PaymentMethodMessages;
@@ -62,6 +63,7 @@ class MollieConfigProvider implements ConfigProviderInterface
         private SavedCardConsentText $savedCardConsentText,
         private CustomerSession $customerSession,
         private PaymentMethodMessages $paymentMethodMessages,
+        private ExpressComponentsBeta $expressComponentsBeta,
     )
     {
         foreach (PaymentMethods::METHODS as $code) {
@@ -99,7 +101,7 @@ class MollieConfigProvider implements ConfigProviderInterface
             $parameters = [
                 'resource' => 'orders',
                 'includeWallets' => MethodQuery::WALLETS,
-                'billingCountry' => $cart->getBillingAddress()->getCountry(),
+                'billingCountry' => $cart->getBillingAddress()?->getCountry(),
             ];
 
             if ($amount['currency'] !== null) {
@@ -152,7 +154,9 @@ class MollieConfigProvider implements ConfigProviderInterface
         $config['payment']['mollie']['messages'] = $this->getMessages();
         $config['payment']['mollie']['store']['name'] = $storeName;
         $config['payment']['mollie']['store']['currency'] = $this->config->getStoreCurrency($storeId);
-        $config['payment']['mollie']['expresscomponents']['enabled'] = $this->getMethodInstance('mollie_methods_expresscomponents')->isAvailable();
+        $config['payment']['mollie']['expresscomponents']['enabled'] =
+            $this->getMethodInstance('mollie_methods_expresscomponents')?->isAvailable() ?? false;
+        $config['payment']['mollie']['expresscomponents']['beta'] = $this->expressComponentsBeta->isEnabled($storeId);
         $useImage = $this->mollieHelper->useImage();
 
         $this->appendSavedCardsConfig($config, $storeId);
