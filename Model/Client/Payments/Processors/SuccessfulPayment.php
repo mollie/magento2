@@ -152,6 +152,7 @@ class SuccessfulPayment implements PaymentProcessorInterface
         $this->transactionProcessor->process($magentoOrder, $molliePayment);
 
         $this->orderRepository->save($magentoOrder);
+        $payment->getCreatedInvoice()?->setOrigData();
     }
 
     /**
