@@ -148,6 +148,10 @@
         <index referenceId="MOLLIE_PAYMENT_TRANSACTION_TO_ORDER_TRANSACTION_ID" indexType="btree">
             <column name="transaction_id"/>
         </index>
+
+        <index referenceId="MOLLIE_PAYMENT_TRANSACTION_TO_ORDER_ORDER_ID" indexType="btree">
+            <column name="order_id"/>
+        </index>
     </table>
 
     <table name="mollie_saved_card_consent" engine="innodb" resource="default" comment="Saved-card consent audit log">
