@@ -122,9 +122,7 @@ class CreateSession
             $lines[] = [
                 'type' => $item->getIsVirtual() ? 'digital' : 'physical',
                 'description' => '[' . $item->getSku() . '] ' . $item->getName(),
-                'quantity' => (int)$item->getQty(),
-                'unitPrice' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax()),
-                'totalAmount' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax() * (int)$item->getQty()),
+                ...$this->getQuantityWithAmounts($currency, $item),
                 'totalWeight' => [
                     'value' => $this->getWeightInGrams($item),
                     'unit' => 'g',
@@ -160,6 +158,39 @@ class CreateSession
         }
 
         return $lines;
+    }
+
+    /**
+     * Mollie only accepts whole quantities, so a line with a fractional quantity (such as 4.32 square metres)
+     * is sent as a single unit priced at the row total. The amounts stay exact; only the presentation changes.
+     *
+     * @return array<string, mixed>
+     */
+    private function getQuantityWithAmounts(?string $currency, CartItemInterface $item): array
+    {
+        if ($this->hasWholeQuantity($item)) {
+            return [
+                'quantity' => (int)$item->getQty(),
+                'unitPrice' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax()),
+                'totalAmount' => $this->mollieHelper->getAmountArray(
+                    $currency,
+                    (float)$item->getPriceInclTax() * (int)$item->getQty(),
+                ),
+            ];
+        }
+
+        $rowTotal = $this->mollieHelper->getAmountArray($currency, (float)$item->getRowTotalInclTax());
+
+        return [
+            'quantity' => 1,
+            'unitPrice' => $rowTotal,
+            'totalAmount' => $rowTotal,
+        ];
+    }
+
+    private function hasWholeQuantity(CartItemInterface $item): bool
+    {
+        return (float)$item->getQty() === floor((float)$item->getQty());
     }
 
     private function getSegmentType(string $code, float $value): string

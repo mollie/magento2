@@ -109,10 +109,16 @@ class Order
         $discountAmount = $this->getDiscountAmountOrderItem($item);
 
         /**
+         * Mollie only accepts whole quantities, so a fractional quantity (such as 4.32 square metres) is sent
+         * as a single unit priced at the row total.
+         */
+        $quantity = $this->getWholeQuantity($item);
+
+        /**
          * The price of a single item including VAT in the order line.
          * Calculated back from the totalAmount + discountAmount to overcome rounding issues.
          */
-        $unitPrice = round(($totalAmount + $discountAmount) / $item->getQtyOrdered(), 2);
+        $unitPrice = round(($totalAmount + $discountAmount) / $quantity, 2);
 
         /**
          * The amount of VAT on the line.
@@ -133,7 +139,7 @@ class Order
             'item_id' => $item->getId(),
             'type' => $item->getIsVirtual() !== null && (int) $item->getIsVirtual() !== 1 ? 'physical' : 'digital',
             'description' => preg_replace('/[^\p{L}\p{N} -]/u', '', $item->getName() ?? ''),
-            'quantity' => round((float)$item->getQtyOrdered()),
+            'quantity' => $quantity,
             'unitPrice' => $this->mollieHelper->getAmountArray($this->currency, $unitPrice),
             'totalAmount' => $this->mollieHelper->getAmountArray($this->currency, $totalAmount),
             'vatRate' => sprintf('%.2f', $item->getTaxPercent()),
@@ -189,6 +195,16 @@ class Order
         ];
 
         return $this->orderLinesProcessor->process($orderLine, $this->order);
+    }
+
+    private function getWholeQuantity(OrderItemInterface $item): int
+    {
+        $quantity = (float)$item->getQtyOrdered();
+        if ($quantity >= 1 && $quantity === floor($quantity)) {
+            return (int)$quantity;
+        }
+
+        return 1;
     }
 
     /**
