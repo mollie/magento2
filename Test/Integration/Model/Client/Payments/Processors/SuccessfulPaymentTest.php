@@ -85,6 +85,21 @@ class SuccessfulPaymentTest extends IntegrationTestCase
     }
 
     /**
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testTheCreatedInvoiceIsNotSeenAsNewWhenTheOrderIsSavedAgain(): void
+    {
+        $order = $this->prepareOrder();
+
+        $this->processWebhook($order);
+
+        $invoice = $order->getPayment()->getCreatedInvoice();
+        $this->assertNotNull($invoice);
+        $this->assertNotNull($invoice->getId());
+        $this->assertEquals($invoice->getId(), $invoice->getOrigData('entity_id'));
+    }
+
+    /**
      * @magentoDataFixture Magento/Sales/_files/invoice.php
      */
     public function testItMarksThePaymentAsProcessed(): void

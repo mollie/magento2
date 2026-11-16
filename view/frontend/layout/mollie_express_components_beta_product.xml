@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+<!--
+    The product page placement needs the shipping options beta of Mollie. Added by
+    Mollie\Payment\Observer\LayoutLoadBefore\AddExpressComponentsLayoutHandle when the beta is enabled and
+    "Show on product page" is on.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="product.info.addtocart">
+            <block template="Mollie_Payment::product/view/express-components.phtml"
+                   name="mollie.express.components.product"/>
+        </referenceBlock>
+        <referenceBlock name="product.info.addtocart.additional">
+            <block template="Mollie_Payment::product/view/express-components.phtml"
+                   name="mollie.express.components.product.additional"/>
+        </referenceBlock>
+    </body>
+</page>

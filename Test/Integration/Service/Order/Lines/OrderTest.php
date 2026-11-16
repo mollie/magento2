@@ -43,6 +43,45 @@ class OrderTest extends IntegrationTestCase
         $this->assertEquals(34.71, $row['vatAmount']['value']);
     }
 
+    /**
+     * @dataProvider fractionalQuantityDataProvider
+     */
+    #[DataProvider('fractionalQuantityDataProvider')]
+    public function testCollapsesFractionalQuantitiesIntoASingleUnitLine(float $quantity, float $rowTotal): void
+    {
+        $this->loadFixture('Magento/Sales/order_item_list.php');
+
+        $order = $this->loadOrderById('100000001');
+        $order->setBaseCurrencyCode('EUR');
+
+        foreach ($order->getItems() as $item) {
+            $item->setIsVirtual(false);
+            if ((float)$item->getBaseRowTotal() === 200.0) {
+                $item->setQtyOrdered($quantity);
+                $item->setRowTotal($rowTotal);
+                $item->setBaseRowTotal($rowTotal);
+            }
+        }
+
+        /** @var Subject $instance */
+        $instance = $this->objectManager->get(Subject::class);
+
+        $result = $this->withoutBalancingLines($instance->get($order));
+
+        $row = $result[1]; // Custom created item
+        $this->assertSame(1, $row['quantity']);
+        $this->assertEquals($rowTotal, $row['unitPrice']['value']);
+        $this->assertEquals($rowTotal, $row['totalAmount']['value']);
+    }
+
+    public static function fractionalQuantityDataProvider(): array
+    {
+        return [
+            'square metres' => [4.32, 432.0],
+            'below one' => [0.3, 30.0],
+        ];
+    }
+
     public function testGetOrderLinesShippingFeeCalculation(): void
     {
         $this->loadFixture('Magento/Sales/order_item_list.php');

@@ -21,10 +21,13 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
+use Mollie\Payment\Service\Mollie\Express\ProductSessions;
 use Mollie\Payment\Service\Mollie\MollieApiClient;
 
 class Process implements HttpGetActionInterface
 {
+    private const STATUS_COMPLETED = 'completed';
+
     public function __construct(
         readonly private RequestInterface $request,
         readonly private CartRepositoryInterface $cartRepository,
@@ -35,29 +38,77 @@ class Process implements HttpGetActionInterface
         readonly private ResultFactory $resultFactory,
         readonly private ManagerInterface $messageManager,
         readonly private UrlInterface $urlBuilder,
+        readonly private ProductSessions $productSessions,
     ) {}
 
     public function execute(): ResultInterface
     {
-        $token = $this->request->getParam('paymentToken');
-        $cartId = $this->paymentTokenRepository->getByToken($token)->getCartId();
-        $cart = $this->cartRepository->get($cartId);
+        $token = (string)$this->request->getParam('paymentToken');
 
-        $sessionId = $cart->getPayment()->getAdditionalInformation('mollie_session_id');
+        $productSessionId = $this->productSessions->find($token);
+        if ($productSessionId !== null) {
+            return $this->processProductSession($token, $productSessionId);
+        }
+
+        // Banking apps often open the redirect in another browser, which does not know the product page session.
+        // Its token only exists once the webhook placed the order, and then belongs to the cart of that order,
+        // which has no session id. The wait page waits for the order, and sends the customer to the cart when it
+        // does not show up.
+        $paymentToken = $this->paymentTokenRepository->getByToken($token);
+        if ($paymentToken === null) {
+            return $this->renderResultPage($token);
+        }
+
+        $cart = $this->cartRepository->get((int)$paymentToken->getCartId());
+
+        $sessionId = (string)$cart->getPayment()->getAdditionalInformation('mollie_session_id');
+        if ($sessionId === '') {
+            return $this->renderResultPage($token);
+        }
+
         $mollie = $this->mollieApiClient->loadByStore($cart->getStoreId());
         $session = $mollie->sessions->get($sessionId);
 
         /** @var 'open'|'expired'|'completed' $status */
         $status = $session->status;
 
-        if ($status != 'completed') {
+        if ($status != self::STATUS_COMPLETED) {
             return $this->redirectToCart($cart);
         }
 
-        $cart->setIsActive(0);
+        $cart->setIsActive(false);
         $this->cartRepository->save($cart);
 
         return $this->renderResultPage($token);
+    }
+
+    /*
+     * A product page session has no cart, and the webhook may not have created the order and its payment token yet.
+     * The shopping cart of the customer was never touched, so it stays as it is.
+     */
+    private function processProductSession(string $token, string $sessionId): ResultInterface
+    {
+        $mollie = $this->mollieApiClient->loadByStore($this->getStoreId());
+
+        if ($mollie->sessions->get($sessionId)->status !== self::STATUS_COMPLETED) {
+            return $this->paymentNotCompletedResponse();
+        }
+
+        return $this->renderResultPage($token);
+    }
+
+    /**
+     * Store views that share a domain without store codes in their URLs all resolve to the same store, so the
+     * redirect URL carries the store id of the session.
+     */
+    private function getStoreId(): int
+    {
+        $storeId = (int)$this->request->getParam('storeId');
+        if ($storeId !== 0) {
+            return $storeId;
+        }
+
+        return (int)$this->storeManager->getStore()->getId();
     }
 
     private function redirectToCart(CartInterface $cart): ResultInterface
@@ -65,6 +116,11 @@ class Process implements HttpGetActionInterface
         $cart->setIsActive(true);
         $this->cartRepository->save($cart);
 
+        return $this->paymentNotCompletedResponse();
+    }
+
+    private function paymentNotCompletedResponse(): ResultInterface
+    {
         $this->messageManager->addErrorMessage(
             __('Your payment was not completed. Please try again or select another payment method.')
         );
@@ -76,7 +132,7 @@ class Process implements HttpGetActionInterface
     private function renderResultPage(string $token): Page
     {
         $resultPage = $this->resultPageFactory->create();
-        $resultPage->getConfig()->getTitle()->set(__('Confirming your payment'));
+        $resultPage->getConfig()->getTitle()->set(__('Confirming your payment')->render());
 
         /** @var Template $block */
         $block = $resultPage->getLayout()->getBlock('mollie.express.wait');

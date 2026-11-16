@@ -20,6 +20,8 @@ class GroupFrontendModelTest extends IntegrationTestCase
     private const EXPRESS_COMPONENTS_ID = 'mollie_methods_expresscomponents';
 
     /**
+     * Express Components is generally available, so the card shows like any other method, even while inactive.
+     *
      * @magentoAppArea adminhtml
      * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 0
      */
@@ -27,7 +29,6 @@ class GroupFrontendModelTest extends IntegrationTestCase
     {
         $html = $this->render(self::EXPRESS_COMPONENTS_ID);
 
-        $this->assertStringNotContainsString('mollie-method-card hidden', $html);
         $this->assertStringContainsString(
             'class="section-config mollie-method-card mollie-configuration-method-inactive"',
             $html

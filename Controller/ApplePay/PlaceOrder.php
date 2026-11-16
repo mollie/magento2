@@ -31,6 +31,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Payment;
 use Mollie\Payment\Config;
 use Mollie\Payment\Service\PaymentToken\Generate;
+use Mollie\Payment\Service\Quote\GetApplePayShippingMethodIdentifier;
 use Mollie\Payment\Service\Quote\SetCityFromApplePayAddress;
 use Mollie\Payment\Service\Quote\SetRegionFromApplePayAddress;
 
@@ -48,6 +49,7 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         private readonly Config $config,
         private readonly ScopeConfigInterface $scopeConfig,
         private readonly SetCityFromApplePayAddress $setCityFromApplePayAddress,
+        private readonly GetApplePayShippingMethodIdentifier $getApplePayShippingMethodIdentifier,
     ) {
         parent::__construct($context);
     }
@@ -69,14 +71,9 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         $cart->setCustomerEmail($billingAddressData['emailAddress'] ?? $shippingAddressData['emailAddress'] ?? '');
 
         // Orders with digital products can't have a shipping method
-        if ($this->getRequest()->getParam('shippingMethod')) {
-            $shippingAddress->setShippingMethod(
-                str_replace(
-                    '__SPLIT__',
-                    '_',
-                    $this->getRequest()->getParam('shippingMethod')['identifier'],
-                ),
-            );
+        $shippingMethodCode = $this->getShippingMethodCode();
+        if ($shippingMethodCode !== null) {
+            $shippingAddress->setShippingMethod($shippingMethodCode);
         }
 
         $cart->setData('payment_method', 'mollie_methods_applepay');
@@ -140,6 +137,16 @@ class PlaceOrder extends Action implements HttpPostActionInterface
         }
 
         return $this->checkoutSession->getQuote();
+    }
+
+    private function getShippingMethodCode(): ?string
+    {
+        $identifier = $this->getApplePayShippingMethodIdentifier->execute($this->getRequest());
+        if ($identifier === null) {
+            return null;
+        }
+
+        return str_replace('__SPLIT__', '_', $identifier);
     }
 
     private function isGuestCart(CartInterface $cart): bool

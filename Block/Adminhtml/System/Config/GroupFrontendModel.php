@@ -48,13 +48,11 @@ class GroupFrontendModel extends Fieldset
                 </dialog>
             ';
 
-        $output = preg_replace(
+        return (string)preg_replace(
             '/(<fieldset[^>]*>.*?<\/fieldset>)/s',
             $newHtml,
             $output,
         );
-
-        return $output;
     }
 
     protected function _getFrontendClass($element): string

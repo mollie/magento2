@@ -1,0 +1,24 @@
+<?php
+/*
+ * Copyright Magmodules.eu. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+declare(strict_types=1);
+
+use Magento\Framework\Escaper;
+use Magento\Framework\View\Element\Template;
+use Mollie\Payment\Controller\Express\CreateSession;
+
+/** @var Template $block */
+/** @var Escaper $escaper */
+?>
+<div class="mollie-express-product"
+     data-mage-init='<?= $escaper->escapeHtmlAttr((string)json_encode([
+         'Mollie_Payment/js/view/product/express-components' => [
+             'createSessionUrl' => $block->getUrl(
+                 'mollie/express/createSession',
+                 ['type' => CreateSession::TYPE_PRODUCT]
+             ),
+         ],
+     ])) ?>'></div>

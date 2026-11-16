@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Service\Mollie\Order;
 
+use Magento\Framework\Registry;
 use Magento\Sales\Api\Data\InvoiceInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader;
@@ -18,14 +19,12 @@ class CreateCreditmemoFromRefund
 {
     public function __construct(
         private readonly CreditmemoLoader $creditmemoLoader,
-        private readonly CreditmemoService $creditmemoService
+        private readonly CreditmemoService $creditmemoService,
+        private readonly Registry $registry
     ) {}
 
     public function execute(OrderInterface $order, InvoiceInterface $invoice, Refund $refund): void
     {
-        $order->getPayment()->setTransactionId($refund->id);
-        $order->getPayment()->setLastTransId($refund->id);
-
         $qtys = [];
         foreach ($order->getAllItems() as $item) {
             $qtys[$item->getId()]['qty'] = 0;
@@ -40,11 +39,15 @@ class CreateCreditmemoFromRefund
             'items' => $qtys,
         ]);
 
+        $this->registry->unregister('current_creditmemo');
         $creditmemo = $this->creditmemoLoader->load();
 
         if (!$creditmemo) {
             return;
         }
+
+        $creditmemo->getOrder()->getPayment()->setTransactionId($refund->id);
+        $creditmemo->getOrder()->getPayment()->setLastTransId($refund->id);
 
         // Prevent a refund loop by setting the Mollie transaction ID so we can recognize that the refund
         // has already been processed on the Mollie side.

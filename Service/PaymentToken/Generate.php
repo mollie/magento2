@@ -43,13 +43,21 @@ class Generate
 
         /** @var PaymentTokenInterface $model */
         $model = $this->paymentTokenFactory->create();
-        $model->setCartId($order->getQuoteId());
+        $model->setCartId((int)$order->getQuoteId());
         $model->setOrderId($order->getId());
         $model->setToken($token);
 
         $this->paymentTokenRepository->save($model);
 
         return $model;
+    }
+
+    /**
+     * A token that is not in use yet, for when the cart it belongs to does not exist yet.
+     */
+    public function unusedToken(): string
+    {
+        return $this->getUniquePaymentToken();
     }
 
     private function getUniquePaymentToken(): string

@@ -23,6 +23,15 @@ class CreateSessionRequest extends ResourceHydratableRequest implements HasPaylo
 
     protected $hydratableResource = Session::class;
 
+    /**
+     * @param array<int, array<string, mixed>> $lines
+     * @param array<string, string> $payment
+     * @param array<string, mixed> $metadata
+     * @param string[] $requiredCustomerDetails
+     * @param array<string, string> $shipping
+     * @param array<string, string> $billingAddress
+     * @param array<string, string> $shippingAddress
+     */
     public function __construct(
         readonly private string $redirectUrl,
         readonly private string $cancelUrl,
@@ -32,6 +41,9 @@ class CreateSessionRequest extends ResourceHydratableRequest implements HasPaylo
         readonly private array $payment = [],
         readonly private array $metadata = [],
         readonly private array $requiredCustomerDetails = [],
+        readonly private array $shipping = [],
+        readonly private array $billingAddress = [],
+        readonly private array $shippingAddress = [],
     ) {}
 
     public function resolveResourcePath(): string
@@ -39,6 +51,9 @@ class CreateSessionRequest extends ResourceHydratableRequest implements HasPaylo
         return 'sessions';
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     protected function defaultPayload(): array
     {
         $output = [
@@ -59,6 +74,18 @@ class CreateSessionRequest extends ResourceHydratableRequest implements HasPaylo
 
         if ($this->requiredCustomerDetails !== []) {
             $output['requiredCustomerDetails'] = $this->requiredCustomerDetails;
+        }
+
+        if ($this->shipping !== []) {
+            $output['shipping'] = $this->shipping;
+        }
+
+        if ($this->billingAddress !== []) {
+            $output['billingAddress'] = $this->billingAddress;
+        }
+
+        if ($this->shippingAddress !== []) {
+            $output['shippingAddress'] = $this->shippingAddress;
         }
 
         return $output;
