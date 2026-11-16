@@ -103,6 +103,44 @@ class ProcessTransactionTest extends GraphQLTestCase
     }
 
     /**
+     * The customer return is not a webhook. Processing it as "webhook" enqueues a message identical to the one the
+     * real Mollie webhook enqueues, so every paid order gets duplicate mollie.transaction.process queue messages.
+     *
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testProcessesTheCustomerReturnWithTheSuccessType(): void
+    {
+        /** @var CartInterface $cart */
+        $cart = $this->objectManager->create(Quote::class);
+        $cart->load('test01', 'reserved_order_id');
+        $cart->setIsActive(0);
+        $cart->save();
+
+        $order = $this->loadOrder('100000001');
+        $order->setQuoteId($cart->getId());
+        $order->setMollieTransactionId('tr_123');
+        $order->save();
+
+        $tokenModel = $this->objectManager->get(Generate::class)->forOrder($order);
+
+        $fake = $this->objectManager->create(ProcessTransactionFake::class);
+        $fake->setResponse($this->objectManager->create(
+            GetMollieStatusResult::class,
+            ['status' => 'paid', 'method' => 'ideal'],
+        ));
+        $this->objectManager->addSharedInstance($fake, ProcessTransaction::class);
+
+        $this->graphQlQuery('mutation {
+            mollieProcessTransaction(input: { payment_token: "' . $tokenModel->getToken() . '" }) {
+                paymentStatus
+            }
+        }');
+
+        $this->assertSame(['success'], $fake->getCalledTypes());
+    }
+
+    /**
      * @dataProvider everyStatusTheModuleCanReturnProvider
      * @magentoDataFixture Magento/Sales/_files/quote.php
      * @magentoDataFixture Magento/Sales/_files/order.php
