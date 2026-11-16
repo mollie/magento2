@@ -275,18 +275,16 @@ class CreateSession
         $lines = [];
         $currency = $this->cart->getQuoteCurrencyCode();
         foreach ($this->cart->getItems() ?? [] as $item) {
-            $totalAmount = (float)$item->getPriceInclTax() * (int)$item->getQty();
+            $amounts = $this->getQuantityWithAmounts($currency, $item);
             $lines[] = [
                 'type' => $item->getIsVirtual() ? 'digital' : 'physical',
                 'description' => '[' . $item->getSku() . '] ' . $item->getName(),
-                'quantity' => (int)$item->getQty(),
-                'unitPrice' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax()),
-                'totalAmount' => $this->mollieHelper->getAmountArray($currency, $totalAmount),
+                ...$amounts,
                 'totalWeight' => [
                     'value' => $this->getWeightInGrams($item),
                     'unit' => 'g',
                 ],
-                ...$this->lineVat->forLine($currency, $totalAmount, (float)$item->getTaxPercent()),
+                ...$this->lineVat->forLine($currency, (float)$amounts['totalAmount']['value'], (float)$item->getTaxPercent()),
             ];
         }
 
@@ -335,6 +333,39 @@ class CreateSession
             $value,
             $this->lineVat->getShippingVatRate($this->cart->getShippingAddress()),
         );
+    }
+
+    /**
+     * Mollie only accepts whole quantities, so a line with a fractional quantity (such as 4.32 square metres)
+     * is sent as a single unit priced at the row total. The amounts stay exact; only the presentation changes.
+     *
+     * @return array<string, mixed>
+     */
+    private function getQuantityWithAmounts(?string $currency, CartItemInterface $item): array
+    {
+        if ($this->hasWholeQuantity($item)) {
+            return [
+                'quantity' => (int)$item->getQty(),
+                'unitPrice' => $this->mollieHelper->getAmountArray($currency, (float)$item->getPriceInclTax()),
+                'totalAmount' => $this->mollieHelper->getAmountArray(
+                    $currency,
+                    (float)$item->getPriceInclTax() * (int)$item->getQty(),
+                ),
+            ];
+        }
+
+        $rowTotal = $this->mollieHelper->getAmountArray($currency, (float)$item->getRowTotalInclTax());
+
+        return [
+            'quantity' => 1,
+            'unitPrice' => $rowTotal,
+            'totalAmount' => $rowTotal,
+        ];
+    }
+
+    private function hasWholeQuantity(CartItemInterface $item): bool
+    {
+        return (float)$item->getQty() === floor((float)$item->getQty());
     }
 
     private function getSegmentType(string $code, float $value): string
