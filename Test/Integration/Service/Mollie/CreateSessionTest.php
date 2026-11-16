@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Service\Mollie;
 
+use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\CartTotalRepositoryInterface;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\TestFramework\Quote\Model\GetQuoteByReservedOrderId;
@@ -19,6 +20,7 @@ use Mollie\Payment\Service\Mollie\Api\CreateSessionRequest;
 use Mollie\Payment\Service\Mollie\CreateSession;
 use Mollie\Payment\Test\Fakes\Service\Mollie\FakeMollieApiClient;
 use Mollie\Payment\Test\Integration\IntegrationTestCase;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * @magentoAppArea frontend
@@ -209,6 +211,67 @@ class CreateSessionTest extends IntegrationTestCase
 
             return true;
         });
+    }
+
+    /**
+     * @dataProvider fractionalQuantityDataProvider
+     * @magentoDataFixture Magento/Checkout/_files/quote_with_address_and_shipping_method_saved.php
+     */
+    #[DataProvider('fractionalQuantityDataProvider')]
+    public function testCollapsesFractionalQuantitiesSoTheLinesMatchTheSessionAmount(float $quantity): void
+    {
+        $client = $this->fakeSessionRequest();
+
+        $cart = $this->loadQuote();
+        $this->changeQuantityTo($cart, $quantity);
+
+        /** @var CreateSession $instance */
+        $instance = $this->objectManager->create(CreateSession::class);
+        $instance->execute($cart, true);
+
+        $client->assertSent(function (PendingRequest $request): bool {
+            $lines = $this->extractLines($request);
+            $amount = $this->extractAmount($request);
+
+            $this->assertSame(
+                $amount['value'],
+                number_format($this->sumOfLines($lines), 2, '.', ''),
+                'the lines must add up to the session amount',
+            );
+
+            foreach ($lines as $line) {
+                $this->assertSame(1, $line['quantity']);
+                $this->assertSame($line['totalAmount']['value'], $line['unitPrice']['value']);
+            }
+
+            return true;
+        });
+    }
+
+    public static function fractionalQuantityDataProvider(): array
+    {
+        return [
+            'square metres' => [4.32],
+            'below one' => [0.3],
+        ];
+    }
+
+    private function changeQuantityTo(CartInterface $cart, float $quantity): void
+    {
+        foreach ($cart->getItems() as $item) {
+            $item->setQty($quantity);
+        }
+
+        $cart->setTotalsCollectedFlag(false)->collectTotals();
+        $this->objectManager->get(CartRepositoryInterface::class)->save($cart);
+    }
+
+    private function sumOfLines(array $lines): float
+    {
+        return array_sum(array_map(
+            fn (array $line): float => (float)$line['totalAmount']['value'],
+            $lines,
+        ));
     }
 
     private function fakeSessionRequest(): MollieApiClient
