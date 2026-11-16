@@ -8,6 +8,7 @@ declare(strict_types=1);
 
 namespace Mollie\Payment\Test\Integration\Model\Client\Payments\Processors;
 
+use Magento\Sales\Api\Data\CreditmemoCommentInterface;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderStatusHistoryInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
@@ -30,7 +31,54 @@ class HandleExternalRefundsTest extends IntegrationTestCase
 
         $freshOrder = $this->loadOrder($order->getIncrementId());
         $this->assertSame(1, $freshOrder->getCreditmemosCollection()->getSize());
-        $this->assertSame([], $this->getCommentsMentioning($freshOrder, 're_external_123'));
+        $this->assertSame([], array_filter(
+            $this->getCommentsMentioning($freshOrder, 're_external_123'),
+            fn (OrderStatusHistoryInterface $history): bool => str_contains(
+                (string) $history->getComment(),
+                'No credit memo was created',
+            ),
+        ));
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/invoice.php
+     */
+    public function testCreatesACreditmemoForEachExternalRefundInTheSameCall(): void
+    {
+        $order = $this->loadPreparedOrder();
+        $payment = (new PaymentWithRefundsFake())
+            ->withRefund('re_external_123', 10)
+            ->withRefund('re_external_456', 5);
+
+        $this->processRefunds($order, $payment);
+
+        $this->assertCreditmemoBaseGrandTotals($order, [5.0, 10.0]);
+        foreach ($this->loadOrder($order->getIncrementId())->getCreditmemosCollection() as $creditmemo) {
+            $comments = array_map(
+                fn (CreditmemoCommentInterface $comment): string => (string) $comment->getComment(),
+                array_values($creditmemo->getCommentsCollection()->getItems()),
+            );
+            $this->assertContains(
+                'This refund was created outside Magento, possible through the Mollie Dashboard.',
+                $comments,
+            );
+        }
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/invoice.php
+     */
+    public function testDoesNotCreateTheCreditmemosAgainWhenThePaymentIsProcessedAgain(): void
+    {
+        $order = $this->loadPreparedOrder();
+        $payment = (new PaymentWithRefundsFake())
+            ->withRefund('re_external_123', 10)
+            ->withRefund('re_external_456', 5);
+
+        $this->processRefunds($order, $payment);
+        $this->processRefunds($this->loadOrder($order->getIncrementId()), $payment);
+
+        $this->assertCreditmemoBaseGrandTotals($order, [5.0, 10.0]);
     }
 
     /**
@@ -110,6 +158,21 @@ class HandleExternalRefundsTest extends IntegrationTestCase
                 'type' => 'webhook',
             ]),
         );
+    }
+
+    /**
+     * @param float[] $expected
+     */
+    private function assertCreditmemoBaseGrandTotals(OrderInterface $order, array $expected): void
+    {
+        $freshOrder = $this->loadOrder($order->getIncrementId());
+        $grandTotals = array_map(
+            'floatval',
+            $freshOrder->getCreditmemosCollection()->getColumnValues('base_grand_total'),
+        );
+        sort($grandTotals);
+
+        $this->assertSame($expected, $grandTotals);
     }
 
     /**
