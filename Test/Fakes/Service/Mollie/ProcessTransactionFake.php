@@ -17,6 +17,11 @@ class ProcessTransactionFake extends ProcessTransaction
 {
     private int $timesCalled = 0;
 
+    /**
+     * @var string[]
+     */
+    private array $calledTypes = [];
+
     private ?GetMollieStatusResult $response = null;
 
     private ?Throwable $exception = null;
@@ -24,6 +29,14 @@ class ProcessTransactionFake extends ProcessTransaction
     public function getTimesCalled(): int
     {
         return $this->timesCalled;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getCalledTypes(): array
+    {
+        return $this->calledTypes;
     }
 
     public function setResponse(GetMollieStatusResult $response): void
@@ -39,6 +52,7 @@ class ProcessTransactionFake extends ProcessTransaction
     public function execute(int $orderId, string $transactionId, string $type = 'webhook'): GetMollieStatusResult
     {
         $this->timesCalled++;
+        $this->calledTypes[] = $type;
 
         if ($this->exception) {
             throw $this->exception;
