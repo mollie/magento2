@@ -36,7 +36,7 @@ class AddAdditionalInformation implements PaymentProcessorInterface
         $magentoPayment->setAdditionalInformation('method', $molliePayment->method);
 
         $status = $molliePayment->status;
-        if ($type == 'webhook' && $magentoPayment->getAdditionalInformation('payment_status') != $status) {
+        if ($type == 'webhook' && ($magentoPayment->getAdditionalInformation()['payment_status'] ?? null) !== $status) {
             $magentoPayment->setAdditionalInformation('payment_status', $status);
         }
 
