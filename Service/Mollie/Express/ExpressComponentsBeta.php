@@ -18,6 +18,9 @@ use Magento\Store\Model\ScopeInterface;
 class ExpressComponentsBeta
 {
     public const XML_PATH_ENABLED = 'payment/mollie_methods_expresscomponents/beta_shipping_options';
+    public const XML_PATH_SHOW_PRODUCT_PAGE = 'payment/mollie_methods_expresscomponents/show_product_page';
+    public const XML_PATH_SHOW_MINICART = 'payment/mollie_methods_expresscomponents/show_minicart';
+    public const XML_PATH_SHOW_SHIPPING_STEP = 'payment/mollie_methods_expresscomponents/show_shipping_step';
 
     public function __construct(
         private readonly ScopeConfigInterface $scopeConfig,
@@ -25,6 +28,26 @@ class ExpressComponentsBeta
 
     public function isEnabled(?int $storeId = null): bool
     {
-        return $this->scopeConfig->isSetFlag(self::XML_PATH_ENABLED, ScopeInterface::SCOPE_STORE, $storeId);
+        return $this->isSetFlag(self::XML_PATH_ENABLED, $storeId);
+    }
+
+    public function shouldShowOnProductPage(?int $storeId = null): bool
+    {
+        return $this->isEnabled($storeId) && $this->isSetFlag(self::XML_PATH_SHOW_PRODUCT_PAGE, $storeId);
+    }
+
+    public function shouldShowInMinicart(?int $storeId = null): bool
+    {
+        return $this->isEnabled($storeId) && $this->isSetFlag(self::XML_PATH_SHOW_MINICART, $storeId);
+    }
+
+    public function shouldShowOnShippingStep(?int $storeId = null): bool
+    {
+        return $this->isEnabled($storeId) && $this->isSetFlag(self::XML_PATH_SHOW_SHIPPING_STEP, $storeId);
+    }
+
+    private function isSetFlag(string $path, ?int $storeId): bool
+    {
+        return $this->scopeConfig->isSetFlag($path, ScopeInterface::SCOPE_STORE, $storeId);
     }
 }
