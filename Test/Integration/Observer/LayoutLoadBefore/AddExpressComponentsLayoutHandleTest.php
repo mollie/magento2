@@ -19,7 +19,10 @@ use Mollie\Payment\Test\Integration\IntegrationTestCase;
 class AddExpressComponentsLayoutHandleTest extends IntegrationTestCase
 {
     private const HANDLE = 'mollie_express_components';
-    private const BETA_HANDLE = 'mollie_express_components_beta';
+    private const BETA_PRODUCT_HANDLE = 'mollie_express_components_beta_product';
+    private const BETA_SHIPPING_HANDLE = 'mollie_express_components_beta_shipping';
+    private const BETA_MINICART_HANDLE = 'mollie_express_components_beta_minicart';
+    private const MINICART_DISABLED_HANDLE = 'mollie_express_components_minicart_disabled';
 
     /**
      * @magentoAppArea frontend
@@ -78,20 +81,24 @@ class AddExpressComponentsLayoutHandleTest extends IntegrationTestCase
     }
 
     /**
-     * The shipping step and the product page need the shipping options beta of Mollie.
+     * The shipping step and the product page need the shipping options beta of Mollie. All placements default to on.
      *
      * @magentoAppArea frontend
      * @magentoConfigFixture current_store payment/mollie_general/enabled 1
      * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 1
      * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/beta_shipping_options 1
      */
-    public function testAddsTheBetaLayoutHandleWhenTheBetaIsEnabled(): void
+    public function testAddsAllBetaPlacementHandlesWhenTheBetaIsEnabled(): void
     {
         $layout = $this->objectManager->create(LayoutInterface::class);
 
         $this->executeObserver($layout);
 
-        $this->assertContains(self::BETA_HANDLE, $layout->getUpdate()->getHandles());
+        $handles = $layout->getUpdate()->getHandles();
+        $this->assertContains(self::BETA_PRODUCT_HANDLE, $handles);
+        $this->assertContains(self::BETA_SHIPPING_HANDLE, $handles);
+        $this->assertContains(self::BETA_MINICART_HANDLE, $handles);
+        $this->assertNotContains(self::MINICART_DISABLED_HANDLE, $handles);
     }
 
     /**
@@ -100,14 +107,18 @@ class AddExpressComponentsLayoutHandleTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 1
      * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/beta_shipping_options 0
      */
-    public function testDoesNotAddTheBetaLayoutHandleWhenTheBetaIsDisabled(): void
+    public function testDoesNotAddTheBetaPlacementHandlesWhenTheBetaIsDisabled(): void
     {
         $layout = $this->objectManager->create(LayoutInterface::class);
 
         $this->executeObserver($layout);
 
-        $this->assertContains(self::HANDLE, $layout->getUpdate()->getHandles());
-        $this->assertNotContains(self::BETA_HANDLE, $layout->getUpdate()->getHandles());
+        $handles = $layout->getUpdate()->getHandles();
+        $this->assertContains(self::HANDLE, $handles);
+        $this->assertNotContains(self::BETA_PRODUCT_HANDLE, $handles);
+        $this->assertNotContains(self::BETA_SHIPPING_HANDLE, $handles);
+        $this->assertNotContains(self::BETA_MINICART_HANDLE, $handles);
+        $this->assertNotContains(self::MINICART_DISABLED_HANDLE, $handles);
     }
 
     /**
@@ -116,13 +127,72 @@ class AddExpressComponentsLayoutHandleTest extends IntegrationTestCase
      * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 0
      * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/beta_shipping_options 1
      */
-    public function testDoesNotAddTheBetaLayoutHandleWhenExpressComponentsAreDisabled(): void
+    public function testDoesNotAddTheBetaPlacementHandlesWhenExpressComponentsAreDisabled(): void
     {
         $layout = $this->objectManager->create(LayoutInterface::class);
 
         $this->executeObserver($layout);
 
-        $this->assertNotContains(self::BETA_HANDLE, $layout->getUpdate()->getHandles());
+        $handles = $layout->getUpdate()->getHandles();
+        $this->assertNotContains(self::BETA_PRODUCT_HANDLE, $handles);
+        $this->assertNotContains(self::BETA_SHIPPING_HANDLE, $handles);
+        $this->assertNotContains(self::BETA_MINICART_HANDLE, $handles);
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/beta_shipping_options 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/show_product_page 0
+     */
+    public function testSkipsTheProductPageHandleWhenTheProductPagePlacementIsOff(): void
+    {
+        $layout = $this->objectManager->create(LayoutInterface::class);
+
+        $this->executeObserver($layout);
+
+        $handles = $layout->getUpdate()->getHandles();
+        $this->assertNotContains(self::BETA_PRODUCT_HANDLE, $handles);
+        $this->assertContains(self::BETA_SHIPPING_HANDLE, $handles);
+        $this->assertContains(self::BETA_MINICART_HANDLE, $handles);
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/beta_shipping_options 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/show_shipping_step 0
+     */
+    public function testSkipsTheShippingStepHandleWhenTheShippingStepPlacementIsOff(): void
+    {
+        $layout = $this->objectManager->create(LayoutInterface::class);
+
+        $this->executeObserver($layout);
+
+        $handles = $layout->getUpdate()->getHandles();
+        $this->assertNotContains(self::BETA_SHIPPING_HANDLE, $handles);
+        $this->assertContains(self::BETA_PRODUCT_HANDLE, $handles);
+        $this->assertContains(self::BETA_MINICART_HANDLE, $handles);
+    }
+
+    /**
+     * @magentoAppArea frontend
+     * @magentoConfigFixture current_store payment/mollie_general/enabled 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/active 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/beta_shipping_options 1
+     * @magentoConfigFixture current_store payment/mollie_methods_expresscomponents/show_minicart 0
+     */
+    public function testDisablesTheMinicartWhenTheMinicartPlacementIsOff(): void
+    {
+        $layout = $this->objectManager->create(LayoutInterface::class);
+
+        $this->executeObserver($layout);
+
+        $handles = $layout->getUpdate()->getHandles();
+        $this->assertNotContains(self::BETA_MINICART_HANDLE, $handles);
+        $this->assertContains(self::MINICART_DISABLED_HANDLE, $handles);
     }
 
     private function loadCheckoutSessionFake(): SessionFake

@@ -115,5 +115,35 @@
                 <field id="active">1</field>
             </depends>
         </field>
+        <field id="show_product_page" translate="label" type="select" sortOrder="120" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Show on product page</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/mollie_methods_expresscomponents/show_product_page</config_path>
+            <depends>
+                <field id="active">1</field>
+                <field id="beta_shipping_options">1</field>
+            </depends>
+        </field>
+        <field id="show_minicart" translate="label" type="select" sortOrder="130" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Show in mini cart</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/mollie_methods_expresscomponents/show_minicart</config_path>
+            <depends>
+                <field id="active">1</field>
+                <field id="beta_shipping_options">1</field>
+            </depends>
+        </field>
+        <field id="show_shipping_step" translate="label" type="select" sortOrder="140" showInDefault="1"
+               showInWebsite="1" showInStore="1">
+            <label>Show on checkout shipping step</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>payment/mollie_methods_expresscomponents/show_shipping_step</config_path>
+            <depends>
+                <field id="active">1</field>
+                <field id="beta_shipping_options">1</field>
+            </depends>
+        </field>
     </group>
 </include>

@@ -10,17 +10,6 @@ Express Components voegt door Mollie gehoste express checkout-widgets toe aan de
 
 **Belangrijk:** Express Components ondersteunt geen testmodus. De Magento-configuratie inschakelen alleen is niet voldoende als de functie niet is ingeschakeld voor je live API-sleutel aan Mollie's kant.
 
-## Eerste activering
-
-De configuratiekaart van Express Components is verborgen in Magento Admin totdat de methode eenmalig is geactiveerd. Schakel deze eerst in via de CLI:
-
-```bash
-php bin/magento config:set payment/mollie_methods_expresscomponents/active 1
-php bin/magento cache:flush
-```
-
-Ga daarna naar **Stores → Configuration → Mollie → Payment Methods** en configureer **Express Components** zoals elke andere Mollie-betaalmethode.
-
 ## Configuratie
 
 De methode biedt de volgende instellingen onder **Stores → Configuration → Mollie → Payment Methods → Express Components**:
@@ -29,6 +18,9 @@ De methode biedt de volgende instellingen onder **Stores → Configuration → M
 |---|---|
 | **Enabled** | Schakelt de frontend-widgets in of uit |
 | **Shipping options and product page (beta)** | Laat Mollie het adres verzamelen en je verzendmethoden aanbieden buiten de betalingsstap, en toont de knoppen op de verzendstap en de productpagina. Schakel dit alleen in als Mollie de bèta voor klantgegevens en verzendopties voor je account heeft geactiveerd |
+| **Show on product page** | Toont of verbergt de knoppen op de productpagina. Alleen zichtbaar als de bèta is ingeschakeld |
+| **Show in mini cart** | Toont of verbergt de knoppen in de minicart. Alleen zichtbaar als de bèta is ingeschakeld |
+| **Show on checkout shipping step** | Toont of verbergt de knoppen op de verzendstap van het afrekenen. Alleen zichtbaar als de bèta is ingeschakeld |
 | **Title** | Label dat voor de betaalmethode wordt gebruikt |
 | **Description** | Betalingsomschrijving die naar Mollie wordt gestuurd. Ondersteunt de standaard placeholders zoals `{ordernumber}` en `{storename}` |
 | **Capture method** | Bepaalt of de betaling automatisch of handmatig wordt vastgelegd |
@@ -50,6 +42,8 @@ Wanneer de methode is ingeschakeld, rendert de module Express Components op vijf
 - **Checkout**: voor de reguliere lijst met betaalmethoden
 
 De productpagina, de verzendstap en de verzendopties zijn alleen beschikbaar als **Shipping options and product page (beta)** is ingeschakeld. Zonder deze instelling rekent de winkelwagenpagina het totaalbedrag inclusief de geschatte verzendkosten af, zoals voorheen, en wacht de module bij gasten tot ze een e-mailadres hebben ingevuld.
+
+Met de bèta ingeschakeld bepaal je per plaatsing of de knoppen worden getoond via **Show on product page**, **Show in mini cart** en **Show on checkout shipping step**. Staat **Show in mini cart** uit, dan verdwijnen de knoppen volledig uit de minicart, ook voor ingelogde klanten.
 
 ### Productpagina
 
@@ -85,7 +79,6 @@ Als je manual capture gebruikt, valideer dan de volledige workflow in een live o
 ## Beperkingen
 
 - De functie is alleen live en moet door Mollie Support worden ingeschakeld voor de actieve API-sleutel
-- De Admin-configuratiekaart blijft verborgen totdat de methode eenmalig via CLI is geactiveerd
 - De module biedt geen toeslag-instellingen voor Express Components. Zie [Payment Fee](PAYMENT_FEE.md)
 
 ## Volgende stappen

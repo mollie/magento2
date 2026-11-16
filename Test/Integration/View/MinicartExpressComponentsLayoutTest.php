@@ -27,9 +27,22 @@ class MinicartExpressComponentsLayoutTest extends IntegrationTestCase
 
     public function testTellsTheMinicartTheBetaIsEnabled(): void
     {
-        $config = $this->getMinicartComponentConfig(['mollie_express_components', 'mollie_express_components_beta']);
+        $config = $this->getMinicartComponentConfig([
+            'mollie_express_components',
+            'mollie_express_components_beta_minicart',
+        ]);
 
         $this->assertTrue($config['isBetaEnabled']);
+    }
+
+    public function testDisablesTheMinicartComponentWhenTheMinicartPlacementIsOff(): void
+    {
+        $config = $this->getMinicartComponentConfig([
+            'mollie_express_components',
+            'mollie_express_components_minicart_disabled',
+        ]);
+
+        $this->assertTrue($config['componentDisabled']);
     }
 
     private function getMinicartComponentConfig(array $handles): array
