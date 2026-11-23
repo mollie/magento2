@@ -14,7 +14,6 @@ use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Controller\ResultInterfaceFactory;
 use Magento\Framework\Message\ManagerInterface;
-use Magento\Quote\Api\CartRepositoryInterface;
 use Mollie\Payment\Api\PaymentTokenRepositoryInterface;
 use Mollie\Payment\Config;
 
@@ -23,7 +22,6 @@ class RedirectToCart implements HttpGetActionInterface
     public function __construct(
         readonly private RequestInterface $request,
         readonly private ManagerInterface $messageManager,
-        readonly private CartRepositoryInterface $cartRepository,
         readonly private ResultFactory $resultFactory,
         readonly private Config $config,
         readonly private PaymentTokenRepositoryInterface $paymentTokenRepository,
@@ -31,15 +29,15 @@ class RedirectToCart implements HttpGetActionInterface
 
     public function execute(): ResultInterface
     {
-        $token = $this->request->getParam('token');
+        $token = (string)$this->request->getParam('token');
         $paymentToken = $this->paymentTokenRepository->getByToken($token);
-        $cartId = $paymentToken->getCartId();
-        $cart = $this->cartRepository->get($cartId);
 
+        // A product page session only gets its payment token once the webhook created the order.
         $this->config->addToLog('error', [
             'message' => 'Order creation timed out for quote, redirecting user to quote',
-            'quoteId' => $cart->getId(),
-            'orderId' => $paymentToken->getOrderId(),
+            'quoteId' => $paymentToken?->getCartId(),
+            'orderId' => $paymentToken?->getOrderId(),
+            'paymentToken' => $token,
         ]);
 
         $this->messageManager->addErrorMessage(

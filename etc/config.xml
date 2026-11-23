@@ -9,7 +9,7 @@
     <default>
         <payment>
             <mollie_general>
-                <version>v3.3.0</version>
+                <version>v3.4.0</version>
                 <active>0</active>
                 <enabled>0</enabled>
                 <type>test</type>
@@ -313,6 +313,10 @@
             </mollie_methods_eps>
             <mollie_methods_expresscomponents>
                 <active>0</active>
+                <beta_shipping_options>0</beta_shipping_options>
+                <show_product_page>1</show_product_page>
+                <show_minicart>1</show_minicart>
+                <show_shipping_step>1</show_shipping_step>
                 <model>Mollie\Payment\Model\Methods\Expresscomponents</model>
                 <title>Express Components</title>
                 <payment_description>{ordernumber}</payment_description>

@@ -44,7 +44,11 @@ class ProcessTransaction implements ResolverInterface
         }
 
         $order = $this->orderRepository->get($tokenModel->getOrderId());
-        $result = $this->processTransaction->execute((int)$tokenModel->getOrderId(), $order->getMollieTransactionId());
+        $result = $this->processTransaction->execute(
+            (int)$tokenModel->getOrderId(),
+            $order->getMollieTransactionId(),
+            'success',
+        );
         $redirectToSuccessPage = $result->shouldRedirectToSuccessPage();
 
         $cart = null;

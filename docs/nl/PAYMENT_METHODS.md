@@ -209,7 +209,7 @@ SEPA Direct Debit is standaard uitgeschakeld en vereist expliciete activering in
 
 ### Express Components
 
-Express Components heeft geen testmodus en werkt alleen met een live API-sleutel. Schakel het in en configureer het onder **Stores → Configuration → Mollie → Payment Methods → Express Components**. Zie [Express Components](EXPRESS_COMPONENTS.md) voor plaatsing, capture-gedrag en beperkingen voor live gebruik.
+Configureer Express Components onder **Stores → Configuration → Mollie → Payment Methods → Express Components**, zoals elke andere Mollie-betaalmethode. Zie [Express Components](EXPRESS_COMPONENTS.md) voor plaatsing, capture-gedrag en beperkingen voor live gebruik.
 
 ## Volgende stappen
 

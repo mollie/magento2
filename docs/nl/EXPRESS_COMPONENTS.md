@@ -1,6 +1,6 @@
 # Express Components
 
-Express Components voegt door Mollie gehoste express checkout-widgets toe aan de standaard Magento-storefront. In deze module wordt de functie gerenderd op de winkelwagenpagina, in de minicart en op de betalingsstap van het afrekenen.
+Express Components voegt door Mollie gehoste express checkout-widgets toe aan de standaard Magento-storefront. In deze module wordt de functie gerenderd op de productpagina, de winkelwagenpagina, in de minicart, op de verzendstap en op de betalingsstap van het afrekenen.
 
 ## Vereisten
 
@@ -10,10 +10,6 @@ Express Components voegt door Mollie gehoste express checkout-widgets toe aan de
 
 **Belangrijk:** Express Components ondersteunt geen testmodus. De Magento-configuratie inschakelen alleen is niet voldoende als de functie niet is ingeschakeld voor je live API-sleutel aan Mollie's kant.
 
-## Inschakelen
-
-Ga naar **Stores → Configuration → Mollie → Payment Methods** en schakel **Express Components** in zoals elke andere Mollie-betaalmethode. Leeg daarna de cache.
-
 ## Configuratie
 
 De methode biedt de volgende instellingen onder **Stores → Configuration → Mollie → Payment Methods → Express Components**:
@@ -21,6 +17,10 @@ De methode biedt de volgende instellingen onder **Stores → Configuration → M
 | Veld | Beschrijving |
 |---|---|
 | **Enabled** | Schakelt de frontend-widgets in of uit |
+| **Shipping options and product page (beta)** | Laat Mollie het adres verzamelen en je verzendmethoden aanbieden buiten de betalingsstap, en toont de knoppen op de verzendstap en de productpagina. Schakel dit alleen in als Mollie de bèta voor klantgegevens en verzendopties voor je account heeft geactiveerd |
+| **Show on product page** | Toont of verbergt de knoppen op de productpagina. Alleen zichtbaar als de bèta is ingeschakeld |
+| **Show in mini cart** | Toont of verbergt de knoppen in de minicart. Alleen zichtbaar als de bèta is ingeschakeld |
+| **Show on checkout shipping step** | Toont of verbergt de knoppen op de verzendstap van het afrekenen. Alleen zichtbaar als de bèta is ingeschakeld |
 | **Title** | Label dat voor de betaalmethode wordt gebruikt |
 | **Description** | Betalingsomschrijving die naar Mollie wordt gestuurd. Ondersteunt de standaard placeholders zoals `{ordernumber}` en `{storename}` |
 | **Capture method** | Bepaalt of de betaling automatisch of handmatig wordt vastgelegd |
@@ -33,23 +33,39 @@ Voor capture-gedrag na autorisatie, zie [Order Management](ORDER_MANAGEMENT.md).
 
 ## Storefront-gedrag
 
-Wanneer de methode is ingeschakeld, rendert de module Express Components op drie plaatsen:
+Wanneer de methode is ingeschakeld, rendert de module Express Components op vijf plaatsen:
 
+- **Productpagina**: bij de knop In winkelwagen
 - **Winkelwagenpagina**: binnen het gebied met afrekenmethoden
 - **Minicart**: wanneer de minicart wordt geopend en de winkelwagen niet leeg is
+- **Verzendstap**: boven het adresformulier in de eerste stap van het afrekenen
 - **Checkout**: voor de reguliere lijst met betaalmethoden
 
-### Winkelwagen en minicart
+De productpagina, de verzendstap en de verzendopties zijn alleen beschikbaar als **Shipping options and product page (beta)** is ingeschakeld. Zonder deze instelling rekent de winkelwagenpagina het totaalbedrag inclusief de geschatte verzendkosten af, zoals voorheen, en wacht de module bij gasten tot ze een e-mailadres hebben ingevuld.
 
-Op de winkelwagenpagina en in de minicart wordt het component aangemaakt als een express checkout-stroom voor de verzendkeuze. In deze plaatsing gebruikt de sessie het subtotaal van de winkelwagen inclusief belasting, niet het uiteindelijke totaalbedrag.
+Met de bèta ingeschakeld bepaal je per plaatsing of de knoppen worden getoond via **Show on product page**, **Show in mini cart** en **Show on checkout shipping step**. Staat **Show in mini cart** uit, dan verdwijnen de knoppen volledig uit de minicart, ook voor ingelogde klanten.
 
-De widget is geconfigureerd voor iDEAL Express in deze plaatsingen. Apple Pay en Google Pay zijn daar expliciet uitgeschakeld.
+### Productpagina
+
+Op de productpagina rekent de klant alleen het getoonde product af, met de gekozen hoeveelheid en opties. De winkelwagen van de klant blijft ongewijzigd. De module bewaart hiervoor geen winkelwagen in de database: de bestelling wordt opgebouwd in het geheugen en pas opgeslagen wanneer Mollie de betaling bevestigt via de webhook. Bij elke wijziging van hoeveelheid of opties wordt een nieuwe sessie aangemaakt.
+
+Zolang verplichte opties, zoals de maat van een configureerbaar product, niet gekozen zijn, worden de knoppen niet getoond.
+
+### Winkelwagen, minicart en verzendstap
+
+Op deze plaatsen is nog geen verzendmethode gekozen. De sessie gebruikt daarom het subtotaal van de winkelwagen inclusief belasting. Mollie vraagt de klant om het verzendadres en, als dat ontbreekt, het e-mailadres en factuuradres. Gasten kunnen dus direct afrekenen zonder eerst hun e-mailadres in te vullen.
+
+Zodra de klant een adres kiest, vraagt Mollie de verzendopties op bij de winkel via `mollie/express/shippingOptions`. De module geeft dezelfde verzendmethoden terug als Magento voor dat adres berekent. Mollie telt de gekozen verzendkosten op bij het totaalbedrag, en de bestelling krijgt dezelfde verzendmethode. Zijn er geen verzendmethoden voor het adres, dan toont Mollie dat het adres niet wordt ondersteund.
+
+Mollie moet de winkel kunnen bereiken voor de verzendopties, net als voor de webhook. Staan webhooks uit in testmodus onder **Stores → Configuration → Mollie → General**, dan worden er geen verzendopties aangeboden.
+
+Apple Pay en Google Pay zijn in deze plaatsingen expliciet uitgeschakeld.
 
 ### Checkout
 
 Op de betalingsstap van het afrekenen wordt de widget geinitialiseerd nadat de standaard afrekengegevens beschikbaar zijn. Voor gastafrekenen wacht de module totdat de klant een e-mailadres heeft ingevoerd voordat de sessie wordt aangemaakt.
 
-In deze plaatsing gebruikt de sessie het volledige totaalbedrag, inclusief verzendkosten en andere totaalonderdelen die op het moment van afrekenen al bekend zijn. De iDEAL Express-optie is hier uitgeschakeld omdat de verzendmethode al is geselecteerd.
+In deze plaatsing gebruikt de sessie het volledige totaalbedrag, inclusief verzendkosten en andere totaalonderdelen die op het moment van afrekenen al bekend zijn. Apple Pay en Google Pay zijn hier wel beschikbaar.
 
 ## Capture en afwikkeling
 

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+  ~ Copyright Magmodules.eu. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+<!--
+    Guest sessions in the minicart need the shipping options beta of Mollie. Added by
+    Mollie\Payment\Observer\LayoutLoadBefore\AddExpressComponentsLayoutHandle when the beta is enabled and
+    "Show in mini cart" is on.
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="header-wrapper">
+            <referenceBlock name="minicart">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="components" xsi:type="array">
+                            <item name="minicart_content" xsi:type="array">
+                                <item name="children" xsi:type="array">
+                                    <item name="mollie_express_components" xsi:type="array">
+                                        <item name="config" xsi:type="array">
+                                            <item name="isBetaEnabled" xsi:type="boolean">true</item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </referenceBlock>
+        </referenceContainer>
+    </body>
+</page>

@@ -22,12 +22,6 @@ class GetExpressPayment
     {
         $mollieApi = $this->mollieApiClient->loadByStore($storeId);
 
-        $paymentRequest = GetPaymentRequestFactory::new($paymentId)
-            ->withQuery([])
-            ->create();
-
-        $paymentRequest->query()->add('include', 'details.idealExpressMetadata');
-
-        return $mollieApi->send($paymentRequest);
+        return $mollieApi->send(GetPaymentRequestFactory::new($paymentId)->create());
     }
 }
