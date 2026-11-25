@@ -153,6 +153,7 @@
                 <item name="CaptureDelay" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\CaptureDelay</item>
                 <item name="terminalId" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\TerminalId</item>
                 <item name="LimitStreetLength" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitStreetLength</item>
+                <item name="HandleUnusablePostalCode" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\HandleUnusablePostalCode</item>
                 <item name="LimitedMethods" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\LimitedMethods</item>
                 <item name="AddTrackingCookiesToRedirectUrl" xsi:type="object">Mollie\Payment\Service\Order\TransactionPart\AddTrackingCookiesToRedirectUrl</item>
             </argument>
