@@ -17,6 +17,8 @@ use Magento\Framework\Exception\NoSuchEntityException;
 
 class SetPurchaseTypeOnCreateOrderItem implements ObserverInterface
 {
+    private const ACTION_SAVE = 'save';
+
     public function __construct(
         private ProductRepositoryInterface $productRepository
     ) {}
@@ -27,7 +29,7 @@ class SetPurchaseTypeOnCreateOrderItem implements ObserverInterface
         $request = $observer->getData('request_model');
 
         if (
-            $request->has('item') && !$request->getPost('update_items')
+            $request->has('item') && !$request->getPost('update_items') && !$this->isSavingTheOrder($request)
         ) {
             $itemsChanged = false;
             $items = $request->getPost('item');
@@ -44,6 +46,11 @@ class SetPurchaseTypeOnCreateOrderItem implements ObserverInterface
                 $request->setPostValue('item', $items);
             }
         }
+    }
+
+    private function isSavingTheOrder(RequestInterface $request): bool
+    {
+        return strtolower((string) $request->getActionName()) === self::ACTION_SAVE;
     }
 
     private function productAllowsOneTimePurchase(int $productId): bool
