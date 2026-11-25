@@ -21,12 +21,16 @@ use Mollie\Payment\Service\Order\TransactionProcessor;
 
 class SendEmailForAsyncPayment implements PaymentProcessorInterface
 {
+    /**
+     * @param string[] $methodsConfirmedBeforePayment
+     */
     public function __construct(
         private General $mollieHelper,
         private AsyncPaymentMethods $asyncPaymentMethods,
         private ProcessTransactionResponseFactory $processTransactionResponseFactory,
         private TransactionProcessor $transactionProcessor,
-        private SendOrderEmails $sendOrderEmails
+        private SendOrderEmails $sendOrderEmails,
+        private array $methodsConfirmedBeforePayment = [],
     ) {}
 
     public function process(
@@ -43,7 +47,7 @@ class SendEmailForAsyncPayment implements PaymentProcessorInterface
 
         $magentoOrder->setStatus($statusPending);
         $magentoOrder->setState(Order::STATE_PENDING_PAYMENT);
-        $this->sendOrderEmails->sendOrderConfirmation($magentoOrder);
+        $this->sendOrderConfirmationWhenConfirmedBeforePayment($magentoOrder, $molliePayment);
 
         $this->transactionProcessor->process($magentoOrder, $molliePayment);
 
@@ -53,5 +57,16 @@ class SendEmailForAsyncPayment implements PaymentProcessorInterface
             'order_id' => $magentoOrder->getId(),
             'type' => $type,
         ]);
+    }
+
+    private function sendOrderConfirmationWhenConfirmedBeforePayment(
+        OrderInterface $magentoOrder,
+        Payment $molliePayment,
+    ): void {
+        if (!in_array($molliePayment->method, $this->methodsConfirmedBeforePayment, true)) {
+            return;
+        }
+
+        $this->sendOrderEmails->sendOrderConfirmation($magentoOrder);
     }
 }

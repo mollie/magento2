@@ -327,6 +327,14 @@
         </arguments>
     </type>
 
+    <type name="Mollie\Payment\Model\Client\Payments\Processors\SendEmailForAsyncPayment">
+        <arguments>
+            <argument name="methodsConfirmedBeforePayment" xsi:type="array">
+                <item name="banktransfer" xsi:type="string">banktransfer</item>
+            </argument>
+        </arguments>
+    </type>
+
     <type name="Mollie\Payment\Service\Mollie\AsyncPaymentMethods">
         <arguments>
             <argument name="methods" xsi:type="array">
