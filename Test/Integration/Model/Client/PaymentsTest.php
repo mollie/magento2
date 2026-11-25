@@ -9,12 +9,15 @@ declare(strict_types=1);
 namespace Mollie\Payment\Test\Integration\Model\Client;
 
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Quote\Model\Quote;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\InvoiceSender;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Mollie\Api\Exceptions\ApiException;
 use Mollie\Api\Fake\MockResponse;
+use Mollie\Api\Http\PendingRequest;
+use Mollie\Api\Http\Requests\CreatePaymentRequest;
 use Mollie\Api\Http\Requests\GetPaymentRequest;
 use Mollie\Api\MollieApiClient;
 use Mollie\Api\Resources\Payment;
@@ -172,5 +175,109 @@ class PaymentsTest extends IntegrationTestCase
         $instance = $this->objectManager->create(Payments::class);
 
         $this->assertFalse($instance->orderHasUpdate($order, $mollieApi));
+    }
+
+    public static function postcodesMollieRefusesProvider(): array
+    {
+        return [
+            'no postcode' => [null],
+            'empty postcode' => [''],
+            'only whitespace' => [' '],
+            'only a dash' => ['-'],
+        ];
+    }
+
+    /**
+     * @dataProvider postcodesMollieRefusesProvider
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    #[DataProvider('postcodesMollieRefusesProvider')]
+    public function testLeavesOutThePostalAddressWhenThePostcodeIsUnusable(?string $postcode): void
+    {
+        $order = $this->loadOrderWithAddressesIn('IE', $postcode);
+
+        $payload = $this->startTransactionAndGetPayload($order);
+
+        $this->assertSame(
+            ['givenName', 'familyName', 'email'],
+            array_keys($payload['billingAddress']),
+        );
+        $this->assertArrayNotHasKey('shippingAddress', $payload);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testSendsTheFullAddressesWhenThePostcodeIsPresent(): void
+    {
+        $order = $this->loadOrderWithAddressesIn('IE', 'D02 X285');
+
+        $payload = $this->startTransactionAndGetPayload($order);
+
+        $this->assertSame('D02 X285', $payload['billingAddress']['postalCode']);
+        $this->assertSame('IE', $payload['billingAddress']['country']);
+        $this->assertSame('D02 X285', $payload['shippingAddress']['postalCode']);
+        $this->assertSame('IE', $payload['shippingAddress']['country']);
+    }
+
+    /**
+     * @magentoDataFixture Magento/Sales/_files/quote.php
+     * @magentoDataFixture Magento/Sales/_files/order.php
+     */
+    public function testKeepsTheAddressesWithoutPostcodeInACountryWithoutPostcodes(): void
+    {
+        $order = $this->loadOrderWithAddressesIn('HK', null);
+
+        $payload = $this->startTransactionAndGetPayload($order);
+
+        $this->assertSame('HK', $payload['billingAddress']['country']);
+        $this->assertArrayNotHasKey('postalCode', $payload['billingAddress']);
+        $this->assertSame('HK', $payload['shippingAddress']['country']);
+        $this->assertArrayNotHasKey('postalCode', $payload['shippingAddress']);
+    }
+
+    private function loadOrderWithAddressesIn(string $countryId, ?string $postcode): OrderInterface
+    {
+        $order = $this->loadOrder('100000001');
+        $order->getPayment()->setMethod('mollie_methods_creditcard');
+        $order->setQuoteId($this->objectManager->create(Quote::class)->load('test01', 'reserved_order_id')->getId());
+        $order->setData('shipping_address_id', $order->getShippingAddress()->getId());
+
+        foreach ([$order->getBillingAddress(), $order->getShippingAddress()] as $address) {
+            $address->setCountryId($countryId);
+            $address->setPostcode($postcode);
+            $address->setRegion(null);
+            $address->setCompany(null);
+            $address->setTelephone(null);
+        }
+
+        return $order;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function startTransactionAndGetPayload(OrderInterface $order): array
+    {
+        $client = MollieApiClient::fake([
+            CreatePaymentRequest::class => MockResponse::created('payment'),
+        ]);
+
+        $this->objectManager->create(Payments::class)->startTransaction($order, $client);
+
+        $payload = [];
+        $client->assertSent(function (PendingRequest $pendingRequest) use (&$payload): bool {
+            if (!$pendingRequest->getRequest() instanceof CreatePaymentRequest) {
+                return false;
+            }
+
+            $payload = json_decode((string)$pendingRequest->payload(), true);
+
+            return true;
+        });
+
+        return $payload;
     }
 }
